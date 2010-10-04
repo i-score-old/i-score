@@ -1,0 +1,27 @@
+Instructions d'installation :
+
+1 - Installer le Framework MidiShare en le téléchargeant depuis 
+http://sourceforge.net/projects/midishare/ - Download - Version pour MacOSX
+
+(l'installation s'effectue dans /System/Library/Frameworks/MidiShare.framework, 
+si ce n'est pas le cas, modifier la ligne  :
+"QMAKE_LFLAGS += -Llib -L/System/Library/Frameworks/" 
+dans boxes-devel.pro en spécifiant la localisation du framework)
+
+2 - Installer Qt depuis "http://trolltech.com/developer/downloads/qt/mac" si nécessaire : 
+lien en bas de la page "qt-mac-opensource-4.4.X.dmg" (X = dernière version)
+
+3 - Configurer "qmake" si ce n'est pas fait pour générer un fichier xcode :
+
+> qmake -spec macx -xcode boxes-devel.pro
+
+4 - Dans la console, taper :
+
+> qmake
+
+(ces deux lignes placées dans ~/.bash_profile pourraient vous aider à lancer qmake : 
+"PATH=/usr/bin/qmake-4.4:$PATH
+export PATH" )
+
+6 - Ouvrir le fichier "boxes-devel.xcodeproj" puis cliquer sur "Build and go". 
+(Si boxes ne se lance pas, rester cliqué sur build and go et choisir "Run executable")

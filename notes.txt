@@ -1,0 +1,12 @@
+## Connaitre les librairies liees a l'application
+
+otool -L acousmoscribe2.app/Contents/MacOS/acousmoscribe2
+
+## Compiler pour creer un makefile sous mac
+
+qmake -project        # Creation du .pro
+qmake -spec macx-g++  # Creation du Makefile
+
+## Faire un make en utilisant les processeurs disponibles
+
+make -j
