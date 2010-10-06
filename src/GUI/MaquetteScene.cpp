@@ -46,7 +46,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QGraphicsTextItem>
 #include <QGraphicsSceneDragDropEvent>
 #include <float.h>
-#include <limits.h>
+#include <limits>
 #include "BasicBox.hpp"
 #include "SoundBox.hpp"
 #include "ControlBox.hpp"

@@ -39,6 +39,7 @@ knowledge of the CeCILL license and that you accept its terms.
 */
 #include <iostream>
 #include <utility>
+#include <algorithm>
 #include <math.h>
 
 #include <QPainter>
