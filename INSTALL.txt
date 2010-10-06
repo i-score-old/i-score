@@ -1,31 +1,82 @@
-[ INSTALL FIRST ]
-- Qt (LGPL) :
+== [ INSTALL FIRST ] ==
+
+[ Qt (LGPL) ]
 http://qt.nokia.com/products/
-- Gecode :
+
+In linux :
+
+Install packages libxext-dev, libx11-dev, libxrender-dev 
+
+$ tar -xf qt-everywhere-opensource-src-4.7.0.tar.gz
+$ cd qt-everywhere-opensource-src-4.7.0
+
+In file mkspecs/common/linux.conf
+Replace lines
+"QMAKE_INCDIR_X11 = /usr/X11R6/include
+QMAKE_LIBDIR_X11 = /usr/X11R6/lib"
+with
+"QMAKE_INCDIR_X11 = /usr/include/X11
+QMAKE_LIBDIR_X11 = /usr/lib/X11"
+
+$ ./configure -opensource -shared
+$ make
+$ sudo make install
+
+[ Gecode 3.2.0]
 http://www.gecode.org/download.html
-- LibXml2 :
+MacOS : download and install from "http://www.gecode.org/download/Gecode-3.2.0.dmg"
+Linux :
+$ ./configure --enable-static
+$ make
+$ sudo make install
+
+[ LibXml2 ]
 http://xmlsoft.org/downloads.html
+MacOS : download the binary for your OS.X
+Linux :
+$ ./configure
+$ make
+$ sudo make install
 
 [ Device-Manager ] 
 http://github.com/blueyeti/Device-Manager
 
+Linux and MacOS :
 $ make
 $ sudo cp libDeviceManager.a /usr/local/lib/
 $ sudo mkdir /usr/local/include/DeviceManager
 $ sudo cp DeviceManager.h /usr/local/include/DeviceManager
+
 $ cd Plugins/Linux_MacOS/
+
+In 'compileMinuit.sh' :
+replace "cd minuit" with "cd Minuit"
+
+Linux only : 
+In 'Makefile' :
+Replace occurences of "dynamiclib -undefined dynamic_lookup"
+with "-shared"
+Replace occurences of ".dylib"
+with ".so"
+
+Linux and MacOS :
+$ ./compileMinuit.sh
 $ make
 $ sudo mkdir /usr/local/lib/Iscore
 $ sudo cp Plugins/* /usr/local/lib/Iscore
 
-[LibIscore] :
+[LibIscore]
 http://github.com/raphaelmarczak/libiscore
 
+macOS : $ qmake -spec macx-g++ mac_iscore.pro
+linux : $ qmake unix_iscore.pro
 $ make
-$ sudo make install
+$ chmod install.sh u+x
+$ ./install.sh
 
-[Acousmoscribe] : 
+[Acousmoscribe]
 http://github.com/lucvercellin/acousmoscribe
 
-$ qmake (on macOS : -spec macx-g++
+macOS : $ qmake -spec macx-g++ mac_acousmosrcibe.pro
+linux : $ qmake unix_acousmosrcibe.pro
 $ make

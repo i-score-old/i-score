@@ -64,7 +64,7 @@ class AbstractParentBox : public AbstractBox
  public :
 	 friend class ParentBox;
   AbstractParentBox(const QPointF &newTopLeft = QPointF(0.,0.), const float &newLength = 0., const float &newHeight = 0.,
-		   const std::string &newName = "", const QColor &newColor = Qt::black, unsigned int ID = NO_ID, unsigned int ID = ROOT_BOX_ID);
+		   const std::string &newName = "", const QColor &newColor = Qt::black, unsigned int ID = NO_ID, unsigned int motherID = ROOT_BOX_ID);
 
   AbstractParentBox(const AbstractParentBox &other);
 
