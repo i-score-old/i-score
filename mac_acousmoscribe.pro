@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = 
+TARGET = acousmoscribe
 DEPENDPATH += . \
 include \
 lib \
@@ -103,7 +103,7 @@ src/GUI/TextEdit.cpp \
 src/GUI/TriggerPoint.cpp \
 src/GUI/ViewRelations.cpp
 
-RESOURCES += acousmoscribe2.qrc
+RESOURCES += acousmoscribe.qrc
 
 DEFINES += __Types__
 
