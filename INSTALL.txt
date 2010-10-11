@@ -59,6 +59,12 @@ with "-shared"
 Replace occurences of ".dylib"
 with ".so"
 
+Linux :
+in "NetworkCommunication/ip/UdpSocket.h"
+add "#define SO_REUSEPORT 15"
+in "NetworkCommunication/osc/OscPrintReceiveElement.h"
+add "#include <string>"
+
 Linux and MacOS :
 $ ./compileMinuit.sh
 $ make
