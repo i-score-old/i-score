@@ -1,4 +1,5 @@
 *svn*
 *.o
 moc_*
-
+acousmoscribe.app
+acousmoscribe.xcodeproj
