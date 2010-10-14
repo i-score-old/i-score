@@ -5,7 +5,7 @@ http://qt.nokia.com/products/
 
 In linux :
 
-Install packages libxext-dev, libx11-dev, libxrender-dev 
+Install packages libxext-dev, libx11-dev, libxrender-dev
 
 $ tar -xf qt-everywhere-opensource-src-4.7.0.tar.gz
 $ cd qt-everywhere-opensource-src-4.7.0
@@ -38,7 +38,7 @@ $ ./configure
 $ make
 $ sudo make install
 
-[ Device-Manager ] 
+[ Device-Manager ]
 http://github.com/blueyeti/Device-Manager
 
 Linux and MacOS :
@@ -52,7 +52,7 @@ $ cd Plugins/Linux_MacOS/
 In 'compileMinuit.sh' :
 replace "cd minuit" with "cd Minuit"
 
-Linux only : 
+Linux only :
 In 'Makefile' :
 Replace occurences of "dynamiclib -undefined dynamic_lookup"
 with "-shared"
