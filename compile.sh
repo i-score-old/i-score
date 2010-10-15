@@ -76,7 +76,7 @@ $MAKE_CLEAN
 if [ "$OS" = "LINUX" ]
 then
 echo '-=[LibIScore]=- Generating makefile ...'
-$QMAKE iscore.pro
+$QMAKE -spec linux-g++ iscore.pro
 elif [ "$OS" = "MACOS" ]
 then
 echo '-=[LibIScore]=- Generating makefile ...'
@@ -97,7 +97,7 @@ $MAKE_CLEAN
 if [ "$OS" = "LINUX" ]
 then
 echo '-=[Acousmocribe]=- Generating makefile ...'
-$QMAKE acousmoscribe.pro
+$QMAKE -spec linux-g++ acousmoscribe.pro
 elif [ "$OS" = "MACOS" ]
 then
 echo '-=[Acousmoscribe]=- Generating makefile ...'

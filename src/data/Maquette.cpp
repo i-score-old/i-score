@@ -82,7 +82,7 @@ Maquette::init() {
 	string pluginsDir;
 	pluginsDir.append(buf);
 	pluginsDir.append("/plugins");*/
-	string pluginsDir = "/usr/local/lib/Iscore";
+	string pluginsDir = "/usr/local/lib/IScore";
 	_engines = new Engines(SCENARIO_SIZE,pluginsDir);
 
 	vector<string> pluginsLoaded;

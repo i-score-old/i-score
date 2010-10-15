@@ -3,3 +3,7 @@
 moc_*
 acousmoscribe.app
 acousmoscribe.xcodeproj
+compiler_*
+*~
+#*
+org.eclipse*
