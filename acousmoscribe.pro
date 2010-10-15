@@ -9,19 +9,33 @@ src/data \
 src/GUI \
 lib/Editor/CSP
 
+unix {
+INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2
+}
+macx{
 INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /Library/Frameworks/
+}
 
 QT += network xml svg
 
+linux-g++ {
+QMAKE_LFLAGS += -L/usr/local/lib/ -L/usr/lib -L/usr/local/lib
+}
+macx-g++ {
 QMAKE_LFLAGS += -L/usr/local/lib/ -L/System/Library/Frameworks/ -L/Library/Frameworks/
+}
 
 # Dossier des sources temporaires de Qt
 MOC_DIR = moc 
 # Dossier des binaires
 OBJETCS_DIR = bin
 
+linux-g++ {
+LIBS += -liscore -lDeviceManager -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodescheduling -lgecodeset -lgecodesupport -lgecodegraph
+}
+macx-g++ {
 LIBS += -liscore -lDeviceManager -framework gecode -framework libxml
-
+}
 # Input
 HEADERS += /usr/local/include/IScore/Engines.hpp \
 /usr/local/include/IScore/CSPTypes.hpp \
