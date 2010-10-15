@@ -1,15 +1,31 @@
 == [ INSTALL FIRST ] ==
 
-[ Qt (LGPL) ]
-http://qt.nokia.com/products/
+To install acousmoscribe, here are some needed packages : 
+(if they are already installed, go to step 4)
 
-In linux :
+====<[ MacOS ]>====
 
-Install packages libxext-dev, libx11-dev, libxrender-dev
+1 - [ Qt (LGPL) ]
+http://qt.nokia.com/downloads/qt-for-open-source-cpp-development-on-mac-os-x
+2 - [ Gecode 3.2.0 ]
+http://www.gecode.org/download/Gecode-3.2.0.dmg
+3 - [LibXml2]
+http://www.explain.com.au/download/combo-2007-10-07.dmg.gz
+
+====<[ Linux ]>====
+
+1 - [ Qt (LGPL) ]
+http://qt.nokia.com/downloads/linux-x11-cpp
 
 $ tar -xf qt-everywhere-opensource-src-4.7.0.tar.gz
 $ cd qt-everywhere-opensource-src-4.7.0
+$ ./configure -opensource -shared
+$ make
+$ sudo make install
 
+Notes :
+You may need to install packages libxext-dev, libx11-dev, libxrender-dev.
+If you're having troubles about X11, you may do this :
 In file mkspecs/common/linux.conf
 Replace lines
 "QMAKE_INCDIR_X11 = /usr/X11R6/include
@@ -18,71 +34,32 @@ with
 "QMAKE_INCDIR_X11 = /usr/include/X11
 QMAKE_LIBDIR_X11 = /usr/lib/X11"
 
-$ ./configure -opensource -shared
-$ make
-$ sudo make install
+2 - [ Gecode 3.2.0]
+http://www.gecode.org/download/gecode-3.2.0.tar.gz
 
-[ Gecode 3.2.0]
-http://www.gecode.org/download.html
-MacOS : download and install from "http://www.gecode.org/download/Gecode-3.2.0.dmg"
-Linux :
 $ ./configure --enable-static
 $ make
 $ sudo make install
 
-[ LibXml2 ]
+Notes : you may have to remove the .so generated first, for them not to be copied in /usr/local/lib.
+
+3 - [ LibXml2 ]
 http://xmlsoft.org/downloads.html
-MacOS : download the binary for your OS.X
-Linux :
 $ ./configure
 $ make
 $ sudo make install
 
-[ Device-Manager ]
-http://github.com/blueyeti/Device-Manager
+== [ INSTALL THEN ] ==
 
-Linux and MacOS :
-$ make
-$ sudo cp libDeviceManager.a /usr/local/lib/
-$ sudo mkdir /usr/local/include/DeviceManager
-$ sudo cp DeviceManager.h /usr/local/include/DeviceManager
-
-$ cd Plugins/Linux_MacOS/
-
-In 'compileMinuit.sh' :
-replace "cd minuit" with "cd Minuit"
-
-Linux only :
-In 'Makefile' :
-Replace occurences of "dynamiclib -undefined dynamic_lookup"
-with "-shared"
-Replace occurences of ".dylib"
-with ".so"
-
-Linux :
-in "NetworkCommunication/ip/UdpSocket.h"
-add "#define SO_REUSEPORT 15"
-in "NetworkCommunication/osc/OscPrintReceiveElement.h"
-add "#include <string>"
-
-Linux and MacOS :
-$ ./compileMinuit.sh
-$ make
-$ sudo mkdir /usr/local/lib/Iscore
-$ sudo cp Plugins/* /usr/local/lib/Iscore
-
-[LibIscore]
-http://github.com/raphaelmarczak/libiscore
-
-macOS : $ qmake -spec macx-g++ mac_iscore.pro
-linux : $ qmake unix_iscore.pro
-$ make
-$ chmod install.sh u+x
-$ ./install.sh
-
-[Acousmoscribe]
-http://github.com/lucvercellin/acousmoscribe
-
-macOS : $ qmake -spec macx-g++ mac_acousmosrcibe.pro
-linux : $ qmake unix_acousmosrcibe.pro
-$ make
+First, download the 3 packages (into the same parent folder) from :
+4 - Device-Manager : http://github.com/blueyeti/Device-Manager
+5 - LibIscore : http://github.com/raphaelmarczak/libIscore
+6 - Acousmoscribe : http://github.com/lucvercellin/acousmoscribe
+Rename them respectively to "device-manager" "libIscore" and "acousmoscribe"
+$ cd acousmoscribe
+Edit compile.sh to specify the folders you've downloaded sources to, then :
+$ chmod u+x compile.sh
+On MacOS :
+$ ./compile.sh MACOS
+On Linux :
+$ ./compile.sh LINUX
