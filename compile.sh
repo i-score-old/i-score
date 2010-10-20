@@ -51,7 +51,7 @@ echo '-=[Device Manager : MACOS]=-'
 echo '-=[Device Manager : Library]=- Cleaning ...'
 $MAKE_CLEAN
 echo '-=[Device Manager : Library]=- Compiling  ...'
-$MAKE
+$MAKE_MAC
 echo '-=[Device Manager : Library]=- Installing ...'
 sudo cp libDeviceManager.a /usr/local/lib/
 echo '-=[Device Manager : Library]=- Done.'
