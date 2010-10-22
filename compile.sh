@@ -23,7 +23,7 @@ echo '-=[START]=-'
 
 echo '-=[Device Manager : Library]=- Compiling ...'
 cd $DEVICE_MANAGER_PATH
-if [ "$OS" == "LINUX" ]
+if [ "$OS" = "LINUX" ]
 then
 {
 echo '-=[Device Manager : LINUX]=-'
@@ -45,7 +45,7 @@ echo '-=[Device Manager : Plugins]=- Installing ...'
 sudo mkdir -p /usr/local/lib/IScore/
 sudo cp Plugins/*.so /usr/local/lib/IScore/
 }
-elif [ "$OS" == "MACOS" ]
+elif [ "$OS" = "MACOS" ]
 then
 echo '-=[Device Manager : MACOS]=-'
 echo '-=[Device Manager : Library]=- Cleaning ...'
