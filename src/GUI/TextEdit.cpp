@@ -49,7 +49,7 @@ using std::string;
 TextEdit::TextEdit(QWidget *parent, const string &text, const string &defaultValue)
   : QDialog(parent)
 {
-  setWindowFlags(Qt::Window);
+  setWindowFlags(Qt::Dialog);
   setWindowModality(Qt::WindowModal);
   setWindowOpacity(1.);
 

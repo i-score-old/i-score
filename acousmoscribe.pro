@@ -9,26 +9,33 @@ src/data \
 src/GUI \
 lib/Editor/CSP
 
-QMAKE_CXXFLAGS += -Wall
-
 linux-g++ {
-INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2 /usr/include/libxml2
-QMAKE_LFLAGS += -L/usr/local/lib/
-LIBS += -lIscore -lDeviceManager -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodescheduling -lgecodeset -lgecodesupport -lgecodegraph
+INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2
 }
 macx-g++ {
 INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /Library/Frameworks/
-QMAKE_LFLAGS += -L/usr/local/lib/ -L/System/Library/Frameworks/ -L/Library/Frameworks/
-LIBS += -lIscore -lDeviceManager -framework gecode -framework libxml
 }
 
 QT += network xml svg
+
+linux-g++ {
+QMAKE_LFLAGS += -L/usr/local/lib/
+}
+macx-g++ {
+QMAKE_LFLAGS += -L/usr/local/lib/ -L/System/Library/Frameworks/ -L/Library/Frameworks/
+}
 
 # Dossier des sources temporaires de Qt
 MOC_DIR = moc 
 # Dossier des binaires
 OBJETCS_DIR = bin
 
+linux-g++ {
+LIBS += -lIscore -lDeviceManager -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodescheduling -lgecodeset -lgecodesupport -lgecodegraph
+}
+macx-g++ {
+LIBS += -lIscore -lDeviceManager -framework gecode -framework libxml
+}
 # Input
 HEADERS += /usr/local/include/IScore/Engines.hpp \
 /usr/local/include/IScore/CSPTypes.hpp \

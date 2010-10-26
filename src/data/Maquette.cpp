@@ -656,9 +656,9 @@ bool Maquette::updateBox(unsigned int boxID, const Coords &coord) {
 	vector<unsigned int>::iterator it;
 	if (boxID != NO_ID && boxID != ROOT_BOX_ID) {
 		BasicBox *box = _boxes[boxID];
-		if ((moveAccepted = _engines->performBoxEditing(boxID, coord.topLeftX * MaquetteScene::MS_PER_PIXEL,
+		if (moveAccepted = _engines->performBoxEditing(boxID, coord.topLeftX * MaquetteScene::MS_PER_PIXEL,
 				coord.topLeftX * MaquetteScene::MS_PER_PIXEL +
-				coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved))) {
+				coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
 			box->setRelativeTopLeft(QPoint(coord.topLeftX,coord.topLeftY));
 			box->setSize(QPoint(coord.sizeX,coord.sizeY));
 			box->setPos(box->getCenter());
@@ -703,16 +703,16 @@ bool Maquette::updateBox(unsigned int boxID, const Coords &coord) {
 bool
 Maquette::updateBoxes(const map<unsigned int,Coords> &boxes) {
 
-	bool moveAccepted = false;
+	bool moveAccepted;
 	vector<unsigned int> moved;
 	map<unsigned int,Coords >::const_iterator it;
 	vector<unsigned int>::iterator it2;
 	for (it = boxes.begin() ; it!= boxes.end() ; it++) {
 		if (it->first != NO_ID && it->first != ROOT_BOX_ID) {
 			BasicBox *curBox = _boxes[it->first];
-			if ((moveAccepted = _engines->performBoxEditing(it->first, it->second.topLeftX * MaquetteScene::MS_PER_PIXEL,
+			if (moveAccepted = _engines->performBoxEditing(it->first, it->second.topLeftX * MaquetteScene::MS_PER_PIXEL,
 					it->second.topLeftX * MaquetteScene::MS_PER_PIXEL +
-					it->second.sizeX * MaquetteScene::MS_PER_PIXEL, moved))) {
+					it->second.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
 				curBox->setRelativeTopLeft(QPoint(it->second.topLeftX,it->second.topLeftY));
 				curBox->setSize(QPoint(it->second.sizeX,it->second.sizeY));
 				curBox->setPos(_boxes[it->first]->getCenter());
@@ -1290,7 +1290,7 @@ Maquette::load(const string &fileName) {
 	QString name,boxType,relType;
 	QColor color(1.,1.,1.);
 	Palette pal;
-	int boxID = ROOT_BOX_ID,motherID = ROOT_BOX_ID;
+	int boxID,motherID;
 	QMap<int,unsigned int> hashMap;
 	QDomNode mainNode = root.firstChild(); // Boxes
 	while (!mainNode.isNull()) {

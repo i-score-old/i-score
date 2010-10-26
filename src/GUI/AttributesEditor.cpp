@@ -1091,7 +1091,6 @@ void AttributesEditor::profilesChanged() {
 	if (box != NULL) {
 		if (box->type() == SOUND_BOX_TYPE) {
 			static_cast<SoundBox*>(box)->setPalette(*_palette);
-			_scene->update(box->getTopLeft().x(),box->getTopLeft().y(),box->width(),box->height() + 10);
 		}
 	}
 }

@@ -488,6 +488,7 @@ BasicBox::addTriggerPoint(BoxExtremity extremity)
 	}
 
 	delete _trgPntMsgEdit;
+
 	unlock();
 
 	return ret;
