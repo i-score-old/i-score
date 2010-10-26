@@ -482,13 +482,13 @@ BasicBox::addTriggerPoint(BoxExtremity extremity)
 			if (trgID > NO_ID) {
 				_triggerPoints[extremity] = _scene->getTriggerPoint(trgID);
 				_triggerPoints[extremity]->updatePosition();
-				_scene->addItem(_triggerPoints[extremity]);
 			}
 			ret = true;
 		}
 	}
 
 	delete _trgPntMsgEdit;
+	unlock();
 
 	return ret;
 }

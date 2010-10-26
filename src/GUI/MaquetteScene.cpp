@@ -1722,17 +1722,17 @@ void MaquetteScene::updatePlayingBoxes() {
 void
 MaquetteScene::play() {
 	displayMessage("Playing ...",INDICATION_LEVEL);
-	if (_paused) {
+/*	if (_paused) {
 		_paused = false;
 		_playing = true;
 		_maquette->setAccelerationFactor(1.);
 	}
-	else {
+	else {*/
 		_playing = true;
 		_maquette->startPlaying(_startingValue);
 		_playThread->start();
 		_startingValue = 0;
-	}
+	//}
 }
 
 void
