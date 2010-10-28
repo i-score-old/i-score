@@ -108,12 +108,6 @@ NetworkMessagesEditor::addLine() {
 	}
 }
 
-/*
-void NetworkMessagesEditor::messagesChanged() {
-	//Maquette::getInstance()->
-}
-*/
-
 void
 NetworkMessagesEditor::addMessage(const string &device, const string &message, const string &value)
 {
@@ -179,6 +173,7 @@ NetworkMessagesEditor::removeLine()
 					it--;
 					found = true;
 					_currentLine = _table->rowCount();
+					messagesChanged();
 				}
 				else {
 					std::cerr << "NetworkMessagesEditor::removeLine : index out of bounds" << std::endl;
@@ -217,12 +212,16 @@ NetworkMessagesEditor::computeMessages() {
 								msgs.push_back(lineMsg.str());
 							}
 							else {
+#ifdef NDEBUG
 								std::cerr << "NetworkMessagesEditor::computeMessages : empty value ignored" << std::endl;
+#endif
 							}
 						}
 					}
 					else {
+#ifdef NDEBUG
 						std::cerr << "NetworkMessagesEditor::computeMessages : empty message ignored" << std::endl;
+#endif
 					}
 				}
 			}
@@ -270,7 +269,9 @@ NetworkMessagesEditor::addMessages(const vector<string> &messages)
 			}
 		}
 		else {
+#ifdef NDEBUG
 			std::cerr << "NetworkMessagesEditor::addMessages : empty message found ignored" << std::endl;
+#endif
 		}
 	}
 }
@@ -311,7 +312,9 @@ NetworkMessagesEditor::importMessages()
 			}
 		}
 		else {
+#ifdef NDEBUG
 			std::cerr << "NetworkMessagesEditor::importMessages : empty line found" << std::endl;
+#endif
 		}
 	}
 }
@@ -342,11 +345,15 @@ NetworkMessagesEditor::exportMessages()
 							copy += "\r";
 						}
 						else {
+#ifdef NDEBUG
 							std::cerr << "NetworkMessagesEditor::exportMessages : empty value ignored" << std::endl;
+#endif
 						}
 					}
 					else {
+#ifdef NDEBUG
 						std::cerr << "NetworkMessagesEditor::exportMessages : empty message ignored" << std::endl;
+#endif
 					}
 				}
 				else {
@@ -355,10 +362,14 @@ NetworkMessagesEditor::exportMessages()
 			}
 			else {
 				if (cell == NULL) {
+#ifdef NDEBUG
 					std::cerr << "NetworkMessagesEditor::exportMessages : cell empty" << std::endl;
+#endif
 				}
 				if (device.isEmpty()) {
+#ifdef NDEBUG
 					std::cerr << "NetworkMessagesEditor::exportMessages : device empty" << std::endl;
+#endif
 				}
 			}
 		}

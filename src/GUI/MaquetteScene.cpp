@@ -147,7 +147,6 @@ void
 MaquetteScene::setAttributes(AbstractBox *abstract)
 {
 	_editor->setAttributes(abstract);
-	//((MainWindow*)_view->parent())->showEditor(true);
 }
 
 Palette
@@ -531,6 +530,12 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 			setCurrentMode(RELATION_MODE);
 		}
 	}
+	if (mouseEvent->modifiers() == Qt::ControlModifier) {
+		setCurrentMode(CREATION_MODE);
+	}
+	else {
+		setCurrentMode(RELATION_MODE);
+	}
 	switch (_currentInteractionMode) {
 	case RELATION_MODE :
 		_mousePos = mouseEvent->scenePos();
@@ -727,19 +732,6 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 	setCurrentMode(_savedInteractionMode,BoxCreationMode(_savedBoxMode));
 
 	update();
-}
-
-void
-MaquetteScene::wheelEvent(QGraphicsSceneWheelEvent * event)
-{
-	if (event->modifiers() == Qt::ControlModifier) {
-		if (event->delta() > 0) {
-			_view->zoomIn();
-		}
-		else if (event->delta() < 0) {
-			_view->zoomOut();
-		}
-	}
 }
 
 void
@@ -1603,6 +1595,11 @@ MaquetteScene::boxMoved(unsigned int boxID) {
 	if (ret) {
 		update();
 		setModified(true);
+/*		std::cerr << "Box top left coordinates : " << box->mapToScene(box->boundingRect().topLeft()).x() + box->boundingRect().size().width() << std::endl;
+		std::cerr << "View right max coordinates :" << _view->sceneRect().topLeft().x() + _view->sceneRect().width() << std::endl;*/
+		//if (box->mapToScene(box->boundingRect().topLeft()).x() + box->boundingRect().size().width() >= (_view->sceneRect().topLeft().x() + _view->sceneRect().width() - 100)) {
+		//_view->fitInView(box,Qt::KeepAspectRatio);
+		//}
 	}
 
 	return ret;

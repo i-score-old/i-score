@@ -576,13 +576,6 @@ class MaquetteScene : public QGraphicsScene
    */
   virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent);
   /*!
-   * \brief Redefinition of QGraphicsScene::wheelEvent().
-   * Called when the mouse wheel is used.
-   *
-   * \param event : contains the information about the event
-   */
-  virtual void wheelEvent(QGraphicsSceneWheelEvent *event);
-  /*!
    * \brief Redefinition of QGraphicsScene::contextMenuEvent().
    * Called when a mouse right button is released on the scene.
    *

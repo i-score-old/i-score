@@ -1042,7 +1042,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 		textRect.setWidth(_abstract->height());
 		//textRect.setHeight(std::min(_abstract->width(),(float)(RESIZE_TOLERANCE - LINE_WIDTH)));
 	}
-	painter->fillRect(0,0,textRect.width(),textRect.height(),Qt::white);
+	painter->fillRect(0,0,textRect.width(),textRect.height(),isSelected() ? Qt::yellow : Qt::white);
 	painter->drawText(QRectF(0,0,textRect.width(),textRect.height()),Qt::AlignCenter,name());
 	if (_abstract->width() <= 3*RESIZE_TOLERANCE) {
 		painter->rotate(-90);

@@ -148,6 +148,9 @@ private :
 	float _scaleY;
 	bool _redundancy;
 	std::string _address;
+
+	bool _lastPointSelected;
+	float _lastPointCoeff;
 };
 
 #endif /* CURVE_WIDGET_HPP */

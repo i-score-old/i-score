@@ -1283,6 +1283,7 @@ AttributesEditor::changeColor() {
 		_profilesPreviewArea->setColor(color);
 		//_profilesPreviewArea->setBrush(QBrush(QColor(color.red(),color.green(),color.blue(),127)));
 		_palette->setColor(color);
+		profilesChanged();
 	}
 }
 

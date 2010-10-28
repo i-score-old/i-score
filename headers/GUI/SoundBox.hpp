@@ -147,7 +147,7 @@ class SoundBox : public BasicBox
   /*!
    * \brief Updates messages to send at Control Points
    */
-  void updateMessagesToSend();
+  void updateMessagesToSend(bool init);
   /*!
    * \brief Plays the box in current playing mode through a network message.
    */

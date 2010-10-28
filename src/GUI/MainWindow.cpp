@@ -402,8 +402,6 @@ MainWindow::sliderChanged(int value)
 {
 	double newValue = _slider->accelerationValue(value);
 
-	std::cerr << newValue << std::endl;
-
 	Maquette::getInstance()->setAccelerationFactor(newValue);
 
 	_lcdNumber->display(newValue);
@@ -850,13 +848,15 @@ MainWindow::createToolBars()
 {
 	_fileToolBar = addToolBar(tr("File"));
 
-  _fileToolBar->addAction(_selectModeAct);
+	//_fileToolBar->addAction(_selectModeAct);
+
   _fileToolBar->addAction(_SBModeAct);
   _fileToolBar->addAction(_CBModeAct);
   _fileToolBar->addAction(_PBModeAct);
-  _fileToolBar->addAction(_relationModeAct);
+
+/*  _fileToolBar->addAction(_relationModeAct);
   _fileToolBar->addAction(_commentModeAct);
-  _fileToolBar->addAction(_triggerModeAct);
+  _fileToolBar->addAction(_triggerModeAct);*/
 
   _fileToolBar->addSeparator();
 
