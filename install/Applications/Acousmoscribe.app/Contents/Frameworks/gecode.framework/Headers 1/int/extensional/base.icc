@@ -1,0 +1,160 @@
+/* -*- mode: C++; c-basic-offset: 2; indent-tabs-mode: nil -*- */
+/*
+ *  Main authors:
+ *     Mikael Lagerkvist <lagerkvist@gecode.org>
+ *
+ *  Copyright:
+ *     Mikael Lagerkvist, 2007
+ *
+ *  Last modified:
+ *     $Date: 2008-01-13 15:02:42 +0100 (So, 13 Jan 2008) $ by $Author: schulte $
+ *     $Revision: 5862 $
+ *
+ *  This file is part of Gecode, the generic constraint
+ *  development environment:
+ *     http://www.gecode.org
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining
+ *  a copy of this software and associated documentation files (the
+ *  "Software"), to deal in the Software without restriction, including
+ *  without limitation the rights to use, copy, modify, merge, publish,
+ *  distribute, sublicense, and/or sell copies of the Software, and to
+ *  permit persons to whom the Software is furnished to do so, subject to
+ *  the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be
+ *  included in all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ *  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ *  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ *  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ *  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ *  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+namespace Gecode { namespace Int { namespace Extensional {
+  /*
+   * The propagator proper
+   *
+   */
+
+  template <class View, bool subscribe>
+  forceinline
+  Base<View,subscribe>::Base(Space* home, ViewArray<View>& x0, const TupleSet& t)
+    : Propagator(home), x(x0), tupleSet(t), last_data(NULL) {
+    if (subscribe)
+      x.subscribe(home, this, PC_INT_DOM);
+
+    if (!ts()->finalized()) ts()->finalize();
+    init_last(home, ts()->last);
+
+    this->force(home);
+  }
+
+  template <class View, bool subscribe>
+  forceinline
+  Base<View,subscribe>::Base(Space* home, bool share, Base<View,subscribe>& p)
+    : Propagator(home,share,p), last_data(NULL) {
+    x.update(home, share, p.x);
+    tupleSet.update(home, share, p.tupleSet);
+
+    init_last(home, p.last_data);
+  }
+
+  template <class View, bool subscribe>
+  forceinline void
+  Base<View,subscribe>::init_last(Space* home, Tuple** source) {
+    if (last_data == NULL) {
+      int literals = ts()->domsize*x.size();
+      last_data = static_cast<Tuple**>(home->alloc(literals*sizeof(Tuple*)));
+      for (int i = literals; i--; ) {
+        last_data[i] = source[i];
+      }
+    }
+  }
+
+  template <class View, bool subscribe>
+  forceinline TupleSet::TupleSetI*
+  Base<View,subscribe>::ts(void) {
+    return tupleSet.implementation();
+  }
+
+  template <class View, bool subscribe>
+  PropCost
+  Base<View,subscribe>::cost(ModEventDelta) const {
+    return PC_QUADRATIC_HI;
+  }
+
+#define GECODE_LAST_TUPLE(l) (*(l))
+
+  template <class View, bool subscribe>
+  forceinline Tuple
+  Base<View,subscribe>::last(int var, int val) {
+    return GECODE_LAST_TUPLE(last_data[(var*ts()->domsize) + val]);
+  }
+
+  template <class View, bool subscribe>
+  forceinline Tuple
+  Base<View,subscribe>::last_next(int var, int val) {
+    assert(last(var, val) != NULL);
+    assert(last(var, val)[var] == val+ts()->min);
+    int pos = (var*ts()->domsize) + val;
+    ++(last_data[pos]);
+    if (last(var,val)[var] != (val+ts()->min))
+      last_data[pos] = ts()->nullptr;
+    return last(var, val);
+  }
+
+
+  template <class View, bool subscribe>
+  forceinline void
+  Base<View,subscribe>::init_dom(Space* home, Domain dom) {
+    int domsize = ts()->domsize;
+    for (int i = x.size(); i--; ) {
+      dom[i].init(home, domsize);
+      for (ViewValues<View> vv(x[i]); vv(); ++vv)
+        dom[i].set(vv.val()-ts()->min);
+    }
+  }
+
+  template <class View, bool subscribe>
+  forceinline bool
+  Base<View,subscribe>::valid(Tuple t, Domain dom) {
+    for (int i = x.size(); i--; )
+      if (!dom[i].get(t[i]-ts()->min))
+        return false;
+    return true;
+  }
+#undef GECODE_LAST_TUPLE
+  template <class View, bool subscribe>
+  forceinline Tuple
+  Base<View,subscribe>::find_support(Domain dom, int var, int val) {
+    Tuple l = last(var, val);
+    while (l != NULL && !valid(l, dom)) {
+      l = last_next(var, val);
+    }
+    return l;
+  }
+
+
+  template <class View, bool subscribe>
+  size_t
+  Base<View,subscribe>::dispose(Space* home) {
+    this->unforce(home);
+    (void) Propagator::dispose(home);
+    if (!home->failed()) {
+      if (subscribe)
+        x.cancel(home,this,PC_INT_DOM);
+      // take care of last_data
+      int literals = ts()->domsize*x.size();    
+      home->reuse(last_data, sizeof(Tuple*)*literals);
+    }
+    (void) tupleSet.~TupleSet();    
+    return sizeof(*this);
+  }
+}}}
+
+// STATISTICS: int-prop
+

@@ -1,0 +1,370 @@
+/* -*- mode: C++; c-basic-offset: 2; indent-tabs-mode: nil -*- */
+/*
+ *  Main authors:
+ *     Guido Tack <tack@gecode.org>
+ *     Christian Schulte <schulte@gecode.org>
+ *     Gabor Szokoli <szokoli@gecode.org>
+ *
+ *  Copyright:
+ *     Guido Tack, 2004
+ *     Christian Schulte, 2004
+ *     Gabor Szokoli, 2004
+ *
+ *  Last modified:
+ *     $Date: 2008-01-31 18:29:16 +0100 (Do, 31 Jan 2008) $ by $Author: tack $
+ *     $Revision: 6017 $
+ *
+ *  This file is part of Gecode, the generic constraint
+ *  development environment:
+ *     http://www.gecode.org
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining
+ *  a copy of this software and associated documentation files (the
+ *  "Software"), to deal in the Software without restriction, including
+ *  without limitation the rights to use, copy, modify, merge, publish,
+ *  distribute, sublicense, and/or sell copies of the Software, and to
+ *  permit persons to whom the Software is furnished to do so, subject to
+ *  the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be
+ *  included in all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ *  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ *  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ *  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ *  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ *  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+#include "gecode/set.hh"
+#include "gecode/int.hh"
+
+namespace Gecode { namespace Set { namespace Int {
+
+  /// Value Iterator for values above a certain weight
+  template <class I>
+  class OverweightValues {
+  private:
+    /// The threshold above which values should be iterated
+    int threshold;
+    /// The value iterator
+    I iter;
+    /// A superset of the elements found in the iterator
+    const SharedArray<int> elements;
+    /// Weights for all the possible elements
+    const SharedArray<int> weights;
+    /// The current index into the elements and weights
+    int index;
+    /// Move to the next element
+    void next(void);
+  public:
+    /// \name Constructors and initialization
+    //@{
+    /// Default constructor
+    OverweightValues(void);
+    /// Initialize with elements/weights pairs, threshold \a t and iterator \a i
+    OverweightValues(int t,
+                     SharedArray<int>& elements0,
+                     SharedArray<int>& weights0,
+                     I& i);
+    /// Initialize with elements/weights pairs, threshold \a t and iterator \a i
+    void init(int t,
+              SharedArray<int>& elements0,
+              SharedArray<int>& weights0,
+              I& i);
+    //@}
+
+    /// \name Iteration control
+    //@{
+    /// Test whether iterator is still at a value or done
+    bool operator()(void) const;
+    /// Move iterator to next value (if possible)
+    void operator++(void);
+    //@}
+    /// \name Value access
+    //@{
+    /// Return current value
+    int  val(void) const;
+    //@}
+  };
+
+  template <class I>
+  forceinline void
+  OverweightValues<I>::next(void) {
+    while (iter()) {
+      while (elements[index]<iter.val()) index++;
+      assert(elements[index]==iter.val());
+      if (weights[index] > threshold) {
+        return;
+      }
+      ++iter;
+    }
+  }
+
+  template <class I>
+  forceinline
+  OverweightValues<I>::OverweightValues(void) {}
+
+  template <class I>
+  forceinline
+  OverweightValues<I>::OverweightValues(int t,
+                                        SharedArray<int>& elements0,
+                                        SharedArray<int>& weights0,
+                                        I& i) : threshold(t),
+                                                iter(i),
+                                                elements(elements0),
+                                                weights(weights0),
+                                                index(0) {
+    next();
+  }
+
+  template <class I>
+  forceinline void
+  OverweightValues<I>::init(int t,
+                            SharedArray<int>& elements0,
+                            SharedArray<int>& weights0,
+                            I& i) {
+    threshold = t; iter = i;
+    elements = elements0; weights = weights0;
+    index = 0;
+    next();
+  }
+
+  template <class I>
+  forceinline bool
+  OverweightValues<I>::operator()(void) const { return iter(); }
+
+  template <class I>
+  forceinline void
+  OverweightValues<I>::operator++(void) { ++iter; next(); }
+
+  template <class I>
+  forceinline int
+  OverweightValues<I>::val(void) const { return elements[index]; }
+
+  template <class View>
+  forceinline
+  Weights<View>::Weights(Space* home,
+                   const IntArgs& elements0, const IntArgs& weights0,
+                   View x0, Gecode::Int::IntView y0)
+    : Propagator(home), elements(elements0.size()), weights(weights0.size()),
+      x(x0), y(y0) {
+    x.subscribe(home,this, PC_SET_ANY);
+    y.subscribe(home,this, Gecode::Int::PC_INT_BND);
+    for (int i=elements0.size(); i--;) {
+      elements[i] = elements0[i];
+      weights[i] = weights0[i];
+    }
+  }
+
+  template <class View>
+  forceinline
+  Weights<View>::Weights(Space* home, bool share, Weights& p)
+    : Propagator(home,share,p) {
+    x.update(home,share,p.x);
+    y.update(home,share,p.y);
+    elements.update(home,share,p.elements);
+    weights.update(home,share,p.weights);
+  }
+
+  template <class View>
+  inline ExecStatus
+  Weights<View>::post(Space* home, const IntArgs& elements, const IntArgs& weights,
+                View x, Gecode::Int::IntView y) {
+    if (elements.size() != weights.size())
+      throw ArgumentSizeMismatch("Weights");
+    GECODE_AUTOARRAY(int, els_arr, elements.size());
+    for (int i=elements.size(); i--;)
+      els_arr[i] = elements[i];
+    IntSet els(els_arr, elements.size());
+    IntSetRanges er(els);
+    GECODE_ME_CHECK(x.intersectI(home, er));
+    (void) new (home) Weights(home,elements,weights,x,y);
+    return ES_OK;
+  }
+
+  template <class View>
+  PropCost
+  Weights<View>::cost(ModEventDelta) const {
+    return PC_LINEAR_LO;
+  }
+
+  template <class View>
+  size_t
+  Weights<View>::dispose(Space* home) {
+    assert(!home->failed());
+    x.cancel(home,this, PC_SET_ANY);
+    y.cancel(home,this, Gecode::Int::PC_INT_BND);
+    (void) Propagator::dispose(home);
+    return sizeof(*this);
+  }
+
+  template <class View>
+  Actor*
+  Weights<View>::copy(Space* home, bool share) {
+    return new (home) Weights(home,share,*this);
+  }
+
+  enum CostType { POS_COST, NEG_COST, ALL_COST };
+
+  template <class I, CostType c>
+  forceinline
+  int weightI(SharedArray<int>& elements,
+              SharedArray<int>& weights,
+              I& iter) {
+    int sum = 0;
+    int i = 0;
+    for (Iter::Ranges::ToValues<I> v(iter); v(); ++v) {
+      // Skip all elements below the current
+      while (elements[i]<v.val()) i++;
+      assert(elements[i] == v.val());
+      switch (c) {
+      case ALL_COST:
+        sum += weights[i];
+        break;
+      case POS_COST:
+        if (weights[i] > 0) sum += weights[i];
+        break;
+      case NEG_COST:
+        if (weights[i] < 0) sum += weights[i];
+        break;
+      default: GECODE_NEVER;
+      }
+    }
+    return sum;
+  }
+
+
+  /// Sort order for integers
+  class IntLt {
+  public:
+    bool operator()(int x, int y);
+  };
+
+  forceinline bool 
+  IntLt::operator()(int x, int y) {
+    return x < y;
+  }
+
+  template <class View>
+  ExecStatus
+  Weights<View>::propagate(Space* home, ModEventDelta) {
+
+    if (x.assigned()) {
+      GlbRanges<View> glb(x);
+      int w = 
+        weightI<GlbRanges<View>,ALL_COST>(elements, weights, glb);
+      GECODE_ME_CHECK(y.eq(home, w));
+      return ES_SUBSUMED(this,home);
+    }
+
+    int lowCost;
+    int lowestCost;
+    int highestCost;
+    int size = elements.size();
+    {
+      UnknownRanges<View> ur(x);
+      Iter::Ranges::ToValues<UnknownRanges<View> > urv(ur);
+      GECODE_AUTOARRAY(int, currentWeights, size);
+      for (int i=0; i<size; i++) {
+        if (!urv() || elements[i]<urv.val()) {
+          currentWeights[i] = 0;
+        } else {
+          assert(elements[i] == urv.val());
+          currentWeights[i] = weights[i];
+          ++urv;
+        }
+      }
+
+      IntLt ilt;
+      Support::quicksort<int>(currentWeights, size, ilt);
+
+      GlbRanges<View> glb(x);
+      lowCost = weightI<GlbRanges<View>,ALL_COST>(elements, weights, glb);
+      highestCost =
+        weightI<GlbRanges<View>,ALL_COST>(elements, weights, glb);
+
+      int delta = std::min(x.unknownSize(), x.cardMax() - x.glbSize());
+
+      for (int i=0; i<delta-1; i++) {
+        if (currentWeights[i] >= 0)
+          break;
+        lowCost+=currentWeights[i];
+      }
+      lowestCost = lowCost;
+      if (delta>0 && currentWeights[delta-1]<0)
+        lowestCost+=currentWeights[delta-1];
+
+      for (int i=0; i<delta; i++) {
+        if (currentWeights[size-i-1]<=0)
+          break;
+        highestCost += currentWeights[size-i-1];
+      }
+
+    }
+
+    GECODE_ME_CHECK(y.gq(home, lowestCost));
+    GECODE_ME_CHECK(y.lq(home, highestCost));
+
+    ModEvent me;
+    {
+      UnknownRanges<View> ur2(x);
+      Iter::Ranges::ToValues<UnknownRanges<View> > urv(ur2);
+      OverweightValues<Iter::Ranges::ToValues<UnknownRanges<View> > >
+        ov(y.max()-lowCost, elements, weights, urv);
+      Iter::Values::ToRanges<OverweightValues<
+        Iter::Ranges::ToValues<UnknownRanges<View> > > > ovr(ov);
+      me = x.excludeI(home, ovr);
+      GECODE_ME_CHECK(me);
+    }
+
+    if (x.assigned()) {
+      GlbRanges<View> glb(x);
+      int w = 
+        weightI<GlbRanges<View>,ALL_COST>(elements, weights, glb);
+      GECODE_ME_CHECK(y.eq(home, w));
+      return ES_SUBSUMED(this,home);
+    }
+    return me_modified(me) ? ES_NOFIX : ES_FIX;
+  }
+
+  template <class View>
+  Support::Symbol
+  Weights<View>::ati(void) {
+    return Reflection::mangle<View>("Gecode::Set::Int::Weights");
+  }
+
+  template <class View>
+  Reflection::ActorSpec
+  Weights<View>::spec(const Space* home, Reflection::VarMap& m) const {
+    Reflection::ActorSpec s(ati());
+    return s << Reflection::Arg::newIntArray(elements)
+             << Reflection::Arg::newIntArray(weights)
+             << x.spec(home, m)
+             << y.spec(home, m);
+  }
+
+  template <class View>
+  void
+  Weights<View>::post(Space* home, Reflection::VarMap& vars,
+                      const Reflection::ActorSpec& spec) {
+    spec.checkArity(4);
+    Reflection::IntArrayArg* elementsArg = spec[0]->toIntArray();
+    Reflection::IntArrayArg* weightsArg = spec[1]->toIntArray();
+    IntArgs elements(elementsArg->size());
+    IntArgs weights(weightsArg->size());
+    for (int i=elementsArg->size(); i--;)
+      elements[i] = (*elementsArg)[i];
+    for (int i=weightsArg->size(); i--;)
+      weights[i] = (*weightsArg)[i];
+    View x0(home, vars, spec[2]);
+    Gecode::Int::IntView x1(home, vars, spec[3]);
+    (void) new (home) Weights<View>(home,elements,weights,x0,x1);
+  }
+
+}}}
+
+// STATISTICS: set-prop

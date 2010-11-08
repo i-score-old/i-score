@@ -1,0 +1,148 @@
+/* -*- mode: C++; c-basic-offset: 2; indent-tabs-mode: nil -*- */
+/*
+ *  Main authors:
+ *     Guido Tack <tack@gecode.org>
+ *     Christian Schulte <schulte@gecode.org>
+ *
+ *  Contributing authors:
+ *     Gabor Szokoli <szokoli@gecode.org>
+ *
+ *  Copyright:
+ *     Guido Tack, 2004
+ *     Christian Schulte, 2004
+ *     Gabor Szokoli, 2004
+ *
+ *  Last modified:
+ *     $Date: 2008-01-31 18:29:16 +0100 (Do, 31 Jan 2008) $ by $Author: tack $
+ *     $Revision: 6017 $
+ *
+ *  This file is part of Gecode, the generic constraint
+ *  development environment:
+ *     http://www.gecode.org
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining
+ *  a copy of this software and associated documentation files (the
+ *  "Software"), to deal in the Software without restriction, including
+ *  without limitation the rights to use, copy, modify, merge, publish,
+ *  distribute, sublicense, and/or sell copies of the Software, and to
+ *  permit persons to whom the Software is furnished to do so, subject to
+ *  the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be
+ *  included in all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ *  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ *  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ *  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ *  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ *  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+namespace Gecode { namespace Set { namespace Branch {
+
+  forceinline ViewSelStatus
+  ByNone::init(const Space*, SetView) {
+    return VSS_COMMIT;
+  }
+  forceinline ViewSelStatus
+  ByNone::select(const Space*, SetView) {
+    GECODE_NEVER;
+    return VSS_NONE;
+  }
+  inline Support::Symbol
+  ByNone::type(void) {
+    return Support::Symbol("Gecode::Set::Branch::ByNone");
+  }
+
+  forceinline ViewSelStatus
+  ByMinCard::init(const Space*, SetView x) { 
+    minCard = x.unknownSize();
+    return (minCard == 1) ? VSS_COMMIT : VSS_SELECT;
+  }
+  forceinline ViewSelStatus
+  ByMinCard::select(const Space*, SetView x) {
+    unsigned int us = x.unknownSize();
+    if (us < minCard) {
+      minCard = us;
+      return (minCard == 1) ? VSS_COMMIT : VSS_SELECT;
+    }
+    return VSS_NONE;
+  }
+  inline Support::Symbol
+  ByMinCard::type(void) {
+    return Support::Symbol("Gecode::Set::Branch::ByMinCard");
+  }
+
+  forceinline ViewSelStatus
+  ByMaxCard::init(const Space*, SetView x) { 
+    maxCard = x.unknownSize();
+    return VSS_SELECT;
+  }
+  forceinline ViewSelStatus
+  ByMaxCard::select(const Space*, SetView x) {
+    unsigned int us = x.unknownSize();
+    if (us > maxCard) {
+      maxCard = us; return VSS_SELECT;
+    }
+    return VSS_NONE;
+  }
+  inline Support::Symbol
+  ByMaxCard::type(void) {
+    return Support::Symbol("Gecode::Set::Branch::ByMaxCard");
+  }
+
+  forceinline ViewSelStatus
+  ByMinUnknown::init(const Space*, SetView x) {
+    UnknownRanges<SetView> unknown(x);
+    minUnknown = unknown.min();
+    return VSS_SELECT;
+  }
+  forceinline ViewSelStatus
+  ByMinUnknown::select(const Space*, SetView x) {
+    UnknownRanges<SetView> unknown(x);
+    int um = unknown.min();
+    if (um < minUnknown) {
+      minUnknown = um; return VSS_SELECT;
+    }
+    return VSS_NONE;
+  }
+  inline Support::Symbol
+  ByMinUnknown::type(void) {
+    return Support::Symbol("Gecode::Set::Branch::ByMinUnknown");
+  }
+
+  forceinline ViewSelStatus
+  ByMaxUnknown::init(const Space*, SetView x) {
+    UnknownRanges<SetView> unknown(x);
+    do {
+      maxUnknown = unknown.max();
+      ++unknown;
+    } while(unknown());
+    return VSS_SELECT;
+  }
+  forceinline ViewSelStatus
+  ByMaxUnknown::select(const Space*, SetView x) {
+    UnknownRanges<SetView> unknown(x);
+    int um = 0;
+    assert(unknown());
+    do {
+      um = unknown.max();
+      ++unknown;
+    } while(unknown());
+    if (um > maxUnknown) {
+      maxUnknown = um; return VSS_SELECT;
+    }
+    return VSS_NONE;
+  }
+  inline Support::Symbol
+  ByMaxUnknown::type(void) {
+    return Support::Symbol("Gecode::Set::Branch::ByMaxUnknown");
+  }
+
+}}}
+
+// STATISTICS: set-branch
+

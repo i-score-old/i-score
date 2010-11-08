@@ -1,0 +1,228 @@
+/* -*- mode: C++; c-basic-offset: 2; indent-tabs-mode: nil -*- */
+/*
+ *  Main authors:
+ *     Guido Tack <tack@gecode.org>
+ *     Christian Schulte <schulte@gecode.org>
+ *     Gabor Szokoli <szokoli@gecode.org>
+ *
+ *  Copyright:
+ *     Guido Tack, 2004
+ *     Christian Schulte, 2004
+ *     Gabor Szokoli, 2004
+ *
+ *  Last modified:
+ *     $Date: 2008-02-20 10:27:10 +0100 (Mi, 20 Feb 2008) $ by $Author: tack $
+ *     $Revision: 6241 $
+ *
+ *  This file is part of Gecode, the generic constraint
+ *  development environment:
+ *     http://www.gecode.org
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining
+ *  a copy of this software and associated documentation files (the
+ *  "Software"), to deal in the Software without restriction, including
+ *  without limitation the rights to use, copy, modify, merge, publish,
+ *  distribute, sublicense, and/or sell copies of the Software, and to
+ *  permit persons to whom the Software is furnished to do so, subject to
+ *  the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be
+ *  included in all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ *  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ *  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ *  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ *  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ *  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+
+
+#include "gecode/set.hh"
+#include "gecode/int.hh"
+
+namespace Gecode { namespace Set { namespace Int {
+
+  template <class View>
+  forceinline
+  MinElement<View>::MinElement(Space* home, View y0, Gecode::Int::IntView y1)
+    : IntSetPropagator<View,PC_SET_ANY,
+                       Gecode::Int::PC_INT_BND> (home, y0, y1) {}
+
+  template <class View>
+  forceinline ExecStatus
+  MinElement<View>::post(Space* home, View x0, Gecode::Int::IntView x1) {
+    GECODE_ME_CHECK(x0.cardMin(home,1));
+    (void) new (home) MinElement(home,x0,x1);
+    return ES_OK;
+  }
+
+  template <class View>
+  forceinline
+  MinElement<View>::MinElement(Space* home, bool share, MinElement& p)
+    : IntSetPropagator<View,PC_SET_ANY,
+                       Gecode::Int::PC_INT_BND> (home, share, p) {}
+
+  template <class View>
+  Actor*
+  MinElement<View>::copy(Space* home, bool share) {
+   return new (home) MinElement(home,share,*this);
+  }
+
+  template <class View>
+  Support::Symbol
+  MinElement<View>::ati(void) {
+   return Reflection::mangle<View>("Gecode::Set::Int::MinElement");
+  }
+
+  template <class View>
+  Reflection::ActorSpec
+  MinElement<View>::spec(const Space* home, Reflection::VarMap& m) const {
+   return IntSetPropagator<View,PC_SET_ANY,Gecode::Int::PC_INT_BND>
+     ::spec(home, m, ati());
+  }
+
+  template <class View>
+  void
+  MinElement<View>::post(Space* home, Reflection::VarMap& vars,
+                         const Reflection::ActorSpec& spec) {
+    spec.checkArity(2);
+    View x0(home, vars, spec[0]);
+    Gecode::Int::IntView x1(home, vars, spec[1]);
+    (void) post(home,x0,x1);
+  }
+
+  template <class View>
+  ExecStatus
+  MinElement<View>::propagate(Space* home, ModEventDelta) {
+    //x1 is an element of x0.ub
+    //x1 =< smallest element of x0.lb
+    //x1 =< x0.cardinialityMin-est largest element of x0.ub
+    //(these 2 take care of determined x0)
+    //No element in x0 is smaller than x1
+    //if x1 is determined, it is part of the ub.
+
+    //Consequently:
+    //The domain of x1 is a subset of x0.ub up to the first element in x0.lb.
+    //x0 lacks everything smaller than smallest possible x1.
+
+    {
+      LubRanges<View> ub(x0);
+      GECODE_ME_CHECK(x1.inter_r(home,ub,false));
+    }
+    GECODE_ME_CHECK(x1.lq(home,x0.glbMin()));
+    //if cardMin>lbSize?
+    assert(x0.cardMin()>=1);
+
+    {
+      /// Compute n-th largest element in x0.lub for n = x0.cardMin()-1
+      int size = 0;
+      int maxN = BndSet::MAX_OF_EMPTY;
+      for (LubRanges<View> ubr(x0); ubr(); ++ubr, ++size) {}
+      GECODE_AUTOARRAY(int, ub, size*2);
+      int i=0;
+      for (LubRanges<View> ubr(x0); ubr(); ++ubr, ++i) {
+        ub[2*i]   = ubr.min();
+        ub[2*i+1] = ubr.max();
+      }
+      int x0cm = x0.cardMin()-1;
+      for (int i=size; i--;) {
+        int width = ub[2*i+1]-ub[2*i]+1;
+        if (width > x0cm) {
+          maxN = ub[2*i+1]-x0cm;
+          break;
+        }
+        x0cm -= width;
+      }
+      GECODE_ME_CHECK(x1.lq(home,maxN));
+    }
+
+    GECODE_ME_CHECK( x0.exclude(home,
+                                Limits::min, x1.min()-1) );
+
+    if (x1.assigned()) {
+      GECODE_ME_CHECK(x0.include(home,x1.val()));
+      GECODE_ME_CHECK(x0.exclude(home,
+                                 Limits::min, x1.val()-1));
+      return ES_SUBSUMED(this,home);
+    }
+
+    return ES_FIX;
+  }
+
+  template <class View>
+  forceinline
+  MaxElement<View>::MaxElement(Space* home, View y0, Gecode::Int::IntView y1)
+    : IntSetPropagator<View,PC_SET_ANY,
+                       Gecode::Int::PC_INT_BND> (home, y0, y1) {}
+
+  template <class View>
+  forceinline
+  MaxElement<View>::MaxElement(Space* home, bool share, MaxElement& p)
+    : IntSetPropagator<View,PC_SET_ANY,
+                       Gecode::Int::PC_INT_BND> (home, share, p) {}
+
+  template <class View>
+  ExecStatus
+  MaxElement<View>::post(Space* home, View x0,
+                              Gecode::Int::IntView x1) {
+    GECODE_ME_CHECK(x0.cardMin(home,1));
+    (void) new (home) MaxElement(home,x0,x1);
+    return ES_OK;
+  }
+
+  template <class View>
+  Actor*
+  MaxElement<View>::copy(Space* home, bool share) {
+    return new (home) MaxElement(home,share,*this);
+  }
+
+  template <class View>
+  Support::Symbol
+  MaxElement<View>::ati(void) {
+    return Reflection::mangle<View>("Gecode::Set::Int::MaxElement");
+  }
+
+  template <class View>
+  Reflection::ActorSpec
+  MaxElement<View>::spec(const Space* home, Reflection::VarMap& m) const {
+    return IntSetPropagator<View,PC_SET_ANY,Gecode::Int::PC_INT_BND>
+      ::spec(home, m, ati());
+  }
+
+  template <class View>
+  void
+  MaxElement<View>::post(Space* home, Reflection::VarMap& vars,
+                         const Reflection::ActorSpec& spec) {
+    spec.checkArity(2);
+    View x0(home, vars, spec[0]);
+    Gecode::Int::IntView x1(home, vars, spec[1]);
+    (void) new (home) MaxElement<View>(home,x0,x1);
+  }
+
+  template <class View>
+  ExecStatus
+  MaxElement<View>::propagate(Space* home, ModEventDelta) {
+    LubRanges<View> ub(x0);
+    GECODE_ME_CHECK(x1.inter_r(home,ub,false));
+    GECODE_ME_CHECK(x1.gq(home,x0.glbMax()));
+    assert(x0.cardMin()>=1);
+    GECODE_ME_CHECK(x1.gq(home,x0.lubMinN(x0.cardMin()-1)));
+    GECODE_ME_CHECK(x0.exclude(home,
+                               x1.max()+1,Limits::max) );
+
+    if (x1.assigned()) {
+      GECODE_ME_CHECK(x0.include(home,x1.val()));
+      GECODE_ME_CHECK( x0.exclude(home,
+                                  x1.val()+1,Limits::max) );
+      return ES_SUBSUMED(this,home);
+    }
+
+    return ES_FIX;
+  }  
+}}}
+
+// STATISTICS: set-prop
