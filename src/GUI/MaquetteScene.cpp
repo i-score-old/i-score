@@ -522,6 +522,12 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 	}
 	_savedInteractionMode = _currentInteractionMode;
 	_savedBoxMode = _currentBoxMode;
+	if (mouseEvent->modifiers() == Qt::ControlModifier) {
+		setCurrentMode(CREATION_MODE);
+	}
+	else {
+		setCurrentMode(SELECTION_MODE);
+	}
 	if (itemAt(mouseEvent->scenePos()) != 0) {
 		if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::PointingHandCursor && _currentInteractionMode != TRIGGER_MODE) {
 			setCurrentMode(TRIGGER_MODE);
@@ -530,12 +536,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 			setCurrentMode(RELATION_MODE);
 		}
 	}
-	if (mouseEvent->modifiers() == Qt::ControlModifier) {
-		setCurrentMode(CREATION_MODE);
-	}
-	else {
-		setCurrentMode(RELATION_MODE);
-	}
+
 	switch (_currentInteractionMode) {
 	case RELATION_MODE :
 		_mousePos = mouseEvent->scenePos();
@@ -576,8 +577,6 @@ void
 MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 	QGraphicsScene::mouseMoveEvent(mouseEvent);
 
-	bool resize = false;
-
 	switch (_currentInteractionMode) {
 	case RELATION_MODE :
 		if (_clicked) {
@@ -605,31 +604,13 @@ MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 		}
 		break;
 	case TEXT_MODE :
-		if (_clicked) {
-			if (resizeMode() != NO_RESIZE) {
-				resize = true;
-			}
-		}
 		break;
 	case TRIGGER_MODE :
-		if (_clicked) {
-			if (resizeMode() != NO_RESIZE) {
-				resize = true;
-			}
-		}
 		break;
 	case SELECTION_MODE :
-		if (_clicked) {
-			if (resizeMode() != NO_RESIZE) {
-				resize = true;
-			}
-		}
 		break;
 	case CREATION_MODE :
-		if (resizeMode() != NO_RESIZE) {
-			resize = true;
-		}
-		else if (_tempBox) {
+		if (resizeMode() == NO_RESIZE && _tempBox) {
 			int upLeftX, upLeftY, width, height;
 
 			if (_pressPoint.x() < mouseEvent->scenePos().x()) {

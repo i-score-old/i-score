@@ -725,10 +725,7 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 	if (event->button() == Qt::LeftButton) {
 		_clicked = true;
 		//setSelected(true);
-		if (cursor().shape() == Qt::ArrowCursor) {
-			QGraphicsItem::mousePressEvent(event);
-		}
-		else if (cursor().shape() == Qt::CrossCursor) {
+		if (cursor().shape() == Qt::CrossCursor) {
 			lock();
 			if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
 				_scene->setRelationFirstBox(_abstract->ID(),BOX_START);

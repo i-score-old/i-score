@@ -219,7 +219,6 @@ ParentBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 			setSelected(true);
 			if (cursor().shape() == Qt::ArrowCursor) {
 				unlock();
-				//BasicBox::mousePressEvent(event);
 			}
 			else if (cursor().shape() == Qt::CrossCursor) {
 				lock();
@@ -257,11 +256,13 @@ ParentBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 			update();
 		}
 		else {
-			if (cursor().shape() == Qt::ArrowCursor) {
+			if (cursor().shape() == Qt::ArrowCursor && event->modifiers() == Qt::ControlModifier) {
 				lock();
-				//BasicBox::mousePressEvent(event);
 			}
 		}
+	}
+	else {
+		std::cerr << "RIGHT BUTTON" << std::endl;
 	}
 }
 
