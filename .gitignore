@@ -3,6 +3,10 @@
 moc_*
 acousmoscribe.app
 acousmoscribe.xcodeproj
+qrc_acousmoscribe.cpp
+Acousmoscribe_28_10_10.pkg
+*.pkg
+.DS_Store
 compiler_*
 *~
 #*
