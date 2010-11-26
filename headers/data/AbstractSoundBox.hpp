@@ -79,7 +79,17 @@ class AbstractSoundBox : public AbstractBox
    */
   int type() const;
 
+  /*!
+   * \brief Gets the palette of the sound box.
+   *
+   * \return the palette of the sound box.
+   */
   inline Palette pal() const {return _pal;}
+  /*!
+   * \brief Sets the palette of the sound box.
+   *
+   * \param pal : the palette of the sound box.
+   */
   inline void setPal(const Palette &pal) {_pal = pal;}
 
  private :

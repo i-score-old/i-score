@@ -109,12 +109,19 @@ class AttributesEditor : public QDockWidget
    * \return the current color used in PreviewArea
    **/
   QColor getColor() const;
-
+  /*!
+   * \brief Gets current box edited in the editor.
+   *
+   * \return the box edited in the editor
+   **/
   unsigned int currentBox();
 
 	public slots:
 
-  void noBoxEdited();
+	/*!
+	 * \brief Called to specify that no box is currently edited.
+	 */
+	void noBoxEdited();
 
  protected:
   /*!
@@ -257,24 +264,46 @@ class AttributesEditor : public QDockWidget
    * \brief Pastes copied messages in end box message
    */
   void endMsgPasted();
-
+  /*!
+   * \brief Called when profiles are modified.
+   */
   void profilesChanged();
-
+  /*!
+   * \brief Called when general attributes are modified.
+   */
   void generalChanged();
-
+  /*!
+   * \brief Called when the start of the box is changed.
+   */
   void startChanged();
-
+  /*!
+   * \brief Called when the length of the box is changed.
+   */
   void lengthChanged();
-
+  /*!
+   * \brief Called when the name of the box is changed.
+   */
   void nameChanged();
-
+  /*!
+   * \brief Called when the network tree is clicked on.
+   */
   void networkTreeCollapsed();
-
+  /*!
+   * \brief Assigns the snapshot to the start of the box.
+   */
   void assignSnapshotStart();
+  /*!
+   * \brief Assigns the snapshot to the end of the box.
+   */
   void assignSnapshotEnd();
 
  private:
 
+	 /*!
+	  * \brief Gets the absolute address of an item in the snapshot tree.
+	  *
+	  * \param item : the item to get address for
+	  */
 	 QString getAbsoluteAddress(QTreeWidgetItem *item) const;
 
 	 MaquetteScene * _scene;

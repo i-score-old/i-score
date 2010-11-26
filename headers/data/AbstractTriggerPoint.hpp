@@ -71,18 +71,78 @@ class AbstractTriggerPoint : public Abstract
 
   virtual ~AbstractTriggerPoint(){}
 
+  /*!
+   * \brief Gets the ID of the Trigger Point box.
+   *
+   * \return the ID of the Trigger Point box.
+   */
   inline unsigned int boxID() const {return _boxID;}
+  /*!
+   * \brief Gets the box extremity of the Trigger Point.
+   *
+   * \return the box extremity of the Trigger Point.
+   */
   inline BoxExtremity boxExtremity() const {return _boxExtremity;}
+  /*!
+   * \brief Gets the message of the Trigger Point.
+   *
+   * \return the message of the Trigger Point.
+   */
   inline std::string message() const {return _message;}
+  /*!
+   * \brief Gets the waiting state of the Trigger Point.
+   *
+   * \return the waiting state of the Trigger Point.
+   */
   inline bool waiting() const {return _waiting;}
+  /*!
+   * \brief Gets the position of the Trigger Point.
+   *
+   * \return the position of the Trigger Point.
+   */
   inline QPointF position() const {return _pos;}
+  /*!
+   * \brief Gets the ID of the Trigger Point.
+   *
+   * \return the ID of the Trigger Point.
+   */
   inline unsigned int ID() const {return _ID;}
 
+  /*!
+   * \brief Sets the ID of the Trigger Point's box.
+   *
+   * \param boxID : the ID of the Trigger's box.
+   */
   inline void setBoxID(unsigned int boxID) {_boxID = boxID;}
+  /*!
+   * \brief Sets the box extremity of the Trigger Point.
+   *
+   * \param boxID : the box extremity of the Trigger Point.
+   */
   inline void setBoxExtremity(BoxExtremity extremity) {_boxExtremity = extremity;}
+  /*!
+   * \brief Sets the message of the Trigger Point.
+   *
+   * \param boxID : the message of the Trigger Point.
+   */
   inline void setMessage(const std::string &message) {_message = message;}
+  /*!
+   * \brief Sets the waiting state of the Trigger Point.
+   *
+   * \param boxID : the waiting state of the Trigger Point.
+   */
   inline void setWaiting(bool waiting) {_waiting = waiting;}
+  /*!
+   * \brief Sets the position of the Trigger Point.
+   *
+   * \param boxID : the position of the Trigger Point.
+   */
   inline void setPosition(const QPointF &position) {_pos = position;}
+  /*!
+   * \brief Sets the ID of the Trigger Point.
+   *
+   * \param boxID : the ID of the Trigger Point.
+   */
   inline void setID(unsigned int ID) {_ID = ID;}
 
   /*!

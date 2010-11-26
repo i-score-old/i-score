@@ -70,11 +70,30 @@ class CurveWidget : public QWidget
 
 public :
 	~CurveWidget();
+
 	CurveWidget(QWidget *parent,unsigned int boxID, const std::string &address, unsigned int argPosition, const std::vector<float> &values, unsigned int sampleRate,
 			bool redundancy, const std::vector<std::string> &argType, const std::vector<float> &xPercents, const std::vector<float> &yValues,
 			const std::vector<short> &sectionType, const std::vector<float> &coeff);
 
 	void applyChanges();
+	/*!
+	 * \brief Sets attributes of a curve at a specific address in a box.
+	 *
+	 * \param boxID : the ID of the box
+	 * \param address : the address of the curve
+	 * \param argPosition : the index of the curve
+	 * \param values : the breakpoints' values for y-axis
+	 * \param sampleRate : the sample rate
+	 * \param redundancy : the redundancy
+	 * \param argType : the respective types of the values to be set
+	 * \param xPercents : the values to be set for x-axis in percents (0 < % < 100)
+	 * \param yValues : y-axis values to be set
+	 * \param sectionType : types of curve's subsections (curves...)
+	 * \param coeff : coeff of curve's subsections' types to be set (for CURVES_POW: 0 to 0.9999 => sqrt, 1 => linear, 1 to infinity => pow)
+	 * \param update : if modifications should rise to the Engines
+	 *
+	 * \return if curves were set correctly
+	 */
 	void setAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition, const std::vector<float> &values, unsigned int sampleRate,
 			bool redundancy, const std::vector<std::string> &argType, const std::vector<float> &xPercents, const std::vector<float> &yValues,
 			const std::vector<short> &sectionType, const std::vector<float> &coeff, 	bool update = true);
@@ -121,36 +140,51 @@ private :
   static const unsigned int H_MARGIN; //!< Curve widget horizontal margin.
   static const unsigned int V_MARGIN; //!< Curve widget vertical margin.
 
+  /*!
+   * \brief Gets local coordinates of a point.
+   * X => scales, translates and percents
+   * Y => translates, gets symmetrical and scales
+   */
   QPointF relativeCoordinates(const QPointF &point);
-	QPointF absoluteCoordinates(const QPointF &point);
-	void updateInterspace();
-	bool curveChanged();
+  /*!
+   * \brief Gets absolute coordinates of a point.
+   * X => unpercents, scales and translates
+   * Y => scales, gets symmetrical and translates
+   */
+  QPointF absoluteCoordinates(const QPointF &point);
+  /*!
+   * \brief Called to update interspace between points.
+   */
+  void updateInterspace();
+  /*!
+   * \brief Called when curve is modified.
+   */
+  bool curveChanged();
 
-	unsigned int _boxID;
+	unsigned int _boxID; //!< Box ID.
 
-	QPointF _origin;
+	QPointF _origin; //!< O(0,0) of the curve in Widget coordinates
 
-	std::vector<float> _curve;
+	std::vector<float> _curve; //!< List of all curve values.
+	//! Map of breakpoints with their values and curving values.
 	std::map<float,std::pair<float,float> > _breakpoints;
-	float _breakpointMovedX;
-	float _breakpointMovedY;
+	float _breakpointMovedX; //!< Moved break point x coordinate.
+	float _breakpointMovedY; //!< Moved break point y coordinate.
 
-	bool _clicked;
+	bool _clicked; //!< Clicked state.
 
-	QGridLayout *_layout;
+	QGridLayout *_layout; //!< Layout for widget.
 
-/*	unsigned int _width;
-	unsigned int _height;*/
-	unsigned int _sampleRate;
-	float _interspace;
-	float _curveWidth;
-	float _scaleX;
-	float _scaleY;
-	bool _redundancy;
-	std::string _address;
+	unsigned int _sampleRate; //!< Curve sample rate.
+	float _interspace; //!< Horizontal interspace.
+	float _curveWidth; //!< Curve width.
+	float _scaleX; //!< Value for horizontal scaling.
+	float _scaleY; //!< Value for vertical scaling.
+	bool _redundancy; //!< Handles curve's redundancy
+	std::string _address; //!< Address of the curve.
 
-	bool _lastPointSelected;
-	float _lastPointCoeff;
+	bool _lastPointSelected; //!< Last point selected.
+	float _lastPointCoeff; //!< Coefficient for last point.
 };
 
 #endif /* CURVE_WIDGET_HPP */

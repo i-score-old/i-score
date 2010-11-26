@@ -94,10 +94,6 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 	_relation = new AbstractRelation;
 
 	_playThread = new PlayingThread(this);
-	_playingAreaLeft = std::numeric_limits<float>::max();
-	_playingAreaRight = 0;
-	_playingAreaUp = std::numeric_limits<float>::max();
-	_playingAreaDown = 0;
 }
 
 MaquetteScene::~MaquetteScene() {

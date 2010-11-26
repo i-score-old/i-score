@@ -71,21 +71,81 @@ class AbstractRelation : public Abstract
 
   inline virtual ~AbstractRelation(){}
 
+  /*!
+   * \brief Sets the first box of the relation.
+   * \param boxID : the first box of the relation
+   */
   inline void setFirstBox(unsigned int boxID) {_firstBox = boxID;}
+  /*!
+   * \brief Sets the second box of the relation.
+   * \param boxID : the second box of the relation
+   */
   inline void setSecondBox(unsigned int boxID) {_secondBox = boxID;}
+  /*!
+   * \brief Sets the first box's extremity of the relation.
+   * \param extremity : the first box's extremity of the relation
+   */
   inline void setFirstExtremity(BoxExtremity extremity) {_firstBoxExt = extremity;}
+  /*!
+   * \brief Sets the second box's extremity of the relation.
+   * \param extremity : the second box's extremity of the relation
+   */
   inline void setSecondExtremity(BoxExtremity extremity) {_secondBoxExt = extremity;}
+  /*!
+   * \brief Sets the minimal boundary of the relation's length.
+   * \param minBound : the minimal boundary of the relation's length
+   */
   inline void setMinBound(const float &minBound) {_minBound = minBound;}
+  /*!
+   * \brief Sets the maximal boundary of the relation's length.
+   * \param maxBound : the maximal boundary of the relation's length
+   */
   inline void setMaxBound(const float &maxBound) {_maxBound = maxBound;}
+  /*!
+   * \brief Sets the ID of the relation.
+   * \param ID : the ID of the relation
+   */
   inline void setID(unsigned int ID) {_ID = ID;}
 
+  /*!
+   * \brief Gets the first box of the relation.
+   * \return the first box of the relation
+   */
   inline unsigned int firstBox() const {return _firstBox;}
+  /*!
+   * \brief Gets the second box of the relation.
+   * \return the second box of the relation
+   */
   inline unsigned int secondBox() const {return _secondBox;}
+  /*!
+   * \brief Gets the first extremity of the relation.
+   * \return the first extremity of the relation
+   */
   inline BoxExtremity firstExtremity() const {return _firstBoxExt;}
+  /*!
+   * \brief Gets the second extremity of the relation.
+   * \return the second extremity of the relation
+   */
   inline BoxExtremity secondExtremity() const {return _secondBoxExt;}
+  /*!
+   * \brief Gets the lngth of the relation.
+   * \return the length of the relation
+   */
   inline float length() const {return _length;}
+  /*!
+   * \brief Gets the minimal bound of the relation.
+   * \return the minimal bound of the relation
+   */
   inline float minBound() const {return _minBound;}
+  /*!
+   * \brief Gets the maximal bound of the relation.
+   * \return the maximal bound of the relation
+   */
   inline float maxBound() const {return _maxBound;}
+  /*!
+   * \brief Gets the ID of the relation.
+   * \return the ID of the relation
+   */
   inline unsigned int ID() const {return _ID;}
 
   /*!
@@ -101,9 +161,9 @@ class AbstractRelation : public Abstract
   BoxExtremity _firstBoxExt; //!< First box extremity concerned by the relation.
   unsigned int _secondBox; //!< Second box concerned by the relation.
   BoxExtremity _secondBoxExt; //!< Second box extremity concerned by the relation.
-  float _length;
-  float _minBound;
-  float _maxBound;
+  float _length; //!< Length of the relation.
+  float _minBound; //!< Minimal boundary of the relation's length.
+  float _maxBound; //!< Maximal boundary of the relation's length.
 
   unsigned int _ID; //!< The ID of the relation.
 };

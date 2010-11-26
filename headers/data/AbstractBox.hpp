@@ -92,6 +92,10 @@ class AbstractBox : public Abstract
    * not always the same as the graphical representation.
    */
   inline QPointF topLeft() const {return _topLeft;}
+  /*!
+   * \brief The local coordinates of the bottom right corner :
+   * not always the same as the graphical representation.
+   */
   inline QPointF bottomRight() const {return _topLeft + QPointF(_width,_height);}
   /*!
    * \brief The local value of the width :
@@ -103,25 +107,84 @@ class AbstractBox : public Abstract
    * not always the same as the graphical representation.
    */
   inline float height() const {return _height;}
-
+  /*!
+   * \brief Gets the name of the box.
+   * \return the name of the box
+   */
   inline std::string name() const {return _name;}
+  /*!
+   * \brief Gets the color of the box.
+   * \return the color of the box
+   */
   inline QColor color() const {return _color;}
+  /*!
+   * \brief Gets the ID of the box.
+   * \return the ID of the box
+   */
   inline unsigned int ID() const {return _ID;}
+  /*!
+   * \brief Gets the mother of the box.
+   * \return the mother of the box
+   */
   inline unsigned int mother() const {return _motherID;}
+  /*!
+   * \brief Gets the messages to send at box start.
+   * \return the messages to send at box start
+   */
   inline std::vector<std::string> firstMsgs() const {return _firstMsgs;}
+  /*!
+   * \brief Gets the messages to send at box end.
+   * \return the messages to send at box end
+   */
   inline std::vector<std::string> lastMsgs() const {return _lastMsgs;}
 
+  /*!
+   * \brief Sets the top left coordinates of the box.
+   * \param topLeft : the top left coordinates of the box
+   */
   inline void setTopLeft(const QPointF &topLeft) {_topLeft = topLeft;}
+  /*!
+   * \brief Sets the width of the box.
+   * \param width : the new width of the box
+   */
   inline void setWidth(const float &width) {_width = width;}
+  /*!
+   * \brief Sets the height of the box.
+   * \param height : the new height of the box
+   */
   inline void setHeight(const float &height) {_height = height;}
+  /*!
+   * \brief Sets the name of the box.
+   * \param height : the new name if the box
+   */
   inline void setName(const std::string &name) {_name = name;}
+  /*!
+   * \brief Sets the color of the box.
+   * \param color : the new color of the box
+   */
   inline void setColor(const QColor &color) {_color = color;}
+  /*!
+   * \brief Sets the ID of the box.
+   * \param ID : the new ID of the box
+   */
   inline void setID(unsigned int ID) {_ID = ID;}
+  /*!
+   * \brief Sets the width of the box.
+   * \param width : the new width for the box
+   */
   inline void setMother(unsigned int motherID) {_motherID = motherID;}
+  /*!
+   * \brief Sets the messages to send at box start.
+   * \param firstMsgs : the new messages to send at box start
+   */
   inline void setFirstMsgs(const std::vector<std::string> &firstMsgs){
   	_firstMsgs.clear();
   	_firstMsgs = firstMsgs;
 	};
+  /*!
+   * \brief Sets the messages to send at box end.
+   * \param lastMsgs : the new messages to send at box end
+   */
   inline void setLastMsgs(const std::vector<std::string> &lastMsgs){
   	_lastMsgs.clear();
   	_lastMsgs = lastMsgs;

@@ -86,31 +86,6 @@ class ControlBox : public BasicBox
    * \brief Gets the abstract of the item.
    */
   virtual Abstract *abstract() const;
-/*  !
-   * \brief Sets the new horizontal size after a mouse horizontal resizing.
-   * It doesn't change the graphical representation, that task is performed
-   * when the new system has been computed by the constraint solver.
-   *
-   * \param width : the new width
-
-  virtual void resizeWidthEdition(int width);
-  !
-   * \brief Sets the new vertical size after a mouse vertical resizing.
-   * It doesn't change the graphical representation, that task is performed
-   * when the new system has been computed by the constraint solver.
-   *
-   * \param height : the new height
-
-  virtual void resizeHeightEdition(int height);
-  !
-   * \brief Sets the new size after a mouse resizing.
-   * It doesn't change the graphical representation, that task is performed
-   * when the new system has been computed by the constraint solver.
-   *
-   * \param length : the new length
-   * \param height : the new height
-
-  virtual void resizeAllEdition(int height, int length);*/
 
  protected :
 

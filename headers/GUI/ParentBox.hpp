@@ -86,43 +86,60 @@ public:
 	 * \brief Gets the abstract of the item.
 	 */
 	virtual Abstract *abstract() const;
-
+	/*!
+	 * \brief Determines if box has a specific child.
+	 *
+	 * \param childID : the child to be found
+	 *
+	 * \return if child was found
+	 */
 	bool hasChild(unsigned int childID) const;
+	/*!
+	 * \brief Adds a child to the box.
+	 *
+	 * \param childID : the child to add
+	 *
+	 * \return if child was added
+	 */
 	bool addChild(unsigned int childID);
+	/*!
+	 * \brief Removes a child from the box.
+	 *
+ 	 * \param childID : the child to remove
+	 *
+	 * \return if child was removed
+	 */
 	bool removeChild(unsigned int childID);
+	/*!
+	 * \brief Gets the whole map of children.
+	 */
 	std::map<unsigned int,BasicBox*> children() const;
+	/*!
+	 * \brief Determines if the box has any child.
+	 *
+	 * \return if box has children
+	 */
 	bool empty() const;
-
 	/*
-	 * \brief Sets the new horizontal size after a mouse horizontal resizing.
-	 * It doesn't change the graphical representation, that task is performed
-	 * when the new system has been computed by the constraint solver.
+	 * \brief Sets the new horizontal size.
 	 *
 	 * \param width : the new width
 	 */
 	virtual void resizeWidthEdition(int width);
-/*	!
-	 * \brief Sets the new vertical size after a mouse vertical resizing.
-	 * It doesn't change the graphical representation, that task is performed
-	 * when the new system has been computed by the constraint solver.
-	 *
-	 * \param height : the new height
-
-	virtual void resizeHeightEdition(int height);
-	!
-	 * \brief Sets the new size after a mouse resizing.
-	 * It doesn't change the graphical representation, that task is performed
-	 * when the new system has been computed by the constraint solver.
-	 *
-	 * \param length : the new length
-	 * \param height : the new height
-
-	virtual void resizeAllEdition(int height, int length);*/
 
 protected :
 
+	/*!
+	 * \brief Plays individually the parent box.
+	 */
 	virtual void play();
-
+	/*!
+	 * \brief Redefinition of QGraphicsItem::itemChange().
+	 * Occurs when item is modified.
+	 *
+	 * \param change : containing the change's type
+	 * \param value : containing the change's value
+	 */
 	virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 	/*!
 	 * \brief Redefinition of QGraphicsItem::mousePressEvent().
@@ -176,7 +193,7 @@ protected :
 	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
 private:
-	std::map<unsigned int,BasicBox*> _children;
+	std::map<unsigned int,BasicBox*> _children; //!< Handling box's children by ID.
 };
 
 #endif

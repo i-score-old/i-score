@@ -102,11 +102,3 @@ CurvesWidget::updateMessages(unsigned int boxID) {
 		}
 	}
 }
-
-void CurvesWidget::tabInserted(int index) {
-
-}
-
-void CurvesWidget::tabRemoved(int index) {
-
-}

@@ -116,9 +116,16 @@ class Relation : public QGraphicsItem
    * \return the bottom right corner
    */
   QPointF getCenter() const;
-
+  /*!
+   * \brief Update relation extremities' coordinates.
+   */
   void updateCoordinates();
-
+  /*!
+   * \brief Change relation boundaries.
+   *
+   * \param minBound : the new min bound to be set
+   * \param maxBound : the new max bound to be set
+   */
   void changeBounds(const float &minBound, const float &maxBound);
 
  protected:
@@ -206,8 +213,8 @@ class Relation : public QGraphicsItem
   QPointF _start; //!< The starting point of the relation.
   QPointF _end; //!< The ending point of the relation.
 
-  bool _leftHandleSelected;
-  bool _rightHandleSelected;
+  bool _leftHandleSelected; //!< Left handle selection state.
+  bool _rightHandleSelected; //!< Right handle selection state.
 
   static const float ARROW_SIZE; //!< The size of the arrow.
   static const float HANDLE_HEIGHT; //!< The height of a handle.

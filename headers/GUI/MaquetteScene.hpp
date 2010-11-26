@@ -175,7 +175,7 @@ class MaquetteScene : public QGraphicsScene
    * \brief Adds a new trigger point to a box.
    *
    * \param boxID : box to add trigger point
-   * \param extremity : box's etremity concerned by the trigger point
+   * \param extremity : box's extremity concerned by the trigger point
    * \param message : the message of the trigger point
    *
    * \return the ID of the trigger added
@@ -268,11 +268,18 @@ class MaquetteScene : public QGraphicsScene
   /*!
    * \brief Adds a new relation as an item to the maquette.
    *
-   * \param abstractRel : the abstract to create relation from.
+   * \param abstractRel : the abstract to create relation from
    * \return the ID of relation to create
    */
   int addRelation(const AbstractRelation &abstractRel);
-
+  /*!
+   * \brief Change boundaries for a relation.
+   *
+   * \param relID : the relation to be modified
+   * \param length : the new length
+   * \param minBound : the new min bound
+   * \param maxBound : the new max bound
+   */
   void changeRelationBounds(unsigned int relID, const float &length, const float &minBound, const float &maxBound);
   /*!
    * \brief Creates a new interval relation between 2 objects.
@@ -315,7 +322,9 @@ class MaquetteScene : public QGraphicsScene
    */
   void selectionMoved();
   /*!
-   * \brief Apply move of a moving box if confirmed by the Engines.
+   * \brief Apply move for a moving box if confirmed by the Engines.
+   *
+   * \param boxID : the box to be modified
    */
   bool boxMoved(unsigned int boxID);
   /*!
@@ -354,9 +363,10 @@ class MaquetteScene : public QGraphicsScene
   /*!
    * \brief Changes the network configuration.
    *
-   * \param pluginName : the new plugin to use
-   * \param IP : the new IP to use
-   * \param port : the new port to use
+   * \param deviceName : device to be modified
+   * \param pluginName : the new plugin for device
+   * \param IP : the new IP for device
+   * \param port : the new port for device
    */
   void changeNetworkDevice(const std::string &deviceName, const std::string &pluginName, const std::string &IP, const std::string &port);
   /*!
@@ -469,7 +479,9 @@ class MaquetteScene : public QGraphicsScene
    * \param extremumType : the extremity of the box
    */
   void setRelationFirstBox(unsigned int ID, BoxExtremity extremumType);
-
+  /*!
+   * \brief Called when a possible box for relation in creation is found
+   */
   void relationBoxFound();
   /*!
    * \brief Determines if the document was modified.
@@ -507,9 +519,16 @@ class MaquetteScene : public QGraphicsScene
    * \return the paused state
    */
   bool paused() const ;
-
+  /*!
+   * \brief Updates the boxes currently playing.
+   */
   void updatePlayingBoxes();
-
+  /*!
+   * \brief Set the stored playing state of a box.
+   *
+   * \param boxID : the box to change playing state
+   * \param playing : the playing state
+   */
   void setPlaying(unsigned int boxID, bool playing);
 
   //! Integer handling scene's maximal width.
@@ -518,7 +537,7 @@ class MaquetteScene : public QGraphicsScene
   static const int MAX_SCENE_HEIGHT = 100000;
   //! Integer handling scene's milliseconds per pixel rate.
   static float MS_PER_PIXEL;
-
+  //! Float handling scene's precision in milliseconds.
   static const float MS_PRECISION;
   //! Default trigger message used.
   static const std::string DEFAULT_TRIGGER_MSG;
@@ -656,7 +675,12 @@ class MaquetteScene : public QGraphicsScene
    * \return the string containing computed name
    */
   std::string sequentialName(const std::string &name);
-
+  /*!
+   * \brief Looks for a mother for specified coordinates.
+   * \param topLeft : the top left coordinates of the box
+   * \param size : the size of the box
+   * \return the ID of the possible mother
+   */
   unsigned int findMother(const QPointF &topLeft, const QPointF &size);
   /*!
    * \brief Adds a box.
@@ -694,7 +718,7 @@ class MaquetteScene : public QGraphicsScene
    */
   int addPendingRelation();
   /*!
-   * \brief Gets the current box mode creation (can be NoBox).
+   * \brief Gets the current box mode creation.
    *
    * \return the current box mode creation (can be NoBox)
    */
@@ -716,15 +740,14 @@ class MaquetteScene : public QGraphicsScene
   QPointF _pressPoint; //!< Last pression point.
   QPointF _releasePoint; //!< Last release point.
   QGraphicsRectItem *_tempBox; //!< Temporary box when a creation is in progress.
-  unsigned int _parentBox;
 
   int _currentZValue; //!< ZValue to be attributed to the next bounding box.
   bool _tracksView; //! Visibility of track.
   int _resizeMode; //! Current resizing mode.
   int _currentInteractionMode; //!< Current interaction mode.
-  int _currentBoxMode; /// Current box creation mode.
-  int _savedInteractionMode;
-	int _savedBoxMode;
+  int _currentBoxMode; //!< Current box creation mode.
+  int _savedInteractionMode; //!< Saved interation mode.
+	int _savedBoxMode; //!< Saved box interation mode.
   SndBoxProp::PlayingMode _playMode; //!< Current playing mode.
 
   unsigned int _resizeBox; //!< During a resizing operation, the concerned box
@@ -740,11 +763,7 @@ class MaquetteScene : public QGraphicsScene
   //! Handles information about relation beeing created.
   AbstractRelation * _relation;
 
-  std::map<unsigned int,BasicBox*> _playingBoxes;
-  float _playingAreaLeft;
-  float _playingAreaRight;
-  float _playingAreaUp;
-  float _playingAreaDown;
+  std::map<unsigned int,BasicBox*> _playingBoxes; //!< Handles the whole set of currently playing boxes
 
   PlayingThread *_playThread; //!< The thread handling playing.
 };

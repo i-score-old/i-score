@@ -335,7 +335,7 @@ class MainWindow : public QMainWindow
   Help *_helpDialog; //!< Help dialog.
 
   LogarithmicSlider *_slider; //!< Acceleration slider.
-  QLCDNumber *_lcdNumber;
+  QLCDNumber *_lcdNumber; //!< Acceleration value.
   QAction *_sliderAct; //!< Acceleration slider action.
 };
 

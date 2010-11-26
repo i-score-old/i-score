@@ -101,7 +101,11 @@ struct Coords {
   float sizeX;
   float sizeY;
 };
-
+/*!
+ * \class MyDevice
+ *
+ * \brief Network device handling a name, a plug-in, a port and a network host.
+ */
 class MyDevice {
 public :
 	MyDevice(const std::string &nameArg = "NO_STR", const std::string &pluginArg = "NO_STR",
@@ -116,10 +120,10 @@ public :
 	}
 	~MyDevice() {
 	}
-	std::string name;
-	std::string plugin;
-	unsigned int networkPort;
-	std::string networkHost;
+	std::string name; //!< Name of the device.
+	std::string plugin; //!< plugin used by the device.
+	unsigned int networkPort; //!< Network port used by device.
+	std::string networkHost; //!< Network host used by device.
 };
 
 /*!
@@ -209,47 +213,81 @@ class Maquette : public QObject
    * \param port : the new port to use
    */
   void changeNetworkDevice(const std::string &deviceName, const std::string &pluginName, const std::string &IP, const std::string &port);
-
+  /*!
+   * \brief Gets the set of devices and their respective requestability.
+   *
+   * \param deviceName : the devices to be filled
+   * \param pluginName : the respective requestabilities
+   */
   void getNetworkDeviceNames(std::vector<std::string>& deviceName, std::vector<bool>& namespaceRequestable);
-
+  /*!
+     * \brief Requests a snapshot to the Engines.
+     *
+     * \param address : the address to be snapped.
+     * \return the snapshot taken
+     */
   std::vector<std::string> requestNetworkSnapShot(const std::string &address);
-
-
-
+  /*!
+     * \brief Adds a curve at specified address.
+     *
+     * \param boxID : the box to add a curve to
+     * \param address : the address concerned by the curve
+     */
 	void addCurve(unsigned int boxID, const std::string &address);
-
+  /*!
+     * \brief Removes a curve at specified address.
+     *
+     * \param boxID : the box to remove a curve from
+     * \param address : the address concerned by the curve
+     */
 	void removeCurve(unsigned int boxID, const std::string &address);
-
+  /*!
+     * \brief Removes all curves for a specified box.
+     *
+     * \param boxID : the box to remove curves from
+     */
 	void clearCurves(unsigned int boxID);
-
+  /*!
+     * \brief Gets the addresses associated to curves for a specified box.
+     *
+     * \param boxID : the box to get curves from
+     */
 	std::vector<std::string> getCurvesAddresses(unsigned int boxID);
-
-/*
-	void setCurveSampleRate(unsigned int boxID, const std::string &address, unsigned int sampleRate);
-
-	unsigned int getCurveSampleRate(unsigned int boxID, const std::string &address);
-
-	void setCurveRedundancy(unsigned int boxID, const std::string &address, bool redundancy);
-
-	bool getCurveRedundancy(unsigned int boxID, const std::string &address);
-
-	void getCurveArgTypes(const std::string &stringToParse, std::vector<std::string>& result);*/
-
+	/*!
+	 * \brief Sets sections of a curve at a specific address in a box.
+	 *
+	 * \param boxID : the ID of the box
+	 * \param address : the address of the curve
+	 * \param argPosition : the index of the curve
+	 * \param xPercents : x-axis values in percents (0 < % < 100)
+	 * \param yValues : y-axis values
+	 * \param sectionType : types of curve's subsections (curves...)
+	 * \param coeff : coeff of curve's subsections' types (for CURVES_POW: 0 to 0.9999 => sqrt, 1 => linear, 1 to infinity => pow)
+	 *
+	 * \return if curves were set correctly
+	 */
 	bool setCurveSections(unsigned int boxID, const std::string &address, unsigned int argPosition,
 				const std::vector<float> &xPercents, const std::vector<float> &yValues, const std::vector<short> &sectionType, const std::vector<float> &coeff);
-
-/*	bool getCurveSections(unsigned int boxID, const std::string &address, unsigned int argPosition,
-				std::vector<float> &xPercents, std::vector<float> &yValues, std::vector<short> &sectionType, std::vector<float> &coeff);
-
-	bool getCurveValues(unsigned int boxID, const std::string &address, unsigned int argPosition, std::vector<float>& values);
-*/
-
+	/*!
+	 * \brief Gets attributes of a curve at a specific address in a box.
+	 *
+	 * \param boxID : the ID of the box
+	 * \param address : the address of the curve
+	 * \param argPosition : the index of the curve
+	 * \param sampleRate : the sample rate to be set
+	 * \param redundancy : the redundancy to be set
+	 * \param values : the breakpoints' values to be set for y-axis
+	 * \param argTypes : the respective types of the values to be set
+	 * \param xPercents : the values to be set for x-axis in percents (0 < % < 100)
+	 * \param yValues : y-axis values to be set
+	 * \param sectionType : types of curve's subsections (curves...)
+	 * \param coeff : coeff of curve's subsections' types to be set (for CURVES_POW: 0 to 0.9999 => sqrt, 1 => linear, 1 to infinity => pow)
+	 *
+	 * \return if curves were set correctly
+	 */
 	bool getCurveAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition, unsigned int & sampleRate,
 			bool &redundancy, std::vector<float>& values,	std::vector<std::string> & argTypes, std::vector<float> &xPercents,
 			std::vector<float> &yValues, std::vector<short> &sectionType, std::vector<float> &coeff);
-
-/*	bool setCurveAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition, const std::vector<float>& values,
-			const std::vector<float> &xPercents, const std::vector<float> &yValues, const std::vector<short> &sectionType, const std::vector<float> &coeff);*/
 
   /*!
    * \brief Raised when execution is finished
@@ -354,7 +392,11 @@ class Maquette : public QObject
    * \return the ID of box created
    */
   unsigned int addParentBox(const AbstractParentBox &abstract);
-
+	/*!
+	 * \brief Gets the whole set of parent boxes.
+	 *
+	 * \return the whole set of parent boxes
+	 */
   std::map<unsigned int,ParentBox*> parentBoxes();
 
   /*!
@@ -376,7 +418,13 @@ class Maquette : public QObject
    * \return a specific error message in ErrorMessage enum
    */
   int addRelation(const AbstractRelation &abstract);
-
+  /*!
+   * \brief Change boundaries for a specific relation.
+   *
+   * \param relID : the ID of the relation to change boundaries from
+   * \param minBound : the minimal boundary to be set
+   * \param maxBound : the maximal boundary to be set
+   */
   void changeRelationBounds(unsigned int relID, const float &minBound, const float &maxBound);
   /*!
    * \brief Creates a new interval relation between 2 objects.
@@ -446,7 +494,12 @@ class Maquette : public QObject
    * \return false if the Engines can not perform the transformation
    */
   bool updateBoxes(const std::map<unsigned int,Coords> &boxes);
-
+  /*!
+   * \brief Perform moving or resizing for a single box.
+   *
+   * \param box : the box that has to be transformed with its new coordinates
+   * \return false if the Engines can not perform the transformation
+   */
   bool updateBox(unsigned int boxID, const Coords &coord);
   /*!
    * \brief Informs relations that boxes have been moved.
@@ -507,11 +560,22 @@ class Maquette : public QObject
    * \return the box progress ratio
    */
   float getProgression(unsigned int boxID) ;
-
+  /*!
+   * \brief Requests a snapshot of the network on a namespace.
+   *
+   * \param address : the address to take snapshot on
+   * \param nodes : the nodes to be filled
+   * \param leaves : the leaves to be filled
+   * \param attributes : the attributes to be filled
+   * \param attributesValue : the respective values of the attributes to be filled
+   */
 	int requestNetworkNamespace(const std::string &address, std::vector<std::string>& nodes, std::vector<std::string>& leaves,
 						 std::vector<std::string>& attributes, std::vector<std::string>& attributesValue);
 
-  void updateBoxesFromEngines();
+	/*!
+	 * \brief Update boxes from Engines.
+	 */
+	void updateBoxesFromEngines();
 
   public slots :
 
@@ -594,9 +658,18 @@ class Maquette : public QObject
    * \param ID : the ID of the box to be saved
    */
   void saveBox(unsigned int ID);
-
+  /*!
+   * \brief Update curves for a box by specifying star end end messages.
+   *
+   * \param startMsgs : the start messages of the box
+   * \param endMsgs : the end messages of the box
+   */
   void updateCurves(unsigned int boxID, const std::vector<std::string> &startMsgs, const std::vector<std::string> &endMsgs);
-
+  /*!
+   * \brief Updates a set of boxes from Engines coordinates.
+   *
+   * \param movedBoxes : boxes to be updated
+   */
   void updateBoxesFromEngines(const std::vector<unsigned int> &movedBoxes);
 
   //! The MaquetteScene managing display and interaction.

@@ -80,7 +80,11 @@ class SoundBox : public BasicBox
    * \return the item's type of the box
    */
   virtual int type() const;
-
+  /*!
+   * \brief Sets the ID of the box.
+   *
+   * \param ID : the new ID of the box
+   */
   virtual void setID(unsigned int ID);
   /*!
    * \brief Initialises item's properties.

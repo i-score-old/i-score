@@ -99,7 +99,7 @@ class MaquetteView : public QGraphicsView
  private :
 
   MaquetteScene *_scene; //!< The scene displayed by the view.
-  float _zoom;
+  float _zoom; //!< The zoom factor value.
 };
 
 #endif

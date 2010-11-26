@@ -149,11 +149,16 @@ class BasicBox : public QGraphicsItem
    * \param ID : the new mother ID to be set
    */
   void setMother(unsigned int motherID);
-
+  /*!
+   * \brief Determines if box has a mother.
+   *
+   * \return the possible mother of the box
+   */
   bool hasMother();
-
+  /*!
+   * \brief Updates stuff related to the box graphical attributes.
+   */
   void updateStuff();
-
   /*!
    * \brief Adds a relation to an extremity
    *
@@ -226,6 +231,12 @@ class BasicBox : public QGraphicsItem
    * \return if trigger point could be created
    */
   bool addTriggerPoint(BoxExtremity extremity);
+  /*!
+   * \brief Adds an existing trigger point to the box.
+   *
+   * \param extremity : the extremity of the box concerned by the trigger point
+   * \param tp : the trigger point to add
+   */
   void addTriggerPoint(BoxExtremity extremity, TriggerPoint *tp);
   /*!
    * \brief Adds a trigger point to the box.
@@ -354,7 +365,11 @@ class BasicBox : public QGraphicsItem
    * \return the x value of the top left corner
    */
   float beginPos() const;
-
+  /*!
+   * \brief Gets the begin position relative to the parent box.
+   *
+   * \return the x value of the top left corner
+   */
   float relativeBeginPos() const;
   /*!
    * \brief Gets the horizontal size of the box.

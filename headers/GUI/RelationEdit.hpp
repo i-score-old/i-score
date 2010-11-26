@@ -109,12 +109,12 @@ class RelationEdit : public QDialog
   QLabel *_maxBoundLabel; //!< QLabel for time max bound.
   QLabel *_timeUnits;
 
-  QDoubleSpinBox *_timeBox; //!< QSpinBox managing time value.
-  QDoubleSpinBox *_minBoundBox; //!< QSpinBox managing time min bound value.
-  QDoubleSpinBox *_maxBoundBox; //!< QSpinBox managing time max bound value.
+  QDoubleSpinBox *_timeBox; //!< QSpinBox managing time's value.
+  QDoubleSpinBox *_minBoundBox; //!< QSpinBox managing time's min bound value.
+  QDoubleSpinBox *_maxBoundBox; //!< QSpinBox managing time's max bound value.
 
-  QCheckBox *_minBoundCheckBox;
-  QCheckBox *_maxBoundCheckBox;
+  QCheckBox *_minBoundCheckBox; //!< QCheckBox managing time's min bound activation.
+  QCheckBox *_maxBoundCheckBox; //!< QCheckBox managing time's max bound activation.
 
   QPushButton *_okButton; //!< Button used to confirme.
   QPushButton *_cancelButton; //!< Button used to cancel.

@@ -91,7 +91,7 @@ class TextEdit : public QDialog
 
   QGridLayout *_layout; //!< Internal layout.
   QLabel *_indication; //!< QLabel for 'what to do' indication.
-  QLineEdit *_lineEdit; //!< QLineEdit
+  QLineEdit *_lineEdit; //!< QLineEdit for setting value
 };
 
 #endif

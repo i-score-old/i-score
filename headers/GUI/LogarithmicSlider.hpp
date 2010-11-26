@@ -59,9 +59,15 @@ class LogarithmicSlider : public QSlider {
 
 public :
 	LogarithmicSlider(Qt::Orientation orientation, QWidget *parent);
+	/*!
+	 * \brief Gets acceleration value corresponding to a slider value.
+	 *
+	 * \param value : the slider value to get acceleration value from
+	 * \return acceleration value
+	 */
 	double accelerationValue(int value) const;
-	static const int MINIMUM_VALUE = 0;
-	static const int MAXIMUM_VALUE = 100;
+	static const int MINIMUM_VALUE = 0; //!< Slider minimum value
+	static const int MAXIMUM_VALUE = 100; //!< Slider maximum value
 protected :
 	virtual void mouseDoubleClickEvent(QMouseEvent *event);
 };

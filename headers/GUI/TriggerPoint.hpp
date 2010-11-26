@@ -94,7 +94,11 @@ class TriggerPoint : public QGraphicsItem
    */
   inline void setID(unsigned int ID)
   {_abstract->setID(ID);}
-
+  /*!
+   * \brief Gets the trigger point box's extremity.
+   *
+   * \return the box's extremity
+   */
   BoxExtremity boxExtremity() const
   {return _abstract->boxExtremity();}
   /*!
