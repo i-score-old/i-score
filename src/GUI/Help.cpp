@@ -50,7 +50,7 @@ using std::string;
 Help::Help(QWidget *parent)
   : QDialog(parent)
 {
-  setWindowModality(Qt::WindowModal);
+	//setWindowModality(Qt::WindowModal);
 
   setWindowTitle("Help");
   _layout = new QVBoxLayout;
@@ -89,6 +89,17 @@ Help::Help(QWidget *parent)
   }
   _contextLabel = new QLabel(contextString);
   _tabs->addTab(_contextLabel,"Contextual Menu");
+
+  QString editorString;
+  QFile editor(":/documentation/editor.htm");
+  if (editor.open(QIODevice::ReadOnly)) {
+    editorString = QString(editor.readAll());
+  }
+  else {
+    editorString = "No Help Found";
+  }
+  _editorLabel = new QLabel(editorString);
+  _tabs->addTab(_editorLabel,"Attributes Editor");
 
   _layout->addWidget(_tabs);
   setLayout(_layout);

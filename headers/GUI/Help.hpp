@@ -75,6 +75,7 @@ class Help : public QDialog
   QLabel *_fileLabel; //!< File menu help tab.
   QLabel *_toolBarLabel; //!< Toolbar help tab.
   QLabel *_contextLabel; //!< Contextual menu help tab.
+  QLabel *_editorLabel; //!< Attributes editor help tab.
 };
 
 #endif

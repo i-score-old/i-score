@@ -27,5 +27,6 @@
     <file>documentation/file.htm</file>
     <file>documentation/menu.htm</file>
     <file>documentation/toolbar.htm</file>
+    <file>documentation/editor.htm</file>
   </qresource>
 </RCC>
