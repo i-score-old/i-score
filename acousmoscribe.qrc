@@ -20,13 +20,16 @@
     <file>images/stop.svg</file>
     <file>images/trigger.svg</file>   
     <file>images/zoomin.svg</file>       
-    <file>images/zoomout.svg</file>       
+    <file>images/zoomout.svg</file>      
     <file>images/acousmoscribe.icns</file>
+    <file>images/BoxInteraction.png</file>
+    <file>images/Relation.png</file>
     <file>documentation/contextual.htm</file>
     <file>documentation/help.htm</file>
     <file>documentation/file.htm</file>
     <file>documentation/menu.htm</file>
     <file>documentation/toolbar.htm</file>
     <file>documentation/editor.htm</file>
+    <file>documentation/interaction.htm</file>
   </qresource>
 </RCC>

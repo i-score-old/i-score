@@ -773,7 +773,7 @@ void
 BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
 	QGraphicsItem::mouseMoveEvent(event);
-	if (_clicked && _scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::ArrowCursor) {
+	if (_clicked && _scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor) {
 		_scene->selectionMoved();
 		//_scene->boxMoved(_abstract->ID());
 	}
@@ -821,7 +821,7 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 	QGraphicsItem::hoverEnterEvent(event);
 
 	if (event->modifiers() == Qt::ShiftModifier) {
-		setCursor(Qt::ArrowCursor);
+		setCursor(Qt::SizeAllCursor);
 	}
 	else {
 		const float eventPosX = event->pos().x();
@@ -852,7 +852,7 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 				setCursor(Qt::CrossCursor);
 			}
 			else {
-				setCursor(Qt::ArrowCursor);
+				setCursor(Qt::SizeAllCursor);
 			}
 		}
 		else if (_scene->currentMode() == TRIGGER_MODE) {
@@ -863,7 +863,7 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 				setCursor(Qt::PointingHandCursor);
 			}
 			else {
-				setCursor(Qt::ArrowCursor);
+				setCursor(Qt::SizeAllCursor);
 			}
 		}
 		else {
@@ -881,7 +881,7 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 					setCursor(Qt::PointingHandCursor);
 				}
 				else {
-					setCursor(Qt::ArrowCursor);
+					setCursor(Qt::SizeAllCursor);
 				}
 			}
 			else if (eventPosX < boxStartX + BORDER_GRIP) {
@@ -895,14 +895,14 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 					setCursor(Qt::PointingHandCursor);
 				}
 				else {
-					setCursor(Qt::ArrowCursor);
+					setCursor(Qt::SizeAllCursor);
 				}
 			}
 			else if (eventPosY > boxEndY - BORDER_GRIP) {
 				setCursor(Qt::SizeVerCursor);
 			}
 			else {
-				setCursor(Qt::ArrowCursor);
+				setCursor(Qt::SizeAllCursor);
 			}
 		}
 	}
@@ -914,7 +914,7 @@ BasicBox::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 	QGraphicsItem::hoverMoveEvent(event);
 
 	if (event->modifiers() == Qt::ShiftModifier) {
-		setCursor(Qt::ArrowCursor);
+		setCursor(Qt::SizeAllCursor);
 	}
 	else {
 		const float eventPosX = event->pos().x();
@@ -945,7 +945,7 @@ BasicBox::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 				setCursor(Qt::CrossCursor);
 			}
 			else {
-				setCursor(Qt::ArrowCursor);
+				setCursor(Qt::SizeAllCursor);
 			}
 		}
 		else if (_scene->currentMode() == TRIGGER_MODE) {
@@ -956,7 +956,7 @@ BasicBox::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 				setCursor(Qt::PointingHandCursor);
 			}
 			else {
-				setCursor(Qt::ArrowCursor);
+				setCursor(Qt::SizeAllCursor);
 			}
 		}
 		else {
@@ -974,7 +974,7 @@ BasicBox::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 					setCursor(Qt::PointingHandCursor);
 				}
 				else {
-					setCursor(Qt::ArrowCursor);
+					setCursor(Qt::SizeAllCursor);
 				}
 			}
 			else if (eventPosX < boxStartX + BORDER_GRIP) {
@@ -988,14 +988,14 @@ BasicBox::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 					setCursor(Qt::PointingHandCursor);
 				}
 				else {
-					setCursor(Qt::ArrowCursor);
+					setCursor(Qt::SizeAllCursor);
 				}
 			}
 			else if (eventPosY > boxEndY - BORDER_GRIP) {
 				setCursor(Qt::SizeVerCursor);
 			}
 			else {
-				setCursor(Qt::ArrowCursor);
+				setCursor(Qt::SizeAllCursor);
 			}
 		}
 	}

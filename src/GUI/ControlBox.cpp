@@ -112,27 +112,6 @@ ControlBox::type() const
   return CONTROL_BOX_TYPE;
 }
 
-/*void
-ControlBox::resizeWidthEdition(int width)
-{
-  BasicBox::resizeWidthEdition(width);
-  update();
-}
-
-void
-ControlBox::resizeHeightEdition(int height)
-{
-  BasicBox::resizeHeightEdition(height);
-  update();
-}
-
-void
-ControlBox::resizeAllEdition(int width,int height)
-{
-  BasicBox::resizeAllEdition(width,height);
-  update();
-}*/
-
 void
 ControlBox::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {

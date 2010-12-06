@@ -2,8 +2,8 @@
 
 echo 'Resources'
 echo '...Ajout'
-rm -rf acousmoscribe.app/Contents/Resources/images acousmoscribe2.app/Contents/Resources/documentation
-rm -rf acousmoscribe.app/Contents/Resources/images acousmoscribe2.app/Contents/Resources/images
+rm -rf acousmoscribe.app/Contents/Resources/images acousmoscribe.app/Contents/Resources/documentation
+rm -rf acousmoscribe.app/Contents/Resources/images acousmoscribe.app/Contents/Resources/images
 mkdir acousmoscribe.app/Contents/Resources/images
 mkdir acousmoscribe.app/Contents/Resources/documentation
 

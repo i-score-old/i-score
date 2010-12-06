@@ -270,7 +270,7 @@ Relation::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
   		setCursor(Qt::SplitHCursor);
   	}
   	else {
-    	setCursor(Qt::ArrowCursor);
+    	setCursor(Qt::PointingHandCursor);
   	}
   }
   else if (QRectF(endBound - HANDLE_WIDTH,centerY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
@@ -278,11 +278,11 @@ Relation::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
   		setCursor(Qt::SplitHCursor);
   	}
     else {
-    	setCursor(Qt::ArrowCursor);
+    	setCursor(Qt::PointingHandCursor);
     }
   }
   else {
-  	setCursor(Qt::ArrowCursor);
+  	setCursor(Qt::PointingHandCursor);
   }
 }
 

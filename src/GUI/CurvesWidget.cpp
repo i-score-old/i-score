@@ -60,6 +60,8 @@ const int CurvesWidget::HEIGHT = 400;
 CurvesWidget::CurvesWidget(QWidget *parent)
   : QTabWidget(parent) {
   setBackgroundRole(QPalette::Base);
+  setUsesScrollButtons(true);
+  setElideMode(Qt::ElideLeft);
   update();
   setFixedSize(WIDTH,HEIGHT);
   _parentWidget = parent;
@@ -93,7 +95,9 @@ CurvesWidget::updateMessages(unsigned int boxID) {
 
 			if (Maquette::getInstance()->getCurveAttributes(boxID,*curveAddressIt,0,sampleRate,redundancy,values,argTypes,xPercents,yValues,sectionType,coeff)) {
 				CurveWidget *curve = new CurveWidget(_parentWidget,boxID,*curveAddressIt,0,values,sampleRate,redundancy,argTypes,xPercents,yValues,sectionType,coeff);
-				unsigned int curveIndex = addTab(curve,QString::fromStdString(*curveAddressIt));
+				QString curveAddressStr = QString::fromStdString(*curveAddressIt);
+				unsigned int curveIndex = addTab(curve,curveAddressStr);
+				setTabToolTip(curveIndex,curveAddressStr);
 				_curves[curveIndex] = curve;
 			}
 			else {

@@ -36,7 +36,7 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL license and that you accept its terms.
-*/
+ */
 #include "Help.hpp"
 
 #include <QString>
@@ -44,63 +44,97 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QTabWidget>
+#include <QScrollArea>
 #include <string>
 using std::string;
 
 Help::Help(QWidget *parent)
-  : QDialog(parent)
+: QDialog(parent)
 {
-	//setWindowModality(Qt::WindowModal);
+	//setWindowModality(Qt::ApplicationModal);
 
-  setWindowTitle("Help");
-  _layout = new QVBoxLayout;
-  _tabs = new QTabWidget;
+	setWindowTitle("Help");
+	_layout = new QVBoxLayout();
+	_tabs = new QTabWidget(this);
 
-  QString fileString;
-  QFile file(":/documentation/file.htm");
-  if (file.open(QIODevice::ReadOnly)) {
-    fileString = QString(file.readAll());
-  }
-  else {
-    fileString = "No Help Found";
-  }
+	QString fileString;
+	QFile file(":/documentation/file.htm");
+	if (file.open(QIODevice::ReadOnly)) {
+		fileString = QString(file.readAll());
+	}
+	else {
+		fileString = "No Help Found";
+	}
 
-  _fileLabel = new QLabel(fileString);
-  _tabs->addTab(_fileLabel,tr("File"));
+	_fileLabel = new QLabel(fileString);
 
-  QString toolbarString;
-  QFile toolbar(":/documentation/toolbar.htm");
-  if (toolbar.open(QIODevice::ReadOnly)) {
-    toolbarString = QString(toolbar.readAll());
-  }
-  else {
-    toolbarString = "No Help Found";
-  }
-  _toolBarLabel = new QLabel(toolbarString);
-  _tabs->addTab(_toolBarLabel,"Toolbar");
+	QString toolbarString;
+	QFile toolbar(":/documentation/toolbar.htm");
+	if (toolbar.open(QIODevice::ReadOnly)) {
+		toolbarString = QString(toolbar.readAll());
+	}
+	else {
+		toolbarString = "No Help Found";
+	}
+	_toolBarLabel = new QLabel(toolbarString);
 
-  QString contextString;
-  QFile context(":/documentation/contextual.htm");
-  if (context.open(QIODevice::ReadOnly)) {
-    contextString = QString(context.readAll());
-  }
-  else {
-    contextString = "No Help Found";
-  }
-  _contextLabel = new QLabel(contextString);
-  _tabs->addTab(_contextLabel,"Contextual Menu");
+	QString contextString;
+	QFile context(":/documentation/contextual.htm");
+	if (context.open(QIODevice::ReadOnly)) {
+		contextString = QString(context.readAll());
+	}
+	else {
+		contextString = "No Help Found";
+	}
+	_contextLabel = new QLabel(contextString);
 
-  QString editorString;
-  QFile editor(":/documentation/editor.htm");
-  if (editor.open(QIODevice::ReadOnly)) {
-    editorString = QString(editor.readAll());
-  }
-  else {
-    editorString = "No Help Found";
-  }
-  _editorLabel = new QLabel(editorString);
-  _tabs->addTab(_editorLabel,"Attributes Editor");
+	QString editorString;
+	QFile editor(":/documentation/editor.htm");
+	if (editor.open(QIODevice::ReadOnly)) {
+		editorString = QString(editor.readAll());
+	}
+	else {
+		editorString = "No Help Found";
+	}
+	_editorLabel = new QLabel(editorString);
 
-  _layout->addWidget(_tabs);
-  setLayout(_layout);
+	QString interactionString;
+	QFile interaction(":/documentation/interaction.htm");
+	if (interaction.open(QIODevice::ReadOnly)) {
+		interactionString = QString(interaction.readAll());
+	}
+	else {
+		interactionString = "No Help Found";
+	}
+	_interactionLabel = new QLabel(interactionString);
+
+	QScrollArea *fileScrollArea = new QScrollArea;
+	fileScrollArea->setWidget(_fileLabel);
+
+	//_tabs->addTab(fileScrollArea,tr("File"));
+
+	QScrollArea *toolBarScrollArea = new QScrollArea;
+	toolBarScrollArea->setWidget(_toolBarLabel);
+
+	_tabs->addTab(toolBarScrollArea,"Toolbar");
+
+	QScrollArea *contextScrollArea = new QScrollArea;
+	contextScrollArea->setWidget(_contextLabel);
+
+	//_tabs->addTab(contextScrollArea,"Contextual Menu");
+
+	QScrollArea *editorScrollArea = new QScrollArea;
+	editorScrollArea->setWidget(_editorLabel);
+
+	_tabs->addTab(editorScrollArea,"Attributes Editor");
+
+	QScrollArea *interactionScrollArea = new QScrollArea;
+	interactionScrollArea->setWidget(_interactionLabel);
+
+	_tabs->addTab(interactionScrollArea,"Interaction");
+
+	_layout->addWidget(_tabs);
+
+	setLayout(_layout);
+	adjustSize();
 }
