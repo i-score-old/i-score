@@ -3,7 +3,7 @@ CONFIG += debug
 TARGET = acousmoscribe
 DEPENDPATH += . \
 include \
-lib \
+#lib \
 headers/data \
 headers/GUI \
 src/data \

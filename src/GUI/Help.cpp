@@ -56,6 +56,7 @@ Help::Help(QWidget *parent)
 	setWindowTitle("Help");
 	_layout = new QVBoxLayout();
 	_tabs = new QTabWidget(this);
+	_editorTabs = new QTabWidget(this);
 
 	QString fileString;
 	QFile file(":/documentation/file.htm");
@@ -88,16 +89,6 @@ Help::Help(QWidget *parent)
 	}
 	_contextLabel = new QLabel(contextString);
 
-	QString editorString;
-	QFile editor(":/documentation/editor.htm");
-	if (editor.open(QIODevice::ReadOnly)) {
-		editorString = QString(editor.readAll());
-	}
-	else {
-		editorString = "No Help Found";
-	}
-	_editorLabel = new QLabel(editorString);
-
 	QString interactionString;
 	QFile interaction(":/documentation/interaction.htm");
 	if (interaction.open(QIODevice::ReadOnly)) {
@@ -108,6 +99,56 @@ Help::Help(QWidget *parent)
 	}
 	_interactionLabel = new QLabel(interactionString);
 
+	QString editorGeneralString;
+	QFile editorGeneral(":/documentation/editorGeneral.htm");
+	if (editorGeneral.open(QIODevice::ReadOnly)) {
+		editorGeneralString = QString(editorGeneral.readAll());
+	}
+	else {
+		editorGeneralString = "No Help Found";
+	}
+	_editorGeneralLabel = new QLabel(editorGeneralString);
+
+	QString editorProfilesString;
+	QFile editorProfiles(":/documentation/editorProfiles.htm");
+	if (editorProfiles.open(QIODevice::ReadOnly)) {
+		editorProfilesString = QString(editorProfiles.readAll());
+	}
+	else {
+		editorProfilesString = "No Help Found";
+	}
+	_editorProfilesLabel = new QLabel(editorProfilesString);
+
+	QString editorMessagesString;
+	QFile editorMessages(":/documentation/editorMessages.htm");
+	if (editorMessages.open(QIODevice::ReadOnly)) {
+		editorMessagesString = QString(editorMessages.readAll());
+	}
+	else {
+		editorMessagesString = "No Help Found";
+	}
+	_editorMessagesLabel = new QLabel(editorMessagesString);
+
+	QString editorSnapshotString;
+	QFile editorSnapshot(":/documentation/editorSnapshot.htm");
+	if (editorSnapshot.open(QIODevice::ReadOnly)) {
+		editorSnapshotString = QString(editorSnapshot.readAll());
+	}
+	else {
+		editorSnapshotString = "No Help Found";
+	}
+	_editorSnapshotLabel = new QLabel(editorSnapshotString);
+
+	QString editorCurvesString;
+	QFile editorCurves(":/documentation/editorCurves.htm");
+	if (editorCurves.open(QIODevice::ReadOnly)) {
+		editorCurvesString = QString(editorCurves.readAll());
+	}
+	else {
+		editorCurvesString = "No Help Found";
+	}
+	_editorCurvesLabel = new QLabel(editorCurvesString);
+
 	QScrollArea *fileScrollArea = new QScrollArea;
 	fileScrollArea->setWidget(_fileLabel);
 
@@ -115,23 +156,37 @@ Help::Help(QWidget *parent)
 
 	QScrollArea *toolBarScrollArea = new QScrollArea;
 	toolBarScrollArea->setWidget(_toolBarLabel);
-
 	_tabs->addTab(toolBarScrollArea,"Toolbar");
 
 	QScrollArea *contextScrollArea = new QScrollArea;
 	contextScrollArea->setWidget(_contextLabel);
 
 	//_tabs->addTab(contextScrollArea,"Contextual Menu");
-
-	QScrollArea *editorScrollArea = new QScrollArea;
-	editorScrollArea->setWidget(_editorLabel);
-
-	_tabs->addTab(editorScrollArea,"Attributes Editor");
-
 	QScrollArea *interactionScrollArea = new QScrollArea;
 	interactionScrollArea->setWidget(_interactionLabel);
-
 	_tabs->addTab(interactionScrollArea,"Interaction");
+
+	QScrollArea *editorGeneralScrollArea = new QScrollArea;
+	editorGeneralScrollArea->setWidget(_editorGeneralLabel);
+	_editorTabs->addTab(editorGeneralScrollArea,"General");
+
+	QScrollArea *editorProfilesScrollArea = new QScrollArea;
+	editorProfilesScrollArea->setWidget(_editorProfilesLabel);
+	_editorTabs->addTab(editorProfilesScrollArea,"Profiles");
+
+	QScrollArea *editorMessagesScrollArea = new QScrollArea;
+	editorMessagesScrollArea->setWidget(_editorMessagesLabel);
+	_editorTabs->addTab(editorMessagesScrollArea,"Messages");
+
+	QScrollArea *editorSnapshotScrollArea = new QScrollArea;
+	editorSnapshotScrollArea->setWidget(_editorSnapshotLabel);
+	_editorTabs->addTab(editorSnapshotScrollArea,"Snapshot");
+
+	QScrollArea *editorCurvesScrollArea = new QScrollArea;
+	editorCurvesScrollArea->setWidget(_editorCurvesLabel);
+	_editorTabs->addTab(editorCurvesScrollArea,"Curves");
+
+	_tabs->addTab(_editorTabs,"Attributes Editor");
 
 	_layout->addWidget(_tabs);
 

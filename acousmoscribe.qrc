@@ -24,12 +24,21 @@
     <file>images/acousmoscribe.icns</file>
     <file>images/BoxInteraction.png</file>
     <file>images/Relation.png</file>
+    <file>images/GeneralTab.png</file>
+    <file>images/ProfilesTab.png</file>
+    <file>images/MessagesTab.png</file>
+    <file>images/SnapshotTab.png</file>
+    <file>images/CurvesTab.png</file>
     <file>documentation/contextual.htm</file>
     <file>documentation/help.htm</file>
     <file>documentation/file.htm</file>
     <file>documentation/menu.htm</file>
     <file>documentation/toolbar.htm</file>
-    <file>documentation/editor.htm</file>
+    <file>documentation/editorGeneral.htm</file>
+    <file>documentation/editorProfiles.htm</file>
+    <file>documentation/editorMessages.htm</file>
+    <file>documentation/editorSnapshot.htm</file>
+    <file>documentation/editorCurves.htm</file>
     <file>documentation/interaction.htm</file>
   </qresource>
 </RCC>
