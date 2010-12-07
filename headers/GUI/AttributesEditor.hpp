@@ -53,7 +53,7 @@ class QComboBox;
 class QButtonGroup;
 class QRadioButton;
 class QGridLayout;
-class QHBoxLayout;
+class QVBoxLayout;
 class QLabel;
 class QPushButton;
 class QCheckBox;
@@ -318,10 +318,19 @@ class AttributesEditor : public QDockWidget
 	int _generalTabIndex; //!< Index of tab handling general information
 	QWidget * _profilesTab; //!< Tab handling profiles
 	int _profilesTabIndex; //!< Index of tab handling profiles
+	QTabWidget * _profilesTabs; //!< Widget handling internal profiles tabs.
+	int _shapeTabIndex;
+	int _rythmTabIndex;
+	int _melodyTabIndex;
+	int _harmonyTabIndex;
+
 	QTabWidget * _networkTabWidget;
 	int _networkTabIndex;
 	QWidget * _messagesTab; //!< Tab handling network
 	int _messagesTabIndex; //!< Index of tab handling network
+	QTabWidget * _messagesTabs;
+	int _startMsgsIndex;
+	int _endMsgsIndex;
 	QWidget * _snapshotTab; //!< Tab handling snapshot
 	int _snapshotTabIndex; //!< Index of tab handling snapshot
 	QWidget * _curvesTab; //!< Tab handling curves
@@ -344,6 +353,7 @@ class AttributesEditor : public QDockWidget
   QGridLayout * _generalLayout; //!< Layout handling general properties.
 
   QLabel * _startLabel;
+  QLabel * _endLabel;
   QLabel * _lengthLabel;
   QLabel * _nameLabel;
   QDoubleSpinBox * _boxStartValue;
@@ -405,9 +415,9 @@ class AttributesEditor : public QDockWidget
   QGridLayout * _messagesLayout; //!< Layout handling network
 
   QGridLayout * _msgStartTopLayout; //!< Layout handling start message top
-  QHBoxLayout * _msgStartLayout; //!< Layout handling start message
+  QVBoxLayout * _msgStartLayout; //!< Layout handling start message
   QGridLayout * _msgEndTopLayout; //!< Layout handling end message top
-  QHBoxLayout * _msgEndLayout; //!< Layout handling end message
+  QVBoxLayout * _msgEndLayout; //!< Layout handling end message
 
   QLabel * _messagesLabel; //!< Process messages label.
   QLabel * _startMsgLabel; //!< Start message label
@@ -430,9 +440,10 @@ class AttributesEditor : public QDockWidget
   QPushButton *_endMsgPasteButton; //!< Button used to paste.
 
   QString _startMsgText; //!< Start message contained text
-  QString _endMsgText; //!< Start message contained text
+  QString _endMsgText; //!< End message contained text
 
-  QGridLayout * _snapshotLayout; //!< Layout handling network
+  QGridLayout * _snapshotTopLayout; //!< Layout handling network assign buttons
+  QVBoxLayout * _snapshotLayout; //!< Layout handling snapshot
 
   QTreeWidget *_networkTree;
   QLabel *_assignLabel;

@@ -55,7 +55,7 @@ using std::string;
 #include "Maquette.hpp"
 
 const int CurvesWidget::WIDTH = 400;
-const int CurvesWidget::HEIGHT = 400;
+const int CurvesWidget::HEIGHT = 600;
 
 CurvesWidget::CurvesWidget(QWidget *parent)
   : QTabWidget(parent) {

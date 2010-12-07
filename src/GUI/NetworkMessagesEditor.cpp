@@ -83,12 +83,7 @@ NetworkMessagesEditor::NetworkMessagesEditor(QWidget *parent)
 	//addLine();
 	setMinimumWidth(WIDTH);
 	static const int TABLE_WIDTH = WIDTH - 40;
-	//_table->setMinimumWidth(WIDTH);
-	_table->setColumnWidth(0,TABLE_WIDTH/8);
-	_table->setColumnWidth(1,TABLE_WIDTH/4);
-	_table->setColumnWidth(2,3*TABLE_WIDTH/8);
-	_table->setColumnWidth(3,2*TABLE_WIDTH/8);
-	_layout->addWidget(_table);
+ 	_layout->addWidget(_table);
 
 	_clipboard = QApplication::clipboard();
 	connect(_table,SIGNAL(cellChanged(int,int)),this,SIGNAL(messagesChanged()));

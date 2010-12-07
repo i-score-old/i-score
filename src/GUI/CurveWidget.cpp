@@ -61,7 +61,7 @@ using std::make_pair;
 #include "Maquette.hpp"
 
 const unsigned int CurveWidget::WIDTH = 300; // Must be hundreds (100 200 300 ...)
-const unsigned int CurveWidget::HEIGHT = 300;
+const unsigned int CurveWidget::HEIGHT = 500;
 const unsigned int CurveWidget::H_MARGIN = 10;
 const unsigned int CurveWidget::V_MARGIN = 10;
 

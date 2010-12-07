@@ -1,4 +1,4 @@
-/*
+	/*
 Copyright: LaBRI / SCRIME
 
 Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
@@ -67,7 +67,7 @@ using std::map;
 #include <QColorDialog>
 #include <QScrollArea>
 #include <QApplication>
-#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QDoubleSpinBox>
 #include <QLineEdit>
 #include <QTreeWidget>
@@ -229,18 +229,18 @@ AttributesEditor::nameWidgets(int language)
 		variation = "Variation";
 		irregular = "Irregular   ";
 		profiles = "<big><b>PROFILES</b></big>";
-		shapeLabel = "<u><b>DYNAMIC PROFILE</b></u>";
-		rythm = "<u><b>RYTHM PROFILE</b></u>";
+		shapeLabel = "Dynamics";
+		rythm = "Rythm";
 		grain = "Grain";
 		vibrato = "Vibrato";
 		speedHeld = "Speed Held";
 		speedVariation = "Speed Variation";
 		pitchStart = "Pitch Start";
-		melody = "<u><b>MELODIC PROFILE</u></b>";
+		melody = "Melody";
 		pitchEnd = "Pitch End";
 		grade = "Grade :";
 		amplitude = "Amplitude :";
-		harmony= "<u><b>HARMONIC PROFILE</u></b>";
+		harmony= "Harmony";
 		shapeList << "Flat" << "Insistant" << "Steep attack" << "Gentle" << "Steep truncated";
 		speedHeldList << "None" << "Slow" << "Moderate" << "Fast";
 		speedVariationList << "None" << "Acceleration" << "Deceleration";
@@ -251,7 +251,7 @@ AttributesEditor::nameWidgets(int language)
 		<< "Node" << "Fringe";
 		harmoVariationList << "None default" << "Getting richer" << "Getting poorer";
 		messages = "<big><b>MESSAGES</b></big>";
-		msgStart = "Start Messsage";
+		msgStart = "Start Message";
 		msgEnd = "End Message";
 		apply = "Apply";
 		cancel = "Cancel";
@@ -280,19 +280,19 @@ AttributesEditor::nameWidgets(int language)
 		impulsive = "Impulsive  ";
 		variation = "Variation";
 		profiles = "<big><b>PROFILS</b></big>";
-		shapeLabel = "<u><b>PROFIL DYNAMIQUE</b></u>";
-		rythm = "<u><b>PROFIL RYTHMIQUE</b></u>";
+		shapeLabel = "Dynamique";
+		rythm = "Rythmique";
 		grain = "Grain";
 		vibrato = "Vibrato";
 		irregular = "Irrégulier   ";
 		speedHeld = "Vitesse Tenue";
 		speedVariation = "Vitesse Variante";
 		pitchStart = "Hauteur Début:";
-		melody = "<u><b>PROFIL MÉLODIQUE</b></u>";
+		melody = "Mélodique";
 		pitchEnd = "Hauteur Fin";
 		grade = "Calibre :";
 		amplitude = "Amplitude :";
-		harmony= "<u><b>PROFIL HARMONIQUE</b><u>";
+		harmony= "Harmonique";
 		shapeList << "Plate" << "Appui" << "Attaque raide" << "Douce" << "Raide tronquée";
 		speedHeldList << "Aucune" << "Lente" << "Modérée" << "Rapide";
 		speedVariationList << "Aucune" << "Accélération" << "Décéleration";
@@ -303,7 +303,7 @@ AttributesEditor::nameWidgets(int language)
 		<< "Noeud" <<  "Frange";
 		harmoVariationList << "Aucune" << "Enrichie" << "Appauvrie";
 		messages = "<big><b>MESSAGES</b></big>";
-		msgStart = "Messsage debut";
+		msgStart = "Message debut";
 		msgEnd = "Message fin";
 		apply = "Appliquer";
 		cancel = "Annuler";
@@ -386,6 +386,24 @@ AttributesEditor::nameWidgets(int language)
 	if (_curvesTabIndex != -1) {
 		_tabWidget->setTabText(_curvesTabIndex,curves);
 	}
+	if (_shapeTabIndex != -1) {
+		_profilesTabs->setTabText(_shapeTabIndex,shapeLabel);
+	}
+	if (_rythmTabIndex != -1) {
+		_profilesTabs->setTabText(_rythmTabIndex,rythm);
+	}
+	if (_melodyTabIndex != -1) {
+		_profilesTabs->setTabText(_melodyTabIndex,melody);
+	}
+	if (_harmonyTabIndex != -1) {
+		_profilesTabs->setTabText(_harmonyTabIndex,harmony);
+	}
+	if (_startMsgsIndex != -1) {
+		_messagesTabs->setTabText(_startMsgsIndex,msgStart);
+	}
+	if (_endMsgsIndex != -1) {
+		_messagesTabs->setTabText(_endMsgsIndex,msgEnd);
+	}
 
 	if (firstTimeCalled) { // First time function call : add Items
 		_shapeComboBox->addItems(shapeList);
@@ -442,10 +460,12 @@ AttributesEditor::createWidgets()
 	// Allocations and names
 
 	_tabWidget = new QTabWidget;
-	_generalTab = new QTabWidget;
-	_profilesTab = new QTabWidget;
+	_generalTab = new QWidget;
+	_profilesTab = new QWidget;
+	_profilesTabs = new QTabWidget;
 	_networkTabWidget = new QTabWidget;
 	_messagesTab = new QWidget;
+	_messagesTabs = new QTabWidget;
 	_snapshotTab = new QWidget;
 	_curvesTab = new QWidget;
 	_profilesColorButton = new QPushButton;
@@ -457,6 +477,7 @@ AttributesEditor::createWidgets()
   _boxName = new QLineEdit;
 
 	_startLabel = new QLabel;
+	_endLabel = new QLabel;
 	_lengthLabel = new QLabel;
   _nameLabel = new QLabel;
 	_profilesLabel = new QLabel;
@@ -515,6 +536,12 @@ AttributesEditor::createWidgets()
   _messagesTabIndex = -1;
   _snapshotTabIndex = -1;
   _curvesTabIndex = -1;
+  _shapeTabIndex = -1;
+  _rythmTabIndex = -1;
+  _melodyTabIndex = -1;
+  _harmonyTabIndex = -1;
+  _startMsgsIndex = -1;
+  _endMsgsIndex = -1;
 
 	_paletteLayout = new QGridLayout;
 	_profilesTopLayout = new QGridLayout;
@@ -526,12 +553,13 @@ AttributesEditor::createWidgets()
 	_generalLayout = new QGridLayout;
 	_profilesLayout = new QGridLayout;
 	_messagesLayout = new QGridLayout;
-	_snapshotLayout = new QGridLayout;
+	_snapshotTopLayout = new QGridLayout;
+	_snapshotLayout = new QVBoxLayout;
 	_curvesLayout = new QGridLayout;
 	_msgStartTopLayout = new QGridLayout;
-	_msgStartLayout = new QHBoxLayout;
+	_msgStartLayout = new QVBoxLayout;
 	_msgEndTopLayout = new QGridLayout;
-	_msgEndLayout = new QHBoxLayout;
+	_msgEndLayout = new QVBoxLayout;
 
 	_paletteLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
 	_profilesTopLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
@@ -543,6 +571,7 @@ AttributesEditor::createWidgets()
 	_profilesLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
 	_messagesLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
 	_snapshotLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
+	_snapshotTopLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
 	_msgStartTopLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
 	_msgEndTopLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
 	_msgStartLayout->setContentsMargins(0 , TOP_MARGIN , 0 , BOTTOM_MARGIN);
@@ -578,7 +607,7 @@ AttributesEditor::createWidgets()
 	}
 
 	_networkTree->addTopLevelItems(itemsList);
-	_networkTree->setFixedSize(QSize(2*PreviewArea::WIDTH,5*PreviewArea::HEIGHT));
+	//_networkTree->setFixedSize(QSize(2*PreviewArea::WIDTH,5*PreviewArea::HEIGHT));
 }
 
 void
@@ -624,10 +653,13 @@ AttributesEditor::addWidgetsToLayout()
 
 	/* VOLUME */
 	// Options and internal layout
+	_shapeLayout->setAlignment(Qt::AlignTop);
 	_shapeLayout->addWidget(_shapeComboBox , 0 , 0 , Qt::AlignCenter);
 	_shapeLayout->addWidget(_shapeOptionRandom , 0 , 1 , Qt::AlignCenter);
 	_shapeLayout->addWidget(_shapeOptionImpulsive , 0 , 2 , 1 , 2 , Qt::AlignCenter);
 	_shapeOptionImpulsive->setEnabled(false);
+	QWidget *shapeWidget = new QWidget(this);
+	shapeWidget->setLayout(_shapeLayout);
 
 	/* RYTHM */
 	// Held
@@ -638,6 +670,7 @@ AttributesEditor::addWidgetsToLayout()
 	// Grain
 	_grainLabel->setBuddy(_grainComboBox);
 	// Internal Layout
+	_speedLayout->setAlignment(Qt::AlignTop);
 	_speedLayout->addWidget(_speedHeldLabel, 0 , 0 ,  Qt::AlignLeft);
 	_speedLayout->addWidget(_speedHeldComboBox, 0 , 1 , Qt::AlignRight);
 	_speedLayout->addWidget(_speedOptionRandom, 0 , 2 , Qt::AlignRight);
@@ -645,9 +678,12 @@ AttributesEditor::addWidgetsToLayout()
 	_speedLayout->addWidget(_speedVariationComboBox, 1 , 1 , Qt::AlignRight);
 	_speedLayout->addWidget(_grainLabel, 2 , 0 , Qt::AlignLeft);
 	_speedLayout->addWidget(_grainComboBox, 2 , 1 , Qt::AlignRight);
+	QWidget *speedWidget = new QWidget(this);
+	speedWidget->setLayout(_speedLayout);
 	/* MELODY */
 	// Held or variation of pitch
 	// Pitch Start
+	_pitchLayout->setAlignment(Qt::AlignTop);
 	_pitchStartLabel->setBuddy(_pitchStartComboBox);
 	_melodyLabel->setBuddy(_pitchStartComboBox);
 	// Pitch Variation
@@ -662,8 +698,11 @@ AttributesEditor::addWidgetsToLayout()
 	_pitchLayout->addWidget(_pitchAmplitudeComboBox , 2 , 1);
 	_pitchLayout->addWidget(_gradeLabel , 2 , 2);
 	_pitchLayout->addWidget(_pitchGradeComboBox , 2 , 3);
+	QWidget *pitchWidget = new QWidget(this);
+	pitchWidget->setLayout(_pitchLayout);
 	/* HARMONY*/
 	// Held
+	_harmonyLayout->setAlignment(Qt::AlignTop);
 	_harmonyHeldLabel->setBuddy(_harmoHeldComboBox);
 	_harmonyLabel->setBuddy(_harmoHeldComboBox);
 	// Variation
@@ -672,75 +711,71 @@ AttributesEditor::addWidgetsToLayout()
 	_harmonyLayout->addWidget(_harmoHeldComboBox, 0 , 1 , Qt::AlignCenter);
 	_harmonyLayout->addWidget(_harmonyVariationLabel, 1 , 0);
 	_harmonyLayout->addWidget(_harmoVariationComboBox, 1 , 1, Qt::AlignCenter);
+	QWidget *harmonyWidget = new QWidget(this);
+	harmonyWidget->setLayout(_harmonyLayout);
+
 
 	unsigned int offsetY = 0;
 	unsigned int offsetX = 0;
+
 	/* Add internal layouts and titles to the main Layout */
 	// Preview Area Menu
 	_profilesLayout->addLayout(_profilesTopLayout, offsetY , offsetX, 2 , 2, Qt::AlignCenter);
 	offsetY += 2;
 	// Shape Menu
-	_profilesLayout->addWidget(_shapeLabel, offsetY, offsetX, LABEL_HEIGHT, LABEL_WIDTH, Qt::AlignCenter);
-	offsetY += LABEL_HEIGHT;
-	_profilesLayout->addLayout(_shapeLayout, offsetY, offsetX , 2 , 2 , Qt::AlignCenter);
-	// Rhythm Menu
-	offsetY += 2;
-	_profilesLayout->addWidget(_rythmLabel, offsetY, offsetX, LABEL_HEIGHT, LABEL_WIDTH, Qt::AlignLeft);
-	offsetY += LABEL_HEIGHT;
-	_profilesLayout->addLayout(_speedLayout, offsetY, offsetX, 3, 2, Qt::AlignLeft);
-	// Melody Menu
-	offsetY += 3;
-	_profilesLayout->addWidget(_melodyLabel, offsetY, offsetX, LABEL_HEIGHT, LABEL_WIDTH, Qt::AlignLeft);
-	offsetY += LABEL_HEIGHT;
-	_profilesLayout->addLayout(_pitchLayout, offsetY, offsetX, 2, 2, Qt::AlignLeft);
-	// Harmony Menu
-	offsetY += 2;
-	_profilesLayout->addWidget(_harmonyLabel, offsetY, offsetX, LABEL_HEIGHT, LABEL_WIDTH, Qt::AlignLeft);
-	offsetY += LABEL_HEIGHT;
-	_profilesLayout->addLayout(_harmonyLayout, offsetY , offsetX , 1 , 2);
+	_shapeTabIndex = _profilesTabs->addTab(shapeWidget,_shapeLabel->text());
+	_rythmTabIndex = _profilesTabs->addTab(speedWidget,_rythmLabel->text());
+	_melodyTabIndex = _profilesTabs->addTab(pitchWidget,_melodyLabel->text());
+	_harmonyTabIndex = _profilesTabs->addTab(harmonyWidget,_harmonyLabel->text());
+
+	_profilesLayout->addWidget(_profilesTabs,offsetY,offsetX);
 	_profilesTab->setLayout(_profilesLayout);
 
 	offsetY = 0;
-	_messagesLayout->addWidget(_messagesLabel, offsetY, offsetX, LABEL_HEIGHT, LABEL_WIDTH, Qt::AlignLeft);
-	offsetY += LABEL_HEIGHT;
-	_msgStartTopLayout->addWidget(_startMsgLabel, 0, 0, 1, 1, Qt::AlignLeft);
-	_msgStartTopLayout->addWidget(_startMsgsAddButton, 0, 1, 1, 1, Qt::AlignLeft);
-	_msgStartTopLayout->addWidget(_startMsgCopyButton, 0, 2, 1, 1, Qt::AlignLeft);
-	_msgStartTopLayout->addWidget(_startMsgPasteButton, 0, 3, 1, 1, Qt::AlignLeft);
-	_msgStartTopLayout->addWidget(_startMsgClearButton, 0, 4, 1, 1, Qt::AlignRight);
-	_messagesLayout->addLayout(_msgStartTopLayout,offsetY,offsetX,1,3);
+	//_msgStartTopLayout->addWidget(_startMsgLabel, 0, 0, 1, 1, Qt::AlignLeft);
+	_msgStartTopLayout->addWidget(_startMsgsAddButton, 0, 0, 1, 1, Qt::AlignLeft);
+	_msgStartTopLayout->addWidget(_startMsgCopyButton, 0, 1, 1, 1, Qt::AlignLeft);
+	_msgStartTopLayout->addWidget(_startMsgPasteButton, 0, 2, 1, 1, Qt::AlignLeft);
+	_msgStartTopLayout->addWidget(_startMsgClearButton, 0, 3, 1, 1, Qt::AlignRight);
+	_msgStartLayout->addLayout(_msgStartTopLayout);
 	offsetY += LABEL_HEIGHT;
 	_msgStartLayout->addWidget(_startMsgsEditor);
-	_messagesLayout->addLayout(_msgStartLayout,offsetY,offsetX,2,3);
-	offsetY += 2*LABEL_HEIGHT;
-	/*_messagesLayout->addWidget(_startMsgApplyButton, offsetY, offsetX, 1,1, Qt::AlignCenter);
-	_messagesLayout->addWidget(_startMsgCancelButton, offsetY, offsetX+1, 1, 1, Qt::AlignCenter);*/
-	//offsetY += LABEL_HEIGHT;
-	_msgEndTopLayout->addWidget(_endMsgLabel, 0, 0, 1, 1, Qt::AlignLeft);
-	_msgEndTopLayout->addWidget(_endMsgsAddButton, 0, 1, 1, 1, Qt::AlignLeft);
-	_msgEndTopLayout->addWidget(_endMsgCopyButton, 0, 2, 1, 1, Qt::AlignLeft);
-	_msgEndTopLayout->addWidget(_endMsgPasteButton, 0, 3, 1, 1, Qt::AlignLeft);
-	_msgEndTopLayout->addWidget(_endMsgClearButton, 0, 4, 1, 1, Qt::AlignRight);
-	_messagesLayout->addLayout(_msgEndTopLayout,offsetY,offsetX,1,3);
+
+	QWidget * startMsgsWidget = new QWidget(this);
+	startMsgsWidget->setLayout(_msgStartLayout);
+
+	offsetY = 0;
+	//_msgEndTopLayout->addWidget(_endMsgLabel, 0, 0, 1, 1, Qt::AlignLeft);
+	_msgEndTopLayout->addWidget(_endMsgsAddButton, 0, 0, 1, 1, Qt::AlignLeft);
+	_msgEndTopLayout->addWidget(_endMsgCopyButton, 0, 1, 1, 1, Qt::AlignLeft);
+	_msgEndTopLayout->addWidget(_endMsgPasteButton, 0, 2, 1, 1, Qt::AlignLeft);
+	_msgEndTopLayout->addWidget(_endMsgClearButton, 0, 3, 1, 1, Qt::AlignRight);
+	_msgEndLayout->addLayout(_msgEndTopLayout);
 	offsetY += LABEL_HEIGHT;
 	_msgEndLayout->addWidget(_endMsgsEditor);
-	_messagesLayout->addLayout(_msgEndLayout, offsetY, offsetX, 2 , 3 , Qt::AlignCenter);
-/*	offsetY += 2*LABEL_HEIGHT;
-	_messagesLayout->addWidget(_endMsgApplyButton, offsetY, offsetX, LABEL_HEIGHT, LABEL_WIDTH, Qt::AlignCenter);
-	_messagesLayout->addWidget(_endMsgCancelButton, offsetY, offsetX+1, LABEL_HEIGHT, LABEL_WIDTH, Qt::AlignCenter);*/
 
+	QWidget * endMsgsWidget = new QWidget(this);
+	endMsgsWidget->setLayout(_msgEndLayout);
+
+	//_messagesLayout->addLayout(_msgEndLayout, offsetY, offsetX, 2 , 3 , Qt::AlignCenter);
+
+	_startMsgsIndex = _messagesTabs->addTab(startMsgsWidget,_startMsgLabel->text());
+	_endMsgsIndex = _messagesTabs->addTab(endMsgsWidget,_endMsgLabel->text());
+
+	_messagesLayout->addWidget(_messagesTabs);
 	_messagesTab->setLayout(_messagesLayout);
 
 	//_networkTree->setMinimumSize(QSize(PreviewArea::WIDTH,2*PreviewArea::HEIGHT));
 	//_networkTree->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);//setFixedSize(_networkTree->sizeHint());
 	_networkTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
-	_snapshotLayout->addWidget(_assignLabel,0,0,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignBottom);
-	_snapshotLayout->addWidget(_assignSnapshotStart,0,1,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignBottom);
-	_snapshotLayout->addWidget(_assignSnapshotEnd,0,2,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignBottom);
-	_snapshotLayout->addWidget(_networkTree,1,0,3,20,Qt::AlignTop);
+	_snapshotTopLayout->addWidget(_assignLabel,0,0,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
+	_snapshotTopLayout->addWidget(_assignSnapshotStart,0,1,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
+	_snapshotTopLayout->addWidget(_assignSnapshotEnd,0,2,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
+	_snapshotLayout->addLayout(_snapshotTopLayout);
+	_snapshotLayout->addWidget(_networkTree);
+
 	_snapshotTab->setLayout(_snapshotLayout);
 
-	//_centralWidget->setLayout(_profilesLayout);
 
 	// Options defaultly disabled
 	_pitchOptionRandom->setDisabled(true);
@@ -1415,7 +1450,7 @@ AttributesEditor::networkTreeCollapsed() {
 				selectedItem->addChild(childItem);
 				list.clear();
 			}
-			_networkTree->adjustSize();
+			//_networkTree->adjustSize();
 		}
 	}
 }
@@ -1490,3 +1525,4 @@ void AttributesEditor::assignSnapshotEnd()
 		_scene->displayMessage("No selection found during snapshot",INDICATION_LEVEL);
 	}
 }
+
