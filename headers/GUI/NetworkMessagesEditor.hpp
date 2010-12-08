@@ -47,15 +47,14 @@ knowledge of the CeCILL license and that you accept its terms.
  */
 
 #include <QWidget>
-#include <vector>
+#include <map>
 #include <string>
 #include <QStringList>
+#include <QTableWidget>
 
 class QComboBox;
 class QLineEdit;
-class QPushButton;
 class QVBoxLayout;
-class QTableWidget;
 class QClipboard;
 
 /*!
@@ -64,7 +63,6 @@ class QClipboard;
  */
 struct NetworkLine {
 	QComboBox *devicesBox;
-	QPushButton *deleteButton;
 	unsigned int index;
 };
 
@@ -73,7 +71,7 @@ struct NetworkLine {
  *
  * \brief Network messages editor, derived class from Qt's QWidget.
  */
-class NetworkMessagesEditor : public QWidget {
+class NetworkMessagesEditor : public QTableWidget {
   Q_OBJECT
 public :
 	NetworkMessagesEditor(QWidget *parent);
@@ -116,20 +114,19 @@ public slots :
 	 * \brief Push back an empty line.
 	 */
 	void addLine();
+	/*!
+	 * \brief Remove the selected lines if some.
+	 */
+	void removeLines();
 
 signals :
 	void messagesChanged();
 
-private slots :
-	/*!
-	 * \brief Remove the selected line if one.
-	 */
-	void removeLine();
-
 private :
+	std::string computeMessage(const NetworkLine &line);
+
 	QWidget *_parent; //!< The parent widget.
 	unsigned int _currentLine; //!< The next line index given.
-	QTableWidget *_table; //!<  The table displaying the lines.
 	QVBoxLayout *_layout; //!< The layout handling lines.
 	std::vector<NetworkLine> _networkLines; //!< Set of existing lines.
 	static QStringList _devicesList; //!< List of existing devices names.

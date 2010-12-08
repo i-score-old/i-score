@@ -430,6 +430,7 @@ class AttributesEditor : public QDockWidget
   QPushButton *_endMsgsAddButton; //!< End message add button
   QPushButton *_startMsgCopyButton; //!< Button used to copy.
   QPushButton *_startMsgPasteButton; //!< Button used to paste.
+  QPushButton *_startMsgDeleteButton; //!< Button used to delete lines.
   QPushButton *_startMsgApplyButton; //!< Button used to confirme.
   QPushButton *_startMsgCancelButton; //!< Button used to cancel.
   QPushButton *_startMsgClearButton; //!< Button used to clear messages.
@@ -438,6 +439,7 @@ class AttributesEditor : public QDockWidget
   QPushButton *_endMsgClearButton; //!< Button used to clear.
   QPushButton *_endMsgCopyButton; //!< Button used to copy.
   QPushButton *_endMsgPasteButton; //!< Button used to paste.
+  QPushButton *_endMsgDeleteButton; //!< Button used to delete lines.
 
   QString _startMsgText; //!< Start message contained text
   QString _endMsgText; //!< End message contained text

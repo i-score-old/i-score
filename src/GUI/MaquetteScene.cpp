@@ -1013,7 +1013,7 @@ MaquetteScene::sequentialName(const string &name)
 	std::stringstream tmp;
 	tmp << curID;
 
-	return name + " " + tmp.str();
+	return name + "_" + tmp.str();
 }
 
 QString
@@ -1219,7 +1219,7 @@ MaquetteScene::addSoundBox() {
 	QString name;
 	while (name.isEmpty()) {
 
-		name = sequentialName("Sound Box").c_str();
+		name = sequentialName("Sound_Box").c_str();
 		ok = true;
 		if (!ok) {
 			return NO_ID;
@@ -1301,7 +1301,7 @@ MaquetteScene::addControlBox() {
 	QString name;
 	while (name.isEmpty()) {
 
-		name = sequentialName("Control Box").c_str();
+		name = sequentialName("Control_Box").c_str();
 		ok = true;
 		if (!ok) {
 			return NO_ID;
@@ -1380,7 +1380,7 @@ MaquetteScene::addParentBox() {
 	QString name;
 	while (name.isEmpty()) {
 
-		name = sequentialName("Parent Box").c_str();
+		name = sequentialName("Parent_Box").c_str();
 		ok = true;
 		if (!ok) {
 			return NO_ID;

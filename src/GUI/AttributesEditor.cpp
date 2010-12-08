@@ -212,7 +212,7 @@ AttributesEditor::nameWidgets(int language)
 	rythm, grain, vibrato, speedHeld, speedVariation, grade, amplitude,
 	pitchStart, melody, pitchEnd, harmony, profiles, messages, msgStart, msgEnd,
 	apply,cancel,clear,profilesTab,networkTab,messagesTab,snapshotTab,copy,paste,
-	general,start,length,name,assign,assignStart,assignEnd,curves;
+	deleteStr,general,start,length,name,assign,assignStart,assignEnd,curves;
 
 	// Used to switch between adding and renaming items
 	bool firstTimeCalled = false;
@@ -258,6 +258,7 @@ AttributesEditor::nameWidgets(int language)
 		clear = "Clear";
 		copy = "Copy";
 		paste = "Paste";
+		deleteStr = "Delete";
 		profilesTab = "Profiles";
 		networkTab = "Network";
 		messagesTab = "Messages";
@@ -310,6 +311,7 @@ AttributesEditor::nameWidgets(int language)
 		clear = "Vider";
 		copy = "Copier";
 		paste = "Coller";
+		deleteStr = "Supprimer";
 		profilesTab = "Profils";
 		networkTab = "Réseau";
 		messagesTab = "Messages";
@@ -351,16 +353,14 @@ AttributesEditor::nameWidgets(int language)
 	_messagesLabel->setText(messages);
 	_startMsgLabel->setText(msgStart);
 	_endMsgLabel->setText(msgEnd);
-/*	_startMsgApplyButton->setText(apply);
-	_endMsgApplyButton->setText(apply);
-	_startMsgCancelButton->setText(cancel);
-	_endMsgCancelButton->setText(cancel);*/
 	_startMsgClearButton->setText(clear);
 	_endMsgClearButton->setText(clear);
 	_startMsgCopyButton->setText(copy);
 	_endMsgCopyButton->setText(copy);
 	_startMsgPasteButton->setText(paste);
 	_endMsgPasteButton->setText(paste);
+	_startMsgDeleteButton->setText(deleteStr);
+	_endMsgDeleteButton->setText(deleteStr);
 	_startLabel->setText(start);
 	_lengthLabel->setText(length);
 	_nameLabel->setText(name);
@@ -519,16 +519,14 @@ AttributesEditor::createWidgets()
   _endMsgsEditor = new NetworkMessagesEditor(_endMsgScrollArea);
 	_startMsgsAddButton = new QPushButton("+",this);
 	_endMsgsAddButton = new QPushButton("+",this);
-/*  _startMsgApplyButton = new QPushButton("Apply", this);
-  _endMsgApplyButton = new QPushButton("Apply", this);
-  _startMsgCancelButton = new QPushButton("Cancel", this);
-  _endMsgCancelButton = new QPushButton("Cancel", this);*/
   _startMsgClearButton = new QPushButton("Clear", this);
   _endMsgClearButton = new QPushButton("Clear", this);
   _startMsgCopyButton = new QPushButton("Copy", this);
   _endMsgCopyButton = new QPushButton("Copy", this);
   _startMsgPasteButton = new QPushButton("Paste", this);
   _endMsgPasteButton = new QPushButton("Paste", this);
+  _startMsgDeleteButton = new QPushButton("Delete", this);
+  _endMsgDeleteButton = new QPushButton("Delete", this);
 
   _profilesTabIndex = -1;
   _generalTabIndex = -1;
@@ -732,11 +730,11 @@ AttributesEditor::addWidgetsToLayout()
 	_profilesTab->setLayout(_profilesLayout);
 
 	offsetY = 0;
-	//_msgStartTopLayout->addWidget(_startMsgLabel, 0, 0, 1, 1, Qt::AlignLeft);
 	_msgStartTopLayout->addWidget(_startMsgsAddButton, 0, 0, 1, 1, Qt::AlignLeft);
-	_msgStartTopLayout->addWidget(_startMsgCopyButton, 0, 1, 1, 1, Qt::AlignLeft);
-	_msgStartTopLayout->addWidget(_startMsgPasteButton, 0, 2, 1, 1, Qt::AlignLeft);
-	_msgStartTopLayout->addWidget(_startMsgClearButton, 0, 3, 1, 1, Qt::AlignRight);
+	_msgStartTopLayout->addWidget(_startMsgDeleteButton, 0, 1, 1, 1, Qt::AlignLeft);
+	_msgStartTopLayout->addWidget(_startMsgCopyButton, 0, 2, 1, 1, Qt::AlignLeft);
+	_msgStartTopLayout->addWidget(_startMsgPasteButton, 0, 3, 1, 1, Qt::AlignLeft);
+	_msgStartTopLayout->addWidget(_startMsgClearButton, 0, 4, 1, 1, Qt::AlignRight);
 	_msgStartLayout->addLayout(_msgStartTopLayout);
 	offsetY += LABEL_HEIGHT;
 	_msgStartLayout->addWidget(_startMsgsEditor);
@@ -745,11 +743,11 @@ AttributesEditor::addWidgetsToLayout()
 	startMsgsWidget->setLayout(_msgStartLayout);
 
 	offsetY = 0;
-	//_msgEndTopLayout->addWidget(_endMsgLabel, 0, 0, 1, 1, Qt::AlignLeft);
 	_msgEndTopLayout->addWidget(_endMsgsAddButton, 0, 0, 1, 1, Qt::AlignLeft);
-	_msgEndTopLayout->addWidget(_endMsgCopyButton, 0, 1, 1, 1, Qt::AlignLeft);
-	_msgEndTopLayout->addWidget(_endMsgPasteButton, 0, 2, 1, 1, Qt::AlignLeft);
-	_msgEndTopLayout->addWidget(_endMsgClearButton, 0, 3, 1, 1, Qt::AlignRight);
+	_msgEndTopLayout->addWidget(_endMsgDeleteButton, 0, 1, 1, 1, Qt::AlignLeft);
+	_msgEndTopLayout->addWidget(_endMsgCopyButton, 0, 2, 1, 1, Qt::AlignLeft);
+	_msgEndTopLayout->addWidget(_endMsgPasteButton, 0, 3, 1, 1, Qt::AlignLeft);
+	_msgEndTopLayout->addWidget(_endMsgClearButton, 0, 4, 1, 1, Qt::AlignRight);
 	_msgEndLayout->addLayout(_msgEndTopLayout);
 	offsetY += LABEL_HEIGHT;
 	_msgEndLayout->addWidget(_endMsgsEditor);
@@ -757,16 +755,12 @@ AttributesEditor::addWidgetsToLayout()
 	QWidget * endMsgsWidget = new QWidget(this);
 	endMsgsWidget->setLayout(_msgEndLayout);
 
-	//_messagesLayout->addLayout(_msgEndLayout, offsetY, offsetX, 2 , 3 , Qt::AlignCenter);
-
 	_startMsgsIndex = _messagesTabs->addTab(startMsgsWidget,_startMsgLabel->text());
 	_endMsgsIndex = _messagesTabs->addTab(endMsgsWidget,_endMsgLabel->text());
 
 	_messagesLayout->addWidget(_messagesTabs);
 	_messagesTab->setLayout(_messagesLayout);
 
-	//_networkTree->setMinimumSize(QSize(PreviewArea::WIDTH,2*PreviewArea::HEIGHT));
-	//_networkTree->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);//setFixedSize(_networkTree->sizeHint());
 	_networkTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	_snapshotTopLayout->addWidget(_assignLabel,0,0,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
 	_snapshotTopLayout->addWidget(_assignSnapshotStart,0,1,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
@@ -827,18 +821,16 @@ AttributesEditor::connectSlots()
 	connect(_harmoHeldComboBox, SIGNAL(activated(int)), this, SLOT(harmoHeldChanged()));
 	connect(_harmoVariationComboBox, SIGNAL(activated(int)), this, SLOT(harmoVariationChanged()));
 
-	//connect(_startMsgApplyButton, SIGNAL(clicked()), this, SLOT(startMsgApplied()));
-  //connect(_startMsgCancelButton, SIGNAL(clicked()), this, SLOT(startMsgCanceled()));
   connect(_startMsgCopyButton, SIGNAL(clicked()), this, SLOT(startMsgCopied()));
   connect(_startMsgPasteButton, SIGNAL(clicked()), this, SLOT(startMsgPasted()));
   connect(_startMsgClearButton, SIGNAL(clicked()), this, SLOT(startMsgCleared()));
-  //connect(_endMsgApplyButton, SIGNAL(clicked()), this, SLOT(endMsgApplied()));
-  //connect(_endMsgCancelButton, SIGNAL(clicked()), this, SLOT(endMsgCanceled()));
   connect(_endMsgCopyButton, SIGNAL(clicked()), this, SLOT(endMsgCopied()));
   connect(_endMsgPasteButton, SIGNAL(clicked()), this, SLOT(endMsgPasted()));
   connect(_endMsgClearButton, SIGNAL(clicked()), this, SLOT(endMsgCleared()));
   connect(_startMsgsAddButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(addLine()));
   connect(_endMsgsAddButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(addLine()));
+  connect(_startMsgDeleteButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(removeLines()));
+  connect(_endMsgDeleteButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(removeLines()));
   connect(_startMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(startMsgApplied()));
   connect(_endMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(endMsgApplied()));
 

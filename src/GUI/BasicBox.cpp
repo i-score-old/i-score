@@ -457,18 +457,22 @@ BasicBox::hasTriggerPoint(BoxExtremity extremity)
 bool
 BasicBox::addTriggerPoint(BoxExtremity extremity)
 {
-	_trgPntMsgEdit = new TextEdit(_scene->views().first(),"Enter the trigger point message :",
-			MaquetteScene::DEFAULT_TRIGGER_MSG);
 	switch (extremity) {
 	case BOX_START :
+		_trgPntMsgEdit = new TextEdit(_scene->views().first(),"Enter the trigger point message :",
+				"/"+_abstract->name()+"/start");
 		_trgPntMsgEdit->move(mapToScene(boundingRect().topLeft()).x(),
 				mapToScene(boundingRect().topLeft()).y() - 4 * _trgPntMsgEdit->height());
 		break;
 	case BOX_END :
+		_trgPntMsgEdit = new TextEdit(_scene->views().first(),"Enter the trigger point message :",
+				"/"+_abstract->name()+"/end");
 		_trgPntMsgEdit->move(mapToScene(boundingRect().topRight()).x(),
 				mapToScene(boundingRect().topRight()).y() - 4 * _trgPntMsgEdit->height());
 		break;
 	default :
+		_trgPntMsgEdit = new TextEdit(_scene->views().first(),"Enter the trigger point message :",
+				"/"+_abstract->name()+MaquetteScene::DEFAULT_TRIGGER_MSG);
 		_trgPntMsgEdit->move(mapToScene(boundingRect().topLeft()).x(),
 				mapToScene(boundingRect().topLeft()).y());
 		break;

@@ -848,23 +848,17 @@ MainWindow::createToolBars()
 {
 	_fileToolBar = addToolBar(tr("File"));
 
-	//_fileToolBar->addAction(_selectModeAct);
+	_fileToolBar->addAction(_SBModeAct);
+	_fileToolBar->addAction(_CBModeAct);
+	_fileToolBar->addAction(_PBModeAct);
 
-  _fileToolBar->addAction(_SBModeAct);
-  _fileToolBar->addAction(_CBModeAct);
-  _fileToolBar->addAction(_PBModeAct);
+	_fileToolBar->addSeparator();
 
-/*  _fileToolBar->addAction(_relationModeAct);
-  _fileToolBar->addAction(_commentModeAct);
-  _fileToolBar->addAction(_triggerModeAct);*/
+	_fileToolBar->addAction(_copyAct);
+	_fileToolBar->addAction(_cutAct);
+	_fileToolBar->addAction(_pasteAct);
 
-  _fileToolBar->addSeparator();
-
-  _fileToolBar->addAction(_copyAct);
-  _fileToolBar->addAction(_cutAct);
-  _fileToolBar->addAction(_pasteAct);
-
-  _fileToolBar->addSeparator();
+	_fileToolBar->addSeparator();
 
   _fileToolBar->addAction(_zoomOutAct);
   _fileToolBar->addAction(_zoomInAct);
@@ -872,7 +866,6 @@ MainWindow::createToolBars()
   _fileToolBar->addSeparator();
 
   _fileToolBar->addAction(_editorAct);
-  //_fileToolBar->addAction(_viewTrackAct);
 
   _fileToolBar->addSeparator();
 
@@ -891,6 +884,14 @@ MainWindow::createToolBars()
 
   _fileToolBar->insertWidget(_playAct,_slider);
   _fileToolBar->insertWidget(_playAct,_lcdNumber);
+
+  addToolBarBreak();
+  QToolBar * gotoBar = addToolBar("goto");
+  QAction *null = new QAction(this);
+  QSlider *gotoSlider = new QSlider(this);
+  gotoSlider->setOrientation(Qt::Horizontal);
+  gotoSlider->setTickPosition(QSlider::TicksBelow);
+  gotoBar->insertWidget(null,gotoSlider);
 }
 
 void

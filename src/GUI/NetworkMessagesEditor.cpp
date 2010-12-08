@@ -40,8 +40,10 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "NetworkMessagesEditor.hpp"
 #include "Maquette.hpp"
 #include <map>
+#include <set>
 #include <sstream>
 using std::map;
+using std::set;
 using std::vector;
 using std::string;
 using std::stringstream;
@@ -66,27 +68,27 @@ using std::istringstream;
 QStringList NetworkMessagesEditor::_devicesList = QStringList();
 
 NetworkMessagesEditor::NetworkMessagesEditor(QWidget *parent)
-: QWidget(parent)
+: QTableWidget(0,3,parent)
 {
 	_parent = parent;
-	_layout = new QVBoxLayout(this);
-	_layout->setSpacing(0);
-	_layout->setAlignment(Qt::AlignTop);
-	_table = new QTableWidget(0,4,this);
+	//_layout = new QVBoxLayout(this);
+	//_layout->setSpacing(0);
+	//_layout->setAlignment(Qt::AlignTop);
+	//_table = new QTableWidget(0,3,this);
 	QStringList labels;
-	labels << "" << "Device" << "Message" << "Values";
-	_table->setContentsMargins(0,0,0,0);
-	_table->setHorizontalHeaderLabels(labels);
+	labels << "Device" << "Message" << "Values";
+	setContentsMargins(0,0,0,0);
+	setHorizontalHeaderLabels(labels);
+	setSelectionBehavior(QAbstractItemView::SelectRows);
 	//_table->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	_table->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	_currentLine = 0;
-	//addLine();
-	setMinimumWidth(WIDTH);
+	//setMinimumWidth(WIDTH);
 	static const int TABLE_WIDTH = WIDTH - 40;
- 	_layout->addWidget(_table);
+ 	//_layout->addWidget(_table);
 
 	_clipboard = QApplication::clipboard();
-	connect(_table,SIGNAL(cellChanged(int,int)),this,SIGNAL(messagesChanged()));
+	connect(this,SIGNAL(cellChanged(int,int)),this,SIGNAL(messagesChanged()));
 }
 
 NetworkMessagesEditor::~NetworkMessagesEditor(){}
@@ -114,7 +116,7 @@ NetworkMessagesEditor::addMessage(const string &device, const string &message, c
 		}
 	}
 
-	_table->insertRow(_currentLine);
+	insertRow(_currentLine);
 	NetworkLine line;
 	line.devicesBox = new QComboBox();
 	line.devicesBox->addItems(_devicesList);
@@ -130,102 +132,112 @@ NetworkMessagesEditor::addMessage(const string &device, const string &message, c
 	else {
 		std::cerr << "NetworkMessagesEditor::addMessage : empty device found - default used" << std::endl;
 	}
-	line.deleteButton = new QPushButton(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),"");
+	//line.deleteButton = new QPushButton(QApplication::style()->standardIcon(QStyle::SP_TrashIcon),"");
 	line.index = _currentLine;
 
 	_networkLines.push_back(line);
 
-	_table->setCellWidget(_currentLine,0,line.deleteButton);
-	_table->setCellWidget(_currentLine,1,line.devicesBox);
-	_table->setItem(_currentLine,2,new QTableWidgetItem(QString::fromStdString(message)));
-	_table->setItem(_currentLine,3,new QTableWidgetItem(QString::fromStdString(value)));
+	//_table->setCellWidget(_currentLine,0,line.deleteButton);
+	setCellWidget(_currentLine,0,line.devicesBox);
+	setItem(_currentLine,1,new QTableWidgetItem(QString::fromStdString(message)));
+	setItem(_currentLine,2,new QTableWidgetItem(QString::fromStdString(value)));
 	_parent->update();
 
-	connect(line.deleteButton, SIGNAL(clicked()), this, SLOT(removeLine()));
 	connect(line.devicesBox,SIGNAL(activated(int)), this, SIGNAL(messagesChanged()));
 	_currentLine++;
 }
 
 void
-NetworkMessagesEditor::removeLine()
-{
-	QPushButton *button = qobject_cast<QPushButton *>(sender());
+NetworkMessagesEditor::removeLines() {
+	QModelIndexList selectedCells = selectedIndexes();
 
-	bool found = false;
-	unsigned int indexFound = 0;
-	vector<NetworkLine>::iterator it = _networkLines.begin();
-	for (it = _networkLines.begin() ; it != _networkLines.end() ; it++) {
-		if (!found) {
-			if ((*it).deleteButton == button) {
-				indexFound = (*it).index;
-				if ((int)indexFound < _table->rowCount()) {
-					/*	_table->removeCellWidget(indexFound,0);
-					_table->removeCellWidget(indexFound,1);*/
-					_table->removeRow(indexFound);
-					delete (*it).deleteButton;
-					delete (*it).devicesBox;
-					_networkLines.erase(it);
-					it--;
-					found = true;
-					_currentLine = _table->rowCount();
-					messagesChanged();
+	QModelIndexList::iterator cellIt;
+	QSet<int> selectedLines;
+	for (cellIt = selectedCells.begin() ; cellIt != selectedCells.end() ; ++cellIt) {
+		selectedLines.insert(cellIt->row());
+	}
+
+	unsigned int deletedLinesCount = 0;
+
+	vector<NetworkLine>::iterator lineIt = _networkLines.begin();
+	for (lineIt = _networkLines.begin() ; lineIt != _networkLines.end() ; lineIt++) {
+		int oldIndex = lineIt->index; // Index before any deletions
+		int tableIndex = oldIndex - deletedLinesCount; // Corresponding table index
+		if (selectedLines.contains(oldIndex)) {
+			if (tableIndex < rowCount()) {
+				removeRow(tableIndex);
+				delete lineIt->devicesBox;
+				_networkLines.erase(lineIt);
+				lineIt--;
+				_currentLine = rowCount();
+				deletedLinesCount++;
+			}
+			else {
+				std::cerr << "NetworkMessagesEditor::removeLines : index out of bounds" << std::endl;
+			}
+		}
+		else {
+			lineIt->index = tableIndex;
+		}
+	}
+	messagesChanged();
+
+}
+
+string
+NetworkMessagesEditor::computeMessage(const NetworkLine &line) {
+	stringstream lineMsg;
+	QString device = line.devicesBox->currentText();
+	int lineIndex = line.index;
+	if (lineIndex != -1 && lineIndex < rowCount()) {
+		if (!device.isEmpty()) {
+			lineMsg << device.toStdString();
+			QTableWidgetItem *cell = item(lineIndex,1);
+			if (cell != NULL) {
+				QString msg = cell->text();
+				if (!msg.isEmpty()) {
+					lineMsg << msg.toStdString();
+					cell = item(lineIndex,2);
+					if (cell != NULL) {
+						QString value = cell->text();
+						if (!value.isEmpty()) {
+							lineMsg << " " << value.toStdString();
+						}
+						else {
+#ifdef NDEBUG
+							std::cerr << "NetworkMessagesEditor::computeMessage : empty value ignored" << std::endl;
+#endif
+						}
+					}
 				}
 				else {
-					std::cerr << "NetworkMessagesEditor::removeLine : index out of bounds" << std::endl;
+#ifdef NDEBUG
+					std::cerr << "NetworkMessagesEditor::computeMessage : empty message ignored" << std::endl;
+#endif
 				}
 			}
 		}
 		else {
-			if ((*it).index > indexFound) {
-				((*it).index)--;
-			}
+			std::cerr << "NetworkMessagesEditor::computeMessage : no device" << std::endl;
 		}
 	}
+	else {
+		std::cerr << "NetworkMessagesEditor::computeMessage : index out of bounds" << std::endl;
+	}
+	return lineMsg.str();
 }
 
 vector<string>
 NetworkMessagesEditor::computeMessages() {
 	vector<string> msgs;
-	vector<NetworkLine>::iterator it;
+	vector<NetworkLine>::const_iterator it;
 	for (it = _networkLines.begin() ; it != _networkLines.end() ; it++) {
-		stringstream lineMsg;
-		QString device = (*it).devicesBox->currentText();
-		int lineIndex = (*it).index;
-		if (lineIndex != -1 && lineIndex < _table->rowCount()) {
-			if (!device.isEmpty()) {
-				lineMsg << device.toStdString();
-				QTableWidgetItem *cell = _table->item(lineIndex,2);
-				if (cell != NULL) {
-					QString msg = cell->text();
-					if (!msg.isEmpty()) {
-						lineMsg << msg.toStdString();
-						cell = _table->item(lineIndex,3);
-						if (cell != NULL) {
-							QString value = cell->text();
-							if (!value.isEmpty()) {
-								lineMsg << " " << value.toStdString();
-								msgs.push_back(lineMsg.str());
-							}
-							else {
-#ifdef NDEBUG
-								std::cerr << "NetworkMessagesEditor::computeMessages : empty value ignored" << std::endl;
-#endif
-							}
-						}
-					}
-					else {
-#ifdef NDEBUG
-						std::cerr << "NetworkMessagesEditor::computeMessages : empty message ignored" << std::endl;
-#endif
-					}
-				}
-			}
-			else {
-				std::cerr << "NetworkMessagesEditor::computeMessages : no device" << std::endl;
-			}
+		string lineMsg = computeMessage(*it);
+		if (lineMsg != "") {
+			msgs.push_back(lineMsg);
 		}
 		else {
-			std::cerr << "NetworkMessagesEditor::computeMessages : index out of bounds" << std::endl;
+			std::cerr << "NetworkMessagesEditor::computeMessages : bad message ignored" << std::endl;
 		}
 	}
 	return msgs;
@@ -324,13 +336,13 @@ NetworkMessagesEditor::exportMessages()
 		stringstream lineMsg;
 		QString device = (*it).devicesBox->currentText();
 		int lineIndex = (*it).index;
-		if (lineIndex != -1 && lineIndex < _table->rowCount()) {
-			QTableWidgetItem *cell = _table->item(lineIndex,2);
+		if (lineIndex != -1 && lineIndex < rowCount()) {
+			QTableWidgetItem *cell = item(lineIndex,1);
 			if (cell != NULL && !device.isEmpty()) {
 				if (cell->isSelected()) {
 					QString msg = cell->text();
 					if (!msg.isEmpty()) {
-						cell = _table->item(lineIndex,3);
+						cell = item(lineIndex,2);
 						QString value = cell->text();
 						if (!value.isEmpty()) {
 							copy += device;
@@ -381,9 +393,9 @@ NetworkMessagesEditor::clear()
 	vector<NetworkLine>::reverse_iterator it;
 	for (it = _networkLines.rbegin() ; it != _networkLines.rend() ; it++) {
 		int index = (*it).index;
-		if (index != -1 && index < _table->rowCount()) {
-			_table->removeRow(index);
-			delete (*it).deleteButton;
+		if (index != -1 && index < rowCount()) {
+			removeRow(index);
+			//delete (*it).deleteButton;
 			delete (*it).devicesBox;
 		}
 		else {
