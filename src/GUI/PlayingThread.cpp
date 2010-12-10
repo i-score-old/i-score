@@ -48,6 +48,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "MaquetteScene.hpp"
 
 PlayingThread::PlayingThread(MaquetteScene *scene)
+: QThread()
 {
 	_scene = scene;
 }

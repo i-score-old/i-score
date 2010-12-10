@@ -580,11 +580,13 @@ class Maquette : public QObject
   public slots :
 
   /*!
-   * \brief Launches the playing process at a specific time.
-   *
-   * \param startTime : the relative date of the maquette when playing starts
+   * \brief Sets the goto value in the engines in ms.
    */
-  void startPlaying(unsigned int startTime);
+  void setGotoValue(int gotoValue);
+  /*!
+   * \brief Launches the playing process.
+   */
+  void startPlaying();
   /*!
    * \brief Stops the playing process.
    */

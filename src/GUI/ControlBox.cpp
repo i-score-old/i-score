@@ -55,6 +55,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QMimeData>
 #include <QBuffer>
 #include <QPainter>
+#include <QProgressBar>
 #include "TextEdit.hpp"
 
 #include <vector>
@@ -168,13 +169,7 @@ ControlBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
 {
 	BasicBox::paint(painter,option,widget);
 
-  if (_playing) {
-    QPen pen = painter->pen();
-    QBrush brush = painter->brush();
-    brush.setStyle(Qt::NoBrush);
-    painter->setPen(pen);
-    painter->setBrush(brush);
-  }
+	painter->translate(boundingRect().topLeft());
 
   painter->setRenderHint(QPainter::Antialiasing, true);
 
@@ -183,8 +178,6 @@ ControlBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
   brush.setStyle(Qt::NoBrush);
   painter->setPen(pen);
   painter->setBrush(brush);
-
-  //painter->drawRect(mapFromScene(getTopLeft()).x() + RESIZE_TOLERANCE,mapFromScene(getTopLeft()).y() + RESIZE_TOLERANCE,_abstract->width(),_abstract->height());
 
   painter->translate(0,0);
 }

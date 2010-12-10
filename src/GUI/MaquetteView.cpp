@@ -71,10 +71,17 @@ MaquetteView::MaquetteView(MainWindow *mw)
   setAlignment(Qt::AlignLeft | Qt::AlignTop);
   centerOn(0,0);
   _zoom = 1;
+  _gotoValue = 0;
 }
 
 MaquetteView::~MaquetteView()
 {
+}
+
+void
+MaquetteView::setGotoValue(int value) {
+	_gotoValue = value;
+	updateScene();
 }
 
 void
@@ -125,6 +132,19 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
 			painter->setPen(savePen);
     }
   }
+
+  double progressBarPosX = _gotoValue/(float)MaquetteScene::MS_PER_PIXEL;
+
+  QPen reSavedPen = painter->pen();
+  QPen pen3(Qt::black);
+  pen3.setWidth(5);
+  painter->setPen(pen3);
+  painter->drawLine(QPointF(progressBarPosX,0),QPointF(progressBarPosX,HEIGHT));
+  pen3.setColor(Qt::white);
+  pen3.setWidth(1);
+  painter->setPen(pen3);
+  painter->drawLine(QPointF(progressBarPosX,0),QPointF(progressBarPosX,HEIGHT));
+  painter->setPen(reSavedPen);
 
   if (_scene->tracksView()) {
     QPen pen2(Qt::darkGray);

@@ -49,6 +49,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QMainWindow>
 #include <QTextEdit>
 #include <QDialog>
+#include <QSlider>
 
 #include "Palette.hpp"
 #include "MaquetteScene.hpp"
@@ -63,6 +64,7 @@ class QTabWidget;
 class QLCDNumber;
 class LogarithmicSlider;
 class Help;
+class QDoubleSpinBox;
 
 /*!
  * \class MainWindow
@@ -111,6 +113,10 @@ class MainWindow : public QMainWindow
    * \brief Called when the end of the composition is reached.
    */
   void timeEndReached();
+  /*!
+   * \brief Returns goto value in ms.
+   */
+  int gotoValue();
 
  protected:
 
@@ -205,9 +211,15 @@ class MainWindow : public QMainWindow
    */
   void playModeChanged();
   /*!
-   * \brief Raised when the slider value is changed.
+   * \brief Raised when the acceleration slider value is changed.
    */
-  void sliderChanged(int value);
+  void accelerationChanged(int value);
+  void accelerationValueEntered(double value);
+  /*!
+   * \brief Raised when the goto slider value is changed.
+   */
+  void gotoChanged();
+  void gotoValueEntered(double value);
   /*!
    * \brief Switched current interaction mode.
    */
@@ -294,6 +306,7 @@ class MainWindow : public QMainWindow
 
   QMenuBar *_menuBar; //!< Main menu bar.
   QToolBar *_fileToolBar; //!< Toolbar containing usual actions.
+  QToolBar *_gotoBar; //!< Toolbar handling goto slider.
   QMenu *_fileMenu; //!< File menu.
   QMenu *_editMenu; //!< Edit menu.
   QMenu *_viewMenu; //!< View menu.
@@ -334,9 +347,10 @@ class MainWindow : public QMainWindow
 
   Help *_helpDialog; //!< Help dialog.
 
-  LogarithmicSlider *_slider; //!< Acceleration slider.
-  QLCDNumber *_lcdNumber; //!< Acceleration value.
-  QAction *_sliderAct; //!< Acceleration slider action.
+  LogarithmicSlider *_accelerationSlider; //!< Acceleration slider.
+  QDoubleSpinBox *_accelerationDisplay; //!< Acceleration value.
+  QSlider *_gotoSlider; //!< Slider handling goto value.
+  QDoubleSpinBox *_gotoDisplay; //!< Goto value.
 };
 
 #endif

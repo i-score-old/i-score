@@ -65,6 +65,13 @@ class MaquetteView : public QGraphicsView
   MaquetteView(MainWindow *mw);
   virtual ~MaquetteView();
 
+  /*!
+   * \brief Sets the goto value.
+   *
+   * \param value : the goto value in ms
+   */
+  void setGotoValue(int value);
+
   public slots :
 
   /*!
@@ -100,6 +107,7 @@ class MaquetteView : public QGraphicsView
 
   MaquetteScene *_scene; //!< The scene displayed by the view.
   float _zoom; //!< The zoom factor value.
+  int _gotoValue; //!< The goto value in pixels.
 };
 
 #endif

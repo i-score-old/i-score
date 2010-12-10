@@ -129,51 +129,7 @@ AttributesEditor::init() {
 
 AttributesEditor::~AttributesEditor()
 {
-/*	delete _shapeLabel;
-
-	delete _shapeOptionRandom;
-	delete _shapeComboBox;
-
-	delete _rythmLabel;
-	delete _speedHeldLabel;
-	delete _speedOptionRandom;
-	delete _speedVariationLabel;
-	delete _grainLabel;
-	delete _speedHeldComboBox;
-	delete _speedVariationComboBox;
-	delete _grainComboBox;
-
-	delete _melodyLabel;
-	delete _pitchStartLabel;
-	delete _gradeLabel;
-	delete _amplitudeLabel;
-
-	delete _pitchOptionRandom;
-	delete _pitchOptionVibrato;
-
-	delete _pitchEnd;
-	delete _pitchStartComboBox;
-	delete _pitchEndComboBox;
-	delete _pitchAmplitudeComboBox;
-	delete _pitchGradeComboBox;
-
-	delete _harmonyLabel;
-	delete _harmonyHeldLabel;
-	delete _harmonyVariationLabel;
-	delete _harmoHeldComboBox;
-	delete _harmoVariationComboBox;
-
-	delete _colorButton;
-	delete _resetButton;*/
-
 	delete _centralWidget;
-/*	delete _shapeLayout;
-	delete _speedLayout;
-	delete _pitchLayout;
-	delete _harmonyLayout;
-	delete _paletteLayout;*/
-
-	//delete _profilesPreviewArea;
 	delete _palette;
 }
 

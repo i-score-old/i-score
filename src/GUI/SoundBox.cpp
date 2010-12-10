@@ -414,16 +414,6 @@ SoundBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 	BasicBox::paint(painter,option,widget);
 
 	if (_playing) {
-		/*     srand(time(NULL));
-     QColor color((double)rand() / ((double)RAND_MAX + 1) * 255,
- 		 (double)rand() / ((double)RAND_MAX + 1) * 255,
- 		 (double)rand() / ((double)RAND_MAX + 1) * 255);
-     QColor bgColor = color.lighter();
-     QPen pen(color,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
-     QBrush brush = painter->brush();
-     brush.setStyle(Qt::NoBrush);
-     painter->setPen(pen);
-     painter->setBrush(brush);*/
 		QPen pen = painter->pen();
 		QBrush brush = painter->brush();//(bgColor,isSelected() ? Qt::Dense7Pattern : Qt::Dense6Pattern);
 		brush.setStyle(Qt::NoBrush);
@@ -433,10 +423,13 @@ SoundBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
 	painter->setRenderHint(QPainter::Antialiasing, true);
 
-	if ((getBottomRight().x() - getTopLeft().x()) > (2.5 * RESIZE_TOLERANCE) && (getBottomRight().y() - getTopLeft().y()) > (4 * RESIZE_TOLERANCE))
-		((AbstractSoundBox*)_abstract)->_pal.paint(painter,mapFromScene(getTopLeft()).x() + RESIZE_TOLERANCE,
-				mapFromScene(getTopLeft()).y() + RESIZE_TOLERANCE,
-				_abstract->width()- 2*RESIZE_TOLERANCE,_abstract->height() - 2*RESIZE_TOLERANCE);
+	if ((getBottomRight().x() - getTopLeft().x()) > (2.5 * RESIZE_TOLERANCE) && (getBottomRight().y() - getTopLeft().y()) > (4 * RESIZE_TOLERANCE)) {
+		((AbstractSoundBox*)_abstract)->_pal.paint(painter,
+				mapFromScene(getTopLeft()).x(),
+				mapFromScene(getTopLeft()).y() + 3*RESIZE_TOLERANCE/2.,
+				_abstract->width(),
+				_abstract->height() - 2.25*RESIZE_TOLERANCE);
+	}
 
 	painter->translate(0,0);
 }

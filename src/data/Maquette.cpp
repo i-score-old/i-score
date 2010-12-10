@@ -1067,18 +1067,22 @@ Maquette::getProgression(unsigned int boxID)
 }
 
 void
-Maquette::startPlaying(unsigned int startTime)
+Maquette::setGotoValue(int gotoValue) {
+	_engines->setGotoValue(gotoValue);
+}
+
+void
+Maquette::startPlaying()
 {
 	for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
 		it->second->lock();
 		if (it->second->type() == SOUND_BOX_TYPE) {
-			if (it->second->date() >= startTime) {
+			if (it->second->date() >= _engines->getGotoValue()) {
 				sendMessage(static_cast<SoundBox*>(it->second)->getPalette().toString());
 			}
 		}
 	}
 
-	_engines->setGotoValue(startTime);
 	_engines->play();
 }
 

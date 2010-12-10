@@ -57,6 +57,7 @@ knowledge of the CeCILL license and that you accept its terms.
 enum {CONTROL_BOX_TYPE = QGraphicsItem::UserType + 7};
 
 class AttributesEditor;
+class QProgressBar;
 
 /*!
  * \class ControlBox
@@ -129,6 +130,7 @@ class ControlBox : public BasicBox
   virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
  private:
+	 QProgressBar *_progressBar;
 };
 
 #endif

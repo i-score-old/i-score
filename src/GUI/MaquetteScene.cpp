@@ -1667,21 +1667,24 @@ MaquetteScene::updateStartingTime(int value)
 
 void MaquetteScene::setPlaying(unsigned int boxID, bool playing)
 {
+	BasicBox *box = getBox(boxID);
 	map<unsigned int,BasicBox*>::iterator it;
 	if ((it = _playingBoxes.find(boxID)) != _playingBoxes.end()) {
-		switch (playing) {
-		case true :
-			it->second = getBox(boxID);
-			break ;
-		case false :
-			it->second->update();
+		it->second = box;
+		it->second->update();
+		if (!playing) { // Playing ended, removing box from set
 			_playingBoxes.erase(it);
-			break;
+		}
+		else {
+			std::cerr << "MaquetteScene::setPlaying : trying to start playing an playing box" << std::endl;
 		}
 	}
 	else {
-		if (playing == true) {
-			_playingBoxes[it->first] = getBox(boxID);
+		if (playing) {
+			if (box != NULL) {
+				_playingBoxes[boxID] = box;
+				box->update();
+			}
 		}
 	}
 }
@@ -1703,7 +1706,7 @@ MaquetteScene::play() {
 	}
 	else {
 		_playing = true;
-		_maquette->startPlaying(_startingValue);
+		_maquette->startPlaying();
 		_playThread->start();
 		_startingValue = 0;
 	}
@@ -1723,6 +1726,7 @@ MaquetteScene::stop() {
 	_paused = false;
 	_maquette->stopPlaying();
 	_playThread->quit();
+	_playingBoxes.clear();
 	update();
 }
 

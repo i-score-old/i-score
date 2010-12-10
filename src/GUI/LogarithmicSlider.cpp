@@ -57,6 +57,16 @@ LogarithmicSlider::mouseDoubleClickEvent(QMouseEvent *event) {
 	setSliderPosition(50);
 }
 
+int
+LogarithmicSlider::valueForAcceleration(double value) const {
+	// A = [0,2 ; 5] ;; B = [0 ; 100]
+	// A = 0.2 x (10 ^ (log_10(25) / 100))^B
+	//
+	static const double MAGIC_NUMBER = pow(2,log2(25)/100.);
+
+	return log2(value/0.2) / log2(MAGIC_NUMBER);
+}
+
 double
 LogarithmicSlider::accelerationValue(int value) const
 {
@@ -67,19 +77,10 @@ LogarithmicSlider::accelerationValue(int value) const
 	// y = 0.2 x (10 ^ (log_10(25) / 100))^c
 	// y =~ 0.2 x 1.0327 ^ c
 	static const double SLIDER_LOW_POW = 0.2;
-	static const double MAGIC_NUMBER = 1.0327;
+	//static const double MAGIC_NUMBER = 1.0327;
+	static const double MAGIC_NUMBER = pow(2,log2(25)/100.);
 
 	double newValue = SLIDER_LOW_POW * pow(MAGIC_NUMBER,value);
 
-	return round(newValue * 100.) / 100.;
-
-	/*	static const double BOUND_VALUES[] = {0.2, 0.33, 0.5, 0.66, 1., 2., 3., 4., 5};
-		static const int STEP_VALUES[] = {0, 125, 250, 375, 500, terval / (float)STEP_INTERVAL) * boundInterval;
-				newValue = BOUND_VALUES[i-1] + boundDistance;
-				break;
-			}
-		}
-		if (value == 0) {
-			newValue = 0.2;
-		}*/
+	return round(newValue * 10.) / 10.;
 }

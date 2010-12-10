@@ -69,6 +69,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QCloseEvent>
 #include <QKeyEvent>
 #include <QLCDNumber>
+#include <QDoubleSpinBox>
 
 #include <iostream>
 #include <math.h>
@@ -78,6 +79,8 @@ using std::string;
 using std::stringstream;
 
 using namespace SndBoxProp;
+
+static const float S_TO_MS = 1000.;
 
 MainWindow::MainWindow()
 {
@@ -398,13 +401,44 @@ MainWindow::pasteSelection()
 }
 
 void
-MainWindow::sliderChanged(int value)
+MainWindow::accelerationChanged(int value)
 {
-	double newValue = _slider->accelerationValue(value);
+	double newValue = _accelerationSlider->accelerationValue(value);
 
-	Maquette::getInstance()->setAccelerationFactor(newValue);
+	if (_accelerationDisplay->value() != newValue) {
+		_accelerationDisplay->setValue(newValue);
+	}
+}
 
-	_lcdNumber->display(newValue);
+void
+MainWindow::accelerationValueEntered(double value)
+{
+	int newValue = _accelerationSlider->valueForAcceleration(value);
+
+	Maquette::getInstance()->setAccelerationFactor(value);
+
+	_accelerationSlider->setValue(newValue);
+}
+
+void
+MainWindow::gotoChanged()
+{
+	double newValue = _gotoSlider->value();
+
+	Maquette::getInstance()->setGotoValue(newValue);
+
+	_view->setGotoValue(newValue);
+
+	_gotoDisplay->setValue(newValue / S_TO_MS);
+}
+
+void
+MainWindow::gotoValueEntered(double value) {
+	Maquette::getInstance()->setGotoValue(value * S_TO_MS);
+	_gotoSlider->setTracking(false);
+	_gotoSlider->setValue(value * S_TO_MS);
+	_gotoSlider->setTracking(true);
+	_view->setGotoValue(value * S_TO_MS);
 }
 
 void
@@ -476,14 +510,15 @@ MainWindow::escapeKeyPressed() {
 
 void
 MainWindow::timeEndReached() {
-  _slider->setEnabled(true);
+  _accelerationSlider->setEnabled(true);
+  _accelerationDisplay->setEnabled(true);
   _playAct->setChecked(false);
 }
 
 void
 MainWindow::play()
 {
-  //_slider->setDisabled(true);
+  //_accelerationSlider->setDisabled(true);
   _playAct->setChecked(true);
   _scene->play();
 }
@@ -491,7 +526,7 @@ MainWindow::play()
 void
 MainWindow::pause()
 {
-  //_slider->setDisabled(true);
+  //_accelerationSlider->setDisabled(true);
   _scene->pause();
 }
 
@@ -501,7 +536,7 @@ MainWindow::stop()
   _scene->stop();
   _stopAct->setChecked(false);
   _playAct->setChecked(false);
-  //_slider->setEnabled(true);
+  //_accelerationSlider->setEnabled(true);
 }
 
 void
@@ -663,14 +698,6 @@ MainWindow::createActions()
   _zoomOutAct->setStatusTip(tr("Zoom out"));
   connect(_zoomOutAct, SIGNAL(triggered()), _view, SLOT(zoomOut()));
 
-/*  _viewTrackAct = new QAction(QIcon(":/images/tracks.png"), tr("View tracks"),this);
-  _viewTrackAct->setStatusTip(tr("Show tracks"));
-  _viewTrackAct->setCheckable(true);
-  _viewTrackAct->setChecked(false);
-  //viewTrack();
-  _viewTrackAct->setDisabled(true);
-  connect(_viewTrackAct,SIGNAL(triggered()), this, SLOT(viewTrack()));*/
-
   _editorAct = new QAction(QIcon(":/images/edit.svg"), tr("Edit attributes"), this);
   _editorAct->setShortcut(tr("Ctrl+E"));
   _editorAct->setStatusTip(tr("Edit box attributes"));
@@ -788,16 +815,39 @@ MainWindow::createActions()
   _playModeAct->addAction(_synthPlayAct);
   _playModeAct->setExclusive(true);
 
-  _slider = new LogarithmicSlider(Qt::Horizontal,this);
-  _slider->setFixedWidth(100);
-  connect(_slider,SIGNAL(valueChanged(int)),this,SLOT(sliderChanged(int)));
+  _accelerationSlider = new LogarithmicSlider(Qt::Horizontal,this);
+  _accelerationSlider->setStatusTip("Acceleration");
+  _accelerationSlider->setFixedWidth(100);
+  connect(_accelerationSlider,SIGNAL(valueChanged(int)),this,SLOT(accelerationChanged(int)));
 
-  _lcdNumber = new QLCDNumber(this);
-  _lcdNumber->setDigitCount(4);
-  _lcdNumber->setSmallDecimalPoint(true);
-  _lcdNumber->setSegmentStyle(QLCDNumber::Flat);
+  _accelerationDisplay = new QDoubleSpinBox(this);
+  _accelerationDisplay->setStatusTip("Acceleration");
+  _accelerationDisplay->setRange(0.,5);
+  _accelerationDisplay->setDecimals(1);
+  _accelerationDisplay->setKeyboardTracking(false);
+  connect(_accelerationDisplay, SIGNAL(valueChanged(double)), this, SLOT(accelerationValueEntered(double)));
 
-  _slider->setSliderPosition(50);
+  _accelerationSlider->setSliderPosition(50);
+
+  _gotoSlider = new QSlider(this);
+  _gotoSlider->setStatusTip("Goto");
+  _gotoSlider->setOrientation(Qt::Horizontal);
+  //_gotoSlider->setTickPosition(QSlider::TicksBelow);
+  _gotoSlider->setRange(0,_view->sceneRect().width() * MaquetteScene::MS_PER_PIXEL);
+  _gotoSlider->setSingleStep(1);
+  _gotoSlider->setPageStep(10);
+  _gotoSlider->setStyleSheet("QSlider::handle:horizontal { background: white; border: 5px solid black;}");
+
+  connect(_gotoSlider,SIGNAL(valueChanged(int)),this,SLOT(gotoChanged()));
+
+  static const unsigned int GOTO_PRECISION = 2;
+  static const float S_TO_MS = 1000.;
+  _gotoDisplay = new QDoubleSpinBox;
+  _gotoDisplay->setStatusTip("Goto");
+  _gotoDisplay->setRange(0.,MaquetteScene::MAX_SCENE_WIDTH * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
+  _gotoDisplay->setDecimals(GOTO_PRECISION);
+  _gotoDisplay->setKeyboardTracking(false);
+  connect(_gotoDisplay, SIGNAL(valueChanged(double)), this, SLOT(gotoValueEntered(double)));
 }
 
 void
@@ -882,16 +932,21 @@ MainWindow::createToolBars()
   _fileToolBar->addAction(_helpAct);
   _fileToolBar->addAction(_helpAct);
 
-  _fileToolBar->insertWidget(_playAct,_slider);
-  _fileToolBar->insertWidget(_playAct,_lcdNumber);
+  QAction *noAction = new QAction(this);
+  _fileToolBar->insertWidget(noAction,_accelerationSlider);
+  _fileToolBar->insertWidget(noAction,_accelerationDisplay);
 
-  addToolBarBreak();
-  QToolBar * gotoBar = addToolBar("goto");
-  QAction *null = new QAction(this);
-  QSlider *gotoSlider = new QSlider(this);
-  gotoSlider->setOrientation(Qt::Horizontal);
-  gotoSlider->setTickPosition(QSlider::TicksBelow);
-  gotoBar->insertWidget(null,gotoSlider);
+  //addToolBarBreak();
+  _gotoBar = addToolBar("Goto");
+  _gotoBar->insertWidget(noAction,_gotoSlider);
+  //QLabel * gotoLabel("GOTO");
+  //_gotoBar->insertWidget(noAction,gotoLabel);
+  _gotoBar->insertWidget(noAction,_gotoDisplay);
+}
+
+int
+MainWindow::gotoValue() {
+	return _gotoSlider->value();
 }
 
 void
