@@ -49,7 +49,7 @@ LogarithmicSlider::LogarithmicSlider(Qt::Orientation orientation, QWidget *paren
   setSingleStep((MAXIMUM_VALUE - MINIMUM_VALUE) / 100);
   setPageStep((MAXIMUM_VALUE - MINIMUM_VALUE) / 10);
   setTickPosition(QSlider::TicksAbove);
-}
+  }
 
 void
 LogarithmicSlider::mouseDoubleClickEvent(QMouseEvent *event) {

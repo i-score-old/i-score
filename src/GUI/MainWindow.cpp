@@ -933,15 +933,14 @@ MainWindow::createToolBars()
   _fileToolBar->addAction(_helpAct);
 
   QAction *noAction = new QAction(this);
-  _fileToolBar->insertWidget(noAction,_accelerationSlider);
   _fileToolBar->insertWidget(noAction,_accelerationDisplay);
+  _fileToolBar->insertWidget(noAction,_accelerationSlider);
+
 
   //addToolBarBreak();
   _gotoBar = addToolBar("Goto");
-  _gotoBar->insertWidget(noAction,_gotoSlider);
-  //QLabel * gotoLabel("GOTO");
-  //_gotoBar->insertWidget(noAction,gotoLabel);
   _gotoBar->insertWidget(noAction,_gotoDisplay);
+  _gotoBar->insertWidget(noAction,_gotoSlider);
 }
 
 int
