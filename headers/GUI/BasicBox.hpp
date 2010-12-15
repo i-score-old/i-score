@@ -553,7 +553,6 @@ class BasicBox : public QGraphicsItem
   MaquetteScene * _scene; //!< The scene containing box.
   bool _hasContextMenu; //!< True if box has contextual menu.
   QMenu* _contextMenu; //!< The contextual menu, if one.
-  bool _clicked; //!< Box's selection state.
   bool _shift; //!< State of Shift Key.
   bool _playing; //!< State of playing.
   TextEdit *_trgPntMsgEdit; //!< The trigger point editing dialog.

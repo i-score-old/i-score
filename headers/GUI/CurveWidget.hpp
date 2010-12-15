@@ -97,8 +97,6 @@ public :
 	void setAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition, const std::vector<float> &values, unsigned int sampleRate,
 			bool redundancy, const std::vector<std::string> &argType, const std::vector<float> &xPercents, const std::vector<float> &yValues,
 			const std::vector<short> &sectionType, const std::vector<float> &coeff, 	bool update = true);
-  static const unsigned int WIDTH; //!< Curve widget width.
-  static const unsigned int HEIGHT; //!< Curve widget height.
 protected :
   /*!
    * \brief Redefinition of QWidget::paintEvent(QPaintEvent *event).
@@ -128,17 +126,13 @@ protected :
    * \param event : the information about the event
    */
   virtual void mouseReleaseEvent(QMouseEvent *event);
-  /*!
-   * \brief Redefinition of QWidget::sizeHint(). Gets the
-   * recommanded size to use.
-   *
-   * \return the recommended size for the preview area
-   */
-  virtual QSize sizeHint() const;
-private :
+/*!
+ * \brief This event handler can be reimplemented in a subclass to receive widget resize events which are passed in the event parameter.
+ * \param event : the resizing event
+ */
+  virtual void resizeEvent(QResizeEvent * event);
 
-  static const unsigned int H_MARGIN; //!< Curve widget horizontal margin.
-  static const unsigned int V_MARGIN; //!< Curve widget vertical margin.
+private :
 
   /*!
    * \brief Gets local coordinates of a point.
@@ -153,17 +147,15 @@ private :
    */
   QPointF absoluteCoordinates(const QPointF &point);
   /*!
-   * \brief Called to update interspace between points.
+   * \brief Called to update representation.
    */
-  void updateInterspace();
+  void curveRepresentationOutdated();
   /*!
    * \brief Called when curve is modified.
    */
   bool curveChanged();
 
 	unsigned int _boxID; //!< Box ID.
-
-	QPointF _origin; //!< O(0,0) of the curve in Widget coordinates
 
 	std::vector<float> _curve; //!< List of all curve values.
 	//! Map of breakpoints with their values and curving values.
@@ -177,9 +169,10 @@ private :
 
 	unsigned int _sampleRate; //!< Curve sample rate.
 	float _interspace; //!< Horizontal interspace.
-	float _curveWidth; //!< Curve width.
 	float _scaleX; //!< Value for horizontal scaling.
 	float _scaleY; //!< Value for vertical scaling.
+	float _minY;
+	float _maxY;
 	bool _redundancy; //!< Handles curve's redundancy
 	std::string _address; //!< Address of the curve.
 

@@ -79,8 +79,6 @@ public :
 	 * \param boxID : the box handling messages
 	 */
 	void updateMessages(unsigned int boxID);
-	static const int WIDTH; //!< Curves widget width.
-  static const int HEIGHT; //!< Curves widget height.
 private :
 	std::map<unsigned int,CurveWidget*> _curves; //!< Set of curves identified by their tab index
 	unsigned int _width; //!< Widget height.

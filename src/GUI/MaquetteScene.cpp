@@ -370,13 +370,13 @@ MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
 		}
 		else {
 #ifdef DEBUG
-			std::cout << "MaquetteScene::drawForeground : not clicked" << std::endl;
+			std::cerr << "MaquetteScene::drawForeground : not clicked" << std::endl;
 #endif
 		}
 	}
 	else {
 #ifdef DEBUG
-		std::cout << "MaquetteScene::drawForeground : not in relation mode" << std::endl;
+		std::cerr << "MaquetteScene::drawForeground : not in relation mode" << std::endl;
 #endif
 	}
 }
@@ -911,7 +911,7 @@ void MaquetteScene::pasteBoxes()
 		if (newID != NO_ID && absCopyBox != NULL) {
 			IDMap[absCopyBox->ID()] = newID;
 #ifdef NDEBUG
-			std::cout << "MaquetteScene::pasteBoxes : assigning ID " << newID << " to copy of box " << absCopyBox->ID() << std::endl;
+			std::cerr << "MaquetteScene::pasteBoxes : assigning ID " << newID << " to copy of box " << absCopyBox->ID() << std::endl;
 #endif
 			newBox = getBox(newID);
 			newBox->setSelected(false);
@@ -935,8 +935,8 @@ void MaquetteScene::pasteBoxes()
 			AbstractRelation *relation = static_cast<AbstractRelation*>(*it);
 			if (IDMap.find(relation->firstBox()) != IDMap.end() && IDMap.find(relation->secondBox()) != IDMap.end()) {
 #ifdef NDEBUG
-				std::cout << "MaquetteScene::pasteBoxes : relation was between " << relation->firstBox() << " and " << relation->secondBox() << std::endl;
-				std::cout << "MaquetteScene::pasteBoxes : relation is now between " << IDMap[relation->firstBox()] << " and " << IDMap[relation->secondBox()] << std::endl;
+				std::cerr << "MaquetteScene::pasteBoxes : relation was between " << relation->firstBox() << " and " << relation->secondBox() << std::endl;
+				std::cerr << "MaquetteScene::pasteBoxes : relation is now between " << IDMap[relation->firstBox()] << " and " << IDMap[relation->secondBox()] << std::endl;
 #endif
 				relation->setFirstBox(IDMap[relation->firstBox()]);
 				relation->setSecondBox(IDMap[relation->secondBox()]);
@@ -1104,12 +1104,12 @@ unsigned int
 MaquetteScene::findMother(const QPointF &topLeft, const QPointF &size)
 {
 #ifdef NDEBUG
-	std::cout << "MaquetteScene::findMother : child coords : [" << topLeft.x() << ";" << topLeft.y()
+	std::cerr << "MaquetteScene::findMother : child coords : [" << topLeft.x() << ";" << topLeft.y()
 	<< "] / [" << size.x() << ";" << size.y() << "]" << std::endl;
 #endif
 	map<unsigned int,ParentBox*> parentBoxes = _maquette->parentBoxes();
 #ifdef NDEBUG
-	std::cout << "MaquetteScene::findMother : parentBoxes size : " << parentBoxes.size() << std::endl;
+	std::cerr << "MaquetteScene::findMother : parentBoxes size : " << parentBoxes.size() << std::endl;
 #endif
 	map<unsigned int,ParentBox*>::iterator it;
 	unsigned int motherID = ROOT_BOX_ID;
@@ -1118,12 +1118,12 @@ MaquetteScene::findMother(const QPointF &topLeft, const QPointF &size)
 	for (it = parentBoxes.begin() ; it != parentBoxes.end() ; ++it) {
 		QRectF mRect = QRectF(it->second->getTopLeft(),QSize(it->second->getSize().x(),it->second->getSize().y()));
 #ifdef NDEBUG
-		std::cout << "MaquetteScene::findMother : possible mother coords : [" << mRect.topLeft().x() << ";" << mRect.topLeft().y()
+		std::cerr << "MaquetteScene::findMother : possible mother coords : [" << mRect.topLeft().x() << ";" << mRect.topLeft().y()
 		<< "] / [" << mRect.size().width() << ";" << mRect.size().height() << "]" << std::endl;
 #endif
 		if (mRect.contains(childRect) && !childRect.contains(mRect)) {
 #ifdef NDEBUG
-			std::cout << "MaquetteScene::findMother : newMother : " << it->first << std::endl;
+			std::cerr << "MaquetteScene::findMother : newMother : " << it->first << std::endl;
 #endif
 			motherID = it->first;
 			motherZValue = it->second->zValue();
@@ -1416,7 +1416,7 @@ MaquetteScene::addRelation(const AbstractRelation &abstractRel) {
 	}
 
 #ifdef NDEBUG
-	std::cout << "MaquetteScene::addRelation : returns " << ret << std::endl;
+	std::cerr << "MaquetteScene::addRelation : returns " << ret << std::endl;
 #endif
 
 	switch (ret) {

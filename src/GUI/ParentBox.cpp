@@ -215,7 +215,6 @@ ParentBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 	BasicBox::mousePressEvent(event);
 	if (event->button() == Qt::LeftButton) {
 		if (_scene->currentMode() != CREATION_MODE) {
-			_clicked = true;
 			setSelected(true);
 			if (cursor().shape() == Qt::SizeAllCursor) {
 				unlock();

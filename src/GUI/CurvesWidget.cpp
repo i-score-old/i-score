@@ -54,16 +54,13 @@ using std::string;
 #include "CurveWidget.hpp"
 #include "Maquette.hpp"
 
-const int CurvesWidget::WIDTH = 400;
-const int CurvesWidget::HEIGHT = 600;
-
 CurvesWidget::CurvesWidget(QWidget *parent)
   : QTabWidget(parent) {
   setBackgroundRole(QPalette::Base);
   setUsesScrollButtons(true);
   setElideMode(Qt::ElideLeft);
   update();
-  setFixedSize(WIDTH,HEIGHT);
+  //setFixedSize(WIDTH,HEIGHT);
   _parentWidget = parent;
 }
 

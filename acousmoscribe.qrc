@@ -25,10 +25,15 @@
     <file>images/BoxInteraction.png</file>
     <file>images/Relation.png</file>
     <file>images/GeneralTab.png</file>
-    <file>images/ProfilesTab.png</file>
-    <file>images/MessagesTab.png</file>
+    <file>images/ProfilesDynamics.png</file>
+    <file>images/ProfilesRythm.png</file>
+    <file>images/ProfilesMelody.png</file>
+    <file>images/ProfilesHarmony.png</file>
+    <file>images/Messages.png</file>
     <file>images/SnapshotTab.png</file>
-    <file>images/CurvesTab.png</file>
+    <file>images/Curves.png</file>
+    <file>images/Acceleration.png</file>
+    <file>images/Goto.png</file>
     <file>documentation/contextual.htm</file>
     <file>documentation/help.htm</file>
     <file>documentation/file.htm</file>

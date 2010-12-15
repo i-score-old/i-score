@@ -60,54 +60,50 @@ using std::make_pair;
 #include "Engines.hpp"
 #include "Maquette.hpp"
 
-const unsigned int CurveWidget::WIDTH = 300; // Must be hundreds (100 200 300 ...)
-const unsigned int CurveWidget::HEIGHT = 500;
-const unsigned int CurveWidget::H_MARGIN = 10;
-const unsigned int CurveWidget::V_MARGIN = 10;
-
 CurveWidget::CurveWidget(QWidget *parent,unsigned int boxID, const string &address, unsigned int argPosition, const vector<float> &values, unsigned int sampleRate,
-		bool redundancy, const vector<string> &argType, const vector<float> &xPercents, const vector<float> &yValues,
-		const vector<short> &sectionType, const vector<float> &coeff)
-  : QWidget(parent) {
-  setBackgroundRole(QPalette::Base);
-  //update();
-  setFixedSize(WIDTH,HEIGHT);
-  setCursor(Qt::CrossCursor);
-  setMouseTracking(true);
+bool redundancy, const vector<string> &argType, const vector<float> &xPercents, const vector<float> &yValues,
+const vector<short> &sectionType, const vector<float> &coeff) : QWidget(parent) {
+	setBackgroundRole(QPalette::Base);
+	setCursor(Qt::CrossCursor);
+	setMouseTracking(true);
 
-  _layout = new QGridLayout;
-  _layout->setAlignment(Qt::AlignCenter);
-  //_sampleRate = 10;
-  _scaleX = 1;
-  _scaleY = 1;
+	_layout = new QGridLayout;
+	_layout->setAlignment(Qt::AlignCenter);
+	_scaleX = 1;
+	_scaleY = 1;
 
-  _interspace = WIDTH;
-  _curveWidth = WIDTH;
-  _redundancy = false;
-  _address = "";
+	_interspace = width();
+	_redundancy = false;
+	_address = "";
 
-  _clicked = false;
-  _breakpointMovedX = -1;
-  _breakpointMovedY = -1;
-  _lastPointSelected = false;
-  _lastPointCoeff = 1;
+	_clicked = false;
+	_breakpointMovedX = -1;
+	_breakpointMovedY = -1;
+	_minY = -100;
+	_maxY = 100;
+	_lastPointSelected = false;
+	_lastPointCoeff = 1;
 
-  _boxID = NO_ID;
+	_boxID = NO_ID;
 
-  _origin = QPointF(H_MARGIN,HEIGHT/2.);
+	setLayout(_layout);
 
-  setLayout(_layout);
-
-  setAttributes(boxID,address,argPosition,values,sampleRate,redundancy,argType,xPercents,yValues,sectionType,coeff,false);
+	setAttributes(boxID,address,argPosition,values,sampleRate,redundancy,argType,xPercents,yValues,sectionType,coeff,false);
 }
 
 CurveWidget::~CurveWidget() {
 
 }
 
-void CurveWidget::updateInterspace() {
-	_interspace = WIDTH / (std::max((unsigned int)2,(unsigned int)(_curve.size())) - 1);
-	_curveWidth = (_curve.size() - 1) * _interspace;
+void CurveWidget::curveRepresentationOutdated() {
+	_interspace = width() / (float)(std::max((unsigned int)2,(unsigned int)(_curve.size())) - 1);
+	_minY = *(std::min_element(_curve.begin(),_curve.end()));
+	_maxY = *(std::max_element(_curve.begin(),_curve.end()));
+	float halfSizeY = std::max(fabs(_maxY),fabs(_minY));
+
+	_scaleY = height() / (2*halfSizeY);
+
+	update();
 }
 
 void
@@ -118,14 +114,9 @@ CurveWidget::setAttributes(unsigned int boxID, const std::string &address, unsig
 	_curve.clear();
 	_breakpoints.clear();
 	_sampleRate = sampleRate;
+
 	_redundancy = redundancy;
 	_address = address;
-
-	float minY = *(std::min_element(values.begin(),values.end()));
-	float maxY = *(std::max_element(values.begin(),values.end()));
-	float halfSizeY = std::max(fabs(maxY),fabs(minY));
-
-	_scaleY = (float)HEIGHT / (2*halfSizeY);
 
 	vector<float>::const_iterator it;
 	vector<float>::const_iterator it2;
@@ -140,18 +131,18 @@ CurveWidget::setAttributes(unsigned int boxID, const std::string &address, unsig
 
 	_lastPointCoeff = coeff.back();
 
-	updateInterspace();
+	curveRepresentationOutdated();
 }
 
 QPointF
 CurveWidget::relativeCoordinates(const QPointF &point) {
 	float pointX = point.x();
 	float scaledX = pointX / (float)_scaleX;
-	float translatedX = scaledX;// - _origin.x();
-	float finalX = std::max((float)0.,std::min((float)1.,translatedX / (float)_curveWidth));
+	float translatedX = scaledX;
+	float finalX = std::max((float)0.,std::min((float)1.,translatedX / width() ));
 
 	float pointY = point.y();
-	float translatedY = pointY - _origin.y();
+	float translatedY = pointY - height()/2.;
 	float symetricalY = - translatedY;
 	float finalY = symetricalY / (float)_scaleY;
 
@@ -162,14 +153,14 @@ QPointF
 CurveWidget::absoluteCoordinates(const QPointF &point)
 {
 	float pointX = point.x();
-	float unpercentX = pointX * (float)_curveWidth;
+	float unpercentX = pointX * width();
 	float scaledX = unpercentX * (float)_scaleX;
-	float finalX = scaledX;// + _origin.x();
+	float finalX = scaledX;
 
 	float pointY = point.y();
 	float scaledY = pointY * (float)_scaleY;
 	float symetricalY = -scaledY;
-	float finalY = symetricalY + _origin.y();
+	float finalY = symetricalY + height()/2.;
 
 	return QPointF(finalX,finalY);
 }
@@ -181,15 +172,17 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
 	_clicked = true;
 	QPointF relativePoint = relativeCoordinates(event->pos());
 
-	// TODO : forbid extremities
 	switch(event->modifiers()) {
 	case Qt::ShiftModifier :
 	{
 		map<float,pair<float,float> >::iterator it;
 		QPointF relativePoint = relativeCoordinates(event->pos());
 		QPointF absolutePoint = absoluteCoordinates(relativePoint);
-		if (fabs(((_curve.size()-1) * _interspace * _scaleX) - absolutePoint.x()) <= 0.01) {
+		std::cerr << "Absolute mouse pos X : " << absolutePoint.x() << std::endl;
+		std::cerr << "Absolute last point X " << (_curve.size()-1) * _interspace * _scaleX << std::endl;
+		if (fabs(((_curve.size()-1) * _interspace * _scaleX) - absolutePoint.x()) <= 2) {
 			_lastPointSelected = true;
+			std::cerr << "Last point selected" << std::endl;
 		}
 		else {
 			_lastPointSelected = false;
@@ -268,14 +261,18 @@ void
 CurveWidget::mouseMoveEvent(QMouseEvent *event)
 {
 	QWidget::mouseMoveEvent(event);
+
+	// Draw cursor coordinates as a tooltip
 	QPointF mousePos = relativeCoordinates(event->pos());
 	QRect rect;
 	QString posStr = QString("%1 ; %2").arg(mousePos.x(),0,'f',2).arg(mousePos.y(),0,'f',2);
 	QToolTip::showText(event->globalPos(), posStr, this, rect);
+
+	// Handle interactions
 	if (_clicked) {
 		QPointF relativePoint = relativeCoordinates(event->pos());
 		switch (event->modifiers()) {
-		case Qt::ShiftModifier :
+		case Qt::ShiftModifier : // POW
 		{
 			if (_lastPointSelected) {
 				float mousePosY = event->pos().y();
@@ -308,7 +305,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 			}
 			break;
 		}
-		case Qt::ControlModifier :
+		case Qt::ControlModifier : // VERTICAL SLIDE
 		{
 			if (_breakpointMovedX != -1) {
 				map<float,pair<float,float> >::iterator it;
@@ -323,7 +320,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 			}
 			break;
 		}
-		case Qt::NoModifier :
+		case Qt::NoModifier : // MOVE
 		{
 			_breakpointMovedX = relativePoint.x();
 			_breakpointMovedY = relativePoint.y();
@@ -337,7 +334,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 			update();
 			break;
 		}
-	}
+		}
 	}
 	update();
 }
@@ -365,10 +362,6 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event) {
 	_lastPointSelected = false;
 
 	update();
-}
-
-QSize CurveWidget::sizeHint() const {
-  return QSize(WIDTH,HEIGHT);
 }
 
 bool
@@ -414,54 +407,83 @@ CurveWidget::curveChanged() {
 
 void
 CurveWidget::applyChanges() {
-  update();
+	update();
+}
+
+void
+CurveWidget::resizeEvent ( QResizeEvent * event ) {
+	QWidget::resizeEvent(event);
+	curveRepresentationOutdated();
 }
 
 void CurveWidget::paintEvent(QPaintEvent * /* event */) {
-  QPainter *painter = new QPainter(this);
+	QPainter *painter = new QPainter(this);
 
-  painter->setRenderHint(QPainter::Antialiasing, true);
+	painter->setRenderHint(QPainter::Antialiasing, true);
 
-  QPen pen = painter->pen();
-  QBrush brush = painter->brush();
-  brush.setColor(Qt::green);
-  pen.setBrush(brush);
-  painter->setBrush(brush);
+	painter->setPen(Qt::black);
 
-  painter->drawLine(0,HEIGHT/2,_curveWidth,HEIGHT/2);
+	painter->drawLine(0,height()/2.,width(),height()/2.); // Abcisses line
 
-  vector<float>::iterator it;
-  map<float,pair<float,float> >::iterator it2;
+	vector<float>::iterator it;
+	map<float,pair<float,float> >::iterator it2;
 	float pointSizeX = 4;
 	float pointSizeY = 4;
 	QPointF curPoint(0,0);
-  QPointF precPoint(-1,-1);
-  unsigned int i = 0;
-  for (it = _curve.begin() ; it != _curve.end() ; ++it) {
-  	curPoint = absoluteCoordinates(QPointF(1,*it));
-  	curPoint.setX(i * _interspace * _scaleX);
-  	if (it == _curve.begin()) {
-  		painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),Qt::red);
-  	}
-  	if (precPoint != QPointF(-1,-1)) {
-  		painter->drawLine(precPoint,curPoint);
-  	}
-  	precPoint = curPoint;
-  	i++;
-  }
+	QPointF precPoint(-1,-1);
+
+	unsigned int i = 0;
+	unsigned int Xdiv = _curve.size() / 10;
+	unsigned int XsubDiv = std::max((unsigned int)1,Xdiv) / 10;
+
+	for (it = _curve.begin() ; it != _curve.end() ; ++it) {
+		curPoint = absoluteCoordinates(QPointF(1,*it));
+		curPoint.setX(i * _interspace * _scaleX);
+
+		if (XsubDiv != 0) {
+			if ((i % XsubDiv) == 0) {
+				painter->setPen(Qt::gray);
+				painter->drawLine(QPointF(curPoint.x(),height()/2.-5),QPointF(curPoint.x(),height()/2.+5));
+				painter->setPen(Qt::black);
+			}
+		}
+
+		if (Xdiv != 0) {
+			if ((i % Xdiv) == 0) {
+				painter->setPen(Qt::black);
+				painter->drawLine(QPointF(curPoint.x(),height()/2.-10),QPointF(curPoint.x(),height()/2.+10));
+				painter->setPen(Qt::black);
+			}
+		}
+
+		if (it == _curve.begin()) { // First point is represented by a red rectangle
+			painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),Qt::red);
+		}
+		if (precPoint != QPointF(-1,-1)) {
+			painter->setPen(Qt::darkRed);
+			painter->drawLine(precPoint,curPoint); // Draw lines between values
+			painter->setPen(Qt::black);
+		}
+
+		precPoint = curPoint;
+		i++;
+	}
+	// Last point is represented by a red rectangle
 	painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),Qt::red);
 
 	precPoint = QPointF(-1,-1);
-  for (it2 = _breakpoints.begin() ; it2 != _breakpoints.end() ; ++it2) {
-  	curPoint = absoluteCoordinates(QPointF(it2->first,it2->second.first));
-  	painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),Qt::blue);
-  	precPoint = curPoint;
-  }
+	for (it2 = _breakpoints.begin() ; it2 != _breakpoints.end() ; ++it2) {
+		curPoint = absoluteCoordinates(QPointF(it2->first,it2->second.first));
+		// Breakpoints are drawn in blue
+		painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),Qt::blue);
+		precPoint = curPoint;
+	}
 
-  if (_breakpointMovedX != -1 && _breakpointMovedY != -1) {
-  	QPointF cursor = absoluteCoordinates(QPointF(_breakpointMovedX,_breakpointMovedY));
-		painter->fillRect(QRectF(cursor - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),Qt::blue);
-  }
+	if (_breakpointMovedX != -1 && _breakpointMovedY != -1) {
+		QPointF cursor = absoluteCoordinates(QPointF(_breakpointMovedX,_breakpointMovedY));
+		// If a breakpoint is currently being moved, it is represented in blue
+		painter->fillRect(QRectF(cursor - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),Qt::darkBlue);
+	}
 
-  delete painter;
+	delete painter;
 }

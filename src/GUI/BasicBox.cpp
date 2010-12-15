@@ -120,7 +120,6 @@ BasicBox::init()
 	_playing = false;
 
 	_comment = NULL;
-	_clicked = false;
 
 	setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
@@ -727,8 +726,6 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
 	QGraphicsItem::mousePressEvent(event);
 	if (event->button() == Qt::LeftButton) {
-		_clicked = true;
-		//setSelected(true);
 		if (cursor().shape() == Qt::CrossCursor) {
 			lock();
 			if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
@@ -777,11 +774,10 @@ void
 BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
 	QGraphicsItem::mouseMoveEvent(event);
-	if (_clicked && _scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor) {
+	if (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor) {
 		_scene->selectionMoved();
-		//_scene->boxMoved(_abstract->ID());
 	}
-	else if (_clicked && _scene->resizeMode() != NO_RESIZE && (cursor().shape() == Qt::SizeVerCursor || cursor().shape() == Qt::SizeHorCursor || cursor().shape() == Qt::SizeFDiagCursor)) {
+	else if (_scene->resizeMode() != NO_RESIZE && (cursor().shape() == Qt::SizeVerCursor || cursor().shape() == Qt::SizeHorCursor || cursor().shape() == Qt::SizeFDiagCursor)) {
 		switch (_scene->resizeMode()) {
 		case HORIZONTAL_RESIZE :
 			resizeWidthEdition(_abstract->width() + event->pos().x() - boundingRect().topRight().x());
@@ -807,8 +803,6 @@ BasicBox::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 	QGraphicsItem::mouseReleaseEvent(event);
 
 	if (event->button() == Qt::LeftButton) {
-		_clicked = true;
-		//setSelected(true);
 		_scene->setAttributes(_abstract);
 	}
 
@@ -824,7 +818,7 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 {
 	QGraphicsItem::hoverEnterEvent(event);
 
-	if (event->modifiers() == Qt::ShiftModifier) {
+	if (event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::ControlModifier) {
 		setCursor(Qt::SizeAllCursor);
 	}
 	else {
@@ -917,7 +911,7 @@ BasicBox::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 {
 	QGraphicsItem::hoverMoveEvent(event);
 
-	if (event->modifiers() == Qt::ShiftModifier) {
+	if (event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::ControlModifier) {
 		setCursor(Qt::SizeAllCursor);
 	}
 	else {
