@@ -14,7 +14,7 @@ linux-g++ {
 INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2
 }
 macx-g++ {
-INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /Library/Frameworks/
+INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /Library/Frameworks/ /usr/local/include/libxml2
 }
 
 QT += network xml svg
@@ -35,7 +35,7 @@ linux-g++ {
 LIBS += -lIscore -lDeviceManager -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodescheduling -lgecodeset -lgecodesupport -lgecodegraph
 }
 macx-g++ {
-LIBS += -lIscore -lDeviceManager -framework gecode -framework libxml
+LIBS += -lIscore -lDeviceManager -framework gecode -lxml2
 }
 # Input
 HEADERS += /usr/local/include/IScore/Engines.hpp \
@@ -61,6 +61,7 @@ headers/GUI/ControlBoxContextMenu.hpp \
 headers/GUI/CurveWidget.hpp \
 headers/GUI/CurvesWidget.hpp \
 headers/GUI/Help.hpp \
+headers/GUI/Interpolation.hpp \
 headers/GUI/LogarithmicSlider.hpp \
 headers/GUI/MainWindow.hpp \
 headers/GUI/MaquetteScene.hpp \
@@ -100,6 +101,7 @@ src/GUI/ControlBoxContextMenu.cpp \
 src/GUI/CurveWidget.cpp \
 src/GUI/CurvesWidget.cpp \
 src/GUI/Help.cpp \
+src/GUI/Interpolation.cpp \
 src/GUI/LogarithmicSlider.cpp \
 src/GUI/MainWindow.cpp \
 src/GUI/MaquetteScene.cpp \

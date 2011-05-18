@@ -178,11 +178,8 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
 		map<float,pair<float,float> >::iterator it;
 		QPointF relativePoint = relativeCoordinates(event->pos());
 		QPointF absolutePoint = absoluteCoordinates(relativePoint);
-		std::cerr << "Absolute mouse pos X : " << absolutePoint.x() << std::endl;
-		std::cerr << "Absolute last point X " << (_curve.size()-1) * _interspace * _scaleX << std::endl;
 		if (fabs(((_curve.size()-1) * _interspace * _scaleX) - absolutePoint.x()) <= 2) {
 			_lastPointSelected = true;
-			std::cerr << "Last point selected" << std::endl;
 		}
 		else {
 			_lastPointSelected = false;

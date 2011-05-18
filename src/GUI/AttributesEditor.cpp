@@ -75,6 +75,7 @@ using std::map;
 #include <QSizePolicy>
 #include "NetworkMessagesEditor.hpp"
 #include "CurvesWidget.hpp"
+#include "Interpolation.hpp"
 
 /* La palette hérite de QDockWidget, a pour parent la fenetre principale*/
 

@@ -679,12 +679,13 @@ MainWindow::createActions()
   connect(_aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
   _helpDialog = new Help(this);
+
   _helpAct = new QAction( QIcon(":/images/help.svg"), tr("&Help"), this);
   _helpAct->setShortcut(QKeySequence::HelpContents);
   _helpAct->setStatusTip(tr("Show the application's Help"));
   connect(_helpAct, SIGNAL(triggered()), this, SLOT(help()));
 
-  _networkAct = new QAction(QIcon(":/images/network.svg"),tr("&Network"),this);
+   _networkAct = new QAction(QIcon(":/images/network.svg"),tr("&Network"),this);
   _networkAct->setStatusTip(tr("Configure network preferences"));
   connect(_networkAct, SIGNAL(triggered()), this, SLOT(networkConfig()));
 
@@ -836,7 +837,8 @@ MainWindow::createActions()
   _gotoSlider->setRange(0,_view->sceneRect().width() * MaquetteScene::MS_PER_PIXEL);
   _gotoSlider->setSingleStep(1);
   _gotoSlider->setPageStep(10);
-  _gotoSlider->setStyleSheet("QSlider::handle:horizontal { background: white; border: 5px solid black;}");
+  _gotoSlider->setStyleSheet("QSlider::handle:horizontal { background: white; width: 3px; "
+		  "border-left: 3px solid black; border-right : 3px solid black;  border-top: 0px; border-bottom: 0px;}");
 
   connect(_gotoSlider,SIGNAL(valueChanged(int)),this,SLOT(gotoChanged()));
 
@@ -930,14 +932,11 @@ MainWindow::createToolBars()
   _fileToolBar->addSeparator();
 
   _fileToolBar->addAction(_helpAct);
-  _fileToolBar->addAction(_helpAct);
 
   QAction *noAction = new QAction(this);
   _fileToolBar->insertWidget(noAction,_accelerationDisplay);
   _fileToolBar->insertWidget(noAction,_accelerationSlider);
 
-
-  //addToolBarBreak();
   _gotoBar = addToolBar("Goto");
   _gotoBar->insertWidget(noAction,_gotoDisplay);
   _gotoBar->insertWidget(noAction,_gotoSlider);

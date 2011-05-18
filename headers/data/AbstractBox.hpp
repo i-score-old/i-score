@@ -49,6 +49,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <iostream>
 #include <vector>
 #include <string>
+#include <map>
 #include "Abstract.hpp"
 #include "CSPTypes.hpp"
 #include <QPoint>
@@ -189,7 +190,6 @@ class AbstractBox : public Abstract
   	_lastMsgs.clear();
   	_lastMsgs = lastMsgs;
 	};
-
 
  protected :
 

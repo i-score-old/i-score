@@ -253,6 +253,14 @@ class Maquette : public QObject
      * \param boxID : the box to get curves from
      */
 	std::vector<std::string> getCurvesAddresses(unsigned int boxID);
+
+	void setCurveRedundancy(unsigned int boxID, const std::string &address, bool redundancy);
+	void setCurveSampleRate(unsigned int boxID, const std::string &address, int sampleRate);
+
+	void setCurveMuteState(unsigned int boxID, const std::string &address, bool muteState);
+	bool getCurveMuteState(unsigned int boxID, const std::string &address);
+
+
 	/*!
 	 * \brief Sets sections of a curve at a specific address in a box.
 	 *
@@ -288,6 +296,8 @@ class Maquette : public QObject
 	bool getCurveAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition, unsigned int & sampleRate,
 			bool &redundancy, std::vector<float>& values,	std::vector<std::string> & argTypes, std::vector<float> &xPercents,
 			std::vector<float> &yValues, std::vector<short> &sectionType, std::vector<float> &coeff);
+
+
 
   /*!
    * \brief Raised when execution is finished

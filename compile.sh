@@ -8,7 +8,7 @@
 CURRENT_PATH=`pwd`
 
 OS=$1
-DEVICE_MANAGER_PATH='/Users/luc/Documents/workspace/device-manager'
+DEVICE_MANAGER_PATH='/Users/luc/Documents/workspace/Device-Manager'
 LIB_ISCORE_PATH='/Users/luc/Documents/workspace/libIscore'
 ACOUSMOSCRIBE_PATH='/Users/luc/Documents/workspace/Acousmoscribe'
 QMAKE='qmake'

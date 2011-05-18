@@ -64,6 +64,7 @@ class QLineEdit;
 class QTreeWidget;
 class QTreeWidgetItem;
 class CurvesWidget;
+class Interpolation;
 
 class PreviewArea;
 class Palette;

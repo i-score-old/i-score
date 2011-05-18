@@ -863,6 +863,23 @@ vector<string> Maquette::getCurvesAddresses(unsigned int boxID)
 {
 	return _engines->getCurvesAddress(boxID);
 }
+
+void Maquette::setCurveRedundancy(unsigned int boxID, const string &address, bool redundancy) {
+	_engines->setCurveRedundancy(boxID,address,redundancy);
+}
+
+void Maquette::setCurveSampleRate(unsigned int boxID, const string &address, int sampleRate) {
+	_engines->setCurveSampleRate(boxID,address,sampleRate);
+}
+
+void Maquette::setCurveMuteState(unsigned int boxID, const string &address, bool muteState) {
+	_engines->setCurveMuteState(boxID,address,muteState);
+}
+
+bool Maquette::getCurveMuteState(unsigned int boxID, const string &address) {
+	return _engines->getCurveMuteState(boxID,address);
+}
+
 bool Maquette::setCurveSections(unsigned int boxID, const string &address, unsigned int argPosition,
 			const vector<float> &xPercents, const vector<float> &yValues, const vector<short> &sectionType, const vector<float> &coeff)
 {
