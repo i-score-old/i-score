@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ENGINES version="0.8" scenarioSize="600000">
+  <EDITOR>
+    <BOXES>
+      <BOX id="1" begin="0" length="600000" processid="1">
+        <BOXES>
+          <BOX id="2" begin="592" length="5392" processid="2">
+            <BOXES/>
+            <RELATIONS/>
+            <TRIGGERPOINTS/>
+            <CONTROLPOINTS>
+              <CONTROLPOINT id="1" begin="592" stepid="1"/>
+              <CONTROLPOINT id="2" begin="5984" stepid="2"/>
+            </CONTROLPOINTS>
+          </BOX>
+        </BOXES>
+        <RELATIONS/>
+        <TRIGGERPOINTS/>
+        <CONTROLPOINTS>
+          <CONTROLPOINT id="1" begin="0" stepid="1"/>
+          <CONTROLPOINT id="2" begin="600000" stepid="2"/>
+        </CONTROLPOINTS>
+      </BOX>
+    </BOXES>
+    <RELATIONS/>
+    <TRIGGERPOINTS/>
+  </EDITOR>
+  <ECOMACHINE>
+    <ECOPROCESS>
+      <PROCESS id="2" type="networkMessageToSend" mute="false">
+        <STEP id="1" mute="false">
+          <MESSAGE value="MaxDevice/box/play 2"/>
+          <MESSAGE value="MaxDevice/msg 1"/>
+        </STEP>
+        <STEP id="2" mute="false">
+          <MESSAGE value="MaxDevice/box/stop 2"/>
+          <MESSAGE value="MaxDevice/msg 200"/>
+        </STEP>
+        <CURVE_INFORMATION address="MaxDevice/msg" samplerate="20" avoidRedundancy="false" muteState="true">
+          <ARGUMENT nb="0">
+            <SECTION section_type="pow" coeff="1"/>
+          </ARGUMENT>
+        </CURVE_INFORMATION>
+      </PROCESS>
+    </ECOPROCESS>
+  </ECOMACHINE>
+</ENGINES>

@@ -147,7 +147,7 @@ SoundBox::selectMode(const PlayingMode &mode)
 void
 SoundBox::selectSound()
 {
-	QString fileName = QFileDialog::getOpenFileName(_contextMenu,"Choose a sound","","Sound Files (*.wav *.ogg *.aif *.aiff)");
+	QString fileName = QFileDialog::getOpenFileName(_contextMenu,QObject::tr("Choose a sound"),"",QObject::tr("Sound Files (*.wav *.ogg *.aif *.aiff)"));
 	if (!fileName.isEmpty()) {
 		((AbstractSoundBox*)_abstract)->_pal.setSoundFile(fileName);
 	}

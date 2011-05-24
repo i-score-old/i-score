@@ -66,7 +66,7 @@ Interpolation::Interpolation(QWidget *parent)
 	_parent = parent;
 
 	QStringList labels;
-	labels << "Address" << "Sample Rate" << "Redundancy";
+	labels << tr("Address") << tr("Sample Rate") << tr("Redundancy");
 	setContentsMargins(0,0,0,0);
 	setHorizontalHeaderLabels(labels);
 	setSelectionBehavior(QAbstractItemView::SelectRows);

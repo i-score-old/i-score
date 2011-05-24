@@ -55,39 +55,39 @@ SoundBoxContextMenu::SoundBoxContextMenu(SoundBox *box) :
 
   _aspectMenu = new QMenu("Aspect",this);
 
-  _copyGraphicAspectAct = new QAction("Copy",this);
+  _copyGraphicAspectAct = new QAction(tr("Copy"),this);
   _aspectMenu->addAction(_copyGraphicAspectAct);
   connect(_copyGraphicAspectAct, SIGNAL(triggered()), this, SLOT(copyAspect()));
 
-  _pasteGraphicAspectAct = new QAction("Paste",this);
+  _pasteGraphicAspectAct = new QAction(tr("Paste"),this);
   _aspectMenu->addAction(_pasteGraphicAspectAct);
   connect(_pasteGraphicAspectAct, SIGNAL(triggered()), this, SLOT(pasteAspect()));
 
-  /*_editGraphicAspectAct = new QAction("Edit",this);
+  /*_editGraphicAspectAct = new QAction(tr("Edit"),this);
   _aspectMenu->addAction(_editGraphicAspectAct);
   connect(_editGraphicAspectAct, SIGNAL(triggered()), this, SLOT(editAspect()));
 
-  _importGraphicAspectAct = new QAction("Import",this);
+  _importGraphicAspectAct = new QAction(tr("Import"),this);
   _aspectMenu->addAction(_importGraphicAspectAct);
   connect(_importGraphicAspectAct, SIGNAL(triggered()), this, SLOT(importAspect()));
 
-  _makeImpulsiveAct = new QAction("Make impulsive",this);
+  _makeImpulsiveAct = new QAction(tr("Make impulsive"),this);
   _aspectMenu->addAction(_makeImpulsiveAct);
   connect(_makeImpulsiveAct, SIGNAL(triggered()), this, SLOT(switchImpulsive()));
 */
   addMenu(_aspectMenu);
 
-  _soundMenu = new QMenu("Sound",this);
+  _soundMenu = new QMenu(tr("Sound"),this);
 
-  _selectModeMenu = new QMenu("Mode",this);
+  _selectModeMenu = new QMenu(tr("Mode"),this);
 
-  _synthModeAct = new QAction("Synthesis",this);
+  _synthModeAct = new QAction(tr("Synthesis"),this);
   _synthModeAct->setCheckable(true);
   _synthModeAct->setChecked(true);
   _selectModeMenu->addAction(_synthModeAct);
   connect(_synthModeAct, SIGNAL(triggered()), this, SLOT(selectSynthMode()));
 
-  _directModeAct = new QAction("File",this);
+  _directModeAct = new QAction(tr("File"),this);
   _directModeAct->setCheckable(true);
   _directModeAct->setChecked(false);
   _selectModeMenu->addAction(_directModeAct);
@@ -102,15 +102,15 @@ SoundBoxContextMenu::SoundBoxContextMenu(SoundBox *box) :
 
   _soundMenu->addMenu(_selectModeMenu);
 
-  _selectSoundAct = new QAction("Choose a File",this);
+  _selectSoundAct = new QAction(tr("Select File"),this);
   _soundMenu->addAction(_selectSoundAct);
   connect(_selectSoundAct, SIGNAL(triggered()), this, SLOT(selectSound()));
 
-  _playAct = new QAction("Play",this);
+  _playAct = new QAction(tr("Play"),this);
   _soundMenu->addAction(_playAct);
   connect(_playAct, SIGNAL(triggered()), this, SLOT(play()));
 
-  _fineTuneAct = new QAction("Fine Tune",this);
+  _fineTuneAct = new QAction(tr("Fine Tune"),this);
   _soundMenu->addAction(_fineTuneAct);
   connect(_fineTuneAct, SIGNAL(triggered()), this, SLOT(fineTune()));
 

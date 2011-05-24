@@ -71,6 +71,7 @@ class Palette;
 class NetworkMessagesEditor;
 class AbstractBox;
 class MaquetteScene;
+class NetworkTree;
 
 /*!
  * \class AttributesEditor
@@ -286,10 +287,6 @@ class AttributesEditor : public QDockWidget
    */
   void nameChanged();
   /*!
-   * \brief Called when the network tree is clicked on.
-   */
-  void networkTreeCollapsed();
-  /*!
    * \brief Assigns the snapshot to the start of the box.
    */
   void assignSnapshotStart();
@@ -299,13 +296,6 @@ class AttributesEditor : public QDockWidget
   void assignSnapshotEnd();
 
  private:
-
-	 /*!
-	  * \brief Gets the absolute address of an item in the snapshot tree.
-	  *
-	  * \param item : the item to get address for
-	  */
-	 QString getAbsoluteAddress(QTreeWidgetItem *item) const;
 
 	 MaquetteScene * _scene;
 
@@ -327,13 +317,17 @@ class AttributesEditor : public QDockWidget
 
 	QTabWidget * _networkTabWidget;
 	int _networkTabIndex;
-	QWidget * _messagesTab; //!< Tab handling network
+	QWidget * _messagesTab; //!< Tab handling messages
 	int _messagesTabIndex; //!< Index of tab handling network
 	QTabWidget * _messagesTabs;
 	int _startMsgsIndex;
 	int _endMsgsIndex;
+	QTabWidget * _explorationTab;
+	int _explorationTabIndex;
 	QWidget * _snapshotTab; //!< Tab handling snapshot
 	int _snapshotTabIndex; //!< Index of tab handling snapshot
+	QWidget * _treeMapTab;
+	int _treeMapTabIndex;
 	QWidget * _curvesTab; //!< Tab handling curves
 	int _curvesTabIndex; //!< Index of tab handling curves
 
@@ -448,7 +442,7 @@ class AttributesEditor : public QDockWidget
   QGridLayout * _snapshotTopLayout; //!< Layout handling network assign buttons
   QVBoxLayout * _snapshotLayout; //!< Layout handling snapshot
 
-  QTreeWidget *_networkTree;
+  NetworkTree *_networkTree;
   QLabel *_assignLabel;
   QPushButton *_assignSnapshotStart;
   QPushButton *_assignSnapshotEnd;

@@ -45,5 +45,7 @@
     <file>documentation/editorSnapshot.htm</file>
     <file>documentation/editorCurves.htm</file>
     <file>documentation/interaction.htm</file>
+    <file>translations/acousmoscribe_fr.qm</file>
+    <file>translations/acousmoscribe_en.qm</file>
   </qresource>
 </RCC>

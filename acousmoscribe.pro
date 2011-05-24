@@ -68,6 +68,7 @@ headers/GUI/MaquetteScene.hpp \
 headers/GUI/MaquetteView.hpp \
 headers/GUI/NetworkConfig.hpp \
 headers/GUI/NetworkMessagesEditor.hpp \
+headers/GUI/NetworkTree.hpp \
 headers/GUI/ParentBox.hpp \
 headers/GUI/ParentBoxContextMenu.hpp \
 headers/GUI/PlayingThread.hpp \
@@ -78,6 +79,8 @@ headers/GUI/SoundBox.hpp \
 headers/GUI/SoundBoxContextMenu.hpp \
 headers/GUI/TextEdit.hpp \
 headers/GUI/TriggerPoint.hpp \
+headers/GUI/TreeMap.hpp \
+headers/GUI/TreeMapElement.hpp \
 headers/GUI/ViewRelations.hpp
 
 SOURCES += main.cpp \
@@ -108,6 +111,7 @@ src/GUI/MaquetteScene.cpp \
 src/GUI/MaquetteView.cpp \
 src/GUI/NetworkConfig.cpp \
 src/GUI/NetworkMessagesEditor.cpp \
+src/GUI/NetworkTree.cpp \
 src/GUI/ParentBox.cpp \
 src/GUI/ParentBoxContextMenu.cpp \
 src/GUI/PlayingThread.cpp \
@@ -118,6 +122,8 @@ src/GUI/SoundBox.cpp \
 src/GUI/SoundBoxContextMenu.cpp \
 src/GUI/TextEdit.cpp \
 src/GUI/TriggerPoint.cpp \
+src/GUI/TreeMap.cpp \
+src/GUI/TreeMapElement.cpp \
 src/GUI/ViewRelations.cpp
 
 RESOURCES += acousmoscribe.qrc
@@ -125,3 +131,6 @@ RESOURCES += acousmoscribe.qrc
 DEFINES += __Types__
 
 ICON = images/acousmoscribe.icns
+
+TRANSLATIONS = acousmoscribe_en.ts \
+               acousmoscribe_fr.ts

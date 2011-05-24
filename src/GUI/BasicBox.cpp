@@ -64,6 +64,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QColorDialog>
 #include <QGraphicsTextItem>
 #include <QKeyEvent>
+#include <QString>
+#include <QTranslator>
 
 using std::string;
 using std::vector;
@@ -387,7 +389,7 @@ BasicBox::removeRelations(BoxExtremity extremity) {
 void
 BasicBox::addComment()
 {
-	addComment(AbstractComment("Comment",_abstract->ID()));
+	addComment(AbstractComment(QObject::tr("Comment").toStdString(),_abstract->ID()));
 }
 
 void
@@ -458,19 +460,19 @@ BasicBox::addTriggerPoint(BoxExtremity extremity)
 {
 	switch (extremity) {
 	case BOX_START :
-		_trgPntMsgEdit = new TextEdit(_scene->views().first(),"Enter the trigger point message :",
+		_trgPntMsgEdit = new TextEdit(_scene->views().first(),QObject::tr("Enter the trigger point message :").toStdString(),
 				"/"+_abstract->name()+"/start");
 		_trgPntMsgEdit->move(mapToScene(boundingRect().topLeft()).x(),
 				mapToScene(boundingRect().topLeft()).y() - 4 * _trgPntMsgEdit->height());
 		break;
 	case BOX_END :
-		_trgPntMsgEdit = new TextEdit(_scene->views().first(),"Enter the trigger point message :",
+		_trgPntMsgEdit = new TextEdit(_scene->views().first(),QObject::tr("Enter the trigger point message :").toStdString(),
 				"/"+_abstract->name()+"/end");
 		_trgPntMsgEdit->move(mapToScene(boundingRect().topRight()).x(),
 				mapToScene(boundingRect().topRight()).y() - 4 * _trgPntMsgEdit->height());
 		break;
 	default :
-		_trgPntMsgEdit = new TextEdit(_scene->views().first(),"Enter the trigger point message :",
+		_trgPntMsgEdit = new TextEdit(_scene->views().first(),QObject::tr("Enter the trigger point message :").toStdString(),
 				"/"+_abstract->name()+MaquetteScene::DEFAULT_TRIGGER_MSG);
 		_trgPntMsgEdit->move(mapToScene(boundingRect().topLeft()).x(),
 				mapToScene(boundingRect().topLeft()).y());

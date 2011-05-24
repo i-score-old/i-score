@@ -76,7 +76,7 @@ NetworkMessagesEditor::NetworkMessagesEditor(QWidget *parent)
 	//_layout->setAlignment(Qt::AlignTop);
 	//_table = new QTableWidget(0,3,this);
 	QStringList labels;
-	labels << "Device" << "Message" << "Values";
+	labels << tr("Device") << tr("Message") << tr("Values");
 	setContentsMargins(0,0,0,0);
 	setHorizontalHeaderLabels(labels);
 	setSelectionBehavior(QAbstractItemView::SelectRows);

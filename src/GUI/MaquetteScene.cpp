@@ -654,7 +654,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 				}
 				else {
 					if (selectedItems().empty()) {
-						displayMessage("No relation created",WARNING_LEVEL);
+						displayMessage(tr("No relation created").toStdString(),WARNING_LEVEL);
 					}
 					else {
 						selectionMoved();
@@ -682,7 +682,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 		break;
 	case TEXT_MODE :
 		if (itemAt(mouseEvent->scenePos()) == 0) {
-			addComment("Comment",mouseEvent->scenePos(),NO_ID);
+			addComment(tr("Comment").toStdString(),mouseEvent->scenePos(),NO_ID);
 		}
 		break;
 	case CREATION_MODE :
@@ -916,8 +916,8 @@ void MaquetteScene::pasteBoxes()
 			newBox = getBox(newID);
 			newBox->setSelected(false);
 			name = QString(newBox->name()).toStdString();
-			if ((name.find("- Copy")) == std::string::npos) {
-				name += " - Copy";
+			if ((name.find(tr("- Copy").toStdString())) == std::string::npos) {
+				name += tr(" - Copy").toStdString();
 			}
 			newBox->setName(QString::fromStdString(name));
 			newBox->setPos(newBox->getCenter());
@@ -1053,15 +1053,15 @@ MaquetteScene::addTriggerPoint(unsigned int boxID, BoxExtremity extremity, const
 	int trgID = NO_ID;
 
 	if ((trgID = _maquette->addTriggerPoint(boxID, extremity, message)) > NO_ID) {
-		displayMessage("New trigger point added.",INDICATION_LEVEL);
+		displayMessage(tr("New trigger point added.").toStdString(),INDICATION_LEVEL);
 		setModified(true);
 
 		return trgID;
 	}
 	else {
 		std::stringstream ss;
-		ss << "Cannot add trigger point for box " << getBox(boxID)->name().toStdString() << " at " << extremity;
-		std::cerr << "MaquetteScene::Cannot add trigger point for box " << getBox(boxID)->name().toStdString() << " at " << extremity << std::endl;
+		ss << tr("Cannot add trigger point for box ").toStdString() << getBox(boxID)->name().toStdString() << tr(" at ").toStdString() << extremity;
+		std::cerr << tr("MaquetteScene::Cannot add trigger point for box ").toStdString() << getBox(boxID)->name().toStdString() << tr(" at ").toStdString() << extremity << std::endl;
 		displayMessage(ss.str(),INDICATION_LEVEL);
 		return trgID;
 	}
@@ -1218,8 +1218,7 @@ MaquetteScene::addSoundBox() {
 	bool ok;
 	QString name;
 	while (name.isEmpty()) {
-
-		name = sequentialName("Sound_Box").c_str();
+		name = QString::fromStdString(sequentialName(tr("Sound_Box").toStdString()));
 		ok = true;
 		if (!ok) {
 			return NO_ID;
@@ -1301,7 +1300,7 @@ MaquetteScene::addControlBox() {
 	QString name;
 	while (name.isEmpty()) {
 
-		name = sequentialName("Control_Box").c_str();
+		name = QString::fromStdString(sequentialName(tr("Control_Box").toStdString()));
 		ok = true;
 		if (!ok) {
 			return NO_ID;
@@ -1380,7 +1379,7 @@ MaquetteScene::addParentBox() {
 	QString name;
 	while (name.isEmpty()) {
 
-		name = sequentialName("Parent_Box").c_str();
+		name = QString::fromStdString(sequentialName(tr("Parent_Box").toStdString()));
 		ok = true;
 		if (!ok) {
 			return NO_ID;
@@ -1421,19 +1420,19 @@ MaquetteScene::addRelation(const AbstractRelation &abstractRel) {
 
 	switch (ret) {
 	case SUCCESS :
-		displayMessage("New relation created",INDICATION_LEVEL);
+		displayMessage(tr("New relation created").toStdString(),INDICATION_LEVEL);
 		break;
 	case NO_MODIFICATION :
-		displayMessage("A relation between these two points already exists",INDICATION_LEVEL);
+		displayMessage(tr("A relation between these two points already exists").toStdString(),INDICATION_LEVEL);
 		break;
 	case RETURN_ERROR :
-		displayMessage("Relation is not compatible with the system",INDICATION_LEVEL);
+		displayMessage(tr("Relation is not compatible with the system").toStdString(),INDICATION_LEVEL);
 		break;
 	case ARGS_ERROR :
-		displayMessage("Boxes can not be identified",WARNING_LEVEL);
+		displayMessage(tr("Boxes can not be identified").toStdString(),WARNING_LEVEL);
 		break;
 	default :
-		displayMessage("Unknown relation creation error",WARNING_LEVEL);
+		displayMessage(tr("Unknown relation creation error").toStdString(),WARNING_LEVEL);
 		break;
 	}
 
@@ -1698,7 +1697,7 @@ void MaquetteScene::updatePlayingBoxes() {
 
 void
 MaquetteScene::play() {
-	displayMessage("Playing ...",INDICATION_LEVEL);
+	displayMessage(tr("Playing ...").toStdString(),INDICATION_LEVEL);
 	if (_paused) {
 		_paused = false;
 		_playing = true;
@@ -1714,14 +1713,14 @@ MaquetteScene::play() {
 
 void
 MaquetteScene::pause() {
-	displayMessage("Paused",INDICATION_LEVEL);
+	displayMessage(tr("Paused").toStdString(),INDICATION_LEVEL);
 	_maquette->setAccelerationFactor(0.);
 	_paused = true;
 }
 
 void
 MaquetteScene::stop() {
-	displayMessage("Stopped",INDICATION_LEVEL);
+	displayMessage(tr("Stopped").toStdString(),INDICATION_LEVEL);
 	_playing = false;
 	_paused = false;
 	_maquette->stopPlaying();

@@ -55,17 +55,17 @@ BoxContextMenu::BoxContextMenu(BasicBox *box)
 
   setWindowModality(Qt::ApplicationModal);
 
-  _changeNameAct = new QAction("Change name",this);
+  _changeNameAct = new QAction(tr("Change name"),this);
   addAction(_changeNameAct);
   connect(_changeNameAct, SIGNAL(triggered()), this, SLOT(editName()));
 
-  _commentMenu = new QMenu("Comment",this);
+  _commentMenu = new QMenu(tr("Comment"),this);
 
-  _addCommentAct = new QAction("Add Comment",this);
+  _addCommentAct = new QAction(tr("Add Comment"),this);
   _commentMenu->addAction(_addCommentAct);
   connect(_addCommentAct,SIGNAL(triggered()), this, SLOT(addComment()));
 
-  _removeCommentAct = new QAction("Remove Comment",this);
+  _removeCommentAct = new QAction(tr("Remove Comment"),this);
   _commentMenu->addAction(_removeCommentAct);
   connect(_removeCommentAct,SIGNAL(triggered()), this, SLOT(removeComment()));
 
@@ -73,11 +73,11 @@ BoxContextMenu::BoxContextMenu(BasicBox *box)
   _removeCommentAct->setDisabled(true);
   addMenu(_commentMenu);
 
-  _changeColorAct = new QAction("Change color",this);
+  _changeColorAct = new QAction(tr("Change color"),this);
   addAction(_changeColorAct);
   connect(_changeColorAct, SIGNAL(triggered()), this, SLOT(editColor()));
 
-  _viewRelationAct = new QAction("View relations",this);
+  _viewRelationAct = new QAction(tr("View relations"),this);
   addAction(_viewRelationAct);
   connect(_viewRelationAct, SIGNAL(triggered()), this, SLOT(viewRelations()));
 

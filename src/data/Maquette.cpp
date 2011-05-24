@@ -129,7 +129,7 @@ Maquette::init() {
 	}
 	else {
 		string error;
-		error.append("No network plugins found in ");
+		error.append(tr("No network plugins found in ").toStdString());
 		error.append(pluginsDir);
 		_scene->displayMessage(error,ERROR_LEVEL);
 	}
@@ -796,11 +796,11 @@ Maquette::addTriggerPoint(unsigned int boxID, BoxExtremity extremity, const stri
 		return RETURN_ERROR;
 	}
 	if (!_engines->assignCtrlPointToTriggerPoint(triggerID,boxID,controlPointID)) {
-		_scene->displayMessage("Trigger point already linked to a control point.",INDICATION_LEVEL);
+		_scene->displayMessage(tr("Trigger point already linked to a control point.").toStdString(),INDICATION_LEVEL);
 		return NO_MODIFICATION;
 	}
 	else {
-		_scene->displayMessage("Trigger point succesfully added",INDICATION_LEVEL);
+		_scene->displayMessage(tr("Trigger point succesfully added").toStdString(),INDICATION_LEVEL);
 		_engines->setTriggerPointMessage(triggerID,message);
 		TriggerPoint * newTP = new TriggerPoint(boxID,extremity,message,triggerID,_scene);
 		_scene->addItem(newTP);

@@ -47,6 +47,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "Maquette.hpp"
 #include "MaquetteScene.hpp"
 #include "Maquette.hpp"
+#include "TreeMap.hpp"
 
 #include <map>
 #include <string>
@@ -76,6 +77,7 @@ using std::map;
 #include "NetworkMessagesEditor.hpp"
 #include "CurvesWidget.hpp"
 #include "Interpolation.hpp"
+#include "NetworkTree.hpp"
 
 /* La palette hérite de QDockWidget, a pour parent la fenetre principale*/
 
@@ -90,9 +92,6 @@ using namespace SndBoxProp;
 #define RIGHT_MARGIN 5
 
 static const float S_TO_MS  = 1000.;
-
-enum {NodeNamespaceType = QTreeWidgetItem::UserType + 1, NodeNoNamespaceType = QTreeWidgetItem::UserType + 2 ,
-	LeaveType = QTreeWidgetItem::UserType + 3, AttributeType = QTreeWidgetItem::UserType + 4};
 
 AttributesEditor::AttributesEditor(QWidget* parent) : QDockWidget(tr("AttributesEditor"),parent,0)
 {
@@ -169,12 +168,65 @@ AttributesEditor::nameWidgets(int language)
 	rythm, grain, vibrato, speedHeld, speedVariation, grade, amplitude,
 	pitchStart, melody, pitchEnd, harmony, profiles, messages, msgStart, msgEnd,
 	apply,cancel,clear,profilesTab,networkTab,messagesTab,snapshotTab,copy,paste,
-	deleteStr,general,start,length,name,assign,assignStart,assignEnd,curves;
+	deleteStr,general,start,length,name,assign,assignStart,assignEnd,curves,explorationTab,treeMapTab;
 
 	// Used to switch between adding and renaming items
 	bool firstTimeCalled = false;
-	if (_shapeComboBox->count() == 0)
+	if (_shapeComboBox->count() == 0) {
 		firstTimeCalled = true;
+	}
+
+	color = tr("Color");
+	reset = tr("Reset");
+	held = tr("Held (Default)");
+	impulsive = tr("Impulsive  ");
+	variation = tr("Variation");
+	irregular = tr("Irregular   ");
+	profiles = tr("<big><b>PROFILES</b></big>");
+	shapeLabel = tr("Dynamics");
+	rythm = tr("Rythm");
+	grain = tr("Grain");
+	vibrato = tr("Vibrato");
+	speedHeld = tr("Speed Held");
+	speedVariation = tr("Speed Variation");
+	pitchStart = tr("Pitch Start");
+	melody = tr("Melody");
+	pitchEnd = tr("Pitch End");
+	grade = tr("Grade :");
+	amplitude = tr("Amplitude :");
+	harmony= tr("Harmony");
+	shapeList << tr("Flat") << tr("Insistant") << tr("Steep attack") << tr("Gentle") << tr("Steep truncated");
+	speedHeldList << tr("None") << tr("Slow") << tr("Moderate") << tr("Fast");
+	speedVariationList << tr("None") << tr("Acceleration") << tr("Deceleration");
+	grainList << tr("Smooth") << tr("Fat") << tr("Tidy") << tr("Thin");
+	pitchList << tr("None") << tr("Lowest") << tr("Low") << tr("Medium") << tr("High") << tr("Highest");
+	pitchVariationList << tr("None") << tr("Fat") << tr("Tidy") << tr("Thin");
+	harmoHeldList << tr("Pure") << tr("Key Note") << tr("Key Note Group") << tr("Ribbed") << tr("Node Group")
+	<< tr("Node") << tr("Fringe");
+	harmoVariationList << tr("None default") << tr("Getting richer") << tr("Getting poorer");
+	messages = tr("<big><b>MESSAGES</b></big>");
+	msgStart = tr("Start Message");
+	msgEnd = tr("End Message");
+	apply = tr("Apply");
+	cancel = tr("Cancel");
+	clear = tr("Clear");
+	copy = tr("Copy");
+	paste = tr("Paste");
+	deleteStr = tr("Delete");
+	profilesTab = tr("Profiles");
+	networkTab = tr("Network");
+	messagesTab = tr("Messages");
+	snapshotTab = tr("Snapshot");
+	treeMapTab = tr("Tree Map");
+	explorationTab = tr("Exploration");
+	curves = tr("Curves");
+	general = tr("General");
+	start = tr("Start");
+	length = tr("Length");
+	name = tr("Name");
+	assign = tr("Assign");
+	assignStart = tr("Start");
+	assignEnd = tr("End");
 
 	switch(language){
 	case 1 :
@@ -220,6 +272,8 @@ AttributesEditor::nameWidgets(int language)
 		networkTab = "Network";
 		messagesTab = "Messages";
 		snapshotTab = "Snapshot";
+		treeMapTab = tr("Tree Map");
+		explorationTab = tr("Exploration");
 		curves = "Curves";
 		general = "General";
 		start = "Start";
@@ -273,6 +327,8 @@ AttributesEditor::nameWidgets(int language)
 		networkTab = "Réseau";
 		messagesTab = "Messages";
 		snapshotTab = "Capture";
+		treeMapTab = "Tree Map";
+		explorationTab = "Exploration";
 		curves = "Courbes";
 		general = "Général";
 		start = "Début";
@@ -337,8 +393,8 @@ AttributesEditor::nameWidgets(int language)
 	if (_messagesTabIndex != -1 ) {
 		_tabWidget->setTabText(_messagesTabIndex,messagesTab);
 	}
-	if (_snapshotTabIndex != -1) {
-		_tabWidget->setTabText(_snapshotTabIndex,snapshotTab);
+	if (_explorationTabIndex != -1) {
+		_tabWidget->setTabText(_explorationTabIndex,explorationTab);
 	}
 	if (_curvesTabIndex != -1) {
 		_tabWidget->setTabText(_curvesTabIndex,curves);
@@ -361,7 +417,12 @@ AttributesEditor::nameWidgets(int language)
 	if (_endMsgsIndex != -1) {
 		_messagesTabs->setTabText(_endMsgsIndex,msgEnd);
 	}
-
+	if (_snapshotTabIndex != -1) {
+		_explorationTab->setTabText(_snapshotTabIndex,snapshotTab);
+	}
+	if (_explorationTabIndex != -1) {
+		_explorationTab->setTabText(_explorationTabIndex,explorationTab);
+	}
 	if (firstTimeCalled) { // First time function call : add Items
 		_shapeComboBox->addItems(shapeList);
 		_speedHeldComboBox->addItems(speedHeldList);
@@ -422,7 +483,10 @@ AttributesEditor::createWidgets()
 	_profilesTabs = new QTabWidget;
 	_networkTabWidget = new QTabWidget;
 	_messagesTab = new QWidget;
+
 	_messagesTabs = new QTabWidget;
+	_explorationTab = new QTabWidget;
+	_treeMapTab = new QTabWidget;
 	_snapshotTab = new QWidget;
 	_curvesTab = new QWidget;
 	_profilesColorButton = new QPushButton;
@@ -489,7 +553,9 @@ AttributesEditor::createWidgets()
   _generalTabIndex = -1;
   _networkTabIndex = -1;
   _messagesTabIndex = -1;
+  _explorationTabIndex = -1;
   _snapshotTabIndex = -1;
+  _treeMapTabIndex = -1;
   _curvesTabIndex = -1;
   _shapeTabIndex = -1;
   _rythmTabIndex = -1;
@@ -532,37 +598,12 @@ AttributesEditor::createWidgets()
 	_msgStartLayout->setContentsMargins(0 , TOP_MARGIN , 0 , BOTTOM_MARGIN);
 	_msgEndLayout->setContentsMargins(0 , TOP_MARGIN , 0 , BOTTOM_MARGIN);
 
-	_networkTree = new QTreeWidget;
+	_networkTree = new NetworkTree(this);
 	_assignSnapshotStart = new QPushButton;
 	_assignSnapshotEnd = new QPushButton;
 	_assignLabel = new QLabel;
 
-	vector<string> deviceNames;
-	vector<bool> deviceRequestable;
-	Maquette::getInstance()->getNetworkDeviceNames(deviceNames, deviceRequestable);
-
-	vector<string>::iterator nameIt;
-	vector<bool>::iterator requestableIt;
-
-	QList<QTreeWidgetItem*> itemsList;
-
-	for (nameIt = deviceNames.begin(), requestableIt = deviceRequestable.begin() ; nameIt != deviceNames.end(), requestableIt != deviceRequestable.end() ;	++nameIt,++requestableIt) {
-		QStringList deviceName;
-		deviceName << QString::fromStdString(*nameIt);
-		QTreeWidgetItem *curItem = NULL;
-		if (!(*requestableIt)) {
-			curItem = new QTreeWidgetItem(deviceName,NodeNoNamespaceType);
-			curItem->setBackground(0,QBrush(Qt::gray));
-		}
-		else {
-			curItem = new QTreeWidgetItem(deviceName,NodeNamespaceType);
-			curItem->setBackground(0,QBrush(Qt::darkCyan));
-		}
-		itemsList << curItem;
-	}
-
-	_networkTree->addTopLevelItems(itemsList);
-	//_networkTree->setFixedSize(QSize(2*PreviewArea::WIDTH,5*PreviewArea::HEIGHT));
+	_networkTree->load();
 }
 
 void
@@ -726,7 +767,10 @@ AttributesEditor::addWidgetsToLayout()
 	_snapshotLayout->addWidget(_networkTree);
 
 	_snapshotTab->setLayout(_snapshotLayout);
+	_snapshotTabIndex = _explorationTab->addTab(_snapshotTab,"Snapshot");
 
+	TreeMap * treeMap = new TreeMap(this);
+	_treeMapTabIndex = _explorationTab->addTab(_treeMapTab,"Tree Map");
 
 	// Options defaultly disabled
 	_pitchOptionRandom->setDisabled(true);
@@ -743,7 +787,7 @@ AttributesEditor::addWidgetsToLayout()
 	_generalTabIndex = _tabWidget->addTab(_generalTab,"General");
 	_profilesTabIndex = _tabWidget->addTab(_profilesTab,"Profiles");
 	_messagesTabIndex = _tabWidget->addTab(_messagesTab,"Messages");
-	_snapshotTabIndex = _tabWidget->addTab(_snapshotTab,"Snapshot");
+	_explorationTabIndex = _tabWidget->addTab(_explorationTab,"Exploration");
 	_curvesTabIndex = _tabWidget->addTab(_curvesTab,"Curves");
 }
 
@@ -756,7 +800,7 @@ AttributesEditor::connectSlots()
 	connect(_generalColorButton, SIGNAL(clicked()), this, SLOT(changeColor()));
 	connect(_boxStartValue, SIGNAL(valueChanged(double)), this, SLOT(startChanged()));
 	connect(_boxLengthValue, SIGNAL(valueChanged(double)), this, SLOT(lengthChanged()));
-  connect(_boxName, SIGNAL(returnPressed()), this, SLOT(nameChanged()));
+    connect(_boxName, SIGNAL(returnPressed()), this, SLOT(nameChanged()));
 
 	// Profiles
 	connect(_profilesColorButton, SIGNAL(clicked()), this, SLOT(changeColor()));
@@ -791,7 +835,6 @@ AttributesEditor::connectSlots()
   connect(_startMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(startMsgApplied()));
   connect(_endMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(endMsgApplied()));
 
-  connect(_networkTree, SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(networkTreeCollapsed()));
   connect(_assignSnapshotStart, SIGNAL(clicked()),this,SLOT(assignSnapshotStart()));
   connect(_assignSnapshotEnd, SIGNAL(clicked()),this,SLOT(assignSnapshotEnd()));
 }
@@ -1340,138 +1383,43 @@ AttributesEditor::endMsgPasted()
 	endMsgApplied();
 }
 
-QString
-AttributesEditor::getAbsoluteAddress(QTreeWidgetItem *item) const {
-	QString address;
-	QTreeWidgetItem * curItem = item;
-	while (curItem != NULL) {
-		QString node;
-		if (curItem->parent() != NULL) {
-			node.append("/");
-		}
-		node.append(curItem->text(0));
-		address.insert(0,node);
-		curItem = curItem->parent();
-	}
-	return address;
-}
-
-void
-AttributesEditor::networkTreeCollapsed() {
-	QTreeWidgetItem *selectedItem = _networkTree->currentItem();
-	if (!selectedItem->isDisabled()) {
-		if (selectedItem->type() == NodeNamespaceType || selectedItem->type() == LeaveType) {
-			QString address = getAbsoluteAddress(selectedItem);
-
-			vector<string> nodes,leaves,attributes,attributesValues;
-
-			Maquette::getInstance()->requestNetworkNamespace(address.toStdString(), nodes, leaves, attributes, attributesValues);
-
-			QList<QTreeWidgetItem *> selectedItemChildren = selectedItem->takeChildren();
-			QList<QTreeWidgetItem *>::iterator childIt;
-			for (childIt = selectedItemChildren.begin() ; childIt != selectedItemChildren.end() ; ++childIt) {
-				delete *childIt;
-			}
-			vector<string>::iterator it;
-			vector<string>::iterator it2;
-			for (it = nodes.begin() ; it != nodes.end() ; ++it) {
-				QStringList list;
-				list << QString::fromStdString(*it);
-				QTreeWidgetItem *childItem = new QTreeWidgetItem(list,NodeNamespaceType);
-				//childItem->setFlags(Qt::ItemIsSelectable|Qt::ItemIsUserCheckable);
-				childItem->setBackground(0,QBrush(Qt::darkCyan));
-				selectedItem->addChild(childItem);
-				list.clear();
-			}
-			for (it = leaves.begin() ; it != leaves.end() ; ++it) {
-				QStringList list;
-				list << QString::fromStdString(*it);
-				QTreeWidgetItem *childItem = new QTreeWidgetItem(list,LeaveType);
-				childItem->setBackground(0,QBrush(Qt::darkGreen));
-				selectedItem->addChild(childItem);
-				list.clear();
-			}
-			for (it = attributes.begin(),it2 = attributesValues.begin() ; it != attributes.end(), it2 != attributesValues.end() ; ++it , ++it2) {
-				QStringList list;
-				list << QString::fromStdString(*it + " : " + *it2);
-				QTreeWidgetItem *childItem = new QTreeWidgetItem(list,AttributeType);
-				childItem->setBackground(0,QBrush(Qt::green));
-				selectedItem->addChild(childItem);
-				list.clear();
-			}
-			//_networkTree->adjustSize();
-		}
-	}
-}
-
 void
 AttributesEditor::assignSnapshotStart()
 {
-	QList<QTreeWidgetItem*> selectedItems = _networkTree->selectedItems();
-	if (!selectedItems.empty()) {
-		QList<QTreeWidgetItem*>::iterator it;
-		vector<string> snapshots;
-		vector<string>::iterator it2;
+	vector<string> snapshot = _networkTree->snapshot();
 
-		for (it = selectedItems.begin(); it != selectedItems.end() ; ++it) {
-			QString address = getAbsoluteAddress(*it);
-			if (!address.isEmpty()) {
-				vector<string> snapshot = Maquette::getInstance()->requestNetworkSnapShot(address.toStdString());
-				snapshots.insert(snapshots.end(),snapshot.begin(),snapshot.end());
-			}
-		}
-
-		if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
-			if (!snapshots.empty()) {
-				_startMsgsEditor->addMessages(snapshots);
-				startMsgApplied();
-				_scene->displayMessage("Snapshot successfully captured and applied to box start",INDICATION_LEVEL);
-			}
-			else {
-				_scene->displayMessage("No snapshot taken for selection",INDICATION_LEVEL);
-			}
+	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
+		if (!snapshot.empty()) {
+			_startMsgsEditor->addMessages(snapshot);
+			startMsgApplied();
+			_scene->displayMessage("Snapshot successfully captured and applied to box start",INDICATION_LEVEL);
 		}
 		else {
-			_scene->displayMessage("No box selected during snapshot assignment",INDICATION_LEVEL);
+			_scene->displayMessage("No snapshot taken for selection",INDICATION_LEVEL);
 		}
 	}
 	else {
-		_scene->displayMessage("No selection found during snapshot",INDICATION_LEVEL);
+		_scene->displayMessage("No box selected during snapshot assignment",INDICATION_LEVEL);
 	}
+
 }
 
 void AttributesEditor::assignSnapshotEnd()
 {
-	QList<QTreeWidgetItem*> selectedItems = _networkTree->selectedItems();
-	if (!selectedItems.empty()) {
-		QList<QTreeWidgetItem*>::iterator it;
-		vector<string> snapshots;
-		vector<string>::iterator it2;
+	vector<string> snapshot = _networkTree->snapshot();
 
-		for (it = selectedItems.begin(); it != selectedItems.end() ; ++it) {
-			QString address = getAbsoluteAddress(*it);
-			if (!address.isEmpty()) {
-				vector<string> snapshot = Maquette::getInstance()->requestNetworkSnapShot(address.toStdString());
-				snapshots.insert(snapshots.end(),snapshot.begin(),snapshot.end());
-			}
-		}
-
-		if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
-			if (!snapshots.empty()) {
-				_endMsgsEditor->addMessages(snapshots);
-				endMsgApplied();
-				_scene->displayMessage("Snapshot successfully captured and applied to box end",INDICATION_LEVEL);
-			}
-			else {
-				_scene->displayMessage("No snapshot taken for selection",INDICATION_LEVEL);
-			}
+	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
+		if (!snapshot.empty()) {
+			_endMsgsEditor->addMessages(snapshot);
+			endMsgApplied();
+			_scene->displayMessage("Snapshot successfully captured and applied to box end",INDICATION_LEVEL);
 		}
 		else {
-			_scene->displayMessage("No box selected during snapshot assignment",INDICATION_LEVEL);
+			_scene->displayMessage("No snapshot taken for selection",INDICATION_LEVEL);
 		}
 	}
 	else {
-		_scene->displayMessage("No selection found during snapshot",INDICATION_LEVEL);
+		_scene->displayMessage("No box selected during snapshot assignment",INDICATION_LEVEL);
 	}
 }
 

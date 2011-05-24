@@ -66,7 +66,7 @@ CurvesWidget::CurvesWidget(QWidget *parent)
   _tabWidget = new QTabWidget(parent);
   addTab(_tabWidget,tr("Curves"));
   _interpolation = new Interpolation(parent);
-  addTab(_interpolation,tr("Interpolation"));
+  addTab(_interpolation,tr("Attributes"));
   _parentWidget = parent;
 
   connect(_interpolation,SIGNAL(activationChanged(const QString &,bool)),this,SLOT(curveActivationChanged(const QString&,bool)));

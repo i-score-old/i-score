@@ -315,7 +315,7 @@ MainWindow::exporting()
   QString fileName = QFileDialog::getSaveFileName(this,tr("Export File"),"",tr("PNG Files (*.png)"));
 
   if (!fileName.isEmpty()) {
-  	displayMessage("Exporting file : "+fileName,INDICATION_LEVEL);
+  	displayMessage(tr("Exporting file : ")+fileName,INDICATION_LEVEL);
   	QPixmap pixmap = QPixmap::grabWidget(_view);
     pixmap.save(fileName);
   }
@@ -324,7 +324,7 @@ MainWindow::exporting()
 void
 MainWindow::print()
 {
-	displayMessage("Printing ...",INDICATION_LEVEL);
+	displayMessage(tr("Printing ..."),INDICATION_LEVEL);
 
   QPrinter printer;
   if (QPrintDialog(&printer).exec() == QDialog::Accepted) {
@@ -468,7 +468,7 @@ MainWindow::returnKeyPressed()
 
   if (_scene->playing()) {
   	std::stringstream msg;
-  	msg << "Triggering with message : '" << MaquetteScene::DEFAULT_TRIGGER_MSG << "'";
+  	msg << tr("Triggering with message : '").toStdString() << MaquetteScene::DEFAULT_TRIGGER_MSG << "'";
   	displayMessage(QString::fromStdString(msg.str()),INDICATION_LEVEL);
     _scene->trigger(MaquetteScene::DEFAULT_TRIGGER_MSG);
   }
@@ -542,10 +542,10 @@ MainWindow::stop()
 void
 MainWindow::playModeChanged()
 {
-  if (_playModeAct->checkedAction()->text() == "Direct") {
+  if (_playModeAct->checkedAction()->text() == tr("Direct")) {
     _scene->setPlayingMode(FileMode);
   }
-  else if (_playModeAct->checkedAction()->text() == "Synth") {
+  else if (_playModeAct->checkedAction()->text() == tr("Synth")) {
     _scene->setPlayingMode(SynthMode);
   }
   else {
@@ -562,25 +562,25 @@ MainWindow::selectAll()
 
 void
 MainWindow::selectMode() {
-  if (_modeAct->checkedAction()->text() == "Select") {
+  if (_modeAct->checkedAction()->text() == tr("Select")) {
     _scene->setCurrentMode(SELECTION_MODE);
   }
-  else if (_modeAct->checkedAction()->text() == "Sound Box") {
+  else if (_modeAct->checkedAction()->text() == tr("Sound Box")) {
     _scene->setCurrentMode(CREATION_MODE,SB_MODE);
   }
-  else if (_modeAct->checkedAction()->text() == "Control Box") {
+  else if (_modeAct->checkedAction()->text() == tr("Control Box")) {
     _scene->setCurrentMode(CREATION_MODE,CB_MODE);
   }
-  else if (_modeAct->checkedAction()->text() == "Parent Box") {
+  else if (_modeAct->checkedAction()->text() == tr("Parent Box")) {
     _scene->setCurrentMode(CREATION_MODE,PB_MODE);
   }
-  else if (_modeAct->checkedAction()->text() == "Relation") {
+  else if (_modeAct->checkedAction()->text() == tr("Relation")) {
     _scene->setCurrentMode(RELATION_MODE);
   }
-  else if (_modeAct->checkedAction()->text() == "Comment") {
+  else if (_modeAct->checkedAction()->text() == tr("Comment")) {
     _scene->setCurrentMode(TEXT_MODE);
   }
-  else if (_modeAct->checkedAction()->text() == "Trigger") {
+  else if (_modeAct->checkedAction()->text() == tr("Trigger")) {
     _scene->setCurrentMode(TRIGGER_MODE);
   }
 }
@@ -669,7 +669,7 @@ MainWindow::createActions()
   connect(_printAct, SIGNAL(triggered()), this, SLOT(print()));
 
   _quitAct = new QAction(tr("&Quit"), this);
-  _quitAct->setShortcut(tr("Ctrl+Q"));
+  _quitAct->setShortcut(QString("Ctrl+Q"));
   _quitAct->setStatusTip(tr("Quit the application"));
   connect(_quitAct, SIGNAL(triggered()), this, SLOT(close()));
 
@@ -700,7 +700,7 @@ MainWindow::createActions()
   connect(_zoomOutAct, SIGNAL(triggered()), _view, SLOT(zoomOut()));
 
   _editorAct = new QAction(QIcon(":/images/edit.svg"), tr("Edit attributes"), this);
-  _editorAct->setShortcut(tr("Ctrl+E"));
+  _editorAct->setShortcut(QString("Ctrl+E"));
   _editorAct->setStatusTip(tr("Edit box attributes"));
   _editorAct->setCheckable(true);
   _editorAct->setChecked(true);
@@ -734,28 +734,28 @@ MainWindow::createActions()
 
   _selectModeAct = new QAction(QIcon(":/images/select.svg"), tr("Select"), this);
   _selectModeAct->setStatusTip(tr("Switch mode to selection"));
-  _selectModeAct->setShortcut(tr("Ctrl+Shift+E"));
+  _selectModeAct->setShortcut(QString("Ctrl+Shift+E"));
   _selectModeAct->setCheckable(true);
   _selectModeAct->setChecked(false);
   connect(_selectModeAct,SIGNAL(triggered()), this, SLOT(selectMode()));
 
   _SBModeAct = new QAction(QIcon(":/images/soundBox.svg"), tr("Sound Box"), this);
   _SBModeAct->setStatusTip(tr("Switch mode to Sound Box creation"));
-  _SBModeAct->setShortcut(tr("Ctrl+Shift+S"));
+  _SBModeAct->setShortcut(QString("Ctrl+Shift+S"));
   _SBModeAct->setCheckable(true);
   _SBModeAct->setChecked(true);
   connect(_SBModeAct,SIGNAL(triggered()), this, SLOT(selectMode()));
 
   _CBModeAct = new QAction(QIcon(":/images/controlBox.svg"), tr("Control Box"), this);
   _CBModeAct->setStatusTip(tr("Switch mode to Control Box creation"));
-  _CBModeAct->setShortcut(tr("Ctrl+Shift+C"));
+  _CBModeAct->setShortcut(QString("Ctrl+Shift+C"));
   _CBModeAct->setCheckable(true);
   _CBModeAct->setChecked(false);
   connect(_CBModeAct,SIGNAL(triggered()), this, SLOT(selectMode()));
 
   _PBModeAct = new QAction(QIcon(":/images/parentBox.svg"), tr("Parent Box"), this);
   _PBModeAct->setStatusTip(tr("Switch mode to Parent Box creation"));
-  _PBModeAct->setShortcut(tr("Ctrl+Shift+P"));
+  _PBModeAct->setShortcut(QString("Ctrl+Shift+P"));
   _PBModeAct->setCheckable(true);
   _PBModeAct->setChecked(false);
   connect(_PBModeAct,SIGNAL(triggered()), this, SLOT(selectMode()));
@@ -769,7 +769,7 @@ MainWindow::createActions()
 
   _commentModeAct = new QAction(QIcon(":/images/comment.svg"), tr("Comment"), this);
   _commentModeAct->setStatusTip(tr("Adds a Comment"));
-  _commentModeAct->setShortcut(tr("Ctrl+Shift+T"));
+  _commentModeAct->setShortcut(QString("Ctrl+Shift+T"));
   _commentModeAct->setCheckable(true);
   _commentModeAct->setChecked(false);
   _commentModeAct->setEnabled(false);
@@ -817,12 +817,12 @@ MainWindow::createActions()
   _playModeAct->setExclusive(true);
 
   _accelerationSlider = new LogarithmicSlider(Qt::Horizontal,this);
-  _accelerationSlider->setStatusTip("Acceleration");
+  _accelerationSlider->setStatusTip(tr("Acceleration"));
   _accelerationSlider->setFixedWidth(100);
   connect(_accelerationSlider,SIGNAL(valueChanged(int)),this,SLOT(accelerationChanged(int)));
 
   _accelerationDisplay = new QDoubleSpinBox(this);
-  _accelerationDisplay->setStatusTip("Acceleration");
+  _accelerationDisplay->setStatusTip(tr("Acceleration"));
   _accelerationDisplay->setRange(0.,5);
   _accelerationDisplay->setDecimals(1);
   _accelerationDisplay->setKeyboardTracking(false);
@@ -831,7 +831,7 @@ MainWindow::createActions()
   _accelerationSlider->setSliderPosition(50);
 
   _gotoSlider = new QSlider(this);
-  _gotoSlider->setStatusTip("Goto");
+  _gotoSlider->setStatusTip(tr("Goto"));
   _gotoSlider->setOrientation(Qt::Horizontal);
   //_gotoSlider->setTickPosition(QSlider::TicksBelow);
   _gotoSlider->setRange(0,_view->sceneRect().width() * MaquetteScene::MS_PER_PIXEL);
@@ -845,7 +845,7 @@ MainWindow::createActions()
   static const unsigned int GOTO_PRECISION = 2;
   static const float S_TO_MS = 1000.;
   _gotoDisplay = new QDoubleSpinBox;
-  _gotoDisplay->setStatusTip("Goto");
+  _gotoDisplay->setStatusTip(tr("Goto"));
   _gotoDisplay->setRange(0.,MaquetteScene::MAX_SCENE_WIDTH * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
   _gotoDisplay->setDecimals(GOTO_PRECISION);
   _gotoDisplay->setKeyboardTracking(false);
@@ -937,7 +937,7 @@ MainWindow::createToolBars()
   _fileToolBar->insertWidget(noAction,_accelerationDisplay);
   _fileToolBar->insertWidget(noAction,_accelerationSlider);
 
-  _gotoBar = addToolBar("Goto");
+  _gotoBar = addToolBar(tr("Goto"));
   _gotoBar->insertWidget(noAction,_gotoDisplay);
   _gotoBar->insertWidget(noAction,_gotoSlider);
 }
@@ -1024,7 +1024,7 @@ MainWindow::setCurrentFile(const QString &fileName)
   setWindowModified(false);
   QString shownName;
   if (_curFile.isEmpty()) {
-    shownName = "New file";
+    shownName = tr("New file");
   }
   else {
     shownName = strippedName(_curFile);

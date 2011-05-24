@@ -72,10 +72,10 @@ NetworkConfig::NetworkConfig(MaquetteScene *scene, QWidget *parent)
   _layout = new QGridLayout(this);
   setLayout(_layout);
 
-  _devicesLabel = new QLabel("Devices");
-  _pluginsLabel = new QLabel("Plugins");
-  _portLabel = new QLabel("Port");
-  _IPLabel = new QLabel("IP");
+  _devicesLabel = new QLabel(tr("Devices"));
+  _pluginsLabel = new QLabel(tr("Plugins"));
+  _portLabel = new QLabel(tr("Port"));
+  _IPLabel = new QLabel(tr("IP"));
 
   _portBox = new QSpinBox;
   _portBox->setRange(0,10000);
@@ -109,7 +109,7 @@ NetworkConfig::NetworkConfig(MaquetteScene *scene, QWidget *parent)
   	_pluginsComboBox->setCurrentIndex(found);
   }
   else {
-  	QMessageBox::warning(this,"","MaxDevice plugin not found : default selected");
+  	QMessageBox::warning(this,"",tr("MaxDevice plugin not found : default selected"));
   	_pluginsComboBox->setCurrentIndex(0);
   }
   _portBox->setValue(maxDevice.networkPort);
@@ -129,11 +129,11 @@ NetworkConfig::NetworkConfig(MaquetteScene *scene, QWidget *parent)
   _layout->addWidget(_IPLabel, 3, 0, 1, 1);
   _layout->addWidget(_IPBox, 3, 1, 1, 1);
 
-  _okButton = new QPushButton("OK", this);
+  _okButton = new QPushButton(tr("OK"), this);
   connect(_okButton, SIGNAL(clicked()), this, SLOT(updateNetworkConfiguration()));
   _layout->addWidget(_okButton, 3, 2, 1, 1);
 
-  _cancelButton = new QPushButton("Cancel", this);
+  _cancelButton = new QPushButton(tr("Cancel"), this);
   connect(_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
   _layout->addWidget(_cancelButton, 3, 3, 1, 1);
 }
@@ -151,7 +151,7 @@ void NetworkConfig::deviceSelected(int indexSelected) {
 		  	_pluginsComboBox->setCurrentIndex(found);
 		  }
 		  else {
-		  	QMessageBox::warning(this,"","Device plugin not found : default selected");
+		  	QMessageBox::warning(this,"",tr("Device plugin not found : default selected"));
 		  	_pluginsComboBox->setCurrentIndex(0);
 		  }
 		  _portBox->setValue(it->second.networkPort);
@@ -172,7 +172,7 @@ void NetworkConfig::updateNetworkConfiguration() {
       accept();
     }
     else {
-      QMessageBox::warning(this,"","Unvalid IP address");
+      QMessageBox::warning(this,"",tr("Unvalid IP address"));
     }
   }
   else {

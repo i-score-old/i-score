@@ -82,9 +82,9 @@ RelationEdit::RelationEdit(MaquetteScene *scene, unsigned int relID, QWidget *pa
   		_layout = new QGridLayout(this);
   		setLayout(_layout);
 
-  		_timeLabel = new QLabel("Time");
-  		_minBoundLabel = new QLabel("Min Bound");
-  		_maxBoundLabel = new QLabel("Max Bound");
+  		_timeLabel = new QLabel(tr("Time"));
+  		_minBoundLabel = new QLabel(tr("Min Bound"));
+  		_maxBoundLabel = new QLabel(tr("Max Bound"));
   		_timeUnits = new QLabel("s");
 
   		_timeBox = new QDoubleSpinBox;
@@ -136,11 +136,11 @@ RelationEdit::RelationEdit(MaquetteScene *scene, unsigned int relID, QWidget *pa
   		_layout->addWidget(new QLabel("s"), 2, 2, 1, 1);
   		_layout->addWidget(_maxBoundCheckBox, 2, 3, 1, 1);
 
-  		_okButton = new QPushButton("OK", this);
+  		_okButton = new QPushButton(tr("OK"), this);
   		connect(_okButton, SIGNAL(clicked()), this, SLOT(updateRelationConfiguration()));
   		_layout->addWidget(_okButton, 3, 2, 1, 1);
 
-  		_cancelButton = new QPushButton("Cancel", this);
+  		_cancelButton = new QPushButton(tr("Cancel"), this);
   		connect(_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
   		_layout->addWidget(_cancelButton, 3, 3, 1, 1);
   	}

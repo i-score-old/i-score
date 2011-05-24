@@ -87,14 +87,14 @@ ChooseTemporalRelationPanel::ChooseTemporalRelationPanel(unsigned int ID1, unsig
   _layout->addWidget(_relationTypeBox, 0, 0, 4, 1);
 
   _allenComboBox = new QComboBox(this);
-  _allenComboBox->addItem("before", ALLEN_BEFORE);
-  _allenComboBox->addItem("after", ALLEN_AFTER);
-  _allenComboBox->addItem("meets", ALLEN_MEETS);
-  _allenComboBox->addItem("during", ALLEN_DURING);
-  _allenComboBox->addItem("equals", ALLEN_EQUALS);
-  _allenComboBox->addItem("overlaps", ALLEN_OVERLAPS);
-  _allenComboBox->addItem("starts", ALLEN_STARTS);
-  _allenComboBox->addItem("finishes", ALLEN_FINISHES);
+  _allenComboBox->addItem(tr("before"), ALLEN_BEFORE);
+  _allenComboBox->addItem(tr("after"), ALLEN_AFTER);
+  _allenComboBox->addItem(tr("meets"), ALLEN_MEETS);
+  _allenComboBox->addItem(tr("during"), ALLEN_DURING);
+  _allenComboBox->addItem(tr("equals"), ALLEN_EQUALS);
+  _allenComboBox->addItem(tr("overlaps"), ALLEN_OVERLAPS);
+  _allenComboBox->addItem(tr("starts"), ALLEN_STARTS);
+  _allenComboBox->addItem(tr("finishes"), ALLEN_FINISHES);
   _allenComboBox->setEnabled(false);
   
   _name1 = new QLabel(_scene->getBox(_ent1ID)->name(),this);
@@ -123,11 +123,11 @@ ChooseTemporalRelationPanel::ChooseTemporalRelationPanel(unsigned int ID1, unsig
   _intervalBox->setEnabled(false);
   _layout->addWidget(_intervalBox, 2, 1, 1, 3);
   
-  _okButton = new QPushButton("OK", this);
+  _okButton = new QPushButton(tr("OK"), this);
   connect(_okButton, SIGNAL(clicked()), this, SLOT(createRelation()));
   _layout->addWidget(_okButton, 3, 2, 1, 1);
   
-  _cancelButton = new QPushButton("Cancel", this);
+  _cancelButton = new QPushButton(tr("Cancel"), this);
   connect(_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
   _layout->addWidget(_cancelButton, 3, 3, 1, 1);
 }

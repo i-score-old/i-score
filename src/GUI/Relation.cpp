@@ -121,34 +121,34 @@ Relation::toString() {
   ret = "'" + _scene->getBox(_abstract->firstBox())->name() + "'";
   switch (_abstract->firstExtremity()) {
   case BOX_START :
-    ret += " start";
+    ret += QObject::tr(" start");
     break;
   case BOX_END :
-    ret += " end";
+    ret += QObject::tr(" end");
     break;
   case NO_EXTREMITY :
-    ret += " no extremity";
+    ret += QObject::tr(" no extremity");
     break;
   default :
-    ret += " unknown extremity";
+    ret += QObject::tr(" unknown extremity");
     break;
   }
 
-  ret += " [Before] ";
+  ret += QObject::tr(" [Before] ");
   ret += "'" + _scene->getBox(_abstract->secondBox())->name() + "'";
 
   switch (_abstract->secondExtremity()) {
   case BOX_START :
-    ret += " start";
+    ret += QObject::tr(" start");
     break;
   case BOX_END :
-    ret += " end";
+    ret += QObject::tr(" end");
     break;
   case NO_EXTREMITY :
-    ret += " no extremity";
+    ret += QObject::tr(" no extremity");
     break;
   default :
-    ret += " unknown extremity";
+    ret += QObject::tr(" unknown extremity");
     break;
   }
 

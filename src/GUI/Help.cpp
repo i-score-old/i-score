@@ -64,7 +64,7 @@ Help::Help(QWidget *parent)
 		fileString = QString(file.readAll());
 	}
 	else {
-		fileString = "No Help Found";
+		fileString = tr("No Help Found");
 	}
 
 	_fileLabel = new QLabel(fileString);
@@ -75,7 +75,7 @@ Help::Help(QWidget *parent)
 		toolbarString = QString(toolbar.readAll());
 	}
 	else {
-		toolbarString = "No Help Found";
+		toolbarString = tr("No Help Found");
 	}
 	_toolBarLabel = new QLabel(toolbarString);
 
@@ -85,7 +85,7 @@ Help::Help(QWidget *parent)
 		contextString = QString(context.readAll());
 	}
 	else {
-		contextString = "No Help Found";
+		contextString = tr("No Help Found");
 	}
 	_contextLabel = new QLabel(contextString);
 
@@ -95,7 +95,7 @@ Help::Help(QWidget *parent)
 		interactionString = QString(interaction.readAll());
 	}
 	else {
-		interactionString = "No Help Found";
+		interactionString = tr("No Help Found");
 	}
 	_interactionLabel = new QLabel(interactionString);
 
@@ -105,7 +105,7 @@ Help::Help(QWidget *parent)
 		editorGeneralString = QString(editorGeneral.readAll());
 	}
 	else {
-		editorGeneralString = "No Help Found";
+		editorGeneralString = tr("No Help Found");
 	}
 	_editorGeneralLabel = new QLabel(editorGeneralString);
 
@@ -115,7 +115,7 @@ Help::Help(QWidget *parent)
 		editorProfilesString = QString(editorProfiles.readAll());
 	}
 	else {
-		editorProfilesString = "No Help Found";
+		editorProfilesString = tr("No Help Found");
 	}
 	_editorProfilesLabel = new QLabel(editorProfilesString);
 
@@ -125,7 +125,7 @@ Help::Help(QWidget *parent)
 		editorMessagesString = QString(editorMessages.readAll());
 	}
 	else {
-		editorMessagesString = "No Help Found";
+		editorMessagesString = tr("No Help Found");
 	}
 	_editorMessagesLabel = new QLabel(editorMessagesString);
 
@@ -135,7 +135,7 @@ Help::Help(QWidget *parent)
 		editorSnapshotString = QString(editorSnapshot.readAll());
 	}
 	else {
-		editorSnapshotString = "No Help Found";
+		editorSnapshotString = tr("No Help Found");
 	}
 	_editorSnapshotLabel = new QLabel(editorSnapshotString);
 
@@ -145,7 +145,7 @@ Help::Help(QWidget *parent)
 		editorCurvesString = QString(editorCurves.readAll());
 	}
 	else {
-		editorCurvesString = "No Help Found";
+		editorCurvesString = tr("No Help Found");
 	}
 	_editorCurvesLabel = new QLabel(editorCurvesString);
 
@@ -156,7 +156,7 @@ Help::Help(QWidget *parent)
 
 	QScrollArea *toolBarScrollArea = new QScrollArea;
 	toolBarScrollArea->setWidget(_toolBarLabel);
-	_tabs->addTab(toolBarScrollArea,"Toolbar");
+	_tabs->addTab(toolBarScrollArea,tr("Toolbar"));
 
 	QScrollArea *contextScrollArea = new QScrollArea;
 	contextScrollArea->setWidget(_contextLabel);
@@ -164,29 +164,29 @@ Help::Help(QWidget *parent)
 	//_tabs->addTab(contextScrollArea,"Contextual Menu");
 	QScrollArea *interactionScrollArea = new QScrollArea;
 	interactionScrollArea->setWidget(_interactionLabel);
-	_tabs->addTab(interactionScrollArea,"Interaction");
+	_tabs->addTab(interactionScrollArea,tr("Interaction"));
 
 	QScrollArea *editorGeneralScrollArea = new QScrollArea;
 	editorGeneralScrollArea->setWidget(_editorGeneralLabel);
-	_editorTabs->addTab(editorGeneralScrollArea,"General");
+	_editorTabs->addTab(editorGeneralScrollArea,tr("General"));
 
 	QScrollArea *editorProfilesScrollArea = new QScrollArea;
 	editorProfilesScrollArea->setWidget(_editorProfilesLabel);
-	_editorTabs->addTab(editorProfilesScrollArea,"Profiles");
+	_editorTabs->addTab(editorProfilesScrollArea,tr("Profiles"));
 
 	QScrollArea *editorMessagesScrollArea = new QScrollArea;
 	editorMessagesScrollArea->setWidget(_editorMessagesLabel);
-	_editorTabs->addTab(editorMessagesScrollArea,"Messages");
+	_editorTabs->addTab(editorMessagesScrollArea,tr("Messages"));
 
 	QScrollArea *editorSnapshotScrollArea = new QScrollArea;
 	editorSnapshotScrollArea->setWidget(_editorSnapshotLabel);
-	_editorTabs->addTab(editorSnapshotScrollArea,"Snapshot");
+	_editorTabs->addTab(editorSnapshotScrollArea,tr("Snapshot"));
 
 	QScrollArea *editorCurvesScrollArea = new QScrollArea;
 	editorCurvesScrollArea->setWidget(_editorCurvesLabel);
-	_editorTabs->addTab(editorCurvesScrollArea,"Curves");
+	_editorTabs->addTab(editorCurvesScrollArea,tr("Curves"));
 
-	_tabs->addTab(_editorTabs,"Attributes Editor");
+	_tabs->addTab(_editorTabs,tr("Attributes Editor"));
 
 	_layout->addWidget(_tabs);
 

@@ -68,15 +68,15 @@ ViewRelations::ViewRelations(unsigned int entID, MaquetteScene *scene, QWidget *
   connect(_relationsList, SIGNAL(itemSelectionChanged()), this, 
 	  SLOT(linkSelectionChanged()));
 	
-  _okButton = new QPushButton("OK", this);
+  _okButton = new QPushButton(tr("OK"), this);
   connect(_okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
   _layout->addWidget(_okButton, 5, 0, 1, 2);
 	 
-  _cancelButton = new QPushButton("Cancel", this);
+  _cancelButton = new QPushButton(tr("Cancel"), this);
   connect(_cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
   _layout->addWidget(_cancelButton, 5, 2, 1, 3);
 	
-  _deleteButton = new QPushButton("Delete", this);
+  _deleteButton = new QPushButton(tr("Delete"), this);
   _deleteButton->setShortcut(QKeySequence::Delete);
   connect(_deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
   _layout->addWidget(_deleteButton, 3, 0, 1, 5);

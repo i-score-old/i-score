@@ -261,7 +261,7 @@ ParentBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 		}
 	}
 	else {
-		std::cerr << "RIGHT BUTTON" << std::endl;
+
 	}
 }
 

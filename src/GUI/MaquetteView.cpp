@@ -60,7 +60,7 @@ MaquetteView::MaquetteView(MainWindow *mw)
   setRenderHint(QPainter::Antialiasing);
   setBackgroundBrush(QColor(140,176,140));
   setCacheMode(QGraphicsView::CacheBackground);
-  setWindowTitle("Maquette");
+  setWindowTitle(tr("Maquette"));
   setAlignment(Qt::AlignLeft | Qt::AlignTop);
   centerOn(0,0);
   _zoom = 1;
@@ -157,23 +157,23 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
 	QGraphicsView::keyPressEvent(event);
 	if (event->matches(QKeySequence::Copy)) {
 		_scene->copyBoxes();
-		_scene->displayMessage("Selection copied",INDICATION_LEVEL);
+		_scene->displayMessage(tr("Selection copied").toStdString(),INDICATION_LEVEL);
 	}
 	else if (event->matches(QKeySequence::Cut)) {
 		_scene->cutBoxes();
-		_scene->displayMessage("Selection cut",INDICATION_LEVEL);
+		_scene->displayMessage(tr("Selection cut").toStdString(),INDICATION_LEVEL);
 	}
 	else if (event->matches(QKeySequence::Paste)) {
 		_scene->pasteBoxes();
-		_scene->displayMessage("Copied selection pasted",INDICATION_LEVEL);
+		_scene->displayMessage(tr("Copied selection pasted").toStdString(),INDICATION_LEVEL);
 	}
 	else if (event->matches(QKeySequence::SelectAll)) {
 		_scene->selectAll();
-		_scene->displayMessage("All selected",INDICATION_LEVEL);
+		_scene->displayMessage(tr("All selected").toStdString(),INDICATION_LEVEL);
 	}
 	else 	if (event->matches(QKeySequence::Delete)) {
 		_scene->removeSelectedItems();
-		_scene->displayMessage("Selection removed",INDICATION_LEVEL);
+		_scene->displayMessage(tr("Selection removed").toStdString(),INDICATION_LEVEL);
 	}
 }
 
