@@ -36,10 +36,115 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL license and that you accept its terms.
-*/
+ */
 
 #include "TreeMap.hpp"
+#include "Maquette.hpp"
+
+using std::vector;
+using std::string;
+using std::pair;
 
 TreeMap::TreeMap(QWidget *parent) : QWidget(parent){
 	//setBackgroundColor(Qt::blue);
+	_deviceRoot = NULL;
 }
+
+/*TreeMapElement* TreeMap::element(TreeMapElement *parent, const string &device, const string &message, ElementType type) {
+	TreeMapElement *child = parent->findChild(message);
+	if (child == NULL) {
+		child = new TreeMapElement(this);
+		child->setAttributes(parent,device,curMsgPart,Node);
+	}
+	return child;
+}*/
+
+void TreeMap::updateMessages(const string &address) {
+	vector<string> messages = Maquette::getInstance()->requestNetworkSnapShot(address);
+	vector<string>::const_iterator msgIt;
+	for (msgIt = messages.begin() ; msgIt != messages.end() ; ++msgIt) {
+		string msg = (*msgIt);
+		if (!msg.empty()) {
+			size_t msgBeginPos;
+			if ((msgBeginPos = msg.find_first_of("/")) != string::npos) {
+				if (msg.size() > msgBeginPos+1) {
+					string device = msg.substr(0,msgBeginPos);
+					if (_deviceRoot == NULL) {
+						std::cerr << "TreeMap::updateMessages : DEVICE : " << device << std::endl;
+						_deviceRoot = new TreeMapElement(this);
+						_deviceRoot->setAttributes(NULL,device,device,Node);
+					}
+					string msgWithValue = msg.substr(msgBeginPos);
+					size_t valueBeginPos;
+					if ((valueBeginPos = msgWithValue.find_first_of(" ")) != string::npos) {
+						if (msgWithValue.size() > valueBeginPos+1) {
+							string msg = msgWithValue.substr(0,valueBeginPos);
+							string tmpMsg = msg;
+							vector<TreeMapElement*> msgParts;
+							size_t msgPartEndPos;
+							unsigned int vecPos = 0;
+							while ((msgPartEndPos = tmpMsg.find_first_of("/")) != string::npos) {
+								string curMsgPart = tmpMsg.substr(0,msgPartEndPos);
+								tmpMsg = tmpMsg.substr(msgPartEndPos+1);
+								TreeMapElement *child = NULL;
+								if (vecPos == 0) { // Parent : device
+									child = _deviceRoot->findChild(curMsgPart);
+									if (child == NULL) {
+										child = new TreeMapElement(this);
+										child->setAttributes(_deviceRoot,device,curMsgPart,Node);
+									}
+								}
+								else {
+									TreeMapElement *parent = msgParts[vecPos-1];
+									child = parent->findChild(curMsgPart);
+									if (child == NULL) {
+										child = new TreeMapElement(this);
+										child->setAttributes(parent,device,curMsgPart,Node);
+									}
+								}
+
+								if (child != NULL) {
+									msgParts.insert(msgParts.begin()+vecPos,child);
+									vecPos++;
+								}
+							}
+							if (!tmpMsg.empty()) {
+								TreeMapElement *child = NULL;
+								TreeMapElement *parent = msgParts[vecPos-1];
+								if (child == NULL) {
+									child = new TreeMapElement(this);
+									child->setAttributes(parent,device,tmpMsg,Node);
+								}
+								msgParts.insert(msgParts.begin()+vecPos,child);
+							}
+
+							string value = msgWithValue.substr(valueBeginPos+1);
+							TreeMapElement *valueElt = NULL;
+							TreeMapElement *parent = msgParts[vecPos-1];
+							valueElt = parent->findChild(value);
+							if (valueElt == NULL) {
+								valueElt = new TreeMapElement(this);
+								valueElt->setAttributes(parent,device,value,Leave);
+							}
+
+							//_elements.insert(pair<string,TreeMapElement*>(value,valueElt));
+							msgParts.insert(msgParts.begin()+vecPos,valueElt);
+
+						}
+					}
+				}
+			}
+		}
+	}
+	/*	std::multimap<string,TreeMapElement*>::iterator it;
+	std::cerr << "MULTIMAP" << std::endl;
+	for (it = _elements.begin() ; it != _elements.end() ; ++it) {
+		std::cerr << it->first << std::endl;
+	}*/
+	//std::cerr << "TreeMap::updateMessages : children count : " << _deviceRoot->descendance() << std::endl;
+}
+
+//void TreeMap::build() {
+//	map<string,TreeMapElement*> children = _root->children();
+//}
+

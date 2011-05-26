@@ -771,6 +771,7 @@ AttributesEditor::addWidgetsToLayout()
 
 	TreeMap * treeMap = new TreeMap(this);
 	_treeMapTabIndex = _explorationTab->addTab(_treeMapTab,"Tree Map");
+	treeMap->updateMessages("MinuitDevice1");
 
 	// Options defaultly disabled
 	_pitchOptionRandom->setDisabled(true);

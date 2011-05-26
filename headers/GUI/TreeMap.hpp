@@ -45,18 +45,19 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "TreeMapElement.hpp"
 #include <vector>
 #include <map>
+#include <string>
 
 class TreeMap : public QWidget {
 	Q_OBJECT
 
 public :
 	TreeMap(QWidget *parent = 0);
+	void updateMessages(const std::string &address);
 
 private :
-	std::vector<unsigned int> _nodes;
-	std::vector<unsigned int> _leaves;
-	std::vector<unsigned int> _attributes;
-	std::vector<unsigned int> _values;
+	std::multimap<std::string,TreeMapElement*> _elements;
+	//std::map<std::string,TreeMapElement *> _deviceRoots;
+	TreeMapElement *_deviceRoot;
 };
 
 #endif /* TREEMAP_HPP_ */

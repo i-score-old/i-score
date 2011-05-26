@@ -38,9 +38,57 @@ The fact that you are presently reading this means that you have had
 knowledge of the CeCILL license and that you accept its terms.
 */
 
+#include <iostream>
 #include <QGridLayout>
 #include "TreeMapElement.hpp"
 
-TreeMapElement::TreeMapElement(QWidget *parent, QBoxLayout::Direction direction) : QWidget(parent) {
-	_layout = new QBoxLayout(direction);
+using std::string;
+using std::map;
+
+TreeMapElement::TreeMapElement(QWidget *parent) : QWidget(parent) {
+	//_layout = new QBoxLayout;
+	_parent = NULL;
+	_descendanceCount = 0;
+	connect(this,SIGNAL(oneMoreChild()),this,SLOT(increaseDescendance()));
+}
+
+void TreeMapElement::setAttributes(TreeMapElement *parentElt, const string &device, const string &message, ElementType type) {
+	_parent = parentElt;
+	_device = device;
+	_message = message;
+	_type = type;
+	if (_parent != NULL) {
+		std::cerr << "TreeMapElement::setAttributes : Parent found for : " << _message << std::endl;
+		_parent->addChild(this);
+		connect(this,SIGNAL(oneMoreChild()),_parent,SIGNAL(familyExpanded()));
+		connect(this,SIGNAL(familyExpanded()),_parent,SIGNAL(familyExpanded()));
+	}
+	else {
+		std::cerr << "TreeMapElement::setAttributes : No Parent found for : " << _message << std::endl;
+	}
+}
+
+TreeMapElement* TreeMapElement::findChild(const string &message) {
+	map<string,TreeMapElement*>::iterator it;
+	if ((it = _children.find(message)) != _children.end()) {
+		return it->second;
+	}
+	else {
+		return NULL;
+	}
+}
+
+void TreeMapElement::addChild(TreeMapElement *child) {
+	_children[child->message()] = child;
+	std::cerr << "TreeMapElement::addChild : [ " << _message << " : " << child->message() << std::endl;
+	emit(oneMoreChild());
+}
+
+void TreeMapElement::setParent(TreeMapElement *parent) {
+	_parent = parent;
+}
+
+void TreeMapElement::increaseDescendance() {
+	std::cerr << "TreeMapElement::increaseDescendance for : " << _message << std::endl;
+	_descendanceCount++;
 }

@@ -44,19 +44,40 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QWidget>
 #include <vector>
 #include <QBoxLayout>
+#include <string>
+#include <map>
 
 enum ElementType {Node, Leave, Attribute, AttributeValue};
 
 class TreeMapElement : public QWidget {
 	Q_OBJECT
+
 public :
-	TreeMapElement(QWidget *parent = 0, QBoxLayout::Direction direction = QBoxLayout::TopToBottom);
+	TreeMapElement(QWidget *parent = 0);
+	void setAttributes(TreeMapElement *parentElt, const std::string &device, const std::string &message, ElementType type);
+	void addChild(TreeMapElement *child);
+	TreeMapElement* findChild(const std::string &message);
+	void setParent(TreeMapElement *parent);
+	std::map<std::string,TreeMapElement*> children() {return _children;}
+	std::string message() {return _message;}
+	unsigned int descendance() {return _descendanceCount;}
+
+signals :
+	void oneMoreChild();
+	void familyExpanded();
+
+public slots:
+	void increaseDescendance();
+
 private :
 	unsigned int _ID;
 	ElementType _type;
-	unsigned int _parent;
-	std::vector<unsigned int> _children;
+	TreeMapElement* _parent;
+	std::string _device;
+	std::string _message;
+	std::map<std::string,TreeMapElement*> _children;
 	QBoxLayout *_layout;
+	unsigned int _descendanceCount;
 };
 
 #endif /* TREEMAPELEMENT_HPP_ */
