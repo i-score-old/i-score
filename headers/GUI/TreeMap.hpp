@@ -55,9 +55,12 @@ public :
 	void updateMessages(const std::string &address);
 
 private :
-	std::multimap<std::string,TreeMapElement*> _elements;
-	//std::map<std::string,TreeMapElement *> _deviceRoots;
 	TreeMapElement *_deviceRoot;
+	TreeMapElement* findOrCreateChild(TreeMapElement* parent, const std::string &msg, ElementType type);
+	QVBoxLayout *_layout;
+
+protected :
+	virtual void paintEvent ( QPaintEvent * event );
 };
 
 #endif /* TREEMAP_HPP_ */

@@ -41,9 +41,9 @@ knowledge of the CeCILL license and that you accept its terms.
 #ifndef TREEMAPELEMENT_HPP_
 #define TREEMAPELEMENT_HPP_
 
+#include <QBoxLayout>
 #include <QWidget>
 #include <vector>
-#include <QBoxLayout>
 #include <string>
 #include <map>
 
@@ -54,13 +54,15 @@ class TreeMapElement : public QWidget {
 
 public :
 	TreeMapElement(QWidget *parent = 0);
-	void setAttributes(TreeMapElement *parentElt, const std::string &device, const std::string &message, ElementType type);
+	void setAttributes(TreeMapElement *parentElt, const std::string &message, ElementType type);
 	void addChild(TreeMapElement *child);
 	TreeMapElement* findChild(const std::string &message);
-	void setParent(TreeMapElement *parent);
 	std::map<std::string,TreeMapElement*> children() {return _children;}
+	//unsigned int childrenCount() {return _children->count();}
 	std::string message() {return _message;}
 	unsigned int descendance() {return _descendanceCount;}
+	void addChildren(const std::vector<std::string>& nodes, const std::vector<std::string>& leaves,
+			const std::vector<std::string>& attributes, const std::vector<std::string>& attributesValue);
 
 signals :
 	void oneMoreChild();
@@ -73,11 +75,14 @@ private :
 	unsigned int _ID;
 	ElementType _type;
 	TreeMapElement* _parent;
-	std::string _device;
 	std::string _message;
 	std::map<std::string,TreeMapElement*> _children;
 	QBoxLayout *_layout;
 	unsigned int _descendanceCount;
+
+protected :
+	QBoxLayout::Direction direction();
+	virtual void paintEvent ( QPaintEvent * event );
 };
 
 #endif /* TREEMAPELEMENT_HPP_ */

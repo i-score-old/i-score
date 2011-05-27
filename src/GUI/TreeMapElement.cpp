@@ -38,33 +38,50 @@ The fact that you are presently reading this means that you have had
 knowledge of the CeCILL license and that you accept its terms.
 */
 
+#include <QString>
+#include <QPainter>
+#include <QPaintEvent>
 #include <iostream>
 #include <QGridLayout>
+#include <QBoxLayout>
 #include "TreeMapElement.hpp"
+#include <vector>
 
+using std::vector;
 using std::string;
 using std::map;
 
 TreeMapElement::TreeMapElement(QWidget *parent) : QWidget(parent) {
-	//_layout = new QBoxLayout;
+	_layout = new QBoxLayout(QBoxLayout::LeftToRight,this);
+	setLayout(_layout);
 	_parent = NULL;
+	_message = "";
 	_descendanceCount = 0;
 	connect(this,SIGNAL(oneMoreChild()),this,SLOT(increaseDescendance()));
 }
 
-void TreeMapElement::setAttributes(TreeMapElement *parentElt, const string &device, const string &message, ElementType type) {
+void TreeMapElement::setAttributes(TreeMapElement *parentElt, const string &message, ElementType type) {
 	_parent = parentElt;
-	_device = device;
 	_message = message;
 	_type = type;
 	if (_parent != NULL) {
+#ifdef NDEBUG
 		std::cerr << "TreeMapElement::setAttributes : Parent found for : " << _message << std::endl;
+#endif
 		_parent->addChild(this);
-		connect(this,SIGNAL(oneMoreChild()),_parent,SIGNAL(familyExpanded()));
-		connect(this,SIGNAL(familyExpanded()),_parent,SIGNAL(familyExpanded()));
+		setParent(_parent);
+		if (_parent->direction() == QBoxLayout::LeftToRight) {
+			_layout->setDirection(QBoxLayout::TopToBottom);
+		}
+		else {
+			_layout->setDirection(QBoxLayout::LeftToRight);
+		}
 	}
 	else {
+#ifdef NDEBUG
 		std::cerr << "TreeMapElement::setAttributes : No Parent found for : " << _message << std::endl;
+#endif
+		_layout->setDirection(QBoxLayout::LeftToRight);
 	}
 }
 
@@ -80,15 +97,80 @@ TreeMapElement* TreeMapElement::findChild(const string &message) {
 
 void TreeMapElement::addChild(TreeMapElement *child) {
 	_children[child->message()] = child;
-	std::cerr << "TreeMapElement::addChild : [ " << _message << " : " << child->message() << std::endl;
-	emit(oneMoreChild());
-}
-
-void TreeMapElement::setParent(TreeMapElement *parent) {
-	_parent = parent;
+#ifdef NDEBUG
+	std::cerr << "TreeMapElement::addChild : [" << _message << ":" << child->message() << "]" << std::endl;
+#endif
+	//emit(oneMoreChild());
+	increaseDescendance();
+	unsigned int cpt = 0;
+	map<string,TreeMapElement*>::iterator it;
+	for (it = _children.begin() ; it != _children.end() ; ++it) {
+		(it->second)->setGeometry((float)cpt/(float)width(),0,(float)_children.size()/(float)width(),(int)height());
+		_layout->addWidget(it->second);
+		cpt++;
+	}
 }
 
 void TreeMapElement::increaseDescendance() {
+#ifdef NDEBUG
 	std::cerr << "TreeMapElement::increaseDescendance for : " << _message << std::endl;
+#endif
 	_descendanceCount++;
+	if (_parent != NULL) {
+		_parent->increaseDescendance();
+	}
+}
+
+QBoxLayout::Direction TreeMapElement::direction() {
+	return _layout->direction();
+}
+
+void TreeMapElement::addChildren(const vector<string>& nodes, const vector<string>& leaves,
+		const vector<string>& attributes, const vector<string>& attributesValue) {
+	vector<string>::const_iterator it;
+	vector<string>::const_iterator it2;
+	for (it = leaves.begin() ; it != leaves.end() ; ++it) {
+		TreeMapElement *leaveChild = new TreeMapElement(this);
+		leaveChild->setAttributes(this,*it,Leave);
+		addChild(leaveChild);
+	}
+	for (it = attributes.begin(), it2 = attributesValue.begin() ; it != attributes.end(),it2 != attributesValue.end() ; ++it,++it2) {
+		TreeMapElement *attributeChild = new TreeMapElement(this);
+		attributeChild->setAttributes(this,*it,Attribute);
+		addChild(attributeChild);
+		TreeMapElement *attributeValueChild = new TreeMapElement(this);
+		attributeValueChild->setAttributes(this,*it,AttributeValue);
+		addChild(attributeValueChild);
+	}
+	for (it = nodes.begin() ; it != nodes.end() ; ++it) {
+		TreeMapElement *nodeChild = new TreeMapElement(this);
+		nodeChild->setAttributes(this,*it,Node);
+		addChild(nodeChild);
+
+		//Maquette::getInstance()->requestNetworkNamespace()
+	}
+}
+
+void TreeMapElement::paintEvent ( QPaintEvent * event ) {
+	QWidget::paintEvent(event);
+#ifdef NDEBUG
+	std::cerr << "TreeMapElement::paintEvent" << std::endl;
+#endif
+	QPainter painter(this);
+	if (_message != "") {
+		switch(_type) {
+		case Node :
+			painter.setBrush(QBrush(Qt::blue));
+			painter.fillRect(rect(),Qt::blue);
+			break;
+		case Leave :
+			painter.setBrush(QBrush(Qt::green));
+			painter.fillRect(rect(),Qt::green);
+			break;
+		}
+		painter.setBrush(QBrush(Qt::black,Qt::NoBrush));
+		painter.drawRect(rect());
+		painter.drawText(rect(),QString::fromStdString(_message),QTextOption(Qt::AlignJustify));
+	}
+	//painter.fillRect(rect(),Qt::blue);
 }

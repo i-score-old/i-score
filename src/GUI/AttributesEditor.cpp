@@ -769,8 +769,8 @@ AttributesEditor::addWidgetsToLayout()
 	_snapshotTab->setLayout(_snapshotLayout);
 	_snapshotTabIndex = _explorationTab->addTab(_snapshotTab,"Snapshot");
 
-	TreeMap * treeMap = new TreeMap(this);
 	_treeMapTabIndex = _explorationTab->addTab(_treeMapTab,"Tree Map");
+	TreeMap * treeMap = new TreeMap(_treeMapTab);
 	treeMap->updateMessages("MinuitDevice1");
 
 	// Options defaultly disabled
