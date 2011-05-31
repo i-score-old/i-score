@@ -46,6 +46,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QBoxLayout>
 #include "TreeMapElement.hpp"
 #include <vector>
+#include "Maquette.hpp"
 
 using std::vector;
 using std::string;
@@ -56,6 +57,7 @@ TreeMapElement::TreeMapElement(QWidget *parent) : QWidget(parent) {
 	setLayout(_layout);
 	_parent = NULL;
 	_message = "";
+	_value = "";
 	_descendanceCount = 0;
 	connect(this,SIGNAL(oneMoreChild()),this,SLOT(increaseDescendance()));
 }
@@ -95,19 +97,54 @@ TreeMapElement* TreeMapElement::findChild(const string &message) {
 	}
 }
 
+void TreeMapElement::setValue(const string &value) {
+	_value = value;
+}
+
+TreeMapElement* TreeMapElement::addChild(const string &message, ElementType type) {
+	TreeMapElement *child = new TreeMapElement(this);
+	child->setAttributes(this,message,type);
+
+	addChild(child);
+
+	return child;
+}
+
 void TreeMapElement::addChild(TreeMapElement *child) {
 	_children[child->message()] = child;
+	switch (child->type()) {
+	case Node :
+		_nodes.push_back(child);
+		break;
+	case Leave :
+		_leaves.push_back(child);
+		break;
+	case Attribute :
+		_attributes.push_back(child);
+		break;
+	default :
+		break;
+	}
+
 #ifdef NDEBUG
 	std::cerr << "TreeMapElement::addChild : [" << _message << ":" << child->message() << "]" << std::endl;
 #endif
-	//emit(oneMoreChild());
+
+	childAdded();
+}
+
+void TreeMapElement::childAdded() {
 	increaseDescendance();
-	unsigned int cpt = 0;
+	// TODO : Parents should resize too
 	map<string,TreeMapElement*>::iterator it;
+	const float CHILD_WIDTH = (float)_children.size()/(float)width();
+	const float CHILD_HEIGHT = height();
+	float childPosX = 0;
+	float childPosY = 0;
 	for (it = _children.begin() ; it != _children.end() ; ++it) {
-		(it->second)->setGeometry((float)cpt/(float)width(),0,(float)_children.size()/(float)width(),(int)height());
-		_layout->addWidget(it->second);
-		cpt++;
+		TreeMapElement *curChild = it->second;
+		curChild->setGeometry(childPosX,childPosY,CHILD_WIDTH,CHILD_HEIGHT);
+		_layout->addWidget(curChild);
 	}
 }
 
@@ -130,24 +167,34 @@ void TreeMapElement::addChildren(const vector<string>& nodes, const vector<strin
 	vector<string>::const_iterator it;
 	vector<string>::const_iterator it2;
 	for (it = leaves.begin() ; it != leaves.end() ; ++it) {
-		TreeMapElement *leaveChild = new TreeMapElement(this);
-		leaveChild->setAttributes(this,*it,Leave);
-		addChild(leaveChild);
+		TreeMapElement *child = addChild(*it,Leave);
+
+		vector<string> childNodes,childLeaves,childAttributes,childAttributesvalues;
+
+		Maquette::getInstance()->requestNetworkNamespace(child->address(),childNodes,childLeaves,childAttributes,childAttributesvalues);
+		child->addChildren(childNodes,childLeaves,childAttributes,childAttributesvalues);
 	}
 	for (it = attributes.begin(), it2 = attributesValue.begin() ; it != attributes.end(),it2 != attributesValue.end() ; ++it,++it2) {
-		TreeMapElement *attributeChild = new TreeMapElement(this);
-		attributeChild->setAttributes(this,*it,Attribute);
-		addChild(attributeChild);
-		TreeMapElement *attributeValueChild = new TreeMapElement(this);
-		attributeValueChild->setAttributes(this,*it,AttributeValue);
-		addChild(attributeValueChild);
+		TreeMapElement *child = addChild(*it,Attribute);
+		child->setValue(*it2);
 	}
 	for (it = nodes.begin() ; it != nodes.end() ; ++it) {
-		TreeMapElement *nodeChild = new TreeMapElement(this);
-		nodeChild->setAttributes(this,*it,Node);
-		addChild(nodeChild);
+		TreeMapElement *child = addChild(*it,Node);
 
-		//Maquette::getInstance()->requestNetworkNamespace()
+		vector<string> childNodes,childLeaves,childAttributes,childAttributesvalues;
+
+		Maquette::getInstance()->requestNetworkNamespace(child->address(),childNodes,childLeaves,childAttributes,childAttributesvalues);
+		child->addChildren(childNodes,childLeaves,childAttributes,childAttributesvalues);
+	}
+	update();
+}
+
+string TreeMapElement::address() {
+	if (_parent != NULL) {
+		return _parent->address() + _message + "/";
+	}
+	else {
+		return _message + "/";
 	}
 }
 
@@ -157,20 +204,44 @@ void TreeMapElement::paintEvent ( QPaintEvent * event ) {
 	std::cerr << "TreeMapElement::paintEvent" << std::endl;
 #endif
 	QPainter painter(this);
+	QColor bgColor = Qt::white;
+	QColor lineColor = Qt::black;
+	Qt::PenStyle lineStyle;
 	if (_message != "") {
 		switch(_type) {
 		case Node :
-			painter.setBrush(QBrush(Qt::blue));
-			painter.fillRect(rect(),Qt::blue);
+			if (_parent != NULL) {
+				bgColor = Qt::darkCyan;
+				lineStyle = Qt::DashLine;
+			}
+			else {
+				bgColor = Qt::gray;
+				lineStyle = Qt::SolidLine;
+			}
 			break;
 		case Leave :
-			painter.setBrush(QBrush(Qt::green));
-			painter.fillRect(rect(),Qt::green);
+			bgColor = Qt::darkGreen;
+			lineStyle = Qt::DashDotLine;
+			break;
+		case Attribute:
+			bgColor = Qt::green;
+			lineStyle = Qt::DotLine;
+			break;
+		default :
 			break;
 		}
-		painter.setBrush(QBrush(Qt::black,Qt::NoBrush));
+		QBrush backBrush = QBrush(bgColor);
+		painter.setBrush(backBrush);
+		painter.fillRect(rect(),backBrush);
+		QBrush frontBrush = QBrush(lineColor);
+		QPen frontPen = QPen (frontBrush, 1, lineStyle);
+		painter.setPen(frontPen);
 		painter.drawRect(rect());
-		painter.drawText(rect(),QString::fromStdString(_message),QTextOption(Qt::AlignJustify));
+		if (_value != "") {
+			painter.drawText(rect(),QString::fromStdString(_message + " : " + _value),QTextOption(Qt::AlignLeft));
+		}
+		else {
+			painter.drawText(rect(),QString::fromStdString(_message),QTextOption(Qt::AlignLeft));
+		}
 	}
-	//painter.fillRect(rect(),Qt::blue);
 }

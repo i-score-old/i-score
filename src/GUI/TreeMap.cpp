@@ -59,17 +59,6 @@ TreeMap::TreeMap(QWidget *parent) : QWidget(parent){
 	setGeometry(0,0,parent->width(),parent->height());
 }
 
-TreeMapElement* TreeMap::findOrCreateChild(TreeMapElement* parent, const string &msg, ElementType type) {
-	TreeMapElement *child = NULL;
-	child = parent->findChild(msg);
-	if (child == NULL) {
-		child = new TreeMapElement(parent);
-		child->setAttributes(parent,msg,type);
-	}
-
-	return child;
-}
-
 void TreeMap::updateMessages(const string &address) {
 	_deviceRoot = new TreeMapElement(this);
 	_deviceRoot->setAttributes(NULL,address,Node);
@@ -79,75 +68,6 @@ void TreeMap::updateMessages(const string &address) {
 
 	Maquette::getInstance()->requestNetworkNamespace(address,nodes,leaves,attributes,attributesvalues);
 	_deviceRoot->addChildren(nodes,leaves,attributes,attributesvalues);
-
-	/*
-	vector<string> messages = Maquette::getInstance()->requestNetworkSnapShot(address);
-	vector<string>::const_iterator msgIt;
-	for (msgIt = messages.begin() ; msgIt != messages.end() ; ++msgIt) {
-		string msg = (*msgIt);
-		if (!msg.empty()) {
-			size_t msgBeginPos;
-			if ((msgBeginPos = msg.find_first_of("/")) != string::npos) {
-				if (msg.size() > msgBeginPos+1) {
-					string device = msg.substr(0,msgBeginPos);
-					if (_deviceRoot == NULL) {
-#ifdef NDEBUG
-						std::cerr << "TreeMap::updateMessages : DEVICE : " << device << std::endl;
-#endif
-						_deviceRoot = new TreeMapElement(this);
-						_deviceRoot->setAttributes(NULL,device,Node);
-						_layout->addWidget(_deviceRoot);
-					}
-					string msgWithValue = msg.substr(msgBeginPos);
-					size_t valueBeginPos;
-					if ((valueBeginPos = msgWithValue.find_first_of(" ")) != string::npos) {
-						if (msgWithValue.size() > valueBeginPos+1) {
-							string msg = msgWithValue.substr(1,valueBeginPos);
-							string tmpMsg = msg;
-#ifdef NDEBUG
-							std::cerr << "TreeMapElement::updateMessages : MESSAGE : " << tmpMsg << std::endl;
-#endif
-							vector<TreeMapElement*> msgParts;
-							size_t msgPartEndPos;
-							unsigned int vecPos = 0;
-							while ((msgPartEndPos = tmpMsg.find_first_of("/")) != string::npos) {
-								string curMsgPart = tmpMsg.substr(0,msgPartEndPos);
-								tmpMsg = tmpMsg.substr(msgPartEndPos+1);
-								TreeMapElement *child = NULL;
-								if (vecPos == 0) { // Parent : device
-									child = findOrCreateChild(_deviceRoot,curMsgPart,Node);
-								}
-								else {
-									child = findOrCreateChild(msgParts[vecPos-1],curMsgPart,Node);
-								}
-
-								if (child != NULL) {
-									msgParts.insert(msgParts.begin()+vecPos,child);
-									vecPos++;
-								}
-							}
-							if (!tmpMsg.empty()) {
-								TreeMapElement *child = findOrCreateChild(msgParts[vecPos-1],tmpMsg,Leave);
-								msgParts.insert(msgParts.begin()+vecPos,child);
-								vecPos++;
-							}
-
-							string value = msgWithValue.substr(valueBeginPos+1);
-							findOrCreateChild(msgParts[vecPos-1],value,AttributeValue);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	if (_deviceRoot != NULL) {
-#ifdef NDEBUG
-		std::cerr << "TreeMap::updateMessages : children count : " << _deviceRoot->descendance() << std::endl;
-#endif
-
-	}
-	*/
 }
 
 void TreeMap::paintEvent ( QPaintEvent * event ) {
@@ -155,15 +75,4 @@ void TreeMap::paintEvent ( QPaintEvent * event ) {
 	#ifdef NDEBUG
 	std::cerr << "TreeMap::paintEvent" << std::endl;
 #endif
-/*	QPainter painter(this);
-	painter.fillRect(rect(),Qt::red);*/
-	/*	if (_deviceRoot != NULL) {
-		std::cerr << "TreeMap::paintEvent : root found" << std::endl;
-
-		map<string,TreeMapElement*> children = _deviceRoot->children();
-		map<string,TreeMapElement*>::iterator it;
-		for (it = children.begin() ; it != children.end() ; ++it) {
-			it->second->update();
-		}
-	}*/
 }

@@ -149,8 +149,8 @@ void AttributesEditor::noBoxEdited() {
 	_boxLengthValue->clear();
 	_boxName->clear();
 	_generalTab->setEnabled(false);
-	_networkTabWidget->setEnabled(false);
-	_snapshotTab->setEnabled(false);
+	//_networkTabWidget->setEnabled(false);
+	//_snapshotTab->setEnabled(false);
 	_messagesTab->setEnabled(false);
 	_curvesWidget->updateMessages(NO_ID);
 	_curvesTab->setEnabled(false);

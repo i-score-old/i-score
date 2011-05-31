@@ -47,22 +47,33 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <string>
 #include <map>
 
-enum ElementType {Node, Leave, Attribute, AttributeValue};
+enum ElementType {Node, Leave, Attribute};
 
 class TreeMapElement : public QWidget {
 	Q_OBJECT
 
 public :
 	TreeMapElement(QWidget *parent = 0);
+
 	void setAttributes(TreeMapElement *parentElt, const std::string &message, ElementType type);
-	void addChild(TreeMapElement *child);
-	TreeMapElement* findChild(const std::string &message);
-	std::map<std::string,TreeMapElement*> children() {return _children;}
-	//unsigned int childrenCount() {return _children->count();}
+
+	ElementType type() {return _type;}
+
+	std::string value() {return _value;}
+	void setValue(const std::string &value);
+
 	std::string message() {return _message;}
+
 	unsigned int descendance() {return _descendanceCount;}
+
+	std::string address();
+
+	TreeMapElement* findChild(const std::string &message);
+	TreeMapElement* addChild(const std::string &message, ElementType type);
 	void addChildren(const std::vector<std::string>& nodes, const std::vector<std::string>& leaves,
-			const std::vector<std::string>& attributes, const std::vector<std::string>& attributesValue);
+				const std::vector<std::string>& attributes, const std::vector<std::string>& attributesValue);
+
+	std::map<std::string,TreeMapElement*> children() {return _children;}
 
 signals :
 	void oneMoreChild();
@@ -70,13 +81,19 @@ signals :
 
 public slots:
 	void increaseDescendance();
+	void childAdded();
 
 private :
+	void addChild(TreeMapElement* child);
 	unsigned int _ID;
 	ElementType _type;
 	TreeMapElement* _parent;
 	std::string _message;
+	std::string _value;
 	std::map<std::string,TreeMapElement*> _children;
+	std::vector<TreeMapElement*> _nodes;
+	std::vector<TreeMapElement*> _leaves;
+	std::vector<TreeMapElement*> _attributes;
 	QBoxLayout *_layout;
 	unsigned int _descendanceCount;
 
