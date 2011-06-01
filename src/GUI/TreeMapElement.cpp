@@ -53,7 +53,12 @@ using std::string;
 using std::map;
 
 TreeMapElement::TreeMapElement(QWidget *parent) : QWidget(parent) {
+	//_globalLayout = new QVBoxLayout(this);
+	//_titleLabel = new QLabel("",this);
+	//_globalLayout->addWidget(_titleLabel);
 	_layout = new QBoxLayout(QBoxLayout::LeftToRight,this);
+
+	//_globalLayout->addLayout(_layout);
 	setLayout(_layout);
 	_parent = NULL;
 	_message = "";
@@ -65,6 +70,8 @@ TreeMapElement::TreeMapElement(QWidget *parent) : QWidget(parent) {
 void TreeMapElement::setAttributes(TreeMapElement *parentElt, const string &message, ElementType type) {
 	_parent = parentElt;
 	_message = message;
+	//_titleLabel->setText(QString::fromStdString(_message));
+	//_titleLabel->adjustSize();
 	_type = type;
 	if (_parent != NULL) {
 #ifdef NDEBUG
@@ -99,6 +106,8 @@ TreeMapElement* TreeMapElement::findChild(const string &message) {
 
 void TreeMapElement::setValue(const string &value) {
 	_value = value;
+	//_titleLabel->setText(QString::fromStdString(_message + " : " + _value));
+	//_titleLabel->adjustSize();
 }
 
 TreeMapElement* TreeMapElement::addChild(const string &message, ElementType type) {
@@ -206,6 +215,7 @@ void TreeMapElement::paintEvent ( QPaintEvent * event ) {
 	QPainter painter(this);
 	QColor bgColor = Qt::white;
 	QColor lineColor = Qt::black;
+	unsigned int lineWidth = 1;
 	Qt::PenStyle lineStyle;
 	if (_message != "") {
 		switch(_type) {
@@ -234,9 +244,10 @@ void TreeMapElement::paintEvent ( QPaintEvent * event ) {
 		painter.setBrush(backBrush);
 		painter.fillRect(rect(),backBrush);
 		QBrush frontBrush = QBrush(lineColor);
-		QPen frontPen = QPen (frontBrush, 1, lineStyle);
+		QPen frontPen = QPen (frontBrush, lineWidth, lineStyle);
 		painter.setPen(frontPen);
-		painter.drawRect(rect());
+		QRect boundingRect = rect();
+		painter.drawRect(boundingRect.topLeft().x(),boundingRect.topLeft().x(),boundingRect.width()-lineWidth,boundingRect.height()-lineWidth);
 		if (_value != "") {
 			painter.drawText(rect(),QString::fromStdString(_message + " : " + _value),QTextOption(Qt::AlignLeft));
 		}

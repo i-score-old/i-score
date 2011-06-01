@@ -43,6 +43,7 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #include <QBoxLayout>
 #include <QWidget>
+#include <QLabel>
 #include <vector>
 #include <string>
 #include <map>
@@ -60,6 +61,7 @@ public :
 	ElementType type() {return _type;}
 
 	std::string value() {return _value;}
+
 	void setValue(const std::string &value);
 
 	std::string message() {return _message;}
@@ -95,6 +97,8 @@ private :
 	std::vector<TreeMapElement*> _leaves;
 	std::vector<TreeMapElement*> _attributes;
 	QBoxLayout *_layout;
+	QVBoxLayout *_globalLayout;
+	QLabel *_titleLabel;
 	unsigned int _descendanceCount;
 
 protected :
