@@ -13,6 +13,9 @@ lib/Editor/CSP
 linux-g++ {
 INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2
 }
+linux-g++-64 {
+INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2
+}
 macx-g++ {
 INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /Library/Frameworks/ /usr/local/include/libxml2
 }
@@ -20,6 +23,9 @@ INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /Library/Fra
 QT += network xml svg
 
 linux-g++ {
+QMAKE_LFLAGS += -L/usr/local/lib/
+}
+linux-g++-64 {
 QMAKE_LFLAGS += -L/usr/local/lib/
 }
 macx-g++ {
@@ -32,6 +38,9 @@ MOC_DIR = moc
 OBJETCS_DIR = bin
 
 linux-g++ {
+LIBS += -lIscore -lDeviceManager -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodescheduling -lgecodeset -lgecodesupport -lgecodegraph
+}
+linux-g++-64 {
 LIBS += -lIscore -lDeviceManager -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodescheduling -lgecodeset -lgecodesupport -lgecodegraph
 }
 macx-g++ {
