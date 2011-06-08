@@ -11,14 +11,14 @@ CURRENT_PATH=`pwd`
 
 OS=$1
 
-if [ "$OS" = "LINUX"] || [ "$OS" = "LINUX_64" ];
+if [ "$OS" = "LINUX"] || [ "$OS" = "LINUX_64" ]
 then
-
 DEVICE_MANAGER_PATH='/home/luc/Documents/workspace/Device-Manager'
 LIB_ISCORE_PATH='/home/luc/Documents/workspace/libIscore'
 ACOUSMOSCRIBE_PATH='/home/luc/Documents/workspace/Acousmoscribe'
+fi
 
-elif [ "$OS" = "MACOS" ]
+if [ "$OS" = "MACOS" ]
 then
 
 DEVICE_MANAGER_PATH='/Users/luc/Documents/workspace/Device-Manager'
