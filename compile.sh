@@ -11,20 +11,20 @@ CURRENT_PATH=`pwd`
 
 OS=$1
 
-if [ "$OS" = "LINUX"] || [ "$OS" = "LINUX_64" ]
+if [ "$OS" = "LINUX"] || [ "$OS" = "LINUX_64" ];
 then
-{
+
 DEVICE_MANAGER_PATH='/home/luc/Documents/workspace/Device-Manager'
 LIB_ISCORE_PATH='/home/luc/Documents/workspace/libIscore'
 ACOUSMOSCRIBE_PATH='/home/luc/Documents/workspace/Acousmoscribe'
-}
+
 elif [ "$OS" = "MACOS" ]
 then
-{
+
 DEVICE_MANAGER_PATH='/Users/luc/Documents/workspace/Device-Manager'
 LIB_ISCORE_PATH='/Users/luc/Documents/workspace/libIscore'
 ACOUSMOSCRIBE_PATH='/Users/luc/Documents/workspace/Acousmoscribe'
-}
+
 fi
 
 QMAKE_LINUX='qmake -spec linux-g++'
@@ -41,7 +41,7 @@ echo '-=[START]=-'
 
 echo '-=[Device Manager : Library]=- Compiling ...'
 cd $DEVICE_MANAGER_PATH
-if [ "$OS" = "LINUX"] || [ "$OS" = "LINUX64" ]
+if [ "$OS"="LINUX"] || [ "$OS"="LINUX64" ]
 then
 {
 echo '-=[Device Manager : LINUX]=-'
