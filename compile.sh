@@ -11,7 +11,7 @@ CURRENT_PATH=`pwd`
 
 OS=$1
 
-if [ "$OS" = "LINUX" ] || [ "$OS" = "LINUX_64" ]
+if [ "$OS" = "LINUX" ] || [ "$OS" = "LINUX64" ]
 then
 {
 DEVICE_MANAGER_PATH='/home/luc/Documents/workspace/Device-Manager'
