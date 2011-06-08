@@ -52,7 +52,7 @@ $MAKE_LINUX
 echo '-=[Device Manager : Library]=- Installing ...'
 sudo cp libDeviceManager.a /usr/local/lib/
 sudo mkdir -p /usr/local/include/DeviceManager/
-sudo cp libDeviceManager.h /usr/local/include/DeviceManager/
+sudo cp DeviceManager.h /usr/local/include/DeviceManager/
 echo '-=[Device Manager : Library]=- Done.'
 cd Plugins/Linux_MacOS/
 echo '-=[Device Manager : Plugins]=- Cleaning ...'
@@ -76,7 +76,7 @@ $MAKE_MAC
 echo '-=[Device Manager : Library]=- Installing ...'
 sudo cp libDeviceManager.a /usr/local/lib/
 sudo mkdir -p /usr/local/include/DeviceManager/
-sudo cp libDeviceManager.h /usr/local/include/DeviceManager/
+sudo cp DeviceManager.h /usr/local/include/DeviceManager/
 echo '-=[Device Manager : Library]=- Done.'
 cd Plugins/Linux_MacOS/
 echo '-=[Device Manager : Plugins]=- Cleaning ...'
