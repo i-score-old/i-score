@@ -13,14 +13,18 @@ OS=$1
 
 if [ "$OS" = "LINUX"] || [ "$OS" = "LINUX_64" ]
 then
+{
 DEVICE_MANAGER_PATH='/home/luc/Documents/workspace/Device-Manager'
 LIB_ISCORE_PATH='/home/luc/Documents/workspace/libIscore'
 ACOUSMOSCRIBE_PATH='/home/luc/Documents/workspace/Acousmoscribe'
+}
 elif [ "$OS" = "MACOS" ]
 then
+{
 DEVICE_MANAGER_PATH='/Users/luc/Documents/workspace/Device-Manager'
 LIB_ISCORE_PATH='/Users/luc/Documents/workspace/libIscore'
 ACOUSMOSCRIBE_PATH='/Users/luc/Documents/workspace/Acousmoscribe'
+}
 fi
 
 QMAKE_LINUX='qmake -spec linux-g++'
@@ -63,6 +67,7 @@ sudo cp Plugins/*.so /usr/local/lib/IScore/
 }
 elif [ "$OS" = "MACOS" ]
 then
+{
 echo '-=[Device Manager : MACOS]=-'
 echo '-=[Device Manager : Library]=- Cleaning ...'
 $MAKE_CLEAN
@@ -84,6 +89,7 @@ $MAKE_MAC
 echo '-=[Device Manager : Plugins]=- Installing ...'
 sudo mkdir -p /usr/local/lib/IScore/
 sudo cp Plugins/*.dylib /usr/local/lib/IScore/
+}
 fi
 
 ## LibIscore Compilation
@@ -93,18 +99,26 @@ echo '-=[LibIScore]=- Cleaning ...'
 $MAKE_CLEAN
 if [ "$OS" = "LINUX" ]
 then
+{
 echo '-=[LibIScore]=- Generating makefile ...'
 $QMAKE_LINUX iscore.pro
+}
 elif [ "$OS" = "LINUX64" ]
 then
+{
 echo '-=[LibIScore]=- Generating makefile ...'
 $QMAKE_LINUX_64 iscore.pro
+}
 elif [ "$OS" = "MACOS" ]
 then
+{
 echo '-=[LibIScore]=- Generating makefile ...'
 $QMAKE_MACOS iscore.pro
+}
 else
+{
 echo '-=[LibIScore]=- ERROR : Unhandled OS'
+}
 fi
 echo '-=[LibIScore]=- Compiling  ...'
 $MAKE
@@ -118,18 +132,26 @@ echo '-=[Acousmoscribe]=- Cleaning ...'
 $MAKE_CLEAN
 if [ "$OS" = "LINUX" ]
 then
+{
 echo '-=[Acousmocribe]=- Generating makefile ...'
 $QMAKE_LINUX acousmoscribe.pro
+}
 elif [ "$OS" = "LINUX64" ]
 then
+{
 echo '-=[Acousmocribe]=- Generating makefile ...'
 $QMAKE_LINUX_64 acousmoscribe.pro
+}
 elif [ "$OS" = "MACOS" ]
 then
+{
 echo '-=[Acousmoscribe]=- Generating makefile ...'
 $QMAKE_MACOS acousmoscribe.pro
+}
 else
+{
 echo '-=[Acousmoscribe]=- ERROR : Unhandled OS'
+}
 fi
 echo '-=[Acousmoscribe]=- Compiling  ...'
 $MAKE
