@@ -38,6 +38,11 @@
 	      	  Acousmoscribe : $ git clone git://github.com/lucvercellin/acousmoscribe.git
        . In "Device-Manager/Plugins/Linux_MacOS/NetworkCommunication/osc/OscPrintReceivedElements.cpp", insert at line 35 :
        	    #include <string.h>
+       . In "Device-Manager/Makefile" line 12 replace :
+       	   	GCC = g++ -c -Wall
+			with :
+		GCC = g++ -c -Wall -fPIC
+       . In "Device-Manager/Plugins/Linux_MacOS/compileForLinux.sh" replace all occurences of "gcc" with "g++"
        . Go into acousmoscribe folder
        . Edit compileWithLibraries.sh to specify the folders you've downloaded sources to.
        . Compile :
