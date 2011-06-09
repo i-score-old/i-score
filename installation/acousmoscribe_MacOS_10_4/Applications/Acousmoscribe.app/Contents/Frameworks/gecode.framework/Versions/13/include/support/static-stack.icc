@@ -1,0 +1,125 @@
+/* -*- mode: C++; c-basic-offset: 2; indent-tabs-mode: nil -*- */
+/*
+ *  Main authors:
+ *     Christian Schulte <schulte@gecode.org>
+ *
+ *  Copyright:
+ *     Christian Schulte, 2002
+ *
+ *  Last modified:
+ *     $Date: 2007-09-11 14:20:32 +0200 (Di, 11 Sep 2007) $ by $Author: schulte $
+ *     $Revision: 4971 $
+ *
+ *  This file is part of Gecode, the generic constraint
+ *  development environment:
+ *     http://www.gecode.org
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining
+ *  a copy of this software and associated documentation files (the
+ *  "Software"), to deal in the Software without restriction, including
+ *  without limitation the rights to use, copy, modify, merge, publish,
+ *  distribute, sublicense, and/or sell copies of the Software, and to
+ *  permit persons to whom the Software is furnished to do so, subject to
+ *  the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be
+ *  included in all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ *  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ *  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ *  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ *  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ *  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+namespace Gecode { namespace Support {
+
+  /**
+   * \brief Stack with fixed number of elements
+   *
+   * \ingroup FuncSupport
+   */
+  template <class T>
+  class StaticStack {
+  private:
+    /// Stack space
+    T* stack;
+    /// Top of stack
+    unsigned int tos;
+  public:
+    /// Initialize for \a n elements
+    StaticStack(const int n);
+    /// Release memory
+    ~StaticStack(void);
+
+    /// Reset stack (pop all elements)
+    void reset(void);
+    /// Test whether stack is empty
+    bool empty(void) const;
+
+    /// Pop topmost element from stack and return it
+    T pop(void);
+    /// Return element on top of stack
+    T& top(void) const;
+    /// Return element that has just been popped
+    T& last(void) const;
+    /// Push element \a x on top of stack
+    void push(T x);
+
+  };
+
+  template <class T>
+  forceinline
+  StaticStack<T>::StaticStack(const int n)
+    : tos(0) {
+    stack = static_cast<T*>(Memory::malloc((n+1)*sizeof(T)));
+  }
+
+  template <class T>
+  forceinline
+  StaticStack<T>::~StaticStack(void) {
+    Memory::free(stack);
+  }
+
+  template <class T>
+  forceinline bool
+  StaticStack<T>::empty(void) const {
+    return tos==0;
+  }
+
+  template <class T>
+  forceinline void
+  StaticStack<T>::reset(void) {
+    tos = 0;
+  }
+
+  template <class T>
+  forceinline T
+  StaticStack<T>::pop(void) {
+    return stack[--tos];
+  }
+
+  template <class T>
+  forceinline T&
+  StaticStack<T>::top(void) const {
+    return stack[tos-1];
+  }
+
+  template <class T>
+  forceinline T&
+  StaticStack<T>::last(void) const {
+    return stack[tos];
+  }
+
+  template <class T>
+  forceinline void
+  StaticStack<T>::push(T x) {
+    stack[tos++] = x;
+  }
+
+}}
+
+// STATISTICS: support-any

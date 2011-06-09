@@ -1,0 +1,65 @@
+== [ INSTALL FIRST ] ==
+
+To install acousmoscribe, here are some needed packages : 
+(if they are already installed, go to step 4)
+
+====<[ MacOS ]>====
+
+1 - [ Qt (LGPL) ]
+http://qt.nokia.com/downloads/qt-for-open-source-cpp-development-on-mac-os-x
+2 - [ Gecode 3.2.0 ]
+http://www.gecode.org/download/Gecode-3.2.0.dmg
+3 - [LibXml2]
+http://www.explain.com.au/download/combo-2007-10-07.dmg.gz
+
+====<[ Linux ]>====
+
+1 - [ Qt (LGPL) ]
+http://qt.nokia.com/downloads/linux-x11-cpp
+
+$ tar -xf qt-everywhere-opensource-src-4.7.0.tar.gz
+$ cd qt-everywhere-opensource-src-4.7.0
+$ ./configure -opensource -shared
+$ make
+$ sudo make install
+
+Notes :
+You may need to install packages libxext-dev, libx11-dev, libxrender-dev.
+If you're having troubles about X11, you may do this :
+In file mkspecs/common/linux.conf
+Replace lines
+"QMAKE_INCDIR_X11 = /usr/X11R6/include
+QMAKE_LIBDIR_X11 = /usr/X11R6/lib"
+with
+"QMAKE_INCDIR_X11 = /usr/include/X11
+QMAKE_LIBDIR_X11 = /usr/lib/X11"
+
+2 - [ Gecode 3.2.0]
+http://www.gecode.org/download/gecode-3.2.0.tar.gz
+
+$ ./configure --enable-static
+$ make
+$ sudo make install
+
+Notes : you may have to remove the .so generated first, for them not to be copied in /usr/local/lib.
+
+3 - [ LibXml2 ]
+http://xmlsoft.org/downloads.html
+$ ./configure
+$ make
+$ sudo make install
+
+== [ INSTALL THEN ] ==
+
+First, download the 3 packages (into the same parent folder) from :
+4 - Device-Manager : http://github.com/blueyeti/Device-Manager
+5 - LibIscore : http://github.com/raphaelmarczak/libIscore
+6 - Acousmoscribe : http://github.com/lucvercellin/acousmoscribe
+Rename them respectively to "device-manager" "libIscore" and "acousmoscribe"
+$ cd acousmoscribe
+Edit compile.sh to specify the folders you've downloaded sources to, then :
+$ chmod u+x compile.sh
+On MacOS :
+$ ./compile.sh MACOS
+On Linux :
+$ ./compile.sh LINUX
