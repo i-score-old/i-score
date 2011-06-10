@@ -581,6 +581,10 @@ public:
 	 */
 	bool getCurveRedundancy(unsigned int boxId, const std::string & address);
 
+	void setCurveMuteState(unsigned int boxId, const std::string & address, bool muteState);
+	bool getCurveMuteState(unsigned int boxId, const std::string & address);
+
+
 	/*!
 	 * Gets all arguments type of a given string. Useful too for getting the address information of a message.
 	 *
