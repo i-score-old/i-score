@@ -48,6 +48,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <string>
 #include <map>
 
+class TreeMap;
+
 enum ElementType {Node, Leave, Attribute};
 
 class TreeMapElement : public QWidget {
@@ -86,6 +88,7 @@ public slots:
 	void childAdded();
 
 private :
+	void setGlobalTreeMap(TreeMap *treeMap);
 	void addChild(TreeMapElement* child);
 	unsigned int _ID;
 	ElementType _type;
@@ -100,10 +103,17 @@ private :
 	QVBoxLayout *_globalLayout;
 	QLabel *_titleLabel;
 	unsigned int _descendanceCount;
+	bool _selected;
+	static TreeMap *TREE_MAP;
 
 protected :
 	QBoxLayout::Direction direction();
-	virtual void paintEvent ( QPaintEvent * event );
+	void paintEvent ( QPaintEvent * event );
+	void mouseDoubleClickEvent(QMouseEvent *event);
+	void mousePressEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);
+
+	friend class TreeMap;
 };
 
 #endif /* TREEMAPELEMENT_HPP_ */

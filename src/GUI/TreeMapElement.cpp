@@ -47,10 +47,13 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "TreeMapElement.hpp"
 #include <vector>
 #include "Maquette.hpp"
+#include "TreeMap.hpp"
 
 using std::vector;
 using std::string;
 using std::map;
+
+TreeMap * TreeMapElement::TREE_MAP = NULL;
 
 TreeMapElement::TreeMapElement(QWidget *parent) : QWidget(parent) {
 	//_globalLayout = new QVBoxLayout(this);
@@ -64,6 +67,8 @@ TreeMapElement::TreeMapElement(QWidget *parent) : QWidget(parent) {
 	_message = "";
 	_value = "";
 	_descendanceCount = 0;
+	_selected = false;
+
 	connect(this,SIGNAL(oneMoreChild()),this,SLOT(increaseDescendance()));
 }
 
@@ -91,6 +96,13 @@ void TreeMapElement::setAttributes(TreeMapElement *parentElt, const string &mess
 		std::cerr << "TreeMapElement::setAttributes : No Parent found for : " << _message << std::endl;
 #endif
 		_layout->setDirection(QBoxLayout::LeftToRight);
+		TREE_MAP = static_cast<TreeMap*>(parent());
+	}
+}
+
+void TreeMapElement::setGlobalTreeMap(TreeMap *treeMap) {
+	if (treeMap != NULL) {
+		TREE_MAP = treeMap;
 	}
 }
 
@@ -200,11 +212,36 @@ void TreeMapElement::addChildren(const vector<string>& nodes, const vector<strin
 
 string TreeMapElement::address() {
 	if (_parent != NULL) {
-		return _parent->address() + _message + "/";
+		return _parent->address() + "/" + _message;
 	}
 	else {
-		return _message + "/";
+		return _message;
 	}
+}
+
+void TreeMapElement::mousePressEvent(QMouseEvent *event)
+{
+	QWidget::mousePressEvent(event);
+}
+
+void TreeMapElement::mouseReleaseEvent(QMouseEvent *event)
+{
+	//QWidget::mouseReleaseEvent(event);
+	_parent->_selected = false;
+	_selected = true;
+	std::cerr << "TreeMapElement::mouseReleaseEvent : for " << _message << std::endl;
+}
+
+void TreeMapElement::mouseDoubleClickEvent(QMouseEvent *event)
+{
+	//QWidget::mouseDoubleClickEvent(event);
+
+	std::cerr << "TreeMapElement::mouseDoubleClickEvent : for " << address() << std::endl;
+	//if (_type == Node || _type == Leave) {
+		if (TREE_MAP != NULL) {
+			TREE_MAP->updateMessages(address());
+		}
+	//}
 }
 
 void TreeMapElement::paintEvent ( QPaintEvent * event ) {
@@ -222,7 +259,7 @@ void TreeMapElement::paintEvent ( QPaintEvent * event ) {
 		case Node :
 			if (_parent != NULL) {
 				bgColor = Qt::darkCyan;
-				lineStyle = Qt::DashLine;
+				lineStyle = _selected ? Qt::SolidLine : Qt::DashLine;
 			}
 			else {
 				bgColor = Qt::gray;
@@ -231,11 +268,11 @@ void TreeMapElement::paintEvent ( QPaintEvent * event ) {
 			break;
 		case Leave :
 			bgColor = Qt::darkGreen;
-			lineStyle = Qt::DashDotLine;
+			lineStyle = _selected ? Qt::SolidLine : Qt::DashDotLine;
 			break;
 		case Attribute:
 			bgColor = Qt::green;
-			lineStyle = Qt::DotLine;
+			lineStyle = _selected ? Qt::SolidLine : Qt::DotLine;
 			break;
 		default :
 			break;

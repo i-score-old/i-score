@@ -1,0 +1,83 @@
+#N canvas 724 152 570 474 10;
+#X obj 417 25 cnv 15 100 60 empty empty empty 20 12 0 14 -262130 -66577
+0;
+#X obj 425 63 minuit.device;
+#X text 425 27 communication;
+#X text 430 43 avec Virage;
+#X obj 16 340 cnv 15 320 110 empty empty empty 20 12 0 14 -204800 -66577
+0;
+#X obj 57 349 minuit.num /groupe1/controle1 11;
+#X obj 57 370 minuit.num /groupe1/controle2 12;
+#X obj 134 404 minuit.num /groupe2/controle1 21;
+#X obj 134 426 minuit.num /groupe2/controle2 22;
+#X floatatom 21 350 5 0 0 0 - - -;
+#X floatatom 99 427 5 0 0 0 - - -;
+#X floatatom 21 371 5 0 0 0 - - -;
+#X floatatom 99 405 5 0 0 0 - - -;
+#X obj 11 24 cnv 15 350 270 empty empty empty 20 12 0 14 -204800 -66577
+0;
+#X obj 42 272 print ANY;
+#X msg 80 225 edit;
+#X msg 131 53 edit;
+#X obj 108 80 minuit.num myNum 123;
+#X obj 42 250 minuit.any myAny;
+#X obj 108 104 print NUM;
+#X obj 21 33 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 10000 1;
+#X obj 157 195 print SYM;
+#X msg 188 143 edit;
+#X obj 157 171 minuit.sym mySym valeur_initiale;
+#X symbolatom 73 172 10 0 0 0 - - -;
+#X text 91 3 objets contrôlés par Virage:;
+#X text 85 322 organisés avec une arborescence:;
+#X obj 237 270 print ANY;
+#X msg 275 223 edit;
+#X obj 18 250 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 206 249 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+1;
+#X obj 237 248 minuit.any myAny2;
+#X obj 423 219 cnv 15 130 230 empty empty empty 20 12 0 14 -204786
+-66577 0;
+#X obj 432 321 virage.obj;
+#X msg 432 234 start;
+#X msg 444 256 end;
+#X msg 434 378 start;
+#X msg 446 400 end;
+#X text 430 179 contrôle des objets;
+#X text 453 196 DANS Virage:;
+#X obj 434 424 virage.obj objet_1;
+#X text 211 63 valeur initiale;
+#X text 438 359 avec un argument:;
+#X msg 498 297 objet_2;
+#X msg 489 274 groupe-2;
+#X connect 5 0 9 0;
+#X connect 6 0 11 0;
+#X connect 7 0 12 0;
+#X connect 8 0 10 0;
+#X connect 9 0 5 0;
+#X connect 10 0 8 0;
+#X connect 11 0 6 0;
+#X connect 12 0 7 0;
+#X connect 15 0 18 0;
+#X connect 16 0 17 0;
+#X connect 17 0 19 0;
+#X connect 17 0 20 0;
+#X connect 18 0 14 0;
+#X connect 18 0 29 0;
+#X connect 20 0 17 0;
+#X connect 22 0 23 0;
+#X connect 23 0 21 0;
+#X connect 23 0 24 0;
+#X connect 24 0 23 0;
+#X connect 28 0 31 0;
+#X connect 29 0 18 0;
+#X connect 30 0 31 0;
+#X connect 31 0 27 0;
+#X connect 31 0 30 0;
+#X connect 34 0 33 0;
+#X connect 35 0 33 0;
+#X connect 36 0 40 0;
+#X connect 37 0 40 0;
+#X connect 43 0 33 1;
+#X connect 44 0 33 1;

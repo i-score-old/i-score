@@ -72,6 +72,7 @@ class NetworkMessagesEditor;
 class AbstractBox;
 class MaquetteScene;
 class NetworkTree;
+class TreeMap;
 
 /*!
  * \class AttributesEditor
@@ -295,6 +296,8 @@ class AttributesEditor : public QDockWidget
    */
   void assignSnapshotEnd();
 
+  void reloadTreeMap();
+
  private:
 
 	 MaquetteScene * _scene;
@@ -442,10 +445,15 @@ class AttributesEditor : public QDockWidget
   QGridLayout * _snapshotTopLayout; //!< Layout handling network assign buttons
   QVBoxLayout * _snapshotLayout; //!< Layout handling snapshot
 
-  NetworkTree *_networkTree;
   QLabel *_assignLabel;
   QPushButton *_assignSnapshotStart;
   QPushButton *_assignSnapshotEnd;
+  NetworkTree *_networkTree;
+
+  QGridLayout * _treeMapLayout;
+  QComboBox *_treeMapDevicesBox;
+  QPushButton *_treeMapLoad;
+  TreeMap *_treeMap;
 
   QGridLayout *_curvesLayout;
 

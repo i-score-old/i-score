@@ -1,0 +1,28 @@
+#N canvas 741 286 517 274 10;
+#X obj 33 4 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 0 1;
+#X floatatom 31 142 5 0 0 0 - - -;
+#X obj 67 41 minuit.num /node1/subnode1/control 11 float 0 127;
+#X obj 101 102 minuit.sym /node1/subnode2/param hello symbol;
+#X obj 126 148 minuit.any /node2/subthing1/subsub/troncol anything
+;
+#X obj 78 124 print SYM;
+#X obj 88 172 print ANY;
+#X obj 123 233 print NUM;
+#X obj 151 193 minuit.num /node2/subthing2/subsub/marap 44 float 0
+127;
+#X msg 150 75 edit;
+#X msg 180 126 edit;
+#X msg 198 170 edit;
+#X msg 109 6 edit;
+#X obj 388 23 minuit.device 9998;
+#X connect 0 0 1 0;
+#X connect 0 0 2 0;
+#X connect 2 0 0 0;
+#X connect 3 0 5 0;
+#X connect 4 0 6 0;
+#X connect 8 0 7 0;
+#X connect 9 0 3 0;
+#X connect 10 0 4 0;
+#X connect 11 0 8 0;
+#X connect 12 0 2 0;

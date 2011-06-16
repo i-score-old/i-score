@@ -1,4 +1,4 @@
-	/*
+/*
 Copyright: LaBRI / SCRIME
 
 Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
@@ -36,7 +36,7 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL license and that you accept its terms.
-*/
+ */
 #include <iostream>
 #include <algorithm>
 #include "SoundBox.hpp"
@@ -161,19 +161,25 @@ AttributesEditor::nameWidgets(int language)
 {
 	// QComboBoxes containments names
 	QStringList shapeList, speedHeldList, speedVariationList, grainList,
-	pitchList, pitchVariationList, harmoHeldList, harmoVariationList;
+	pitchList, pitchVariationList, harmoHeldList, harmoVariationList,devicesList;
 
 	// QWidgets names
 	QString color, reset, shapeLabel, impulsive, held, variation, irregular,
 	rythm, grain, vibrato, speedHeld, speedVariation, grade, amplitude,
 	pitchStart, melody, pitchEnd, harmony, profiles, messages, msgStart, msgEnd,
 	apply,cancel,clear,profilesTab,networkTab,messagesTab,snapshotTab,copy,paste,
-	deleteStr,general,start,length,name,assign,assignStart,assignEnd,curves,explorationTab,treeMapTab;
+	deleteStr,general,start,length,name,assign,assignStart,assignEnd,curves,explorationTab,treeMapTab,treeMapLoad;
 
 	// Used to switch between adding and renaming items
 	bool firstTimeCalled = false;
 	if (_shapeComboBox->count() == 0) {
 		firstTimeCalled = true;
+	}
+
+	map<string,MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
+	map<string,MyDevice>::iterator it;
+	for (it = devices.begin() ; it != devices.end() ; ++it) {
+		devicesList << QString::fromStdString(it->first);
 	}
 
 	color = tr("Color");
@@ -202,7 +208,7 @@ AttributesEditor::nameWidgets(int language)
 	pitchList << tr("None") << tr("Lowest") << tr("Low") << tr("Medium") << tr("High") << tr("Highest");
 	pitchVariationList << tr("None") << tr("Fat") << tr("Tidy") << tr("Thin");
 	harmoHeldList << tr("Pure") << tr("Key Note") << tr("Key Note Group") << tr("Ribbed") << tr("Node Group")
-	<< tr("Node") << tr("Fringe");
+			<< tr("Node") << tr("Fringe");
 	harmoVariationList << tr("None default") << tr("Getting richer") << tr("Getting poorer");
 	messages = tr("<big><b>MESSAGES</b></big>");
 	msgStart = tr("Start Message");
@@ -218,6 +224,7 @@ AttributesEditor::nameWidgets(int language)
 	messagesTab = tr("Messages");
 	snapshotTab = tr("Snapshot");
 	treeMapTab = tr("Tree Map");
+	treeMapLoad = tr("Load");
 	explorationTab = tr("Exploration");
 	curves = tr("Curves");
 	general = tr("General");
@@ -227,119 +234,6 @@ AttributesEditor::nameWidgets(int language)
 	assign = tr("Assign");
 	assignStart = tr("Start");
 	assignEnd = tr("End");
-
-	switch(language){
-	case 1 :
-	{
-		color = "Color";
-		reset = "Reset";
-		held = "Held (Default)";
-		impulsive = "Impulsive  ";
-		variation = "Variation";
-		irregular = "Irregular   ";
-		profiles = "<big><b>PROFILES</b></big>";
-		shapeLabel = "Dynamics";
-		rythm = "Rythm";
-		grain = "Grain";
-		vibrato = "Vibrato";
-		speedHeld = "Speed Held";
-		speedVariation = "Speed Variation";
-		pitchStart = "Pitch Start";
-		melody = "Melody";
-		pitchEnd = "Pitch End";
-		grade = "Grade :";
-		amplitude = "Amplitude :";
-		harmony= "Harmony";
-		shapeList << "Flat" << "Insistant" << "Steep attack" << "Gentle" << "Steep truncated";
-		speedHeldList << "None" << "Slow" << "Moderate" << "Fast";
-		speedVariationList << "None" << "Acceleration" << "Deceleration";
-		grainList << "Smooth" << "Fat" << "Tidy" << "Thin";
-		pitchList << "None" << "Lowest" << "Low" << "Medium" << "High" << "Highest";
-		pitchVariationList << "None" << "Fat" << "Tidy" << "Thin" ;
-		harmoHeldList << "Pure" << "Key Note" << "Key Note Group" << "Ribbed" << "Node Group"
-		<< "Node" << "Fringe";
-		harmoVariationList << "None default" << "Getting richer" << "Getting poorer";
-		messages = "<big><b>MESSAGES</b></big>";
-		msgStart = "Start Message";
-		msgEnd = "End Message";
-		apply = "Apply";
-		cancel = "Cancel";
-		clear = "Clear";
-		copy = "Copy";
-		paste = "Paste";
-		deleteStr = "Delete";
-		profilesTab = "Profiles";
-		networkTab = "Network";
-		messagesTab = "Messages";
-		snapshotTab = "Snapshot";
-		treeMapTab = tr("Tree Map");
-		explorationTab = tr("Exploration");
-		curves = "Curves";
-		general = "General";
-		start = "Start";
-		length = "Length";
-		name = "Name";
-		assign = "Assign";
-		assignStart = "Start";
-		assignEnd = "End";
-	}
-	break;
-	case 0:
-	{
-		color = "Couleur";
-		reset = "Réinitialiser";
-		held = "Tenu (Defaut)";
-		impulsive = "Impulsive  ";
-		variation = "Variation";
-		profiles = "<big><b>PROFILS</b></big>";
-		shapeLabel = "Dynamique";
-		rythm = "Rythmique";
-		grain = "Grain";
-		vibrato = "Vibrato";
-		irregular = "Irrégulier   ";
-		speedHeld = "Vitesse Tenue";
-		speedVariation = "Vitesse Variante";
-		pitchStart = "Hauteur Début:";
-		melody = "Mélodique";
-		pitchEnd = "Hauteur Fin";
-		grade = "Calibre :";
-		amplitude = "Amplitude :";
-		harmony= "Harmonique";
-		shapeList << "Plate" << "Appui" << "Attaque raide" << "Douce" << "Raide tronquée";
-		speedHeldList << "Aucune" << "Lente" << "Modérée" << "Rapide";
-		speedVariationList << "Aucune" << "Accélération" << "Décéleration";
-		grainList << "Lisse" << "Gros" << "Net" << "Fin";
-		pitchList << "Aucune" << "Sur-grave" << "Grave" << "Medium" << "Aigue" << "Sur-aigue";
-		pitchVariationList << "Aucune" << "Fort" << "Moyen" << "Faible" ;
-		harmoHeldList << "Pur" << "Tonique" << "Groupe Tonique" << "Cannelé" << "Groupe Nodal"
-		<< "Noeud" <<  "Frange";
-		harmoVariationList << "Aucune" << "Enrichie" << "Appauvrie";
-		messages = "<big><b>MESSAGES</b></big>";
-		msgStart = "Message debut";
-		msgEnd = "Message fin";
-		apply = "Appliquer";
-		cancel = "Annuler";
-		clear = "Vider";
-		copy = "Copier";
-		paste = "Coller";
-		deleteStr = "Supprimer";
-		profilesTab = "Profils";
-		networkTab = "Réseau";
-		messagesTab = "Messages";
-		snapshotTab = "Capture";
-		treeMapTab = "Tree Map";
-		explorationTab = "Exploration";
-		curves = "Courbes";
-		general = "Général";
-		start = "Début";
-		length = "Durée";
-		name = "Nom";
-		assign = "Assigner";
-		assignStart = "Début";
-		assignEnd = "Fin";
-	}
-	break;
-	}
 
 	_profilesColorButton->setText(color);
 	_generalColorButton->setText(color);
@@ -380,6 +274,7 @@ AttributesEditor::nameWidgets(int language)
 	_assignLabel->setText(assign);
 	_assignSnapshotStart->setText(assignStart);
 	_assignSnapshotEnd->setText(assignEnd);
+	_treeMapLoad->setText(treeMapLoad);
 
 	if (_generalTabIndex != -1) {
 		_tabWidget->setTabText(_generalTabIndex,general);
@@ -434,6 +329,7 @@ AttributesEditor::nameWidgets(int language)
 		_pitchGradeComboBox->addItems(pitchVariationList);
 		_harmoHeldComboBox->addItems(harmoHeldList);
 		_harmoVariationComboBox->addItems(harmoVariationList);
+		_treeMapDevicesBox->addItems(devicesList);
 	}
 	else { // Gives Items Names
 		QStringList::iterator i;
@@ -464,6 +360,9 @@ AttributesEditor::nameWidgets(int language)
 		for (i = harmoVariationList.begin() , count = 0; i != harmoVariationList.end(); ++i , ++count) {
 			_harmoVariationComboBox->setItemText(count,harmoVariationList[count]);
 		}
+		for (i = devicesList.begin() , count = 0; i != devicesList.end(); ++i , ++count) {
+			_treeMapDevicesBox->setItemText(count,devicesList[count]);
+		}
 	}
 }
 
@@ -493,14 +392,14 @@ AttributesEditor::createWidgets()
 	_generalColorButton = new QPushButton;
 	_profilesResetButton = new QPushButton;
 
-  _boxStartValue = new QDoubleSpinBox;
-  _boxLengthValue = new QDoubleSpinBox;
-  _boxName = new QLineEdit;
+	_boxStartValue = new QDoubleSpinBox;
+	_boxLengthValue = new QDoubleSpinBox;
+	_boxName = new QLineEdit;
 
 	_startLabel = new QLabel;
 	_endLabel = new QLabel;
 	_lengthLabel = new QLabel;
-  _nameLabel = new QLabel;
+	_nameLabel = new QLabel;
 	_profilesLabel = new QLabel;
 	_shapeLabel = new QLabel;
 	_shapeOptionRandom = new QCheckBox;
@@ -531,38 +430,43 @@ AttributesEditor::createWidgets()
 	_harmoHeldComboBox = new QComboBox;
 	_harmoVariationComboBox = new QComboBox;
 
-  _messagesLabel = new QLabel;
-  _startMsgLabel = new QLabel;
-  _endMsgLabel = new QLabel;
+	_messagesLabel = new QLabel;
+	_startMsgLabel = new QLabel;
+	_endMsgLabel = new QLabel;
 	_startMsgScrollArea = new QScrollArea;
 	_endMsgScrollArea = new QScrollArea;
-  _startMsgsEditor = new NetworkMessagesEditor(_startMsgScrollArea);
-  _endMsgsEditor = new NetworkMessagesEditor(_endMsgScrollArea);
+	_startMsgsEditor = new NetworkMessagesEditor(_startMsgScrollArea);
+	_endMsgsEditor = new NetworkMessagesEditor(_endMsgScrollArea);
 	_startMsgsAddButton = new QPushButton("+",this);
 	_endMsgsAddButton = new QPushButton("+",this);
-  _startMsgClearButton = new QPushButton("Clear", this);
-  _endMsgClearButton = new QPushButton("Clear", this);
-  _startMsgCopyButton = new QPushButton("Copy", this);
-  _endMsgCopyButton = new QPushButton("Copy", this);
-  _startMsgPasteButton = new QPushButton("Paste", this);
-  _endMsgPasteButton = new QPushButton("Paste", this);
-  _startMsgDeleteButton = new QPushButton("Delete", this);
-  _endMsgDeleteButton = new QPushButton("Delete", this);
+	_startMsgClearButton = new QPushButton("Clear", this);
+	_endMsgClearButton = new QPushButton("Clear", this);
+	_startMsgCopyButton = new QPushButton("Copy", this);
+	_endMsgCopyButton = new QPushButton("Copy", this);
+	_startMsgPasteButton = new QPushButton("Paste", this);
+	_endMsgPasteButton = new QPushButton("Paste", this);
+	_startMsgDeleteButton = new QPushButton("Delete", this);
+	_endMsgDeleteButton = new QPushButton("Delete", this);
 
-  _profilesTabIndex = -1;
-  _generalTabIndex = -1;
-  _networkTabIndex = -1;
-  _messagesTabIndex = -1;
-  _explorationTabIndex = -1;
-  _snapshotTabIndex = -1;
-  _treeMapTabIndex = -1;
-  _curvesTabIndex = -1;
-  _shapeTabIndex = -1;
-  _rythmTabIndex = -1;
-  _melodyTabIndex = -1;
-  _harmonyTabIndex = -1;
-  _startMsgsIndex = -1;
-  _endMsgsIndex = -1;
+
+	_treeMap = new TreeMap(_treeMapTab);
+	_treeMapLoad = new QPushButton("Load", this);
+	_treeMapDevicesBox = new QComboBox;
+
+	_profilesTabIndex = -1;
+	_generalTabIndex = -1;
+	_networkTabIndex = -1;
+	_messagesTabIndex = -1;
+	_explorationTabIndex = -1;
+	_snapshotTabIndex = -1;
+	_treeMapTabIndex = -1;
+	_curvesTabIndex = -1;
+	_shapeTabIndex = -1;
+	_rythmTabIndex = -1;
+	_melodyTabIndex = -1;
+	_harmonyTabIndex = -1;
+	_startMsgsIndex = -1;
+	_endMsgsIndex = -1;
 
 	_paletteLayout = new QGridLayout;
 	_profilesTopLayout = new QGridLayout;
@@ -581,6 +485,7 @@ AttributesEditor::createWidgets()
 	_msgStartLayout = new QVBoxLayout;
 	_msgEndTopLayout = new QGridLayout;
 	_msgEndLayout = new QVBoxLayout;
+	_treeMapLayout = new QGridLayout;
 
 	_paletteLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
 	_profilesTopLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
@@ -597,6 +502,7 @@ AttributesEditor::createWidgets()
 	_msgEndTopLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
 	_msgStartLayout->setContentsMargins(0 , TOP_MARGIN , 0 , BOTTOM_MARGIN);
 	_msgEndLayout->setContentsMargins(0 , TOP_MARGIN , 0 , BOTTOM_MARGIN);
+	_treeMapLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
 
 	_networkTree = new NetworkTree(this);
 	_assignSnapshotStart = new QPushButton;
@@ -769,9 +675,13 @@ AttributesEditor::addWidgetsToLayout()
 	_snapshotTab->setLayout(_snapshotLayout);
 	_snapshotTabIndex = _explorationTab->addTab(_snapshotTab,"Snapshot");
 
+
+	_treeMapLayout->addWidget(_treeMapDevicesBox,0,0);
+	_treeMapLayout->addWidget(_treeMapLoad,0,1);
+	_treeMapLayout->addWidget(_treeMap,1,0,1,2);
+
+	_treeMapTab->setLayout(_treeMapLayout);
 	_treeMapTabIndex = _explorationTab->addTab(_treeMapTab,"Tree Map");
-	TreeMap * treeMap = new TreeMap(_treeMapTab);
-	treeMap->updateMessages("MinuitDevice1");
 
 	// Options defaultly disabled
 	_pitchOptionRandom->setDisabled(true);
@@ -801,7 +711,7 @@ AttributesEditor::connectSlots()
 	connect(_generalColorButton, SIGNAL(clicked()), this, SLOT(changeColor()));
 	connect(_boxStartValue, SIGNAL(valueChanged(double)), this, SLOT(startChanged()));
 	connect(_boxLengthValue, SIGNAL(valueChanged(double)), this, SLOT(lengthChanged()));
-    connect(_boxName, SIGNAL(returnPressed()), this, SLOT(nameChanged()));
+	connect(_boxName, SIGNAL(returnPressed()), this, SLOT(nameChanged()));
 
 	// Profiles
 	connect(_profilesColorButton, SIGNAL(clicked()), this, SLOT(changeColor()));
@@ -823,21 +733,23 @@ AttributesEditor::connectSlots()
 	connect(_harmoHeldComboBox, SIGNAL(activated(int)), this, SLOT(harmoHeldChanged()));
 	connect(_harmoVariationComboBox, SIGNAL(activated(int)), this, SLOT(harmoVariationChanged()));
 
-  connect(_startMsgCopyButton, SIGNAL(clicked()), this, SLOT(startMsgCopied()));
-  connect(_startMsgPasteButton, SIGNAL(clicked()), this, SLOT(startMsgPasted()));
-  connect(_startMsgClearButton, SIGNAL(clicked()), this, SLOT(startMsgCleared()));
-  connect(_endMsgCopyButton, SIGNAL(clicked()), this, SLOT(endMsgCopied()));
-  connect(_endMsgPasteButton, SIGNAL(clicked()), this, SLOT(endMsgPasted()));
-  connect(_endMsgClearButton, SIGNAL(clicked()), this, SLOT(endMsgCleared()));
-  connect(_startMsgsAddButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(addLine()));
-  connect(_endMsgsAddButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(addLine()));
-  connect(_startMsgDeleteButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(removeLines()));
-  connect(_endMsgDeleteButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(removeLines()));
-  connect(_startMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(startMsgApplied()));
-  connect(_endMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(endMsgApplied()));
+	connect(_startMsgCopyButton, SIGNAL(clicked()), this, SLOT(startMsgCopied()));
+	connect(_startMsgPasteButton, SIGNAL(clicked()), this, SLOT(startMsgPasted()));
+	connect(_startMsgClearButton, SIGNAL(clicked()), this, SLOT(startMsgCleared()));
+	connect(_endMsgCopyButton, SIGNAL(clicked()), this, SLOT(endMsgCopied()));
+	connect(_endMsgPasteButton, SIGNAL(clicked()), this, SLOT(endMsgPasted()));
+	connect(_endMsgClearButton, SIGNAL(clicked()), this, SLOT(endMsgCleared()));
+	connect(_startMsgsAddButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(addLine()));
+	connect(_endMsgsAddButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(addLine()));
+	connect(_startMsgDeleteButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(removeLines()));
+	connect(_endMsgDeleteButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(removeLines()));
+	connect(_startMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(startMsgApplied()));
+	connect(_endMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(endMsgApplied()));
 
-  connect(_assignSnapshotStart, SIGNAL(clicked()),this,SLOT(assignSnapshotStart()));
-  connect(_assignSnapshotEnd, SIGNAL(clicked()),this,SLOT(assignSnapshotEnd()));
+	connect(_assignSnapshotStart, SIGNAL(clicked()),this,SLOT(assignSnapshotStart()));
+	connect(_assignSnapshotEnd, SIGNAL(clicked()),this,SLOT(assignSnapshotEnd()));
+
+	connect(_treeMapLoad, SIGNAL(clicked()), this, SLOT(reloadTreeMap()));
 }
 
 void
@@ -902,14 +814,12 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 		if (_boxEdited == NO_ID) {
 			_generalTab->setEnabled(false);
 			_networkTabWidget->setEnabled(false);
-			_snapshotTab->setEnabled(false);
 			_messagesTab->setEnabled(false);
 			_curvesTab->setEnabled(false);
 		}
 		else {
 			_generalTab->setEnabled(true);
 			_networkTabWidget->setEnabled(true);
-			_snapshotTab->setEnabled(true);
 			_messagesTab->setEnabled(true);
 			_curvesTab->setEnabled(true);
 		}
@@ -921,14 +831,12 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 			_generalTab->setEnabled(false);
 			_networkTabWidget->setEnabled(false);
 			_profilesTab->setEnabled(true);
-			_snapshotTab->setEnabled(false);
 			_messagesTab->setEnabled(false);
 			_curvesTab->setEnabled(false);
 		}
 		else {
 			_generalTab->setEnabled(true);
 			_networkTabWidget->setEnabled(true);
-			_snapshotTab->setEnabled(true);
 			_messagesTab->setEnabled(true);
 			_curvesTab->setEnabled(true);
 		}
@@ -940,14 +848,12 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 			_generalTab->setEnabled(false);
 			_networkTabWidget->setEnabled(false);
 			_profilesTab->setEnabled(true);
-			_snapshotTab->setEnabled(false);
 			_messagesTab->setEnabled(false);
 			_curvesTab->setEnabled(false);
 		}
 		else {
 			_generalTab->setEnabled(true);
 			_networkTabWidget->setEnabled(true);
-			_snapshotTab->setEnabled(true);
 			_messagesTab->setEnabled(true);
 			_curvesTab->setEnabled(true);
 		}
@@ -963,7 +869,7 @@ AttributesEditor::updateWidgets()
 	if (box != NULL) {
 		_boxStartValue->setValue(box->beginPos() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
 		_boxLengthValue->setValue(box->width() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
-	  _boxName->setText(box->name());
+		_boxName->setText(box->name());
 	}
 
 	Shape shape = Shape(_palette->shape());
@@ -1245,11 +1151,11 @@ AttributesEditor::pitchStartChanged() {
 
 	if (_pitchOptionRandom->checkState() == Qt::Checked){ // Random
 		_palette->setPitchRandom(true);
-	_palette->setPitchVibrato(false);
+		_palette->setPitchVibrato(false);
 	}
 	else if (_pitchOptionVibrato->checkState() == Qt::Checked) { // Vibrato
 		_palette->setPitchVibrato(true);
-	_palette->setPitchRandom(false);
+		_palette->setPitchRandom(false);
 	}
 	else { // No vibrato No random
 		_palette->setPitchRandom(false);
@@ -1326,7 +1232,7 @@ AttributesEditor::startMsgApplied()
 void
 AttributesEditor::startMsgCanceled()
 {
-/*	_startMsgsEditor->clear();
+	/*	_startMsgsEditor->clear();
 	_startMsgsEditor->addMessages(Maquette::getInstance()->firstMessagesToSend(_boxEdited));*/
 }
 
@@ -1360,7 +1266,7 @@ AttributesEditor::endMsgApplied()
 void
 AttributesEditor::endMsgCanceled()
 {
-/*	_endMsgsEditor->clear();
+	/*	_endMsgsEditor->clear();
 	_endMsgsEditor->addMessages(Maquette::getInstance()->lastMessagesToSend(_boxEdited));*/
 }
 
@@ -1424,3 +1330,7 @@ void AttributesEditor::assignSnapshotEnd()
 	}
 }
 
+void AttributesEditor::reloadTreeMap()
+{
+	_treeMap->updateMessages(_treeMapDevicesBox->currentText().toStdString());
+}

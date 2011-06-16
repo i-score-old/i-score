@@ -60,8 +60,12 @@ TreeMap::TreeMap(QWidget *parent) : QWidget(parent){
 }
 
 void TreeMap::updateMessages(const string &address) {
+	if (_deviceRoot != NULL) {
+		_layout->removeWidget(_deviceRoot);
+	}
 	_deviceRoot = new TreeMapElement(this);
 	_deviceRoot->setAttributes(NULL,address,Node);
+	_deviceRoot->setGlobalTreeMap(this);
 	_layout->addWidget(_deviceRoot);
 
 	vector<string> nodes,leaves,attributes,attributesvalues;
@@ -72,7 +76,7 @@ void TreeMap::updateMessages(const string &address) {
 
 void TreeMap::paintEvent ( QPaintEvent * event ) {
 	QWidget::paintEvent(event);
-	#ifdef NDEBUG
+#ifdef NDEBUG
 	std::cerr << "TreeMap::paintEvent" << std::endl;
 #endif
 }
