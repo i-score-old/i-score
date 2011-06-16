@@ -6,6 +6,8 @@
 ## ./compile.sh LINUX64
 ##         OR
 ## ./compile.sh MACOS
+##         OR
+## ./compile.sh MACOS64
 
 CURRENT_PATH=`pwd`
 
@@ -21,7 +23,7 @@ ACOUSMOSCRIBE_PATH='/home/luc/Documents/workspace/Acousmoscribe'
 elif [ "$OS" = "MACOS" ]
 then
 {
-DEVICE_MANAGER_PATH='/Users/luc/Documents/workspace/Device-Manager'
+device_MANAGER_PATH='/Users/luc/Documents/workspace/Device-Manager'
 LIB_ISCORE_PATH='/Users/luc/Documents/workspace/libIscore'
 ACOUSMOSCRIBE_PATH='/Users/luc/Documents/workspace/Acousmoscribe'
 }
