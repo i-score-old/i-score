@@ -18,14 +18,14 @@ then
 {
 DEVICE_MANAGER_PATH='/home/luc/Documents/workspace/Device-Manager'
 LIB_ISCORE_PATH='/home/luc/Documents/workspace/libIscore'
-ACOUSMOSCRIBE_PATH='/home/luc/Documents/workspace/Acousmoscribe'
+ACOUSMOSCRIBE_PATH='/home/luc/Documents/workspace/acousmoscribe'
 }
 elif [ "$OS" = "MACOS" ] || [ "$OS" = "MACOS64" ]
 then
 {
 DEVICE_MANAGER_PATH='/Users/luc/Documents/workspace/Device-Manager'
 LIB_ISCORE_PATH='/Users/luc/Documents/workspace/libIscore'
-ACOUSMOSCRIBE_PATH='/Users/luc/Documents/workspace/Acousmoscribe'
+ACOUSMOSCRIBE_PATH='/Users/luc/Documents/workspace/acousmoscribe'
 }
 fi
 
@@ -43,7 +43,7 @@ echo '-=[START]=-'
 
 echo 'Device-Manager changes tranfert'
 
-cp devManChanges/* ../Device-Manager/Plugins/Linux_MacOS/
+cp -r $ACOUSMOSCRIBE_PATH/devManChanges/* $DEVICE_MANAGER_PATH
 
 ## Device-Manager Compilation
 
@@ -66,14 +66,14 @@ cd Plugins/Linux_MacOS/
 echo '-=[Device Manager : Plugins]=- Cleaning ...'
 $MAKE_CLEAN
 echo '-=[Device Manager : Plugins]=- Compiling  ...'
-if [ "$OS" = "LINUX"]
+if [ "$OS" = "LINUX" ]
 then
     {
 	chmod u+x compileForLinux.sh
 	./compileForLinux.sh
 	$MAKE_LINUX
     }
-elif [ "$OS" = "LINUX64"]
+elif [ "$OS" = "LINUX64" ]
 then
 {
     chmod u+x compileForLinux64.sh

@@ -1,74 +1,58 @@
 #give your OS on the command line :
 #make linux
-#make macos
+#make mac
+#make windows
 
 #OS by default :
 OS = LINUX
 
-GCC = g++
-MAC_CFLAGS = -dynamiclib -undefined dynamic_lookup
-MAC64_CFLAGS = -dynamiclib -undefined dynamic_lookup -Dx86_64
-LINUX_CFLAGS = -c -fPIC
-LINUX64_CFLAGS = -c -fPIC -Dx86_64
-LINUX_CCFLAGS = -shared
-
-OBJ_FILES =  Minuit/*.o NetworkCommunication/osc/*.o NetworkCommunication/ip/*.o ../../xmlParser.o ../../Device.o ../../DeviceManager.o ../../PluginFactories.o
-
-OSC_LIB_NAME = OSC
-MINUIT_LIB_NAME = Minuit
-MAC_LIB_TYPE = dylib
-LINUX_LIB_TYPE = so
+ifeq ($(OS), WIN32)
+	GCC = cl.exe /c /EHsc
+else
+	GCC = g++ -c -Wall -fPIC
+endif
 
 .PHONY: linux
 linux:
 	make all OS=LINUX
-
-.PHONY: linux64
-linux64:
-	make all OS=LINUX64
-
+ 
+.PHONY: windows
+windows:
+	make all OS=WIN32
+        
 .PHONY: mac
 mac:
 	make all OS=MAC
 
-.PHONY: mac64
-mac64:
-	make all OS=MAC64
 
-all: 
-ifeq ($(OS), MAC)
-	$(GCC) $(MAC_CFLAGS) Minuit.cpp $(OBJ_FILES) -o $(MINUIT_LIB_NAME).$(MAC_LIB_TYPE)
-	$(GCC) $(MAC_CFLAGS) OSC.cpp $(OBJ_FILES) -o $(OSC_LIB_NAME).$(MAC_LIB_TYPE)
-	test -d ./Plugins || mkdir ./Plugins
-	mv *.$(MAC_LIB_TYPE) ./Plugins
-	rm -f *~ *.o *.$(MAC_LIB_TYPE)
+all: libDeviceManager
+
+libDeviceManager: PluginFactories.obj Device.obj xmlParser.obj DeviceManager.obj
+ifeq ($(OS), WIN32) 
+	lib.exe /out:DeviceManager.lib PluginFactories.obj Device.obj xmlParser.obj DeviceManager.obj
+	#rm -f *~ *.obj
+else 
+	ar -cr libDeviceManager.a PluginFactories.o Device.o xmlParser.o DeviceManager.o
+	#rm -f *~ *.o
 endif
-ifeq ($(OS), MAC64)
-	$(GCC) $(MAC64_CFLAGS) Minuit.cpp $(OBJ_FILES) -o $(MINUIT_LIB_NAME).$(MAC_LIB_TYPE)
-	$(GCC) $(MAC64_CFLAGS) OSC.cpp $(OBJ_FILES) -o $(OSC_LIB_NAME).$(MAC_LIB_TYPE)
-	test -d ./Plugins || mkdir ./Plugins
-	mv *.$(MAC_LIB_TYPE) ./Plugins
-	rm -f *~ *.o *.$(MAC_LIB_TYPE)
-endif
+
+
+PluginFactories.obj: PluginFactories.cpp PluginFactories.h 
 ifeq ($(OS), LINUX)
-	$(GCC) $(LINUX_CFLAGS) Minuit.cpp
-	$(GCC) $(LINUX_CCFLAGS) Minuit.o $(OBJ_FILES) -o $(MINUIT_LIB_NAME).$(LINUX_LIB_TYPE)
-	$(GCC) $(LINUX_CFLAGS) OSC.cpp
-	$(GCC) $(LINUX_CCFLAGS) OSC.o $(OBJ_FILES) -o $(OSC_LIB_NAME).$(LINUX_LIB_TYPE)
-	test -d ./Plugins || mkdir ./Plugins
-	mv *.$(LINUX_LIB_TYPE) ./Plugins
-	rm -f *~ *.o *.$(LINUX_LIB_TYPE)
+	$(GCC) -fPIC PluginFactories.cpp
+else
+	$(GCC) PluginFactories.cpp 
 endif
-ifeq ($(OS), LINUX64)
-	$(GCC) $(LINUX64_CFLAGS) Minuit.cpp
-	$(GCC) $(LINUX64_CCFLAGS) Minuit.o $(OBJ_FILES) -o $(MINUIT_LIB_NAME).$(LINUX_LIB_TYPE)
-	$(GCC) $(LINUX64_CFLAGS) OSC.cpp
-	$(GCC) $(LINUX64_CCFLAGS) OSC.o $(OBJ_FILES) -o $(OSC_LIB_NAME).$(LINUX_LIB_TYPE)
-	test -d ./Plugins || mkdir ./Plugins
-	mv *.$(LINUX_LIB_TYPE) ./Plugins
-	rm -f *~ *.o *.$(LINUX_LIB_TYPE)
-endif
+
+Device.obj: Device.cpp Device.h
+	$(GCC) Device.cpp
+
+xmlParser.obj: xmlParser.cpp xmlParser.h
+	$(GCC) xmlParser.cpp
+
+DeviceManager.obj: DeviceManager.cpp DeviceManager.h
+	$(GCC) DeviceManager.cpp
+
 
 clean:
-	rm -f *~ *.o *.$(MAC_LIB_TYPE) *.$(LINUX_LIB_TYPE) Plugins/*.$(MAC_LIB_TYPE) Plugins/*.$(LINUX_LIB_TYPE)
-
+	rm -f *~ *.o libDeviceManager.a *.obj DeviceManager.lib
