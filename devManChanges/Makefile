@@ -7,9 +7,9 @@ OS = LINUX
 
 GCC = g++
 MAC_CFLAGS = -dynamiclib -undefined dynamic_lookup
-MAC64_CFLAGS = -dynamiclib -undefined dynamic_lookup -DX86_64
+MAC64_CFLAGS = -dynamiclib -undefined dynamic_lookup -Dx86_64
 LINUX_CFLAGS = -c -fPIC
-LINUX64_CFLAGS = -c -fPIC -DX86_64
+LINUX64_CFLAGS = -c -fPIC -Dx86_64
 LINUX_CCFLAGS = -shared
 
 OBJ_FILES =  Minuit/*.o NetworkCommunication/osc/*.o NetworkCommunication/ip/*.o ../../xmlParser.o ../../Device.o ../../DeviceManager.o ../../PluginFactories.o
@@ -31,10 +31,21 @@ linux64:
 mac:
 	make all OS=MAC
 
+.PHONY: mac64
+mac64:
+	make all OS=MAC64
+
 all: 
 ifeq ($(OS), MAC)
 	$(GCC) $(MAC_CFLAGS) Minuit.cpp $(OBJ_FILES) -o $(MINUIT_LIB_NAME).$(MAC_LIB_TYPE)
 	$(GCC) $(MAC_CFLAGS) OSC.cpp $(OBJ_FILES) -o $(OSC_LIB_NAME).$(MAC_LIB_TYPE)
+	test -d ./Plugins || mkdir ./Plugins
+	mv *.$(MAC_LIB_TYPE) ./Plugins
+	rm -f *~ *.o *.$(MAC_LIB_TYPE)
+endif
+ifeq ($(OS), MAC64)
+	$(GCC) $(MAC64_CFLAGS) Minuit.cpp $(OBJ_FILES) -o $(MINUIT_LIB_NAME).$(MAC_LIB_TYPE)
+	$(GCC) $(MAC64_CFLAGS) OSC.cpp $(OBJ_FILES) -o $(OSC_LIB_NAME).$(MAC_LIB_TYPE)
 	test -d ./Plugins || mkdir ./Plugins
 	mv *.$(MAC_LIB_TYPE) ./Plugins
 	rm -f *~ *.o *.$(MAC_LIB_TYPE)
@@ -48,7 +59,6 @@ ifeq ($(OS), LINUX)
 	mv *.$(LINUX_LIB_TYPE) ./Plugins
 	rm -f *~ *.o *.$(LINUX_LIB_TYPE)
 endif
-
 ifeq ($(OS), LINUX64)
 	$(GCC) $(LINUX64_CFLAGS) Minuit.cpp
 	$(GCC) $(LINUX64_CCFLAGS) Minuit.o $(OBJ_FILES) -o $(MINUIT_LIB_NAME).$(LINUX_LIB_TYPE)

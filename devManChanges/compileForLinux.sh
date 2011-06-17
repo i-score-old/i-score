@@ -1,12 +1,9 @@
 #!/bin/bash
 
-GCC=g++
-CFLAGS=-c -fPIC
-
 cd Minuit
-$(GCC) $(CFLAGS) *.cpp
+g++ -c -fPIC *.cpp
 cd ../NetworkCommunication/ip
-$(GCC) $(CFLAGS) *.cpp
+g++ -c -fPIC *.cpp
 cd ../osc
-$(GCC) $(CFLAGS) *.cpp
+g++ -c -fPIC *.cpp
 cd ../..
