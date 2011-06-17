@@ -40,13 +40,13 @@ echo "COPYING INCLUDES"
 
 for i in "DeviceManager/" "gecode/" "IScore/" "libxml2/" 
 do
-    sudo mkdir -p $INSTALL_INCLUDE_PATH$i
-    sudo cp -r $ROOT_INCLUDE_PATH$i* $INSTALL_INCLUDE_PATH$i
+    sudo rm -r $INSTALL_INCLUDE_PATH$i
+    sudo cp -r $ROOT_INCLUDE_PATH$i $INSTALL_INCLUDE_PATH
 done
 
 echo "COPYING LIBRARIES"
 
-sudo mkdir -p $INSTALL_LIB_PATH"/IScore"
+sudo rm -r $INSTALL_LIB_PATH"/IScore"
 
 for i in "IScore/" "libDeviceManager.a" "libIscore.a" "libgecode*.a" "libxml*.a" "libxml*.so*"
 do
@@ -60,10 +60,12 @@ done
 
 echo "COPYING SHARE DOCS"
 
+sudo rm -r $INSTALL_SHARE_PATH
 sudo cp -r $LOCAL_SHARE_DOCS_PATH $INSTALL_SHARE_PATH
 
 echo "COPYING DEBIAN FILES"
 
+sudo rm -r $INSTALL_DEBIAN_PATH
 sudo cp -r $LOCAL_DEBIAN_PATH $INSTALL_DEBIAN_PATH
 
 sudo chown root -R $INSTALL_USR_PATH
