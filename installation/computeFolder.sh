@@ -11,28 +11,7 @@
 
 OS=$1
 
-INSTALL_PATH="/home/luc/Documents/workspace/acousmoscribe/installation/"
-
-if [ "$OS" = "UBUNTU32" ]
-then
-    INSTALL_UBUNTU_PATH="/home/luc/Documents/workspace/acousmoscribe/installation/acousmoscribe_ubuntu_32"
-    LOCAL_BIN_PATH="/home/luc/Documents/workspace/acousmoscribe/acousmoscribe"
-elif [ "$OS" = "UBUNTU64" ]
-then
-    INSTALL_UBUNTU_PATH="/home/luc/Documents/workspace/acousmoscribe/installation/acousmoscribe_ubuntu_64"
-    LOCAL_BIN_PATH="/home/luc/Documents/workspace/acousmoscribe/acousmoscribe"
-elif [ "$OS" = "MACOS32" ]
-then
-    INSTALL_MACOS_PATH="/home/luc/Documents/workspace/acousmoscribe/installation/acousmoscribe_MacOS_10_4"
-    LOCAL_BIN_PATH="/home/luc/Documents/workspace/acousmoscribe/acousmoscribe.app"
-elif [ "$OS" = "MACOS64" ]
-then
-    INSTALL_MACOS_PATH="/home/luc/Documents/workspace/acousmoscribe/installation/acousmoscribe_MacOS_10_6"
-    LOCAL_BIN_PATH="/home/luc/Documents/workspace/acousmoscribe/acousmoscribe.app"
-fi
-
-LOCAL_SHARE_DOCS_PATH=$INSTALL_PATH"ubuntuDocs/shareDocs/"
-LOCAL_DEBIAN_PATH=$INSTALL_PATH"ubuntuDocs/DEBIAN/"
+echo "SETTING UP PATH VARIABLES"
 
 ROOT_USR_PATH="/usr/"
 ROOT_BIN_PATH="/usr/bin/"
@@ -40,16 +19,47 @@ ROOT_LIB_PATH="/usr/local/lib/"
 ROOT_INCLUDE_PATH="/usr/local/include/"
 ROOT_SHARE_PATH="/usr/local/share/"
 
-INSTALL_USR_PATH=$INSTALL_UBUNTU_PATH$ROOT_USR_PATH
-INSTALL_LIB_PATH=$INSTALL_UBUNTU_PATH$ROOT_LIB_PATH
-INSTALL_INCLUDE_PATH=$INSTALL_UBUNTU_PATH$ROOT_INCLUDE_PATH
-INSTALL_BIN_PATH=$INSTALL_UBUNTU_PATH$ROOT_BIN_PATH
-INSTALL_SHARE_PATH=$INSTALL_UBUNTU_PATH$ROOT_SHARE_PATH
-INSTALL_DEBIAN_PATH=$INSTALL_UBUNTU_PATH"/DEBIAN/"
+if [ "$OS" = "UBUNTU32" ] || [ "$OS" = "UBUNTU64" ]
+then
+    ACOUSMOSCRIBE_PATH="/home/luc/Documents/workspace/acousmoscribe/"
+    INSTALL_PATH=$ACOUSMOSCRIBE_PATH"installation/"
+    if [ "$OS" = "UBUNTU32" ]
+    then
+	INSTALL_UBUNTU_PATH=$INSTALL_PATH"acousmoscribe_ubuntu_32"
+    elif [ "$OS" = "UBUNTU64" ]
+    then
+	INSTALL_UBUNTU_PATH=$INSTALL_PATH"acousmoscribe_ubuntu_64"
+    fi
+    LOCAL_SHARE_DOCS_PATH=$INSTALL_PATH"ubuntuDocs/shareDocs/"
+    LOCAL_DEBIAN_PATH=$INSTALL_PATH"ubuntuDocs/DEBIAN/"
+    LOCAL_BIN_PATH=$ACOUSMOSCRIBE_PATH"acousmoscribe"
+    INSTALL_USR_PATH=$INSTALL_UBUNTU_PATH$ROOT_USR_PATH
+    INSTALL_LIB_PATH=$INSTALL_UBUNTU_PATH$ROOT_LIB_PATH
+    INSTALL_INCLUDE_PATH=$INSTALL_UBUNTU_PATH$ROOT_INCLUDE_PATH
+    INSTALL_BIN_PATH=$INSTALL_UBUNTU_PATH$ROOT_BIN_PATH
+    INSTALL_SHARE_PATH=$INSTALL_UBUNTU_PATH$ROOT_SHARE_PATH
+    INSTALL_DEBIAN_PATH=$INSTALL_UBUNTU_PATH"/DEBIAN/"
+elif [ "$OS" = "MACOS32" ] || [ "$OS" = "MACOS64" ]
+then
+    ACOUSMOSCRIBE_PATH="/Users/luc/Documents/workspace/acousmoscribe/"
+    INSTALL_PATH=$ACOUSMOSCRIBE_PATH"installation/"
+    if [ "$OS" = "MACOS32" ]
+    then
+	INSTALL_MACOS_PATH=$INSTALL_PATH"acousmoscribe_MacOS_10_4"
+    elif [ "$OS" = "MACOS64" ]
+    then
+	INSTALL_MACOS_PATH=$INSTALL_PATH"acousmoscribe_MacOS_10_6"
+    fi
+    LOCAL_BIN_PATH=$ACOUSMOSCRIBE_PATH"acousmoscribe.app/"
+    INSTALL_USR_PATH=$INSTALL_MACOS_PATH$ROOT_USR_PATH
+    INSTALL_LIB_PATH=$INSTALL_MACOS_PATH$ROOT_LIB_PATH
+    INSTALL_INCLUDE_PATH=$INSTALL_MACOS_PATH$ROOT_INCLUDE_PATH
+    INSTALL_BIN_PATH=$INSTALL_MACOS_PATH"/Applications/Acousmoscribe.app/"
+else
+    echo "Unhandled OS"
+fi
 
-# UBUNTU 64
-
-echo "CREATING INSTALLATION REPOSITORY"
+echo "BUILDING INSTALLATION REPOSITORY"
 
 sudo mkdir -p $INSTALL_USR_PATH
 sudo mkdir -p $INSTALL_LIB_PATH
@@ -65,7 +75,7 @@ then
 elif [ "$OS" = "MACOS32" ] || [ "$OS" = "MACOS64" ]
 then
 {
-    echo "MACOS : TODO"
+    echo ""
 }
 else
 {
@@ -73,18 +83,19 @@ else
 }
 fi
 
-echo "COPYING BINARY"
+echo "COPYING BINARY ..."
 
 if [ "$OS" = "UBUNTU32" ] || [ "$OS" = "UBUNTU64" ]
 then 
 {
-    sudo rm $INSTALL_BIN_PATH"acousmoscribe"
+    sudo rm $INSTALL_BIN_PATH
     sudo cp $LOCAL_BIN_PATH $INSTALL_BIN_PATH
 }
 elif [ "$OS" = "MACOS32" ] || [ "$OS" = "MACOS64" ]
 then
 {
-    echo "MACOS : TODO"
+    sudo rm -rf $INSTALL_BIN_PATH*
+    sudo cp -r $LOCAL_BIN_PATH* $INSTALL_BIN_PATH
 }
 else
 {
@@ -92,23 +103,30 @@ else
 }
 fi
 
-echo "COPYING INCLUDES"
+echo "COPYING INCLUDES..."
 
 if [ "$OS" = "UBUNTU32" ] || [ "$OS" = "UBUNTU64" ]
 then
     for i in "DeviceManager/" "gecode/" "IScore/" "libxml2/" 
     do
-	sudo rm -r $INSTALL_INCLUDE_PATH$i
+	echo "... "$i
+	sudo rm -rf $INSTALL_INCLUDE_PATH$i
 	sudo cp -r $ROOT_INCLUDE_PATH$i $INSTALL_INCLUDE_PATH
     done
 elif [ "$OS" = "MACOS32" ] || [ "$OS" = "MACOS64" ]
 then
-    echo "MACOS : TODO"
+    for i in "DeviceManager/" "IScore/" "libxml2/" 
+    do
+	echo "... "$i
+	sudo rm -rf $INSTALL_INCLUDE_PATH$i
+	sudo mkdir $INSTALL_INCLUDE_PATH$i
+	sudo cp -r $ROOT_INCLUDE_PATH$i $INSTALL_INCLUDE_PATH$i
+    done
 else
     echo "Unhandled OS"
 fi
 
-echo "COPYING LIBRARIES"
+echo "COPYING LIBRARIES ..."
 
 if [ "$OS" = "UBUNTU32" ] || [ "$OS" = "UBUNTU64" ]
 then
@@ -116,16 +134,24 @@ then
     
     for i in "IScore/" "libDeviceManager.a" "libIscore.a" "libgecode*.a" "libxml*.a" "libxml*.so*"
     do
-	if [ $i = "IScore/" ]
-	then
-	    sudo cp -r $ROOT_LIB_PATH$i $INSTALL_LIB_PATH$i
-	else
-	    sudo cp -r $ROOT_LIB_PATH$i $INSTALL_LIB_PATH
-	fi
+	echo "... "$i
+	sudo cp -r $ROOT_LIB_PATH$i $INSTALL_LIB_PATH
     done
 elif [ "$OS" = "MACOS32" ] || [ "$OS" = "MACOS64" ]
 then
-    echo "MACOS : TODO"
+    sudo rm -r $INSTALL_LIB_PATH"/IScore"
+    
+    for i in "IScore/" "libDeviceManager.a" "libIscore.a" "libxml2.a" "libgecode*" "libxml*"
+    do
+	echo "... "$i
+	if [ $i = "IScore/" ]
+	then
+	    sudo mkdir $INSTALL_LIB_PATH$i
+	    sudo cp -r $ROOT_LIB_PATH$i $INSTALL_LIB_PATH$i
+	else
+	    sudo cp $ROOT_LIB_PATH$i $INSTALL_LIB_PATH
+	fi
+    done
 else
     echo "Unhandled OS"
 fi
@@ -157,7 +183,8 @@ then
     fi
 elif [ "$OS" = "MACOS32" ] || [ "$OS" = "MACOS64" ]
 then
-    echo "MACOS : TODO"
+    echo "SETTING UP RIGHTS"
+    sudo chown -R root $INSTALL_USR_PATH
 else
     echo "Unhandled OS"
 fi
