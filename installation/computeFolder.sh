@@ -18,6 +18,7 @@ ROOT_BIN_PATH="/usr/bin/"
 ROOT_LIB_PATH="/usr/local/lib/"
 ROOT_INCLUDE_PATH="/usr/local/include/"
 ROOT_SHARE_PATH="/usr/local/share/"
+ROOT_FRAMEWORKS_PATH="/Library/Frameworks/"
 
 if [ "$OS" = "UBUNTU32" ] || [ "$OS" = "UBUNTU64" ]
 then
@@ -51,10 +52,12 @@ then
 	INSTALL_MACOS_PATH=$INSTALL_PATH"acousmoscribe_MacOS_10_6"
     fi
     LOCAL_BIN_PATH=$ACOUSMOSCRIBE_PATH"acousmoscribe.app/"
+    ROOT_FRAMEWORKS_PATH="/Library/Frameworks/"
     INSTALL_USR_PATH=$INSTALL_MACOS_PATH$ROOT_USR_PATH
     INSTALL_LIB_PATH=$INSTALL_MACOS_PATH$ROOT_LIB_PATH
     INSTALL_INCLUDE_PATH=$INSTALL_MACOS_PATH$ROOT_INCLUDE_PATH
     INSTALL_BIN_PATH=$INSTALL_MACOS_PATH"/Applications/Acousmoscribe.app/"
+    INSTALL_FRAMEWORKS_PATH=$INSTALL_MACOS_PATH$ROOT_FRAMEWORKS_PATH
 else
     echo "Unhandled OS"
 fi
@@ -152,6 +155,13 @@ then
 	    sudo cp $ROOT_LIB_PATH$i $INSTALL_LIB_PATH
 	fi
     done
+
+    echo "COPYING FRAMEWORK ..."
+    sudo rm -r $INSTALL_FRAMEWORKS_PATH
+    sudo mkdir -p $INSTALL_FRAMEWORKS_PATH
+    sudo mkdir $INSTALL_FRAMEWORKS_PATH"gecode.framework"
+    sudo cp -r $ROOT_FRAMEWORKS_PATH"gecode.framework/"* $INSTALL_FRAMEWORKS_PATH"gecode.framework"
+    
 else
     echo "Unhandled OS"
 fi
@@ -185,6 +195,7 @@ elif [ "$OS" = "MACOS32" ] || [ "$OS" = "MACOS64" ]
 then
     echo "SETTING UP RIGHTS"
     sudo chown -R root $INSTALL_USR_PATH
+    sudo chown -R root $INSTALL_FRAMEWORKS_PATH
 else
     echo "Unhandled OS"
 fi

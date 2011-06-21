@@ -1,0 +1,100 @@
+/* -*- mode: C++; c-basic-offset: 2; indent-tabs-mode: nil -*- */
+/*
+ *  Main authors:
+ *     Guido Tack <tack@gecode.org>
+ *
+ *  Copyright:
+ *     Guido Tack, 2006
+ *
+ *  Last modified:
+ *     $Date: 2009-01-21 11:36:29 +0100 (Mi, 21 Jan 2009) $ by $Author: schulte $
+ *     $Revision: 8083 $
+ *
+ *  This file is part of Gecode, the generic constraint
+ *  development environment:
+ *     http://www.gecode.org
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+namespace Gecode { namespace Gist {
+
+  forceinline unsigned int
+  Node::getTag(void) const {
+    return static_cast<unsigned int>
+      (reinterpret_cast<ptrdiff_t>(childrenOrFirstChild) & 3);
+  }
+
+  forceinline void
+  Node::setTag(unsigned int tag) {
+    assert(tag <= 3);
+    assert(getTag() == UNDET);
+    childrenOrFirstChild = reinterpret_cast<void*>
+      ( (reinterpret_cast<ptrdiff_t>(childrenOrFirstChild) & ~(3)) | tag);
+  }
+
+  forceinline void*
+  Node::getPtr(void) const {
+    return reinterpret_cast<void*>
+      (reinterpret_cast<ptrdiff_t>(childrenOrFirstChild) & ~(3));
+  }
+
+  forceinline
+  Node::Node(void) : parent(NULL) {
+    childrenOrFirstChild = NULL;
+    c.secondChild = NULL;
+    setTag(UNDET);
+  }
+
+  forceinline Node*
+  Node::getParent(void) { return parent; }
+
+  forceinline bool
+  Node::isUndetermined(void) const { return getTag() == UNDET; }
+
+  forceinline Node*
+  Node::getChild(unsigned int n) {
+    assert(getTag() != UNDET && getTag() != LEAF);
+    if (getTag() == TWO_CHILDREN) {
+      assert(n != 1 || Support::marked(c.secondChild));
+      return n == 0 ? static_cast<Node*>(getPtr()) :
+        static_cast<Node*>(Support::unmark(c.secondChild));
+    }
+    assert(n < c.noOfChildren);
+    return static_cast<Node**>(getPtr())[n];
+  }
+
+  forceinline bool
+  Node::isRoot(void) const { return parent == NULL; }
+
+  forceinline unsigned int
+  Node::getNumberOfChildren(void) const {
+    switch (getTag()) {
+    case UNDET: return 0;
+    case LEAF:  return 0;
+    case TWO_CHILDREN: return 1+Support::marked(c.secondChild);
+    default: return c.noOfChildren;
+    }
+  }
+
+}}
+
+// STATISTICS: gist-any

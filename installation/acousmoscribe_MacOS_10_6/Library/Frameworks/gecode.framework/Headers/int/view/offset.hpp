@@ -1,0 +1,345 @@
+/* -*- mode: C++; c-basic-offset: 2; indent-tabs-mode: nil -*- */
+/*
+ *  Main authors:
+ *     Christian Schulte <schulte@gecode.org>
+ *
+ *  Copyright:
+ *     Christian Schulte, 2002
+ *
+ *  Last modified:
+ *     $Date: 2009-09-08 21:10:29 +0200 (Di, 08 Sep 2009) $ by $Author: schulte $
+ *     $Revision: 9692 $
+ *
+ *  This file is part of Gecode, the generic constraint
+ *  development environment:
+ *     http://www.gecode.org
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining
+ *  a copy of this software and associated documentation files (the
+ *  "Software"), to deal in the Software without restriction, including
+ *  without limitation the rights to use, copy, modify, merge, publish,
+ *  distribute, sublicense, and/or sell copies of the Software, and to
+ *  permit persons to whom the Software is furnished to do so, subject to
+ *  the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be
+ *  included in all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ *  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ *  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ *  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ *  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ *  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+namespace Gecode {
+
+  namespace Int {
+
+    /*
+     * Constructors and initialization
+     *
+     */
+    forceinline
+    OffsetView::OffsetView(void) {}
+    forceinline
+    OffsetView::OffsetView(const IntView& x, int d)
+      : DerivedViewBase<IntView>(x), c(d) {}
+    forceinline void
+    OffsetView::init(const IntView& x, int d) {
+      view=x; c=d;
+    }
+    forceinline int
+    OffsetView::offset(void) const {
+      return c;
+    }
+
+
+    /*
+     * Value access
+     *
+     */
+    forceinline int
+    OffsetView::min(void) const {
+      return view.min()+c;
+    }
+    forceinline int
+    OffsetView::max(void) const {
+      return view.max()+c;
+    }
+    forceinline int
+    OffsetView::med(void) const {
+      return view.med()+c;
+    }
+    forceinline int
+    OffsetView::val(void) const {
+      return view.val()+c;
+    }
+
+    forceinline unsigned int
+    OffsetView::width(void) const {
+      return view.width();
+    }
+    forceinline unsigned int
+    OffsetView::size(void) const {
+      return view.size();
+    }
+    forceinline unsigned int
+    OffsetView::regret_min(void) const {
+      return view.regret_min();
+    }
+    forceinline unsigned int
+    OffsetView::regret_max(void) const {
+      return view.regret_max();
+    }
+
+    /*
+     * Domain tests
+     *
+     */
+    forceinline bool
+    OffsetView::range(void) const {
+      return view.range();
+    }
+    forceinline bool
+    OffsetView::assigned(void) const {
+      return view.assigned();
+    }
+
+    forceinline bool
+    OffsetView::in(int n) const {
+      return view.in(n-c);
+    }
+    forceinline bool
+    OffsetView::in(double n) const {
+      return view.in(n-c);
+    }
+
+
+    /*
+     * Domain update by value
+     *
+     */
+    forceinline ModEvent
+    OffsetView::lq(Space& home, int n) {
+      return view.lq(home,n-c);
+    }
+    forceinline ModEvent
+    OffsetView::lq(Space& home, double n) {
+      return view.lq(home,n-c);
+    }
+    forceinline ModEvent
+    OffsetView::le(Space& home, int n) {
+      return view.le(home,n-c);
+    }
+    forceinline ModEvent
+    OffsetView::le(Space& home, double n) {
+      return view.le(home,n-c);
+    }
+    forceinline ModEvent
+    OffsetView::gq(Space& home, int n) {
+      return view.gq(home,n-c);
+    }
+    forceinline ModEvent
+    OffsetView::gq(Space& home, double n) {
+      return view.gq(home,n-c);
+    }
+    forceinline ModEvent
+    OffsetView::gr(Space& home, int n) {
+      return view.gr(home,n-c);
+    }
+    forceinline ModEvent
+    OffsetView::gr(Space& home, double n) {
+      return view.gr(home,n-c);
+    }
+    forceinline ModEvent
+    OffsetView::nq(Space& home, int n) {
+      return view.nq(home,n-c);
+    }
+    forceinline ModEvent
+    OffsetView::nq(Space& home, double n) {
+      return view.nq(home,n-c);
+    }
+    forceinline ModEvent
+    OffsetView::eq(Space& home, int n) {
+      return view.eq(home,n-c);
+    }
+    forceinline ModEvent
+    OffsetView::eq(Space& home, double n) {
+      return view.eq(home,n-c);
+    }
+
+
+    /*
+     * Iterator-based domain update
+     *
+     */
+    template<class I>
+    forceinline ModEvent
+    OffsetView::narrow_r(Space& home, I& i, bool depend) {
+      Iter::Ranges::Offset<I> oi(i,-c);
+      return view.narrow_r(home,oi,depend);
+    }
+    template<class I>
+    forceinline ModEvent
+    OffsetView::inter_r(Space& home, I& i, bool depend) {
+      Iter::Ranges::Offset<I> oi(i,-c);
+      return view.inter_r(home,oi,depend);
+    }
+    template<class I>
+    forceinline ModEvent
+    OffsetView::minus_r(Space& home, I& i, bool depend) {
+      Iter::Ranges::Offset<I> oi(i,-c);
+      return view.minus_r(home,oi,depend);
+    }
+    template<class I>
+    forceinline ModEvent
+    OffsetView::narrow_v(Space& home, I& i, bool depend) {
+      Iter::Values::Offset<I> oi(i,-c);
+      return view.narrow_v(home,oi,depend);
+    }
+    template<class I>
+    forceinline ModEvent
+    OffsetView::inter_v(Space& home, I& i, bool depend) {
+      Iter::Values::Offset<I> oi(i,-c);
+      return view.inter_v(home,oi,depend);
+    }
+    template<class I>
+    forceinline ModEvent
+    OffsetView::minus_v(Space& home, I& i, bool depend) {
+      Iter::Values::Offset<I> oi(i,-c);
+      return view.minus_v(home,oi,depend);
+    }
+
+
+
+    /*
+     * Propagator modification events
+     *
+     */
+    forceinline void
+    OffsetView::schedule(Space& home, Propagator& p, ModEvent me) {
+      return IntView::schedule(home,p,me);
+    }
+    forceinline ModEvent
+    OffsetView::me(const ModEventDelta& med) {
+      return IntView::me(med);
+    }
+    forceinline ModEventDelta
+    OffsetView::med(ModEvent me) {
+      return IntView::med(me);
+    }
+
+
+    /*
+     * Dependencies
+     *
+     */
+    forceinline void
+    OffsetView::subscribe(Space& home, Propagator& p, PropCond pc,
+                          bool process) {
+      view.subscribe(home,p,pc,process);
+    }
+    forceinline void
+    OffsetView::cancel(Space& home, Propagator& p, PropCond pc) {
+      view.cancel(home,p,pc);
+    }
+    forceinline void
+    OffsetView::subscribe(Space& home, Advisor& a) {
+      view.subscribe(home,a);
+    }
+    forceinline void
+    OffsetView::cancel(Space& home, Advisor& a) {
+      view.cancel(home,a);
+    }
+
+
+    /*
+     * Delta information for advisors
+     *
+     */
+    forceinline ModEvent
+    OffsetView::modevent(const Delta& d) {
+      return IntView::modevent(d);
+    }
+    forceinline int
+    OffsetView::min(const Delta& d) const {
+      return view.min(d)+c;
+    }
+    forceinline int
+    OffsetView::max(const Delta& d) const {
+      return view.max(d)+c;
+    }
+    forceinline bool
+    OffsetView::any(const Delta& d) const {
+      return view.any(d);
+    }
+
+
+
+    /*
+     * Cloning
+     *
+     */
+    forceinline void
+    OffsetView::update(Space& home, bool share, OffsetView& x) {
+      c=x.c; view.update(home,share,x.view);
+    }
+
+
+    /**
+     * \brief %Range iterator for offset integer views
+     * \ingroup TaskActorIntView
+     */
+    template<>
+    class ViewRanges<OffsetView>
+      : public Iter::Ranges::Offset<ViewRanges<IntView> > {
+    public:
+      /// \name Constructors and initialization
+      //@{
+      /// Default constructor
+      ViewRanges(void);
+      /// Initialize with ranges for view \a x
+      ViewRanges(const OffsetView& x);
+      /// Initialize with ranges for view \a x
+      void init(const OffsetView& x);
+      //@}
+    };
+
+    forceinline
+    ViewRanges<OffsetView>::ViewRanges(void) {}
+
+    forceinline
+    ViewRanges<OffsetView>::ViewRanges(const OffsetView& x) {
+      ViewRanges<IntView> xi(x.base());
+      Iter::Ranges::Offset<ViewRanges<IntView> >::init(xi,x.offset());
+    }
+
+    forceinline void
+    ViewRanges<OffsetView>::init(const OffsetView& x) {
+      ViewRanges<IntView> xi(x.base());
+      Iter::Ranges::Offset<ViewRanges<IntView> >::init(xi,x.offset());
+    }
+  }
+
+  /*
+   * View comparison
+   *
+   */
+  forceinline bool
+  same(const Int::OffsetView& x, const Int::OffsetView& y) {
+    return same(x.base(),y.base()) && (x.offset() == y.offset());
+  }
+  forceinline bool
+  before(const Int::OffsetView& x, const Int::OffsetView& y) {
+    return before(x.base(),y.base())
+      || (same(x.base(),y.base()) && (x.offset() < y.offset()));
+  }
+
+}
+
+// STATISTICS: int-var
+
