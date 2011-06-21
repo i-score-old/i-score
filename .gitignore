@@ -9,6 +9,10 @@ Acousmoscribe_28_10_10.pkg
 .DS_Store
 compiler_*
 *~
-#*
+\#*
 org.eclipse*
 Doxyfile
+installation/acousmoscribe_MacOS_10_6*
+installation/acousmoscribe_MacOS_10_4*
+installation/acousmoscribe_ubuntu32*
+installation/acousmoscribe_ubuntu64*

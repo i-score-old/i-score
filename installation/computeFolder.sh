@@ -31,6 +31,8 @@ then
     then
 	INSTALL_UBUNTU_PATH=$INSTALL_PATH"acousmoscribe_ubuntu_64"
     fi
+    sudo rm -rf $INSTALL_UBUNTU_PATH
+    sudo mkdir -p $INSTALL_UBUNTU_PATH
     LOCAL_SHARE_DOCS_PATH=$INSTALL_PATH"ubuntuDocs/shareDocs/"
     LOCAL_DEBIAN_PATH=$INSTALL_PATH"ubuntuDocs/DEBIAN/"
     LOCAL_BIN_PATH=$ACOUSMOSCRIBE_PATH"acousmoscribe"
@@ -51,6 +53,8 @@ then
     then
 	INSTALL_MACOS_PATH=$INSTALL_PATH"acousmoscribe_MacOS_10_6"
     fi
+    sudo rm -rf $INSTALL_MACOS_PATH
+    sudo mkdir -p $INSTALL_MACOS_PATH
     LOCAL_BIN_PATH=$ACOUSMOSCRIBE_PATH"acousmoscribe.app/"
     ROOT_FRAMEWORKS_PATH="/Library/Frameworks/"
     INSTALL_USR_PATH=$INSTALL_MACOS_PATH$ROOT_USR_PATH
@@ -91,7 +95,7 @@ echo "COPYING BINARY ..."
 if [ "$OS" = "UBUNTU32" ] || [ "$OS" = "UBUNTU64" ]
 then 
 {
-    sudo rm $INSTALL_BIN_PATH
+    sudo rm -f $INSTALL_BIN_PATH
     sudo cp $LOCAL_BIN_PATH $INSTALL_BIN_PATH
 }
 elif [ "$OS" = "MACOS32" ] || [ "$OS" = "MACOS64" ]
@@ -133,7 +137,7 @@ echo "COPYING LIBRARIES ..."
 
 if [ "$OS" = "UBUNTU32" ] || [ "$OS" = "UBUNTU64" ]
 then
-    sudo rm -r $INSTALL_LIB_PATH"/IScore"
+    sudo rm -rf $INSTALL_LIB_PATH"/IScore"
     
     for i in "IScore/" "libDeviceManager.a" "libIscore.a" "libgecode*.a" "libxml*.a" "libxml*.so*"
     do
@@ -142,7 +146,7 @@ then
     done
 elif [ "$OS" = "MACOS32" ] || [ "$OS" = "MACOS64" ]
 then
-    sudo rm -r $INSTALL_LIB_PATH"/IScore"
+    sudo rm -rf $INSTALL_LIB_PATH"/IScore"
     
     for i in "IScore/" "libDeviceManager.a" "libIscore.a" "libxml2.a" "libgecode*" "libxml*"
     do
@@ -157,7 +161,7 @@ then
     done
 
     echo "COPYING FRAMEWORK ..."
-    sudo rm -r $INSTALL_FRAMEWORKS_PATH
+    sudo rm -rf $INSTALL_FRAMEWORKS_PATH
     sudo mkdir -p $INSTALL_FRAMEWORKS_PATH
     sudo mkdir $INSTALL_FRAMEWORKS_PATH"gecode.framework"
     sudo cp -r $ROOT_FRAMEWORKS_PATH"gecode.framework/"* $INSTALL_FRAMEWORKS_PATH"gecode.framework"
@@ -170,12 +174,12 @@ if [ "$OS" = "UBUNTU32" ] || [ "$OS" = "UBUNTU64" ]
 then
     echo "COPYING SHARE DOCS"
     
-    sudo rm -r $INSTALL_SHARE_PATH
+    sudo rm -rf $INSTALL_SHARE_PATH
     sudo cp -r $LOCAL_SHARE_DOCS_PATH $INSTALL_SHARE_PATH
     
     echo "COPYING DEBIAN FILES"
     
-    sudo rm -r $INSTALL_DEBIAN_PATH
+    sudo rm -rf $INSTALL_DEBIAN_PATH
     sudo cp -r $LOCAL_DEBIAN_PATH $INSTALL_DEBIAN_PATH
     
     sudo chown root -R $INSTALL_USR_PATH

@@ -1,8 +1,0 @@
-Package: acousmoscribe
-Version: 2.0
-Section: base
-Priority: optional
-Architecture: amd64
-Depends: qt4-dev-tools
-Maintainer: Vercellin Luc <luc.vercellin@gmail.com>
-Description: This software is a computer program whose purpose is to provide notation and composition combining synthesized as well as recorded sounds, providing answers to the problem of notation and, drawing, from its very design, on benefits from state of the art research in musicology and sound computing.
