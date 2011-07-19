@@ -57,12 +57,28 @@ using std::make_pair;
 
 #include "BasicBox.hpp"
 #include "CurveWidget.hpp"
+#include "AbstractCurve.hpp"
 #include "Engines.hpp"
 #include "Maquette.hpp"
 
-CurveWidget::CurveWidget(QWidget *parent,unsigned int boxID, const string &address, unsigned int argPosition, const vector<float> &values, unsigned int sampleRate,
-bool redundancy, const vector<string> &argType, const vector<float> &xPercents, const vector<float> &yValues,
-const vector<short> &sectionType, const vector<float> &coeff) : QWidget(parent) {
+CurveWidget::CurveWidget(QWidget *parent) : QWidget(parent)
+{
+	init();
+}
+
+CurveWidget::CurveWidget(QWidget *parent, AbstractCurve *abCurve) : QWidget(parent)
+{
+	init();
+	_abstract = abCurve;
+	curveRepresentationOutdated();
+}
+
+CurveWidget::~CurveWidget() {}
+
+void CurveWidget::init()
+{
+	_abstract = new AbstractCurve(NO_ID,"",0,10,false,1,vector<float>(),map<float,pair<float,float> >());
+
 	setBackgroundRole(QPalette::Base);
 	setCursor(Qt::CrossCursor);
 	setMouseTracking(true);
@@ -73,8 +89,6 @@ const vector<short> &sectionType, const vector<float> &coeff) : QWidget(parent) 
 	_scaleY = 1;
 
 	_interspace = width();
-	_redundancy = false;
-	_address = "";
 
 	_clicked = false;
 	_breakpointMovedX = -1;
@@ -82,23 +96,18 @@ const vector<short> &sectionType, const vector<float> &coeff) : QWidget(parent) 
 	_minY = -100;
 	_maxY = 100;
 	_lastPointSelected = false;
-	_lastPointCoeff = 1;
-
-	_boxID = NO_ID;
 
 	setLayout(_layout);
-
-	setAttributes(boxID,address,argPosition,values,sampleRate,redundancy,argType,xPercents,yValues,sectionType,coeff,false);
 }
 
-CurveWidget::~CurveWidget() {
-
+AbstractCurve * CurveWidget::abstractCurve() {
+	return _abstract;
 }
 
 void CurveWidget::curveRepresentationOutdated() {
-	_interspace = width() / (float)(std::max((unsigned int)2,(unsigned int)(_curve.size())) - 1);
-	_minY = *(std::min_element(_curve.begin(),_curve.end()));
-	_maxY = *(std::max_element(_curve.begin(),_curve.end()));
+	_interspace = width() / (float)(std::max((unsigned int)2,(unsigned int)(_abstract->_curve.size())) - 1);
+	_minY = *(std::min_element(_abstract->_curve.begin(),_abstract->_curve.end()));
+	_maxY = *(std::max_element(_abstract->_curve.begin(),_abstract->_curve.end()));
 	float halfSizeY = std::max(fabs(_maxY),fabs(_minY));
 
 	_scaleY = height() / (2*halfSizeY);
@@ -109,28 +118,33 @@ void CurveWidget::curveRepresentationOutdated() {
 void
 CurveWidget::setAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition, const vector<float> &values, unsigned int sampleRate,
 		bool redundancy, const vector<string> &/*argType*/, const vector<float> &xPercents , const vector<float> &yValues, const vector<short> &sectionType,
-		const vector<float> &coeff, bool update) {
-	_boxID = boxID;
-	_curve.clear();
-	_breakpoints.clear();
-	_sampleRate = sampleRate;
+		const vector<float> &coeff) {
+	_abstract->_boxID = boxID;
+	_abstract->_curve.clear();
+	_abstract->_breakpoints.clear();
+	_abstract->_sampleRate = sampleRate;
 
-	_redundancy = redundancy;
-	_address = address;
+	_abstract->_redundancy = redundancy;
+	_abstract->_address = address;
 
 	vector<float>::const_iterator it;
 	vector<float>::const_iterator it2;
 	vector<float>::const_iterator it3;
 	for (it = values.begin() ; it != values.end() ; ++it) {
-		_curve.push_back(*it);
+		_abstract->_curve.push_back(*it);
 	}
 
 	for (unsigned int i = 0 ; i < xPercents.size() ; ++i) {
-		_breakpoints[xPercents[i]/100.] = pair<float,float>(yValues[i],coeff[i]);
+		_abstract->_breakpoints[xPercents[i]/100.] = pair<float,float>(yValues[i],coeff[i]);
 	}
 
-	_lastPointCoeff = coeff.back();
+	_abstract->_lastPointCoeff = coeff.back();
 
+	curveRepresentationOutdated();
+}
+
+void CurveWidget::setAttributes(AbstractCurve *abCurve) {
+	_abstract = abCurve;
 	curveRepresentationOutdated();
 }
 
@@ -178,12 +192,12 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
 		map<float,pair<float,float> >::iterator it;
 		QPointF relativePoint = relativeCoordinates(event->pos());
 		QPointF absolutePoint = absoluteCoordinates(relativePoint);
-		if (fabs(((_curve.size()-1) * _interspace * _scaleX) - absolutePoint.x()) <= 2) {
+		if (fabs(((_abstract->_curve.size()-1) * _interspace * _scaleX) - absolutePoint.x()) <= 2) {
 			_lastPointSelected = true;
 		}
 		else {
 			_lastPointSelected = false;
-			for (it = _breakpoints.begin() ; it != _breakpoints.end() ; ++it) {
+			for (it = _abstract->_breakpoints.begin() ; it != _abstract->_breakpoints.end() ; ++it) {
 				if (fabs(it->first - relativePoint.x()) < 0.01) {
 					_breakpointMovedX = it->first;
 					_breakpointMovedY = -1;
@@ -198,7 +212,7 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
 		map<float,pair<float,float> >::iterator it;
 		bool found;
 		QPointF relativePoint = relativeCoordinates(event->pos());
-		for (it = _breakpoints.begin() ; it != _breakpoints.end() ; ++it) {
+		for (it = _abstract->_breakpoints.begin() ; it != _abstract->_breakpoints.end() ; ++it) {
 			if (fabs(it->first - relativePoint.x()) < 0.01) {
 				found = true;
 				_breakpointMovedX = it->first;
@@ -213,19 +227,19 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
 		map<float,pair<float,float> >::iterator it;
 		bool found;
 		QPointF relativePoint = relativeCoordinates(event->pos());
-		for (it = _breakpoints.begin() ; it != _breakpoints.end() ; ++it) {
+		for (it = _abstract->_breakpoints.begin() ; it != _abstract->_breakpoints.end() ; ++it) {
 			if (fabs(it->first - relativePoint.x()) < 0.01) {
 				found = true;
 				_breakpointMovedX = it->first;
 				_breakpointMovedY = it->second.first;
-				_breakpoints.erase(it);
+				_abstract->_breakpoints.erase(it);
 				curveChanged();
 				update();
 				break;
 			}
 		}
 		if (!found) {
-			_breakpoints[relativePoint.x()] = std::make_pair<float,float>(relativePoint.y(),1.);
+			_abstract->_breakpoints[relativePoint.x()] = std::make_pair<float,float>(relativePoint.y(),1.);
 			_clicked = false;
 			curveChanged();
 			update();
@@ -237,10 +251,10 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
 		map<float,pair<float,float> >::iterator it;
 		bool found;
 		QPointF relativePoint = relativeCoordinates(event->pos());
-		for (it = _breakpoints.begin() ; it != _breakpoints.end() ; ++it) {
+		for (it = _abstract->_breakpoints.begin() ; it != _abstract->_breakpoints.end() ; ++it) {
 			if (fabs(it->first - relativePoint.x()) < 0.01) {
 				found = true;
-				_breakpoints.erase(it);
+				_abstract->_breakpoints.erase(it);
 				_breakpointMovedX = -1.;
 				_breakpointMovedY = -1.;
 				curveChanged();
@@ -274,19 +288,19 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 			if (_lastPointSelected) {
 				float mousePosY = event->pos().y();
 				float pow = 1.;
-				QPointF lastPoint = absoluteCoordinates(QPointF(1,_curve.back()));
+				QPointF lastPoint = absoluteCoordinates(QPointF(1,_abstract->_curve.back()));
 				if (mousePosY > lastPoint.y()) { // mouse under : pow between 0 and 1
 					pow = 1 - std::min((float)(mousePosY - lastPoint.y()),(float)50.) / 50.;
 				}
 				else if (lastPoint.y() > mousePosY){ // mouse above : pow between 1 and 6
 					pow = 1 + std::min((float)(lastPoint.y() - mousePosY),(float)50.) / 10.;
 				}
-				_lastPointCoeff = pow;
+				_abstract->_lastPointCoeff = pow;
 				curveChanged();
 			}
 			else if (_breakpointMovedX != -1) {
 				map<float,pair<float,float> >::iterator it;
-				if ((it = _breakpoints.find(_breakpointMovedX)) != _breakpoints.end()) {
+				if ((it = _abstract->_breakpoints.find(_breakpointMovedX)) != _abstract->_breakpoints.end()) {
 					float mousePosY = relativePoint.y();
 					float pow = 1.;
 					if (mousePosY > it->second.first) { // mouse under : pow between 0 and 1
@@ -306,11 +320,11 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 		{
 			if (_breakpointMovedX != -1) {
 				map<float,pair<float,float> >::iterator it;
-				if ((it = _breakpoints.find(_breakpointMovedX)) != _breakpoints.end()) {
+				if ((it = _abstract->_breakpoints.find(_breakpointMovedX)) != _abstract->_breakpoints.end()) {
 					it->second = std::make_pair<float,float>(relativePoint.y(),it->second.second);
 				}
 				else {
-					_breakpoints[_breakpointMovedX] = std::make_pair<float,float>(relativePoint.y(),1.);
+					_abstract->_breakpoints[_breakpointMovedX] = std::make_pair<float,float>(relativePoint.y(),1.);
 				}
 				_breakpointMovedY = -1;
 				curveChanged();
@@ -344,10 +358,10 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event) {
 		if (event->modifiers() == Qt::NoModifier) {
 			QPointF relativePoint = relativeCoordinates(event->pos());
 			map<float,pair<float,float> >::iterator it;
-			if ((it = _breakpoints.find(_breakpointMovedX)) != _breakpoints.end()) {
-				_breakpoints.erase(it);
+			if ((it = _abstract->_breakpoints.find(_breakpointMovedX)) != _abstract->_breakpoints.end()) {
+				_abstract->_breakpoints.erase(it);
 			}
-			_breakpoints[relativePoint.x()] = std::make_pair<float,float>(relativePoint.y(),1.);
+			_abstract->_breakpoints[relativePoint.x()] = std::make_pair<float,float>(relativePoint.y(),1.);
 			curveChanged();
 			update();
 		}
@@ -368,7 +382,7 @@ CurveWidget::curveChanged() {
 	vector<short> sectionType;
 	vector<float> coeff;
 	map<float,pair<float,float> >::iterator it;
-	for (it = _breakpoints.begin() ; it != _breakpoints.end() ; ++it) {
+	for (it = _abstract->_breakpoints.begin() ; it != _abstract->_breakpoints.end() ; ++it) {
 		xPercents.push_back(it->first * 100);
 		yValues.push_back(it->second.first);
 		coeff.push_back(it->second.second);
@@ -376,9 +390,9 @@ CurveWidget::curveChanged() {
 		sectionType.push_back(CURVE_POW);
 	}
 	sectionType.push_back(CURVE_POW);
-	coeff.push_back(_lastPointCoeff);
+	coeff.push_back(_abstract->_lastPointCoeff);
 
-	if (Maquette::getInstance()->setCurveSections(_boxID, _address, 0 ,xPercents, yValues, sectionType, coeff)) {
+	if (Maquette::getInstance()->setCurveSections(_abstract->_boxID, _abstract->_address, 0 ,xPercents, yValues, sectionType, coeff)) {
 		unsigned int sampleRate;
 		bool redundancy;
 		vector<string> argTypes;
@@ -387,8 +401,8 @@ CurveWidget::curveChanged() {
 		yValues.clear();
 		sectionType.clear();
 		coeff.clear();
-		if (Maquette::getInstance()->getCurveAttributes(_boxID,_address,0,sampleRate,redundancy,values,argTypes,xPercents,yValues,sectionType,coeff)) {
-			setAttributes(_boxID,_address,0,values,sampleRate,redundancy,argTypes,xPercents,yValues,sectionType,coeff,false);
+		if (Maquette::getInstance()->getCurveAttributes(_abstract->_boxID,_abstract->_address,0,sampleRate,redundancy,values,argTypes,xPercents,yValues,sectionType,coeff)) {
+			setAttributes(_abstract->_boxID,_abstract->_address,0,values,sampleRate,redundancy,argTypes,xPercents,yValues,sectionType,coeff);
 			update();
 			return true;
 		}
@@ -430,10 +444,10 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
 	QPointF precPoint(-1,-1);
 
 	unsigned int i = 0;
-	unsigned int Xdiv = _curve.size() / 10;
+	unsigned int Xdiv = _abstract->_curve.size() / 10;
 	unsigned int XsubDiv = std::max((unsigned int)1,Xdiv) / 10;
 
-	for (it = _curve.begin() ; it != _curve.end() ; ++it) {
+	for (it = _abstract->_curve.begin() ; it != _abstract->_curve.end() ; ++it) {
 		curPoint = absoluteCoordinates(QPointF(1,*it));
 		curPoint.setX(i * _interspace * _scaleX);
 
@@ -453,7 +467,7 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
 			}
 		}
 
-		if (it == _curve.begin()) { // First point is represented by a red rectangle
+		if (it == _abstract->_curve.begin()) { // First point is represented by a red rectangle
 			painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),Qt::red);
 		}
 		if (precPoint != QPointF(-1,-1)) {
@@ -469,7 +483,7 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
 	painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),Qt::red);
 
 	precPoint = QPointF(-1,-1);
-	for (it2 = _breakpoints.begin() ; it2 != _breakpoints.end() ; ++it2) {
+	for (it2 = _abstract->_breakpoints.begin() ; it2 != _abstract->_breakpoints.end() ; ++it2) {
 		curPoint = absoluteCoordinates(QPointF(it2->first,it2->second.first));
 		// Breakpoints are drawn in blue
 		painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),Qt::blue);

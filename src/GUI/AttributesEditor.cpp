@@ -152,7 +152,7 @@ void AttributesEditor::noBoxEdited() {
 	//_networkTabWidget->setEnabled(false);
 	//_snapshotTab->setEnabled(false);
 	_messagesTab->setEnabled(false);
-	_curvesWidget->updateMessages(NO_ID);
+	_curvesWidget->updateMessages(NO_ID,false);
 	_curvesTab->setEnabled(false);
 }
 
@@ -168,7 +168,7 @@ AttributesEditor::nameWidgets(int language)
 	rythm, grain, vibrato, speedHeld, speedVariation, grade, amplitude,
 	pitchStart, melody, pitchEnd, harmony, profiles, messages, msgStart, msgEnd,
 	apply,cancel,clear,profilesTab,networkTab,messagesTab,snapshotTab,copy,paste,
-	deleteStr,general,start,length,name,assign,assignStart,assignEnd,curves,explorationTab,treeMapTab,treeMapLoad;
+	deleteStr,general,start,length,name,assign,assignStart,assignEnd,curves,explorationTab,treeMapTab,treeMapLoad,treeMapUp;
 
 	// Used to switch between adding and renaming items
 	bool firstTimeCalled = false;
@@ -225,6 +225,7 @@ AttributesEditor::nameWidgets(int language)
 	snapshotTab = tr("Snapshot");
 	treeMapTab = tr("Tree Map");
 	treeMapLoad = tr("Load");
+	treeMapUp = tr("Up");
 	explorationTab = tr("Exploration");
 	curves = tr("Curves");
 	general = tr("General");
@@ -271,10 +272,14 @@ AttributesEditor::nameWidgets(int language)
 	_startLabel->setText(start);
 	_lengthLabel->setText(length);
 	_nameLabel->setText(name);
-	_assignLabel->setText(assign);
-	_assignSnapshotStart->setText(assignStart);
-	_assignSnapshotEnd->setText(assignEnd);
+	_snapshotAssignLabel->setText(assign);
+	_snapshotAssignStart->setText(assignStart);
+	_snapshotAssignEnd->setText(assignEnd);
 	_treeMapLoad->setText(treeMapLoad);
+	_treeMapUp->setText(treeMapUp);
+	_treeMapAssignLabel->setText(assign);
+	_treeMapAssignStart->setText(assignStart);
+	_treeMapAssignEnd->setText(assignEnd);
 
 	if (_generalTabIndex != -1) {
 		_tabWidget->setTabText(_generalTabIndex,general);
@@ -449,10 +454,6 @@ AttributesEditor::createWidgets()
 	_endMsgDeleteButton = new QPushButton("Delete", this);
 
 
-	_treeMap = new TreeMap(_treeMapTab);
-	_treeMapLoad = new QPushButton("Load", this);
-	_treeMapDevicesBox = new QComboBox;
-
 	_profilesTabIndex = -1;
 	_generalTabIndex = -1;
 	_networkTabIndex = -1;
@@ -478,8 +479,8 @@ AttributesEditor::createWidgets()
 	_generalLayout = new QGridLayout;
 	_profilesLayout = new QGridLayout;
 	_messagesLayout = new QGridLayout;
-	_snapshotTopLayout = new QGridLayout;
-	_snapshotLayout = new QVBoxLayout;
+	//_snapshotTopLayout = new QGridLayout;
+	_snapshotLayout = new QGridLayout;
 	_curvesLayout = new QGridLayout;
 	_msgStartTopLayout = new QGridLayout;
 	_msgStartLayout = new QVBoxLayout;
@@ -497,7 +498,7 @@ AttributesEditor::createWidgets()
 	_profilesLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
 	_messagesLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
 	_snapshotLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
-	_snapshotTopLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
+	//_snapshotTopLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
 	_msgStartTopLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
 	_msgEndTopLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
 	_msgStartLayout->setContentsMargins(0 , TOP_MARGIN , 0 , BOTTOM_MARGIN);
@@ -505,11 +506,19 @@ AttributesEditor::createWidgets()
 	_treeMapLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
 
 	_networkTree = new NetworkTree(this);
-	_assignSnapshotStart = new QPushButton;
-	_assignSnapshotEnd = new QPushButton;
-	_assignLabel = new QLabel;
+	_snapshotAssignStart = new QPushButton;
+	_snapshotAssignEnd = new QPushButton;
+	_snapshotAssignLabel = new QLabel;
 
 	_networkTree->load();
+
+	_treeMap = new TreeMap(_treeMapTab);
+	_treeMapLoad = new QPushButton;
+	_treeMapUp = new QPushButton;
+	_treeMapAssignStart = new QPushButton;
+	_treeMapAssignEnd = new QPushButton;
+	_treeMapAssignLabel = new QLabel;
+	_treeMapDevicesBox = new QComboBox;
 }
 
 void
@@ -538,7 +547,7 @@ AttributesEditor::addWidgetsToLayout()
 
 	_generalTopLayout->addWidget(_generalPreviewArea , 0 , 0 , PREVIEW_AREA_HEIGHT , PREVIEW_AREA_WIDTH , Qt::AlignHCenter);
 	_generalTopLayout->addWidget(_generalColorButton , 0 , PREVIEW_AREA_WIDTH , Qt::AlignCenter);
-	_generalTopLayout->addWidget(_languageComboBox , 1 , PREVIEW_AREA_WIDTH , Qt::AlignCenter);
+	//_generalTopLayout->addWidget(_languageComboBox , 1 , PREVIEW_AREA_WIDTH , Qt::AlignCenter);
 
 	_generalLayout->setAlignment(Qt::AlignTop);
 	_generalLayout->addLayout(_generalTopLayout, 0, 0,2,3, Qt::AlignCenter);
@@ -666,19 +675,22 @@ AttributesEditor::addWidgetsToLayout()
 	_messagesTab->setLayout(_messagesLayout);
 
 	_networkTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
-	_snapshotTopLayout->addWidget(_assignLabel,0,0,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
-	_snapshotTopLayout->addWidget(_assignSnapshotStart,0,1,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
-	_snapshotTopLayout->addWidget(_assignSnapshotEnd,0,2,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
-	_snapshotLayout->addLayout(_snapshotTopLayout);
-	_snapshotLayout->addWidget(_networkTree);
+	_snapshotLayout->addWidget(_snapshotAssignLabel,0,0,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
+	_snapshotLayout->addWidget(_snapshotAssignStart,0,1,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
+	_snapshotLayout->addWidget(_snapshotAssignEnd,0,2,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
+	_snapshotLayout->addWidget(_networkTree,1,0,1,5);
 
 	_snapshotTab->setLayout(_snapshotLayout);
 	_snapshotTabIndex = _explorationTab->addTab(_snapshotTab,"Snapshot");
 
 
-	_treeMapLayout->addWidget(_treeMapDevicesBox,0,0);
-	_treeMapLayout->addWidget(_treeMapLoad,0,1);
-	_treeMapLayout->addWidget(_treeMap,1,0,1,2);
+	_treeMapLayout->addWidget(_treeMapDevicesBox,0,0,1,3);
+	_treeMapLayout->addWidget(_treeMapLoad,0,3);
+	_treeMapLayout->addWidget(_treeMapUp,1,0);
+	_treeMapLayout->addWidget(_treeMapAssignLabel,1,1);
+	_treeMapLayout->addWidget(_treeMapAssignStart,1,2);
+	_treeMapLayout->addWidget(_treeMapAssignEnd,1,3);
+	_treeMapLayout->addWidget(_treeMap,2,0,1,6);
 
 	_treeMapTab->setLayout(_treeMapLayout);
 	_treeMapTabIndex = _explorationTab->addTab(_treeMapTab,"Tree Map");
@@ -743,13 +755,16 @@ AttributesEditor::connectSlots()
 	connect(_endMsgsAddButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(addLine()));
 	connect(_startMsgDeleteButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(removeLines()));
 	connect(_endMsgDeleteButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(removeLines()));
-	connect(_startMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(startMsgApplied()));
-	connect(_endMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(endMsgApplied()));
+	connect(_startMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(startMsgChanged()));
+	connect(_endMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(endMsgChanged()));
 
-	connect(_assignSnapshotStart, SIGNAL(clicked()),this,SLOT(assignSnapshotStart()));
-	connect(_assignSnapshotEnd, SIGNAL(clicked()),this,SLOT(assignSnapshotEnd()));
+	connect(_snapshotAssignStart, SIGNAL(clicked()),this,SLOT(snapshotStartAssignment()));
+	connect(_snapshotAssignEnd, SIGNAL(clicked()),this,SLOT(snapshotEndAssignment()));
 
 	connect(_treeMapLoad, SIGNAL(clicked()), this, SLOT(reloadTreeMap()));
+	connect(_treeMapUp, SIGNAL(clicked()), this, SLOT(upTreeMap()));
+	connect(_treeMapAssignStart, SIGNAL(clicked()),this,SLOT(treeMapStartAssignment()));
+	connect(_treeMapAssignEnd, SIGNAL(clicked()),this,SLOT(treeMapEndAssignment()));
 }
 
 void
@@ -796,14 +811,37 @@ AttributesEditor::resetProfiles()
 void
 AttributesEditor::setAttributes(AbstractBox *abBox)
 {
+	bool boxModified = (_boxEdited != abBox->ID());
+
 	_boxEdited = abBox->ID();
 
-	_startMsgsEditor->clear();
-	_startMsgsEditor->addMessages(abBox->firstMsgs());
-	_endMsgsEditor->clear();
-	_endMsgsEditor->addMessages(abBox->lastMsgs());
-	if (_boxEdited != NO_ID) {
-		_curvesWidget->updateMessages(_boxEdited);
+	if (boxModified || _boxEdited == NO_ID) {
+		_startMsgsEditor->clear();
+		_endMsgsEditor->clear();
+		if (_boxEdited != NO_ID) {
+			_startMsgsEditor->addMessages(abBox->firstMsgs());
+			_endMsgsEditor->addMessages(abBox->lastMsgs());
+		}
+	}
+
+	//if (_boxEdited != NO_ID) {
+		_curvesWidget->updateMessages(_boxEdited,false);
+	//}
+
+	if (abBox->type() == ABSTRACT_SOUND_BOX_TYPE || abBox->type() == ABSTRACT_CONTROL_BOX_TYPE
+			|| abBox->type() == ABSTRACT_PARENT_BOX_TYPE) {
+		if (_boxEdited == NO_ID) {
+			_generalTab->setEnabled(false);
+			_networkTabWidget->setEnabled(false);
+			_messagesTab->setEnabled(false);
+			_curvesTab->setEnabled(false);
+		}
+		else {
+			_generalTab->setEnabled(true);
+			_networkTabWidget->setEnabled(true);
+			_messagesTab->setEnabled(true);
+			_curvesTab->setEnabled(true);
+		}
 	}
 
 	if (abBox->type() == ABSTRACT_SOUND_BOX_TYPE) {
@@ -811,55 +849,17 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 		*_palette = static_cast<AbstractSoundBox*>(abBox)->pal();
 		_palette->setContainer(NULL);
 		_profilesPreviewArea->setColor(_palette->color());
-		if (_boxEdited == NO_ID) {
-			_generalTab->setEnabled(false);
-			_networkTabWidget->setEnabled(false);
-			_messagesTab->setEnabled(false);
-			_curvesTab->setEnabled(false);
-		}
-		else {
-			_generalTab->setEnabled(true);
-			_networkTabWidget->setEnabled(true);
-			_messagesTab->setEnabled(true);
-			_curvesTab->setEnabled(true);
-		}
 	}
-	else if (abBox->type() == ABSTRACT_CONTROL_BOX_TYPE) {
+	else if (abBox->type() == ABSTRACT_CONTROL_BOX_TYPE || abBox->type() == ABSTRACT_PARENT_BOX_TYPE) {
 		_profilesTab->setEnabled(false);
 		*_palette = Palette();
 		if (_boxEdited == NO_ID) {
-			_generalTab->setEnabled(false);
-			_networkTabWidget->setEnabled(false);
 			_profilesTab->setEnabled(true);
-			_messagesTab->setEnabled(false);
-			_curvesTab->setEnabled(false);
-		}
-		else {
-			_generalTab->setEnabled(true);
-			_networkTabWidget->setEnabled(true);
-			_messagesTab->setEnabled(true);
-			_curvesTab->setEnabled(true);
-		}
-	}
-	else if (abBox->type() == ABSTRACT_PARENT_BOX_TYPE) {
-		_profilesTab->setEnabled(false);
-		*_palette = Palette();
-		if (_boxEdited == NO_ID) {
-			_generalTab->setEnabled(false);
-			_networkTabWidget->setEnabled(false);
-			_profilesTab->setEnabled(true);
-			_messagesTab->setEnabled(false);
-			_curvesTab->setEnabled(false);
-		}
-		else {
-			_generalTab->setEnabled(true);
-			_networkTabWidget->setEnabled(true);
-			_messagesTab->setEnabled(true);
-			_curvesTab->setEnabled(true);
 		}
 	}
 
 	updateWidgets();
+
 }
 
 void
@@ -1222,11 +1222,11 @@ AttributesEditor::changeColor() {
 }
 
 void
-AttributesEditor::startMsgApplied()
+AttributesEditor::startMsgChanged()
 {
 	vector<string> msgs = _startMsgsEditor->computeMessages();
 	Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
-	_curvesWidget->updateMessages(_boxEdited);
+	_curvesWidget->updateMessages(_boxEdited,true);
 }
 
 void
@@ -1252,15 +1252,15 @@ void
 AttributesEditor::startMsgPasted()
 {
 	_startMsgsEditor->importMessages();
-	startMsgApplied();
+	startMsgChanged();
 }
 
 void
-AttributesEditor::endMsgApplied()
+AttributesEditor::endMsgChanged()
 {
 	vector<string> msgs = _endMsgsEditor->computeMessages();
 	Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
-	_curvesWidget->updateMessages(_boxEdited);
+	_curvesWidget->updateMessages(_boxEdited,true);
 }
 
 void
@@ -1274,7 +1274,7 @@ void
 AttributesEditor::endMsgCleared()
 {
 	_endMsgsEditor->clear();
-	endMsgApplied();
+	endMsgChanged();
 }
 
 void
@@ -1287,18 +1287,18 @@ void
 AttributesEditor::endMsgPasted()
 {
 	_endMsgsEditor->importMessages();
-	endMsgApplied();
+	endMsgChanged();
 }
 
 void
-AttributesEditor::assignSnapshotStart()
+AttributesEditor::snapshotStartAssignment()
 {
 	vector<string> snapshot = _networkTree->snapshot();
 
 	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 		if (!snapshot.empty()) {
 			_startMsgsEditor->addMessages(snapshot);
-			startMsgApplied();
+			startMsgChanged();
 			_scene->displayMessage("Snapshot successfully captured and applied to box start",INDICATION_LEVEL);
 		}
 		else {
@@ -1311,14 +1311,54 @@ AttributesEditor::assignSnapshotStart()
 
 }
 
-void AttributesEditor::assignSnapshotEnd()
+void AttributesEditor::snapshotEndAssignment()
 {
 	vector<string> snapshot = _networkTree->snapshot();
 
 	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 		if (!snapshot.empty()) {
 			_endMsgsEditor->addMessages(snapshot);
-			endMsgApplied();
+			endMsgChanged();
+			_scene->displayMessage("Snapshot successfully captured and applied to box end",INDICATION_LEVEL);
+		}
+		else {
+			_scene->displayMessage("No snapshot taken for selection",INDICATION_LEVEL);
+		}
+	}
+	else {
+		_scene->displayMessage("No box selected during snapshot assignment",INDICATION_LEVEL);
+	}
+}
+
+void
+AttributesEditor::treeMapStartAssignment()
+{
+	vector<string> snapshot = _treeMap->snapshot();
+
+	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
+		if (!snapshot.empty()) {
+			_startMsgsEditor->addMessages(snapshot);
+			startMsgChanged();
+			_scene->displayMessage("Snapshot successfully captured and applied to box start",INDICATION_LEVEL);
+		}
+		else {
+			_scene->displayMessage("No snapshot taken for selection",INDICATION_LEVEL);
+		}
+	}
+	else {
+		_scene->displayMessage("No box selected during snapshot assignment",INDICATION_LEVEL);
+	}
+
+}
+
+void AttributesEditor::treeMapEndAssignment()
+{
+	vector<string> snapshot = _treeMap->snapshot();
+
+	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
+		if (!snapshot.empty()) {
+			_endMsgsEditor->addMessages(snapshot);
+			endMsgChanged();
 			_scene->displayMessage("Snapshot successfully captured and applied to box end",INDICATION_LEVEL);
 		}
 		else {
@@ -1333,4 +1373,9 @@ void AttributesEditor::assignSnapshotEnd()
 void AttributesEditor::reloadTreeMap()
 {
 	_treeMap->updateMessages(_treeMapDevicesBox->currentText().toStdString());
+}
+
+void AttributesEditor::upTreeMap()
+{
+	_treeMap->up();
 }

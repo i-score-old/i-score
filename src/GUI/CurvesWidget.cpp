@@ -50,11 +50,12 @@ using std::string;
 #include <QMouseEvent>
 #include <QString>
 
+#include "AbstractCurve.hpp"
 #include "BasicBox.hpp"
-#include "CurvesWidget.hpp"
 #include "CurveWidget.hpp"
-#include "Maquette.hpp"
+#include "CurvesWidget.hpp"
 #include "Interpolation.hpp"
+#include "Maquette.hpp"
 
 CurvesWidget::CurvesWidget(QWidget *parent)
   : QTabWidget(parent) {
@@ -63,9 +64,9 @@ CurvesWidget::CurvesWidget(QWidget *parent)
   setElideMode(Qt::ElideLeft);
   update();
   //setFixedSize(WIDTH,HEIGHT);
-  _tabWidget = new QTabWidget(parent);
+  _tabWidget = new QTabWidget(this);
   addTab(_tabWidget,tr("Curves"));
-  _interpolation = new Interpolation(parent);
+  _interpolation = new Interpolation(this);
   addTab(_interpolation,tr("Attributes"));
   _parentWidget = parent;
 
@@ -81,26 +82,26 @@ CurvesWidget::~CurvesWidget() {
 void CurvesWidget::curveActivationChanged(const QString &address, bool state) {
 	if (_boxID != NO_ID) {
 		Maquette::getInstance()->setCurveMuteState(_boxID,address.toStdString(),!state);
-		updateCurve(_boxID,address.toStdString());
+		updateCurve(_boxID,address.toStdString(),true);
 	}
 }
 
 void CurvesWidget::curveRedundancyChanged(const QString &address,bool state) {
 	if (_boxID != NO_ID) {
 		Maquette::getInstance()->setCurveRedundancy(_boxID,address.toStdString(),state);
-		updateCurve(_boxID,address.toStdString());
+		updateCurve(_boxID,address.toStdString(),true);
 	}
 }
 
 void CurvesWidget::curveSampleRateChanged(const QString &address,int value) {
 	if (_boxID != NO_ID) {
 		Maquette::getInstance()->setCurveSampleRate(_boxID,address.toStdString(),value);
-		updateCurve(_boxID,address.toStdString());
+		updateCurve(_boxID,address.toStdString(),true);
 	}
 }
 
 void
-CurvesWidget::updateMessages(unsigned int boxID) {
+CurvesWidget::updateMessages(unsigned int boxID, bool forceUpdate) {
 	/*	map<unsigned int,CurveWidget*>::iterator curveIt;
 	for (curveIt = _curves.begin() ; curveIt != _curves.end() ; ++curveIt) {
 		removeTab(curveIt->first);
@@ -115,13 +116,13 @@ CurvesWidget::updateMessages(unsigned int boxID) {
 		vector<string>::const_iterator curveAddressIt;
 
 		for (curveAddressIt = curvesAddresses.begin() ; curveAddressIt != curvesAddresses.end() ; ++curveAddressIt) {
-			updateCurve(boxID,*curveAddressIt);
+			updateCurve(boxID,*curveAddressIt,forceUpdate);
 		}
 	}
 }
 
 void
-CurvesWidget::updateCurve(unsigned int boxID, const string &address) {
+CurvesWidget::updateCurve(unsigned int boxID, const string &address, bool forceUpdate) {
 	unsigned int sampleRate;
 	bool redundancy;
 	vector<float> values;
@@ -131,25 +132,53 @@ CurvesWidget::updateCurve(unsigned int boxID, const string &address) {
 	vector<short> sectionType;
 	vector<float> coeff;
 
-	if (Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,values,argTypes,xPercents,yValues,sectionType,coeff)) {
-		bool interpolationState = !(Maquette::getInstance()->getCurveMuteState(boxID,address));
-		map<string,unsigned int>::iterator it = _curves.find(address);
-		CurveWidget *curve;
-		if (it == _curves.end()) {
-			curve = new CurveWidget(_tabWidget,boxID,address,0,values,sampleRate,redundancy,argTypes,xPercents,yValues,sectionType,coeff);
-			QString curveAddressStr = QString::fromStdString(address);
-			unsigned int curveIndex = _tabWidget->addTab(curve,curveAddressStr);
-			setTabToolTip(curveIndex,curveAddressStr);
-			_curves[address] = curveIndex;
-			_interpolation->addLine(address,interpolationState,sampleRate,redundancy);
+	BasicBox *box = Maquette::getInstance()->getBox(boxID);
+	if (box != NULL) { // Box Found
+		AbstractCurve *abCurve = NULL;
+		if ((abCurve = box->getCurve(address)) != NULL && !forceUpdate) { // Box Containing curve : get it
+			CurveWidget * curveWidget = NULL;
+			map<string,unsigned int>::iterator it = _curves.find(address);
+			if (it == _curves.end()) { // Tab not existing : create it
+				curveWidget = new CurveWidget(_tabWidget);
+				curveWidget->setAttributes(abCurve);
+				QString curveAddressStr = QString::fromStdString(abCurve->_address);
+				unsigned int curveIndex = _tabWidget->addTab(curveWidget,curveAddressStr);
+				setTabToolTip(curveIndex,curveAddressStr);
+				_curves[address] = curveIndex;
+				bool interpolationState = !(Maquette::getInstance()->getCurveMuteState(abCurve->_boxID,abCurve->_address));
+				_interpolation->addLine(abCurve->_address,interpolationState,abCurve->_sampleRate,abCurve->_redundancy);
+			}
+			else { // Tab existing : update it
+				curveWidget = static_cast<CurveWidget*>(_tabWidget->widget(it->second));
+				curveWidget->setAttributes(abCurve);
+			}
 		}
-		else {
-			static_cast<CurveWidget*>(_tabWidget->widget(it->second))->setAttributes(boxID,address,0,values,sampleRate,redundancy,argTypes,xPercents,yValues,sectionType,coeff);
+		else { // Box not containing curve : add it from engines
+			if (Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,values,argTypes,xPercents,yValues,sectionType,coeff)) {
+				bool interpolationState = !(Maquette::getInstance()->getCurveMuteState(boxID,address));
+				map<string,unsigned int>::iterator it = _curves.find(address);
+				CurveWidget *curve;
+				if (it == _curves.end()) {
+					curve = new CurveWidget(_tabWidget);
+					curve->setAttributes(boxID,address,0,values,sampleRate,redundancy,argTypes,xPercents,yValues,sectionType,coeff);
+					QString curveAddressStr = QString::fromStdString(address);
+					unsigned int curveIndex = _tabWidget->addTab(curve,curveAddressStr);
+					setTabToolTip(curveIndex,curveAddressStr);
+					_curves[address] = curveIndex;
+					_interpolation->addLine(address,interpolationState,sampleRate,redundancy);
+				}
+				else {
+					static_cast<CurveWidget*>(_tabWidget->widget(it->second))->setAttributes(boxID,address,0,values,sampleRate,redundancy,argTypes,xPercents,yValues,sectionType,coeff);
+				}
+				Maquette::getInstance()->getBox(boxID)->setCurve(address,curve->abstractCurve());
+			}
+			else {
+				std::cerr << "CurvesWidget::updateCurve : getCurveAttributes returned false" << std::endl;
+			}
 		}
-
 
 	}
-	else {
-		std::cerr << "CurvesWidget::updateCurve : getCurveAttributes returned false" << std::endl;
+	else { // Box not found
+		std::cerr << "CurvesWidget::updateCurve : box not found width ID : " << boxID << std::endl;
 	}
 }

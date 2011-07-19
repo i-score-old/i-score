@@ -106,7 +106,6 @@ vector<string> NetworkTree::snapshot() {
 			QString address = getAbsoluteAddress(*it);
 			if (!address.isEmpty()) {
 				vector<string> snapshot = Maquette::getInstance()->requestNetworkSnapShot(address.toStdString());
-				std::cerr << address.toStdString() << std::endl;
 				snapshots.insert(snapshots.end(),snapshot.begin(),snapshot.end());
 			}
 		}

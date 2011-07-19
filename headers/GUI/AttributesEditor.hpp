@@ -230,7 +230,7 @@ class AttributesEditor : public QDockWidget
   /*!
    * \brief Updates box start message
    */
-  void startMsgApplied();
+  void startMsgChanged();
   /*!
    * \brief Cancels box start message modifications
    */
@@ -250,7 +250,7 @@ class AttributesEditor : public QDockWidget
   /*!
    * \brief Updates box end message
    */
-  void endMsgApplied();
+  void endMsgChanged();
   /*!
    * \brief Cancels box end message modifications
    */
@@ -290,13 +290,16 @@ class AttributesEditor : public QDockWidget
   /*!
    * \brief Assigns the snapshot to the start of the box.
    */
-  void assignSnapshotStart();
+  void snapshotStartAssignment();
   /*!
    * \brief Assigns the snapshot to the end of the box.
    */
-  void assignSnapshotEnd();
+  void snapshotEndAssignment();
 
+  void treeMapStartAssignment();
+  void treeMapEndAssignment();
   void reloadTreeMap();
+  void upTreeMap();
 
  private:
 
@@ -442,17 +445,21 @@ class AttributesEditor : public QDockWidget
   QString _startMsgText; //!< Start message contained text
   QString _endMsgText; //!< End message contained text
 
-  QGridLayout * _snapshotTopLayout; //!< Layout handling network assign buttons
-  QVBoxLayout * _snapshotLayout; //!< Layout handling snapshot
+  //QGridLayout * _snapshotTopLayout; //!< Layout handling network assign buttons
+  QGridLayout * _snapshotLayout; //!< Layout handling snapshot
 
-  QLabel *_assignLabel;
-  QPushButton *_assignSnapshotStart;
-  QPushButton *_assignSnapshotEnd;
+  QLabel *_snapshotAssignLabel;
+  QPushButton *_snapshotAssignStart;
+  QPushButton *_snapshotAssignEnd;
   NetworkTree *_networkTree;
 
+  QLabel *_treeMapAssignLabel;
   QGridLayout * _treeMapLayout;
   QComboBox *_treeMapDevicesBox;
   QPushButton *_treeMapLoad;
+  QPushButton *_treeMapUp;
+  QPushButton *_treeMapAssignStart;
+  QPushButton *_treeMapAssignEnd;
   TreeMap *_treeMap;
 
   QGridLayout *_curvesLayout;

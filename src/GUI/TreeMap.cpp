@@ -59,6 +59,19 @@ TreeMap::TreeMap(QWidget *parent) : QWidget(parent){
 	setGeometry(0,0,parent->width(),parent->height());
 }
 
+string TreeMap::rootAddress() {
+	if (_deviceRoot != NULL) {
+		return _deviceRoot->address();
+	}
+	return "";
+}
+
+void TreeMap::setSelected(bool selected) {
+	if (_deviceRoot != NULL) {
+		_deviceRoot->setSelected(selected);
+	}
+}
+
 void TreeMap::updateMessages(const string &address) {
 	if (_deviceRoot != NULL) {
 		_layout->removeWidget(_deviceRoot);
@@ -74,9 +87,37 @@ void TreeMap::updateMessages(const string &address) {
 	_deviceRoot->addChildren(nodes,leaves,attributes,attributesvalues);
 }
 
+void TreeMap::up() {
+	string upAddress = _deviceRoot->upAddress();
+	if (upAddress != "") {
+		updateMessages(upAddress);
+	}
+}
+
+void TreeMap::setElementSelection(const string &address, bool selected) {
+	vector<string>::iterator it;
+
+	it = std::find(_selectedAddresses.begin(),_selectedAddresses.end(),address);
+
+	if (it != _selectedAddresses.end() && !selected) {
+		_selectedAddresses.erase(it);
+	}
+	else if (it == _selectedAddresses.end() && selected) {
+		_selectedAddresses.push_back(address);
+	}
+}
+
+vector<string> TreeMap::snapshot() {
+	vector<string> snapshots;
+	vector<string>::iterator it;
+	for (it = _selectedAddresses.begin() ; it != _selectedAddresses.end() ; ++it) {
+		vector<string> snapshot = Maquette::getInstance()->requestNetworkSnapShot(*it);
+		snapshots.insert(snapshots.end(),snapshot.begin(),snapshot.end());
+	}
+
+	return snapshots;
+}
+
 void TreeMap::paintEvent ( QPaintEvent * event ) {
 	QWidget::paintEvent(event);
-#ifdef NDEBUG
-	std::cerr << "TreeMap::paintEvent" << std::endl;
-#endif
 }

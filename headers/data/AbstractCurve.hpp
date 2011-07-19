@@ -1,7 +1,7 @@
 /*
 Copyright: LaBRI / SCRIME
 
-Authors: Luc Vercellin (24/05/2011)
+Authors: Luc Vercellin (08/03/2010)
 
 luc.vercellin@labri.fr
 
@@ -36,37 +36,69 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL license and that you accept its terms.
-*/
+ */
+#ifndef ABSTRACT_CURVE_H
+#define ABSTRACT_CURVE_H
 
-#ifndef TREEMAP_HPP_
-#define TREEMAP_HPP_
+/*!
+ * \file AbstractCurve.h
+ *
+ * \author Luc Vercellin
+ */
 
-#include <QWidget>
-#include "TreeMapElement.hpp"
+#include <iostream>
 #include <vector>
 #include <map>
+#include <utility>
 #include <string>
+#include <map>
+#include "Abstract.hpp"
+#include "CSPTypes.hpp"
+#include <QPoint>
+#include <QColor>
+#include <math.h>
 
-class TreeMap : public QWidget {
-	Q_OBJECT
+class QColor;
 
+//! Defines abstract parent box type.
+enum {ABSTRACT_CURVE_TYPE = 8};
+
+/*!
+ * \class AbstractCurve
+ *
+ * \brief Class managing main information about a curve.
+ */
+class AbstractCurve : public Abstract
+{
 public :
-	TreeMap(QWidget *parent = 0);
-	std::string rootAddress();
-	void updateMessages(const std::string &address);
-	void setSelected(bool selected);
-	void setElementSelection(const std::string &address, bool selected);
-	std::vector<std::string> snapshot();
-	void up();
+
+	//AbstractCurve(unsigned int boxID = NO_ID, const std::string &address = "", unsigned int argPosition = 0, unsigned int sampleRate = 10,
+	//		bool redundancy = false, float lastPointCoeff = 1, const std::vector<float> &curve = std::vector<float>(),
+	//		const std::map<float,std::pair<float,float> > &breakpoints = std::map<float,std::pair<float,float> >);
+
+	AbstractCurve(unsigned int boxID, const std::string &address, unsigned int argPosition, unsigned int sampleRate,
+				bool redundancy, float lastPointCoeff, const std::vector<float> &curve,
+				const std::map<float,std::pair<float,float> > &breakpoints);
+
+	AbstractCurve(const AbstractCurve &other);
+
+	virtual ~AbstractCurve(){}
+
+	virtual int type() const;
 
 private :
-	TreeMapElement *_deviceRoot;
-	TreeMapElement* findOrCreateChild(TreeMapElement* parent, const std::string &msg, ElementType type);
-	QVBoxLayout *_layout;
-	std::vector<std::string> _selectedAddresses;
+	unsigned int _boxID; //!< Box ID.
+	std::string _address; //!< Address of the curve.
+	unsigned int _argPosition;
+	unsigned int _sampleRate; //!< Curve sample rate.
+	bool _redundancy; //!< Handles curve's redundancy
+	float _lastPointCoeff; //!< Coefficient for last point.
+	std::vector<float> _curve; //!< List of all curve values.
+	//! Map of breakpoints with their values and curving values.
+	std::map<float,std::pair<float,float> > _breakpoints;
 
-protected :
-	virtual void paintEvent ( QPaintEvent * event );
+	friend class CurveWidget;
+	friend class CurvesWidget;
 };
 
-#endif /* TREEMAP_HPP_ */
+#endif

@@ -66,6 +66,10 @@ public :
 
 	void setValue(const std::string &value);
 
+	void setSelected(bool selected);
+
+	bool selected() {return _selected;}
+
 	std::string message() {return _message;}
 
 	unsigned int descendance() {return _descendanceCount;}
@@ -78,6 +82,8 @@ public :
 				const std::vector<std::string>& attributes, const std::vector<std::string>& attributesValue);
 
 	std::map<std::string,TreeMapElement*> children() {return _children;}
+
+	std::string upAddress();
 
 signals :
 	void oneMoreChild();
@@ -110,7 +116,6 @@ protected :
 	QBoxLayout::Direction direction();
 	void paintEvent ( QPaintEvent * event );
 	void mouseDoubleClickEvent(QMouseEvent *event);
-	void mousePressEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 
 	friend class TreeMap;

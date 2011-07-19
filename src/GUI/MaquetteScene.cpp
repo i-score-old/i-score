@@ -910,7 +910,7 @@ void MaquetteScene::pasteBoxes()
 		}
 		if (newID != NO_ID && absCopyBox != NULL) {
 			IDMap[absCopyBox->ID()] = newID;
-#ifdef NDEBUG
+#ifdef DEBUG
 			std::cerr << "MaquetteScene::pasteBoxes : assigning ID " << newID << " to copy of box " << absCopyBox->ID() << std::endl;
 #endif
 			newBox = getBox(newID);
@@ -934,7 +934,7 @@ void MaquetteScene::pasteBoxes()
 		if ((*it)->type() == ABSTRACT_RELATION_TYPE) {
 			AbstractRelation *relation = static_cast<AbstractRelation*>(*it);
 			if (IDMap.find(relation->firstBox()) != IDMap.end() && IDMap.find(relation->secondBox()) != IDMap.end()) {
-#ifdef NDEBUG
+#ifdef DEBUG
 				std::cerr << "MaquetteScene::pasteBoxes : relation was between " << relation->firstBox() << " and " << relation->secondBox() << std::endl;
 				std::cerr << "MaquetteScene::pasteBoxes : relation is now between " << IDMap[relation->firstBox()] << " and " << IDMap[relation->secondBox()] << std::endl;
 #endif
@@ -1103,12 +1103,12 @@ MaquetteScene::setTriggerPointMessage(unsigned int trgID, const string &message)
 unsigned int
 MaquetteScene::findMother(const QPointF &topLeft, const QPointF &size)
 {
-#ifdef NDEBUG
+#ifdef DEBUG
 	std::cerr << "MaquetteScene::findMother : child coords : [" << topLeft.x() << ";" << topLeft.y()
 	<< "] / [" << size.x() << ";" << size.y() << "]" << std::endl;
 #endif
 	map<unsigned int,ParentBox*> parentBoxes = _maquette->parentBoxes();
-#ifdef NDEBUG
+#ifdef DEBUG
 	std::cerr << "MaquetteScene::findMother : parentBoxes size : " << parentBoxes.size() << std::endl;
 #endif
 	map<unsigned int,ParentBox*>::iterator it;
@@ -1117,12 +1117,12 @@ MaquetteScene::findMother(const QPointF &topLeft, const QPointF &size)
 	QRectF childRect = QRectF(topLeft,QSize(size.x(),size.y()));
 	for (it = parentBoxes.begin() ; it != parentBoxes.end() ; ++it) {
 		QRectF mRect = QRectF(it->second->getTopLeft(),QSize(it->second->getSize().x(),it->second->getSize().y()));
-#ifdef NDEBUG
+#ifdef DEBUG
 		std::cerr << "MaquetteScene::findMother : possible mother coords : [" << mRect.topLeft().x() << ";" << mRect.topLeft().y()
 		<< "] / [" << mRect.size().width() << ";" << mRect.size().height() << "]" << std::endl;
 #endif
 		if (mRect.contains(childRect) && !childRect.contains(mRect)) {
-#ifdef NDEBUG
+#ifdef DEBUG
 			std::cerr << "MaquetteScene::findMother : newMother : " << it->first << std::endl;
 #endif
 			motherID = it->first;
@@ -1414,7 +1414,7 @@ MaquetteScene::addRelation(const AbstractRelation &abstractRel) {
 		}
 	}
 
-#ifdef NDEBUG
+#ifdef DEBUG
 	std::cerr << "MaquetteScene::addRelation : returns " << ret << std::endl;
 #endif
 

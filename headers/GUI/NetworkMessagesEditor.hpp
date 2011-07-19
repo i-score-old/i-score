@@ -56,6 +56,7 @@ class QComboBox;
 class QLineEdit;
 class QVBoxLayout;
 class QClipboard;
+class QSpinBox;
 
 /*!
  * \struct NetworkLine
@@ -63,6 +64,8 @@ class QClipboard;
  */
 struct NetworkLine {
 	QComboBox *devicesBox;
+	QSpinBox *valueBox;
+	QLineEdit *messageBox;
 	unsigned int index;
 };
 
@@ -124,6 +127,7 @@ signals :
 
 private :
 	std::string computeMessage(const NetworkLine &line);
+	bool lineToStrings(const NetworkLine &line,std::string &device, std::string &message, std::string &value);
 
 	QWidget *_parent; //!< The parent widget.
 	unsigned int _currentLine; //!< The next line index given.
@@ -131,6 +135,9 @@ private :
 	std::vector<NetworkLine> _networkLines; //!< Set of existing lines.
 	static QStringList _devicesList; //!< List of existing devices names.
 	QClipboard *_clipboard; //!< Clipboard handling system's copy/paste.
+
+protected :
+
 };
 
 #endif

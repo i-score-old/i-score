@@ -1,7 +1,7 @@
 /*
 Copyright: LaBRI / SCRIME
 
-Authors: Luc Vercellin (24/05/2011)
+Authors: Luc Vercellin (08/03/2010)
 
 luc.vercellin@labri.fr
 
@@ -38,35 +38,30 @@ The fact that you are presently reading this means that you have had
 knowledge of the CeCILL license and that you accept its terms.
 */
 
-#ifndef TREEMAP_HPP_
-#define TREEMAP_HPP_
-
-#include <QWidget>
-#include "TreeMapElement.hpp"
-#include <vector>
-#include <map>
+#include "AbstractCurve.hpp"
+#include <QPointF>
+#include <QColor>
 #include <string>
+using std::string;
+using std::map;
+using std::pair;
+using std::vector;
 
-class TreeMap : public QWidget {
-	Q_OBJECT
+AbstractCurve::AbstractCurve(unsigned int boxID, const std::string &address, unsigned int argPosition,
+		unsigned int sampleRate, bool redundancy, float lastPointCoeff, const vector<float> &curve,
+		const map<float,pair<float,float> > &breakpoints) :
+  _boxID(boxID), _address(address), _argPosition(argPosition), _sampleRate(sampleRate), _redundancy(redundancy),
+  _lastPointCoeff(lastPointCoeff), _curve(curve), _breakpoints(breakpoints)
+{}
 
-public :
-	TreeMap(QWidget *parent = 0);
-	std::string rootAddress();
-	void updateMessages(const std::string &address);
-	void setSelected(bool selected);
-	void setElementSelection(const std::string &address, bool selected);
-	std::vector<std::string> snapshot();
-	void up();
+AbstractCurve::AbstractCurve(const AbstractCurve &other) :
+  Abstract(), _boxID(other._boxID), _address(other._address), _argPosition(other._argPosition),
+  _sampleRate(other._sampleRate), _redundancy(other._redundancy), _lastPointCoeff(other._lastPointCoeff),
+  _curve(other._curve), _breakpoints(other._breakpoints)
+{}
 
-private :
-	TreeMapElement *_deviceRoot;
-	TreeMapElement* findOrCreateChild(TreeMapElement* parent, const std::string &msg, ElementType type);
-	QVBoxLayout *_layout;
-	std::vector<std::string> _selectedAddresses;
-
-protected :
-	virtual void paintEvent ( QPaintEvent * event );
-};
-
-#endif /* TREEMAP_HPP_ */
+int
+AbstractCurve::type() const
+{
+  return ABSTRACT_CURVE_TYPE;
+}

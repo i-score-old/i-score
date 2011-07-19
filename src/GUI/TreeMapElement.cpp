@@ -36,12 +36,13 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL license and that you accept its terms.
-*/
+ */
 
 #include <QString>
 #include <QPainter>
 #include <QPaintEvent>
 #include <iostream>
+#include <algorithm>
 #include <QGridLayout>
 #include <QBoxLayout>
 #include "TreeMapElement.hpp"
@@ -56,12 +57,8 @@ using std::map;
 TreeMap * TreeMapElement::TREE_MAP = NULL;
 
 TreeMapElement::TreeMapElement(QWidget *parent) : QWidget(parent) {
-	//_globalLayout = new QVBoxLayout(this);
-	//_titleLabel = new QLabel("",this);
-	//_globalLayout->addWidget(_titleLabel);
 	_layout = new QBoxLayout(QBoxLayout::LeftToRight,this);
 
-	//_globalLayout->addLayout(_layout);
 	setLayout(_layout);
 	_parent = NULL;
 	_message = "";
@@ -75,11 +72,9 @@ TreeMapElement::TreeMapElement(QWidget *parent) : QWidget(parent) {
 void TreeMapElement::setAttributes(TreeMapElement *parentElt, const string &message, ElementType type) {
 	_parent = parentElt;
 	_message = message;
-	//_titleLabel->setText(QString::fromStdString(_message));
-	//_titleLabel->adjustSize();
 	_type = type;
 	if (_parent != NULL) {
-#ifdef NDEBUG
+#ifdef DEBUG
 		std::cerr << "TreeMapElement::setAttributes : Parent found for : " << _message << std::endl;
 #endif
 		_parent->addChild(this);
@@ -92,7 +87,7 @@ void TreeMapElement::setAttributes(TreeMapElement *parentElt, const string &mess
 		}
 	}
 	else {
-#ifdef NDEBUG
+#ifdef DEBUG
 		std::cerr << "TreeMapElement::setAttributes : No Parent found for : " << _message << std::endl;
 #endif
 		_layout->setDirection(QBoxLayout::LeftToRight);
@@ -147,7 +142,7 @@ void TreeMapElement::addChild(TreeMapElement *child) {
 		break;
 	}
 
-#ifdef NDEBUG
+#ifdef DEBUG
 	std::cerr << "TreeMapElement::addChild : [" << _message << ":" << child->message() << "]" << std::endl;
 #endif
 
@@ -170,7 +165,7 @@ void TreeMapElement::childAdded() {
 }
 
 void TreeMapElement::increaseDescendance() {
-#ifdef NDEBUG
+#ifdef DEBUG
 	std::cerr << "TreeMapElement::increaseDescendance for : " << _message << std::endl;
 #endif
 	_descendanceCount++;
@@ -219,17 +214,54 @@ string TreeMapElement::address() {
 	}
 }
 
-void TreeMapElement::mousePressEvent(QMouseEvent *event)
-{
-	QWidget::mousePressEvent(event);
+string TreeMapElement::upAddress() {
+	string address = this->address();
+	size_t slashPos = address.find_last_of("/");
+	if (slashPos != string::npos) {
+		return address.substr(0,slashPos);
+	}
+
+	return "";
 }
 
-void TreeMapElement::mouseReleaseEvent(QMouseEvent *event)
+void
+TreeMapElement::mouseReleaseEvent(QMouseEvent *event)
 {
 	//QWidget::mouseReleaseEvent(event);
-	_parent->_selected = false;
-	_selected = true;
+	if (event->button() == Qt::LeftButton) {
+		if (_parent != NULL) {
+			if (event->modifiers() == Qt::ControlModifier) {
+				setSelected(!_selected);
+			}
+			else {
+				bool selectedState = _selected;
+				TREE_MAP->setSelected(false);
+				if (!_selected && selectedState) {// item deselected while parent deselection : keep selected
+					setSelected(selectedState);
+				}
+				else {
+					setSelected(!selectedState);
+				}
+			}
+		}
+		else {
+			setSelected(!_selected);
+		}
+	}
 	std::cerr << "TreeMapElement::mouseReleaseEvent : for " << _message << std::endl;
+}
+
+void
+TreeMapElement::setSelected(bool selected) {
+	_selected = selected;
+	if (_type == Node || _type == Leave) {
+		TREE_MAP->setElementSelection(address(),_selected);
+	}
+	map<string,TreeMapElement*>::iterator it;
+	for (it = _children.begin() ; it != _children.end() ; ++it) {
+		it->second->setSelected(selected);
+	}
+	update();
 }
 
 void TreeMapElement::mouseDoubleClickEvent(QMouseEvent *event)
@@ -237,53 +269,64 @@ void TreeMapElement::mouseDoubleClickEvent(QMouseEvent *event)
 	//QWidget::mouseDoubleClickEvent(event);
 
 	std::cerr << "TreeMapElement::mouseDoubleClickEvent : for " << address() << std::endl;
-	//if (_type == Node || _type == Leave) {
+	if (_type == Node || _type == Leave) {
 		if (TREE_MAP != NULL) {
 			TREE_MAP->updateMessages(address());
 		}
-	//}
+	}
 }
 
 void TreeMapElement::paintEvent ( QPaintEvent * event ) {
 	QWidget::paintEvent(event);
-#ifdef NDEBUG
-	std::cerr << "TreeMapElement::paintEvent" << std::endl;
-#endif
 	QPainter painter(this);
 	QColor bgColor = Qt::white;
 	QColor lineColor = Qt::black;
-	unsigned int lineWidth = 1;
-	Qt::PenStyle lineStyle;
+
+
+	static const QColor ROOT_COLOR = QColor(Qt::gray).toHsl();
+	static const QColor NODE_COLOR = QColor(Qt::darkCyan).toHsl();
+	static const QColor LEAVE_COLOR = QColor(Qt::darkGreen).toHsl();
+	static const QColor ATTRIBUTE_COLOR = QColor(Qt::green).toHsl();
+
+	static const int LIGHTNESS_INCREASE = 30;
+
+	static const QColor NODE_SELECTED_COLOR = QColor::fromHsl(NODE_COLOR.hue(),NODE_COLOR.saturation(),std::min(255,NODE_COLOR.lightness()+LIGHTNESS_INCREASE));
+	static const QColor LEAVE_SELECTED_COLOR = QColor::fromHsl(LEAVE_COLOR.hue(),LEAVE_COLOR.saturation(),std::min(255,LEAVE_COLOR.lightness()+LIGHTNESS_INCREASE));
+	static const QColor ATTRIBUTE_SELECTED_COLOR = QColor::fromHsl(ATTRIBUTE_COLOR.hue(),ATTRIBUTE_COLOR.saturation(),std::min(255,ATTRIBUTE_COLOR.lightness()+LIGHTNESS_INCREASE));
+	static const QColor ROOT_SELECTED_COLOR = QColor::fromHsl(ROOT_COLOR.hue(),ROOT_COLOR.saturation(),std::min(255,ROOT_COLOR.lightness()+LIGHTNESS_INCREASE));
+
+	unsigned int lineWidth = _selected ? 2 : 1;
+	Qt::PenStyle lineStyle = Qt::SolidLine;
 	if (_message != "") {
 		switch(_type) {
 		case Node :
 			if (_parent != NULL) {
-				bgColor = Qt::darkCyan;
+				bgColor = _selected ? NODE_SELECTED_COLOR : NODE_COLOR;
 				lineStyle = _selected ? Qt::SolidLine : Qt::DashLine;
 			}
 			else {
-				bgColor = Qt::gray;
+				bgColor = _selected ? ROOT_SELECTED_COLOR : ROOT_COLOR;
 				lineStyle = Qt::SolidLine;
 			}
 			break;
 		case Leave :
-			bgColor = Qt::darkGreen;
+			bgColor = _selected ? LEAVE_SELECTED_COLOR : LEAVE_COLOR;
 			lineStyle = _selected ? Qt::SolidLine : Qt::DashDotLine;
 			break;
 		case Attribute:
-			bgColor = Qt::green;
+			bgColor = _selected ? ATTRIBUTE_SELECTED_COLOR : ATTRIBUTE_COLOR;
 			lineStyle = _selected ? Qt::SolidLine : Qt::DotLine;
 			break;
 		default :
 			break;
 		}
+		QRect boundingRect = rect();
 		QBrush backBrush = QBrush(bgColor);
 		painter.setBrush(backBrush);
-		painter.fillRect(rect(),backBrush);
+		painter.fillRect(QRect(boundingRect.topLeft().x(),boundingRect.topLeft().x(),boundingRect.width()-lineWidth,boundingRect.height()-lineWidth),backBrush);
 		QBrush frontBrush = QBrush(lineColor);
 		QPen frontPen = QPen (frontBrush, lineWidth, lineStyle);
 		painter.setPen(frontPen);
-		QRect boundingRect = rect();
 		painter.drawRect(boundingRect.topLeft().x(),boundingRect.topLeft().x(),boundingRect.width()-lineWidth,boundingRect.height()-lineWidth);
 		if (_value != "") {
 			painter.drawText(rect(),QString::fromStdString(_message + " : " + _value),QTextOption(Qt::AlignLeft));

@@ -80,8 +80,7 @@ public :
 	 *
 	 * \param boxID : the box handling messages
 	 */
-	void updateMessages(unsigned int boxID);
-	void updateCurve(unsigned int boxID, const std::string &address);
+	void updateMessages(unsigned int boxID, bool forceUpdate);
 
 public slots :
 	void curveActivationChanged(const QString &address,bool state);
@@ -89,6 +88,8 @@ public slots :
 	void curveSampleRateChanged(const QString &address,int value);
 
 private :
+	void updateCurve(unsigned int boxID, const std::string &address, bool forceUpdate);
+
 	QTabWidget *_tabWidget;
 	Interpolation *_interpolation;
 	std::map<std::string,unsigned int> _curves; //!< Set of curves identified by their tab index

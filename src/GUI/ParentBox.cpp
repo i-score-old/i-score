@@ -184,7 +184,7 @@ ParentBox::itemChange(GraphicsItemChange change, const QVariant &value) {
 					if (it->second->getBottomRight().y() >= (newPos.y() + _abstract->height()/2.)) {
 						setSize(QPointF(_abstract->width(),it->second->getBottomRight().y() - _abstract->topLeft().y()));
 						newPos.setY(it->second->getBottomRight().y() - _abstract->height()/2.);
-#ifdef NDEBUG
+#ifdef DEBUG
 						std::cerr << "ParentBox::itemChange : Trying to COMPRESS vertically" << std::endl;
 #endif
 					}

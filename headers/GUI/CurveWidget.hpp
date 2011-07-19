@@ -36,7 +36,7 @@ same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL license and that you accept its terms.
-*/
+ */
 
 #ifndef CURVE_WIDGET_HPP
 #define CURVE_WIDGET_HPP
@@ -57,6 +57,7 @@ knowledge of the CeCILL license and that you accept its terms.
 
 class QTabWidget;
 class QGridLayout;
+class AbstractCurve;
 
 /*!
  * \class CurveWidget
@@ -71,9 +72,13 @@ class CurveWidget : public QWidget
 public :
 	~CurveWidget();
 
-	CurveWidget(QWidget *parent,unsigned int boxID, const std::string &address, unsigned int argPosition, const std::vector<float> &values, unsigned int sampleRate,
-			bool redundancy, const std::vector<std::string> &argType, const std::vector<float> &xPercents, const std::vector<float> &yValues,
-			const std::vector<short> &sectionType, const std::vector<float> &coeff);
+	CurveWidget(QWidget *parent);
+
+	CurveWidget(QWidget *parent, AbstractCurve *abCurve);
+
+	void init();
+
+	AbstractCurve * abstractCurve();
 
 	void applyChanges();
 	/*!
@@ -96,70 +101,70 @@ public :
 	 */
 	void setAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition, const std::vector<float> &values, unsigned int sampleRate,
 			bool redundancy, const std::vector<std::string> &argType, const std::vector<float> &xPercents, const std::vector<float> &yValues,
-			const std::vector<short> &sectionType, const std::vector<float> &coeff, 	bool update = true);
+			const std::vector<short> &sectionType, const std::vector<float> &coeff);
+
+	void setAttributes(AbstractCurve *abCurve);
+
 protected :
-  /*!
-   * \brief Redefinition of QWidget::paintEvent(QPaintEvent *event).
-   * Raised when the curves widget should be repainted.
-   *
-   * \param event : the information about the event
-   */
-  virtual void paintEvent(QPaintEvent *event);
-  /*!
-   * \brief Redefinition of QWidget::moussPressEvent(QPaintEvent *event).
-   * Raised when a mouse press occurs on the curves widget.
-   *
-   * \param event : the information about the event
-   */
-  virtual void mousePressEvent(QMouseEvent *event);
-  /*!
-   * \brief Redefinition of QWidget::moussMoveEvent(QPaintEvent *event).
-   * Raised when a mouse move occurs on the curves widget.
-   *
-   * \param event : the information about the event
-   */
-  virtual void mouseMoveEvent(QMouseEvent *event);
-  /*!
-   * \brief Redefinition of QWidget::moussReleaseEvent(QPaintEvent *event).
-   * Raised when a mouse release occurs on the curves widget.
-   *
-   * \param event : the information about the event
-   */
-  virtual void mouseReleaseEvent(QMouseEvent *event);
-/*!
- * \brief This event handler can be reimplemented in a subclass to receive widget resize events which are passed in the event parameter.
- * \param event : the resizing event
- */
-  virtual void resizeEvent(QResizeEvent * event);
+	/*!
+	 * \brief Redefinition of QWidget::paintEvent(QPaintEvent *event).
+	 * Raised when the curves widget should be repainted.
+	 *
+	 * \param event : the information about the event
+	 */
+	virtual void paintEvent(QPaintEvent *event);
+	/*!
+	 * \brief Redefinition of QWidget::moussPressEvent(QPaintEvent *event).
+	 * Raised when a mouse press occurs on the curves widget.
+	 *
+	 * \param event : the information about the event
+	 */
+	virtual void mousePressEvent(QMouseEvent *event);
+	/*!
+	 * \brief Redefinition of QWidget::moussMoveEvent(QPaintEvent *event).
+	 * Raised when a mouse move occurs on the curves widget.
+	 *
+	 * \param event : the information about the event
+	 */
+	virtual void mouseMoveEvent(QMouseEvent *event);
+	/*!
+	 * \brief Redefinition of QWidget::moussReleaseEvent(QPaintEvent *event).
+	 * Raised when a mouse release occurs on the curves widget.
+	 *
+	 * \param event : the information about the event
+	 */
+	virtual void mouseReleaseEvent(QMouseEvent *event);
+	/*!
+	 * \brief This event handler can be reimplemented in a subclass to receive widget resize events which are passed in the event parameter.
+	 * \param event : the resizing event
+	 */
+	virtual void resizeEvent(QResizeEvent * event);
 
 private :
 
-  /*!
-   * \brief Gets local coordinates of a point.
-   * X => scales, translates and percents
-   * Y => translates, gets symmetrical and scales
-   */
-  QPointF relativeCoordinates(const QPointF &point);
-  /*!
-   * \brief Gets absolute coordinates of a point.
-   * X => unpercents, scales and translates
-   * Y => scales, gets symmetrical and translates
-   */
-  QPointF absoluteCoordinates(const QPointF &point);
-  /*!
-   * \brief Called to update representation.
-   */
-  void curveRepresentationOutdated();
-  /*!
-   * \brief Called when curve is modified.
-   */
-  bool curveChanged();
+	/*!
+	 * \brief Gets local coordinates of a point.
+	 * X => scales, translates and percents
+	 * Y => translates, gets symmetrical and scales
+	 */
+	QPointF relativeCoordinates(const QPointF &point);
+	/*!
+	 * \brief Gets absolute coordinates of a point.
+	 * X => unpercents, scales and translates
+	 * Y => scales, gets symmetrical and translates
+	 */
+	QPointF absoluteCoordinates(const QPointF &point);
+	/*!
+	 * \brief Called to update representation.
+	 */
+	void curveRepresentationOutdated();
+	/*!
+	 * \brief Called when curve is modified.
+	 */
+	bool curveChanged();
 
-	unsigned int _boxID; //!< Box ID.
+	AbstractCurve *_abstract;
 
-	std::vector<float> _curve; //!< List of all curve values.
-	//! Map of breakpoints with their values and curving values.
-	std::map<float,std::pair<float,float> > _breakpoints;
 	float _breakpointMovedX; //!< Moved break point x coordinate.
 	float _breakpointMovedY; //!< Moved break point y coordinate.
 
@@ -167,17 +172,13 @@ private :
 
 	QGridLayout *_layout; //!< Layout for widget.
 
-	unsigned int _sampleRate; //!< Curve sample rate.
 	float _interspace; //!< Horizontal interspace.
 	float _scaleX; //!< Value for horizontal scaling.
 	float _scaleY; //!< Value for vertical scaling.
 	float _minY;
 	float _maxY;
-	bool _redundancy; //!< Handles curve's redundancy
-	std::string _address; //!< Address of the curve.
 
 	bool _lastPointSelected; //!< Last point selected.
-	float _lastPointCoeff; //!< Coefficient for last point.
 };
 
 #endif /* CURVE_WIDGET_HPP */

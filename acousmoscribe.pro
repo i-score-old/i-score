@@ -52,6 +52,7 @@ HEADERS += /usr/local/include/IScore/Engines.hpp \
 headers/data/Abstract.hpp \
 headers/data/AbstractBox.hpp \
 headers/data/AbstractComment.hpp \
+headers/data/AbstractCurve.hpp \
 headers/data/AbstractRelation.hpp \
 headers/data/AbstractSoundBox.hpp \
 headers/data/AbstractControlBox.hpp \
@@ -97,6 +98,7 @@ src/data/Abstract.cpp \
 src/data/AbstractBox.cpp \
 src/data/AbstractComment.cpp \
 src/data/AbstractControlBox.cpp \
+src/data/AbstractCurve.cpp \
 src/data/AbstractParentBox.cpp \
 src/data/AbstractRelation.cpp \
 src/data/AbstractSoundBox.cpp \

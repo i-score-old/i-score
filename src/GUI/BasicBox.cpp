@@ -43,6 +43,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "Maquette.hpp"
 #include "AbstractBox.hpp"
 #include "AbstractComment.hpp"
+#include "AbstractCurve.hpp"
 #include "AbstractTriggerPoint.hpp"
 #include "Comment.hpp"
 #include "TriggerPoint.hpp"
@@ -576,6 +577,24 @@ BasicBox::firstMessagesToSend() const {
 vector<string>
 BasicBox::lastMessagesToSend() const {
 	return _abstract->lastMsgs();
+}
+
+AbstractCurve *
+BasicBox::getCurve(const std::string &address)
+{
+	AbstractCurve * curve = NULL;
+	map<string,AbstractCurve*>::iterator it;
+	if ((it = _abstractCurves.find(address)) != _abstractCurves.end()) {
+		curve = it->second;
+	}
+
+	return curve;
+}
+
+void
+BasicBox::setCurve(const std::string &address, AbstractCurve *curve)
+{
+	_abstractCurves[address] = curve;
 }
 
 void

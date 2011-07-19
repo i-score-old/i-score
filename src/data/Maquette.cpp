@@ -672,7 +672,7 @@ bool Maquette::updateBox(unsigned int boxID, const Coords &coord) {
 					box->getSize().y()));
 			box->setPos(box->getCenter());
 			box->update();
-#ifdef NDEBUG
+#ifdef DEBUG
 			std::cerr << "Maquette::updateBox : Move refused by Engines" << std::endl;
 #endif
 		}
@@ -681,7 +681,7 @@ bool Maquette::updateBox(unsigned int boxID, const Coords &coord) {
 
 	if (moveAccepted) {
 		for (it = moved.begin() ; it != moved.end() ; it++) {
-#ifdef NDEBUG
+#ifdef DEBUG
 			std::cerr << "Maquette::updateBoxes : box moved : " << *it << std::endl;
 #endif
 			if (_boxes[*it]->relativeBeginPos() != _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL ||
@@ -726,7 +726,7 @@ Maquette::updateBoxes(const map<unsigned int,Coords> &boxes) {
 						curBox->getSize().y()));
 				curBox->setPos(curBox->getCenter());
 				curBox->update();
-#ifdef NDEBUG
+#ifdef DEBUG
 				std::cerr << "Maquette::updateBoxes : Move refused by Engines" << std::endl;
 #endif
 			}
@@ -735,7 +735,7 @@ Maquette::updateBoxes(const map<unsigned int,Coords> &boxes) {
 
 	if (moveAccepted) {
 		for (it2 = moved.begin() ; it2 != moved.end() ; it2++) {
-#ifdef NDEBUG
+#ifdef DEBUG
 			std::cerr << "Maquette::updateBoxes : box moved : " << *it2 << std::endl;
 #endif
 			if (_boxes[*it2]->relativeBeginPos() != _engines->getBoxBeginTime(*it2)/MaquetteScene::MS_PER_PIXEL ||
