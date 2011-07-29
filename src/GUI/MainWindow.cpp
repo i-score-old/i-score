@@ -440,7 +440,7 @@ MainWindow::gotoValueEntered(double value) {
 	_gotoSlider->setTracking(true);
 	_view->setGotoValue(value * S_TO_MS);
 }
-
+/*
 void
 MainWindow::keyPressEvent(QKeyEvent *keyEvent) {
   QMainWindow::keyPressEvent(keyEvent);
@@ -465,7 +465,6 @@ MainWindow::keyPressEvent(QKeyEvent *keyEvent) {
 void
 MainWindow::returnKeyPressed()
 {
-
   if (_scene->playing()) {
   	std::stringstream msg;
   	msg << tr("Triggering with message : '").toStdString() << MaquetteScene::DEFAULT_TRIGGER_MSG << "'";
@@ -507,7 +506,7 @@ MainWindow::escapeKeyPressed() {
     stop();
   }
 }
-
+*/
 void
 MainWindow::timeEndReached() {
   _accelerationSlider->setEnabled(true);

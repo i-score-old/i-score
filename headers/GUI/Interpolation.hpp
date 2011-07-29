@@ -58,7 +58,6 @@ class QVBoxLayout;
 class QClipboard;
 class QSpinBox;
 class QCheckBox;
-class QSignalMapper;
 
 /*!
  * \struct InerpolationLine
@@ -68,6 +67,7 @@ struct InterpolationLine {
 	std::string address;
 	QCheckBox *activationBox;
 	QCheckBox *redundancyBox;
+	QCheckBox *showBox;
 	QSpinBox *sampleRate;
 	unsigned int index;
 };
@@ -83,8 +83,8 @@ public :
 	Interpolation(QWidget *parent);
 	~Interpolation();
 
-	void addLine(const std::string &address, bool interpolationState, int sampleRate, bool redundancy);
-	void updateLine(const std::string &address, bool interpolationState, int sampleRate, bool redundancy);
+	void addLine(const std::string &address, bool interpolationState, int sampleRate, bool redundancy, bool show);
+	bool updateLine(const std::string &address, bool interpolationState, int sampleRate, bool redundancy, bool show);
 
 	void clear();
 
@@ -93,17 +93,21 @@ public :
 	static const unsigned int ACTIVATION_COLUMN = 0;
 	static const unsigned int SAMPLE_RATE_COLUMN = 1;
 	static const unsigned int REDUNDANCY_COLUMN = 2;
+	static const unsigned int SHOW_COLUMN = 3;
 	static const std::string ACTIVATION_STRING;
 	static const std::string SAMPLE_RATE_STRING;
 	static const std::string REDUNDANCY_STRING;
+	static const std::string SHOW_STRING;
 
 signals :
 	void activationChanged(const QString &address,bool state);
+	void showChanged(const QString &address,bool state);
 	void redundancyChanged(const QString &address,bool state);
 	void sampleRateChanged(const QString &address,int value);
 
 public slots :
 	void activationChanged(bool state);
+	void showChanged(bool state);
  	void redundancyChanged(bool state);
  	void sampleRateChanged(int value);
 
@@ -113,7 +117,6 @@ private :
 	QVBoxLayout *_layout; //!< The layout handling lines.
 	std::map<std::string,InterpolationLine> _interpolationLines; //!< Set of existing lines.
 	std::map<QWidget*,std::string> _widgetAddress;
-	QSignalMapper *_signalMapper;
 };
 
 #endif

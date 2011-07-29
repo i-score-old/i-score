@@ -674,9 +674,10 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 		}
 		break;
 	case SELECTION_MODE :
-		if (itemAt(mouseEvent->scenePos()) == 0) {
+		if (selectedItems().isEmpty()) {
 			_editor->noBoxEdited();
 		}
+
 		break;
 	case TRIGGER_MODE :
 		break;
@@ -694,7 +695,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 				addBox(BoxCreationMode(_currentBoxMode));
 			}
 			else {
-				if (itemAt(mouseEvent->scenePos()) == 0) {
+				if (selectedItems().empty()) {
 					_editor->noBoxEdited();
 				}
 			}
@@ -726,11 +727,6 @@ MaquetteScene::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
 	_tempBox = NULL;
 
 	QGraphicsScene::contextMenuEvent(event);
-}
-
-void
-MaquetteScene::keyPressEvent(QKeyEvent *keyEvent) {
-	QGraphicsScene::keyPressEvent(keyEvent);
 }
 
 void

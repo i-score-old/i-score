@@ -64,7 +64,7 @@ class QSpinBox;
  */
 struct NetworkLine {
 	QComboBox *devicesBox;
-	QSpinBox *valueBox;
+	QLineEdit *valueBox;
 	QLineEdit *messageBox;
 	unsigned int index;
 };
@@ -98,17 +98,9 @@ public :
 	 */
 	void addMessages(const std::vector<std::string> &messages);
 	/*!
-	 * \brief Called to paste messages from clipboard.
-	 */
-	void importMessages();
-	/*!
-	 * \brief Called to copy messages to clipboard.
-	 */
-	void exportMessages();
-	/*!
 	 * \brief Clears messages contained in the editor.
 	 */
-	void clear();
+	void reset();
 
 	static const int WIDTH = 350; //!< Width of the editor
 
@@ -122,22 +114,49 @@ public slots :
 	 */
 	void removeLines();
 
+	void messageChanged();
+
+	void valueChanged();
+
+	void deviceChanged();
+
+	/*!
+	 * \brief Called to paste messages from clipboard.
+	 */
+	void importMessages();
+	/*!
+	 * \brief Called to copy messages to clipboard.
+	 */
+	void exportMessages();
+	/*!
+	 * \brief Clears messages contained in the editor and set as modified.
+	 */
+	void clear();
+
 signals :
+	void messageChanged(const std::string &address);
+	void messageRemoved(const std::string &address);
 	void messagesChanged();
 
 private :
 	std::string computeMessage(const NetworkLine &line);
 	bool lineToStrings(const NetworkLine &line,std::string &device, std::string &message, std::string &value);
+	void lineDeleted(const NetworkLine &line);
+
+	void lineChanged(const NetworkLine &line, const std::string &changeString);
+
 
 	QWidget *_parent; //!< The parent widget.
 	unsigned int _currentLine; //!< The next line index given.
 	QVBoxLayout *_layout; //!< The layout handling lines.
 	std::vector<NetworkLine> _networkLines; //!< Set of existing lines.
+	std::map<QWidget*,unsigned int> _widgetIndex;
 	static QStringList _devicesList; //!< List of existing devices names.
 	QClipboard *_clipboard; //!< Clipboard handling system's copy/paste.
 
 protected :
-
+	void keyPressEvent(QKeyEvent *event);
+	void keyReleaseEvent(QKeyEvent *event);
 };
 
 #endif

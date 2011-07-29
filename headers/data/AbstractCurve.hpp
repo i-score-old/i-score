@@ -72,12 +72,8 @@ class AbstractCurve : public Abstract
 {
 public :
 
-	//AbstractCurve(unsigned int boxID = NO_ID, const std::string &address = "", unsigned int argPosition = 0, unsigned int sampleRate = 10,
-	//		bool redundancy = false, float lastPointCoeff = 1, const std::vector<float> &curve = std::vector<float>(),
-	//		const std::map<float,std::pair<float,float> > &breakpoints = std::map<float,std::pair<float,float> >);
-
 	AbstractCurve(unsigned int boxID, const std::string &address, unsigned int argPosition, unsigned int sampleRate,
-				bool redundancy, float lastPointCoeff, const std::vector<float> &curve,
+				bool redundancy, bool show, bool interpolate, float lastPointCoeff, const std::vector<float> &curve,
 				const std::map<float,std::pair<float,float> > &breakpoints);
 
 	AbstractCurve(const AbstractCurve &other);
@@ -92,6 +88,8 @@ private :
 	unsigned int _argPosition;
 	unsigned int _sampleRate; //!< Curve sample rate.
 	bool _redundancy; //!< Handles curve's redundancy
+	bool _show;
+	bool _interpolate;
 	float _lastPointCoeff; //!< Coefficient for last point.
 	std::vector<float> _curve; //!< List of all curve values.
 	//! Map of breakpoints with their values and curving values.

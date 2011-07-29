@@ -268,6 +268,7 @@ class BasicBox : public QGraphicsItem
 
   AbstractCurve *getCurve(const std::string &address);
   void setCurve(const std::string &address, AbstractCurve *curve);
+  void removeCurve(const std::string &address);
 
   /*!
    * \brief Gets the top left of the box in the scene coordinates.

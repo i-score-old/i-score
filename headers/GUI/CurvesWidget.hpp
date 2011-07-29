@@ -82,21 +82,26 @@ public :
 	 */
 	void updateMessages(unsigned int boxID, bool forceUpdate);
 
+	bool contains(const std::string &address);
+
 public slots :
 	void curveActivationChanged(const QString &address,bool state);
 	void curveRedundancyChanged(const QString &address,bool state);
 	void curveSampleRateChanged(const QString &address,int value);
+	void curveShowChanged(const QString &address,bool state);
+	void updateCurve(const std::string &address);
+	void removeCurve(const std::string &address);
 
 private :
-	void updateCurve(unsigned int boxID, const std::string &address, bool forceUpdate);
+	bool updateCurve(const std::string &address, bool forceUpdate);
 
 	QTabWidget *_tabWidget;
 	Interpolation *_interpolation;
-	std::map<std::string,unsigned int> _curves; //!< Set of curves identified by their tab index
-	unsigned int _width; //!< Widget height.
-	unsigned int _height; //!< Widget width.
+	std::map<std::string,unsigned int> _curveIndexes; //!< Map of curves tabs' indexes mapped by their addresses
+	unsigned int _width;
+	unsigned int _height;
 	unsigned int _boxID;
-	QWidget *_parentWidget; //!< Parent widget.
+	QWidget *_parentWidget;
 };
 
 #endif /* CURVESWIDGET_HPP_ */

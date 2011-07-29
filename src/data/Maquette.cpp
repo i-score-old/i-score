@@ -530,28 +530,49 @@ void
 Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, const vector<string> &endMsgs)
 {
 	vector<string> curvesAddresses = getCurvesAddresses(boxID);
-	map<string,string> msgs;
+	vector<string> startAddresses;
 	vector<string>::const_iterator it;
 	for (it = startMsgs.begin() ; it != startMsgs.end() ; ++it) {
 		size_t blankPos;
 		if ((blankPos = it->find_first_of(" ")) != string::npos) {
-			msgs[it->substr(0,blankPos)] = *it;
+			startAddresses.push_back(it->substr(0,blankPos));
 		}
 	}
+	vector<string> endAddresses;
 	vector<string>::const_iterator it2;
 	for (it2 = endMsgs.begin() ; it2 != endMsgs.end() ; ++it2) {
 		size_t blankPos;
 		if ((blankPos = it2->find_first_of(" ")) != string::npos) {
-			string address = it2->substr(0,blankPos);
-			map<string,string>::iterator it3;
-			if ((it3 = msgs.find(address)) != msgs.end()) {
-				if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end()) {
-					_engines->addCurve(boxID,address);
-				}
-/*				else {
-					_engines->removeCurve(boxID,address);
-					_engines->addCurve(boxID,address);
-				}*/
+			endAddresses.push_back(it2->substr(0,blankPos));
+		}
+	}
+
+	vector<string>::iterator startAddressIt;
+	for(startAddressIt = startAddresses.begin() ; startAddressIt != startAddresses.end() ; ++startAddressIt) {
+		string address = *startAddressIt;
+		if (std::find(endAddresses.begin(),endAddresses.end(),address) != endAddresses.end()) {
+			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end()) {
+				_engines->addCurve(boxID,address);
+			}
+		}
+		else {
+			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) != curvesAddresses.end()) {
+				_engines->removeCurve(boxID,address);
+			}
+		}
+	}
+
+	vector<string>::iterator endAddressIt;
+	for(endAddressIt = endAddresses.begin() ; endAddressIt != endAddresses.end() ; ++endAddressIt) {
+		string address = *endAddressIt;
+		if (std::find(startAddresses.begin(),startAddresses.end(),address) != startAddresses.end()) {
+			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end()) {
+				_engines->addCurve(boxID,address);
+			}
+		}
+		else {
+			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) != curvesAddresses.end()) {
+				_engines->removeCurve(boxID,address);
 			}
 		}
 	}
@@ -887,13 +908,14 @@ bool Maquette::setCurveSections(unsigned int boxID, const string &address, unsig
 }
 
 bool Maquette::getCurveAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition,
-	unsigned int &sampleRate, bool &redundancy, vector<float>& values, vector<string> &argTypes,
+	unsigned int &sampleRate, bool &redundancy, bool &interpolate, vector<float>& values, vector<string> &argTypes,
 	vector<float> &xPercents, vector<float> &yValues, vector<short> &sectionType, vector<float> &coeff) {
 
 	if (_engines->getCurveValues(boxID,address,argPosition,values)) {
 		if (_engines->getCurveSections(boxID,address,argPosition,xPercents,yValues,sectionType,coeff)) {
 			sampleRate = _engines->getCurveSampleRate(boxID,address);
 			redundancy = _engines->getCurveRedundancy(boxID,address);
+			interpolate = !_engines->getCurveMuteState(boxID,address);
 			_engines->getCurveArgTypes(address,argTypes);
 			return true;
 		}

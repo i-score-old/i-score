@@ -48,16 +48,16 @@ using std::pair;
 using std::vector;
 
 AbstractCurve::AbstractCurve(unsigned int boxID, const std::string &address, unsigned int argPosition,
-		unsigned int sampleRate, bool redundancy, float lastPointCoeff, const vector<float> &curve,
+		unsigned int sampleRate, bool redundancy, bool show, bool interpolate, float lastPointCoeff, const vector<float> &curve,
 		const map<float,pair<float,float> > &breakpoints) :
-  _boxID(boxID), _address(address), _argPosition(argPosition), _sampleRate(sampleRate), _redundancy(redundancy),
-  _lastPointCoeff(lastPointCoeff), _curve(curve), _breakpoints(breakpoints)
+  _boxID(boxID), _address(address), _argPosition(argPosition), _sampleRate(sampleRate), _redundancy(redundancy), _show(show),
+  _interpolate(interpolate), _lastPointCoeff(lastPointCoeff), _curve(curve), _breakpoints(breakpoints)
 {}
 
 AbstractCurve::AbstractCurve(const AbstractCurve &other) :
   Abstract(), _boxID(other._boxID), _address(other._address), _argPosition(other._argPosition),
-  _sampleRate(other._sampleRate), _redundancy(other._redundancy), _lastPointCoeff(other._lastPointCoeff),
-  _curve(other._curve), _breakpoints(other._breakpoints)
+  _sampleRate(other._sampleRate), _redundancy(other._redundancy), _show(other._show), _interpolate(other._interpolate),
+  _lastPointCoeff(other._lastPointCoeff), _curve(other._curve), _breakpoints(other._breakpoints)
 {}
 
 int

@@ -592,9 +592,23 @@ BasicBox::getCurve(const std::string &address)
 }
 
 void
-BasicBox::setCurve(const std::string &address, AbstractCurve *curve)
+BasicBox::setCurve(const string &address, AbstractCurve *curve)
 {
-	_abstractCurves[address] = curve;
+	if (curve != NULL) {
+		_abstractCurves[address] = curve;
+	}
+	else {
+		removeCurve(address);
+	}
+}
+
+void
+BasicBox::removeCurve(const string &address)
+{
+	map<string,AbstractCurve*>::iterator it = _abstractCurves.find(address);
+	if (it != _abstractCurves.end()) {
+		_abstractCurves.erase(it);
+	}
 }
 
 void

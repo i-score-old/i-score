@@ -100,7 +100,7 @@ public :
 	 * \return if curves were set correctly
 	 */
 	void setAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition, const std::vector<float> &values, unsigned int sampleRate,
-			bool redundancy, const std::vector<std::string> &argType, const std::vector<float> &xPercents, const std::vector<float> &yValues,
+			bool redundancy, bool show, bool interpolate, const std::vector<std::string> &argType, const std::vector<float> &xPercents, const std::vector<float> &yValues,
 			const std::vector<short> &sectionType, const std::vector<float> &coeff);
 
 	void setAttributes(AbstractCurve *abCurve);
@@ -165,8 +165,8 @@ private :
 
 	AbstractCurve *_abstract;
 
-	float _breakpointMovedX; //!< Moved break point x coordinate.
-	float _breakpointMovedY; //!< Moved break point y coordinate.
+	float _movingBreakpointX; //!< Moved break point x coordinate.
+	float _movingBreakpointY; //!< Moved break point y coordinate.
 
 	bool _clicked; //!< Clicked state.
 

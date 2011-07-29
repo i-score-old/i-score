@@ -567,13 +567,6 @@ class MaquetteScene : public QGraphicsScene
    */
   virtual void drawForeground ( QPainter * painter, const QRectF & rect );
   /*!
-   * \brief Redefinition of QGraphicsScene::keyPressEvent().
-   * Called when a key is pressed on the scene.
-   *
-   * \param keyEvent : contains the information about the event
-   */
-  virtual void keyPressEvent(QKeyEvent *keyEvent);
-  /*!
    * \brief Redefinition of QGraphicsScene::mousePressEvent().
    * Called when a mouse button is pressed on the scene.
    *

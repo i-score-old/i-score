@@ -121,13 +121,6 @@ class MainWindow : public QMainWindow
  protected:
 
   /*!
-   * \brief Redefinition of QMainWindow::keyPressEvent(QKeyEvent *keyEvent).
-   *
-   * Used to assign specific keys to associated actions.
-   */
-  virtual void keyPressEvent(QKeyEvent *keyEvent);
-
-  /*!
    * \brief Redefinition of QMainWindow::closeEvent(QCloseEvent *event).
    * Executed when the user wants to close the window.
    *
@@ -181,7 +174,6 @@ class MainWindow : public QMainWindow
    * \brief Updates the tracks view.
    */
   void viewTrack();
-
   /*!
    * \brief Cut the current selection of boxes.
    */
@@ -230,22 +222,6 @@ class MainWindow : public QMainWindow
   void selectAll();
 
  private :
-  /*!
-   * \brief Called when a deletion key is pressed.
-   */
-  void deleteKeyPressed();
-  /*!
-   * \brief Called when the return key is pressed.
-   */
-  void returnKeyPressed();
-  /*!
-   * \brief Called when the space key is pressed.
-   */
-  void spaceKeyPressed();
-  /*!
-   * \brief Called when the escape key is pressed.
-   */
-  void escapeKeyPressed();
   /*!
    * \brief Initializes actions.
    */

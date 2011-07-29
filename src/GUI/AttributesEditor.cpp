@@ -745,18 +745,23 @@ AttributesEditor::connectSlots()
 	connect(_harmoHeldComboBox, SIGNAL(activated(int)), this, SLOT(harmoHeldChanged()));
 	connect(_harmoVariationComboBox, SIGNAL(activated(int)), this, SLOT(harmoVariationChanged()));
 
-	connect(_startMsgCopyButton, SIGNAL(clicked()), this, SLOT(startMsgCopied()));
-	connect(_startMsgPasteButton, SIGNAL(clicked()), this, SLOT(startMsgPasted()));
-	connect(_startMsgClearButton, SIGNAL(clicked()), this, SLOT(startMsgCleared()));
-	connect(_endMsgCopyButton, SIGNAL(clicked()), this, SLOT(endMsgCopied()));
-	connect(_endMsgPasteButton, SIGNAL(clicked()), this, SLOT(endMsgPasted()));
-	connect(_endMsgClearButton, SIGNAL(clicked()), this, SLOT(endMsgCleared()));
 	connect(_startMsgsAddButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(addLine()));
-	connect(_endMsgsAddButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(addLine()));
 	connect(_startMsgDeleteButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(removeLines()));
+	connect(_startMsgCopyButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(exportMessages()));
+	connect(_startMsgPasteButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(importMessages()));
+	connect(_startMsgClearButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(clear()));
+	connect(_endMsgsAddButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(addLine()));
 	connect(_endMsgDeleteButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(removeLines()));
-	connect(_startMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(startMsgChanged()));
-	connect(_endMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(endMsgChanged()));
+	connect(_endMsgCopyButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(exportMessages()));
+	connect(_endMsgPasteButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(importMessages()));
+	connect(_endMsgClearButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(clear()));
+
+	connect(_startMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(startMessagesChanged()));
+	connect(_startMsgsEditor,SIGNAL(messageChanged(const std::string &)),this,SLOT(startMessageChanged(const std::string &)));
+	connect(_startMsgsEditor,SIGNAL(messageRemoved(const std::string &)),this,SLOT(startMessageRemoved(const std::string &)));
+	connect(_endMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(endMessagesChanged()));
+	connect(_endMsgsEditor,SIGNAL(messageChanged(const std::string &)),this,SLOT(endMessageChanged(const std::string &)));
+	connect(_endMsgsEditor,SIGNAL(messageRemoved(const std::string &)),this,SLOT(endMessageRemoved(const std::string &)));
 
 	connect(_snapshotAssignStart, SIGNAL(clicked()),this,SLOT(snapshotStartAssignment()));
 	connect(_snapshotAssignEnd, SIGNAL(clicked()),this,SLOT(snapshotEndAssignment()));
@@ -815,9 +820,9 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 
 	_boxEdited = abBox->ID();
 
-	if (boxModified || _boxEdited == NO_ID) {
-		_startMsgsEditor->clear();
-		_endMsgsEditor->clear();
+	if (boxModified || (_boxEdited == NO_ID)) {
+		_startMsgsEditor->reset();
+		_endMsgsEditor->reset();
 		if (_boxEdited != NO_ID) {
 			_startMsgsEditor->addMessages(abBox->firstMsgs());
 			_endMsgsEditor->addMessages(abBox->lastMsgs());
@@ -858,17 +863,21 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 		}
 	}
 
-	updateWidgets();
+	updateWidgets(boxModified);
 
 }
 
 void
-AttributesEditor::updateWidgets()
+AttributesEditor::updateWidgets(bool boxModified)
 {
 	BasicBox * box = _scene->getBox(_boxEdited);
 	if (box != NULL) {
 		_boxStartValue->setValue(box->beginPos() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
+		double savedLengthValue = _boxLengthValue->value();
 		_boxLengthValue->setValue(box->width() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
+		if (!boxModified && _boxLengthValue->value() != savedLengthValue) {
+			_curvesWidget->updateMessages(_boxEdited,true);
+		}
 		_boxName->setText(box->name());
 	}
 
@@ -1222,7 +1231,7 @@ AttributesEditor::changeColor() {
 }
 
 void
-AttributesEditor::startMsgChanged()
+AttributesEditor::startMessagesChanged()
 {
 	vector<string> msgs = _startMsgsEditor->computeMessages();
 	Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
@@ -1230,64 +1239,37 @@ AttributesEditor::startMsgChanged()
 }
 
 void
-AttributesEditor::startMsgCanceled()
-{
-	/*	_startMsgsEditor->clear();
-	_startMsgsEditor->addMessages(Maquette::getInstance()->firstMessagesToSend(_boxEdited));*/
-}
-
-void
-AttributesEditor::startMsgCleared()
-{
-	_startMsgsEditor->clear();
-}
-
-void
-AttributesEditor::startMsgCopied()
-{
-	_startMsgsEditor->exportMessages();
-}
-
-void
-AttributesEditor::startMsgPasted()
-{
-	_startMsgsEditor->importMessages();
-	startMsgChanged();
-}
-
-void
-AttributesEditor::endMsgChanged()
+AttributesEditor::endMessagesChanged()
 {
 	vector<string> msgs = _endMsgsEditor->computeMessages();
 	Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
 	_curvesWidget->updateMessages(_boxEdited,true);
 }
 
-void
-AttributesEditor::endMsgCanceled()
-{
-	/*	_endMsgsEditor->clear();
-	_endMsgsEditor->addMessages(Maquette::getInstance()->lastMessagesToSend(_boxEdited));*/
+void AttributesEditor::startMessageChanged(const string &address) {
+	vector<string> msgs = _startMsgsEditor->computeMessages();
+	Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
+	_curvesWidget->updateCurve(address);
 }
 
-void
-AttributesEditor::endMsgCleared()
-{
-	_endMsgsEditor->clear();
-	endMsgChanged();
+void AttributesEditor::endMessageChanged(const string &address) {
+	vector<string> msgs = _endMsgsEditor->computeMessages();
+	Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
+	_curvesWidget->updateCurve(address);
 }
 
-void
-AttributesEditor::endMsgCopied()
-{
-	_endMsgsEditor->exportMessages();
+void AttributesEditor::startMessageRemoved(const string &address) {
+	vector<string> msgs = _startMsgsEditor->computeMessages();
+	Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
+	Maquette::getInstance()->removeCurve(_boxEdited,address);
+	_curvesWidget->removeCurve(address);
 }
 
-void
-AttributesEditor::endMsgPasted()
-{
-	_endMsgsEditor->importMessages();
-	endMsgChanged();
+void AttributesEditor::endMessageRemoved(const string &address) {
+	vector<string> msgs = _endMsgsEditor->computeMessages();
+	Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
+	Maquette::getInstance()->removeCurve(_boxEdited,address);
+	_curvesWidget->removeCurve(address);
 }
 
 void
@@ -1298,7 +1280,7 @@ AttributesEditor::snapshotStartAssignment()
 	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 		if (!snapshot.empty()) {
 			_startMsgsEditor->addMessages(snapshot);
-			startMsgChanged();
+			startMessagesChanged();
 			_scene->displayMessage("Snapshot successfully captured and applied to box start",INDICATION_LEVEL);
 		}
 		else {
@@ -1318,7 +1300,7 @@ void AttributesEditor::snapshotEndAssignment()
 	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 		if (!snapshot.empty()) {
 			_endMsgsEditor->addMessages(snapshot);
-			endMsgChanged();
+			endMessagesChanged();
 			_scene->displayMessage("Snapshot successfully captured and applied to box end",INDICATION_LEVEL);
 		}
 		else {
@@ -1338,7 +1320,7 @@ AttributesEditor::treeMapStartAssignment()
 	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 		if (!snapshot.empty()) {
 			_startMsgsEditor->addMessages(snapshot);
-			startMsgChanged();
+			startMessagesChanged();
 			_scene->displayMessage("Snapshot successfully captured and applied to box start",INDICATION_LEVEL);
 		}
 		else {
@@ -1358,7 +1340,7 @@ void AttributesEditor::treeMapEndAssignment()
 	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 		if (!snapshot.empty()) {
 			_endMsgsEditor->addMessages(snapshot);
-			endMsgChanged();
+			endMessagesChanged();
 			_scene->displayMessage("Snapshot successfully captured and applied to box end",INDICATION_LEVEL);
 		}
 		else {

@@ -294,7 +294,7 @@ class Maquette : public QObject
 	 * \return if curves were set correctly
 	 */
 	bool getCurveAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition, unsigned int & sampleRate,
-			bool &redundancy, std::vector<float>& values,	std::vector<std::string> & argTypes, std::vector<float> &xPercents,
+			bool &redundancy, bool &interpolate, std::vector<float>& values,	std::vector<std::string> & argTypes, std::vector<float> &xPercents,
 			std::vector<float> &yValues, std::vector<short> &sectionType, std::vector<float> &coeff);
 
 

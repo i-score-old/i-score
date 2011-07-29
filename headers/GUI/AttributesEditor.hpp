@@ -149,7 +149,7 @@ class AttributesEditor : public QDockWidget
   /*!
    * \brief Updates values of widgets according to the editor current attributes
    **/
-  void updateWidgets();
+  void updateWidgets(bool boxModified);
 
   private slots:
 
@@ -227,46 +227,20 @@ class AttributesEditor : public QDockWidget
    * \brief Resets the whole palette attributes to their default values.
    */
   void resetProfiles();
+
+  void startMessageChanged(const std::string &address);
+  void endMessageChanged(const std::string &address);
+  void startMessageRemoved(const std::string &address);
+  void endMessageRemoved(const std::string &address);
+
   /*!
    * \brief Updates box start message
    */
-  void startMsgChanged();
-  /*!
-   * \brief Cancels box start message modifications
-   */
-  void startMsgCanceled();
-  /*!
-   * \brief Clears box start message
-   */
-  void startMsgCleared();
-  /*!
-   * \brief Copies box start message
-   */
-  void startMsgCopied();
-  /*!
-   * \brief Pastes copied messages in start box message
-   */
-  void startMsgPasted();
+  void startMessagesChanged();
   /*!
    * \brief Updates box end message
    */
-  void endMsgChanged();
-  /*!
-   * \brief Cancels box end message modifications
-   */
-  void endMsgCanceled();
-  /*!
-   * \brief Clears box end message
-   */
-  void endMsgCleared();
-  /*!
-   * \brief Copies box end message
-   */
-  void endMsgCopied();
-  /*!
-   * \brief Pastes copied messages in end box message
-   */
-  void endMsgPasted();
+  void endMessagesChanged();
   /*!
    * \brief Called when profiles are modified.
    */

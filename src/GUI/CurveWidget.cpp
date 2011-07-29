@@ -77,7 +77,7 @@ CurveWidget::~CurveWidget() {}
 
 void CurveWidget::init()
 {
-	_abstract = new AbstractCurve(NO_ID,"",0,10,false,1,vector<float>(),map<float,pair<float,float> >());
+	_abstract = new AbstractCurve(NO_ID,"",0,10,false,true,true,1,vector<float>(),map<float,pair<float,float> >());
 
 	setBackgroundRole(QPalette::Base);
 	setCursor(Qt::CrossCursor);
@@ -91,8 +91,8 @@ void CurveWidget::init()
 	_interspace = width();
 
 	_clicked = false;
-	_breakpointMovedX = -1;
-	_breakpointMovedY = -1;
+	_movingBreakpointX = -1;
+	_movingBreakpointY = -1;
 	_minY = -100;
 	_maxY = 100;
 	_lastPointSelected = false;
@@ -117,7 +117,7 @@ void CurveWidget::curveRepresentationOutdated() {
 
 void
 CurveWidget::setAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition, const vector<float> &values, unsigned int sampleRate,
-		bool redundancy, const vector<string> &/*argType*/, const vector<float> &xPercents , const vector<float> &yValues, const vector<short> &sectionType,
+		bool redundancy, bool show, bool interpolate, const vector<string> &/*argType*/, const vector<float> &xPercents , const vector<float> &yValues, const vector<short> &sectionType,
 		const vector<float> &coeff) {
 	_abstract->_boxID = boxID;
 	_abstract->_curve.clear();
@@ -125,6 +125,8 @@ CurveWidget::setAttributes(unsigned int boxID, const std::string &address, unsig
 	_abstract->_sampleRate = sampleRate;
 
 	_abstract->_redundancy = redundancy;
+	_abstract->_show = show;
+	_abstract->_interpolate = interpolate;
 	_abstract->_address = address;
 
 	vector<float>::const_iterator it;
@@ -199,8 +201,8 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
 			_lastPointSelected = false;
 			for (it = _abstract->_breakpoints.begin() ; it != _abstract->_breakpoints.end() ; ++it) {
 				if (fabs(it->first - relativePoint.x()) < 0.01) {
-					_breakpointMovedX = it->first;
-					_breakpointMovedY = -1;
+					_movingBreakpointX = it->first;
+					_movingBreakpointY = -1;
 					break;
 				}
 			}
@@ -215,8 +217,8 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
 		for (it = _abstract->_breakpoints.begin() ; it != _abstract->_breakpoints.end() ; ++it) {
 			if (fabs(it->first - relativePoint.x()) < 0.01) {
 				found = true;
-				_breakpointMovedX = it->first;
-				_breakpointMovedY = -1;
+				_movingBreakpointX = it->first;
+				_movingBreakpointY = -1;
 				break;
 			}
 		}
@@ -230,8 +232,8 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
 		for (it = _abstract->_breakpoints.begin() ; it != _abstract->_breakpoints.end() ; ++it) {
 			if (fabs(it->first - relativePoint.x()) < 0.01) {
 				found = true;
-				_breakpointMovedX = it->first;
-				_breakpointMovedY = it->second.first;
+				_movingBreakpointX = it->first;
+				_movingBreakpointY = it->second.first;
 				_abstract->_breakpoints.erase(it);
 				curveChanged();
 				update();
@@ -255,8 +257,8 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
 			if (fabs(it->first - relativePoint.x()) < 0.01) {
 				found = true;
 				_abstract->_breakpoints.erase(it);
-				_breakpointMovedX = -1.;
-				_breakpointMovedY = -1.;
+				_movingBreakpointX = -1.;
+				_movingBreakpointY = -1.;
 				curveChanged();
 				update();
 				_clicked = false;
@@ -298,9 +300,9 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 				_abstract->_lastPointCoeff = pow;
 				curveChanged();
 			}
-			else if (_breakpointMovedX != -1) {
+			else if (_movingBreakpointX != -1) {
 				map<float,pair<float,float> >::iterator it;
-				if ((it = _abstract->_breakpoints.find(_breakpointMovedX)) != _abstract->_breakpoints.end()) {
+				if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
 					float mousePosY = relativePoint.y();
 					float pow = 1.;
 					if (mousePosY > it->second.first) { // mouse under : pow between 0 and 1
@@ -310,7 +312,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 						pow = 1 + std::min(it->second.first - mousePosY,(float)50.) / 10.;
 					}
 					it->second = std::make_pair<float,float>(it->second.first,pow);
-					_breakpointMovedY = -1;
+					_movingBreakpointY = -1;
 					curveChanged();
 				}
 			}
@@ -318,30 +320,30 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 		}
 		case Qt::ControlModifier : // VERTICAL SLIDE
 		{
-			if (_breakpointMovedX != -1) {
+			if (_movingBreakpointX != -1) {
 				map<float,pair<float,float> >::iterator it;
-				if ((it = _abstract->_breakpoints.find(_breakpointMovedX)) != _abstract->_breakpoints.end()) {
+				if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
 					it->second = std::make_pair<float,float>(relativePoint.y(),it->second.second);
 				}
 				else {
-					_abstract->_breakpoints[_breakpointMovedX] = std::make_pair<float,float>(relativePoint.y(),1.);
+					_abstract->_breakpoints[_movingBreakpointX] = std::make_pair<float,float>(relativePoint.y(),1.);
 				}
-				_breakpointMovedY = -1;
+				_movingBreakpointY = -1;
 				curveChanged();
 			}
 			break;
 		}
 		case Qt::NoModifier : // MOVE
 		{
-			_breakpointMovedX = relativePoint.x();
-			_breakpointMovedY = relativePoint.y();
+			_movingBreakpointX = relativePoint.x();
+			_movingBreakpointY = relativePoint.y();
 			update();
 			break;
 		}
 		default :
 		{
-			_breakpointMovedX = -1;
-			_breakpointMovedY = -1;
+			_movingBreakpointX = -1;
+			_movingBreakpointY = -1;
 			update();
 			break;
 		}
@@ -358,7 +360,7 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event) {
 		if (event->modifiers() == Qt::NoModifier) {
 			QPointF relativePoint = relativeCoordinates(event->pos());
 			map<float,pair<float,float> >::iterator it;
-			if ((it = _abstract->_breakpoints.find(_breakpointMovedX)) != _abstract->_breakpoints.end()) {
+			if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
 				_abstract->_breakpoints.erase(it);
 			}
 			_abstract->_breakpoints[relativePoint.x()] = std::make_pair<float,float>(relativePoint.y(),1.);
@@ -368,8 +370,8 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event) {
 	}
 
 	_clicked = false;
-	_breakpointMovedX = -1.;
-	_breakpointMovedY = -1.;
+	_movingBreakpointX = -1.;
+	_movingBreakpointY = -1.;
 	_lastPointSelected = false;
 
 	update();
@@ -394,15 +396,15 @@ CurveWidget::curveChanged() {
 
 	if (Maquette::getInstance()->setCurveSections(_abstract->_boxID, _abstract->_address, 0 ,xPercents, yValues, sectionType, coeff)) {
 		unsigned int sampleRate;
-		bool redundancy;
+		bool redundancy,interpolate;
 		vector<string> argTypes;
 		vector<float> values;
 		xPercents.clear();
 		yValues.clear();
 		sectionType.clear();
 		coeff.clear();
-		if (Maquette::getInstance()->getCurveAttributes(_abstract->_boxID,_abstract->_address,0,sampleRate,redundancy,values,argTypes,xPercents,yValues,sectionType,coeff)) {
-			setAttributes(_abstract->_boxID,_abstract->_address,0,values,sampleRate,redundancy,argTypes,xPercents,yValues,sectionType,coeff);
+		if (Maquette::getInstance()->getCurveAttributes(_abstract->_boxID,_abstract->_address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff)) {
+			setAttributes(_abstract->_boxID,_abstract->_address,0,values,sampleRate,redundancy,interpolate,_abstract->_show,argTypes,xPercents,yValues,sectionType,coeff);
 			update();
 			return true;
 		}
@@ -432,9 +434,19 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
 
 	painter->setRenderHint(QPainter::Antialiasing, true);
 
-	painter->setPen(Qt::black);
+	static const QColor BASE_COLOR(Qt::black);
+	static const QColor AXE_COLOR(Qt::black);
+	static const QColor X_SUBDIV_COLOR(Qt::gray);
+	static const QColor X_DIV_COLOR(Qt::black);
+	static const QColor EXTREMITY_COLOR(Qt::red);
+	static const QColor CURVE_COLOR(Qt::darkRed);
+	static const QColor BREAKPOINT_COLOR(Qt::blue);
+	static const QColor MOVING_BREAKPOINT_COLOR(Qt::darkBlue);
+	static const QColor UNACTIVE_COLOR(Qt::gray);
 
+	painter->setPen(AXE_COLOR);
 	painter->drawLine(0,height()/2.,width(),height()/2.); // Abcisses line
+	painter->setPen(BASE_COLOR);
 
 	vector<float>::iterator it;
 	map<float,pair<float,float> >::iterator it2;
@@ -453,47 +465,47 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
 
 		if (XsubDiv != 0) {
 			if ((i % XsubDiv) == 0) {
-				painter->setPen(Qt::gray);
+				painter->setPen(X_SUBDIV_COLOR);
 				painter->drawLine(QPointF(curPoint.x(),height()/2.-5),QPointF(curPoint.x(),height()/2.+5));
-				painter->setPen(Qt::black);
+				painter->setPen(BASE_COLOR);
 			}
 		}
 
 		if (Xdiv != 0) {
 			if ((i % Xdiv) == 0) {
-				painter->setPen(Qt::black);
+				painter->setPen(X_DIV_COLOR);
 				painter->drawLine(QPointF(curPoint.x(),height()/2.-10),QPointF(curPoint.x(),height()/2.+10));
-				painter->setPen(Qt::black);
+				painter->setPen(BASE_COLOR);
 			}
 		}
 
-		if (it == _abstract->_curve.begin()) { // First point is represented by a red rectangle
-			painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),Qt::red);
+		if (it == _abstract->_curve.begin()) { // First point is represented by a specific color
+			painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),EXTREMITY_COLOR);
 		}
 		if (precPoint != QPointF(-1,-1)) {
-			painter->setPen(Qt::darkRed);
+			painter->setPen(_abstract->_interpolate ? CURVE_COLOR : UNACTIVE_COLOR);
 			painter->drawLine(precPoint,curPoint); // Draw lines between values
-			painter->setPen(Qt::black);
+			painter->setPen(BASE_COLOR);
 		}
 
 		precPoint = curPoint;
 		i++;
 	}
-	// Last point is represented by a red rectangle
-	painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),Qt::red);
+	// Last point is represented by a specific color
+	painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),EXTREMITY_COLOR);
 
 	precPoint = QPointF(-1,-1);
 	for (it2 = _abstract->_breakpoints.begin() ; it2 != _abstract->_breakpoints.end() ; ++it2) {
 		curPoint = absoluteCoordinates(QPointF(it2->first,it2->second.first));
-		// Breakpoints are drawn in blue
-		painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),Qt::blue);
+		// Breakpoints are drawn with rectangles
+		painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),_abstract->_interpolate ? BREAKPOINT_COLOR : UNACTIVE_COLOR);
 		precPoint = curPoint;
 	}
 
-	if (_breakpointMovedX != -1 && _breakpointMovedY != -1) {
-		QPointF cursor = absoluteCoordinates(QPointF(_breakpointMovedX,_breakpointMovedY));
-		// If a breakpoint is currently being moved, it is represented in blue
-		painter->fillRect(QRectF(cursor - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),Qt::darkBlue);
+	if (_movingBreakpointX != -1 && _movingBreakpointY != -1) {
+		QPointF cursor = absoluteCoordinates(QPointF(_movingBreakpointX,_movingBreakpointY));
+		// If a breakpoint is currently being moved, it is represented by a rectangle
+		painter->fillRect(QRectF(cursor - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),_abstract->_interpolate ? MOVING_BREAKPOINT_COLOR : UNACTIVE_COLOR);
 	}
 
 	delete painter;

@@ -54,19 +54,19 @@ using std::istringstream;
 #include <QKeyEvent>
 #include <QSpinBox>
 #include <QCheckBox>
-#include <QSignalMapper>
 
 const string Interpolation::ACTIVATION_STRING = "ACTIVATION_STRING";
 const string Interpolation::SAMPLE_RATE_STRING = "SAMPLE_RATE_STRING";
 const string Interpolation::REDUNDANCY_STRING = "REDUNDANCY_STRING";
+const string Interpolation::SHOW_STRING = "SHOW_STRING";
 
 Interpolation::Interpolation(QWidget *parent)
-: QTableWidget(0,3,parent)
+: QTableWidget(0,4,parent)
 {
 	_parent = parent;
 
 	QStringList labels;
-	labels << tr("Address") << tr("Sample Rate") << tr("Redundancy");
+	labels << tr("Address") << tr("Sample Rate") << tr("Redundancy") << tr("Show");
 	setContentsMargins(0,0,0,0);
 	setHorizontalHeaderLabels(labels);
 	setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -74,14 +74,12 @@ Interpolation::Interpolation(QWidget *parent)
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	_currentLine = 0;
 
-	_signalMapper = new QSignalMapper;
-
 }
 
 Interpolation::~Interpolation(){}
 
 void
-Interpolation::addLine(const string &address, bool interpolationState, int sampleRate, bool redundancy)
+Interpolation::addLine(const string &address, bool interpolationState, int sampleRate, bool redundancy, bool show)
 {
 	InterpolationLine line;
 
@@ -95,6 +93,9 @@ Interpolation::addLine(const string &address, bool interpolationState, int sampl
 	line.redundancyBox = new QCheckBox(this);
 	line.redundancyBox->setChecked(redundancy);
 
+	line.showBox = new QCheckBox(this);
+	line.showBox->setChecked(show);
+
 	line.sampleRate = new QSpinBox(this);
 	line.sampleRate->setRange(2,1000);
 	line.sampleRate->setKeyboardTracking(false);
@@ -104,6 +105,7 @@ Interpolation::addLine(const string &address, bool interpolationState, int sampl
 
 	_widgetAddress[line.activationBox] = line.address;
 	_widgetAddress[line.redundancyBox] = line.address;
+	_widgetAddress[line.showBox] = line.address;
 	_widgetAddress[line.sampleRate] = line.address;
 
 	_interpolationLines[address] = line;
@@ -111,9 +113,11 @@ Interpolation::addLine(const string &address, bool interpolationState, int sampl
 	setCellWidget(_currentLine,ACTIVATION_COLUMN,line.activationBox);
 	setCellWidget(_currentLine,SAMPLE_RATE_COLUMN,line.sampleRate);
 	setCellWidget(_currentLine,REDUNDANCY_COLUMN,line.redundancyBox);
+	setCellWidget(_currentLine,SHOW_COLUMN,line.showBox);
 
 	connect(line.activationBox,SIGNAL(toggled(bool)), this, SLOT(activationChanged(bool)));
 	connect(line.redundancyBox,SIGNAL(toggled(bool)), this, SLOT(redundancyChanged(bool)));
+	connect(line.showBox,SIGNAL(toggled(bool)), this, SLOT(showChanged(bool)));
 	connect(line.sampleRate,SIGNAL(valueChanged(int)), this, SLOT(sampleRateChanged(int)));
 
 	_parent->update();
@@ -121,8 +125,8 @@ Interpolation::addLine(const string &address, bool interpolationState, int sampl
 	_currentLine++;
 }
 
-void
-Interpolation::updateLine(const string &address, bool interpolationState, int sampleRate, bool redundancy) {
+bool
+Interpolation::updateLine(const string &address, bool interpolationState, int sampleRate, bool redundancy, bool show) {
 	InterpolationLine line;
 	std::map<string,InterpolationLine>::iterator it = _interpolationLines.find(address);
 	if (it != _interpolationLines.end()) {
@@ -130,10 +134,20 @@ Interpolation::updateLine(const string &address, bool interpolationState, int sa
 		if (interpolationState != line.activationBox->isChecked()) {
 			line.activationBox->setChecked(interpolationState);
 		}
-		line.redundancyBox->setChecked(redundancy);
-		line.sampleRate->setValue(sampleRate);
+		if (show != line.showBox->isChecked()) {
+			line.showBox->setChecked(show);
+		}
+		if (redundancy != line.redundancyBox->isChecked()) {
+			line.redundancyBox->setChecked(redundancy);
+		}
+		if (sampleRate != line.sampleRate->value()) {
+			line.sampleRate->setValue(sampleRate);
+		}
 		_parent->update();
+		return true;
 	}
+
+	return false;
 }
 
 QString
@@ -149,9 +163,7 @@ Interpolation::clear()
 		int index = it->second.index;
 		if (index != -1 && index < rowCount()) {
 			removeRow(index);
-			//delete (*it).activationBox;
-			//delete (*it).redundancyBox;
-			//delete (*it).sampleRate;
+			// TODO : delete widgets
 		}
 		else {
 			std::cerr << "NetworkMessagesEditor::clear : index out of bounds" << std::endl;
@@ -176,6 +188,14 @@ Interpolation::redundancyChanged(bool state) {
 	string address = _widgetAddress[box];
 	InterpolationLine line = _interpolationLines[address];
 	emit(redundancyChanged(QString::fromStdString(line.address),state));
+}
+
+void
+Interpolation::showChanged(bool state) {
+	QCheckBox *box = (QCheckBox*)sender();
+	string address = _widgetAddress[box];
+	InterpolationLine line = _interpolationLines[address];
+	emit(showChanged(QString::fromStdString(line.address),state));
 }
 
 void
