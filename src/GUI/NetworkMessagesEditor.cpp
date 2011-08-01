@@ -125,8 +125,6 @@ NetworkMessagesEditor::keyPressEvent(QKeyEvent *event) {
 void
 NetworkMessagesEditor::keyReleaseEvent(QKeyEvent *event) {
 	QTableWidget::keyReleaseEvent(event);
-	std::cerr << "NetworkMessagesEditor::keyReleaseEvent" << std::endl;
-
 }
 void
 NetworkMessagesEditor::addLine() {
@@ -348,7 +346,6 @@ NetworkMessagesEditor::addMessage(const string &device, const string &message, c
 void
 NetworkMessagesEditor::addMessages(const vector<string> &messages)
 {
-	std::cerr << "NetworkMessagesEditor::addMessages : adding" << messages.size() << " messages" << std::endl;
 	vector<string>::const_iterator msgIt;
 	unsigned int msgsCount = 0;
 	for (msgIt = messages.begin() ; msgIt != messages.end() ; ++msgIt) {
@@ -364,7 +361,6 @@ NetworkMessagesEditor::addMessages(const vector<string> &messages)
 						if (msgWithValue.size() > valueBeginPos+1) {
 							string msg = msgWithValue.substr(0,valueBeginPos);
 							string value = msgWithValue.substr(valueBeginPos+1);
-							std::cerr << "NetworkMessagesEditor::addMessages : Adding Message : " << msg << std::endl;
 							addMessage(device,msg,value);
 							msgsCount++;
 						}
@@ -437,7 +433,6 @@ NetworkMessagesEditor::importMessages()
 void
 NetworkMessagesEditor::exportMessages()
 {
-	std::cerr << "NetworkMessagesEditor::exportMessages" << std::endl;
 	QString copy;
 
 	QModelIndexList selectedCells = selectedIndexes();
@@ -519,7 +514,6 @@ void NetworkMessagesEditor::lineChanged(const NetworkLine &line, const string &c
 			emit(messageChanged(address));
 		}
 		else if (changeString == "DELETE") {
-			std::cerr << "NetworkMessagesEditor::lineChanged : DELETE" << std::endl;
 			emit(messageRemoved(address));
 		}
 	}

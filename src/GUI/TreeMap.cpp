@@ -41,6 +41,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QVBoxLayout>
 #include <QPainter>
 #include <QPaintEvent>
+#include <algorithm>
 #include "TreeMap.hpp"
 #include "Maquette.hpp"
 
