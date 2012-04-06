@@ -442,7 +442,7 @@ MainWindow::gotoValueEntered(double value) {
 }
 /*
 void
-MainWindow::keyPressEvent(QKeyEvent *keyEvent) {
+MainWindow::PressEvent(QKeyEvent *keyEvent) {
   QMainWindow::keyPressEvent(keyEvent);
 
   switch (keyEvent->key()) {

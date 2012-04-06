@@ -291,56 +291,70 @@ NetworkMessagesEditor::computeMessages() {
 void
 NetworkMessagesEditor::addMessage(const string &device, const string &message, const string &value)
 {
-	if (_devicesList.empty()) {
-		map<string,MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
-		map<string,MyDevice>::iterator it;
-		for (it = devices.begin() ; it != devices.end() ; ++it) {
-			_devicesList << QString::fromStdString(it->first);
-		}
-	}
+    if (_devicesList.empty()) {
+        map<string,MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
+        map<string,MyDevice>::iterator it;
+        for (it = devices.begin() ; it != devices.end() ; ++it) {
+            _devicesList << QString::fromStdString(it->first);
+        }
+    }
 
-	insertRow(_currentLine);
-	NetworkLine line;
-	line.devicesBox = new QComboBox(this);
-	line.devicesBox->addItems(_devicesList);
-	if (device != "") {
-		int deviceIndex = -1;
-		if ((deviceIndex = line.devicesBox->findText(QString::fromStdString(device))) != -1) {
-			line.devicesBox->setCurrentIndex(deviceIndex);
-		}
-		else {
-			std::cerr << "NetworkMessagesEditor::addMessage : device \"" << device << "\" not found - default used " << std::endl;
-		}
-	}
-	else {
-		std::cerr << "NetworkMessagesEditor::addMessage : empty device found - default used" << std::endl;
-	}
-	line.index = _currentLine;
+    //Verif doublons
+    vector<NetworkLine>::iterator it;
+    for (it = _networkLines.begin() ; it != _networkLines.end() ; it++) {
 
-	line.messageBox = new QLineEdit(this);
-	line.messageBox->setText(QString::fromStdString(message));
+        NetworkLine line = *it;
+        string devCpy = line.devicesBox->currentText().toStdString();
+        string msgCpy = line.messageBox->displayText().toStdString();
 
-	line.valueBox = new QLineEdit(this);
-	line.valueBox->setText(QString::fromStdString(value));
+        if (device.compare(devCpy)==0 && message.compare(msgCpy)==0){
+            line.valueBox->setText(QString::fromStdString(value));
+            return;
+        }
+    }
 
-	_networkLines.push_back(line);
+    insertRow(_currentLine);
+    NetworkLine line;
+    line.devicesBox = new QComboBox(this);
+    line.devicesBox->addItems(_devicesList);
+    if (device != "") {
+        int deviceIndex = -1;
+        if ((deviceIndex = line.devicesBox->findText(QString::fromStdString(device))) != -1) {
+            line.devicesBox->setCurrentIndex(deviceIndex);
+        }
+        else {
+            std::cerr << "NetworkMessagesEditor::addMessage : device \"" << device << "\" not found - default used " << std::endl;
+        }
+    }
+    else {
+        std::cerr << "NetworkMessagesEditor::addMessage : empty device found - default used" << std::endl;
+    }
+    line.index = _currentLine;
 
-	unsigned int lineIndex = _networkLines.size() - 1;
-	_widgetIndex[line.devicesBox] = lineIndex;
-	_widgetIndex[line.messageBox] = lineIndex;
-	_widgetIndex[line.valueBox] = lineIndex;
+    line.messageBox = new QLineEdit(this);
+    line.messageBox->setText(QString::fromStdString(message));
 
-	setCellWidget(_currentLine,0,line.devicesBox);
-	setCellWidget(_currentLine,1,line.messageBox);
-	setCellWidget(_currentLine,2,line.valueBox);
+    line.valueBox = new QLineEdit(this);
+    line.valueBox->setText(QString::fromStdString(value));
 
-	_parent->update();
+    _networkLines.push_back(line);
 
-	connect(line.devicesBox,SIGNAL(activated(int)), this, SLOT(deviceChanged()));
-	connect(line.messageBox,SIGNAL(editingFinished()),this,SLOT(messageChanged()));
-	connect(line.valueBox,SIGNAL(editingFinished()),this,SLOT(valueChanged()));
+    unsigned int lineIndex = _networkLines.size() - 1;
+    _widgetIndex[line.devicesBox] = lineIndex;
+    _widgetIndex[line.messageBox] = lineIndex;
+    _widgetIndex[line.valueBox] = lineIndex;
 
-	_currentLine++;
+    setCellWidget(_currentLine,0,line.devicesBox);
+    setCellWidget(_currentLine,1,line.messageBox);
+    setCellWidget(_currentLine,2,line.valueBox);
+
+    _parent->update();
+
+    connect(line.devicesBox,SIGNAL(activated(int)), this, SLOT(deviceChanged()));
+    connect(line.messageBox,SIGNAL(editingFinished()),this,SLOT(messageChanged()));
+    connect(line.valueBox,SIGNAL(editingFinished()),this,SLOT(valueChanged()));
+
+    _currentLine++;
 }
 
 void
