@@ -742,14 +742,14 @@ MainWindow::createActions()
   _SBModeAct->setStatusTip(tr("Switch mode to Sound Box creation"));
   _SBModeAct->setShortcut(QString("Ctrl+Shift+S"));
   _SBModeAct->setCheckable(true);
-  _SBModeAct->setChecked(true);
+  _SBModeAct->setChecked(false);
   connect(_SBModeAct,SIGNAL(triggered()), this, SLOT(selectMode()));
 
   _CBModeAct = new QAction(QIcon(":/images/controlBox.svg"), tr("Control Box"), this);
   _CBModeAct->setStatusTip(tr("Switch mode to Control Box creation"));
   _CBModeAct->setShortcut(QString("Ctrl+Shift+C"));
   _CBModeAct->setCheckable(true);
-  _CBModeAct->setChecked(false);
+  _CBModeAct->setChecked(true);
   connect(_CBModeAct,SIGNAL(triggered()), this, SLOT(selectMode()));
 
   _PBModeAct = new QAction(QIcon(":/images/parentBox.svg"), tr("Parent Box"), this);
@@ -899,8 +899,8 @@ MainWindow::createToolBars()
 {
 	_fileToolBar = addToolBar(tr("File"));
 
-	_fileToolBar->addAction(_SBModeAct);
-	_fileToolBar->addAction(_CBModeAct);
+    _fileToolBar->addAction(_CBModeAct);
+	_fileToolBar->addAction(_SBModeAct);	
 	_fileToolBar->addAction(_PBModeAct);
 
 	_fileToolBar->addSeparator();
