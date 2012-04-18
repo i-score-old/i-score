@@ -674,7 +674,7 @@ AttributesEditor::addWidgetsToLayout()
 	_messagesLayout->addWidget(_messagesTabs);
 	_messagesTab->setLayout(_messagesLayout);
 
-	_networkTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    _networkTree->setSelectionMode(QAbstractItemView::MultiSelection);
 	_snapshotLayout->addWidget(_snapshotAssignLabel,0,0,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
 	_snapshotLayout->addWidget(_snapshotAssignStart,0,1,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
 	_snapshotLayout->addWidget(_snapshotAssignEnd,0,2,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
@@ -823,9 +823,13 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 	if (boxModified || (_boxEdited == NO_ID)) {
 		_startMsgsEditor->reset();
 		_endMsgsEditor->reset();
+        _networkTree->resetSelectedItems();
 		if (_boxEdited != NO_ID) {
 			_startMsgsEditor->addMessages(abBox->firstMsgs());
 			_endMsgsEditor->addMessages(abBox->lastMsgs());
+            _networkTree->setAssignedItems(abBox->networkTreeItems());
+            //NICO
+            _networkTree->setSelectedItems(_networkTree->assignedItems());
 		}
 	}
 
@@ -1234,7 +1238,14 @@ void
 AttributesEditor::startMessagesChanged()
 {
 	vector<string> msgs = _startMsgsEditor->computeMessages();
-	Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
+    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
+    //NICO
+    //QList<QTreeWidgetItem*> items = _networkTree->getSelectedItems();
+    Maquette::getInstance()->setFirstItemsToSend(_boxEdited,items);
+    //Maquette::getInstance()->setFirstItemsToSend(_boxEdited,itemsSelected);
+    //NICO
+
+    Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
 	_curvesWidget->updateMessages(_boxEdited,true);
 }
 
@@ -1247,6 +1258,10 @@ AttributesEditor::endMessagesChanged()
 }
 
 void AttributesEditor::startMessageChanged(const string &address) {
+    //NICO
+    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
+    Maquette::getInstance()->setFirstItemsToSend(_boxEdited,items);
+    //NICO
 	vector<string> msgs = _startMsgsEditor->computeMessages();
 	Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
 	_curvesWidget->updateCurve(address);
@@ -1259,6 +1274,10 @@ void AttributesEditor::endMessageChanged(const string &address) {
 }
 
 void AttributesEditor::startMessageRemoved(const string &address) {
+    //NICO
+    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
+    Maquette::getInstance()->setFirstItemsToSend(_boxEdited,items);
+    //NICO
 	vector<string> msgs = _startMsgsEditor->computeMessages();
 	Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
 	Maquette::getInstance()->removeCurve(_boxEdited,address);
@@ -1276,10 +1295,13 @@ void
 AttributesEditor::snapshotStartAssignment()
 {
 	vector<string> snapshot = _networkTree->snapshot();
+    QList<QTreeWidgetItem*> assignedItems = _networkTree->getSelectedItems();
 
 	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 		if (!snapshot.empty()) {
+            _networkTree->setAssignedItems(assignedItems);
 			_startMsgsEditor->addMessages(snapshot);
+            _networkTree->setSelectedItems(_networkTree->assignedItems());
 			startMessagesChanged();
 			_scene->displayMessage("Snapshot successfully captured and applied to box start",INDICATION_LEVEL);
 		}

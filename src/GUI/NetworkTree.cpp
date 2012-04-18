@@ -1,4 +1,4 @@
-	/*
+    /*
 Copyright: LaBRI / SCRIME
 
 Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
@@ -42,15 +42,13 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "Maquette.hpp"
 #include <QList>
 #include <map>
-using std::vector;
-using std::string;
-using std::map;
+#include <exception>
 
 NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
-{
+{    
 	connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(itemCollapsed()));
 }
-
+/*
 void NetworkTree::load() {
 	vector<string> deviceNames;
 	vector<bool> deviceRequestable;
@@ -67,16 +65,147 @@ void NetworkTree::load() {
 		QTreeWidgetItem *curItem = NULL;
 		if (!(*requestableIt)) {
 			curItem = new QTreeWidgetItem(deviceName,NodeNoNamespaceType);
-			curItem->setBackground(0,QBrush(Qt::gray));
+            curItem->setBackground(0,QBrush(Qt::gray));
 		}
 		else {
 			curItem = new QTreeWidgetItem(deviceName,NodeNamespaceType);
-			curItem->setBackground(0,QBrush(Qt::darkCyan));
+            curItem->setBackground(0,QBrush(Qt::darkCyan));
 		}
 		itemsList << curItem;
 	}
 
 	addTopLevelItems(itemsList);
+}
+*/
+
+void NetworkTree::setSelectedItems(QList<QTreeWidgetItem*> selectedItems){
+
+    resetSelectedItems();
+    QList<QTreeWidgetItem *>::iterator it;
+    QTreeWidgetItem *curItem;
+    for (it =  selectedItems.begin() ; it !=  selectedItems.end() ; ++it){
+        curItem = *it;
+        curItem->setSelected(true);
+    }
+}
+
+void NetworkTree::resetSelectedItems(){
+
+    //QList<QTreeWidgetItem*> selection = assignedItems();
+    QList<QTreeWidgetItem*> selection = selectedItems();
+    QList<QTreeWidgetItem *>::iterator it;
+    QTreeWidgetItem *curItem;
+
+    for (it =  selection.begin() ; it !=  selection.end() ; ++it){
+        curItem = *it;
+        curItem->setSelected(false);
+    }
+}
+
+QList<QTreeWidgetItem*> NetworkTree::getSelectedItems(){
+
+    QList<QTreeWidgetItem*> items  = selectedItems(), allSelectedItems, *children = new QList<QTreeWidgetItem*>();
+    QList<QTreeWidgetItem*>::iterator it;
+    allSelectedItems << items;
+
+    for(it=items.begin() ; it!=items.end() ; ++it){
+        QTreeWidgetItem *curItem = *it;
+        treeRecursiveSelection(curItem,children);
+        if (!children->empty())
+            allSelectedItems << *children;
+    }
+    return allSelectedItems;
+}
+
+void NetworkTree::treeRecursiveSelection(QTreeWidgetItem *curItem, QList<QTreeWidgetItem*> *itemsList){
+
+    int i;
+    QTreeWidgetItem *child;
+    if (!curItem->isDisabled()) {
+        int childrenCount = curItem->childCount();
+        for (i=0; i < childrenCount ; i++) {
+            child=curItem->child(i);
+            if (child->type()==NodeNamespaceType){
+                itemsList->push_back(child);
+                treeRecursiveSelection(child,itemsList);
+            }
+            if (child->type()==LeaveType){
+                itemsList->push_back(child);
+            }
+        }
+    }
+
+}
+
+void NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
+
+    if (!curItem->isDisabled()) {
+
+        vector<string> nodes,leaves,attributes,attributesValues;
+        QString address = getAbsoluteAddress(curItem);
+        Maquette::getInstance()->requestNetworkNamespace(address.toStdString(), nodes, leaves, attributes, attributesValues);
+        vector<string>::iterator it;
+        vector<string>::iterator it2;
+
+        for (it = leaves.begin() ; it != leaves.end() ; ++it) {
+            QStringList list;
+            list << QString::fromStdString(*it);
+            QTreeWidgetItem *childItem = new QTreeWidgetItem(list,LeaveType);
+            childItem->setBackground(0,QBrush(Qt::darkGreen));
+            curItem->addChild(childItem);
+            list.clear();
+            treeRecursiveExploration(childItem);
+        }
+        for (it = attributes.begin(),it2 = attributesValues.begin() ; it != attributes.end(), it2 != attributesValues.end() ; ++it , ++it2) {
+            QStringList list;
+            list << QString::fromStdString(*it + " : " + *it2);
+            QTreeWidgetItem *childItem = new QTreeWidgetItem(list,AttributeType);
+            childItem->setBackground(0,QBrush(Qt::green));
+            curItem->addChild(childItem);
+            list.clear();
+        }
+        for (it = nodes.begin() ; it != nodes.end() ; ++it) {
+            QStringList list;
+            list << QString::fromStdString(*it);
+            QTreeWidgetItem *childItem = new QTreeWidgetItem(list,NodeNamespaceType);
+            childItem->setBackground(0,QBrush(Qt::darkCyan));
+            curItem->addChild(childItem);
+            list.clear();
+            treeRecursiveExploration(childItem);
+        }
+    }
+}
+
+void NetworkTree::load() {
+    vector<string> deviceNames;
+    vector<bool> deviceRequestable;
+    Maquette::getInstance()->getNetworkDeviceNames(deviceNames, deviceRequestable);
+    vector<string>::iterator nameIt;
+    vector<bool>::iterator requestableIt;
+
+    QList<QTreeWidgetItem*> itemsList;
+
+    for (nameIt = deviceNames.begin(), requestableIt = deviceRequestable.begin() ; nameIt != deviceNames.end(), requestableIt != deviceRequestable.end() ;	++nameIt,++requestableIt) {
+        QStringList deviceName;
+        deviceName << QString::fromStdString(*nameIt);
+        QTreeWidgetItem *curItem = NULL;
+        if (!(*requestableIt)) {
+            curItem = new QTreeWidgetItem(deviceName,NodeNoNamespaceType);
+            curItem->setBackground(0,QBrush(Qt::gray));
+        }
+        else {
+            curItem = new QTreeWidgetItem(deviceName,NodeNamespaceType);
+            curItem->setBackground(0,QBrush(Qt::darkCyan));
+
+            try{
+                treeRecursiveExploration(curItem);
+            }catch (const std::exception & e){
+                std::cerr << *nameIt << " : " << e.what();
+            }
+        }
+        itemsList << curItem;
+    }
+    addTopLevelItems(itemsList);
 }
 
 QString
@@ -96,7 +225,7 @@ NetworkTree::getAbsoluteAddress(QTreeWidgetItem *item) const {
 }
 
 vector<string> NetworkTree::snapshot() {
-	QList<QTreeWidgetItem*> selection = selectedItems();
+	QList<QTreeWidgetItem*> selection = selectedItems();  
 	vector<string> snapshots;
 	if (!selection.empty()) {
 		QList<QTreeWidgetItem*>::iterator it;
@@ -131,31 +260,32 @@ NetworkTree::itemCollapsed() {
 				delete *childIt;
 			}
 			vector<string>::iterator it;
-			vector<string>::iterator it2;
+            vector<string>::iterator it2;
 			for (it = nodes.begin() ; it != nodes.end() ; ++it) {
 				QStringList list;
 				list << QString::fromStdString(*it);
 				QTreeWidgetItem *childItem = new QTreeWidgetItem(list,NodeNamespaceType);
-				childItem->setBackground(0,QBrush(Qt::darkCyan));
+                childItem->setBackground(0,QBrush(Qt::darkCyan));
 				selectedItem->addChild(childItem);
-				list.clear();
+				list.clear();                
 			}
 			for (it = leaves.begin() ; it != leaves.end() ; ++it) {
 				QStringList list;
 				list << QString::fromStdString(*it);
 				QTreeWidgetItem *childItem = new QTreeWidgetItem(list,LeaveType);
-				childItem->setBackground(0,QBrush(Qt::darkGreen));
+                childItem->setBackground(0,QBrush(Qt::darkGreen));
 				selectedItem->addChild(childItem);
-				list.clear();
+				list.clear();                
 			}
 			for (it = attributes.begin(),it2 = attributesValues.begin() ; it != attributes.end(), it2 != attributesValues.end() ; ++it , ++it2) {
 				QStringList list;
 				list << QString::fromStdString(*it + " : " + *it2);
 				QTreeWidgetItem *childItem = new QTreeWidgetItem(list,AttributeType);
-				childItem->setBackground(0,QBrush(Qt::green));
+                childItem->setBackground(0,QBrush(Qt::green));
 				selectedItem->addChild(childItem);
 				list.clear();
 			}
 		}
 	}
 }
+

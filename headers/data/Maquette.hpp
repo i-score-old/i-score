@@ -336,13 +336,22 @@ class Maquette : public QObject
    */
   bool setFirstMessagesToSend(unsigned int boxID, const std::vector<std::string> &messages);
   /*!
+   * \brief Sets the set of treeItems to send for the beginning of a box.
+   *
+   * \param boxID : the box to get treeItems set from
+   * \param itemsSelected : the set of the items selected in the networkTree
+   *
+   * \return if itemsSelected could be set
+   */
+  bool setFirstItemsToSend(unsigned int boxID,  QList<QTreeWidgetItem*> itemsSelected);
+  /*!
    * \brief Sets the set of messages to send for the end of a box.
    *
    * \param boxID : the box to get messages set from
    * \param messages : the new set of the messages
    *
    * \return if messages could be set
-   */
+   */ 
   bool setLastMessagesToSend(unsigned int boxID, const std::vector<std::string> &messages);
   /*!
    * \brief Sends a specific message with current device.

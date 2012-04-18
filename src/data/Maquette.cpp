@@ -593,6 +593,18 @@ Maquette::setFirstMessagesToSend(unsigned int boxID, const vector<string> &first
 	return false;
 }
 
+//NICO
+bool
+Maquette::setFirstItemsToSend(unsigned int boxID,  QList<QTreeWidgetItem*> itemsSelected){
+    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+
+        _boxes[boxID]->setFirstItemsToSend(itemsSelected);
+
+        return true;
+    }
+    return false;
+}
+
 bool
 Maquette::setLastMessagesToSend(unsigned int boxID, const vector<string> &lastMsgs) {
 	if (boxID != NO_ID && (getBox(boxID) != NULL)) {

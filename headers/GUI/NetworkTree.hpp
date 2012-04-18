@@ -46,6 +46,10 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <vector>
 #include <string>
 
+using std::vector;
+using std::string;
+using std::map;
+
 enum {NodeNamespaceType = QTreeWidgetItem::UserType + 1, NodeNoNamespaceType = QTreeWidgetItem::UserType + 2 ,
 	LeaveType = QTreeWidgetItem::UserType + 3, AttributeType = QTreeWidgetItem::UserType + 4};
 
@@ -63,9 +67,22 @@ class NetworkTree : public QTreeWidget
 		  * \param item : the item to get address for
 		  */
 		QString getAbsoluteAddress(QTreeWidgetItem *item) const;
+        QList<QTreeWidgetItem*> getSelectedItems();
+        void setSelectedItems(QList<QTreeWidgetItem*> selectedItems);
+        void resetSelectedItems();
+        inline QList<QTreeWidgetItem*> assignedItems() {return _assignedItems;}
+        inline void setAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems.clear(); _assignedItems=items;}
+        inline void addAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems << items;}
+
+    private :
+        void treeRecursiveExploration(QTreeWidgetItem *curItem);
+        void treeRecursiveSelection(QTreeWidgetItem *curItem, QList<QTreeWidgetItem*> *itemsList);
+
+        QList<QTreeWidgetItem*> _assignedItems;
 
 	public slots:
 		void itemCollapsed();
+
 };
 
 

@@ -468,6 +468,12 @@ class BasicBox : public QGraphicsItem
    */
   void setFirstMessagesToSend(const std::vector<std::string> &messages);
   /*!
+   * \brief Sets networkTreeItems to send when the start of the box is reached.
+   *
+   * \param itemsSelected : the items to send at box's start
+   */
+  void setFirstItemsToSend(QList<QTreeWidgetItem*> itemsSelected);
+  /*!
    * \brief Sets messages to send when the end of the box is reached.
    *
    * \param messages : the messages to send at box's end

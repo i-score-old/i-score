@@ -55,6 +55,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QPoint>
 #include <QColor>
 #include <math.h>
+#include <QTreeWidgetItem>
 
 //! Defines abstract basic box type.
 enum {ABSTRACT_BOX_TYPE = 1};
@@ -134,6 +135,11 @@ class AbstractBox : public Abstract
    */
   inline std::vector<std::string> firstMsgs() const {return _firstMsgs;}
   /*!
+   * \brief Gets the items to send at box start.
+   * \return the items to send at box start
+   */
+  inline QList<QTreeWidgetItem*> networkTreeItems() const {return _networkTreeItems;}
+  /*!
    * \brief Gets the messages to send at box end.
    * \return the messages to send at box end
    */
@@ -181,7 +187,15 @@ class AbstractBox : public Abstract
   inline void setFirstMsgs(const std::vector<std::string> &firstMsgs){
   	_firstMsgs.clear();
   	_firstMsgs = firstMsgs;
-	};
+    }
+  /*!
+   * \brief Sets the items to send at box start.
+   * \param items : the new messages to send at box start
+   */
+  inline void setNetworkTreeItems(QList<QTreeWidgetItem*> &items){
+    _networkTreeItems.clear();
+    _networkTreeItems = items;
+    }
   /*!
    * \brief Sets the messages to send at box end.
    * \param lastMsgs : the new messages to send at box end
@@ -189,7 +203,7 @@ class AbstractBox : public Abstract
   inline void setLastMsgs(const std::vector<std::string> &lastMsgs){
   	_lastMsgs.clear();
   	_lastMsgs = lastMsgs;
-	};
+    }
 
  protected :
 
@@ -202,6 +216,7 @@ class AbstractBox : public Abstract
   unsigned int _motherID ; //!< The possible mother's ID
   std::vector<std::string> _firstMsgs; //!< Messages linked to the start of the box
   std::vector<std::string> _lastMsgs; //!< Messages linked to the end of the box
+  QList<QTreeWidgetItem*> _networkTreeItems;
 };
 
 #endif
