@@ -135,10 +135,15 @@ class AbstractBox : public Abstract
    */
   inline std::vector<std::string> firstMsgs() const {return _firstMsgs;}
   /*!
-   * \brief Gets the items to send at box start.
-   * \return the items to send at box start
+   * \brief Gets the items at box start.
+   * \return the items at box start
    */
   inline QList<QTreeWidgetItem*> networkTreeItems() const {return _networkTreeItems;}
+  /*!
+   * \brief Gets the expanded items .
+   * \return the items expanded.
+   */
+  inline QList<QTreeWidgetItem*> networkTreeExpandedItems() const {return _networkTreeExpandedItems;}
   /*!
    * \brief Gets the messages to send at box end.
    * \return the messages to send at box end
@@ -190,11 +195,19 @@ class AbstractBox : public Abstract
     }
   /*!
    * \brief Sets the items to send at box start.
-   * \param items : the new messages to send at box start
+   * \param items : the items to send at box start
    */
   inline void setNetworkTreeItems(QList<QTreeWidgetItem*> &items){
     _networkTreeItems.clear();
     _networkTreeItems = items;
+    }
+  /*!
+   * \brief Sets the expanded items to send.
+   * \param items : the expanded to send.
+   */
+  inline void setNetworkTreeExpandedItems(QList<QTreeWidgetItem*> &items){
+    _networkTreeExpandedItems.clear();
+    _networkTreeExpandedItems = items;
     }
   /*!
    * \brief Sets the messages to send at box end.
@@ -217,6 +230,8 @@ class AbstractBox : public Abstract
   std::vector<std::string> _firstMsgs; //!< Messages linked to the start of the box
   std::vector<std::string> _lastMsgs; //!< Messages linked to the end of the box
   QList<QTreeWidgetItem*> _networkTreeItems;
+  QList<QTreeWidgetItem*> _networkTreeExpandedItems;
+
 };
 
 #endif

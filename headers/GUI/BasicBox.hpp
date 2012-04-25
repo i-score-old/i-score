@@ -474,6 +474,12 @@ class BasicBox : public QGraphicsItem
    */
   void setFirstItemsToSend(QList<QTreeWidgetItem*> itemsSelected);
   /*!
+   * \brief Sets networkTreeExpandedItems to send.
+   *
+   * \param itemsExpanded : the expanded items to send
+   */
+  void setExpandedItemsList(QList<QTreeWidgetItem*> itemsExpanded);
+  /*!
    * \brief Sets messages to send when the end of the box is reached.
    *
    * \param messages : the messages to send at box's end

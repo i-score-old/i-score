@@ -144,7 +144,7 @@ unsigned int AttributesEditor::currentBox()
 
 void AttributesEditor::noBoxEdited() {
 	_boxEdited = NO_ID;
-	setAttributes(new AbstractSoundBox);
+    setAttributes(new AbstractSoundBox);
 	_boxStartValue->clear();
 	_boxLengthValue->clear();
 	_boxName->clear();
@@ -678,7 +678,8 @@ AttributesEditor::addWidgetsToLayout()
 	_snapshotLayout->addWidget(_snapshotAssignLabel,0,0,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
 	_snapshotLayout->addWidget(_snapshotAssignStart,0,1,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
 	_snapshotLayout->addWidget(_snapshotAssignEnd,0,2,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
-	_snapshotLayout->addWidget(_networkTree,1,0,1,5);
+    //_snapshotLayout->addWidget(_networkTree,1,0,1,5);
+    _snapshotLayout->addWidget(_networkTree,1,0,1,5);
 
 	_snapshotTab->setLayout(_snapshotLayout);
 	_snapshotTabIndex = _explorationTab->addTab(_snapshotTab,"Snapshot");
@@ -824,15 +825,23 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 		_startMsgsEditor->reset();
 		_endMsgsEditor->reset();
         _networkTree->resetSelectedItems();
-		if (_boxEdited != NO_ID) {
-			_startMsgsEditor->addMessages(abBox->firstMsgs());
-			_endMsgsEditor->addMessages(abBox->lastMsgs());
-            _networkTree->setAssignedItems(abBox->networkTreeItems());
-            //NICO
-            _networkTree->setSelectedItems(_networkTree->assignedItems());
-		}
-	}
+        _networkTree->collapseAll();
 
+        if (_boxEdited != NO_ID) {
+			_startMsgsEditor->addMessages(abBox->firstMsgs());
+            _endMsgsEditor->addMessages(abBox->lastMsgs());
+            _networkTree->setAssignedItems(abBox->networkTreeItems());
+            _networkTree->setSelectedItems(_networkTree->assignedItems());
+            //_networkTree->setExpandedItems(abBox->networkTreeExpandedItems());
+            std::cout<<"NICO clic on new box"<<std::endl;
+
+            //Maquette::getInstance()->setExpandedItemsList(_boxEdited,_networkTree->expandedItems());
+
+            _networkTree->clearExpandedItemsList();
+            //_networkTree->collapseAll();
+            _networkTree->expandItems(abBox->networkTreeExpandedItems());
+        }
+    }
 	//if (_boxEdited != NO_ID) {
 		_curvesWidget->updateMessages(_boxEdited,false);
 	//}
@@ -1239,10 +1248,13 @@ AttributesEditor::startMessagesChanged()
 {
 	vector<string> msgs = _startMsgsEditor->computeMessages();
     QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
+    //QList<QTreeWidgetItem*> expandedItems = _networkTree->expandedItems();
+
     //NICO
     //QList<QTreeWidgetItem*> items = _networkTree->getSelectedItems();
     Maquette::getInstance()->setFirstItemsToSend(_boxEdited,items);
-    //Maquette::getInstance()->setFirstItemsToSend(_boxEdited,itemsSelected);
+
+    //Maquette::getInstance()->setExpandedItemsList(_boxEdited,expandedItems);
     //NICO
 
     Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
@@ -1260,7 +1272,9 @@ AttributesEditor::endMessagesChanged()
 void AttributesEditor::startMessageChanged(const string &address) {
     //NICO
     QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
+    //QList<QTreeWidgetItem*> expandedItems = _networkTree->expandedItems();
     Maquette::getInstance()->setFirstItemsToSend(_boxEdited,items);
+    //Maquette::getInstance()->setExpandedItemsList(_boxEdited,expandedItems);
     //NICO
 	vector<string> msgs = _startMsgsEditor->computeMessages();
 	Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
@@ -1294,14 +1308,20 @@ void AttributesEditor::endMessageRemoved(const string &address) {
 void
 AttributesEditor::snapshotStartAssignment()
 {
-	vector<string> snapshot = _networkTree->snapshot();
+    //NICO
+    vector<string> snapshot = _networkTree->snapshot();
     QList<QTreeWidgetItem*> assignedItems = _networkTree->getSelectedItems();
+    QList<QTreeWidgetItem*> expandedItems = _networkTree->getExpandedItems();
 
 	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
-		if (!snapshot.empty()) {
+        if (!snapshot.empty()) {
+            _startMsgsEditor->addMessages(snapshot);
+            _networkTree->setSelectedItems(assignedItems);
             _networkTree->setAssignedItems(assignedItems);
-			_startMsgsEditor->addMessages(snapshot);
-            _networkTree->setSelectedItems(_networkTree->assignedItems());
+
+            std::cout<<"NICO expanded items ajoutés "<<std::endl;
+            Maquette::getInstance()->setExpandedItemsList(_boxEdited,_networkTree->expandedItems());
+
 			startMessagesChanged();
 			_scene->displayMessage("Snapshot successfully captured and applied to box start",INDICATION_LEVEL);
 		}

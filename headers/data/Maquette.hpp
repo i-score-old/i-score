@@ -345,6 +345,15 @@ class Maquette : public QObject
    */
   bool setFirstItemsToSend(unsigned int boxID,  QList<QTreeWidgetItem*> itemsSelected);
   /*!
+   * \brief Sets the set of treeItems expanded.
+   *
+   * \param boxID : the box to get treeItems set from
+   * \param itemsExpanded : the set of the items expanded in the networkTree
+   *
+   * \return if itemsExtanded could be set
+   */
+  bool setExpandedItemsList(unsigned int boxID,  QList<QTreeWidgetItem*> itemsExpanded);
+  /*!
    * \brief Sets the set of messages to send for the end of a box.
    *
    * \param boxID : the box to get messages set from

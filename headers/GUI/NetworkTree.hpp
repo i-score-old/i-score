@@ -67,22 +67,62 @@ class NetworkTree : public QTreeWidget
 		  * \param item : the item to get address for
 		  */
 		QString getAbsoluteAddress(QTreeWidgetItem *item) const;
+        /*!
+         * \brief Gets the list of items selected in the snapshot tree.
+         *
+         * return the item list
+         */
         QList<QTreeWidgetItem*> getSelectedItems();
+        /*!
+         * \brief Gets the list of items expanded in the snapshot tree.
+         *
+         * return the item list
+         */
+        QList<QTreeWidgetItem*> getExpandedItems();
+        /*!
+         * \brief Indicates assigned items in the snapshot tree
+         *
+         * \param selectedItems : items assigned to the box
+         */
         void setSelectedItems(QList<QTreeWidgetItem*> selectedItems);
+        /*!
+         * \brief Reset the general selection in the snapshot tree
+         */
         void resetSelectedItems();
+        /*!
+         * \brief Expands items in the snapshot tree
+         *
+         * \param expandeddItems : items to expand in the tree
+         */
+        void expandItems(QList<QTreeWidgetItem*> expandedItems);
+
         inline QList<QTreeWidgetItem*> assignedItems() {return _assignedItems;}
+        inline QList<QTreeWidgetItem*> expandedItems() {return _expandedItems;}
         inline void setAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems.clear(); _assignedItems=items;}
+        inline void setExpandedItems(QList<QTreeWidgetItem*> items){_expandedItems.clear(); _expandedItems=items;}
+        inline void addExpandedItem(QTreeWidgetItem* item){_expandedItems << item;}
+        inline void removeExpandedItem(QTreeWidgetItem* item){_expandedItems.removeAt(_expandedItems.indexOf(item));}
+        inline void clearExpandedItemsList(){collapseAll(); _expandedItems.clear();}
+
         inline void addAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems << items;}
+        inline void addAssignedItem(QTreeWidgetItem* item){_assignedItems << item;}
+        inline bool isAssigned(QTreeWidgetItem* item){return _assignedItems.contains(item);}
 
     private :
         void treeRecursiveExploration(QTreeWidgetItem *curItem);
         void treeRecursiveSelection(QTreeWidgetItem *curItem, QList<QTreeWidgetItem*> *itemsList);
+        bool allBrothersSelected(QTreeWidgetItem *item, QList<QTreeWidgetItem *> assignedItems);
+        void fathersSelection(QTreeWidgetItem *item);
 
         QList<QTreeWidgetItem*> _assignedItems;
+        QList<QTreeWidgetItem*> _nodesWithAssignedChildren;
+        QList<QTreeWidgetItem*> _expandedItems;
 
 	public slots:
 		void itemCollapsed();
-
+        void clickInNetworkTree();
+        void addToExpandedItemsList(QTreeWidgetItem *item);
+        void removeFromExpandedItemsList(QTreeWidgetItem *item);
 };
 
 

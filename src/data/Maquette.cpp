@@ -606,6 +606,17 @@ Maquette::setFirstItemsToSend(unsigned int boxID,  QList<QTreeWidgetItem*> items
 }
 
 bool
+Maquette::setExpandedItemsList(unsigned int boxID,  QList<QTreeWidgetItem*> itemsExpanded){
+    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+
+        _boxes[boxID]->setExpandedItemsList(itemsExpanded);
+
+        return true;
+    }
+    return false;
+}
+
+bool
 Maquette::setLastMessagesToSend(unsigned int boxID, const vector<string> &lastMsgs) {
 	if (boxID != NO_ID && (getBox(boxID) != NULL)) {
 		_engines->setCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);

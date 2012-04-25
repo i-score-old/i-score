@@ -570,6 +570,11 @@ BasicBox::setFirstItemsToSend(QList<QTreeWidgetItem*> itemsSelected){
 }
 
 void
+BasicBox::setExpandedItemsList(QList<QTreeWidgetItem *> itemsExpanded){
+    _abstract->setNetworkTreeExpandedItems(itemsExpanded);
+}
+
+void
 BasicBox::setLastMessagesToSend(const vector<string> &messages) {
 	_abstract->setLastMsgs(messages);
 }
