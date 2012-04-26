@@ -56,9 +56,9 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     setHeaderLabels(list);
     list.clear();
     //connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(itemCollapsed()));
-    connect(this, SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(clickInNetworkTree()));
+    //connect(this, SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(clickInNetworkTree()));
+    connect(this, SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(removeFromExpandedItemsList(QTreeWidgetItem *)));
     connect(this, SIGNAL(itemExpanded(QTreeWidgetItem *)),this,SLOT(addToExpandedItemsList(QTreeWidgetItem*)));
-    connect(this, SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(removeFromExpandedItemList(QTreeWidgetItem *)));
 
 }
 
@@ -423,10 +423,11 @@ NetworkTree::addToExpandedItemsList(QTreeWidgetItem *item){
 void
 NetworkTree::removeFromExpandedItemsList(QTreeWidgetItem *item){
 
-    std::cout << "NICO remove, list size : "<< _expandedItems.size() <<std::endl;
     removeExpandedItem(item);
-}
 
+    std::cout << "NICO remove, list size : "<< _expandedItems.size() <<std::endl;
+}
+/*
 void
 NetworkTree::itemCollapsed() {
 	QTreeWidgetItem *selectedItem = currentItem();
@@ -472,4 +473,4 @@ NetworkTree::itemCollapsed() {
 		}
 	}
 }
-
+*/

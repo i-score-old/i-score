@@ -119,7 +119,7 @@ class NetworkTree : public QTreeWidget
         QList<QTreeWidgetItem*> _expandedItems;
 
 	public slots:
-		void itemCollapsed();
+        //void itemCollapsed();
         void clickInNetworkTree();
         void addToExpandedItemsList(QTreeWidgetItem *item);
         void removeFromExpandedItemsList(QTreeWidgetItem *item);
