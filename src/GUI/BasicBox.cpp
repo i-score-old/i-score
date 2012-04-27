@@ -575,6 +575,20 @@ BasicBox::setExpandedItemsList(QList<QTreeWidgetItem *> itemsExpanded){
 }
 
 void
+BasicBox::addToExpandedItemsList(QTreeWidgetItem *item){
+    _abstract->addToNetworkTreeExpandedItems(item);
+}
+
+void
+BasicBox::removeFromExpandedItemsList(QTreeWidgetItem *item){
+    _abstract->removeFromNetworkTreeExpandedItems(item);
+}
+
+void
+BasicBox::clearExpandedItemsList(){
+    _abstract->clearNetworkTreeExpandedItems();
+}
+void
 BasicBox::setLastMessagesToSend(const vector<string> &messages) {
 	_abstract->setLastMsgs(messages);
 }

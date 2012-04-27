@@ -210,6 +210,26 @@ class AbstractBox : public Abstract
     _networkTreeExpandedItems = items;
     }
   /*!
+   * \brief Sets the expanded items to send.
+   * \param items : the expanded to send.
+   */
+  inline void addToNetworkTreeExpandedItems(QTreeWidgetItem *item){
+      if(!_networkTreeExpandedItems.contains(item))
+        _networkTreeExpandedItems << item;
+  }
+  /*!
+   * \brief Remove the expanded items from the list.
+   * \param item : the item to remove.
+   */
+  inline void removeFromNetworkTreeExpandedItems(QTreeWidgetItem *item){
+      _networkTreeExpandedItems.removeAt(_networkTreeExpandedItems.indexOf(item));
+  }
+
+  inline void clearNetworkTreeExpandedItems(){
+      _networkTreeExpandedItems.clear();
+  }
+
+  /*!
    * \brief Sets the messages to send at box end.
    * \param lastMsgs : the new messages to send at box end
    */

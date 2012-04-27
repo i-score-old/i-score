@@ -97,12 +97,12 @@ class NetworkTree : public QTreeWidget
         void expandItems(QList<QTreeWidgetItem*> expandedItems);
 
         inline QList<QTreeWidgetItem*> assignedItems() {return _assignedItems;}
-        inline QList<QTreeWidgetItem*> expandedItems() {return _expandedItems;}
+        //inline QList<QTreeWidgetItem*> expandedItems() {return _expandedItems;}
         inline void setAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems.clear(); _assignedItems=items;}
-        inline void setExpandedItems(QList<QTreeWidgetItem*> items){_expandedItems.clear(); _expandedItems=items;}
-        inline void addExpandedItem(QTreeWidgetItem* item){_expandedItems << item;}
-        inline void removeExpandedItem(QTreeWidgetItem* item){_expandedItems.removeAt(_expandedItems.indexOf(item));}
-        inline void clearExpandedItemsList(){collapseAll(); _expandedItems.clear();}
+        //inline void setExpandedItems(QList<QTreeWidgetItem*> items){_expandedItems.clear(); _expandedItems=items;}
+        //inline void addExpandedItem(QTreeWidgetItem* item){_expandedItems << item;}
+        //inline void removeExpandedItem(QTreeWidgetItem* item){_expandedItems.removeAt(_expandedItems.indexOf(item));}
+        //inline void clearExpandedItemsList(){collapseAll(); _expandedItems.clear();}
 
         inline void addAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems << items;}
         inline void addAssignedItem(QTreeWidgetItem* item){_assignedItems << item;}
@@ -116,13 +116,13 @@ class NetworkTree : public QTreeWidget
 
         QList<QTreeWidgetItem*> _assignedItems;
         QList<QTreeWidgetItem*> _nodesWithAssignedChildren;
-        QList<QTreeWidgetItem*> _expandedItems;
+        //QList<QTreeWidgetItem*> _expandedItems;
 
 	public slots:
         //void itemCollapsed();
         void clickInNetworkTree();
-        void addToExpandedItemsList(QTreeWidgetItem *item);
-        void removeFromExpandedItemsList(QTreeWidgetItem *item);
+        //void addToExpandedItemsList(QTreeWidgetItem *item);
+        //void removeFromExpandedItemsList(QTreeWidgetItem *item);
 };
 
 

@@ -617,6 +617,28 @@ Maquette::setExpandedItemsList(unsigned int boxID,  QList<QTreeWidgetItem*> item
 }
 
 bool
+Maquette::addToExpandedItemsList(unsigned int boxID,  QTreeWidgetItem* item){
+    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+
+        _boxes[boxID]->addToExpandedItemsList(item);
+
+        return true;
+    }
+    return false;
+}
+
+bool
+Maquette::removeFromExpandedItemsList(unsigned int boxID,  QTreeWidgetItem* item){
+    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+
+        _boxes[boxID]->removeFromExpandedItemsList(item);
+
+        return true;
+    }
+    return false;
+}
+
+bool
 Maquette::setLastMessagesToSend(unsigned int boxID, const vector<string> &lastMsgs) {
 	if (boxID != NO_ID && (getBox(boxID) != NULL)) {
 		_engines->setCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);

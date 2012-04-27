@@ -56,9 +56,9 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     setHeaderLabels(list);
     list.clear();
     //connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(itemCollapsed()));
-    //connect(this, SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(clickInNetworkTree()));
-    connect(this, SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(removeFromExpandedItemsList(QTreeWidgetItem *)));
-    connect(this, SIGNAL(itemExpanded(QTreeWidgetItem *)),this,SLOT(addToExpandedItemsList(QTreeWidgetItem*)));
+    connect(this, SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(clickInNetworkTree()));
+    //connect(this, SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(removeFromExpandedItemsList(QTreeWidgetItem *)));
+    //connect(this, SIGNAL(itemExpanded(QTreeWidgetItem *)),this,SLOT(addToExpandedItemsList(QTreeWidgetItem*)));
 
 }
 
@@ -143,7 +143,7 @@ void
 NetworkTree::expandItems(QList<QTreeWidgetItem*> expandedItems){
     QList<QTreeWidgetItem *>::iterator it;
     QTreeWidgetItem *curItem;
-
+    collapseAll();
     for (it =  expandedItems.begin() ; it !=  expandedItems.end() ; ++it){
         curItem = *it;
         expandItem(curItem);
@@ -210,14 +210,14 @@ QList<QTreeWidgetItem*> NetworkTree::getSelectedItems(){
     }
     return allSelectedItems;
 }
-
+/*
 QList<QTreeWidgetItem*>
 NetworkTree::getExpandedItems(){
     QList<QTreeWidgetItem*> items  = selectedItems();
 
     return items;
 }
-
+*/
 void NetworkTree::treeRecursiveSelection(QTreeWidgetItem *curItem, QList<QTreeWidgetItem*> *itemsList){
 
     int i;
@@ -403,30 +403,17 @@ NetworkTree::clickInNetworkTree(){
         }
     }
 }
-
+/*
 void
 NetworkTree::addToExpandedItemsList(QTreeWidgetItem *item){
-    QTreeWidgetItem *curItem;
-    QList<QTreeWidgetItem *>::iterator it;
-
-    /*
-    for(it=_expandedItems.begin() ; it != _expandedItems.end() ; ++it){
-        curItem = *it;
-        std::cout << curItem->text(0).toStdString() << std::endl;
-    }
-    */
     addExpandedItem(item);
-
-    std::cout << "NICO list size : "<< _expandedItems.size() <<std::endl;
 }
 
 void
 NetworkTree::removeFromExpandedItemsList(QTreeWidgetItem *item){
-
     removeExpandedItem(item);
-
-    std::cout << "NICO remove, list size : "<< _expandedItems.size() <<std::endl;
 }
+*/
 /*
 void
 NetworkTree::itemCollapsed() {

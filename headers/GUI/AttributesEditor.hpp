@@ -121,6 +121,8 @@ class AttributesEditor : public QDockWidget
 
 	public slots:
 
+  void addToExpandedItemsList(QTreeWidgetItem *item);
+  void removeFromExpandedItemsList(QTreeWidgetItem *item);
 	/*!
 	 * \brief Called to specify that no box is currently edited.
 	 */

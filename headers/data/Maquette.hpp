@@ -354,13 +354,31 @@ class Maquette : public QObject
    */
   bool setExpandedItemsList(unsigned int boxID,  QList<QTreeWidgetItem*> itemsExpanded);
   /*!
+   * \brief Add to treeItems expanded list.
+   *
+   * \param boxID : the box to get treeItems set from
+   * \param item : the items to be add
+   *
+   * \return if itemsExtanded could be add
+   */
+  bool addToExpandedItemsList(unsigned int boxID,  QTreeWidgetItem* item);
+  /*!
+   * \brief Remove from treeItems expanded list.
+   *
+   * \param boxID : the box to get treeItems set from
+   * \param item : the items to be removed
+   *
+   * \return if itemsExtanded could be removed
+   */
+  bool removeFromExpandedItemsList(unsigned int boxID,  QTreeWidgetItem* item);
+  /*!
    * \brief Sets the set of messages to send for the end of a box.
    *
    * \param boxID : the box to get messages set from
    * \param messages : the new set of the messages
    *
    * \return if messages could be set
-   */ 
+   */
   bool setLastMessagesToSend(unsigned int boxID, const std::vector<std::string> &messages);
   /*!
    * \brief Sends a specific message with current device.

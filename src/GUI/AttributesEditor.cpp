@@ -766,6 +766,9 @@ AttributesEditor::connectSlots()
 
 	connect(_snapshotAssignStart, SIGNAL(clicked()),this,SLOT(snapshotStartAssignment()));
 	connect(_snapshotAssignEnd, SIGNAL(clicked()),this,SLOT(snapshotEndAssignment()));
+    //NICO
+    connect(_networkTree, SIGNAL(itemExpanded(QTreeWidgetItem *)),this,SLOT(addToExpandedItemsList(QTreeWidgetItem*)));
+    connect(_networkTree, SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(removeFromExpandedItemsList(QTreeWidgetItem*)));
 
 	connect(_treeMapLoad, SIGNAL(clicked()), this, SLOT(reloadTreeMap()));
 	connect(_treeMapUp, SIGNAL(clicked()), this, SLOT(upTreeMap()));
@@ -833,13 +836,13 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
             _networkTree->setAssignedItems(abBox->networkTreeItems());
             _networkTree->setSelectedItems(_networkTree->assignedItems());
             //_networkTree->setExpandedItems(abBox->networkTreeExpandedItems());
-            std::cout<<"NICO clic on new box"<<std::endl;
 
             //Maquette::getInstance()->setExpandedItemsList(_boxEdited,_networkTree->expandedItems());
 
-            _networkTree->clearExpandedItemsList();
+            //_networkTree->clearExpandedItemsList();
             //_networkTree->collapseAll();
             _networkTree->expandItems(abBox->networkTreeExpandedItems());
+            //abBox->clearNetworkTreeExpandedItems();
         }
     }
 	//if (_boxEdited != NO_ID) {
@@ -1311,7 +1314,6 @@ AttributesEditor::snapshotStartAssignment()
     //NICO
     vector<string> snapshot = _networkTree->snapshot();
     QList<QTreeWidgetItem*> assignedItems = _networkTree->getSelectedItems();
-    QList<QTreeWidgetItem*> expandedItems = _networkTree->getExpandedItems();
 
 	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
         if (!snapshot.empty()) {
@@ -1319,8 +1321,7 @@ AttributesEditor::snapshotStartAssignment()
             _networkTree->setSelectedItems(assignedItems);
             _networkTree->setAssignedItems(assignedItems);
 
-            std::cout<<"NICO expanded items ajoutés "<<std::endl;
-            Maquette::getInstance()->setExpandedItemsList(_boxEdited,_networkTree->expandedItems());
+            //Maquette::getInstance()->setExpandedItemsList(_boxEdited,_networkTree->expandedItems());
 
 			startMessagesChanged();
 			_scene->displayMessage("Snapshot successfully captured and applied to box start",INDICATION_LEVEL);
@@ -1402,4 +1403,16 @@ void AttributesEditor::reloadTreeMap()
 void AttributesEditor::upTreeMap()
 {
 	_treeMap->up();
+}
+
+void
+AttributesEditor::addToExpandedItemsList(QTreeWidgetItem *item){
+    if (Maquette::getInstance()->getBox(_boxEdited) != NULL)
+        Maquette::getInstance()->addToExpandedItemsList(_boxEdited,item);
+}
+
+void
+AttributesEditor::removeFromExpandedItemsList(QTreeWidgetItem *item){
+    if (Maquette::getInstance()->getBox(_boxEdited) != NULL)
+        Maquette::getInstance()->removeFromExpandedItemsList(_boxEdited,item);
 }
