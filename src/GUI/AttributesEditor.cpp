@@ -827,8 +827,8 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 	if (boxModified || (_boxEdited == NO_ID)) {
 		_startMsgsEditor->reset();
 		_endMsgsEditor->reset();
-        _networkTree->resetSelectedItems();
-        _networkTree->collapseAll();
+        //_networkTree->resetSelectedItems();
+        //_networkTree->collapseAll();
 
         if (_boxEdited != NO_ID) {
 			_startMsgsEditor->addMessages(abBox->firstMsgs());
@@ -840,7 +840,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
             //Maquette::getInstance()->setExpandedItemsList(_boxEdited,_networkTree->expandedItems());
 
             //_networkTree->clearExpandedItemsList();
-            //_networkTree->collapseAll();
+            _networkTree->collapseAll();
             _networkTree->expandItems(abBox->networkTreeExpandedItems());
             //abBox->clearNetworkTreeExpandedItems();
         }
