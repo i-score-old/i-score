@@ -211,6 +211,7 @@ TriggerPoint::shape() const
 	return path;
 }
 
+
 void
 TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
@@ -222,29 +223,23 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 
     BasicBox *box = NULL;
     if (_abstract->boxID() != NO_ID) {
-
         if ((box = _scene->getBox(_abstract->boxID())) != NULL) {
             QPainterPath path = shape();
             QPen pen = painter->pen();
             pen.setColor(box->color().darker());
             pen.setWidth(isSelected() ? 2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
-
-
-            if (isSelected()){
-                painter->fillPath(path,Qt::darkGreen);
+            if (!_abstract->waiting()) {
+                painter->fillPath(path,Qt::darkRed);
                 painter->setPen(pen);
                 painter->drawPath(path);
             }
-
-            else{
-                painter->fillPath(path,Qt::darkRed);
+            else {
+                painter->fillPath(path,Qt::darkGreen);
                 painter->setPen(pen);
                 painter->drawPath(path);
             }
         }
     }
-
-
     if (_scene->playing()) {
         if (_abstract->waiting()) {
             painter->drawText(rect.topLeft(),QString::fromStdString(_abstract->message()));

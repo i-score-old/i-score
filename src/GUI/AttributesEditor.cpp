@@ -834,7 +834,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 			_startMsgsEditor->addMessages(abBox->firstMsgs());
             _endMsgsEditor->addMessages(abBox->lastMsgs());
             _networkTree->setAssignedItems(abBox->networkTreeItems());
-            _networkTree->setSelectedItems(_networkTree->assignedItems());
+            _networkTree->assignItems(_networkTree->assignedItems());
             //_networkTree->setExpandedItems(abBox->networkTreeExpandedItems());
 
             //Maquette::getInstance()->setExpandedItemsList(_boxEdited,_networkTree->expandedItems());
@@ -1318,7 +1318,7 @@ AttributesEditor::snapshotStartAssignment()
 	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
         if (!snapshot.empty()) {
             _startMsgsEditor->addMessages(snapshot);
-            _networkTree->setSelectedItems(assignedItems);
+            _networkTree->assignItems(assignedItems);
             _networkTree->setAssignedItems(assignedItems);
 
             //Maquette::getInstance()->setExpandedItemsList(_boxEdited,_networkTree->expandedItems());

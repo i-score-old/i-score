@@ -84,7 +84,7 @@ class NetworkTree : public QTreeWidget
          *
          * \param selectedItems : items assigned to the box
          */
-        void setSelectedItems(QList<QTreeWidgetItem*> selectedItems);
+        void assignItems(QList<QTreeWidgetItem*> selectedItems);
         /*!
          * \brief Reset the general selection in the snapshot tree
          */
@@ -110,9 +110,14 @@ class NetworkTree : public QTreeWidget
 
     private :
         void treeRecursiveExploration(QTreeWidgetItem *curItem);
-        void treeRecursiveSelection(QTreeWidgetItem *curItem, QList<QTreeWidgetItem*> *itemsList);
+        //void treeRecursiveSelection(QTreeWidgetItem *curItem, QList<QTreeWidgetItem*> *itemsList);
+        void recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select);
+        void recursiveFatherSelection(QTreeWidgetItem *item, bool select);
         bool allBrothersSelected(QTreeWidgetItem *item, QList<QTreeWidgetItem *> assignedItems);
-        void fathersSelection(QTreeWidgetItem *item);
+        bool allBrothersSelected(QTreeWidgetItem *item);
+        void fathersPartialAssignation(QTreeWidgetItem *item);
+        void fathersFullAssignation(QTreeWidgetItem *item);
+        bool noBrothersSelected(QTreeWidgetItem *item);
 
         QList<QTreeWidgetItem*> _assignedItems;
         QList<QTreeWidgetItem*> _nodesWithAssignedChildren;
