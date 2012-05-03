@@ -207,7 +207,7 @@ AttributesEditor::nameWidgets(int language)
 	grainList << tr("Smooth") << tr("Fat") << tr("Tidy") << tr("Thin");
 	pitchList << tr("None") << tr("Lowest") << tr("Low") << tr("Medium") << tr("High") << tr("Highest");
 	pitchVariationList << tr("None") << tr("Fat") << tr("Tidy") << tr("Thin");
-	harmoHeldList << tr("Pure") << tr("Key Note") << tr("Key Note Group") << tr("Ribbed") << tr("Node Group")
+    harmoHeldList << tr("Pure") << tr("Key Note") << tr("Key Note Group") << tr("Ribbed") << tr("Node Group")
 			<< tr("Node") << tr("Fringe");
 	harmoVariationList << tr("None default") << tr("Getting richer") << tr("Getting poorer");
 	messages = tr("<big><b>MESSAGES</b></big>");
@@ -674,7 +674,7 @@ AttributesEditor::addWidgetsToLayout()
 	_messagesLayout->addWidget(_messagesTabs);
 	_messagesTab->setLayout(_messagesLayout);
 
-    _networkTree->setSelectionMode(QAbstractItemView::MultiSelection);
+    _networkTree->setSelectionMode(QAbstractItemView:: MultiSelection);
 	_snapshotLayout->addWidget(_snapshotAssignLabel,0,0,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
 	_snapshotLayout->addWidget(_snapshotAssignStart,0,1,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
 	_snapshotLayout->addWidget(_snapshotAssignEnd,0,2,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
@@ -1416,3 +1416,4 @@ AttributesEditor::removeFromExpandedItemsList(QTreeWidgetItem *item){
     if (Maquette::getInstance()->getBox(_boxEdited) != NULL)
         Maquette::getInstance()->removeFromExpandedItemsList(_boxEdited,item);
 }
+

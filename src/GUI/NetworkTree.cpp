@@ -490,6 +490,20 @@ NetworkTree::clickInNetworkTree(){
     }
 }
 
+void
+NetworkTree::keyReleaseEvent(QKeyEvent *event){
+    if ( event->key()==Qt::Key_Shift) {
+        setSelectionMode(QAbstractItemView::MultiSelection);
+    }
+}
+
+void
+NetworkTree::keyPressEvent(QKeyEvent *event){
+   if ( event->key()==Qt::Key_Shift) {
+         setSelectionMode(QAbstractItemView::ContiguousSelection);
+    }
+}
+
 /*
 void
 NetworkTree::itemCollapsed() {

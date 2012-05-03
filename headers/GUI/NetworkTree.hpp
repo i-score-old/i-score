@@ -45,6 +45,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QTreeWidgetItem>
 #include <vector>
 #include <string>
+#include <QKeyEvent>
 
 using std::vector;
 using std::string;
@@ -96,6 +97,7 @@ class NetworkTree : public QTreeWidget
          */
         void expandItems(QList<QTreeWidgetItem*> expandedItems);
 
+
         inline QList<QTreeWidgetItem*> assignedItems() {return _assignedItems;}
         //inline QList<QTreeWidgetItem*> expandedItems() {return _expandedItems;}
         inline void setAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems.clear(); _assignedItems=items;}
@@ -107,6 +109,9 @@ class NetworkTree : public QTreeWidget
         inline void addAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems << items;}
         inline void addAssignedItem(QTreeWidgetItem* item){_assignedItems << item;}
         inline bool isAssigned(QTreeWidgetItem* item){return _assignedItems.contains(item);}
+
+        virtual void keyPressEvent(QKeyEvent *event);
+        virtual void keyReleaseEvent(QKeyEvent *event);
 
     private :
         void treeRecursiveExploration(QTreeWidgetItem *curItem);

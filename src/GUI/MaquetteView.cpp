@@ -174,7 +174,8 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
     else if (event->matches(QKeySequence::Delete) || event->key()==Qt::Key_Backspace) {
 		_scene->removeSelectedItems();
 		_scene->displayMessage(tr("Selection removed").toStdString(),INDICATION_LEVEL);
-	}
+    }
+
 }
 
 /**
