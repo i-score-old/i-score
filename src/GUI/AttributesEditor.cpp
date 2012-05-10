@@ -837,7 +837,6 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
             _networkTree->collapseAll();
             if(abBox->networkTreeItems().isEmpty() && abBox->networkTreeExpandedItems().isEmpty()){
                 QList<QTreeWidgetItem *>itemsFromMsg = _networkTree->getItemsFromMsg(abBox->firstMsgs());
-
                 std::cout<<"Nb msg -> items : "<<itemsFromMsg.size()<<std::endl;
                 _networkTree->setAssignedItems(itemsFromMsg);
                 startMessagesChanged();

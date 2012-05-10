@@ -408,9 +408,7 @@ void NetworkTree::load() {
 QList<QTreeWidgetItem *>
 NetworkTree:: getItemsFromMsg(vector<string> itemsName)
 {
-    QTreeWidgetItem *itemMatched;
     QList<QTreeWidgetItem *> itemsFound;
-    vector<QString> hierarchy;
     QString curName;
     QStringList address;
     QList<QTreeWidgetItem *> itemsMatchedList;
@@ -423,17 +421,9 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
         address = curName.split(" ");
         QStringList::Iterator it2;
 
-        for(it2=address.begin() ; it2!= address.end() ; ++it2){
-            std::cout<<it2->toStdString()<<std::endl;
-        }
         address = address.first().split("/");
 
-        for(it2=address.begin() ; it2!= address.end() ; ++it2){
-            std::cout<<it2->toStdString()<<std::endl;
-        }
-
         itemsFound = this->findItems(address.last(), Qt::MatchRecursive, 0);
-        std::cout << "nb items found : " << itemsFound.size() << std::endl;
         if(itemsFound.size()>1){
             QList<QTreeWidgetItem *>::iterator it3;
             QTreeWidgetItem *curIt;
@@ -442,22 +432,24 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
             for(it3=itemsFound.begin(); it3!=itemsFound.end(); ++it3){
                 curIt = *it3;
                 int i=address.size()-2;
-                std::cout<<"-----------  i = "<<i<<std::endl;
                 while(curIt->parent()!=NULL){
 
                     father=curIt->parent();
                     if(father->text(0)!=address.at(i)){
-                        break;//itemsFound.erase(it3);
+                        found=false;
+                        break;
                     }
                     else{
+                        found=true;
                         curIt=father;
                         i--;
                     }
                 }
+                if(found==true){
+                    itemsMatchedList<<*it3;
+                    break;
+                }
             }
-        }
-        if(!itemsFound.isEmpty()){
-            itemsMatchedList<<itemsFound.first();
         }
     }
 }
@@ -505,10 +497,11 @@ NetworkTree::expandNodes(QList<QTreeWidgetItem *> items){
     QTreeWidgetItem *curIt, *father;
     for(it=items.begin() ; it<items.end() ; ++it){
         curIt=*it;
-        if(curIt->parent()!=NULL){
+        while(curIt->parent()!=NULL){
             father=curIt->parent();
             if(father->type()!=NodeNoNamespaceType)
                 father->setExpanded(true);
+            curIt=father;
         }
     }
 }
