@@ -358,6 +358,12 @@ NetworkMessagesEditor::addMessage(const string &device, const string &message, c
 }
 
 void
+NetworkMessagesEditor::setMessages(const vector<string> &messages){
+    reset();
+    addMessages(messages);
+}
+
+void
 NetworkMessagesEditor::addMessages(const vector<string> &messages)
 {
 	vector<string>::const_iterator msgIt;

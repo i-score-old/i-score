@@ -833,15 +833,22 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
         if (_boxEdited != NO_ID) {
 			_startMsgsEditor->addMessages(abBox->firstMsgs());
             _endMsgsEditor->addMessages(abBox->lastMsgs());
-            _networkTree->setAssignedItems(abBox->networkTreeItems());
-            _networkTree->assignItems(_networkTree->assignedItems());
-            //_networkTree->setExpandedItems(abBox->networkTreeExpandedItems());
 
-            //Maquette::getInstance()->setExpandedItemsList(_boxEdited,_networkTree->expandedItems());
-
-            //_networkTree->clearExpandedItemsList();
             _networkTree->collapseAll();
-            _networkTree->expandItems(abBox->networkTreeExpandedItems());
+            if(abBox->networkTreeItems().isEmpty() && abBox->networkTreeExpandedItems().isEmpty()){
+                QList<QTreeWidgetItem *>itemsFromMsg = _networkTree->getItemsFromMsg(abBox->firstMsgs());
+
+                std::cout<<"Nb msg -> items : "<<itemsFromMsg.size()<<std::endl;
+                _networkTree->setAssignedItems(itemsFromMsg);
+                startMessagesChanged();
+                _networkTree->assignItems(_networkTree->assignedItems());
+                _networkTree->expandNodes(_networkTree->assignedItems());
+            }
+            else{
+                _networkTree->setAssignedItems(abBox->networkTreeItems());
+                _networkTree->expandItems(abBox->networkTreeExpandedItems());
+            }
+            _networkTree->assignItems(_networkTree->assignedItems());
             //abBox->clearNetworkTreeExpandedItems();
         }
     }
@@ -1317,7 +1324,8 @@ AttributesEditor::snapshotStartAssignment()
 
 	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
         if (!snapshot.empty()) {
-            _startMsgsEditor->addMessages(snapshot);
+            //_startMsgsEditor->addMessages(snapshot);
+            _startMsgsEditor->setMessages(snapshot);
             _networkTree->assignItems(assignedItems);
             _networkTree->setAssignedItems(assignedItems);
 

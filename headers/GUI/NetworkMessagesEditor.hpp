@@ -100,6 +100,11 @@ public :
 	/*!
 	 * \brief Clears messages contained in the editor.
 	 */
+    /*!
+     * \brief Set the list of messages.
+     */
+    void setMessages(const std::vector<std::string> &messages);
+
 	void reset();
 
 	static const int WIDTH = 350; //!< Width of the editor

@@ -397,6 +397,73 @@ void NetworkTree::load() {
     addTopLevelItems(itemsList);
 }
 
+
+/*
+ * Idée : Chercher l'item dans l'arbre à partir du nom du msg (ex : MinuitDevice1/groupe2/controle2 4294967318)
+ *      On découpe le nom jusqu'à "espace"  de telle sorte que : vector<string> hierarchy = { MinuitDevice1 ; groupe2 ; controle2 }
+ *      On fait findItems de controle2 (dernier de la liste),  puis on remonte hierarchy en vérifiant à chaque fois le père du itemFound
+ *
+ */
+
+QList<QTreeWidgetItem *>
+NetworkTree:: getItemsFromMsg(vector<string> itemsName)
+{
+    QTreeWidgetItem *itemMatched;
+    QList<QTreeWidgetItem *> itemsFound;
+    vector<QString> hierarchy;
+    QString curName;
+    QStringList address;
+    QList<QTreeWidgetItem *> itemsMatchedList;
+    vector<string>::iterator it;
+
+    if(!itemsName.empty()){
+    //Boucle sur liste message
+    for(it=itemsName.begin() ; it!=itemsName.end() ; ++it){
+        curName = QString::fromStdString(*it);
+        address = curName.split(" ");
+        QStringList::Iterator it2;
+
+        for(it2=address.begin() ; it2!= address.end() ; ++it2){
+            std::cout<<it2->toStdString()<<std::endl;
+        }
+        address = address.first().split("/");
+
+        for(it2=address.begin() ; it2!= address.end() ; ++it2){
+            std::cout<<it2->toStdString()<<std::endl;
+        }
+
+        itemsFound = this->findItems(address.last(), Qt::MatchRecursive, 0);
+        std::cout << "nb items found : " << itemsFound.size() << std::endl;
+        if(itemsFound.size()>1){
+            QList<QTreeWidgetItem *>::iterator it3;
+            QTreeWidgetItem *curIt;
+            QTreeWidgetItem *father;
+            bool found=false;
+            for(it3=itemsFound.begin(); it3!=itemsFound.end(); ++it3){
+                curIt = *it3;
+                int i=address.size()-2;
+                std::cout<<"-----------  i = "<<i<<std::endl;
+                while(curIt->parent()!=NULL){
+
+                    father=curIt->parent();
+                    if(father->text(0)!=address.at(i)){
+                        break;//itemsFound.erase(it3);
+                    }
+                    else{
+                        curIt=father;
+                        i--;
+                    }
+                }
+            }
+        }
+        if(!itemsFound.isEmpty()){
+            itemsMatchedList<<itemsFound.first();
+        }
+    }
+}
+    return itemsMatchedList;
+}
+
 QString
 NetworkTree::getAbsoluteAddress(QTreeWidgetItem *item) const {
 	QString address;
@@ -433,6 +500,20 @@ vector<string> NetworkTree::snapshot() {
 }
 
 void
+NetworkTree::expandNodes(QList<QTreeWidgetItem *> items){
+    QList<QTreeWidgetItem *>::iterator it;
+    QTreeWidgetItem *curIt, *father;
+    for(it=items.begin() ; it<items.end() ; ++it){
+        curIt=*it;
+        if(curIt->parent()!=NULL){
+            father=curIt->parent();
+            if(father->type()!=NodeNoNamespaceType)
+                father->setExpanded(true);
+        }
+    }
+}
+
+void
 NetworkTree::recursiveFatherSelection(QTreeWidgetItem *item, bool select)
 {
 
@@ -462,12 +543,13 @@ NetworkTree::recursiveFatherSelection(QTreeWidgetItem *item, bool select)
                 font.setBold(false);
                 father->setFont(0,font);
                 father->setSelected(false);
-                recursiveFatherSelection(father,false);
+                //recursiveFatherSelection(father,false);
             }
             else{
                 font.setBold(true);
                 father->setFont(0,font);
                 father->setSelected(false);
+                _nodesWithAssignedChildren<<father;
                 recursiveFatherSelection(father,false);
             }
         }

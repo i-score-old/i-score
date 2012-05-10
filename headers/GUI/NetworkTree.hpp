@@ -101,6 +101,8 @@ class NetworkTree : public QTreeWidget
         inline QList<QTreeWidgetItem*> assignedItems() {return _assignedItems;}
         //inline QList<QTreeWidgetItem*> expandedItems() {return _expandedItems;}
         inline void setAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems.clear(); _assignedItems=items;}
+        QList<QTreeWidgetItem*> getItemsFromMsg(vector<string> itemsName);
+        void expandNodes(QList<QTreeWidgetItem *> items);
         //inline void setExpandedItems(QList<QTreeWidgetItem*> items){_expandedItems.clear(); _expandedItems=items;}
         //inline void addExpandedItem(QTreeWidgetItem* item){_expandedItems << item;}
         //inline void removeExpandedItem(QTreeWidgetItem* item){_expandedItems.removeAt(_expandedItems.indexOf(item));}

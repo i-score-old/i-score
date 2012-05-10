@@ -1320,7 +1320,7 @@ Maquette::save(const string &fileName) {
 }
 
 void
-Maquette::load(const string &fileName) {
+Maquette::load(const string &fileName){
 	_engines->load(fileName + ".simone");
 	_engines->addCrossingCtrlPointCallback(&crossTransitionCallback);
 	_engines->addExecutionFinishedCallback(&executionFinishedCallback);
