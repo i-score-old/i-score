@@ -86,7 +86,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 	_editor = editor;
 	_copyPalette = _editor->getPalette();
 	_clicked = false;
-	_playing = false;
+    _playing = false;
 	_paused = false;
 
 	_modified = false;
@@ -525,10 +525,10 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 		setCurrentMode(SELECTION_MODE);
 	}
 	if (itemAt(mouseEvent->scenePos()) != 0) {
-		if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::PointingHandCursor && _currentInteractionMode != TRIGGER_MODE) {
+        if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::PointingHandCursor && _currentInteractionMode != TRIGGER_MODE) {
 			setCurrentMode(TRIGGER_MODE);
 		}
-		if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::CrossCursor && _currentInteractionMode != RELATION_MODE) {
+        if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::CrossCursor && _currentInteractionMode != RELATION_MODE) {
 			setCurrentMode(RELATION_MODE);
 		}
 	}
@@ -1444,14 +1444,14 @@ MaquetteScene::addPendingRelation()
 	int ret = addRelation(*_relation);
 
 	_relationBoxFound = false;
-	_relation = new AbstractRelation();
-
+    _relation = new AbstractRelation();
 	return ret;
 }
 
 void
 MaquetteScene::changeRelationBounds(unsigned int relID, const float &length, const float &minBound, const float &maxBound)
 {
+
 	Relation *rel = getRelation(relID);
 	if (rel != NULL) {
 		_maquette->changeRelationBounds(relID,minBound,maxBound);
@@ -1639,7 +1639,7 @@ MaquetteScene::playingMode() const
 void
 MaquetteScene::setPlayingMode(unsigned int mode)
 {
-	_playMode = SndBoxProp::PlayingMode(mode);
+    _playMode = SndBoxProp::PlayingMode(mode);
 }
 
 bool

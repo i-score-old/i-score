@@ -488,7 +488,7 @@ MainWindow::deleteKeyPressed() {
 }
 
 void
-MainWindow::spaceKeyPressed() {
+MainWindow::spacessed() {
   if (_scene->paused()) {
     play();
   }
@@ -507,6 +507,7 @@ MainWindow::escapeKeyPressed() {
   }
 }
 */
+
 void
 MainWindow::timeEndReached() {
   _accelerationSlider->setEnabled(true);

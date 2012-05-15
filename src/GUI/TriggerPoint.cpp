@@ -130,12 +130,23 @@ TriggerPoint::boundingRect() const
 
 void
 TriggerPoint::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-	QGraphicsItem::mousePressEvent(event);
-	if (_abstract->waiting()) {
+    QGraphicsItem::mousePressEvent(event);
+    if (_abstract->waiting()) {
 		_scene->trigger(_abstract->message());
 		setSelected(false);
 
 	}
+}
+
+void
+TriggerPoint::keyPressEvent(QKeyEvent *event){
+
+    if(event->key() == Qt::Key_Space){
+        if (_abstract->waiting()) {
+            _scene->trigger(_abstract->message());
+            setSelected(false);
+        }
+    }
 }
 
 void

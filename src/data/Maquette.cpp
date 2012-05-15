@@ -135,7 +135,7 @@ Maquette::init() {
 	}
 
 	_engines->addCrossingCtrlPointCallback(&crossTransitionCallback);
-	_engines->addCrossingTrgPointCallback(&crossTriggerPointCallback);
+    _engines->addCrossingTrgPointCallback(&crossTriggerPointCallback);
 	_engines->addExecutionFinishedCallback(&executionFinishedCallback);
 }
 
@@ -1045,12 +1045,10 @@ Maquette::addRelation(unsigned int ID1, BoxExtremity firstExtremum, unsigned int
 		_relations[relationID] = newRel;
 
 		_boxes[ID1]->addRelation(firstExtremum,newRel);
-		_boxes[ID2]->addRelation(secondExtremum,newRel);
-
+        _boxes[ID2]->addRelation(secondExtremum,newRel);
 		_scene->addItem(newRel);
 		updateBoxesFromEngines(movedBoxes);
-		_scene->boxesMoved(movedBoxes);
-
+        _scene->boxesMoved(movedBoxes);
 		return (int)relationID;
 	}
 
@@ -1162,7 +1160,7 @@ Maquette::startPlaying()
 		it->second->lock();
 		if (it->second->type() == SOUND_BOX_TYPE) {
 			if (it->second->date() >= _engines->getGotoValue()) {
-				sendMessage(static_cast<SoundBox*>(it->second)->getPalette().toString());
+                sendMessage(static_cast<SoundBox*>(it->second)->getPalette().toString());
 			}
 		}
 	}
@@ -1183,7 +1181,7 @@ Maquette::stopPlaying()
 	for (it = _boxes.begin() ; it != _boxes.end() ; it++) {
 		int type = it->second->type();
 		if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
-			static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
+            static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
 		}
 	}
 }
@@ -1322,7 +1320,7 @@ Maquette::save(const string &fileName) {
 void
 Maquette::load(const string &fileName){
 	_engines->load(fileName + ".simone");
-	_engines->addCrossingCtrlPointCallback(&crossTransitionCallback);
+    _engines->addCrossingCtrlPointCallback(&crossTransitionCallback);
 	_engines->addExecutionFinishedCallback(&executionFinishedCallback);
 
 	QFile enginesFile(QString::fromStdString(fileName + ".simone"));
@@ -1616,7 +1614,8 @@ Maquette::crossedTriggerPoint(bool  waiting, unsigned int trgID)
 {
 	TriggerPoint *trgPnt = getTriggerPoint(trgID);
 	if (trgPnt != NULL) {
-		trgPnt->setWaiting(waiting);
+        trgPnt->setWaiting(waiting);
+        _scene->setFocusItem(trgPnt,Qt::OtherFocusReason);
 	}
 }
 
@@ -1640,6 +1639,7 @@ crossTriggerPointCallback(bool waiting, unsigned int trgID, unsigned int boxID, 
 	Q_UNUSED(CPIndex);
 	Q_UNUSED(message);
 	Maquette::getInstance()->crossedTriggerPoint(waiting,trgID);
+    std::cout<<"NICO :\n"<<waiting<<"\n"<<trgID<<std::endl;
 }
 
 void

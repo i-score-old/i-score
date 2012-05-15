@@ -543,7 +543,6 @@ class MaquetteScene : public QGraphicsScene
   static const std::string DEFAULT_TRIGGER_MSG;
 
  protected :
-
   /*!
    * \brief Redifinition of QGraphicsScene::drawItems().
    * This method is automatically called by QGraphicsScene::update().

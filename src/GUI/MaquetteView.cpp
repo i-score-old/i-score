@@ -175,7 +175,6 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
 		_scene->removeSelectedItems();
 		_scene->displayMessage(tr("Selection removed").toStdString(),INDICATION_LEVEL);
     }
-
 }
 
 /**

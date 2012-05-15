@@ -773,5 +773,4 @@ void crossTriggerPointCallback(bool waiting, unsigned int trgID, unsigned int bo
  * \brief Callback called when the execution is finished.
  */
 void executionFinishedCallback();
-
 #endif

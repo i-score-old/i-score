@@ -133,8 +133,10 @@ class TriggerPoint : public QGraphicsItem
    * \param waiting : the new waiting state of the trigger point
    */
   inline void setWaiting(bool waiting)
-  {_abstract->setWaiting(waiting);
-  update();}
+  {
+   _abstract->setWaiting(waiting);
+   update();
+   }
   /*!
    * \brief Sets the ID of the Trigger Point.
    *
@@ -156,6 +158,7 @@ class TriggerPoint : public QGraphicsItem
 
  protected:
 
+  virtual void keyPressEvent(QKeyEvent *event);
   /*!
    * \brief Redefinition of QGraphicsItem::mousePressEvent().
    * Occurs when a mouse button is pressed.
