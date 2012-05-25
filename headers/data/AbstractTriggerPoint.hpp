@@ -133,6 +133,12 @@ class AbstractTriggerPoint : public Abstract
    */
   inline void setWaiting(bool waiting) {_waiting = waiting;}
   /*!
+   * \brief Gets the waiting state of the Trigger Point.
+   *
+   * \param boxID : the waiting state of the Trigger Point.
+   */
+  inline bool isWaiting() {return _waiting;}
+  /*!
    * \brief Sets the position of the Trigger Point.
    *
    * \param boxID : the position of the Trigger Point.

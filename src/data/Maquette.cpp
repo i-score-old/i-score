@@ -816,8 +816,7 @@ Maquette::updateBoxes(const map<unsigned int,Coords> &boxes) {
 			}
 		}
 	}
-
-	return moveAccepted;
+    return moveAccepted;
 }
 
 void
@@ -849,6 +848,7 @@ Maquette::addTriggerPoint(unsigned int boxID, BoxExtremity extremity, const stri
 	if (boxID == NO_ID) {
 		return ARGS_ERROR;
 	}
+
 	unsigned int triggerID = _engines->addTriggerPoint(_boxes[boxID]->mother());
 
 	unsigned int controlPointID = NO_ID;
@@ -874,7 +874,8 @@ Maquette::addTriggerPoint(unsigned int boxID, BoxExtremity extremity, const stri
 		_boxes[boxID]->addTriggerPoint(extremity,_triggerPoints[triggerID]);
 
 		return triggerID;
-	}
+    }
+
 	return RETURN_ERROR;
 }
 
@@ -1156,6 +1157,13 @@ Maquette::setGotoValue(int gotoValue) {
 void
 Maquette::startPlaying()
 {
+
+    TrgPntMap::iterator it1;
+    for(it1=_triggerPoints.begin() ; it1!=_triggerPoints.end() ; ++it1){
+        _scene->addToTriggerQueue(it1->second);
+
+    }
+
 	for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
 		it->second->lock();
 		if (it->second->type() == SOUND_BOX_TYPE) {
@@ -1165,7 +1173,7 @@ Maquette::startPlaying()
 		}
 	}
 
-	_engines->play();
+    _engines->play();
 }
 
 void
@@ -1184,6 +1192,7 @@ Maquette::stopPlaying()
             static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
 		}
 	}
+    _scene->getTriggersQueueList().clear();
 }
 
 void
@@ -1610,13 +1619,24 @@ Maquette::crossedTransition(unsigned int boxID, unsigned int CPIndex)
 }
 
 void
-Maquette::crossedTriggerPoint(bool  waiting, unsigned int trgID)
+Maquette::crossedTriggerPoint(bool waiting, unsigned int trgID)
 {
-	TriggerPoint *trgPnt = getTriggerPoint(trgID);
-	if (trgPnt != NULL) {
-        trgPnt->setWaiting(waiting);
-        _scene->setFocusItem(trgPnt,Qt::OtherFocusReason);
-	}
+    TriggerPoint *trgPnt = getTriggerPoint(trgID);
+
+     if (trgPnt != NULL) {
+          if(waiting){
+              trgPnt->setWaiting(waiting);
+              _scene->setFocusItem(_scene->_triggersQueueList.first(),Qt::OtherFocusReason);
+              }
+
+           else{
+              trgPnt->setWaiting(waiting);
+              _scene->_triggersQueueList.pop_front();
+              if(!_scene->_triggersQueueList.isEmpty())
+                 _scene->setFocusItem(_scene->_triggersQueueList.first(),Qt::OtherFocusReason);
+
+           }
+      }
 }
 
 void
@@ -1638,8 +1658,7 @@ crossTriggerPointCallback(bool waiting, unsigned int trgID, unsigned int boxID, 
 	Q_UNUSED(boxID);
 	Q_UNUSED(CPIndex);
 	Q_UNUSED(message);
-	Maquette::getInstance()->crossedTriggerPoint(waiting,trgID);
-    std::cout<<"NICO :\n"<<waiting<<"\n"<<trgID<<std::endl;
+    Maquette::getInstance()->crossedTriggerPoint(waiting,trgID);
 }
 
 void

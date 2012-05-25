@@ -1785,3 +1785,38 @@ void MaquetteScene::load(const string &fileName)
 	setModified(false);
 }
 
+void
+MaquetteScene::addToTriggerQueue(TriggerPoint *trigger){
+    if(!_triggersQueueList.contains(trigger)){
+        int i;
+        qreal trgPosition = trigger->pos().x();
+        for(i=0; i<_triggersQueueList.size(); i++){
+            qreal itPosition=_triggersQueueList.at(i)->pos().x();
+            if(trgPosition<=itPosition)
+                break;
+        }
+        _triggersQueueList.insert(i,trigger);
+    }
+    /*
+    if(_triggersQueueList.isEmpty())
+        _triggersQueueList<<trigger;
+
+    else{
+        if(!_triggersQueueList.contains(trigger)){
+            //QList<TriggerPoint *>::iterator it = _triggersQueueList.begin();
+            int it=0;
+            qreal trgPosition = trigger->pos().x();
+            TriggerPoint *curTrg=_triggersQueueList.at(it);
+            qreal itPosition=curTrg->pos().x();
+
+            while(trgPosition > itPosition && it<_triggersQueueList.size()-1){
+                it++;
+                curTrg=_triggersQueueList.at(it);
+                itPosition=curTrg->pos().x();
+
+            }
+
+            _triggersQueueList.insert(it,trigger);
+        }
+    }*/
+}

@@ -138,6 +138,15 @@ class TriggerPoint : public QGraphicsItem
    update();
    }
   /*!
+   * /brief Gets the waiting state of the trigger point.
+   *
+   * \param waiting : the new waiting state of the trigger point
+   */
+  inline bool isWaiting()
+  {
+      return _abstract->isWaiting();
+   }
+  /*!
    * \brief Sets the ID of the Trigger Point.
    *
    * \param ID : the new ID to be set

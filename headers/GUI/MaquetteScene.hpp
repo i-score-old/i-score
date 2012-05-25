@@ -99,8 +99,8 @@ class MaquetteScene : public QGraphicsScene
 {
   Q_OBJECT
 
-    public :
-
+  public :
+QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
   MaquetteScene(const QRectF & rect, AttributesEditor *palette);
   virtual ~MaquetteScene();
 
@@ -195,6 +195,18 @@ class MaquetteScene : public QGraphicsScene
    * \return the trigger point
    */
   TriggerPoint *getTriggerPoint(unsigned int trgID);
+  /*!
+   * \brief Gets the triggersQueueList.
+
+   * \return the triggersQueueList.
+   */
+  inline QList<TriggerPoint *> getTriggersQueueList(){return _triggersQueueList;}
+  /*!
+   * \brief Adds a trigger to the queue list.
+   *
+   * \param trgID : trigger point to add.
+   */
+  void addToTriggerQueue(TriggerPoint *trigger);
   /*!
    * \brief Adds a new sound box to the maquette with specific coordinates.
    *
@@ -757,6 +769,7 @@ class MaquetteScene : public QGraphicsScene
 
   std::map<unsigned int,BasicBox*> _playingBoxes; //!< Handles the whole set of currently playing boxes
 
+//  QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
   PlayingThread *_playThread; //!< The thread handling playing.
 };
 
