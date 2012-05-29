@@ -101,9 +101,15 @@ void NetworkTree::fathersPartialAssignation(QTreeWidgetItem *item){
         if(!allBrothersSelected(item)){
             QTreeWidgetItem *father;
             father=item->parent();
+
             QFont font;
             font.setBold(true);
             father->setFont(0,font);
+
+            for(int i=0; i<columnCount(); i++){
+                father->setBackground(i,QBrush(Qt::cyan));
+            }
+
             father->setSelected(false);
             father->setCheckState(0,Qt::PartiallyChecked);
             father->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
@@ -212,7 +218,7 @@ NetworkTree::noBrothersSelected(QTreeWidgetItem *item){
         int childrenCount = father->childCount();
         for(int i=0 ; i<childrenCount ; i++){
             child=father->child(i);
-            if(child->isSelected())
+            if(child->isSelected()||_nodesWithAssignedChildren.contains(child))
                 countSelectedItems++;
         }
     }
@@ -240,6 +246,9 @@ void NetworkTree::resetSelectedItems(){
         curItem = *it;
         QFont font;
         font.setBold(false);
+        for(int i=0; i<columnCount(); i++){
+            curItem->setBackground(i,QBrush(Qt::NoBrush));
+        }
         curItem->setFont(0,font);
         curItem->setSelected(false);
         curItem->setCheckState(0,Qt::Unchecked);
@@ -516,11 +525,15 @@ NetworkTree::recursiveFatherSelection(QTreeWidgetItem *item, bool select)
         QFont font;
 
         if (select==true){
+
             font.setBold(true);
             father->setFont(0,font);
 
             if(!allBrothersSelected(item)){
                 father->setSelected(false);
+                for(int i=0; i<columnCount(); i++){
+                    father->setBackground(i,QBrush(Qt::cyan));
+                }
                 recursiveFatherSelection(father,true);
                 _nodesWithAssignedChildren<<father;
             }
@@ -534,13 +547,21 @@ NetworkTree::recursiveFatherSelection(QTreeWidgetItem *item, bool select)
         else{
             if (noBrothersSelected(item)){
                 font.setBold(false);
+                for(int i=0; i<columnCount(); i++){
+                    father->setBackground(i,QBrush(Qt::NoBrush));
+                }
                 father->setFont(0,font);
                 father->setSelected(false);
-                //recursiveFatherSelection(father,false);
+                for(int i=0; i<columnCount(); i++){
+                    father->setBackground(i,QBrush(Qt::NoBrush));
+                }
             }
             else{
                 font.setBold(true);
                 father->setFont(0,font);
+                for(int i=0; i<columnCount(); i++){
+                    father->setBackground(i,QBrush(Qt::cyan));
+                }
                 father->setSelected(false);
                 _nodesWithAssignedChildren<<father;
                 recursiveFatherSelection(father,false);

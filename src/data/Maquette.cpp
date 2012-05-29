@@ -1634,7 +1634,6 @@ Maquette::crossedTriggerPoint(bool waiting, unsigned int trgID)
               _scene->_triggersQueueList.pop_front();
               if(!_scene->_triggersQueueList.isEmpty())
                  _scene->setFocusItem(_scene->_triggersQueueList.first(),Qt::OtherFocusReason);
-
            }
       }
 }
@@ -1657,7 +1656,7 @@ void
 crossTriggerPointCallback(bool waiting, unsigned int trgID, unsigned int boxID, unsigned int CPIndex, string message) {
 	Q_UNUSED(boxID);
 	Q_UNUSED(CPIndex);
-	Q_UNUSED(message);
+    Q_UNUSED(message);
     Maquette::getInstance()->crossedTriggerPoint(waiting,trgID);
 }
 
