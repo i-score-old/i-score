@@ -175,6 +175,14 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
 		_scene->removeSelectedItems();
 		_scene->displayMessage(tr("Selection removed").toStdString(),INDICATION_LEVEL);
     }
+    else if (event->key()==Qt::Key_Space && !_scene->playing()) {
+        _scene->play();
+        _scene->displayMessage(tr("Start playing").toStdString(),INDICATION_LEVEL);
+    }
+    else if (event->key()==Qt::Key_Enter || event->key()==Qt::Key_Return) {
+        _scene->stop();
+        _scene->displayMessage(tr("Stop playing").toStdString(),INDICATION_LEVEL);
+    }
 }
 
 /**

@@ -222,6 +222,7 @@ NetworkTree::noBrothersSelected(QTreeWidgetItem *item){
                 countSelectedItems++;
         }
     }
+
     if(countSelectedItems==0)
         return true;
     else
@@ -246,6 +247,7 @@ void NetworkTree::resetSelectedItems(){
         curItem = *it;
         QFont font;
         font.setBold(false);
+
         for(int i=0; i<columnCount(); i++){
             curItem->setBackground(i,QBrush(Qt::NoBrush));
         }
@@ -253,6 +255,7 @@ void NetworkTree::resetSelectedItems(){
         curItem->setSelected(false);
         curItem->setCheckState(0,Qt::Unchecked);
     }
+    _nodesWithAssignedChildren.clear();
 }
 
 QList<QTreeWidgetItem*> NetworkTree::getSelectedItems(){
@@ -544,17 +547,17 @@ NetworkTree::recursiveFatherSelection(QTreeWidgetItem *item, bool select)
             }
         }
 
+        //select==false
         else{
             if (noBrothersSelected(item)){
                 font.setBold(false);
-                for(int i=0; i<columnCount(); i++){
-                    father->setBackground(i,QBrush(Qt::NoBrush));
-                }
                 father->setFont(0,font);
                 father->setSelected(false);
+                _nodesWithAssignedChildren.removeAll(father);
                 for(int i=0; i<columnCount(); i++){
                     father->setBackground(i,QBrush(Qt::NoBrush));
                 }
+                recursiveFatherSelection(father,false);
             }
             else{
                 font.setBold(true);
