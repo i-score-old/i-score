@@ -578,7 +578,7 @@ MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 		if (_clicked) {
 			_mousePos = mouseEvent->scenePos();
 			if (_relation->firstBox() != NO_ID) {
-				update();
+                update();
 			}
 			if (itemAt(mouseEvent->scenePos()) != 0) {
 				int type = itemAt(mouseEvent->scenePos())->type();
@@ -635,7 +635,7 @@ void
 MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 	QGraphicsScene::mouseReleaseEvent(mouseEvent);
 
-	_releasePoint = mouseEvent->scenePos();
+    _releasePoint = mouseEvent->scenePos();
 	_clicked = false;
 
 	switch (_currentInteractionMode) {
@@ -643,18 +643,21 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 		if (itemAt(mouseEvent->scenePos()) != 0) {
 			int type = itemAt(mouseEvent->scenePos())->type();
 			if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
-				BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
+                BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
+                BasicBox *firstBox = getBox(_relation->firstBox());
 				if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE)) {
-					setRelationSecondBox(secondBox->ID(),BOX_START);
-					addPendingRelation();
+                    setRelationSecondBox(secondBox->ID(),BOX_START);
+                    addPendingRelation();
+                    firstBox->setSelected(true);
 				}
 				else if (mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
 					setRelationSecondBox(secondBox->ID(),BOX_END);
-					addPendingRelation();
+                    addPendingRelation();                    
+                    firstBox->setSelected(true);
 				}
 				else {
 					if (selectedItems().empty()) {
-						displayMessage(tr("No relation created").toStdString(),WARNING_LEVEL);
+//						displayMessage(tr("No relation created").toStdString(),WARNING_LEVEL);
 					}
 					else {
 						selectionMoved();
@@ -671,7 +674,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 			_relationBoxFound = false;
 			delete _relation;
 			_relation = new AbstractRelation;
-		}
+        }
 		break;
 	case SELECTION_MODE :
 		if (selectedItems().isEmpty()) {
@@ -688,7 +691,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 		break;
 	case CREATION_MODE :
 		if (!selectedItems().empty()) {
-			_maquette->updateRelations();
+            _maquette->updateRelations();
 		}
 		if (resizeMode() == NO_RESIZE && _tempBox) {
 			if (_releasePoint != _pressPoint) {
@@ -707,7 +710,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 		break;
 	}
 
-	setCurrentMode(_savedInteractionMode,BoxCreationMode(_savedBoxMode));
+    setCurrentMode(_savedInteractionMode,BoxCreationMode(_savedBoxMode));
 
 	update();
 }
@@ -717,7 +720,7 @@ MaquetteScene::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
 {
 	_tempBox = NULL;
 	_resizeBox = NO_ID;
-	_relation->setFirstBox(NO_ID);
+    _relation->setFirstBox(NO_ID);
 	_relation->setSecondBox(NO_ID);
 	_relationBoxFound = false;
 

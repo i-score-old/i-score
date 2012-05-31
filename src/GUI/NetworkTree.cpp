@@ -119,7 +119,6 @@ NetworkTree::expandItems(QList<QTreeWidgetItem*> expandedItems){
     for (it =  expandedItems.begin() ; it !=  expandedItems.end() ; ++it){
         curItem = *it;
         expandItem(curItem);
-        //curItem->setExpanded(true);
     }
 }
 

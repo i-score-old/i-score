@@ -751,7 +751,7 @@ QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
   int _currentInteractionMode; //!< Current interaction mode.
   int _currentBoxMode; //!< Current box creation mode.
   int _savedInteractionMode; //!< Saved interation mode.
-	int _savedBoxMode; //!< Saved box interation mode.
+  int _savedBoxMode; //!< Saved box interation mode.
   SndBoxProp::PlayingMode _playMode; //!< Current playing mode.
 
   unsigned int _resizeBox; //!< During a resizing operation, the concerned box
