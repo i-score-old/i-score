@@ -50,7 +50,6 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     QStringList list;
     list<<"Name";
     list<<"Value";
-    //list<<"Assigned";
     setColumnWidth(0,250);
     setColumnWidth(1,140);
     setHeaderLabels(list);
@@ -62,58 +61,15 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 
 }
 
-
-/*
-
-void NetworkTree::load() {
-	vector<string> deviceNames;
-	vector<bool> deviceRequestable;
-	Maquette::getInstance()->getNetworkDeviceNames(deviceNames, deviceRequestable);
-
-	vector<string>::iterator nameIt;
-	vector<bool>::iterator requestableIt;
-
-	QList<QTreeWidgetItem*> itemsList;
-
-	for (nameIt = deviceNames.begin(), requestableIt = deviceRequestable.begin() ; nameIt != deviceNames.end(), requestableIt != deviceRequestable.end() ;	++nameIt,++requestableIt) {
-		QStringList deviceName;
-		deviceName << QString::fromStdString(*nameIt);
-		QTreeWidgetItem *curItem = NULL;
-		if (!(*requestableIt)) {
-			curItem = new QTreeWidgetItem(deviceName,NodeNoNamespaceType);
-            curItem->setBackground(0,QBrush(Qt::gray));
-		}
-		else {
-			curItem = new QTreeWidgetItem(deviceName,NodeNamespaceType);
-            curItem->setBackground(0,QBrush(Qt::darkCyan));
-		}
-		itemsList << curItem;
-	}
-
-	addTopLevelItems(itemsList);
-}
-*/
-
-
 void NetworkTree::fathersPartialAssignation(QTreeWidgetItem *item){
 
     if(item->parent()!=NULL){
         if(!allBrothersSelected(item)){
             QTreeWidgetItem *father;
             father=item->parent();
-
-            QFont font;
-            font.setBold(true);
-            father->setFont(0,font);
-
-            for(int i=0; i<columnCount(); i++){
-                father->setBackground(i,QBrush(Qt::cyan));
-            }
-
-            father->setSelected(false);
+            selectPartially(father);
             father->setCheckState(0,Qt::PartiallyChecked);
             father->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-            _nodesWithAssignedChildren<<father;
             fathersPartialAssignation(father);
         }
     }
@@ -173,7 +129,6 @@ bool NetworkTree::allBrothersSelected(QTreeWidgetItem *item, QList<QTreeWidgetIt
 
     if(item->parent()!=NULL){
         father=item->parent();
-
         int childrenCount = father->childCount();
         for(int i=0 ; i<childrenCount ; i++){
             if(!assignedItems.contains(father->child(i))){
@@ -182,7 +137,6 @@ bool NetworkTree::allBrothersSelected(QTreeWidgetItem *item, QList<QTreeWidgetIt
         }
         return true;
     }
-
     else
         return true;
 }
@@ -193,7 +147,6 @@ bool NetworkTree::allBrothersSelected(QTreeWidgetItem *item){
 
     if(item->parent()!=NULL){
         father=item->parent();
-
         int childrenCount = father->childCount();
         for(int i=0 ; i<childrenCount ; i++){
             child=father->child(i);
@@ -203,7 +156,6 @@ bool NetworkTree::allBrothersSelected(QTreeWidgetItem *item){
         }
         return true;
     }
-
     else
         return true;
 }
@@ -232,8 +184,6 @@ NetworkTree::noBrothersSelected(QTreeWidgetItem *item){
 void NetworkTree::resetSelectedItems(){
 
     QList<QTreeWidgetItem*> selection = assignedItems()+selectedItems();
-    //QList<QTreeWidgetItem*> selection = selectedItems();
-    //selection<<assignedItems();
     QList<QTreeWidgetItem *>::iterator it;
     QTreeWidgetItem *curItem;
 
@@ -251,6 +201,7 @@ void NetworkTree::resetSelectedItems(){
         for(int i=0; i<columnCount(); i++){
             curItem->setBackground(i,QBrush(Qt::NoBrush));
         }
+
         curItem->setFont(0,font);
         curItem->setSelected(false);
         curItem->setCheckState(0,Qt::Unchecked);
@@ -267,7 +218,6 @@ QList<QTreeWidgetItem*> NetworkTree::getSelectedItems(){
 
     for(it=items.begin() ; it!=items.end() ; ++it){
         QTreeWidgetItem *curItem = *it;
-        //treeRecursiveSelection(curItem,children);
         if (!children->empty())
             allSelectedItems << *children;
     }
@@ -278,6 +228,7 @@ void NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool sele
 
     int i;
     QTreeWidgetItem *child;
+
     if (!curItem->isDisabled()) {
         int childrenCount = curItem->childCount();
         for (i=0; i < childrenCount ; i++) {
@@ -294,28 +245,6 @@ void NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool sele
 
 }
 
-/*
-void NetworkTree::treeRecursiveSelection(QTreeWidgetItem *curItem, QList<QTreeWidgetItem*> *itemsList){
-
-    int i;
-    QTreeWidgetItem *child;
-    if (!curItem->isDisabled()) {
-        int childrenCount = curItem->childCount();
-        for (i=0; i < childrenCount ; i++) {
-            child=curItem->child(i);
-            if (child->type()==NodeNamespaceType){
-                itemsList->push_back(child);
-                treeRecursiveSelection(child,itemsList);
-            }
-            if (child->type()==LeaveType){
-                itemsList->push_back(child);
-            }
-        }
-    }
-
-}
-*/
-
 void NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
 
     if (!curItem->isDisabled()) {
@@ -330,7 +259,6 @@ void NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
             QStringList list;
             list << QString::fromStdString(*it);
             QTreeWidgetItem *childItem = new QTreeWidgetItem(list,LeaveType);
-            //childItem->setBackground(0,QBrush(Qt::darkGreen));
             curItem->setCheckState(0,Qt::Unchecked);
             curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
             curItem->addChild(childItem);
@@ -341,29 +269,23 @@ void NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
             QStringList list;
             list << QString::fromStdString(*it + " : " + *it2);
             QTreeWidgetItem *childItem = new QTreeWidgetItem(list,AttributeType);
-            //childItem->setBackground(0,QBrush(Qt::green));
-            //curItem->setCheckState(0,Qt::Unchecked);
             curItem->addChild(childItem);
             list.clear();
 
             if(it2==attributesValues.begin()){
                 QString leave_value = QString::fromStdString(*it2);
                 QFont font;
-                //font.setWeight(QFont::Light);
                 font.setCapitalization(QFont::SmallCaps);
                 curItem->setText(1,leave_value);
                 curItem->setFont(1,font);
-                //curItem->setData(0, 5, QString::fromStdString(*it2));
                 curItem->setCheckState(0,Qt::Unchecked);
                 curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-                //list.clear();
             }
         }
         for (it = nodes.begin() ; it != nodes.end() ; ++it) {
             QStringList list;
             list << QString::fromStdString(*it);
             QTreeWidgetItem *childItem = new QTreeWidgetItem(list,NodeNamespaceType);
-            //childItem->setBackground(0,QBrush(Qt::darkCyan));
             curItem->setCheckState(0,Qt::Unchecked);
             curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
             curItem->addChild(childItem);
@@ -390,13 +312,11 @@ void NetworkTree::load() {
             curItem = new QTreeWidgetItem(deviceName,NodeNoNamespaceType);
             curItem->setCheckState(0,Qt::Unchecked);
             curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-            //curItem->setBackground(0,QBrush(Qt::gray));
         }
         else {
             curItem = new QTreeWidgetItem(deviceName,NodeNamespaceType);
             curItem->setCheckState(0,Qt::Unchecked);
             curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-            //curItem->setBackground(0,QBrush(Qt::darkCyan));
 
             try{
                 treeRecursiveExploration(curItem);
@@ -533,12 +453,8 @@ NetworkTree::recursiveFatherSelection(QTreeWidgetItem *item, bool select)
             father->setFont(0,font);
 
             if(!allBrothersSelected(item)){
-                father->setSelected(false);
-                for(int i=0; i<columnCount(); i++){
-                    father->setBackground(i,QBrush(Qt::cyan));
-                }
+                selectPartially(father);
                 recursiveFatherSelection(father,true);
-                _nodesWithAssignedChildren<<father;
             }
 
             else{
@@ -550,27 +466,40 @@ NetworkTree::recursiveFatherSelection(QTreeWidgetItem *item, bool select)
         //select==false
         else{
             if (noBrothersSelected(item)){
-                font.setBold(false);
-                father->setFont(0,font);
-                father->setSelected(false);
-                _nodesWithAssignedChildren.removeAll(father);
-                for(int i=0; i<columnCount(); i++){
-                    father->setBackground(i,QBrush(Qt::NoBrush));
-                }
+                unselectPartially(father);
                 recursiveFatherSelection(father,false);
             }
             else{
-                font.setBold(true);
-                father->setFont(0,font);
-                for(int i=0; i<columnCount(); i++){
-                    father->setBackground(i,QBrush(Qt::cyan));
-                }
-                father->setSelected(false);
-                _nodesWithAssignedChildren<<father;
+                selectPartially(father);
                 recursiveFatherSelection(father,false);
             }
         }
     }
+}
+
+void
+NetworkTree::selectPartially(QTreeWidgetItem *item){
+
+    QFont font;
+    item->setSelected(false);
+    font.setBold(true);
+    item->setFont(0,font);
+    for(int i=0; i<columnCount(); i++){
+        item->setBackground(i,QBrush(Qt::cyan));
+    }
+    addNodePartiallyAssigned(item);
+}
+
+void
+NetworkTree::unselectPartially(QTreeWidgetItem *item){
+
+    QFont font;
+    font.setBold(false);
+    item->setFont(0,font);
+    for(int i=0; i<columnCount(); i++){
+        item->setBackground(i,QBrush(Qt::NoBrush));
+    }
+    removeNodePartiallyAssigned(item);
 }
 
 void
@@ -584,6 +513,7 @@ NetworkTree::clickInNetworkTree(){
     }
 
     if(!item->isSelected()){
+        unselectPartially(item);
         recursiveChildrenSelection(item, false);
         recursiveFatherSelection(item,false);
     }

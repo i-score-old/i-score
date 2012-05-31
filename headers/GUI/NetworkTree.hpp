@@ -125,7 +125,10 @@ class NetworkTree : public QTreeWidget
         void fathersPartialAssignation(QTreeWidgetItem *item);
         void fathersFullAssignation(QTreeWidgetItem *item);
         bool noBrothersSelected(QTreeWidgetItem *item);
-
+        inline void addNodePartiallyAssigned(QTreeWidgetItem *item){if (!_nodesWithAssignedChildren.contains(item)) _nodesWithAssignedChildren<<item;}
+        inline void removeNodePartiallyAssigned(QTreeWidgetItem *item){if (_nodesWithAssignedChildren.contains(item)) _nodesWithAssignedChildren.removeAll(item);}
+        void selectPartially(QTreeWidgetItem *item);
+        void unselectPartially(QTreeWidgetItem *item);
         QList<QTreeWidgetItem*> _assignedItems;
         QList<QTreeWidgetItem*> _nodesWithAssignedChildren;
         //QList<QTreeWidgetItem*> _expandedItems;
