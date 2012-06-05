@@ -1164,6 +1164,7 @@ Maquette::startPlaying()
     }
 
     int nbTrg = _scene->_triggersQueueList.size();
+
     try{
         for(int i=0 ; i<nbTrg ; i++){
         if( gotoValue >= _scene->_triggersQueueList.first()->date() ){
@@ -1636,7 +1637,7 @@ Maquette::crossedTriggerPoint(bool waiting, unsigned int trgID)
 {
     TriggerPoint *trgPnt = getTriggerPoint(trgID);
 
-    if (trgPnt != NULL) {
+     if (trgPnt != NULL) {
           if(waiting){
               trgPnt->setWaiting(waiting);
               _scene->setFocusItem(_scene->_triggersQueueList.first(),Qt::OtherFocusReason);
