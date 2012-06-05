@@ -423,10 +423,10 @@ MainWindow::accelerationValueEntered(double value)
 void
 MainWindow::gotoChanged()
 {
-	double newValue = _gotoSlider->value();
+    double newValue = _gotoSlider->value();
 
 	Maquette::getInstance()->setGotoValue(newValue);
-
+    std::cout<<"GOTO value : "<<newValue<<"\n";
 	_view->setGotoValue(newValue);
 
 	_gotoDisplay->setValue(newValue / S_TO_MS);

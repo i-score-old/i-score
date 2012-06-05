@@ -48,6 +48,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "CSPTypes.hpp"
 #include "Abstract.hpp"
 #include "BasicBox.hpp"
+#include "MaquetteScene.hpp"
 #include <string>
 #include <QPointF>
 

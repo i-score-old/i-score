@@ -79,7 +79,12 @@ class TriggerPoint : public QGraphicsItem
    * \brief Initialises item's properties.
    */
   void init();
-
+  /*!
+   * \brief Gets the trigger point's date.
+   *
+   * \return the date
+   */
+  inline double date() const{return this->pos().x() * (MaquetteScene::MAX_SCENE_WIDTH * MaquetteScene::MS_PER_PIXEL / 100000.);}
   /*!
    * \brief Gets the trigger point's ID.
    *

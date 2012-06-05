@@ -593,7 +593,6 @@ Maquette::setFirstMessagesToSend(unsigned int boxID, const vector<string> &first
 	return false;
 }
 
-//NICO
 bool
 Maquette::setFirstItemsToSend(unsigned int boxID,  QList<QTreeWidgetItem*> itemsSelected){
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
@@ -1157,12 +1156,26 @@ Maquette::setGotoValue(int gotoValue) {
 void
 Maquette::startPlaying()
 {
+    double gotoValue = (double)_engines->getGotoValue();
 
     TrgPntMap::iterator it1;
     for(it1=_triggerPoints.begin() ; it1!=_triggerPoints.end() ; ++it1){
         _scene->addToTriggerQueue(it1->second);
-
     }
+
+    int nbTrg = _scene->_triggersQueueList.size();
+    try{
+        for(int i=0 ; i<nbTrg ; i++){
+        if( gotoValue >= _scene->_triggersQueueList.first()->date() ){
+           _scene->_triggersQueueList.removeFirst();
+        }
+        else
+           break;
+        }
+    }
+    catch (const std::exception & e){
+       std::cerr << e.what();
+   }
 
 	for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
 		it->second->lock();
@@ -1623,7 +1636,7 @@ Maquette::crossedTriggerPoint(bool waiting, unsigned int trgID)
 {
     TriggerPoint *trgPnt = getTriggerPoint(trgID);
 
-     if (trgPnt != NULL) {
+    if (trgPnt != NULL) {
           if(waiting){
               trgPnt->setWaiting(waiting);
               _scene->setFocusItem(_scene->_triggersQueueList.first(),Qt::OtherFocusReason);

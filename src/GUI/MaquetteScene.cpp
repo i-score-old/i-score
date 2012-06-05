@@ -510,7 +510,9 @@ MaquetteScene::dropEvent(QGraphicsSceneDragDropEvent *event)
 void
 MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-	QGraphicsScene::mousePressEvent(mouseEvent);
+    if(!playing()){
+    QGraphicsScene::mousePressEvent(mouseEvent);
+
 	_clicked = true;
 	if (_tempBox) {
 		removeItem(_tempBox);
@@ -521,12 +523,12 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 	if (mouseEvent->modifiers() == Qt::ControlModifier) {
 		setCurrentMode(CREATION_MODE);
 	}
-	else {
-		setCurrentMode(SELECTION_MODE);
+    else {
+        setCurrentMode(SELECTION_MODE);
 	}
 	if (itemAt(mouseEvent->scenePos()) != 0) {
         if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::PointingHandCursor && _currentInteractionMode != TRIGGER_MODE) {
-			setCurrentMode(TRIGGER_MODE);
+            setCurrentMode(TRIGGER_MODE);
 		}
         if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::CrossCursor && _currentInteractionMode != RELATION_MODE) {
 			setCurrentMode(RELATION_MODE);
@@ -567,6 +569,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 		}
 		break;
 	}
+    }
 }
 
 void
@@ -1793,12 +1796,14 @@ MaquetteScene::addToTriggerQueue(TriggerPoint *trigger){
     if(!_triggersQueueList.contains(trigger)){
         int i;
         qreal trgPosition = trigger->pos().x();
+
         for(i=0; i<_triggersQueueList.size(); i++){
             qreal itPosition=_triggersQueueList.at(i)->pos().x();
             if(trgPosition<=itPosition)
                 break;
         }
         _triggersQueueList.insert(i,trigger);
+
     }
     /*
     if(_triggersQueueList.isEmpty())
