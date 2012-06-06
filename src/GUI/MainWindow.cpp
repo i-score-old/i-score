@@ -425,11 +425,11 @@ MainWindow::gotoChanged()
 {
     double newValue = _gotoSlider->value();
 
-	Maquette::getInstance()->setGotoValue(newValue);
-    std::cout<<"GOTO value : "<<newValue<<"\n";
+    Maquette::getInstance()->setGotoValue(newValue);
 	_view->setGotoValue(newValue);
 
 	_gotoDisplay->setValue(newValue / S_TO_MS);
+    _view->repaint();
 }
 
 void
@@ -842,11 +842,11 @@ MainWindow::createActions()
 
   connect(_gotoSlider,SIGNAL(valueChanged(int)),this,SLOT(gotoChanged()));
 
-  static const unsigned int GOTO_PRECISION = 2;
+  static const unsigned int GOTO_PRECISION = 3;
   static const float S_TO_MS = 1000.;
   _gotoDisplay = new QDoubleSpinBox;
   _gotoDisplay->setStatusTip(tr("Goto"));
-  _gotoDisplay->setRange(0.,MaquetteScene::MAX_SCENE_WIDTH * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
+  _gotoDisplay->setRange(0.,MaquetteScene::MAX_SCENE_WIDTH * MaquetteScene::MS_PER_PIXEL / S_TO_MS);  
   _gotoDisplay->setDecimals(GOTO_PRECISION);
   _gotoDisplay->setKeyboardTracking(false);
   connect(_gotoDisplay, SIGNAL(valueChanged(double)), this, SLOT(gotoValueEntered(double)));
