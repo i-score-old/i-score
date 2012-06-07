@@ -228,12 +228,12 @@ ParentBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 					_scene->setRelationFirstBox(_abstract->ID(),BOX_END);
 				}
 			}
-			else if (cursor().shape() == Qt::PointingHandCursor) {
-				lock();
-				if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
-					addTriggerPoint(BOX_START);
+            else if (cursor().shape() == Qt::PointingHandCursor) {
+                lock();
+                if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
+                    addTriggerPoint(BOX_START);
 				}
-				else if (event->pos().x() > boundingRect().topRight().x() - RESIZE_TOLERANCE) {
+                else if (event->pos().x() > boundingRect().topRight().x() - RESIZE_TOLERANCE) {
 					addTriggerPoint(BOX_END);
 				}
 			}

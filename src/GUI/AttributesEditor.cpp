@@ -1044,7 +1044,7 @@ AttributesEditor::nameChanged()
 	BasicBox * box = _scene->getBox(_boxEdited);
 	if (box != NULL) {
 		box->setName(_boxName->text());
-		_scene->update(box->getTopLeft().x(),box->getTopLeft().y(),box->width(),box->height() + 10);
+        _scene->update(box->getTopLeft().x(),box->getTopLeft().y(),box->width(),box->height() + 10);
 	}
 }
 

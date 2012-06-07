@@ -520,7 +520,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 	}
 	_savedInteractionMode = _currentInteractionMode;
 	_savedBoxMode = _currentBoxMode;
-	if (mouseEvent->modifiers() == Qt::ControlModifier) {
+    if (mouseEvent->modifiers() == Qt::ControlModifier) {
 		setCurrentMode(CREATION_MODE);
 	}
     else {
@@ -680,7 +680,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
         }
 		break;
 	case SELECTION_MODE :
-		if (selectedItems().isEmpty()) {
+        if (selectedItems().isEmpty()) {
 			_editor->noBoxEdited();
 		}
 
@@ -970,7 +970,7 @@ void MaquetteScene::pasteBoxes()
 		else if ((*it)->type() == ABSTRACT_TRIGGER_POINT_TYPE) {
 			AbstractTriggerPoint *triggerPoint = static_cast<AbstractTriggerPoint*>(*it);
 			if (triggerPoint->boxID() != NO_ID) {
-				if (IDMap.find(triggerPoint->boxID()) != IDMap.end()) {
+                if (IDMap.find(triggerPoint->boxID()) != IDMap.end()) {
 					getBox(IDMap[triggerPoint->boxID()])->addTriggerPoint(*triggerPoint);
 				}
 			}

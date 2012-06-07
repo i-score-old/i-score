@@ -549,6 +549,13 @@ class BasicBox : public QGraphicsItem
    */
   virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
   /*!
+   * \brief Redefinition of QGraphicsItem::mouseDoubleClickEvent().
+   * Occurs when the mouse moves over the box.
+   *
+   * \param event : the variable containing information about the event
+   */
+  virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
+  /*!
    * \brief Redefinition of QGraphicsItem::mouseReleaseEvent().
    * Occurs when a mouse button is released.
    *

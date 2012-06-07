@@ -459,9 +459,10 @@ BasicBox::hasTriggerPoint(BoxExtremity extremity)
 bool
 BasicBox::addTriggerPoint(BoxExtremity extremity)
 {
+/*
 	switch (extremity) {
-	case BOX_START :
-		_trgPntMsgEdit = new TextEdit(_scene->views().first(),QObject::tr("Enter the trigger point message :").toStdString(),
+    case BOX_START :
+        _trgPntMsgEdit = new TextEdit(_scene->views().first(),QObject::tr("Enter the trigger point message :").toStdString(),
 				"/"+_abstract->name()+"/start");
 		_trgPntMsgEdit->move(mapToScene(boundingRect().topLeft()).x(),
 				mapToScene(boundingRect().topLeft()).y() - 4 * _trgPntMsgEdit->height());
@@ -472,19 +473,24 @@ BasicBox::addTriggerPoint(BoxExtremity extremity)
 		_trgPntMsgEdit->move(mapToScene(boundingRect().topRight()).x(),
 				mapToScene(boundingRect().topRight()).y() - 4 * _trgPntMsgEdit->height());
 		break;
+
 	default :
 		_trgPntMsgEdit = new TextEdit(_scene->views().first(),QObject::tr("Enter the trigger point message :").toStdString(),
 				"/"+_abstract->name()+MaquetteScene::DEFAULT_TRIGGER_MSG);
 		_trgPntMsgEdit->move(mapToScene(boundingRect().topLeft()).x(),
 				mapToScene(boundingRect().topLeft()).y());
 		break;
+
 	}
 
-	bool ok = _trgPntMsgEdit->exec();
-	bool ret = false;
+    bool ok = _trgPntMsgEdit->exec();
+    */
+    bool ok = true;
+    bool ret = false;
 	if (ok) {
 		if (_triggerPoints.find(extremity) == _triggerPoints.end()) {
-			int trgID = _scene->addTriggerPoint(_abstract->ID(),extremity,_trgPntMsgEdit->value());
+            int trgID = _scene->addTriggerPoint(_abstract->ID(),extremity,"/"+_abstract->name()+"/start");
+//			int trgID = _scene->addTriggerPoint(_abstract->ID(),extremity,_trgPntMsgEdit->value());
 			if (trgID > NO_ID) {
 				_triggerPoints[extremity] = _scene->getTriggerPoint(trgID);
 				_triggerPoints[extremity]->updatePosition();
@@ -493,9 +499,9 @@ BasicBox::addTriggerPoint(BoxExtremity extremity)
 		}
 	}
 
-	delete _trgPntMsgEdit;
+//    delete _trgPntMsgEdit;
 
-	unlock();
+    unlock();
 
 	return ret;
 }
@@ -786,7 +792,7 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 	QGraphicsItem::mousePressEvent(event);
 	if (event->button() == Qt::LeftButton) {
 		if (cursor().shape() == Qt::CrossCursor) {
-			lock();
+            lock();
 			if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
 				_scene->setRelationFirstBox(_abstract->ID(),BOX_START);
 			}
@@ -830,10 +836,29 @@ BasicBox::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
 }
 
 void
+BasicBox::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
+
+    QGraphicsItem::mouseDoubleClickEvent(event);
+
+    if (!_scene->playing() && (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor)) {
+        TextEdit * boxMsgEdit = new TextEdit(_scene->views().first(),QObject::tr("Enter the box name :").toStdString(), this->_abstract->name());
+
+        bool ok = boxMsgEdit->exec();
+
+        if (ok) {
+            _abstract->setName(boxMsgEdit->value());
+            this->update();
+            _scene->displayMessage(QObject::tr("Box's name successfully updated").toStdString(),INDICATION_LEVEL);
+        }
+    delete boxMsgEdit;
+    }
+}
+
+void
 BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
 	QGraphicsItem::mouseMoveEvent(event);
-	if (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor) {
+    if (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor) {
 		_scene->selectionMoved();
 	}
 	else if (_scene->resizeMode() != NO_RESIZE && (cursor().shape() == Qt::SizeVerCursor || cursor().shape() == Qt::SizeHorCursor || cursor().shape() == Qt::SizeFDiagCursor)) {
@@ -913,19 +938,21 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 			}
 		}
 		else if (_scene->currentMode() == TRIGGER_MODE) {
-			if (eventPosX >  boxEndX - BORDER_GRIP) {
+
+            if (eventPosX >  boxEndX - BORDER_GRIP) {
 				setCursor(Qt::PointingHandCursor);
 			}
-			else if (eventPosX < boxStartX + BORDER_GRIP) {
-				setCursor(Qt::PointingHandCursor);
-			}
-			else {
-				setCursor(Qt::SizeAllCursor);
+            else{
+                if (eventPosX < boxStartX + BORDER_GRIP) {
+                    setCursor(Qt::PointingHandCursor);
+                }
+                else
+                    setCursor(Qt::SizeAllCursor);
 			}
 		}
-		else {
-			if (eventPosX >  boxEndX - BORDER_GRIP) {
-				if (eventPosY > DIAG_RESIZE_UP) {
+        else {
+            if (eventPosX >  boxEndX - BORDER_GRIP) {
+                if (eventPosY > DIAG_RESIZE_UP) {
 					setCursor(Qt::SizeFDiagCursor);
 				}
 				else if (eventPosY > REL_DOWN && eventPosY <= DIAG_RESIZE_UP) {
@@ -934,7 +961,7 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 				else if (eventPosY > TRIG_DOWN && eventPosY <= REL_DOWN) {
 					setCursor(Qt::CrossCursor);
 				}
-				else if (eventPosY <= REL_DOWN) {
+				else if (eventPosY <= REL_DOWN) {                    
 					setCursor(Qt::PointingHandCursor);
 				}
 				else {
@@ -949,7 +976,7 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 					setCursor(Qt::CrossCursor);
 				}
 				else if (eventPosY <= TRIG_DOWN) {
-					setCursor(Qt::PointingHandCursor);
+					setCursor(Qt::PointingHandCursor);                    
 				}
 				else {
 					setCursor(Qt::SizeAllCursor);
@@ -960,7 +987,7 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 			}
 			else {
 				setCursor(Qt::SizeAllCursor);
-			}
+            }
 		}
 	}
 }
