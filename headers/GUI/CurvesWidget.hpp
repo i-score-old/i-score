@@ -48,7 +48,7 @@ knowledge of the CeCILL license and that you accept its terms.
  */
 
 #include <QTabWidget>
-
+#include <QComboBox>
 #include <map>
 #include <vector>
 #include <string>
@@ -95,7 +95,8 @@ public slots :
 private :
 	bool updateCurve(const std::string &address, bool forceUpdate);
 
-	QTabWidget *_tabWidget;
+    QComboBox *_comboBox;
+    QTabWidget *_tabWidget;
 	Interpolation *_interpolation;
 	std::map<std::string,unsigned int> _curveIndexes; //!< Map of curves tabs' indexes mapped by their addresses
 	unsigned int _width;
