@@ -134,7 +134,6 @@ TriggerPoint::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     if (_abstract->waiting()) {
 		_scene->trigger(_abstract->message());
 		setSelected(false);
-
 	}
 }
 

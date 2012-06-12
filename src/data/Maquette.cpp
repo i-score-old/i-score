@@ -1167,11 +1167,11 @@ Maquette::startPlaying()
 
     try{
         for(int i=0 ; i<nbTrg ; i++){
-        if( gotoValue >= _scene->_triggersQueueList.first()->date() ){
-           _scene->_triggersQueueList.removeFirst();
-        }
-        else
-           break;
+            if( gotoValue >= _scene->_triggersQueueList.first()->date() ){
+                _scene->_triggersQueueList.removeFirst();
+            }
+            else
+                break;
         }
     }
     catch (const std::exception & e){
@@ -1645,7 +1645,7 @@ Maquette::crossedTriggerPoint(bool waiting, unsigned int trgID)
 
            else{
               trgPnt->setWaiting(waiting);
-              _scene->_triggersQueueList.pop_front();
+              _scene->_triggersQueueList.removeAll(trgPnt);
               if(!_scene->_triggersQueueList.isEmpty())
                  _scene->setFocusItem(_scene->_triggersQueueList.first(),Qt::OtherFocusReason);
            }

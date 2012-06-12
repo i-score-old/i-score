@@ -513,7 +513,6 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
     QGraphicsScene::mousePressEvent(mouseEvent);
 
-    if(!playing()){
 	_clicked = true;
 	if (_tempBox) {
 		removeItem(_tempBox);
@@ -536,6 +535,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 		}
 	}
 
+    if(!playing()){
 	switch (_currentInteractionMode) {
 	case RELATION_MODE :
 		_mousePos = mouseEvent->scenePos();
