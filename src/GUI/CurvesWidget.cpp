@@ -68,23 +68,28 @@ CurvesWidget::CurvesWidget(QWidget *parent)
     _tabWidget = new QTabWidget(this);
     _tabWidget->setUsesScrollButtons(true);
     _tabWidget->setElideMode(Qt::ElideLeft);
-    _currentCurveWidget = new QWidget(this);
-    QTabWidget *_curve = new QTabWidget(this);
+//    _currentCurveWidget = new QWidget(this);
+    _curvePageWidget = new QWidget(this);
+    _curvePageLayout = new QGridLayout;
 
-//    addTab(_currentCurveWidget,tr("Curves"));
-    addTab(_tabWidget,tr("Curves"));
-    _curveWidgetList = new QList<CurveWidget *>;
+    _curvePageLayout->addWidget(_comboBox);
+    _curvePageLayout->addWidget(_tabWidget);
+//    _curvePageLayout->addWidget(_currentCurveWidget);
+    _curvePageWidget->setLayout(_curvePageLayout);
+    addTab(_curvePageWidget,tr("Curves"));
 
     _interpolation = new Interpolation(this);
     addTab(_interpolation,tr("Attributes"));
+
     _parentWidget = parent;
+    _curveWidgetList = new QList<CurveWidget *>;
 
     connect(_interpolation,SIGNAL(activationChanged(const QString &,bool)),this,SLOT(curveActivationChanged(const QString&,bool)));
     connect(_interpolation,SIGNAL(sampleRateChanged(const QString&,int)),this,SLOT(curveSampleRateChanged(const QString&,int)));
     connect(_interpolation,SIGNAL(redundancyChanged(const QString&,bool)),this,SLOT(curveRedundancyChanged(const QString&,bool)));
     connect(_interpolation,SIGNAL(showChanged(const QString&,bool)),this,SLOT(curveShowChanged(const QString&,bool)));
-    connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),this, SLOT(displayCurve(const QString&)));
-
+//    connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),this, SLOT(displayCurve(const QString&)));
+    connect(_comboBox,SIGNAL(activated(const QString&)),this, SLOT(displayCurve(const QString&)));
 }
 
 CurvesWidget::~CurvesWidget() {
@@ -130,7 +135,8 @@ void CurvesWidget::displayCurve(const QString &address){
     if (curveIndexFound) {
         unsigned int curveIndex = curveIt->second;
         curveWidget = _curveWidgetList->at(curveIndex);
-//        _currentCurveWidget = static_cast<QWidget *>(curveWidget);
+        _tabWidget->clear();
+        _tabWidget->addTab(curveWidget,address);
     }
 }
 
@@ -156,8 +162,9 @@ CurvesWidget::removeCurve(const string &address) {
         curveTabIndex = curveIt->second;
 
         _tabWidget->removeTab(curveTabIndex);
-//        _comboBox->removeItem(curveTabIndex);
+        _comboBox->removeItem(curveTabIndex);
         _curveIndexes.erase(curveIt);
+        _curveWidgetList->removeAt(curveTabIndex);
         BasicBox *curveBox = Maquette::getInstance()->getBox(_boxID);
         if (curveBox != NULL) {
             curveBox->removeCurve(address);
@@ -169,7 +176,8 @@ void
 CurvesWidget::updateMessages(unsigned int boxID, bool forceUpdate) {
     _tabWidget->clear(); 	// TODO :: delete curves
 //    _comboBox->clear();
-
+    _comboBox->clear();
+    _curveWidgetList->clear();
     _curveIndexes.clear();
     _interpolation->clear();
     _boxID = boxID;
@@ -210,8 +218,6 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
         CurveWidget *curveTab = NULL;
         if (curveIndexFound) {
             curveTab = static_cast<CurveWidget*>(_tabWidget->widget(curveIt->second));
-//            curveTab = static_cast<CurveWidget*>(this->widget(_comboBox->itemData(curveIt->second)));
-
             curveTabIndex = curveIt->second;
         }
 
@@ -258,17 +264,19 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                             // Create and set
 //                            curveTab = new CurveWidget(_currentCurveWidget);
                             curveTab = new CurveWidget(_tabWidget);
-//                            curveTab = new CurveWidget(_comboBox);
+
                             curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
                             QString curveAddressStr = QString::fromStdString(address);
                             // Add tab and store
-                            unsigned int curveIndex2 = addCurve(curveTab);
+                            unsigned int curveIndex = addCurve(curveTab);
                             _comboBox->addItem(curveAddressStr);
-                            unsigned int curveIndex = _tabWidget->addTab(curveTab,curveAddressStr);
+//                            unsigned int curveIndex = _tabWidget->addTab(curveTab,curveAddressStr);
 //                             _comboBox->addItem(curveAddressStr);
 
-                            setTabToolTip(curveIndex,curveAddressStr);
+//                            setTabToolTip(curveIndex,curveAddressStr);
                             _curveIndexes[address] = curveIndex;
+                            displayCurve(curveAddressStr);
+                            _comboBox->setCurrentIndex(curveIndex);
                             // Set box curve
                             box->setCurve(address,curveTab->abstractCurve());
                             if (!_interpolation->updateLine(address,interpolate,sampleRate,redundancy,FORCE_SHOW)) {
@@ -280,20 +288,18 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                     else // No forcing : create through abstract curve
                     {
                         // Create and set
-//                        curveTab = new CurveWidget(_tabWidget);
-                        curveTab = new CurveWidget(_currentCurveWidget);
+                        curveTab = new CurveWidget(_tabWidget);
+//                        curveTab = new CurveWidget(_currentCurveWidget);
                         curveTab->setAttributes(abCurve);
                         QString curveAddressStr = QString::fromStdString(address);
                         // Add tab and store
-                        unsigned int curveIndex = _tabWidget->addTab(curveTab,curveAddressStr);
-                        unsigned int curveIndex2 = addCurve(curveTab);
                         _comboBox->addItem(curveAddressStr);
-                        std::cout<<"CP : "<< curveAddressStr.toStdString()<<std::endl;
-//                        _comboBox->addItem(curveAddressStr);
-//                       unsigned int curveIndex = _comboBox->currentIndex();//PAS SUR
+                        unsigned int curveIndex = addCurve(curveTab);
                         setTabToolTip(curveIndex,curveAddressStr);
                         _curveIndexes[address] = curveIndex;
-
+//                        displayCurve(_comboBox->currentText());
+                        displayCurve(curveAddressStr);
+                        _comboBox->setCurrentIndex(curveIndex);
                         if (!_interpolation->updateLine(address,abCurve->_interpolate,abCurve->_sampleRate,abCurve->_redundancy,abCurve->_show)) {
                             _interpolation->addLine(address,abCurve->_interpolate,abCurve->_sampleRate,abCurve->_redundancy,abCurve->_show);
                         }
@@ -318,7 +324,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                     }
                     // Remove curve tab anyway
                     _tabWidget->removeTab(curveTabIndex);
-//                    _comboBox->removeItem(curveTabIndex);
+                    _comboBox->removeItem(curveTabIndex);
                     delete curveTab;
                     _curveIndexes.erase(curveIt);
                     if (!_interpolation->updateLine(address,abCurve->_interpolate,abCurve->_sampleRate,abCurve->_redundancy,abCurve->_show)) {
@@ -368,12 +374,12 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                         // Creating curve tab from engines anyway (no abstract curve)
                         // Create and set
                         curveTab = new CurveWidget(_tabWidget);
-//                        curveTab = new CurveWidget(_comboBox);
+//                        curveTab = new CurveWidget(_currentCurveWidget);
                         QString curveAddressStr = QString::fromStdString(address);
                         // Add tab and store
-                        unsigned int curveIndex = _tabWidget->addTab(curveTab,curveAddressStr);
-//                        _comboBox->addItem(curveAddressStr);
-//                       unsigned int curveIndex = _comboBox->currentIndex();//PAS SUR
+//                        unsigned int curveIndex = _tabWidget->addTab(curveTab,curveAddressStr);
+                        unsigned int curveIndex = addCurve(curveTab);
+                        _comboBox->addItem(curveAddressStr);
                         setTabToolTip(curveIndex,curveAddressStr);
                         _curveIndexes[address] = curveIndex;
                     }
@@ -399,14 +405,14 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                         box->setCurve(address,curveTab->abstractCurve());
                         // Remove curve tab
                         _tabWidget->removeTab(curveTabIndex);
-//                        _comboBox->removeItem(curveTabIndex);
+                        _comboBox->removeItem(curveTabIndex);
                         _curveIndexes.erase(curveIt);
                     }
                     else // Curve tab not existing
                     {
                         // Creating curve tab from engines anyway (no abstract curve)
                         curveTab = new CurveWidget(_tabWidget);
-//                        curveTab = new CurveWidget(_comboBox);
+//                        curveTab = new CurveWidget(_currentCurveWidget);
                         curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
                         box->setCurve(address,curveTab->abstractCurve());
                         delete curveTab;

@@ -104,9 +104,11 @@ private :
 	unsigned int _height;
 	unsigned int _boxID;
 	QWidget *_parentWidget;
-    QWidget *_currentCurveWidget;
+//    QWidget *_currentCurveWidget;
     QList <CurveWidget *> *_curveWidgetList;
     QTabWidget *_curve;
+    QWidget *_curvePageWidget;
+    QGridLayout *_curvePageLayout;
 };
 
 #endif /* CURVESWIDGET_HPP_ */
