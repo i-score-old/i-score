@@ -510,9 +510,10 @@ MaquetteScene::dropEvent(QGraphicsSceneDragDropEvent *event)
 void
 MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    if(!playing()){
+
     QGraphicsScene::mousePressEvent(mouseEvent);
 
+    if(!playing()){
 	_clicked = true;
 	if (_tempBox) {
 		removeItem(_tempBox);

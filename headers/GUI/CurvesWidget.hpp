@@ -90,19 +90,23 @@ public slots :
 	void curveSampleRateChanged(const QString &address,int value);
 	void curveShowChanged(const QString &address,bool state);
 	void updateCurve(const std::string &address);
-	void removeCurve(const std::string &address);
+    void removeCurve(const std::string &address);
+    void displayCurve(const QString &address);
 
 private :
 	bool updateCurve(const std::string &address, bool forceUpdate);
-
+    unsigned int addCurve(CurveWidget *curveWidget);
     QComboBox *_comboBox;
     QTabWidget *_tabWidget;
 	Interpolation *_interpolation;
-	std::map<std::string,unsigned int> _curveIndexes; //!< Map of curves tabs' indexes mapped by their addresses
+    std::map<std::string,unsigned int> _curveIndexes; //!< Map of curves tabs' indexes mapped by their addresses
 	unsigned int _width;
 	unsigned int _height;
 	unsigned int _boxID;
 	QWidget *_parentWidget;
+    QWidget *_currentCurveWidget;
+    QList <CurveWidget *> *_curveWidgetList;
+    QTabWidget *_curve;
 };
 
 #endif /* CURVESWIDGET_HPP_ */
