@@ -213,19 +213,6 @@ CurvesWidget::addToComboBox(const QString address){
         _comboBox->addItem(address);
 }
 
-//void
-//CurvesWidget::removeInCurveList(unsigned int index){
-//   QList<CurveWidget *>::iterator curveIt ;
-//    bool curveIndexFound = (curveIt != _curveIndexes.end());
-//    unsigned int curveTabIndex = 0;
-//    CurveWidget *curveTab = NULL;
-//    if (curveIndexFound) {
-//        curveTab = static_cast<CurveWidget*>(_tabWidget->widget(curveIt->second));
-//        curveTabIndex = curveIt->second;
-//    }
-
-//}
-
 bool
 CurvesWidget::updateCurve(const string &address, bool forceUpdate)
 {
