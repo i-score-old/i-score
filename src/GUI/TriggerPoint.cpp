@@ -152,8 +152,10 @@ void
 TriggerPoint::mouseDoubleClickEvent (QGraphicsSceneMouseEvent * event) {
 	QGraphicsItem::mouseDoubleClickEvent(event);
 	if (!_scene->playing()) {
-		TextEdit * trgPntMsgEdit = new TextEdit(_scene->views().first(),
-				QObject::tr("Enter the trigger point message :").toStdString(),_abstract->message());
+        TextEdit * trgPntMsgEdit = new TextEdit(_scene->views().first(),
+                QObject::tr("Enter the trigger point message :").toStdString(),_abstract->message());
+        trgPntMsgEdit->setEnabled(true);
+
 		switch (_abstract->boxExtremity()) {
 		case BOX_START :
 			trgPntMsgEdit->move(mapToScene(boundingRect().topLeft()).x(),
@@ -167,9 +169,8 @@ TriggerPoint::mouseDoubleClickEvent (QGraphicsSceneMouseEvent * event) {
 			trgPntMsgEdit->move(mapToScene(boundingRect().topLeft()).x(),
 					mapToScene(boundingRect().topLeft()).y());
 			break;
-		}
-
-		bool ok = trgPntMsgEdit->exec();
+        }
+        bool ok ;
 		if (ok) {
 			if (_scene->setTriggerPointMessage(_abstract->ID(),trgPntMsgEdit->value())) {
 				_abstract->setMessage(trgPntMsgEdit->value());

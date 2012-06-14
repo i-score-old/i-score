@@ -67,6 +67,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QKeyEvent>
 #include <QString>
 #include <QTranslator>
+#include <QInputDialog>
 
 using std::string;
 using std::vector;
@@ -841,8 +842,8 @@ BasicBox::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
     QGraphicsItem::mouseDoubleClickEvent(event);
 
     if (!_scene->playing() && (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor)) {
-        TextEdit * boxMsgEdit = new TextEdit(_scene->views().first(),QObject::tr("Enter the box name :").toStdString(), this->_abstract->name());
 
+        TextEdit * boxMsgEdit = new TextEdit(_scene->views().first(),QObject::tr("Enter the box name :").toStdString(), this->_abstract->name());
         bool ok = boxMsgEdit->exec();
 
         if (ok) {
