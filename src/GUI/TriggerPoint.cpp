@@ -131,8 +131,9 @@ TriggerPoint::boundingRect() const
 void
 TriggerPoint::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     QGraphicsItem::mousePressEvent(event);
+    setSelected(false);
     if (_abstract->waiting()) {
-		_scene->trigger(_abstract->message());
+        _scene->trigger(_abstract->message());
 		setSelected(false);
 	}
 }
@@ -148,18 +149,35 @@ TriggerPoint::keyPressEvent(QKeyEvent *event){
     }
 }
 
+QInputDialog *
+TriggerPoint::nameInputDialog(){
+
+    QInputDialog *nameDialog = new QInputDialog(_scene->views().first(),Qt::Popup);
+    nameDialog->setInputMode(QInputDialog::TextInput);
+    nameDialog->setLabelText(QObject::tr("Enter the trigger message :"));
+    nameDialog->setTextValue(QString::fromStdString(this->_abstract->message()));
+    QPoint position = _scene->views().first()->parentWidget()->pos();
+    int MMwidth = _scene->views().first()->parentWidget()->width();
+    nameDialog->move(position.x()+MMwidth/2,position.y());
+
+    return nameDialog;
+}
+
 void
 TriggerPoint::mouseDoubleClickEvent (QGraphicsSceneMouseEvent * event) {
 	QGraphicsItem::mouseDoubleClickEvent(event);
+
 	if (!_scene->playing()) {
+        /*
         TextEdit * trgPntMsgEdit = new TextEdit(_scene->views().first(),
                 QObject::tr("Enter the trigger point message :").toStdString(),_abstract->message());
-        trgPntMsgEdit->setEnabled(true);
-
+*/
+        QInputDialog *trgPntMsgEdit = nameInputDialog();
+/*
 		switch (_abstract->boxExtremity()) {
 		case BOX_START :
-			trgPntMsgEdit->move(mapToScene(boundingRect().topLeft()).x(),
-					mapToScene(boundingRect().topLeft()).y() - 2 * trgPntMsgEdit->height());
+            trgPntMsgEdit->move(mapToScene(boundingRect().topLeft()).x(),
+                    mapToScene(boundingRect().topLeft()).y() -  trgPntMsgEdit->height());
 			break;
 		case BOX_END :
 			trgPntMsgEdit->move(mapToScene(boundingRect().topRight()).x(),
@@ -170,10 +188,11 @@ TriggerPoint::mouseDoubleClickEvent (QGraphicsSceneMouseEvent * event) {
 					mapToScene(boundingRect().topLeft()).y());
 			break;
         }
-        bool ok ;
+*/
+        bool ok = trgPntMsgEdit->exec();
 		if (ok) {
-			if (_scene->setTriggerPointMessage(_abstract->ID(),trgPntMsgEdit->value())) {
-				_abstract->setMessage(trgPntMsgEdit->value());
+            if (_scene->setTriggerPointMessage(_abstract->ID(),trgPntMsgEdit->textValue().toStdString())) {
+                _abstract->setMessage(trgPntMsgEdit->textValue().toStdString());
 				_scene->displayMessage(QObject::tr("Trigger point's message successfully updated").toStdString(),INDICATION_LEVEL);
 			}
 			else {
@@ -249,10 +268,11 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 
             else{
 
-                if(this->focusItem()&&_scene->getTriggersQueueList().first()==this){
+                if(/*this->focusItem()&&*/_scene->getTriggersQueueList().first()==this){
                     painter->fillPath(path,QColor("green"));
                     painter->setPen(pen);
                     painter->drawPath(path);
+                    this->setFocus();
                 }
                 else{
                     painter->fillPath(path,QColor("orange"));

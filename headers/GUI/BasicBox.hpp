@@ -51,6 +51,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <map>
 #include <vector>
 #include <string>
+#include <QInputDialog>
 #include "AbstractBox.hpp"
 #include "CSPTypes.hpp"
 #include "CurvesWidget.hpp"
@@ -525,7 +526,10 @@ class BasicBox : public QGraphicsItem
   bool operator<(BasicBox *box) const;
 
  protected:
-
+  /*!
+   * \brief Create the QInputDialog, for asking new name.
+   */
+  QInputDialog *nameInputDialog();
   /*!
    * \brief Redefinition of QGraphicsItem::mousePressEvent().
    * Occurs when a mouse button is pressed.

@@ -514,6 +514,8 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     QGraphicsScene::mousePressEvent(mouseEvent);
 
 	_clicked = true;
+
+    if(!playing()){
 	if (_tempBox) {
 		removeItem(_tempBox);
 		_tempBox = NULL;
@@ -529,13 +531,14 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 	if (itemAt(mouseEvent->scenePos()) != 0) {
         if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::PointingHandCursor && _currentInteractionMode != TRIGGER_MODE) {
             setCurrentMode(TRIGGER_MODE);
+
 		}
         if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::CrossCursor && _currentInteractionMode != RELATION_MODE) {
 			setCurrentMode(RELATION_MODE);
+
 		}
 	}
 
-    if(!playing()){
 	switch (_currentInteractionMode) {
 	case RELATION_MODE :
 		_mousePos = mouseEvent->scenePos();

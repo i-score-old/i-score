@@ -67,7 +67,6 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QKeyEvent>
 #include <QString>
 #include <QTranslator>
-#include <QInputDialog>
 
 using std::string;
 using std::vector;
@@ -460,47 +459,30 @@ BasicBox::hasTriggerPoint(BoxExtremity extremity)
 bool
 BasicBox::addTriggerPoint(BoxExtremity extremity)
 {
-/*
-	switch (extremity) {
+    std::string trgName;
+
+    switch (extremity) {
     case BOX_START :
-        _trgPntMsgEdit = new TextEdit(_scene->views().first(),QObject::tr("Enter the trigger point message :").toStdString(),
-				"/"+_abstract->name()+"/start");
-		_trgPntMsgEdit->move(mapToScene(boundingRect().topLeft()).x(),
-				mapToScene(boundingRect().topLeft()).y() - 4 * _trgPntMsgEdit->height());
+        trgName = "/"+_abstract->name()+"/start";
 		break;
 	case BOX_END :
-		_trgPntMsgEdit = new TextEdit(_scene->views().first(),QObject::tr("Enter the trigger point message :").toStdString(),
-				"/"+_abstract->name()+"/end");
-		_trgPntMsgEdit->move(mapToScene(boundingRect().topRight()).x(),
-				mapToScene(boundingRect().topRight()).y() - 4 * _trgPntMsgEdit->height());
+        trgName = "/"+_abstract->name()+"/end";
 		break;
 
 	default :
-		_trgPntMsgEdit = new TextEdit(_scene->views().first(),QObject::tr("Enter the trigger point message :").toStdString(),
-				"/"+_abstract->name()+MaquetteScene::DEFAULT_TRIGGER_MSG);
-		_trgPntMsgEdit->move(mapToScene(boundingRect().topLeft()).x(),
-				mapToScene(boundingRect().topLeft()).y());
+        trgName = "/"+_abstract->name()+MaquetteScene::DEFAULT_TRIGGER_MSG;
 		break;
-
 	}
 
-    bool ok = _trgPntMsgEdit->exec();
-    */
-    bool ok = true;
     bool ret = false;
-	if (ok) {
-		if (_triggerPoints.find(extremity) == _triggerPoints.end()) {
-            int trgID = _scene->addTriggerPoint(_abstract->ID(),extremity,"/"+_abstract->name()+"/start");
-//			int trgID = _scene->addTriggerPoint(_abstract->ID(),extremity,_trgPntMsgEdit->value());
-			if (trgID > NO_ID) {
-				_triggerPoints[extremity] = _scene->getTriggerPoint(trgID);
-				_triggerPoints[extremity]->updatePosition();
-			}
-			ret = true;
-		}
-	}
-
-//    delete _trgPntMsgEdit;
+    if (_triggerPoints.find(extremity) == _triggerPoints.end()) {
+        int trgID = _scene->addTriggerPoint(_abstract->ID(),extremity,trgName);
+        if (trgID > NO_ID) {
+            _triggerPoints[extremity] = _scene->getTriggerPoint(trgID);
+            _triggerPoints[extremity]->updatePosition();
+        }
+        ret = true;
+    }
 
     unlock();
 
@@ -836,6 +818,20 @@ BasicBox::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
 	}
 }
 
+QInputDialog *
+BasicBox::nameInputDialog(){
+
+    QInputDialog *nameDialog = new QInputDialog(_scene->views().first(),Qt::Popup);
+    nameDialog->setInputMode(QInputDialog::TextInput);
+    nameDialog->setLabelText(QObject::tr("Enter the box name :"));
+    nameDialog->setTextValue(QString::fromStdString(this->_abstract->name()));
+    QPoint position = _scene->views().first()->parentWidget()->pos();
+    int MMwidth = _scene->views().first()->parentWidget()->width();
+    nameDialog->move(position.x()+MMwidth/2,position.y());
+
+    return nameDialog;
+}
+
 void
 BasicBox::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
 
@@ -843,15 +839,29 @@ BasicBox::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
 
     if (!_scene->playing() && (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor)) {
 
-        TextEdit * boxMsgEdit = new TextEdit(_scene->views().first(),QObject::tr("Enter the box name :").toStdString(), this->_abstract->name());
-        bool ok = boxMsgEdit->exec();
+        QInputDialog *nameDialog = nameInputDialog();
+
+        bool ok = nameDialog->exec();
+        QString nameValue = nameDialog->textValue();
 
         if (ok) {
-            _abstract->setName(boxMsgEdit->value());
+            _abstract->setName(nameValue.toStdString());
             this->update();
             _scene->displayMessage(QObject::tr("Box's name successfully updated").toStdString(),INDICATION_LEVEL);
-        }
-    delete boxMsgEdit;
+         }
+
+     delete nameDialog;
+
+//        TextEdit * boxMsgEdit = new TextEdit(_scene->views().first(),QObject::tr("Enter the box name :").toStdString(), this->_abstract->name());
+//        bool ok = boxMsgEdit->exec();
+
+//        if (ok) {
+//            _abstract->setName(boxMsgEdit->value());
+//            this->update();
+//            _scene->displayMessage(QObject::tr("Box's name successfully updated").toStdString(),INDICATION_LEVEL);
+//        }
+//    delete boxMsgEdit;
+
     }
 }
 
@@ -1126,6 +1136,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 	}
 	painter->fillRect(0,0,textRect.width(),textRect.height(),isSelected() ? Qt::yellow : Qt::white);
 	painter->drawText(QRectF(0,0,textRect.width(),textRect.height()),Qt::AlignCenter,name());
+
 	if (_abstract->width() <= 3*RESIZE_TOLERANCE) {
 		painter->rotate(-90);
 		painter->translate(-QPointF(RESIZE_TOLERANCE - LINE_WIDTH,0));

@@ -50,6 +50,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "BasicBox.hpp"
 #include "AbstractTriggerPoint.hpp"
 #include <string>
+#include <QInputDialog>
 
 class MaquetteScene;
 class Abstract;
@@ -216,6 +217,10 @@ class TriggerPoint : public QGraphicsItem
    * \return the shape used for mouse interaction and collision
    */
   virtual QPainterPath shape() const;
+  /*!
+   * \brief Create the QInputDialog, for asking new name.
+   */
+  QInputDialog *nameInputDialog();
 
  private :
 
