@@ -118,7 +118,7 @@ void CurveWidget::curveRepresentationOutdated() {
 void
 CurveWidget::setAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition, const vector<float> &values, unsigned int sampleRate,
 		bool redundancy, bool show, bool interpolate, const vector<string> &/*argType*/, const vector<float> &xPercents , const vector<float> &yValues, const vector<short> &sectionType,
-		const vector<float> &coeff) {
+        const vector<float> &coeff) {
 	_abstract->_boxID = boxID;
 	_abstract->_curve.clear();
 	_abstract->_breakpoints.clear();
@@ -136,8 +136,8 @@ CurveWidget::setAttributes(unsigned int boxID, const std::string &address, unsig
 		_abstract->_curve.push_back(*it);
 	}
 
-	for (unsigned int i = 0 ; i < xPercents.size() ; ++i) {
-		_abstract->_breakpoints[xPercents[i]/100.] = pair<float,float>(yValues[i],coeff[i]);
+    for (unsigned int i = 0 ; i < xPercents.size() ; ++i) {
+        _abstract->_breakpoints[xPercents[i]/100.] = pair<float,float>(yValues[i],coeff[i]);
 	}
 
 	_abstract->_lastPointCoeff = coeff.back();
@@ -386,7 +386,7 @@ CurveWidget::curveChanged() {
 	map<float,pair<float,float> >::iterator it;
 	for (it = _abstract->_breakpoints.begin() ; it != _abstract->_breakpoints.end() ; ++it) {
 		xPercents.push_back(it->first * 100);
-		yValues.push_back(it->second.first);
+        yValues.push_back(it->second.first);
 		coeff.push_back(it->second.second);
 
 		sectionType.push_back(CURVE_POW);
@@ -404,7 +404,7 @@ CurveWidget::curveChanged() {
 		sectionType.clear();
 		coeff.clear();
 		if (Maquette::getInstance()->getCurveAttributes(_abstract->_boxID,_abstract->_address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff)) {
-			setAttributes(_abstract->_boxID,_abstract->_address,0,values,sampleRate,redundancy,interpolate,_abstract->_show,argTypes,xPercents,yValues,sectionType,coeff);
+            setAttributes(_abstract->_boxID,_abstract->_address,0,values,sampleRate,redundancy,interpolate,_abstract->_show,argTypes,xPercents,yValues,sectionType,coeff);
 			update();
 			return true;
 		}

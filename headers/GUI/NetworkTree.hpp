@@ -117,7 +117,6 @@ class NetworkTree : public QTreeWidget
 
     private :
         void treeRecursiveExploration(QTreeWidgetItem *curItem);
-        //void treeRecursiveSelection(QTreeWidgetItem *curItem, QList<QTreeWidgetItem*> *itemsList);
         void recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select);
         void recursiveFatherSelection(QTreeWidgetItem *item, bool select);
         bool allBrothersSelected(QTreeWidgetItem *item, QList<QTreeWidgetItem *> assignedItems);
@@ -131,13 +130,10 @@ class NetworkTree : public QTreeWidget
         void unselectPartially(QTreeWidgetItem *item);
         QList<QTreeWidgetItem*> _assignedItems;
         QList<QTreeWidgetItem*> _nodesWithAssignedChildren;
-        //QList<QTreeWidgetItem*> _expandedItems;
 
 	public slots:
         //void itemCollapsed();
         void clickInNetworkTree();
-        //void addToExpandedItemsList(QTreeWidgetItem *item);
-        //void removeFromExpandedItemsList(QTreeWidgetItem *item);
 };
 
 

@@ -835,8 +835,7 @@ Maquette::addTriggerPoint(const AbstractTriggerPoint &abstract) {
 		_scene->addItem(newTP);
 
 		_triggerPoints[abstract.ID()] = newTP;
-		_boxes[abstract.boxID()]->addTriggerPoint(abstract.boxExtremity(),newTP);
-
+        _boxes[abstract.boxID()]->addTriggerPoint(abstract.boxExtremity(),newTP);
 		return (int)abstract.ID();
 	}
 	return RETURN_ERROR;
@@ -869,7 +868,7 @@ Maquette::addTriggerPoint(unsigned int boxID, BoxExtremity extremity, const stri
 		_engines->setTriggerPointMessage(triggerID,message);
 		TriggerPoint * newTP = new TriggerPoint(boxID,extremity,message,triggerID,_scene);
 		_scene->addItem(newTP);
-		_triggerPoints[triggerID] = newTP;
+        _triggerPoints[triggerID] = newTP;
 		_boxes[boxID]->addTriggerPoint(extremity,_triggerPoints[triggerID]);
 
 		return triggerID;
@@ -883,9 +882,10 @@ Maquette::removeTriggerPoint(unsigned int ID)
 {
 	TrgPntMap::iterator it;
 	if ((it = _triggerPoints.find(ID)) != _triggerPoints.end()) {
-		_engines->removeTriggerPoint(ID);
+        _engines->removeTriggerPoint(ID);
 		delete it->second;
 		_triggerPoints.erase(it);
+
 	}
 }
 
@@ -958,6 +958,8 @@ bool Maquette::getCurveAttributes(unsigned int boxID, const std::string &address
 
 	if (_engines->getCurveValues(boxID,address,argPosition,values)) {
 		if (_engines->getCurveSections(boxID,address,argPosition,xPercents,yValues,sectionType,coeff)) {
+            for(int i=0; i< yValues.size(); i++)
+                std::cout<<"Maquette::getCurveAttribute yValue : "<<yValues.at(i)<< std::endl;
 			sampleRate = _engines->getCurveSampleRate(boxID,address);
 			redundancy = _engines->getCurveRedundancy(boxID,address);
 			interpolate = !_engines->getCurveMuteState(boxID,address);
@@ -1154,15 +1156,20 @@ Maquette::setGotoValue(int gotoValue) {
 }
 
 void
-Maquette::startPlaying()
-{
-    double gotoValue = (double)_engines->getGotoValue();
+Maquette::generateTriggerQueue(){
 
     TrgPntMap::iterator it1;
     for(it1=_triggerPoints.begin() ; it1!=_triggerPoints.end() ; ++it1){
         _scene->addToTriggerQueue(it1->second);
     }
+}
 
+void
+Maquette::startPlaying()
+{
+    double gotoValue = (double)_engines->getGotoValue();
+
+    generateTriggerQueue();
     int nbTrg = _scene->_triggersQueueList.size();
 
     try{
@@ -1605,8 +1612,6 @@ Maquette::load(const string &fileName){
 		}
 	}
 
-
-
 	delete _doc;
 }
 
@@ -1640,7 +1645,9 @@ Maquette::crossedTriggerPoint(bool waiting, unsigned int trgID)
      if (trgPnt != NULL) {
           if(waiting){
               trgPnt->setWaiting(waiting);
-              _scene->setFocusItem(_scene->_triggersQueueList.first(),Qt::OtherFocusReason);
+              if (_scene->_triggersQueueList.isEmpty())
+                  generateTriggerQueue();
+                  _scene->setFocusItem(_scene->_triggersQueueList.first(),Qt::OtherFocusReason);
               }
 
            else{

@@ -206,7 +206,13 @@ QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
    *
    * \param trgID : trigger point to add.
    */
-  void addToTriggerQueue(TriggerPoint *trigger);
+  void addToTriggerQueue(TriggerPoint *trigger);  
+  /*!
+   * \brief Removes a trigger from the queue list.
+   *
+   * \param trgID : trigger point to remove.
+   */
+  inline void removeFromTriggerQueue(TriggerPoint *trigger){_triggersQueueList.removeAll(trigger);}
   /*!
    * \brief Adds a new sound box to the maquette with specific coordinates.
    *
@@ -215,7 +221,7 @@ QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
    * \param name : the name of the box
    * \param palette : the palette to assign to the box
    * \return the ID of box created
-   */
+   */  
   unsigned int addSoundBox(const QPointF &topLeft, const QPointF &bottomRight, const std::string &name, const Palette &palette);
   /*!
    * \brief Adds a new sound box containing specific information.

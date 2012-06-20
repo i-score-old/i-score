@@ -244,6 +244,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                 {
                     if (forceUpdate) // Force updating through engines
                     {
+                        std::cout<<"CP1\n";
                         bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                         if (getCurveSuccess) {
                             curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
@@ -265,6 +266,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                 {
                     if (forceUpdate) // Force creating through engines
                     {
+                        std::cout<<"CP2\n";
                         bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                         if (getCurveSuccess) {
                             // Create and set
@@ -290,6 +292,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
 
                     else // No forcing : create through abstract curve
                     {
+                         std::cout<<"CP3\n";
                         // Create and set
                         curveTab = new CurveWidget(_tabWidget);
                         curveTab->setAttributes(abCurve);
@@ -315,6 +318,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                 {
                     if (forceUpdate) // Force updating through engines
                     {
+                        std::cout<<"C4\n";
                         bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                         if (getCurveSuccess) {
                             // Set and assign new abstract curve to box
@@ -325,6 +329,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                     else // No forcing : updating through abstract curve
                     {
                     }
+                    std::cout<<"CP4.1\n";
                     // Remove curve tab anyway
                     removeCurve(address);
                     _comboBox->setCurrentIndex(curveTabIndex);
@@ -338,8 +343,10 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                 {
                     if (forceUpdate) // Force updating through engines
                     {
+                        std::cout<<"CP5\n";
                         bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                         if (getCurveSuccess) {
+                            std::cout<<"CP5.1\n";
                             // Create, set and assign new abstract curve to box
                             curveTab = new CurveWidget(NULL);
                             curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
@@ -361,6 +368,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
         }
         else  // Abstract Curve not found
         {
+            std::cout<<"CP6\n";
             // Get attributes and determine if shown
             bool show = true;
             bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
@@ -374,6 +382,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                 {
                     if (!curveFound) // Curve tab not existing
                     {
+                        std::cout<<"CP6.1\n";
                         // Creating curve tab from engines anyway (no abstract curve)
                         // Create and set
                         curveTab = new CurveWidget(_tabWidget);
@@ -383,13 +392,13 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                         addCurve(curveAddressStr,curveTab);
 
                         addToComboBox(curveAddressStr);
-                        displayCurve(curveAddressStr);                       
+                        displayCurve(curveAddressStr);
                     }
                     else // Curve tab existing
                     {
                         // Updating curve tab from engines anyway (no abstract curve)
                     }
-
+                    std::cout<<"CP6.2\n";
                     curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
                     // Set box curve
                     box->setCurve(address,curveTab->abstractCurve());
@@ -401,6 +410,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                 {
                     if (curveFound) // Curve tab existing
                     {
+                        std::cout<<"CP7\n";
                         // Creating curve tab from engines anyway (no abstract curve)
                         // Set and assign new abstract curve to box
                         curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
@@ -412,6 +422,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
 
                     else // Curve tab not existing
                     {
+                        std::cout<<"CP7.1\n";
                         // Creating curve tab from engines anyway (no abstract curve)
                         curveTab = new CurveWidget(_tabWidget);
                         curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);

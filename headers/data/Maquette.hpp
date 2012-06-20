@@ -660,7 +660,12 @@ class Maquette : public QObject
 
  private :
 
-	 Maquette();
+  /*!
+   * \brief Generates the triggerQueueList.
+   */
+  void generateTriggerQueue();
+
+  Maquette();
 
   /*!
    * \brief Adds a sound box existing in Engines to the maquette with given ID and palette.
