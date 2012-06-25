@@ -837,7 +837,7 @@ Maquette::addTriggerPoint(const AbstractTriggerPoint &abstract) {
 		_triggerPoints[abstract.ID()] = newTP;
         _boxes[abstract.boxID()]->addTriggerPoint(abstract.boxExtremity(),newTP);
 		return (int)abstract.ID();
-	}
+    }
 	return RETURN_ERROR;
 }
 
@@ -943,13 +943,13 @@ void Maquette::setCurveMuteState(unsigned int boxID, const string &address, bool
 }
 
 bool Maquette::getCurveMuteState(unsigned int boxID, const string &address) {
-	return _engines->getCurveMuteState(boxID,address);
+    return _engines->getCurveMuteState(boxID,address);
 }
 
 bool Maquette::setCurveSections(unsigned int boxID, const string &address, unsigned int argPosition,
 			const vector<float> &xPercents, const vector<float> &yValues, const vector<short> &sectionType, const vector<float> &coeff)
 {
-	return _engines->setCurveSections(boxID,address,argPosition,xPercents,yValues,sectionType,coeff);
+    return _engines->setCurveSections(boxID,address,argPosition,xPercents,yValues,sectionType,coeff);
 }
 
 bool Maquette::getCurveAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition,
@@ -957,9 +957,7 @@ bool Maquette::getCurveAttributes(unsigned int boxID, const std::string &address
 	vector<float> &xPercents, vector<float> &yValues, vector<short> &sectionType, vector<float> &coeff) {
 
 	if (_engines->getCurveValues(boxID,address,argPosition,values)) {
-		if (_engines->getCurveSections(boxID,address,argPosition,xPercents,yValues,sectionType,coeff)) {
-            for(int i=0; i< yValues.size(); i++)
-                std::cout<<"Maquette::getCurveAttribute yValue : "<<yValues.at(i)<< std::endl;
+        if (_engines->getCurveSections(boxID,address,argPosition,xPercents,yValues,sectionType,coeff)) {
 			sampleRate = _engines->getCurveSampleRate(boxID,address);
 			redundancy = _engines->getCurveRedundancy(boxID,address);
 			interpolate = !_engines->getCurveMuteState(boxID,address);
@@ -1002,7 +1000,7 @@ Maquette::updateBoxesFromEngines()
 				_engines->getBoxBeginTime(it->first)/MaquetteScene::MS_PER_PIXEL),
 				it->second->getSize().y()));
 		it->second->setPos(it->second->getCenter());
-		it->second->update();
+		it->second->update();        
 	}
 }
 
@@ -1157,7 +1155,7 @@ Maquette::setGotoValue(int gotoValue) {
 
 void
 Maquette::generateTriggerQueue(){
-
+    _scene->_triggersQueueList.clear();
     TrgPntMap::iterator it1;
     for(it1=_triggerPoints.begin() ; it1!=_triggerPoints.end() ; ++it1){
         _scene->addToTriggerQueue(it1->second);
@@ -1398,9 +1396,9 @@ Maquette::load(const string &fileName){
 				WARNING_LEVEL);
 		file.close();
 		return;
-	}
+    }
 
-	_scene->clear();
+    _scene->clear();
 
 	QPointF topLeft,size,bottomRight;
 	QString name,boxType,relType;
@@ -1523,7 +1521,7 @@ Maquette::load(const string &fileName){
 	vector<unsigned int> relationsID;
 	_engines->getRelationsId(relationsID);
 
-	vector<unsigned int>::iterator it;
+    vector<unsigned int>::iterator it;
 	for (it = relationsID.begin() ; it != relationsID.end() ; it++) {
 		AbstractRelation abstractRel;
 		unsigned int firstBoxID = _engines->getRelationFirstBoxId(*it);
@@ -1610,8 +1608,7 @@ Maquette::load(const string &fileName){
 			std::cerr << "Maquette::load : box with NO_ID found for trigger point " << *it << std::endl;
 #endif
 		}
-	}
-
+    }
 	delete _doc;
 }
 

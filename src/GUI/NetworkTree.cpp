@@ -382,6 +382,10 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
                 }
             }
         }
+        else{
+            if(!itemsFound.isEmpty())
+                itemsMatchedList<<itemsFound.first();
+        }
     }
 }
     return itemsMatchedList;

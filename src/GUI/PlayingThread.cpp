@@ -57,7 +57,7 @@ void
 PlayingThread::run()
 {
 	while (_scene->playing()) {
-		_scene->updatePlayingBoxes();
-		msleep(60);
+        _scene->updatePlayingBoxes();
+        msleep(60);
 	}
 }

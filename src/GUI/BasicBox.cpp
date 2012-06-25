@@ -608,7 +608,7 @@ void
 BasicBox::setCurve(const string &address, AbstractCurve *curve)
 {
 	if (curve != NULL) {
-		_abstractCurves[address] = curve;
+		_abstractCurves[address] = curve;        
 	}
 	else {
 		removeCurve(address);

@@ -1729,8 +1729,8 @@ MaquetteScene::stop() {
 	displayMessage(tr("Stopped").toStdString(),INDICATION_LEVEL);
 	_playing = false;
 	_paused = false;
-	_maquette->stopPlaying();
-	_playThread->quit();
+    _maquette->stopPlaying();
+    _playThread->quit();
 	_playingBoxes.clear();
 	update();
 }

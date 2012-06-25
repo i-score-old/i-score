@@ -74,7 +74,7 @@ MaquetteView::~MaquetteView()
 void
 MaquetteView::setGotoValue(int value) {
 	_gotoValue = value;
-	updateScene();
+    updateScene();
 }
 
 void
@@ -91,7 +91,6 @@ void
 MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
 {
   QGraphicsView::drawBackground(painter,rect);
-
   QPen pen(Qt::darkGreen);
 
   painter->setPen(pen);
@@ -208,7 +207,7 @@ MaquetteView::zoomOut()
 {
 	MaquetteScene::MS_PER_PIXEL *= 2;
 	_zoom /= 2.;
-	resetCachedContent();
+    resetCachedContent();
 	_scene->update();
 	Maquette::getInstance()->updateBoxesFromEngines();
 }

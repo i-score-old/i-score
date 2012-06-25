@@ -12,31 +12,31 @@ from its very design, on benefits from state of the art research
 in musicology and sound/music computing.
 
 This software is governed by the CeCILL license under French law and
-abiding by the rules of distribution of free software.  You can  use,
+abiding by the rules of distribution of free software. You can use,
 modify and/ or redistribute the software under the terms of the CeCILL
 license as circulated by CEA, CNRS and INRIA at the following URL
 "http://www.cecill.info".
 
-As a counterpart to the access to the source code and  rights to copy,
+As a counterpart to the access to the source code and rights to copy,
 modify and redistribute granted by the license, users are provided only
-with a limited warranty  and the software's author,  the holder of the
-economic rights,  and the successive licensors  have only  limited
+with a limited warranty and the software's author, the holder of the
+economic rights, and the successive licensors have only limited
 liability.
 
 In this respect, the user's attention is drawn to the risks associated
-with loading,  using,  modifying and/or developing or reproducing the
+with loading, using, modifying and/or developing or reproducing the
 software by the user in light of its specific status of free software,
-that may mean  that it is complicated to manipulate,  and  that  also
-therefore means  that it is reserved for developers  and  experienced
+that may mean that it is complicated to manipulate, and that also
+therefore means that it is reserved for developers and experienced
 professionals having in-depth computer knowledge. Users are therefore
 encouraged to load and test the software's suitability as regards their
 requirements in conditions enabling the security of their systems and/or
-data to be ensured and,  more generally, to use and operate it in the
+data to be ensured and, more generally, to use and operate it in the
 same conditions as regards security.
 
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL license and that you accept its terms.
- */
+*/
 #include <iostream>
 #include <map>
 #include <vector>
@@ -64,17 +64,14 @@ CurvesWidget::CurvesWidget(QWidget *parent)
     setElideMode(Qt::ElideLeft);
     update();
     _comboBox = new QComboBox(this);
-    //setFixedSize(WIDTH,HEIGHT);
     _tabWidget = new QTabWidget(this);
     _tabWidget->setUsesScrollButtons(true);
     _tabWidget->setElideMode(Qt::ElideLeft);
-//    _currentCurveWidget = new QWidget(this);
     _curvePageWidget = new QWidget(this);
     _curvePageLayout = new QGridLayout;
 
     _curvePageLayout->addWidget(_comboBox);
     _curvePageLayout->addWidget(_tabWidget);
-//    _curvePageLayout->addWidget(_currentCurveWidget);
     _curvePageWidget->setLayout(_curvePageLayout);
     addTab(_curvePageWidget,tr("Curves"));
 
@@ -88,6 +85,7 @@ CurvesWidget::CurvesWidget(QWidget *parent)
     connect(_interpolation,SIGNAL(sampleRateChanged(const QString&,int)),this,SLOT(curveSampleRateChanged(const QString&,int)));
     connect(_interpolation,SIGNAL(redundancyChanged(const QString&,bool)),this,SLOT(curveRedundancyChanged(const QString&,bool)));
     connect(_interpolation,SIGNAL(showChanged(const QString&,bool)),this,SLOT(curveShowChanged(const QString&,bool)));
+// connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),this, SLOT(displayCurve(const QString&)));
     connect(_comboBox,SIGNAL(activated(const QString&)),this, SLOT(displayCurve(const QString&)));
 }
 
@@ -133,14 +131,14 @@ void CurvesWidget::displayCurve(const QString &address){
     map<string,unsigned int>::iterator curveIt2 = _curveIndexes.find(add);
 
     bool curveFound = (curveIt != _curveMap.end());
-//    bool curveIndexesFound = (curveIt2 != _curveIndexes.end());
+// bool curveIndexesFound = (curveIt2 != _curveIndexes.end());
 
     if (curveFound) {
 
         CurveWidget *curveWidget = curveIt->second;
-//        unsigned int index = curveIt->second;
-//        std::cout<<"\nWe want to display "<<index<<" "<<add<<"\nlist ("<<_curveWidgetList->size()<<")\n";
-//        CurveWidget *curveWidget2 = _curveWidgetList->at(index);
+// unsigned int index = curveIt->second;
+// std::cout<<"\nWe want to display "<<index<<" "<<add<<"\nlist ("<<_curveWidgetList->size()<<")\n";
+// CurveWidget *curveWidget2 = _curveWidgetList->at(index);
         _tabWidget->clear();
         _tabWidget->addTab(curveWidget,address);
     }
@@ -238,13 +236,12 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
 
         if (abCurve != NULL) // Abstract Curve found
         {
-            if (abCurve->_show)  // Abstract curve showing
+            if (abCurve->_show) // Abstract curve showing
             {
                 if (curveFound) // Curve tab existing
                 {
                     if (forceUpdate) // Force updating through engines
                     {
-                        std::cout<<"CP1\n";
                         bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                         if (getCurveSuccess) {
                             curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
@@ -266,11 +263,10 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                 {
                     if (forceUpdate) // Force creating through engines
                     {
-                        std::cout<<"CP2\n";
                         bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                         if (getCurveSuccess) {
                             // Create and set
-//                            curveTab = new CurveWidget(_currentCurveWidget);
+                            // curveTab = new CurveWidget(_currentCurveWidget);
                             curveTab = new CurveWidget(_tabWidget);
 
                             curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
@@ -280,7 +276,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                             addToComboBox(curveAddressStr);
 
                             _curveMap[address] = curveTab;
-                            displayCurve(curveAddressStr);
+                            displayCurve(_comboBox->currentText());
 
                             // Set box curve
                             box->setCurve(address,curveTab->abstractCurve());
@@ -292,7 +288,6 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
 
                     else // No forcing : create through abstract curve
                     {
-                         std::cout<<"CP3\n";
                         // Create and set
                         curveTab = new CurveWidget(_tabWidget);
                         curveTab->setAttributes(abCurve);
@@ -304,7 +299,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                         _curveMap[address] = curveTab;
 
                         addToComboBox(curveAddressStr);
-                        displayCurve(curveAddressStr);
+                        displayCurve(_comboBox->currentText());
 
                         if (!_interpolation->updateLine(address,abCurve->_interpolate,abCurve->_sampleRate,abCurve->_redundancy,abCurve->_show)) {
                             _interpolation->addLine(address,abCurve->_interpolate,abCurve->_sampleRate,abCurve->_redundancy,abCurve->_show);
@@ -318,7 +313,6 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                 {
                     if (forceUpdate) // Force updating through engines
                     {
-                        std::cout<<"C4\n";
                         bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                         if (getCurveSuccess) {
                             // Set and assign new abstract curve to box
@@ -329,7 +323,6 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                     else // No forcing : updating through abstract curve
                     {
                     }
-                    std::cout<<"CP4.1\n";
                     // Remove curve tab anyway
                     removeCurve(address);
                     _comboBox->setCurrentIndex(curveTabIndex);
@@ -343,10 +336,8 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                 {
                     if (forceUpdate) // Force updating through engines
                     {
-                        std::cout<<"CP5\n";
                         bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                         if (getCurveSuccess) {
-                            std::cout<<"CP5.1\n";
                             // Create, set and assign new abstract curve to box
                             curveTab = new CurveWidget(NULL);
                             curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
@@ -366,9 +357,8 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                 }
             }
         }
-        else  // Abstract Curve not found
+        else // Abstract Curve not found
         {
-            std::cout<<"CP6\n";
             // Get attributes and determine if shown
             bool show = true;
             bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
@@ -378,11 +368,10 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                         show = false;
                     }
                 }
-                if (show)  // Curve showing
+                if (show) // Curve showing
                 {
                     if (!curveFound) // Curve tab not existing
                     {
-                        std::cout<<"CP6.1\n";
                         // Creating curve tab from engines anyway (no abstract curve)
                         // Create and set
                         curveTab = new CurveWidget(_tabWidget);
@@ -392,13 +381,13 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                         addCurve(curveAddressStr,curveTab);
 
                         addToComboBox(curveAddressStr);
-                        displayCurve(curveAddressStr);
+                        displayCurve(_comboBox->currentText());
                     }
                     else // Curve tab existing
                     {
                         // Updating curve tab from engines anyway (no abstract curve)
                     }
-                    std::cout<<"CP6.2\n";
+
                     curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
                     // Set box curve
                     box->setCurve(address,curveTab->abstractCurve());
@@ -410,7 +399,6 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                 {
                     if (curveFound) // Curve tab existing
                     {
-                        std::cout<<"CP7\n";
                         // Creating curve tab from engines anyway (no abstract curve)
                         // Set and assign new abstract curve to box
                         curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
@@ -422,7 +410,6 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
 
                     else // Curve tab not existing
                     {
-                        std::cout<<"CP7.1\n";
                         // Creating curve tab from engines anyway (no abstract curve)
                         curveTab = new CurveWidget(_tabWidget);
                         curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);

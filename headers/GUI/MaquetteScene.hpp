@@ -100,7 +100,7 @@ class MaquetteScene : public QGraphicsScene
   Q_OBJECT
 
   public :
-QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
+  QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
   MaquetteScene(const QRectF & rect, AttributesEditor *palette);
   virtual ~MaquetteScene();
 

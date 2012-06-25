@@ -93,8 +93,8 @@ void CurveWidget::init()
 	_clicked = false;
 	_movingBreakpointX = -1;
 	_movingBreakpointY = -1;
-	_minY = -100;
-	_maxY = 100;
+    _minY = -100;
+    _maxY = 100;
 	_lastPointSelected = false;
 
 	setLayout(_layout);
@@ -112,7 +112,7 @@ void CurveWidget::curveRepresentationOutdated() {
 
 	_scaleY = height() / (2*halfSizeY);
 
-	update();
+    update();
 }
 
 void
