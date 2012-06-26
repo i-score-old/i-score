@@ -640,17 +640,19 @@ MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 
 void
 MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
+
 	QGraphicsScene::mouseReleaseEvent(mouseEvent);
 
     _releasePoint = mouseEvent->scenePos();
-	_clicked = false;
-
-	switch (_currentInteractionMode) {
+    _clicked = false;
+    switch (_currentInteractionMode) {
 	case RELATION_MODE :
+
 		if (itemAt(mouseEvent->scenePos()) != 0) {
 			int type = itemAt(mouseEvent->scenePos())->type();
-			if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+            if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
                 BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
+
                 BasicBox *firstBox = getBox(_relation->firstBox());
 				if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE)) {
                     setRelationSecondBox(secondBox->ID(),BOX_START);
@@ -1341,7 +1343,8 @@ MaquetteScene::addParentBox(unsigned int ID)
 
 unsigned int
 MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name) {
-	unsigned int motherID = findMother(topLeft,QPointF(std::fabs(bottomRight.x() - topLeft.x()),
+
+    unsigned int motherID = findMother(topLeft,QPointF(std::fabs(bottomRight.x() - topLeft.x()),
 			std::fabs(bottomRight.y() - topLeft.y())));
 	ParentBox *parentBox = NULL;
 	if (motherID != ROOT_BOX_ID && motherID != NO_ID) {
@@ -1400,22 +1403,28 @@ MaquetteScene::addParentBox() {
 
 int
 MaquetteScene::addRelation(const AbstractRelation &abstractRel) {
+
 	int ret = _maquette->addRelation(abstractRel);
 	if (ret > NO_ID) {
+
 		unsigned int relationID = (unsigned int) ret;
 		Relation *newRel = _maquette->getRelation(relationID);
-		if (newRel != NULL) {
+        if (newRel != NULL) {
 			newRel->setID(relationID);
 			newRel->setPos(newRel->getCenter());
 			newRel->update();
 			addItem(newRel);
 			BasicBox *box = NULL;
-			if ((box = getBox(abstractRel.firstBox())) != NULL) {
+            if ((box = getBox(abstractRel.firstBox())) != NULL) {
 				box->addRelation(abstractRel.firstExtremity(),newRel);
 			}
-			if ((box = getBox(abstractRel.secondBox())) != NULL) {
+            if ((box = getBox(abstractRel.secondBox())) != NULL) {
 				box->addRelation(abstractRel.secondExtremity(),newRel);
 			}
+
+
+
+
 			ret = SUCCESS;
 		}
 	}
@@ -1615,10 +1624,10 @@ MaquetteScene::removeBox(unsigned int boxID)
 				}
 			}
 		}
-		if (box->hasMother()) {
+        if (box->hasMother()) {
 			BasicBox *mother = NULL;
 			if ((mother = getBox(box->mother())) != NULL) {
-				if (mother->type() == PARENT_BOX_TYPE) {
+                if (mother->type() == PARENT_BOX_TYPE) {
 					static_cast<ParentBox*>(mother)->removeChild(boxID);
 				}
 			}

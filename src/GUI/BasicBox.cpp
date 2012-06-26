@@ -687,11 +687,12 @@ BasicBox::mother() const
 void
 BasicBox::setMother(unsigned int motherID)
 {
+    std::cout<<"BasicBox::SETMOTHER"<<std::endl;
 	_abstract->setMother(motherID);
 }
 
 bool BasicBox::hasMother()
-{
+{ 
 	return (_abstract->mother() != NO_ID && _abstract->mother() != ROOT_BOX_ID);
 }
 

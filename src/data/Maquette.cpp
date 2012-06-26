@@ -1069,6 +1069,7 @@ Maquette::addRelation(const AbstractRelation &abstract) {
 		_scene->addItem(newRel);
 		_boxes[abstract.firstBox()]->addRelation(abstract.firstExtremity(),newRel);
 		_boxes[abstract.secondBox()]->addRelation(abstract.secondExtremity(),newRel);
+        std::cout<<"Maquette::addRelation"<<std::endl;
 		newRel->updateCoordinates();
 
 		return (int)abstract.ID();

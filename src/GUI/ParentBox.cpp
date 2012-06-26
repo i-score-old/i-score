@@ -124,10 +124,9 @@ ParentBox::addChild(unsigned int childID)
 		return false;
 	}
 	else {
-		BasicBox *child = _scene->getBox(childID);
+        BasicBox *child = _scene->getBox(childID);
 		if (child != NULL) {
-			_children[childID] = _scene->getBox(childID);
-			//child->setGroup(_group);
+            _children[childID] = _scene->getBox(childID);
 			return true;
 		}
 	}

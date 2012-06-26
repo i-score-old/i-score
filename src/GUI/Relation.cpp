@@ -92,7 +92,6 @@ void
 Relation::init()
 {
   updateCoordinates();
-
   setFlag(QGraphicsItem::ItemIsMovable, false);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setFlag(QGraphicsItem::ItemIsFocusable, true);
@@ -101,6 +100,7 @@ Relation::init()
   setZValue(0);
   _leftHandleSelected = false;
   _rightHandleSelected = false;
+
 }
 
 Abstract *
@@ -158,7 +158,7 @@ Relation::toString() {
 void
 Relation::updateCoordinates()
 {
-	BasicBox *box = _scene->getBox(_abstract->firstBox());
+  BasicBox *box = _scene->getBox(_abstract->firstBox());
   switch (_abstract->firstExtremity()) {
   case BOX_START :
     _start = box->getMiddleLeft();
@@ -174,13 +174,16 @@ Relation::updateCoordinates()
   box = _scene->getBox(_abstract->secondBox());
   switch (_abstract->secondExtremity()) {
   case BOX_START :
-    _end = box->getMiddleLeft();
+      if(box!=NULL)
+        _end = box->getMiddleLeft();
     break;
   case BOX_END :
-    _end = box->getMiddleRight();
+      if(box!=NULL)
+        _end = box->getMiddleRight();
     break;
   case NO_EXTREMITY :
-    _end = box->getCenter();
+      if(box!=NULL)
+        _end = box->getCenter();
     break;
   }
 

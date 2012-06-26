@@ -332,7 +332,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                         bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                         if (getCurveSuccess) {
                             // Create, set and assign new abstract curve to box
-                            curveTab = new CurveWidget(NULL);//PAS LA
+                            curveTab = new CurveWidget(NULL);
                             curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
                             box->setCurve(address,curveTab->abstractCurve());
                             if (!_interpolation->updateLine(address,interpolate,sampleRate,redundancy,FORCE_HIDE)) {
