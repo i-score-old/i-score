@@ -64,9 +64,9 @@ CurvesWidget::CurvesWidget(QWidget *parent)
     setElideMode(Qt::ElideLeft);
     update();
     _comboBox = new QComboBox(this);
-    _tabWidget = new QTabWidget(this);
-    _tabWidget->setUsesScrollButtons(true);
-    _tabWidget->setElideMode(Qt::ElideLeft);
+    _tabWidget = new QTabWidget(_comboBox);
+//    _tabWidget->setUsesScrollButtons(true);
+//    _tabWidget->setElideMode(Qt::ElideLeft);
     _curvePageWidget = new QWidget(this);
     _curvePageLayout = new QGridLayout;
 
@@ -128,17 +128,11 @@ void CurvesWidget::displayCurve(const QString &address){
 
     std::string add = address.toStdString();
     map<string,CurveWidget *>::iterator curveIt = _curveMap.find(add);
-    map<string,unsigned int>::iterator curveIt2 = _curveIndexes.find(add);
 
     bool curveFound = (curveIt != _curveMap.end());
-// bool curveIndexesFound = (curveIt2 != _curveIndexes.end());
 
     if (curveFound) {
-
         CurveWidget *curveWidget = curveIt->second;
-// unsigned int index = curveIt->second;
-// std::cout<<"\nWe want to display "<<index<<" "<<add<<"\nlist ("<<_curveWidgetList->size()<<")\n";
-// CurveWidget *curveWidget2 = _curveWidgetList->at(index);
         _tabWidget->clear();
         _tabWidget->addTab(curveWidget,address);
     }
@@ -266,9 +260,8 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                         bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                         if (getCurveSuccess) {
                             // Create and set
-                            // curveTab = new CurveWidget(_currentCurveWidget);
-                            curveTab = new CurveWidget(_tabWidget);
-
+                            curveTab = new CurveWidget(NULL);
+                            _tabWidget->clear();
                             curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
                             QString curveAddressStr = QString::fromStdString(address);
                             // Add tab and store
@@ -289,7 +282,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                     else // No forcing : create through abstract curve
                     {
                         // Create and set
-                        curveTab = new CurveWidget(_tabWidget);
+                        curveTab = new CurveWidget(NULL);
                         curveTab->setAttributes(abCurve);
                         QString curveAddressStr = QString::fromStdString(address);
 
@@ -339,7 +332,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                         bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                         if (getCurveSuccess) {
                             // Create, set and assign new abstract curve to box
-                            curveTab = new CurveWidget(NULL);
+                            curveTab = new CurveWidget(NULL);//PAS LA
                             curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
                             box->setCurve(address,curveTab->abstractCurve());
                             if (!_interpolation->updateLine(address,interpolate,sampleRate,redundancy,FORCE_HIDE)) {
@@ -374,7 +367,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                     {
                         // Creating curve tab from engines anyway (no abstract curve)
                         // Create and set
-                        curveTab = new CurveWidget(_tabWidget);
+                        curveTab = new CurveWidget(NULL);
                         QString curveAddressStr = QString::fromStdString(address);
 
                         // Add tab and store
@@ -411,7 +404,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                     else // Curve tab not existing
                     {
                         // Creating curve tab from engines anyway (no abstract curve)
-                        curveTab = new CurveWidget(_tabWidget);
+                        curveTab = new CurveWidget(NULL);
                         curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
                         box->setCurve(address,curveTab->abstractCurve());
                         delete curveTab;

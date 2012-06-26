@@ -205,9 +205,9 @@ MaquetteView::zoomIn()
 void
 MaquetteView::zoomOut()
 {
-	MaquetteScene::MS_PER_PIXEL *= 2;
-	_zoom /= 2.;
+    MaquetteScene::MS_PER_PIXEL *= 2;
+    _zoom /= 2.;
     resetCachedContent();
-	_scene->update();
-	Maquette::getInstance()->updateBoxesFromEngines();
+    _scene->update();
+    Maquette::getInstance()->updateBoxesFromEngines();
 }

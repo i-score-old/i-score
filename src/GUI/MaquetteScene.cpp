@@ -81,7 +81,7 @@ const float MaquetteScene::MS_PRECISION = 10;
 using namespace SndBoxProp;
 
 MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
-: QGraphicsScene(rect) {
+    : QGraphicsScene(rect) {
 
 	_editor = editor;
 	_copyPalette = _editor->getPalette();
@@ -1696,9 +1696,10 @@ void MaquetteScene::setPlaying(unsigned int boxID, bool playing)
 
 void MaquetteScene::updatePlayingBoxes() {
 	map<unsigned int,BasicBox*>::iterator it;
-	for (it = _playingBoxes.begin() ; it != _playingBoxes.end() ; ++it) {
-		it->second->update();
-	}
+
+    for (it = _playingBoxes.begin() ; it != _playingBoxes.end() ; ++it) {
+        it->second->update();
+    }
 }
 
 void
