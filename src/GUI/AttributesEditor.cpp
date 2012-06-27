@@ -1310,7 +1310,7 @@ void AttributesEditor::endMessageRemoved(const string &address) {
 	vector<string> msgs = _endMsgsEditor->computeMessages();
 	Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
 	Maquette::getInstance()->removeCurve(_boxEdited,address);
-	_curvesWidget->removeCurve(address);
+    _curvesWidget->removeCurve(address);
 }
 
 void

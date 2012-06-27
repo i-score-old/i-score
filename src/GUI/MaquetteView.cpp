@@ -51,6 +51,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QMimeData>
 #include <QBuffer>
 #include <QKeyEvent>
+#include <QScrollBar>
 
 using namespace SndBoxProp;
 
@@ -60,6 +61,17 @@ MaquetteView::MaquetteView(MainWindow *mw)
   setRenderHint(QPainter::Antialiasing);
   setBackgroundBrush(QColor(140,176,140));
   setCacheMode(QGraphicsView::CacheBackground);
+
+  QScrollBar *HscrollB = horizontalScrollBar();
+  /*
+  QScrollBar *h = new QScrollBar(this);
+  QSize incr = h->sizeIncrement();
+  h->setSizeIncrement(1,1);
+  std::cout<<"NICO "<<incr.height()<<" "<<incr.width()<<std::endl;
+
+  setHorizontalScrollBar(h);
+  */
+
   setWindowTitle(tr("Maquette"));
   setAlignment(Qt::AlignLeft | Qt::AlignTop);
   centerOn(0,0);
@@ -72,9 +84,18 @@ MaquetteView::~MaquetteView()
 }
 
 void
+MaquetteView::wheelEvent(QWheelEvent *event){
+    QGraphicsView::wheelEvent(event);
+    //std::cout<<"WHEEL EVENT"<<std::endl;
+    //horizontalScrollBar()->setValue(horizontalScrollBar()->value()+1);
+}
+
+void
 MaquetteView::setGotoValue(int value) {
 	_gotoValue = value;
-    updateScene();
+
+/*Modif Nico*/    setSceneRect(0,0,MaquetteScene::MAX_SCENE_WIDTH,MaquetteScene::MAX_SCENE_HEIGHT);
+/*à la place de :  updateScene();*/
 }
 
 void
@@ -84,6 +105,7 @@ MaquetteView::updateScene()
   centerOn(0,0);
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
   setSceneRect(0,0,MaquetteScene::MAX_SCENE_WIDTH,MaquetteScene::MAX_SCENE_HEIGHT);
 }
 
@@ -153,7 +175,7 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
 void
 MaquetteView::keyPressEvent(QKeyEvent *event)
 {
-	QGraphicsView::keyPressEvent(event);
+//	QGraphicsView::keyPressEvent(event);
 	if (event->matches(QKeySequence::Copy)) {
 		_scene->copyBoxes();
 		_scene->displayMessage(tr("Selection copied").toStdString(),INDICATION_LEVEL);

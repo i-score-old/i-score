@@ -222,7 +222,7 @@ bool NetworkMessagesEditor::lineToStrings(const NetworkLine &line,string &device
 /*	int lineIndex = line.index;
 	if (lineIndex != -1 && lineIndex < rowCount()) {*/
 		deviceStr = line.devicesBox->currentText();
-		if (!deviceStr.isEmpty()) {
+        if (!deviceStr.isEmpty()) {
 			device = deviceStr.toStdString();
 			msgStr = line.messageBox->text();
 			if (!msgStr.isEmpty()) {

@@ -102,6 +102,13 @@ class MaquetteView : public QGraphicsView
    * \param event : the information about the event
    */
   virtual void keyPressEvent(QKeyEvent *event);
+  /*!
+   * \brief Redefinition of QGraphicsView::wheelEvent().
+   *
+   * \param event : the information about the event
+   */
+  virtual void wheelEvent(QWheelEvent *event);
+
 
  private :
 
