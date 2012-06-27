@@ -55,6 +55,8 @@ knowledge of the CeCILL license and that you accept its terms.
 
 using namespace SndBoxProp;
 
+static const int SCROLL_BAR_INCREMENT = 1000 / MaquetteScene::MS_PER_PIXEL;
+
 MaquetteView::MaquetteView(MainWindow *mw)
   : QGraphicsView(mw)
 {
@@ -85,23 +87,43 @@ MaquetteView::~MaquetteView()
 
 void
 MaquetteView::wheelEvent(QWheelEvent *event){
-    QGraphicsView::wheelEvent(event);
-    //std::cout<<"WHEEL EVENT"<<std::endl;
-    //horizontalScrollBar()->setValue(horizontalScrollBar()->value()+1);
+
+//    QGraphicsView::wheelEvent(event);
+
+    if(event->orientation()==Qt::Horizontal){
+        if(event->delta()<0) //up
+            horizontalScrollBar()->setValue(horizontalScrollBar()->value()+SCROLL_BAR_INCREMENT);
+        else //down
+            horizontalScrollBar()->setValue(horizontalScrollBar()->value()-SCROLL_BAR_INCREMENT);
+
+    }
+    if(event->orientation()==Qt::Vertical){
+        if(event->delta()<0) //up
+           verticalScrollBar()->setValue(verticalScrollBar()->value()+SCROLL_BAR_INCREMENT);
+
+        else  //down
+           verticalScrollBar()->setValue(verticalScrollBar()->value()-SCROLL_BAR_INCREMENT);
+    }
 }
 
 void
 MaquetteView::setGotoValue(int value) {
 	_gotoValue = value;
 
-/*Modif Nico*/
-    _scene = static_cast<MaquetteScene*>(scene());
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    setSceneRect(0,0,MaquetteScene::MAX_SCENE_WIDTH,MaquetteScene::MAX_SCENE_HEIGHT);
+/*Modif Nico*/     updateSceneWithoutCenterOn();
 /*à la place de :  updateScene();*/
 /*Pour éviter le recentrage lors de la manip de la barre goto*/
 
+}
+
+void
+MaquetteView::updateSceneWithoutCenterOn(){
+
+    _scene = static_cast<MaquetteScene*>(scene());
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
+    setSceneRect(0,0,MaquetteScene::MAX_SCENE_WIDTH,MaquetteScene::MAX_SCENE_HEIGHT);
 }
 
 void
@@ -222,7 +244,7 @@ MaquetteView::zoomIn()
 		MaquetteScene::MS_PER_PIXEL /= 2;
 		_zoom *= 2;
 		resetCachedContent();
-		_scene->update();
+        _scene->update();
 		Maquette::getInstance()->updateBoxesFromEngines();
 	}
 }

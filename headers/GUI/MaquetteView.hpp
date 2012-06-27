@@ -79,6 +79,10 @@ class MaquetteView : public QGraphicsView
    */
   void updateScene();
   /*!
+   * \brief Raised to notify the scene from changes without centering on the scene.
+   */
+  void updateSceneWithoutCenterOn();
+  /*!
    * \brief Performs zoom in of the entire scene.
    */
   void zoomIn();
