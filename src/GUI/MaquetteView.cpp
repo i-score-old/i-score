@@ -94,8 +94,14 @@ void
 MaquetteView::setGotoValue(int value) {
 	_gotoValue = value;
 
-/*Modif Nico*/    setSceneRect(0,0,MaquetteScene::MAX_SCENE_WIDTH,MaquetteScene::MAX_SCENE_HEIGHT);
+/*Modif Nico*/
+    _scene = static_cast<MaquetteScene*>(scene());
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    setSceneRect(0,0,MaquetteScene::MAX_SCENE_WIDTH,MaquetteScene::MAX_SCENE_HEIGHT);
 /*à la place de :  updateScene();*/
+/*Pour éviter le recentrage lors de la manip de la barre goto*/
+
 }
 
 void
@@ -175,7 +181,7 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
 void
 MaquetteView::keyPressEvent(QKeyEvent *event)
 {
-//	QGraphicsView::keyPressEvent(event);
+    QGraphicsView::keyPressEvent(event);
 	if (event->matches(QKeySequence::Copy)) {
 		_scene->copyBoxes();
 		_scene->displayMessage(tr("Selection copied").toStdString(),INDICATION_LEVEL);
