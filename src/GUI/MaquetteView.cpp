@@ -64,16 +64,6 @@ MaquetteView::MaquetteView(MainWindow *mw)
   setBackgroundBrush(QColor(140,176,140));
   setCacheMode(QGraphicsView::CacheBackground);
 
-  QScrollBar *HscrollB = horizontalScrollBar();
-  /*
-  QScrollBar *h = new QScrollBar(this);
-  QSize incr = h->sizeIncrement();
-  h->setSizeIncrement(1,1);
-  std::cout<<"NICO "<<incr.height()<<" "<<incr.width()<<std::endl;
-
-  setHorizontalScrollBar(h);
-  */
-
   setWindowTitle(tr("Maquette"));
   setAlignment(Qt::AlignLeft | Qt::AlignTop);
   centerOn(0,0);
@@ -88,19 +78,16 @@ MaquetteView::~MaquetteView()
 void
 MaquetteView::wheelEvent(QWheelEvent *event){
 
-//    QGraphicsView::wheelEvent(event);
-
     if(event->orientation()==Qt::Horizontal){
         if(event->delta()<0) //up
             horizontalScrollBar()->setValue(horizontalScrollBar()->value()+SCROLL_BAR_INCREMENT);
         else //down
             horizontalScrollBar()->setValue(horizontalScrollBar()->value()-SCROLL_BAR_INCREMENT);
-
     }
+
     if(event->orientation()==Qt::Vertical){
         if(event->delta()<0) //up
            verticalScrollBar()->setValue(verticalScrollBar()->value()+SCROLL_BAR_INCREMENT);
-
         else  //down
            verticalScrollBar()->setValue(verticalScrollBar()->value()-SCROLL_BAR_INCREMENT);
     }
@@ -109,11 +96,7 @@ MaquetteView::wheelEvent(QWheelEvent *event){
 void
 MaquetteView::setGotoValue(int value) {
 	_gotoValue = value;
-
-/*Modif Nico*/     updateSceneWithoutCenterOn();
-/*à la place de :  updateScene();*/
-/*Pour éviter le recentrage lors de la manip de la barre goto*/
-
+    updateSceneWithoutCenterOn();
 }
 
 void
@@ -164,7 +147,7 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
 	 	 painter->setPen(pen);
   	 for (float j = i ; j < i+1 ; j+=1./_zoom) {
     		if (i != j) {
-    			float j_PXL =  j * S_TO_MS / (float)MaquetteScene::MS_PER_PIXEL;
+                float j_PXL = 0;//=  j * S_TO_MS / (float)MaquetteScene::MS_PER_PIXEL;
     			if (_zoom > 4 || QString("%1").arg(j-(int)j).length() < 5) {
     				painter->drawText(QPointF(j_PXL-10, 15),QString("%1").arg(round(j*1000)/1000.));
     			}
@@ -249,6 +232,14 @@ MaquetteView::zoomIn()
 	}
 }
 
+QPointF
+MaquetteView::getCenterCoordinates(){
+    QPointF centerCoordinates;
+
+    std::cout<<"test "<<std::endl;
+    return centerCoordinates;
+}
+
 /**
  * Perform zoom out
  */
@@ -256,6 +247,8 @@ void
 MaquetteView::zoomOut()
 {
     MaquetteScene::MS_PER_PIXEL *= 2;
+
+    QPointF p = getCenterCoordinates();
     _zoom /= 2.;
     resetCachedContent();
     _scene->update();

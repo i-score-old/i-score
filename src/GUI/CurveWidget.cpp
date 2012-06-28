@@ -291,10 +291,10 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 				float mousePosY = event->pos().y();
 				float pow = 1.;
 				QPointF lastPoint = absoluteCoordinates(QPointF(1,_abstract->_curve.back()));
-				if (mousePosY > lastPoint.y()) { // mouse under : pow between 0 and 1
+                if (mousePosY > lastPoint.y()) { // mouse under : pow between 0 and 1
 					pow = 1 - std::min((float)(mousePosY - lastPoint.y()),(float)50.) / 50.;
 				}
-				else if (lastPoint.y() > mousePosY){ // mouse above : pow between 1 and 6
+                else if (lastPoint.y() > mousePosY){ // mouse above : pow between 1 and 6
 					pow = 1 + std::min((float)(lastPoint.y() - mousePosY),(float)50.) / 10.;
 				}
 				_abstract->_lastPointCoeff = pow;
