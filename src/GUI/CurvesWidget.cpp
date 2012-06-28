@@ -314,10 +314,10 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                 std::cout<<"!abst->show"<<std::endl;
 
                 //NICO
-/*
+
                 if (curveFound) // Curve tab existing
                 {
-*/
+
 
                     std::cout<<"curveFound"<<std::endl;
 
@@ -334,12 +334,12 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                         }
 
                      //NICO
-//                    }
-                    /*
+                    }
+
                     else // No forcing : updating through abstract curve
-                    {                        
+                    {
                         std::cout<<"Noforcing"<<std::endl;
-                    }*/
+                    }
 
                     // Remove curve tab anyway
                     removeCurve(address);

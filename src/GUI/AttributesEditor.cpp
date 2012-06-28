@@ -1278,12 +1278,12 @@ AttributesEditor::endMessagesChanged()
 }
 
 void AttributesEditor::startMessageChanged(const string &address) {
+
     //NICO
     QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
-    //QList<QTreeWidgetItem*> expandedItems = _networkTree->expandedItems();
     Maquette::getInstance()->setFirstItemsToSend(_boxEdited,items);
-    //Maquette::getInstance()->setExpandedItemsList(_boxEdited,expandedItems);
     //NICO
+
 	vector<string> msgs = _startMsgsEditor->computeMessages();
 	Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
 	_curvesWidget->updateCurve(address);
@@ -1291,8 +1291,13 @@ void AttributesEditor::startMessageChanged(const string &address) {
 
 void AttributesEditor::endMessageChanged(const string &address) {
 	vector<string> msgs = _endMsgsEditor->computeMessages();
-	Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
-	_curvesWidget->updateCurve(address);
+//    std::cout<<"msgs :"<<std::endl;
+//    for (int i=0;i<msgs.size();i++)
+//        std::cout<<msgs[i]<<" ";
+//    std::cout<<std::endl;
+//    std::cout<<"address :"<<address<<std::endl;
+    Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
+    _curvesWidget->updateCurve(address);
 }
 
 void AttributesEditor::startMessageRemoved(const string &address) {

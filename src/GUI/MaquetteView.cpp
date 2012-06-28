@@ -235,8 +235,6 @@ MaquetteView::zoomIn()
 QPointF
 MaquetteView::getCenterCoordinates(){
     QPointF centerCoordinates;
-
-    std::cout<<"test "<<std::endl;
     return centerCoordinates;
 }
 
@@ -248,7 +246,6 @@ MaquetteView::zoomOut()
 {
     MaquetteScene::MS_PER_PIXEL *= 2;
 
-    QPointF p = getCenterCoordinates();
     _zoom /= 2.;
     resetCachedContent();
     _scene->update();

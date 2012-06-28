@@ -274,6 +274,7 @@ NetworkMessagesEditor::computeMessage(const NetworkLine &line) {
 
 vector<string>
 NetworkMessagesEditor::computeMessages() {
+    std::cout<<"NetworkMsg::compute"<<std::endl;
 	vector<string> msgs;
 	vector<NetworkLine>::const_iterator it;
 	for (it = _networkLines.begin() ; it != _networkLines.end() ; it++) {
