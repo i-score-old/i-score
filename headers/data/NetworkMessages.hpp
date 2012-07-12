@@ -21,8 +21,13 @@ using std::string;
  * \brief Used to store several composants of a message.
  */
 struct Message {
-    QString device;
-    QString message;
+    /* Example :
+     * Device >   MinuitDevice
+     * Message >  /volume/accordion
+     * Value >    12
+     */
+    QString device; // MinuitDevice
+    QString message; // /gain/
     QString value;
 };
 
@@ -64,6 +69,10 @@ public :
      * \brief Set the list of messages.
      */
     void setMessages(const QList < QPair<QTreeWidgetItem *, QString> > messagesList);
+    /*!
+     * \brief Set the list of messages.
+     */
+    void setMessages(const QList < QPair<QTreeWidgetItem *, Message> > messagesList);
     /*!
      * \brief Set the list of messages.
      */

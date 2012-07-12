@@ -842,8 +842,9 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
             if(abBox->networkTreeItems().isEmpty() && abBox->networkTreeExpandedItems().isEmpty()){
                 //LOAD
                 std::cout<<"LOAD"<<std::endl;
-                QList<QTreeWidgetItem *>itemsFromMsg = _networkTree->getItemsFromMsg(abBox->firstMsgs());
-                _networkTree->setAssignedItems(itemsFromMsg);
+//                QList<QTreeWidgetItem *>itemsFromMsg = _networkTree->getItemsFromMsg(abBox->firstMsgs());
+               _networkTree->loadNetworkTree(abBox);
+//                _networkTree->setAssignedItems(itemsFromMsg);
                 startMessagesChanged();
                 _networkTree->assignItems(_networkTree->assignedItems());
                 _networkTree->expandNodes(_networkTree->assignedItems());
@@ -1302,7 +1303,7 @@ void AttributesEditor::startMessageChanged(const string &address) {
     Maquette::getInstance()->setStartMessages(_boxEdited,_networkTree->startMessages());
 
     _networkTree->updateStartMsgsDisplay();
-     _networkTree->updateEndMsgsDisplay();
+    _networkTree->updateEndMsgsDisplay();
 	_curvesWidget->updateCurve(address);
 }
 

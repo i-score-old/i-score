@@ -48,6 +48,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QKeyEvent>
 #include <iostream>
 #include "NetworkMessages.hpp"
+#include "AbstractBox.hpp"
+#include <QPair>
 
 using std::vector;
 using std::string;
@@ -113,10 +115,16 @@ class NetworkTree : public QTreeWidget
          * \param column : the column numero.
          */
         void clearColumn(unsigned int column);
+        /*!
+         * \brief Loads assigned items and messages' value, from the _firstMsgs and _lastMsgs of the abstract box.
+         * \param abBox : The abstractBox.
+         */
+        void loadNetworkTree(AbstractBox *abBox);
 
         inline QList<QTreeWidgetItem*> assignedItems() {return _assignedItems;}
         inline void setAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems.clear(); _assignedItems=items;}
-        QList<QTreeWidgetItem*> getItemsFromMsg(vector<string> itemsName);
+
+        QList< QPair<QTreeWidgetItem *, Message> > getItemsFromMsg(vector<string> itemsName);
         void expandNodes(QList<QTreeWidgetItem *> items);
 
         inline void addAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems << items;}

@@ -168,6 +168,15 @@ void
 NetworkMessages::removeMessage(QTreeWidgetItem *item){
     _messages->remove(item);
 }
+void
+NetworkMessages::setMessages(const QList < QPair<QTreeWidgetItem *, Message> > messagesList){
+    QList< QPair<QTreeWidgetItem *, Message> >::const_iterator it;
+    QPair<QTreeWidgetItem *, Message> curPair;
+    for(it=messagesList.begin() ; it!=messagesList.end() ; it++){
+        curPair = *it;
+        addMessage(curPair.first,curPair.second.device,curPair.second.message,curPair.second.value);
+    }
+}
 
 void
 NetworkMessages::setMessages(const QList < QPair<QTreeWidgetItem *, QString> > messagesList){
@@ -200,21 +209,21 @@ NetworkMessages::setMessages(const QList < QPair<QTreeWidgetItem *, QString> > m
                             msgsCount++;
                         }
                         else {
-                            std::cerr << "NetworkMessagesEditor::addMessages : no value after the message" << std::endl;
+                            std::cerr << "NetworkMessages::addMessages : no value after the message" << std::endl;
                         }
                     }
                 }
                 else {
-                    std::cerr << "NetworkMessagesEditor::addMessages : message too short after the (\"/\")" << std::endl;
+                    std::cerr << "NetworkMessages::addMessages : message too short after the (\"/\")" << std::endl;
                 }
             }
             else {
-                std::cerr << "NetworkMessagesEditor::addMessages : could not find the beginning of the message (\"/\")" << std::endl;
+                std::cerr << "NetworkMessages::addMessages : could not find the beginning of the message (\"/\")" << std::endl;
             }
         }
         else {
 #ifdef DEBUG
-            std::cerr << "NetworkMessagesEditor::addMessages : empty message found ignored" << std::endl;
+            std::cerr << "NetworkMessages::addMessages : empty message found ignored" << std::endl;
 #endif
         }
     }
@@ -253,21 +262,21 @@ NetworkMessages::addMessages(const QList < QPair<QTreeWidgetItem *, QString> > m
                             msgsCount++;
                         }
                         else {
-                            std::cerr << "NetworkMessagesEditor::addMessages : no value after the message" << std::endl;
+                            std::cerr << "NetworkMessages::addMessages : no value after the message" << std::endl;
                         }
                     }
                 }
                 else {
-                    std::cerr << "NetworkMessagesEditor::addMessages : message too short after the (\"/\")" << std::endl;
+                    std::cerr << "NetworkMessages::addMessages : message too short after the (\"/\")" << std::endl;
                 }
             }
             else {
-                std::cerr << "NetworkMessagesEditor::addMessages : could not find the beginning of the message (\"/\")" << std::endl;
+                std::cerr << "NetworkMessages::addMessages : could not find the beginning of the message (\"/\")" << std::endl;
             }
         }
         else {
 #ifdef DEBUG
-            std::cerr << "NetworkMessagesEditor::addMessages : empty message found ignored" << std::endl;
+            std::cerr << "NetworkMessages::addMessages : empty message found ignored" << std::endl;
 #endif
         }
     }

@@ -371,25 +371,33 @@ void NetworkTree::load() {
  *
  */
 
-QList<QTreeWidgetItem *>
+QList< QPair<QTreeWidgetItem *, Message> >
 NetworkTree:: getItemsFromMsg(vector<string> itemsName)
 {
-    QList<QTreeWidgetItem *> itemsFound;
+    Message msg;
+    QList<QTreeWidgetItem *>  itemsFound;
     QString curName;
     QStringList address;
-    QList<QTreeWidgetItem *> itemsMatchedList;
+    QStringList splitAddress;
+    QList< QPair<QTreeWidgetItem *, Message> > itemsMatchedList;
     vector<string>::iterator it;
+    QList< QPair<QTreeWidgetItem *, Message> >::iterator it1;
 
     if(!itemsName.empty()){
     //Boucle sur liste message
     for(it=itemsName.begin() ; it!=itemsName.end() ; ++it){
         curName = QString::fromStdString(*it);
         address = curName.split(" ");
-        QStringList::Iterator it2;
 
-        address = address.first().split("/");
-
-
+        splitAddress = address.first().split("/");
+        int nbSection = splitAddress.size();
+        if (nbSection>=2){
+            curName = address.first();
+            msg.value = address.at(1);//second value
+            msg.device = curName.section('/',0,0);
+            msg.message= tr("/");
+            msg.message += curName.section('/',1,nbSection);
+        }
         //--------------------PROVISOIRE--------------------
 //        Considère les noeuds avec un nombre fixe de parents, NB_PARENT_MAX. Mis en place pour le cas de l'ancienne version de jamoma où peut mettre des noms contenant des "/"
 //        int NB_PARENT_MAX = 2;
@@ -415,7 +423,7 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
 //         }
          //--------------------------------------------------
 
-        itemsFound = this->findItems(address.last(), Qt::MatchRecursive, 0);
+        itemsFound = this->findItems(splitAddress.last(), Qt::MatchRecursive, 0);
         if(itemsFound.size()>1){
             QList<QTreeWidgetItem *>::iterator it3;
             QTreeWidgetItem *curIt;
@@ -423,11 +431,11 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
             bool found=false;
             for(it3=itemsFound.begin(); it3!=itemsFound.end(); ++it3){
                 curIt = *it3;
-                int i=address.size()-2;
+                int i=splitAddress.size()-2;
                 while(curIt->parent()!=NULL){
 
                     father=curIt->parent();
-                    if(father->text(0)!=address.at(i)){
+                    if(father->text(0)!=splitAddress.at(i)){
                         found=false;
                         break;
                     }
@@ -438,18 +446,57 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
                     }
                 }
                 if(found==true){
-                    itemsMatchedList<<*it3;
+                    QPair<QTreeWidgetItem *,Message> newPair = qMakePair(*it3,msg);
+                    itemsMatchedList<<newPair;
                     break;
                 }
             }
         }
         else{
-            if(!itemsFound.isEmpty())
-                itemsMatchedList<<itemsFound.first();
+            if(!itemsFound.isEmpty()){
+                QPair<QTreeWidgetItem *,Message> newPair = qMakePair(itemsFound.first(),msg);
+                itemsMatchedList<<newPair;
+            }
         }
     }
 }
     return itemsMatchedList;
+}
+
+void
+NetworkTree::loadNetworkTree(AbstractBox *abBox){
+
+    QList< QPair<QTreeWidgetItem *, Message> > startItemsAndMsgs = getItemsFromMsg(abBox->firstMsgs());
+    QList< QPair<QTreeWidgetItem *, Message> > endItemsAndMsgs = getItemsFromMsg(abBox->lastMsgs());
+    QList< QPair<QTreeWidgetItem *, Message> >::iterator it0;
+    QPair<QTreeWidgetItem *, Message> curPair;
+
+    QList<QTreeWidgetItem *>itemsFromMsg;
+    for(it0 = startItemsAndMsgs.begin() ; it0 != startItemsAndMsgs.end() ; it0++){
+        curPair = *it0;
+        itemsFromMsg << curPair.first;
+    }
+
+    QList<QTreeWidgetItem *>itemsFromEndMsg;
+    for(it0 = endItemsAndMsgs.begin() ; it0 != endItemsAndMsgs.end() ; it0++){
+        curPair = *it0;
+        itemsFromEndMsg << curPair.first;
+    }
+
+    QList<QTreeWidgetItem *>::iterator it;
+    QTreeWidgetItem *curItem;
+    for(it = itemsFromEndMsg.begin() ; it != itemsFromEndMsg.end() ; it++){
+        curItem = *it;
+        if(!itemsFromMsg.contains(curItem))
+            itemsFromMsg.append(curItem);
+    }
+    setAssignedItems(itemsFromMsg);
+    NetworkMessages *startMsg = new NetworkMessages();
+    NetworkMessages *endMsg = new NetworkMessages();
+    startMsg->setMessages(startItemsAndMsgs);
+    endMsg->setMessages(endItemsAndMsgs);
+    setStartMessages(startMsg);
+    setEndMessages(endMsg);
 }
 
 QString
@@ -482,7 +529,7 @@ NetworkTree::treeSnapshot() {
         for (it = selection.begin(); it != selection.end() ; ++it) {
             curItem = *it;
 
-            if(curItem->type() != NodeNamespaceType && curItem->type() != NodeNoNamespaceType){
+            if(!curItem->text(VALUE_COLUMN).isEmpty()){// >type() != NodeNamespaceType && curItem->type() != NodeNoNamespaceType){
                 QString address = getAbsoluteAddress(*it);
                 QPair<QTreeWidgetItem *, QString> curPair;
 
@@ -633,7 +680,7 @@ NetworkTree::updateStartMsgsDisplay(){
     clearColumn(START_COLUMN);
     for(it=items.begin() ; it!=items.end() ; it++){
         curItem = *it;
-        currentMsg = _startMessages->getMessages()->value(curItem);
+        currentMsg = _startMessages->getMessages()->value(curItem);       
         curItem->setText(START_COLUMN,currentMsg.value);
     }
 }
