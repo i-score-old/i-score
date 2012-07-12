@@ -73,6 +73,7 @@ class AbstractBox;
 class MaquetteScene;
 class NetworkTree;
 class TreeMap;
+class NetworkMessages;
 
 /*!
  * \class AttributesEditor

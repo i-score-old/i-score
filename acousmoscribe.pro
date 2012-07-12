@@ -91,7 +91,8 @@ headers/GUI/TextEdit.hpp \
 headers/GUI/TriggerPoint.hpp \
 headers/GUI/TreeMap.hpp \
 headers/GUI/TreeMapElement.hpp \
-headers/GUI/ViewRelations.hpp
+headers/GUI/ViewRelations.hpp \
+headers/data/NetworkMessages.hpp
 
 SOURCES += main.cpp \
 src/data/Abstract.cpp \
@@ -135,7 +136,8 @@ src/GUI/TextEdit.cpp \
 src/GUI/TriggerPoint.cpp \
 src/GUI/TreeMap.cpp \
 src/GUI/TreeMapElement.cpp \
-src/GUI/ViewRelations.cpp
+src/GUI/ViewRelations.cpp \
+src/data/NetworkMessages.cpp
 
 RESOURCES += acousmoscribe.qrc
 

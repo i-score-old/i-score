@@ -56,6 +56,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QColor>
 #include <math.h>
 #include <QTreeWidgetItem>
+#include "NetworkMessages.hpp"
 
 //! Defines abstract basic box type.
 enum {ABSTRACT_BOX_TYPE = 1};
@@ -135,6 +136,21 @@ class AbstractBox : public Abstract
    */
   inline std::vector<std::string> firstMsgs() const {return _firstMsgs;}
   /*!
+   * \brief Gets the messages to send at box end.
+   * \return the messages to send at box end
+   */
+  inline std::vector<std::string> lastMsgs() const {return _lastMsgs;}
+  /*!
+   * \brief Gets the messages to send at box start.
+   * \return the messages to send at box start
+   */
+   inline NetworkMessages *startMessages() const {return _startMessages;}
+  /*!
+   * \brief Gets the messages to send at box end.
+   * \return the messages to send at box end
+   */
+  inline NetworkMessages *endMessages() const {return _endMessages;}
+  /*!
    * \brief Gets the items at box start.
    * \return the items at box start
    */
@@ -144,12 +160,6 @@ class AbstractBox : public Abstract
    * \return the items expanded.
    */
   inline QList<QTreeWidgetItem*> networkTreeExpandedItems() const {return _networkTreeExpandedItems;}
-  /*!
-   * \brief Gets the messages to send at box end.
-   * \return the messages to send at box end
-   */
-  inline std::vector<std::string> lastMsgs() const {return _lastMsgs;}
-
   /*!
    * \brief Sets the top left coordinates of the box.
    * \param topLeft : the top left coordinates of the box
@@ -194,6 +204,14 @@ class AbstractBox : public Abstract
   	_firstMsgs = firstMsgs;
     }
   /*!
+   * \brief Sets the messages to send at box start.
+   * \param firstMsgs : the new messages to send at box start
+   */
+  inline void setStartMessages(NetworkMessages *startMsgs){
+    _startMessages->clear();
+    _startMessages = new NetworkMessages(startMsgs->getMessages());
+    }
+  /*!
    * \brief Sets the items to send at box start.
    * \param items : the items to send at box start
    */
@@ -224,11 +242,9 @@ class AbstractBox : public Abstract
   inline void removeFromNetworkTreeExpandedItems(QTreeWidgetItem *item){
       _networkTreeExpandedItems.removeAt(_networkTreeExpandedItems.indexOf(item));
   }
-
   inline void clearNetworkTreeExpandedItems(){
       _networkTreeExpandedItems.clear();
   }
-
   /*!
    * \brief Sets the messages to send at box end.
    * \param lastMsgs : the new messages to send at box end
@@ -236,6 +252,14 @@ class AbstractBox : public Abstract
   inline void setLastMsgs(const std::vector<std::string> &lastMsgs){
   	_lastMsgs.clear();
   	_lastMsgs = lastMsgs;
+    }
+  /*!
+   * \brief Sets the messages to send at box end.
+   * \param lastMsgs : the new messages to send at box end
+   */
+  inline void setEndMessages(NetworkMessages *endMsgs){
+    _endMessages->clear();
+    _endMessages = new NetworkMessages(endMsgs->getMessages());
     }
 
  protected :
@@ -249,9 +273,10 @@ class AbstractBox : public Abstract
   unsigned int _motherID ; //!< The possible mother's ID
   std::vector<std::string> _firstMsgs; //!< Messages linked to the start of the box
   std::vector<std::string> _lastMsgs; //!< Messages linked to the end of the box
+  NetworkMessages *_startMessages; //!< pairs QTreeWidgetItem-Message
+  NetworkMessages *_endMessages; //!< pairs QTreeWidgetItem-Message
   QList<QTreeWidgetItem*> _networkTreeItems;
   QList<QTreeWidgetItem*> _networkTreeExpandedItems;
-
 };
 
 #endif

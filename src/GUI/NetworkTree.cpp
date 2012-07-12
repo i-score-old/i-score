@@ -44,21 +44,57 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <map>
 #include <exception>
 
+unsigned int VALUE_COLUMN = 1;
+unsigned int START_COLUMN = 2;
+unsigned int END_COLUMN = 3;
+unsigned int CURVE_COLUMN = 4;
+
 NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 {
-    setColumnCount(2);
+    init();
+    setColumnCount(5);
     QStringList list;
-    list<<"Name";
-    list<<"Value";
+    list<<"Name"<<"Value"<<"Start"<<"End"<<"Curve";
     setColumnWidth(0,250);
-    setColumnWidth(1,140);
+    setColumnWidth(VALUE_COLUMN,75);
+    setColumnWidth(START_COLUMN,75);
+    setColumnWidth(END_COLUMN,75);
+    setColumnWidth(CURVE_COLUMN,50);
     setHeaderLabels(list);
     list.clear();
     //connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(itemCollapsed()));
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(clickInNetworkTree()));
-    //connect(this, SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(removeFromExpandedItemsList(QTreeWidgetItem *)));
-    //connect(this, SIGNAL(itemExpanded(QTreeWidgetItem *)),this,SLOT(addToExpandedItemsList(QTreeWidgetItem*)));
+}
 
+void
+NetworkTree::init(){
+    _startMessages = new NetworkMessages;
+    _endMessages = new NetworkMessages;
+}
+
+void
+NetworkTree::clearColumn(unsigned int column){
+
+    if(!_assignedItems.isEmpty()){
+        QList<QTreeWidgetItem *>::iterator it;
+        QTreeWidgetItem *curIt;
+        for (it=_assignedItems.begin(); it!=_assignedItems.end(); it++){
+            curIt=*it;
+            curIt->setText(column,tr(""));
+        }
+    }
+}
+
+void
+NetworkTree::clearStartMsgs(){
+    clearColumn(START_COLUMN);
+    _startMessages->clear();
+}
+
+void
+NetworkTree::clearEndMsgs(){
+    clearColumn(END_COLUMN);
+    _endMessages->clear();
 }
 
 void NetworkTree::fathersPartialAssignation(QTreeWidgetItem *item){
@@ -115,7 +151,7 @@ void
 NetworkTree::expandItems(QList<QTreeWidgetItem*> expandedItems){
     QList<QTreeWidgetItem *>::iterator it;
     QTreeWidgetItem *curItem;
-    collapseAll();
+//    collapseAll();
     for (it =  expandedItems.begin() ; it !=  expandedItems.end() ; ++it){
         curItem = *it;
         expandItem(curItem);
@@ -216,7 +252,6 @@ QList<QTreeWidgetItem*> NetworkTree::getSelectedItems(){
     allSelectedItems << items;
 
     for(it=items.begin() ; it!=items.end() ; ++it){
-        QTreeWidgetItem *curItem = *it;
         if (!children->empty())
             allSelectedItems << *children;
     }
@@ -356,28 +391,28 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
 
 
         //--------------------PROVISOIRE--------------------
-        int NB_PARENT_MAX = 2;
-        int i;
+//        Considère les noeuds avec un nombre fixe de parents, NB_PARENT_MAX. Mis en place pour le cas de l'ancienne version de jamoma où peut mettre des noms contenant des "/"
+//        int NB_PARENT_MAX = 2;
+//        int i;
 
-        if(address.size()>NB_PARENT_MAX+1){
-            std::cout<<"address concat :"<<address.size()<<std::endl;
+//        if(address.size()>NB_PARENT_MAX+1){
+//            std::cout<<"address concat :"<<address.size()<<std::endl;
 
-            QString concat = address.at(NB_PARENT_MAX);
-            for(i=NB_PARENT_MAX+1; i<address.size(); i++){
-                concat+="/";
-                concat+=address.at(i);
-            }
+//            QString concat = address.at(NB_PARENT_MAX);
+//            for(i=NB_PARENT_MAX+1; i<address.size(); i++){
+//                concat+="/";
+//                concat+=address.at(i);
+//            }
 
-            address.replace(NB_PARENT_MAX,concat);
+//            address.replace(NB_PARENT_MAX,concat);
 
-            for(i=NB_PARENT_MAX+1; i<=address.size(); i++)
-                address.pop_back();
+//            for(i=NB_PARENT_MAX+1; i<=address.size(); i++)
+//                address.pop_back();
 
-            for(i=0;i<address.size();i++)
-                std::cout<<address.at(i).toStdString()<<" ";
-            std::cout<<std::endl<<std::endl;
-         }
-
+//            for(i=0;i<address.size();i++)
+//                std::cout<<address.at(i).toStdString()<<" ";
+//            std::cout<<std::endl<<std::endl;
+//         }
          //--------------------------------------------------
 
         itemsFound = this->findItems(address.last(), Qt::MatchRecursive, 0);
@@ -433,19 +468,58 @@ NetworkTree::getAbsoluteAddress(QTreeWidgetItem *item) const {
 	return address;
 }
 
+QList < QPair<QTreeWidgetItem *, QString> >
+NetworkTree::treeSnapshot() {
+
+    QList < QPair<QTreeWidgetItem *, QString> > snapshots;
+    QList<QTreeWidgetItem*> selection = selectedItems();
+
+    if (!selection.empty()) {
+        QList<QTreeWidgetItem*>::iterator it;
+        vector<string>::iterator it2;
+        QTreeWidgetItem *curItem;
+
+        for (it = selection.begin(); it != selection.end() ; ++it) {
+            curItem = *it;
+
+            if(curItem->type() != NodeNamespaceType && curItem->type() != NodeNoNamespaceType){
+                QString address = getAbsoluteAddress(*it);
+                QPair<QTreeWidgetItem *, QString> curPair;
+
+                if (!address.isEmpty()) {
+                    vector<string> snapshot = Maquette::getInstance()->requestNetworkSnapShot(address.toStdString());
+                    QString message;
+
+                    for(it2=snapshot.begin(); it2!=snapshot.end(); it2++){
+                        message = QString::fromStdString(*it2);
+                        curPair = qMakePair(*it,message);
+                        snapshots << curPair;
+                    }
+                }
+            }
+        }
+    }
+
+    return snapshots;
+}
+
 vector<string> NetworkTree::snapshot() {
+
 	QList<QTreeWidgetItem*> selection = selectedItems();  
 	vector<string> snapshots;
 	if (!selection.empty()) {
-		QList<QTreeWidgetItem*>::iterator it;
+        QList<QTreeWidgetItem*>::iterator it;
 		vector<string>::iterator it2;
 
-		for (it = selection.begin(); it != selection.end() ; ++it) {
-			QString address = getAbsoluteAddress(*it);
-			if (!address.isEmpty()) {
-				vector<string> snapshot = Maquette::getInstance()->requestNetworkSnapShot(address.toStdString());
-				snapshots.insert(snapshots.end(),snapshot.begin(),snapshot.end());
-			}
+        for (it = selection.begin(); it != selection.end() ; ++it) {
+            QTreeWidgetItem *curItem = *it;
+            if(curItem->type() != NodeNamespaceType && curItem->type() != NodeNoNamespaceType){
+                QString address = getAbsoluteAddress(*it);
+                if (!address.isEmpty()) {
+                    vector<string> snapshot = Maquette::getInstance()->requestNetworkSnapShot(address.toStdString());
+                    snapshots.insert(snapshots.end(),snapshot.begin(),snapshot.end());
+                }
+            }
 		}
 	}
 
@@ -545,6 +619,38 @@ NetworkTree::clickInNetworkTree(){
         unselectPartially(item);
         recursiveChildrenSelection(item, false);
         recursiveFatherSelection(item,false);
+    }
+}
+
+void
+NetworkTree::updateStartMsgsDisplay(){
+
+    QList<QTreeWidgetItem *> items = _startMessages->getMessages()->keys();
+    QList<QTreeWidgetItem *>::iterator it;
+    QTreeWidgetItem *curItem;
+    Message currentMsg;
+
+    clearColumn(START_COLUMN);
+    for(it=items.begin() ; it!=items.end() ; it++){
+        curItem = *it;
+        currentMsg = _startMessages->getMessages()->value(curItem);
+        curItem->setText(START_COLUMN,currentMsg.value);
+    }
+}
+
+void
+NetworkTree::updateEndMsgsDisplay(){
+
+    QList<QTreeWidgetItem *> items = _endMessages->getMessages()->keys();
+    QList<QTreeWidgetItem *>::iterator it;
+    QTreeWidgetItem *curItem;
+    Message currentMsg;
+
+    clearColumn(END_COLUMN);
+    for(it=items.begin() ; it!=items.end() ; it++){
+        curItem = *it;
+        currentMsg = _endMessages->getMessages()->value(curItem);
+        curItem->setText(END_COLUMN,currentMsg.value);
     }
 }
 

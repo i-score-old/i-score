@@ -469,11 +469,18 @@ class BasicBox : public QGraphicsItem
    */
   void setFirstMessagesToSend(const std::vector<std::string> &messages);
   /*!
+   * \brief Sets networkMessages to send when the start of the box is reached.
+   *
+   * \param messages : the messages to send at box's start
+   */
+  void setStartMessages(NetworkMessages *messages);
+//  void setStartMessagesToSend(QMap<QTreeWidgetItem *, Message> messages);
+  /*!
    * \brief Sets networkTreeItems to send when the start of the box is reached.
    *
    * \param itemsSelected : the items to send at box's start
    */
-  void setFirstItemsToSend(QList<QTreeWidgetItem*> itemsSelected);
+  void setSelectedItemsToSend(QList<QTreeWidgetItem*> itemsSelected);
   /*!
    * \brief Sets networkTreeExpandedItems to send.
    *
@@ -502,7 +509,13 @@ class BasicBox : public QGraphicsItem
    * \param messages : the messages to send at box's end
    */
   void setLastMessagesToSend(const std::vector<std::string> &messages);
-
+  /*!
+   * \brief Sets networkMessages to send when the end of the box is reached.
+   *
+   * \param messages : the messages to send at box's end
+   */
+  void setEndMessages(NetworkMessages *messages);
+//    void setEndMessagesToSend(QMap<QTreeWidgetItem *, Message> messages);
   //! \brief Handles line width.
   static const unsigned int LINE_WIDTH = 2;
   //! \brief Handles resizing tolerance.

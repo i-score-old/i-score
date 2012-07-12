@@ -51,6 +51,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <string>
 #include <QStringList>
 #include <QTableWidget>
+#include <QTreeWidgetItem>
 
 class QComboBox;
 class QLineEdit;
@@ -68,6 +69,7 @@ struct NetworkLine {
 	QLineEdit *messageBox;
 	unsigned int index;
 };
+
 
 /**!
  * \class NetworkMessagesEditor
@@ -157,7 +159,7 @@ private :
 	std::vector<NetworkLine> _networkLines; //!< Set of existing lines.
 	std::map<QWidget*,unsigned int> _widgetIndex;
 	static QStringList _devicesList; //!< List of existing devices names.
-	QClipboard *_clipboard; //!< Clipboard handling system's copy/paste.
+    QClipboard *_clipboard; //!< Clipboard handling system's copy/paste.
 
 protected :
 	void keyPressEvent(QKeyEvent *event);

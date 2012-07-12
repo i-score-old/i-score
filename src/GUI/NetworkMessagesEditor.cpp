@@ -274,7 +274,6 @@ NetworkMessagesEditor::computeMessage(const NetworkLine &line) {
 
 vector<string>
 NetworkMessagesEditor::computeMessages() {
-    std::cout<<"NetworkMsg::compute"<<std::endl;
 	vector<string> msgs;
 	vector<NetworkLine>::const_iterator it;
 	for (it = _networkLines.begin() ; it != _networkLines.end() ; it++) {
@@ -367,43 +366,43 @@ NetworkMessagesEditor::setMessages(const vector<string> &messages){
 void
 NetworkMessagesEditor::addMessages(const vector<string> &messages)
 {
-	vector<string>::const_iterator msgIt;
-	unsigned int msgsCount = 0;
-	for (msgIt = messages.begin() ; msgIt != messages.end() ; ++msgIt) {
-		string msg = (*msgIt);
-		if (!msg.empty()) {
-			size_t msgBeginPos;
-			if ((msgBeginPos = msg.find_first_of("/")) != string::npos) {
-				if (msg.size() > msgBeginPos+1) {
-					string device = msg.substr(0,msgBeginPos);
-					string msgWithValue = msg.substr(msgBeginPos);
-					size_t valueBeginPos;
-					if ((valueBeginPos = msgWithValue.find_first_of(" ")) != string::npos) {
-						if (msgWithValue.size() > valueBeginPos+1) {
-							string msg = msgWithValue.substr(0,valueBeginPos);
-							string value = msgWithValue.substr(valueBeginPos+1);
-							addMessage(device,msg,value);
-							msgsCount++;
-						}
-						else {
-							std::cerr << "NetworkMessagesEditor::addMessages : no value after the message" << std::endl;
-						}
-					}
-				}
-				else {
-					std::cerr << "NetworkMessagesEditor::addMessages : message too short after the (\"/\")" << std::endl;
-				}
-			}
-			else {
-				std::cerr << "NetworkMessagesEditor::addMessages : could not find the beginning of the message (\"/\")" << std::endl;
-			}
-		}
-		else {
+    vector<string>::const_iterator msgIt;
+    unsigned int msgsCount = 0;
+    for (msgIt = messages.begin() ; msgIt != messages.end() ; ++msgIt) {
+        string msg = (*msgIt);
+        if (!msg.empty()) {
+            size_t msgBeginPos;
+            if ((msgBeginPos = msg.find_first_of("/")) != string::npos) {
+                if (msg.size() > msgBeginPos+1) {
+                    string device = msg.substr(0,msgBeginPos);
+                    string msgWithValue = msg.substr(msgBeginPos);
+                    size_t valueBeginPos;
+                    if ((valueBeginPos = msgWithValue.find_first_of(" ")) != string::npos) {
+                        if (msgWithValue.size() > valueBeginPos+1) {
+                            string msg = msgWithValue.substr(0,valueBeginPos);
+                            string value = msgWithValue.substr(valueBeginPos+1);
+                            addMessage(device,msg,value);
+                            msgsCount++;
+                        }
+                        else {
+                            std::cerr << "NetworkMessagesEditor::addMessages : no value after the message" << std::endl;
+                        }
+                    }
+                }
+                else {
+                    std::cerr << "NetworkMessagesEditor::addMessages : message too short after the (\"/\")" << std::endl;
+                }
+            }
+            else {
+                std::cerr << "NetworkMessagesEditor::addMessages : could not find the beginning of the message (\"/\")" << std::endl;
+            }
+        }
+        else {
 #ifdef DEBUG
-			std::cerr << "NetworkMessagesEditor::addMessages : empty message found ignored" << std::endl;
+            std::cerr << "NetworkMessagesEditor::addMessages : empty message found ignored" << std::endl;
 #endif
-		}
-	}
+        }
+    }
 }
 
 void

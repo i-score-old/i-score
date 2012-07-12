@@ -125,17 +125,20 @@ void CurvesWidget::curveSampleRateChanged(const QString &address,int value) {
 }
 
 void CurvesWidget::displayCurve(const QString &address){
-
+    std::cout<<"diplay()";
     std::string add = address.toStdString();
     map<string,CurveWidget *>::iterator curveIt = _curveMap.find(add);
-
+std::cout<<" 2 ";
     bool curveFound = (curveIt != _curveMap.end());
-
+std::cout<<" 3 ";
     if (curveFound) {
+        std::cout<<" 4 ";
         CurveWidget *curveWidget = curveIt->second;
         _tabWidget->clear();
+        std::cout<<" 5 ";
         _tabWidget->addTab(curveWidget,address);
     }
+    std::cout<<"END"<<std::endl;
 }
 
 bool
@@ -317,20 +320,22 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
 
                 if (curveFound) // Curve tab existing
                 {
-
-
                     std::cout<<"curveFound"<<std::endl;
 
                     if (forceUpdate) // Force updating through engines
                     {
-
                         std::cout<<"force update"<<std::endl;
                         bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                         if (getCurveSuccess) {
+                            if (values.front() != values.back()) {
+                                curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
+                            }
+                            else{
                             // Set and assign new abstract curve to box                            
-                            std::cout<<"CurvesWidget getCurveSuccess"<<std::endl;
-                            curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
-                            box->setCurve(address,curveTab->abstractCurve());
+                                std::cout<<"CurvesWidget getCurveSuccess"<<std::endl;
+                                curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
+                            }
+                        box->setCurve(address,curveTab->abstractCurve());
                         }
 
                      //NICO
@@ -407,8 +412,8 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                         addCurve(curveAddressStr,curveTab);
                         addToComboBox(curveAddressStr);
                         std::cout<<"ATTENTION BUG"<<std::endl;
+                        std::cout<<"WE WANT TO DISPLAY " <<_comboBox->currentText().toStdString()<<std::endl;
                         displayCurve(_comboBox->currentText());
-
                     }
                     else // Curve tab existing
                     {

@@ -549,12 +549,18 @@ BasicBox::triggerPointMessage(BoxExtremity extremity)
 }
 
 void
-BasicBox::setFirstMessagesToSend(const vector<string> &messages) {
+BasicBox::setFirstMessagesToSend(const vector<string> &messages) {    
 	_abstract->setFirstMsgs(messages);
 }
 
 void
-BasicBox::setFirstItemsToSend(QList<QTreeWidgetItem*> itemsSelected){
+BasicBox::setStartMessages(NetworkMessages *messages) {
+    _abstract->setStartMessages(messages);
+
+}
+
+void
+BasicBox::setSelectedItemsToSend(QList<QTreeWidgetItem*> itemsSelected){
     _abstract->setNetworkTreeItems(itemsSelected);
 }
 
@@ -579,7 +585,12 @@ BasicBox::clearExpandedItemsList(){
 }
 void
 BasicBox::setLastMessagesToSend(const vector<string> &messages) {
-	_abstract->setLastMsgs(messages);
+    _abstract->setLastMsgs(messages);
+}
+
+void
+BasicBox::setEndMessages(NetworkMessages *messages) {
+    _abstract->setEndMessages(messages);
 }
 
 vector<string>

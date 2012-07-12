@@ -336,6 +336,15 @@ class Maquette : public QObject
    */
   bool setFirstMessagesToSend(unsigned int boxID, const std::vector<std::string> &messages);
   /*!
+   * \brief Sets the set of messages to send for the end of a box.
+   *
+   * \param boxID : the box to get messages set from
+   * \param messages : the new set of the messages
+   *
+   * \return if messages could be set
+   */
+  bool setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages);
+  /*!
    * \brief Sets the set of treeItems to send for the beginning of a box.
    *
    * \param boxID : the box to get treeItems set from
@@ -343,7 +352,8 @@ class Maquette : public QObject
    *
    * \return if itemsSelected could be set
    */
-  bool setFirstItemsToSend(unsigned int boxID,  QList<QTreeWidgetItem*> itemsSelected);
+
+  bool setSelectedItemsToSend(unsigned int boxID,  QList<QTreeWidgetItem*> itemsSelected);
   /*!
    * \brief Sets the set of treeItems expanded.
    *
@@ -363,6 +373,24 @@ class Maquette : public QObject
    */
   bool addToExpandedItemsList(unsigned int boxID,  QTreeWidgetItem* item);
   /*!
+   * \brief Sets start messages.
+   *
+   * \param boxID : the box to get treeItems set from
+   * \param item : the NetworkMessages to be set
+   *
+   * \return if networkMessages could be set
+   */
+  bool setStartMessages(unsigned int boxID,  NetworkMessages* nm);
+  /*!
+   * \brief Sets end messages.
+   *
+   * \param boxID : the box to get treeItems set from
+   * \param item : the NetworkMessages to be set
+   *
+   * \return if networkMessages could be set
+   */
+  bool setEndMessages(unsigned int boxID,  NetworkMessages* nm);
+  /*!
    * \brief Remove from treeItems expanded list.
    *
    * \param boxID : the box to get treeItems set from
@@ -380,6 +408,15 @@ class Maquette : public QObject
    * \return if messages could be set
    */
   bool setLastMessagesToSend(unsigned int boxID, const std::vector<std::string> &messages);
+  /*!
+   * \brief Sets the set of messages to send for the end of a box.
+   *
+   * \param boxID : the box to get messages set from
+   * \param messages : the new set of the messages
+   *
+   * \return if messages could be set
+   */
+  bool setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages);
   /*!
    * \brief Sends a specific message with current device.
    *

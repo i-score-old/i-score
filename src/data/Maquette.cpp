@@ -594,10 +594,36 @@ Maquette::setFirstMessagesToSend(unsigned int boxID, const vector<string> &first
 }
 
 bool
-Maquette::setFirstItemsToSend(unsigned int boxID,  QList<QTreeWidgetItem*> itemsSelected){
+Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages){
+
+    vector<string> firstMsgs = messages->computeMessages();
+
+    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+        //PRINT
+            std::cout<<"Maquette::SETSTARTMESSAGETOSEND"<<std::endl;
+            for(int i=0 ; i<firstMsgs.size(); i++ )
+                std::cout<< firstMsgs[i]<<std::endl;
+            std::cout<<std::endl<<std::endl;
+        //PRINT
+        _engines->setCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
+        _boxes[boxID]->setFirstMessagesToSend(firstMsgs);
+//        _boxes[boxID]->setStartMessagesToSend(*messages->getMessages());
+
+        vector<string> lastMsgs;
+        _engines->getCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
+        updateCurves(boxID,firstMsgs,lastMsgs);
+
+        return true;
+    }
+    return false;
+}
+
+
+bool
+Maquette::setSelectedItemsToSend(unsigned int boxID,  QList<QTreeWidgetItem*> itemsSelected){
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
 
-        _boxes[boxID]->setFirstItemsToSend(itemsSelected);
+        _boxes[boxID]->setSelectedItemsToSend(itemsSelected);
 
         return true;
     }
@@ -638,6 +664,26 @@ Maquette::removeFromExpandedItemsList(unsigned int boxID,  QTreeWidgetItem* item
 }
 
 bool
+Maquette::setStartMessages(unsigned int boxID,  NetworkMessages* nm){
+    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+
+        _boxes[boxID]->setStartMessages(nm);
+        return true;
+    }
+    return false;
+}
+
+bool
+Maquette::setEndMessages(unsigned int boxID,  NetworkMessages* nm){
+    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+
+        _boxes[boxID]->setEndMessages(nm);
+        return true;
+    }
+    return false;
+}
+
+bool
 Maquette::setLastMessagesToSend(unsigned int boxID, const vector<string> &lastMsgs) {
 	if (boxID != NO_ID && (getBox(boxID) != NULL)) {
 		_engines->setCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
@@ -650,6 +696,23 @@ Maquette::setLastMessagesToSend(unsigned int boxID, const vector<string> &lastMs
 		return true;
 	}
 	return false;
+}
+
+bool
+Maquette::setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages) {
+    vector<string> lastMsgs = messages->computeMessages();
+    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+        _engines->setCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
+        _boxes[boxID]->setLastMessagesToSend(lastMsgs);
+//        _boxes[boxID]->setEndMessagesToSend(*messages->getMessages());
+
+        vector<string> firstMsgs;
+        _engines->getCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
+        updateCurves(boxID,firstMsgs,lastMsgs);
+
+        return true;
+    }
+    return false;
 }
 
 bool

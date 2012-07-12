@@ -46,6 +46,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <vector>
 #include <string>
 #include <QKeyEvent>
+#include <iostream>
+#include "NetworkMessages.hpp"
 
 using std::vector;
 using std::string;
@@ -61,6 +63,8 @@ class NetworkTree : public QTreeWidget
 	public :
 		NetworkTree(QWidget * parent = 0);
 		void load();
+        void init();
+        QList < QPair<QTreeWidgetItem *, QString> > treeSnapshot();
 		std::vector<std::string> snapshot();
 		 /*!
 		  * \brief Gets the absolute address of an item in the snapshot tree.
@@ -93,24 +97,49 @@ class NetworkTree : public QTreeWidget
         /*!
          * \brief Expands items in the snapshot tree
          *
-         * \param expandeddItems : items to expand in the tree
+         * \param expandedItems : items to expand in the tree
          */
         void expandItems(QList<QTreeWidgetItem*> expandedItems);
-
+        /*!
+         * \brief Refreshes the display of start messages.
+         */
+        void updateStartMsgsDisplay();
+        /*!
+         * \brief Refreshes the display of end messages.
+         */
+        void updateEndMsgsDisplay();
+        /*!
+         * \brief Clears a columns.
+         * \param column : the column numero.
+         */
+        void clearColumn(unsigned int column);
 
         inline QList<QTreeWidgetItem*> assignedItems() {return _assignedItems;}
-        //inline QList<QTreeWidgetItem*> expandedItems() {return _expandedItems;}
         inline void setAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems.clear(); _assignedItems=items;}
         QList<QTreeWidgetItem*> getItemsFromMsg(vector<string> itemsName);
         void expandNodes(QList<QTreeWidgetItem *> items);
-        //inline void setExpandedItems(QList<QTreeWidgetItem*> items){_expandedItems.clear(); _expandedItems=items;}
-        //inline void addExpandedItem(QTreeWidgetItem* item){_expandedItems << item;}
-        //inline void removeExpandedItem(QTreeWidgetItem* item){_expandedItems.removeAt(_expandedItems.indexOf(item));}
-        //inline void clearExpandedItemsList(){collapseAll(); _expandedItems.clear();}
 
         inline void addAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems << items;}
         inline void addAssignedItem(QTreeWidgetItem* item){_assignedItems << item;}
         inline bool isAssigned(QTreeWidgetItem* item){return _assignedItems.contains(item);}
+
+        inline void setStartMessages(NetworkMessages *messages){
+             _startMessages->clear();
+             _startMessages = new NetworkMessages(messages->getMessages());
+        }
+
+        inline void setEndMessages(NetworkMessages *messages){
+            _endMessages->clear();
+            _endMessages = new NetworkMessages(messages->getMessages());
+        }
+
+        inline void addStartMessage();
+        inline void addEndMessage();
+
+        inline NetworkMessages *startMessages(){return _startMessages;}
+        inline NetworkMessages *endMessages(){return _endMessages;}
+        void clearStartMsgs();
+        void clearEndMsgs();
 
         virtual void keyPressEvent(QKeyEvent *event);
         virtual void keyReleaseEvent(QKeyEvent *event);
@@ -130,6 +159,8 @@ class NetworkTree : public QTreeWidget
         void unselectPartially(QTreeWidgetItem *item);
         QList<QTreeWidgetItem*> _assignedItems;
         QList<QTreeWidgetItem*> _nodesWithAssignedChildren;
+        NetworkMessages *_startMessages;
+        NetworkMessages *_endMessages;
 
 	public slots:
         //void itemCollapsed();
