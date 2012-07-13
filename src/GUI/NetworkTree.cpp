@@ -48,6 +48,7 @@ unsigned int VALUE_COLUMN = 1;
 unsigned int START_COLUMN = 2;
 unsigned int END_COLUMN = 3;
 unsigned int CURVE_COLUMN = 4;
+bool VALUE_MODIFIED;
 
 NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 {
@@ -61,9 +62,34 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     setColumnWidth(END_COLUMN,75);
     setColumnWidth(CURVE_COLUMN,50);
     setHeaderLabels(list);
-    list.clear();
-    //connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(itemCollapsed()));
+    list.clear();    
+    VALUE_MODIFIED = false;
+    connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(itemCollapsed()));
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(clickInNetworkTree()));
+    connect(this,SIGNAL(itemChanged(QTreeWidgetItem*,int)), this,SLOT(valueChanged(QTreeWidgetItem*,int)));
+    connect(this, SIGNAL(startValueChanged(QTreeWidgetItem*,QString)),this,SLOT(changeStartValue(QTreeWidgetItem*,QString)));
+    connect(this, SIGNAL(endValueChanged(QTreeWidgetItem*,QString)),this,SLOT(changeEndValue(QTreeWidgetItem*,QString)));
+}
+
+void
+NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
+    if (item->type()==LeaveType && column == START_COLUMN && VALUE_MODIFIED){
+        VALUE_MODIFIED = FALSE;
+        if(!isAssigned(item)){
+            addAssignedItem(item);
+            assignItems(_assignedItems);
+        }
+        emit(startValueChanged(item,item->text(START_COLUMN)));
+    }
+
+    if (item->type()==LeaveType && column == END_COLUMN && VALUE_MODIFIED){
+        VALUE_MODIFIED = FALSE;
+        if(!isAssigned(item)){
+            addAssignedItem(item);
+            assignItems(_assignedItems);
+        }
+        emit(endValueChanged(item,item->text(END_COLUMN)));
+    }
 }
 
 void
@@ -657,6 +683,19 @@ NetworkTree::clickInNetworkTree(){
 
     QTreeWidgetItem *item = currentItem();
 
+    if(currentColumn()>0 && item->type()==LeaveType){
+        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
+        editItem(item,currentColumn());
+        if(currentColumn() == START_COLUMN){
+            VALUE_MODIFIED = true;
+        }
+        if(currentColumn() == END_COLUMN){
+            VALUE_MODIFIED = true;
+        }
+        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+        item->setSelected(true);
+    }
+
     if(item->isSelected()){
         recursiveChildrenSelection(item, true);
         recursiveFatherSelection(item,true);
@@ -667,6 +706,8 @@ NetworkTree::clickInNetworkTree(){
         recursiveChildrenSelection(item, false);
         recursiveFatherSelection(item,false);
     }
+
+
 }
 
 void
@@ -712,12 +753,42 @@ void
 NetworkTree::keyPressEvent(QKeyEvent *event){
    if ( event->key()==Qt::Key_Shift) {
          setSelectionMode(QAbstractItemView::ContiguousSelection);
+    }   
+}
+
+void
+NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue){
+    //Prévoir un assert. Vérifier, le type, range...etc
+    if (_startMessages->setValue(item,newValue)){
+        Message msg = _startMessages->getMessages()->value(item);
+        string address = msg.device.toStdString() + msg.message.toStdString();
+        emit(messageValueChanged(address));
+    }
+    else{
+        std::cout<<"NetworkTree::changeEndValue TODO"<<std::endl;
+        //Il faut créer l'objet
+    }
+
+}
+
+void
+NetworkTree::changeEndValue(QTreeWidgetItem *item, QString newValue){
+    //Prévoir un assert. Vérifier, le type, range...etc
+    if (_endMessages->setValue(item,newValue)){
+        Message msg = _endMessages->getMessages()->value(item);
+        string address = msg.device.toStdString() + msg.message.toStdString();
+        emit(messageValueChanged(address));
+    }
+    else{
+        std::cout<<"NetworkTree::changeEndValue TODO"<<std::endl;
+        //Il faut créer l'objet
     }
 }
 
-/*
 void
 NetworkTree::itemCollapsed() {
+    currentItem()->setExpanded(!currentItem()->isExpanded());
+/*
 	QTreeWidgetItem *selectedItem = currentItem();
 	if (!selectedItem->isDisabled()) {
 		if (selectedItem->type() == NodeNamespaceType || selectedItem->type() == LeaveType) {
@@ -759,6 +830,6 @@ NetworkTree::itemCollapsed() {
 				list.clear();
 			}
 		}
-	}
+    }*/
 }
-*/
+

@@ -152,6 +152,11 @@ class NetworkTree : public QTreeWidget
         virtual void keyPressEvent(QKeyEvent *event);
         virtual void keyReleaseEvent(QKeyEvent *event);
 
+    signals :
+        void startValueChanged(QTreeWidgetItem *, QString newValue);
+        void endValueChanged(QTreeWidgetItem *, QString newValue);
+        void messageValueChanged(const std::string &address);
+
     private :
         void treeRecursiveExploration(QTreeWidgetItem *curItem);
         void recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select);
@@ -171,8 +176,11 @@ class NetworkTree : public QTreeWidget
         NetworkMessages *_endMessages;
 
 	public slots:
-        //void itemCollapsed();
+        void itemCollapsed();
         void clickInNetworkTree();
+        void valueChanged(QTreeWidgetItem* item,int column);
+        void changeStartValue(QTreeWidgetItem* item,QString newValue);
+        void changeEndValue(QTreeWidgetItem* item,QString newValue);
 };
 
 

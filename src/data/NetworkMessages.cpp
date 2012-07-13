@@ -283,6 +283,22 @@ NetworkMessages::addMessages(const QList < QPair<QTreeWidgetItem *, QString> > m
 
 }
 
+bool
+NetworkMessages::setValue(QTreeWidgetItem *item, QString newValue){
+    if(_messages->contains(item)){
+        Message newMsg = _messages->value(item);
+        newMsg.value = newValue;
+        _messages->insert(item,newMsg);
+        return true;
+    }
+    else {
+#ifdef DEBUG
+        std::cerr<< "NetworkMessages::setValue : item does not exist"<<std::endl;
+#endif
+        return false;
+    }
+}
+
 void
 NetworkMessages::messageChanged(){
 }

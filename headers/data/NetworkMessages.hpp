@@ -80,11 +80,12 @@ public :
         _messages=messages;
      ;}
     /*!
-     * \brief Creates a NetworkMessages object.
-     *
-     * \param msg.
-     */
-//    NetworkMessages * makeNetworkMessages(vector<string> startMsgs, vector<string> endMsgs);
+      * \brief Changes the start value of an item of the map.
+      * \param item : the item (key)
+      * \param msg : the newValue
+      */
+    bool setValue(QTreeWidgetItem *item, QString newValue);
+
 
     inline QMap<QTreeWidgetItem *, Message> *getMessages(){return _messages;}
 
