@@ -61,6 +61,7 @@ public :
      * \param msg : the message to send
      */
     void addMessage(QTreeWidgetItem *item, const QString &device, const QString &message, const QString &value);
+    void addMessage(QTreeWidgetItem *item, QString address);
     /*!
      * \brief Adds a list of messages.
      */

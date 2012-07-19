@@ -170,7 +170,8 @@ class NetworkTree : public QTreeWidget
     signals :
         void startValueChanged(QTreeWidgetItem *, QString newValue);
         void endValueChanged(QTreeWidgetItem *, QString newValue);
-        void messageValueChanged(const std::string &address);
+        void startMessageValueChanged(const std::string &address);
+        void endMessageValueChanged(const std::string &address);
 
     private :
         void treeRecursiveExploration(QTreeWidgetItem *curItem);

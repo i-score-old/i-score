@@ -764,8 +764,8 @@ AttributesEditor::connectSlots()
 	connect(_startMsgsEditor,SIGNAL(messageChanged(const std::string &)),this,SLOT(startMessageChanged(const std::string &)));
 
     //NICO
-    connect(_networkTree,SIGNAL(messageValueChanged(const std::string &)),this,SLOT(startMessageChanged(const std::string &)));
-    connect(_networkTree,SIGNAL(messageValueChanged(const std::string &)),this,SLOT(endMessageChanged(const std::string &)));
+    connect(_networkTree,SIGNAL(startMessageValueChanged(const std::string &)),this,SLOT(startMessageChanged(const std::string &)));
+    connect(_networkTree,SIGNAL(endMessageValueChanged(const std::string &)),this,SLOT(endMessageChanged(const std::string &)));
 
 	connect(_startMsgsEditor,SIGNAL(messageRemoved(const std::string &)),this,SLOT(startMessageRemoved(const std::string &)));
 	connect(_endMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(endMessagesChanged()));
@@ -1303,7 +1303,7 @@ AttributesEditor::endMessagesChanged()
 void AttributesEditor::startMessageChanged(const string &address) {
     QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
     Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
-
+    std::cout<<"AttriBut::startMessageChanged -> "<<_networkTree->startMessages()->computeMessages().size()<<std::endl;
     Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,_networkTree->startMessages()->computeMessages());
     Maquette::getInstance()->setStartMessages(_boxEdited,_networkTree->startMessages());
 

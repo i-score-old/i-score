@@ -79,22 +79,20 @@ void
 NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
     if (item->type()==LeaveType && column == START_COLUMN && VALUE_MODIFIED){
         VALUE_MODIFIED = FALSE;
-
-        emit(startValueChanged(item,item->text(START_COLUMN)));
         if(!isAssigned(item)){
-//            addAssignedItem(item);
-//            assignItem(item);
+            assignItem(item);
         }
+        emit(startValueChanged(item,item->text(START_COLUMN)));
+
     }
 
     if (item->type()==LeaveType && column == END_COLUMN && VALUE_MODIFIED){
         VALUE_MODIFIED = FALSE;
-
-        emit(endValueChanged(item,item->text(END_COLUMN)));
         if(!isAssigned(item)){
-//            addAssignedItem(item);
-//            assignItem(item);
+            assignItem(item);
         }
+        emit(endValueChanged(item,item->text(END_COLUMN)));
+
     }
 }
 
@@ -1025,16 +1023,24 @@ NetworkTree::keyPressEvent(QKeyEvent *event){
 void
 NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue){
     //Prévoir un assert. Vérifier, le type, range...etc
-    if (_startMessages->setValue(item,newValue)){
-        Message msg = _startMessages->getMessages()->value(item);
-        string address = msg.device.toStdString() + msg.message.toStdString();
-        emit(messageValueChanged(address));
+
+    if (!_startMessages->getMessages()->contains(item)){
+        QString Qaddress = getAbsoluteAddress(item);
+        string address = Qaddress.toStdString();
+        Qaddress += " ";
+        Qaddress += newValue;
+        _startMessages->addMessage(item,Qaddress);
+        emit(startMessageValueChanged(address));
     }
     else{
-        std::cout<<"NetworkTree::changeEndValue TODO"<<std::endl;
-        //Il faut créer l'objet
+        if (_startMessages->setValue(item,newValue)){
+            Message msg = _startMessages->getMessages()->value(item);
+            string address = msg.device.toStdString() + msg.message.toStdString();
+            emit(startMessageValueChanged(address));
+        }
+        else
+             std::cerr << "NetworkTree::changeStartValue : Impossible de créer le networkMessage" << std::endl;
     }
-
 }
 
 void
@@ -1058,14 +1064,23 @@ NetworkTree::editValue(){
 void
 NetworkTree::changeEndValue(QTreeWidgetItem *item, QString newValue){
     //Prévoir un assert. Vérifier, le type, range...etc
-    if (_endMessages->setValue(item,newValue)){
-        Message msg = _endMessages->getMessages()->value(item);
-        string address = msg.device.toStdString() + msg.message.toStdString();
-        emit(messageValueChanged(address));
+    if (!_endMessages->getMessages()->contains(item)){
+        QString Qaddress = getAbsoluteAddress(item);
+        string address = Qaddress.toStdString();
+        Qaddress += " ";
+        Qaddress += newValue;
+        _endMessages->addMessage(item,Qaddress);
+        emit(endMessageValueChanged(address));
     }
     else{
-        std::cout<<"NetworkTree::changeEndValue TODO"<<std::endl;
-        //Il faut créer l'objet
+        if (_endMessages->setValue(item,newValue)){
+            Message msg = _endMessages->getMessages()->value(item);
+            string address = msg.device.toStdString() + msg.message.toStdString();
+            emit(endMessageValueChanged(address));
+        }
+        else{
+            std::cerr << "NetworkTree::changeEndValue : Impossible de créer le networkMessage" << std::endl;
+        }
     }
 }
 

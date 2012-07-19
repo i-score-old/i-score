@@ -150,14 +150,6 @@ NetworkMessages::computeMessages() {
 
 }
 
-//NetworkMessages *makeNetworkMessages(vector<string> startMsgs, vector<string> endMsgs){
-//    NetworkMessages *networkMsgs;
-//    //TODO
-//    // Pour le load des fichiers : Chercher les items grâce aux messages
-//    // Créer les Messages associés aux items (avec les values de début et fin)
-//    return networkMsgs;
-//}
-
 void
 NetworkMessages::addMessage(QTreeWidgetItem *treeItem, const QString &device, const QString &message, const QString &value){
     Message msg = {device, message, value};
@@ -228,6 +220,49 @@ NetworkMessages::setMessages(const QList < QPair<QTreeWidgetItem *, QString> > m
         }
     }
 
+}
+
+void
+NetworkMessages::addMessage(QTreeWidgetItem *item, QString address){
+    std::cout<<"NetworkMessage::addMessage("<<address.toStdString()<<")\n";
+    unsigned int msgsCount = 0;
+    string msg = address.toStdString();
+
+    if (!msg.empty()) {
+        size_t msgBeginPos;
+        if ((msgBeginPos = msg.find_first_of("/")) != string::npos) {
+            if (msg.size() > msgBeginPos+1) {
+                string device = msg.substr(0,msgBeginPos);
+                string msgWithValue = msg.substr(msgBeginPos);
+                size_t valueBeginPos;
+                if ((valueBeginPos = msgWithValue.find_first_of(" ")) != string::npos) {
+                    if (msgWithValue.size() > valueBeginPos+1) {
+                        string msg = msgWithValue.substr(0,valueBeginPos);
+                        string value = msgWithValue.substr(valueBeginPos+1);
+                        QString Qmsg = QString::fromStdString(msg);
+                        QString Qdevice = QString::fromStdString(device);
+                        QString Qvalue = QString::fromStdString(value);
+                        addMessage(item,Qdevice,Qmsg,Qvalue);
+                        msgsCount++;
+                    }
+                    else {
+                        std::cerr << "NetworkMessages::addMessages : no value after the message" << std::endl;
+                    }
+                }
+            }
+            else {
+                std::cerr << "NetworkMessages::addMessages : message too short after the (\"/\")" << std::endl;
+            }
+        }
+        else {
+            std::cerr << "NetworkMessages::addMessages : could not find the beginning of the message (\"/\")" << std::endl;
+        }
+    }
+    else {
+#ifdef DEBUG
+        std::cerr << "NetworkMessages::addMessages : empty message found ignored" << std::endl;
+#endif
+    }
 }
 
 
