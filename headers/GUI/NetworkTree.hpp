@@ -64,10 +64,18 @@ class NetworkTree : public QTreeWidget
 
 	public :
 		NetworkTree(QWidget * parent = 0);
+
 		void load();
+
         void init();
-        void resetNetworkTree();
+
+
+        /***********************************************************************
+         *                          General tools
+         ***********************************************************************/
+
         QList < QPair<QTreeWidgetItem *, QString> > treeSnapshot();
+
 		std::vector<std::string> snapshot();
 		 /*!
 		  * \brief Gets the absolute address of an item in the snapshot tree.
@@ -76,33 +84,62 @@ class NetworkTree : public QTreeWidget
 		  */
 		QString getAbsoluteAddress(QTreeWidgetItem *item) const;
         /*!
-         * \brief Gets the list of items selected in the snapshot tree.
-         *
-         * return the item list
+         * \brief Used for loading. To get tree items, and parsed messages from a string name (given by the engine).
          */
-        QList<QTreeWidgetItem*> getSelectedItems();
+        QList< QPair<QTreeWidgetItem *, Message> > getItemsFromMsg(vector<string> itemsName);
         /*!
-         * \brief Gets the list of items expanded in the snapshot tree.
-         *
-         * return the item list
+         * \brief Sets start messages.
+         * \param The messages to set.
          */
-        QList<QTreeWidgetItem*> getExpandedItems();
+        inline void setStartMessages(NetworkMessages *messages){
+             _startMessages->clear();
+             _startMessages = new NetworkMessages(messages->getMessages());
+        }
         /*!
-         * \brief Indicates assigned items in the snapshot tree
-         *
-         * \param selectedItems : items assigned to the box
+         * \brief Sets end messages.
+         * \param The messages to set.
          */
-        void assignItems(QList<QTreeWidgetItem*> selectedItems);
+        inline void setEndMessages(NetworkMessages *messages){
+            _endMessages->clear();
+            _endMessages = new NetworkMessages(messages->getMessages());
+        }
         /*!
-         * \brief Reset the general selection in the snapshot tree
+         * \brief Adds start messages.
+         * \param The messages to add.
          */
-        void resetSelectedItems();
+        inline void addStartMessage();
         /*!
-         * \brief Expands items in the snapshot tree
-         *
-         * \param expandedItems : items to expand in the tree
+         * \brief Adds start messages.
+         * \param The messages to add.
          */
-        void expandItems(QList<QTreeWidgetItem*> expandedItems);
+        inline void addEndMessage();
+        /*!
+         * \brief Getter.
+         * \return Start messages.
+         */
+        inline NetworkMessages *startMessages(){return _startMessages;}
+        /*!
+         * \brief Getter.
+         * \return End messages.
+         */
+        inline NetworkMessages *endMessages(){return _endMessages;}
+        /*!
+         * \brief Clear start messages list.
+         */
+        void clearStartMsgs();
+        /*!
+         * \brief Clear end messages list.
+         */
+        void clearEndMsgs();
+
+
+        /***********************************************************************
+         *                       General display tools
+         ***********************************************************************/
+        /*!
+         * \brief Resets the network tree display (assigned/selected items).
+         */
+        void resetNetworkTree();
         /*!
          * \brief Refreshes the display of start messages.
          */
@@ -117,6 +154,40 @@ class NetworkTree : public QTreeWidget
          */
         void clearColumn(unsigned int column);
         /*!
+         * \brief Expands items.
+         * \param The items to expand.
+         */
+        void expandNodes(QList<QTreeWidgetItem *> items);
+
+
+        /***********************************************************************
+         *                          Selection tools
+         ***********************************************************************/
+        /*!
+         * \brief Gets the list of items selected in the snapshot tree.
+         *
+         * return the item list
+         */
+        QList<QTreeWidgetItem*> getSelectedItems();
+        /*!
+         * \brief Gets the list of items expanded in the snapshot tree.
+         *
+         * return the item list
+         */
+        QList<QTreeWidgetItem*> getExpandedItems();
+
+        /*!
+         * \brief Reset the general selection in the snapshot tree
+         */
+        void resetSelectedItems();
+        /*!
+         * \brief Expands items in the snapshot tree
+         *
+         * \param expandedItems : items to expand in the tree
+         */
+        void expandItems(QList<QTreeWidgetItem*> expandedItems);
+
+        /*!
          * \brief Loads assigned items and messages' value, from the _firstMsgs and _lastMsgs of the abstract box.
          * \param abBox : The abstractBox.
          */
@@ -126,46 +197,88 @@ class NetworkTree : public QTreeWidget
          */
         void editValue();
 
+
+        /***********************************************************************
+         *                          Assignation tools
+         ***********************************************************************/
+        /*!
+         * \brief Indicates assigned items in the snapshot tree
+         *
+         * \param selectedItems : items assigned to the box
+         */
+        void assignItems(QList<QTreeWidgetItem*> selectedItems);
+        /*!
+         * \brief True if all items' brothers have a value in their column.
+         * \param Item : the item.
+         * \param column : the column numero.
+         */
         bool allBrothersChecked(QTreeWidgetItem *item, int column);
+        /*!
+         * \brief True if some items' brothers have a value in their column.
+         * \param Item : the item.
+         * \param column : the column numero.
+         */
         bool brothersPartiallyChecked(QTreeWidgetItem *item, int column);
+        /*!
+         * \brief Check boxes of fathers (recursive)
+         * \param Item : the child.
+         * \param column : the column numero.
+         */
         void fatherColumnCheck(QTreeWidgetItem *item, int column);
+        /*!
+         * \brief Getter
+         * \return The assigned items list.
+         */
         inline QList<QTreeWidgetItem*> assignedItems() {return _assignedItems;}
+        /*!
+         * \brief Getter
+         * \return The partially assigned items list (nodes with some children assigned).
+         */
         inline QList<QTreeWidgetItem*> nodesPartiallyAssigned() {return _nodesWithSomeChildrenAssigned;}
+        /*!
+         * \brief Getter
+         * \return The full assigned items list (nodes with all children assigned).
+         */
         inline QList<QTreeWidgetItem*> nodesTotallyAssigned() {return _nodesWithAllChildrenAssigned;}
+        /*!
+         * \brief Sets the assigned items list.
+         * \param The assigned items list.
+         */
         inline void setAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems.clear(); _assignedItems=items;}
-
-        QList< QPair<QTreeWidgetItem *, Message> > getItemsFromMsg(vector<string> itemsName);
-        void expandNodes(QList<QTreeWidgetItem *> items);
-
+        /*!
+         * \brief Adds a list to the assigned items list.
+         * \param The assigned items list to add.
+         */
         inline void addAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems << items;}
+        /*!
+         * \brief Adds an item to the assigned items list.
+         * \param The assigned item to add.
+         */
         inline void addAssignedItem(QTreeWidgetItem* item){_assignedItems << item;}
+        /*!
+         * \brief Return true if item is already assigned.
+         * \param The item.
+         */
         inline bool isAssigned(QTreeWidgetItem* item){return _assignedItems.contains(item);}
+        /*!
+         * \brief Removes an item in the assigned items list.
+         * \param The item to remove.
+         */
         inline void removeAssignItem(QTreeWidgetItem* item){ _assignedItems.removeAll(item);}
+        /*!
+         * \brief Reset the display of assigned items (leaves) and clear the assigned items list.
+         */
         void resetAssignedItems();
+        /*!
+         * \brief Reset the display of assigned fathers (full and partial nodes) and clear lists.
+         */
         void resetAssignedNodes();
-
-        inline void setStartMessages(NetworkMessages *messages){
-             _startMessages->clear();
-             _startMessages = new NetworkMessages(messages->getMessages());
-        }
-
-        inline void setEndMessages(NetworkMessages *messages){
-            _endMessages->clear();
-            _endMessages = new NetworkMessages(messages->getMessages());
-        }
-
-        inline void addStartMessage();
-        inline void addEndMessage();
-
-        inline NetworkMessages *startMessages(){return _startMessages;}
-        inline NetworkMessages *endMessages(){return _endMessages;}
-        void clearStartMsgs();
-        void clearEndMsgs();
 
 
         virtual void keyPressEvent(QKeyEvent *event);
         virtual void keyReleaseEvent(QKeyEvent *event);
         virtual void mouseDoubleClickEvent(QMouseEvent *event);
+
 
     signals :
         void startValueChanged(QTreeWidgetItem *, QString newValue);
@@ -173,38 +286,45 @@ class NetworkTree : public QTreeWidget
         void startMessageValueChanged(const std::string &address);
         void endMessageValueChanged(const std::string &address);
 
+
     private :
         void treeRecursiveExploration(QTreeWidgetItem *curItem);
-        void recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select);
+
+
+        /***********************************************************************
+         *                          Selection tools
+         ***********************************************************************/
+        void selectPartially(QTreeWidgetItem *item);
+        void unselectPartially(QTreeWidgetItem *item);
+        bool noBrothersSelected(QTreeWidgetItem *item);
+        inline void addNodePartiallySelected(QTreeWidgetItem *item){if (!_nodesWithSelectedChildren.contains(item)) _nodesWithSelectedChildren<<item;}
+        inline void removeNodePartiallySelected(QTreeWidgetItem *item){if (_nodesWithSelectedChildren.contains(item)) _nodesWithSelectedChildren.removeAll(item);}
         void recursiveFatherSelection(QTreeWidgetItem *item, bool select);
         bool allBrothersSelected(QTreeWidgetItem *item, QList<QTreeWidgetItem *> assignedItems);
         bool allBrothersSelected(QTreeWidgetItem *item);
+        void recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select);
+
+
+        /***********************************************************************
+         *                          Assignation tools
+         ***********************************************************************/
         bool allBrothersAssigned(QTreeWidgetItem *item);
         void fathersAssignation(QTreeWidgetItem *item);
         void fathersFullAssignation(QTreeWidgetItem *item);
-        bool noBrothersSelected(QTreeWidgetItem *item);
-
-        inline void addNodePartiallySelected(QTreeWidgetItem *item){if (!_nodesWithSelectedChildren.contains(item)) _nodesWithSelectedChildren<<item;}
-        inline void removeNodePartiallySelected(QTreeWidgetItem *item){if (_nodesWithSelectedChildren.contains(item)) _nodesWithSelectedChildren.removeAll(item);}
-        void selectPartially(QTreeWidgetItem *item);
-        void unselectPartially(QTreeWidgetItem *item);
-
         inline void addNodePartiallyAssigned(QTreeWidgetItem *item){if (!_nodesWithSomeChildrenAssigned.contains(item)) _nodesWithSomeChildrenAssigned<<item;}
         inline void removeNodePartiallyAssigned(QTreeWidgetItem *item){if (_nodesWithSomeChildrenAssigned.contains(item)) _nodesWithSomeChildrenAssigned.removeAll(item);}
         void assignPartially(QTreeWidgetItem *item);
         void unassignPartially(QTreeWidgetItem *item);
         void unassignItem(QTreeWidgetItem *item);
-
         inline void addNodeTotallyAssigned(QTreeWidgetItem *item){if (!_nodesWithAllChildrenAssigned.contains(item)) _nodesWithAllChildrenAssigned<<item;}
         inline void removeNodeTotallyAssigned(QTreeWidgetItem *item){if (_nodesWithAllChildrenAssigned.contains(item)) _nodesWithAllChildrenAssigned.removeAll(item);}
         void assignTotally(QTreeWidgetItem *item);
         void unassignTotally(QTreeWidgetItem *item);
-
         void assignItem(QTreeWidgetItem *item);
 
-
-        QList<QTreeWidgetItem*> _assignedItems;
         QList<QTreeWidgetItem*> _nodesWithSelectedChildren;
+
+        QList<QTreeWidgetItem*> _assignedItems;        
         QList<QTreeWidgetItem*> _nodesWithSomeChildrenAssigned;
         QList<QTreeWidgetItem*> _nodesWithAllChildrenAssigned;
 
