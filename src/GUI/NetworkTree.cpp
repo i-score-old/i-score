@@ -44,11 +44,13 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <map>
 #include <exception>
 
+unsigned int NAME_COLUMN = 0;
 unsigned int VALUE_COLUMN = 1;
 unsigned int START_COLUMN = 2;
-unsigned int END_COLUMN = 3;
-unsigned int INTERPOLATION_COLUMN = 4;
+unsigned int END_COLUMN = 4;
+unsigned int INTERPOLATION_COLUMN = 3;
 unsigned int REDONDANCY_COLUMN = 5;
+unsigned int SR_COLUMN = 6;
 
 bool VALUE_MODIFIED;
 
@@ -58,13 +60,14 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     init();
     setColumnCount(6);
     QStringList list;
-    list<<"Name"<<"Value"<<"Start"<<"End"<<"Interpolation"<<"redondancy";
-    setColumnWidth(0,250);
+    list<<"Name"<<"Value"<<"Start"<<"Interpolation"<<"End"<<"Redundancy"<<"Sample rate";
+    setColumnWidth(NAME_COLUMN,250);
     setColumnWidth(VALUE_COLUMN,75);
     setColumnWidth(START_COLUMN,75);
     setColumnWidth(END_COLUMN,75);
     setColumnWidth(INTERPOLATION_COLUMN,50);
     setColumnWidth(REDONDANCY_COLUMN,50);
+    setColumnWidth(SR_COLUMN,50);
     setHeaderLabels(list);
     list.clear();    
     VALUE_MODIFIED = false;
@@ -126,7 +129,6 @@ NetworkTree::load() {
  *      On fait findItems de controle2 (dernier de la liste),  puis on remonte hierarchy en vérifiant à chaque fois le père du itemFound
  *
  */
-
 QList< QPair<QTreeWidgetItem *, Message> >
 NetworkTree:: getItemsFromMsg(vector<string> itemsName)
 {
@@ -137,7 +139,6 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
     QStringList splitAddress;
     QList< QPair<QTreeWidgetItem *, Message> > itemsMatchedList;
     vector<string>::iterator it;
-    QList< QPair<QTreeWidgetItem *, Message> >::iterator it1;
 
     if(!itemsName.empty()){
     //Boucle sur liste message
@@ -276,15 +277,15 @@ NetworkTree::treeSnapshot() {
 
     QList < QPair<QTreeWidgetItem *, QString> > snapshots;
     QList<QTreeWidgetItem*> selection = selectedItems();
-
     if (!selection.empty()) {
         QList<QTreeWidgetItem*>::iterator it;
         vector<string>::iterator it2;
         QTreeWidgetItem *curItem;
-
+        std::cout<<"\n****** SELECTED ITEMS *******"<<std::endl;
         for (it = selection.begin(); it != selection.end() ; ++it) {
-            curItem = *it;
 
+            curItem = *it;
+            std::cout<<"\t\t----------------> "<<curItem->text(NAME_COLUMN).toStdString()<<std::endl;
             if(!curItem->text(VALUE_COLUMN).isEmpty()){// >type() != NodeNamespaceType && curItem->type() != NodeNoNamespaceType){
                 QString address = getAbsoluteAddress(*it);
                 QPair<QTreeWidgetItem *, QString> curPair;
@@ -423,18 +424,17 @@ NetworkTree::updateStartMsgsDisplay(){
     QList<QTreeWidgetItem *>::iterator it;
     QTreeWidgetItem *curItem;
     Message currentMsg;
-    QTreeWidgetItem *father;
 
     clearColumn(START_COLUMN);
     for(it=items.begin() ; it!=items.end() ; it++){
         curItem = *it;
         currentMsg = _startMessages->getMessages()->value(curItem);
+        if(curItem->text(START_COLUMN).isEmpty()){
+            std::cout<<"LOAD <<<<<<"<<curItem->text(0).toStdString()<<">>>>>>>\n";
+        }
         curItem->setText(START_COLUMN,currentMsg.value);
-
         fatherColumnCheck(curItem, START_COLUMN);
     }
-
-
 }
 
 void
@@ -467,6 +467,9 @@ NetworkTree::updateEndMsgsDisplay(){
     for(it=items.begin() ; it!=items.end() ; it++){
         curItem = *it;
         currentMsg = _endMessages->getMessages()->value(curItem);
+        if(curItem->text(END_COLUMN).isEmpty()){
+            std::cout<<"LOAD <<<<<<"<<curItem->text(NAME_COLUMN).toStdString()<<">>>>>>>\n";
+        }
         curItem->setText(END_COLUMN,currentMsg.value);
 
         fatherColumnCheck(curItem, END_COLUMN);
@@ -1041,6 +1044,16 @@ NetworkTree::clickInNetworkTree(){
         recursiveChildrenSelection(item, false);
         recursiveFatherSelection(item,false);
     }
+
+    if(selectionMode()==QAbstractItemView::ContiguousSelection){
+        QList<QTreeWidgetItem*> selection = selectedItems();
+        QList<QTreeWidgetItem*>::iterator it;
+        QTreeWidgetItem *curIt;
+        for(it=selection.begin() ; it!=selection.end() ; it++){
+            curIt = *it;
+            recursiveChildrenSelection(curIt, true);
+        }
+    }
 }
 
 void
@@ -1051,7 +1064,6 @@ NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
             assignItem(item);
         }
         emit(startValueChanged(item,item->text(START_COLUMN)));
-
     }
 
     if (item->type()==LeaveType && column == END_COLUMN && VALUE_MODIFIED){
@@ -1068,6 +1080,7 @@ void
 NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue){
     //Prévoir un assert. Vérifier, le type, range...etc
 
+    std::cout<<"startValueChanged : "<<item->text(0).toStdString()<<std::endl;
     if (!_startMessages->getMessages()->contains(item)){
         QString Qaddress = getAbsoluteAddress(item);
         string address = Qaddress.toStdString();
@@ -1089,6 +1102,7 @@ NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue){
 
 void
 NetworkTree::changeEndValue(QTreeWidgetItem *item, QString newValue){
+     std::cout<<"endValueChanged : "<<item->text(0).toStdString()<<std::endl;
     //Prévoir un assert. Vérifier, le type, range...etc
     if (!_endMessages->getMessages()->contains(item)){
         QString Qaddress = getAbsoluteAddress(item);
