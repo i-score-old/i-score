@@ -392,7 +392,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
             bool show = true;
 
             /* *** AJOUT NICO***  */
-            interpolate = false;
+            interpolate = true;
             /**********************/
             bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
             if (getCurveSuccess) {
