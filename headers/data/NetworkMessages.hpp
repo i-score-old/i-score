@@ -22,13 +22,22 @@ using std::string;
  */
 struct Message {
     /* Example :
-     * Device >   MinuitDevice
-     * Message >  /volume/accordion
-     * Value >    12
+     *  Device >   MinuitDevice
+     *  Message >  /volume/accordion
+     *  Value >    12
      */
     QString device; // MinuitDevice
     QString message; // /gain/
     QString value;
+};
+
+struct Data {
+    unsigned int sampleRate;
+    QString value;
+    QString msg;
+    QString address;
+    bool hasCurve;
+    bool curveActivated;
 };
 
 /**!
@@ -67,19 +76,23 @@ public :
      */
     void addMessages(const QList < QPair<QTreeWidgetItem *, QString> > messagesList);
     /*!
-     * \brief Set the list of messages.
+     * \brief Sets the list of messages.
      */
     void setMessages(const QList < QPair<QTreeWidgetItem *, QString> > messagesList);
     /*!
-     * \brief Set the list of messages.
+     * \brief Sets the list of messages.
      */
     void setMessages(const QList < QPair<QTreeWidgetItem *, Message> > messagesList);
     /*!
-     * \brief Set the list of messages.
+     * \brief Sets the list of messages.
      */
     inline void setMessages(QMap<QTreeWidgetItem *, Message> *messages){
         _messages=messages;
      ;}
+    /*!
+     * \brief Set the list of messages.
+     */
+    void setMessages(const QMap<QTreeWidgetItem *, Data> messagesList);
     /*!
       * \brief Changes the start value of an item of the map.
       * \param item : the item (key)

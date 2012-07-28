@@ -50,6 +50,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "NetworkMessages.hpp"
 #include "AbstractBox.hpp"
 #include <QPair>
+#include <QMap>
 
 using std::vector;
 using std::string;
@@ -57,6 +58,8 @@ using std::map;
 
 enum {NodeNamespaceType = QTreeWidgetItem::UserType + 1, NodeNoNamespaceType = QTreeWidgetItem::UserType + 2 ,
 	LeaveType = QTreeWidgetItem::UserType + 3, AttributeType = QTreeWidgetItem::UserType + 4};
+
+
 
 class NetworkTree : public QTreeWidget
 {
@@ -74,7 +77,9 @@ class NetworkTree : public QTreeWidget
          *                          General tools
          ***********************************************************************/
 
-        QList < QPair<QTreeWidgetItem *, QString> > treeSnapshot();
+
+
+        QMap<QTreeWidgetItem *, Data> treeSnapshot(unsigned int boxID);
 
 		std::vector<std::string> snapshot();
 		 /*!
@@ -83,6 +88,12 @@ class NetworkTree : public QTreeWidget
 		  * \param item : the item to get address for
 		  */
 		QString getAbsoluteAddress(QTreeWidgetItem *item) const;
+        /*!
+         * \brief Gets the absolute address of an item in the snapshot tree.
+         *
+         * \param item : the item to get address for
+         */
+       QTreeWidgetItem *getItemFromAddress(string address) const;
         /*!
          * \brief Used for loading. To get tree items, and parsed messages from a string name (given by the engine).
          */
@@ -131,7 +142,12 @@ class NetworkTree : public QTreeWidget
          * \brief Clear end messages list.
          */
         void clearEndMsgs();
-
+        /*!
+         * \brief Checks item's messages, to knows if start and end messages are set.
+         * \param The item we want to check.
+         * \return True if start and end messages are set.
+         */
+        bool hasStartEndMsg(QTreeWidgetItem *item);
 
         /***********************************************************************
          *                       General display tools
@@ -158,6 +174,7 @@ class NetworkTree : public QTreeWidget
          * \param The items to expand.
          */
         void expandNodes(QList<QTreeWidgetItem *> items);
+
 
 
         /***********************************************************************
@@ -206,7 +223,8 @@ class NetworkTree : public QTreeWidget
          *
          * \param selectedItems : items assigned to the box
          */
-        void assignItems(QList<QTreeWidgetItem*> selectedItems);
+//        void assignItems(QList<QTreeWidgetItem*> selectedItems);
+         void assignItems(QMap<QTreeWidgetItem*,Data> selectedItems);
         /*!
          * \brief True if all items' brothers have a value in their column.
          * \param Item : the item.
@@ -229,7 +247,8 @@ class NetworkTree : public QTreeWidget
          * \brief Getter
          * \return The assigned items list.
          */
-        inline QList<QTreeWidgetItem*> assignedItems() {return _assignedItems;}
+//        inline QList<QTreeWidgetItem*> assignedItems() {return _assignedItems;}
+         inline QMap<QTreeWidgetItem*,Data> assignedItems() {return _assignedItems;}
         /*!
          * \brief Getter
          * \return The partially assigned items list (nodes with some children assigned).
@@ -244,17 +263,20 @@ class NetworkTree : public QTreeWidget
          * \brief Sets the assigned items list.
          * \param The assigned items list.
          */
-        inline void setAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems.clear(); _assignedItems=items;}
+//        inline void setAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems.clear(); _assignedItems=items;}
+        inline void setAssignedItems(QMap<QTreeWidgetItem*,Data> items){_assignedItems.clear(); _assignedItems=items;}
         /*!
          * \brief Adds a list to the assigned items list.
          * \param The assigned items list to add.
          */
-        inline void addAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems << items;}
+//        inline void addAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems << items;}
+//        inline void addAssignedItems(QMap<QTreeWidgetItem*,Data> items){_assignedItems << items;}
         /*!
          * \brief Adds an item to the assigned items list.
          * \param The assigned item to add.
          */
-        inline void addAssignedItem(QTreeWidgetItem* item){_assignedItems << item;}
+//        inline void addAssignedItem(QTreeWidgetItem* item){_assignedItems << item;}
+        inline void addAssignedItem(QTreeWidgetItem* item, Data data){_assignedItems.insert(item,data);}
         /*!
          * \brief Return true if item is already assigned.
          * \param The item.
@@ -264,7 +286,8 @@ class NetworkTree : public QTreeWidget
          * \brief Removes an item in the assigned items list.
          * \param The item to remove.
          */
-        inline void removeAssignItem(QTreeWidgetItem* item){ _assignedItems.removeAll(item);}
+//        inline void removeAssignItem(QTreeWidgetItem* item){ _assignedItems.removeAll(item);}
+         inline void removeAssignItem(QTreeWidgetItem* item){ _assignedItems.remove(item);}
         /*!
          * \brief Reset the display of assigned items (leaves) and clear the assigned items list.
          */
@@ -275,6 +298,19 @@ class NetworkTree : public QTreeWidget
         void resetAssignedNodes();
 
 
+        /***********************************************************************
+         *                              Curves
+         ***********************************************************************/
+
+        bool updateCurve(QTreeWidgetItem *item, unsigned int boxID);
+        void updateCurves(unsigned int boxID);
+        unsigned int getSampleRate(QTreeWidgetItem *item);
+        bool hasCurve(QTreeWidgetItem *item);
+        void setSampleRate(QTreeWidgetItem *item, unsigned int sampleRate);
+        void setHasCurve(QTreeWidgetItem *item, bool val);
+        void setCurveActivated(QTreeWidgetItem *item, bool activated);
+
+
         virtual void keyPressEvent(QKeyEvent *event);
         virtual void keyReleaseEvent(QKeyEvent *event);
         virtual void mouseDoubleClickEvent(QMouseEvent *event);
@@ -283,8 +319,9 @@ class NetworkTree : public QTreeWidget
     signals :
         void startValueChanged(QTreeWidgetItem *, QString newValue);
         void endValueChanged(QTreeWidgetItem *, QString newValue);
-        void startMessageValueChanged(const std::string &address);
-        void endMessageValueChanged(const std::string &address);
+//        void startMessageValueChanged(const std::string &address);
+        void startMessageValueChanged(QTreeWidgetItem *);
+        void endMessageValueChanged(QTreeWidgetItem *);
 
 
     private :
@@ -320,11 +357,15 @@ class NetworkTree : public QTreeWidget
         inline void removeNodeTotallyAssigned(QTreeWidgetItem *item){if (_nodesWithAllChildrenAssigned.contains(item)) _nodesWithAllChildrenAssigned.removeAll(item);}
         void assignTotally(QTreeWidgetItem *item);
         void unassignTotally(QTreeWidgetItem *item);
-        void assignItem(QTreeWidgetItem *item);
+//        void assignItem(QTreeWidgetItem *item);
+        void assignItem(QTreeWidgetItem *item,Data data);
 
+
+
+
+        QMap<QTreeWidgetItem *,string> _addressMap;
         QList<QTreeWidgetItem*> _nodesWithSelectedChildren;
-
-        QList<QTreeWidgetItem*> _assignedItems;        
+        QMap<QTreeWidgetItem *, Data> _assignedItems;
         QList<QTreeWidgetItem*> _nodesWithSomeChildrenAssigned;
         QList<QTreeWidgetItem*> _nodesWithAllChildrenAssigned;
 

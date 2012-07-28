@@ -255,7 +255,10 @@ class Maquette : public QObject
 	std::vector<std::string> getCurvesAddresses(unsigned int boxID);
 
 	void setCurveRedundancy(unsigned int boxID, const std::string &address, bool redundancy);
+    bool getCurveRedundancy(unsigned int boxID, const std::string &address);
+
 	void setCurveSampleRate(unsigned int boxID, const std::string &address, int sampleRate);
+    unsigned int getCurveSampleRate(unsigned int boxID, const std::string &address);
 
 	void setCurveMuteState(unsigned int boxID, const std::string &address, bool muteState);
 	bool getCurveMuteState(unsigned int boxID, const std::string &address);
@@ -353,7 +356,8 @@ class Maquette : public QObject
    * \return if itemsSelected could be set
    */
 
-  bool setSelectedItemsToSend(unsigned int boxID,  QList<QTreeWidgetItem*> itemsSelected);
+//  bool setSelectedItemsToSend(unsigned int boxID,  QList<QTreeWidgetItem*> itemsSelected);
+  bool setSelectedItemsToSend(unsigned int boxID,  QMap<QTreeWidgetItem*,Data> itemsSelected);
   /*!
    * \brief Sets the set of treeItems expanded.
    *

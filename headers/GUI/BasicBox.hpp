@@ -480,7 +480,8 @@ class BasicBox : public QGraphicsItem
    *
    * \param itemsSelected : the items to send at box's start
    */
-  void setSelectedItemsToSend(QList<QTreeWidgetItem*> itemsSelected);
+//  void setSelectedItemsToSend(QList<QTreeWidgetItem*> itemsSelected);
+  void setSelectedItemsToSend(QMap<QTreeWidgetItem*,Data> itemsSelected);
   /*!
    * \brief Sets networkTreeExpandedItems to send.
    *

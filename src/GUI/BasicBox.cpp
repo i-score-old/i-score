@@ -559,10 +559,15 @@ BasicBox::setStartMessages(NetworkMessages *messages) {
 
 }
 
+//void
+//BasicBox::setSelectedItemsToSend(QList<QTreeWidgetItem*> itemsSelected){
+//    _abstract->setNetworkTreeItems(itemsSelected);
+//}
 void
-BasicBox::setSelectedItemsToSend(QList<QTreeWidgetItem*> itemsSelected){
+BasicBox::setSelectedItemsToSend(QMap<QTreeWidgetItem*,Data> itemsSelected){
     _abstract->setNetworkTreeItems(itemsSelected);
 }
+
 
 void
 BasicBox::setExpandedItemsList(QList<QTreeWidgetItem *> itemsExpanded){

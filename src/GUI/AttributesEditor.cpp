@@ -761,15 +761,16 @@ AttributesEditor::connectSlots()
 	connect(_endMsgClearButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(clear()));
 
 	connect(_startMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(startMessagesChanged()));
-	connect(_startMsgsEditor,SIGNAL(messageChanged(const std::string &)),this,SLOT(startMessageChanged(const std::string &)));
+//	connect(_startMsgsEditor,SIGNAL(messageChanged(const std::string &)),this,SLOT(startMessageChanged(const std::string &)));
 
     //NICO
-    connect(_networkTree,SIGNAL(startMessageValueChanged(const std::string &)),this,SLOT(startMessageChanged(const std::string &)));
-    connect(_networkTree,SIGNAL(endMessageValueChanged(const std::string &)),this,SLOT(endMessageChanged(const std::string &)));
+//    connect(_networkTree,SIGNAL(startMessageValueChanged(const std::string &)),this,SLOT(startMessageChanged(const std::string &)));
+    connect(_networkTree,SIGNAL(startMessageValueChanged(QTreeWidgetItem *)),this,SLOT(startMessageChanged(QTreeWidgetItem *)));
+    connect(_networkTree,SIGNAL(endMessageValueChanged(QTreeWidgetItem *)),this,SLOT(endMessageChanged(QTreeWidgetItem *)));
 
 	connect(_startMsgsEditor,SIGNAL(messageRemoved(const std::string &)),this,SLOT(startMessageRemoved(const std::string &)));
 	connect(_endMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(endMessagesChanged()));
-	connect(_endMsgsEditor,SIGNAL(messageChanged(const std::string &)),this,SLOT(endMessageChanged(const std::string &)));
+//	connect(_endMsgsEditor,SIGNAL(messageChanged(const std::string &)),this,SLOT(endMessageChanged(const std::string &)));
 	connect(_endMsgsEditor,SIGNAL(messageRemoved(const std::string &)),this,SLOT(endMessageRemoved(const std::string &)));
 
 	connect(_snapshotAssignStart, SIGNAL(clicked()),this,SLOT(snapshotStartAssignment()));
@@ -851,8 +852,9 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
                _networkTree->loadNetworkTree(abBox);
                 startMessagesChanged();
                 endMessagesChanged();
-                _networkTree->assignItems(_networkTree->assignedItems());
-                _networkTree->expandNodes(_networkTree->assignedItems());
+//                _networkTree->assignItems(_networkTree->assignedItems());
+//                _networkTree->expandNodes(_networkTree->assignedItems());
+                _networkTree->expandNodes(_networkTree->assignedItems().keys());
             }
             else{
                 _networkTree->setAssignedItems(abBox->networkTreeItems());
@@ -867,10 +869,23 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
             _networkTree->updateStartMsgsDisplay();            
             _networkTree->updateEndMsgsDisplay();
             _networkTree->assignItems(_networkTree->assignedItems());
+
+            //PRINT
+//            QList<QTreeWidgetItem *> items = _networkTree->assignedItems().keys();
+//            QList<QTreeWidgetItem *>::iterator i;
+//            QTreeWidgetItem *curIt;
+//            std::cout<<"\nAFFICHAGE START\n";
+//            for(i=items.begin() ; i!=items.end() ; i++){
+//                curIt=*i;
+//                std::cout<<curIt->text(0).toStdString()<<" "<<_networkTree->getSampleRate(curIt)<<std::endl;
+//            }
+//            std::cout<<"--AFFICHAGE END\n\n";
+            //PRINT
         }
     }
 	//if (_boxEdited != NO_ID) {
 		_curvesWidget->updateMessages(_boxEdited,false);
+        _networkTree->updateCurves(_boxEdited);
 	//}
 
 	if (abBox->type() == ABSTRACT_SOUND_BOX_TYPE || abBox->type() == ABSTRACT_CONTROL_BOX_TYPE
@@ -1273,7 +1288,8 @@ AttributesEditor::changeColor() {
 void
 AttributesEditor::startMessagesChanged()
 {
-    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
+//    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
+    QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
     vector<string> networkMsgs = _networkTree->startMessages()->computeMessages();
 
     Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
@@ -1282,13 +1298,17 @@ AttributesEditor::startMessagesChanged()
 
     _networkTree->updateStartMsgsDisplay();
 //    _networkTree->updateEndMsgsDisplay();
+//    _networkTree->updateEndMsgsDisplay();
 	_curvesWidget->updateMessages(_boxEdited,true);
+    _networkTree->updateCurves(_boxEdited);
 }
 
 void
 AttributesEditor::endMessagesChanged()
 {
-    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
+//    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
+
+    QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
     Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
 
     vector<string> networkMsgs = _networkTree->endMessages()->computeMessages();
@@ -1297,23 +1317,30 @@ AttributesEditor::endMessagesChanged()
 //    Maquette::getInstance()->setEndMessagesToSend(_boxEdited,_networkTree->endMessages());
     Maquette::getInstance()->setEndMessages(_boxEdited,_networkTree->endMessages());
     _networkTree->updateEndMsgsDisplay();
-	_curvesWidget->updateMessages(_boxEdited,true);
+    _curvesWidget->updateMessages(_boxEdited,true);
+    _networkTree->updateCurves(_boxEdited);
 }
 
-void AttributesEditor::startMessageChanged(const string &address) {
-    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
+void AttributesEditor::startMessageChanged(QTreeWidgetItem *item) {
+    string address = _networkTree->getAbsoluteAddress(item).toStdString();
+    _networkTree->updateCurve(item,_boxEdited);
+    //PAS OPTIMAL, NE DEVRAIT MODIFIER QU'UN SEUL ITEM
+    QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
     Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
-    std::cout<<"AttriBut::startMessageChanged -> "<<_networkTree->startMessages()->computeMessages().size()<<std::endl;
+
     Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,_networkTree->startMessages()->computeMessages());
     Maquette::getInstance()->setStartMessages(_boxEdited,_networkTree->startMessages());
 
     _networkTree->updateStartMsgsDisplay();
+    //_networkTree->updateInterpolation();
+//    std::cout<<"---Après update : "<< item->text(0).toStdString()<<" "<<_networkTree->assignedItems().value(item).sampleRate<<std::endl;
     _curvesWidget->updateCurve(address);
 }
 
-void AttributesEditor::endMessageChanged(const string &address) {
-
-    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
+void AttributesEditor::endMessageChanged(QTreeWidgetItem *item) {
+    string address = _networkTree->getAbsoluteAddress(item).toStdString();
+    _networkTree->updateCurve(item,_boxEdited);
+    QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
     Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
 
     Maquette::getInstance()->setLastMessagesToSend(_boxEdited,_networkTree->endMessages()->computeMessages());
@@ -1325,7 +1352,8 @@ void AttributesEditor::endMessageChanged(const string &address) {
 
 void AttributesEditor::startMessageRemoved(const string &address) {
     //NICO
-    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
+//    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
+    QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
     Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
     Maquette::getInstance()->setStartMessages(_boxEdited,_networkTree->startMessages());
     //NICO
@@ -1375,25 +1403,23 @@ AttributesEditor::snapshotStartAssignment()
 
     //---------------------------------------- Nouvelle version -------------------------------------
     QList<QTreeWidgetItem*> assignedItems;// = _networkTree->getSelectedItems();
-    QList < QPair<QTreeWidgetItem *, QString> > treeSnapshot = _networkTree->treeSnapshot();
-    for(int i=0 ; i<treeSnapshot.size() ; i++){
-        std::cout<<"TREESNAPSHOT : "<<treeSnapshot.at(i).first->text(0).toStdString()<<std::endl;
-        assignedItems<<treeSnapshot.at(i).first;
-    }
+    QMap<QTreeWidgetItem *, Data> treeSnapshot = _networkTree->treeSnapshot(_boxEdited);
+
     vector<string> snapshot = _networkTree->snapshot();//A ENLEVER
     _networkTree->clearStartMsgs();
+
     if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
         if (!treeSnapshot.empty()) {
             _startMsgsEditor->setMessages(snapshot);//A ENLEVER
 
             _networkTree->startMessages()->setMessages(treeSnapshot);
-             _networkTree->assignItems(assignedItems);
+
+            _networkTree->assignItems(treeSnapshot);
             startMessagesChanged();
             //_networkTree->resetSelectedItems();
             //_networkTree->setAssignedItems(assignedItems);
 
 //            _networkTree->startMessages()->setMessages(treeSnapshot);
-//            startMessagesChanged();
 
 //            _networkTree->assignItems(assignedItems);
 
@@ -1430,12 +1456,7 @@ void AttributesEditor::snapshotEndAssignment()
 
     //---------------------------------------- AJOUT NICO - Nouvelle version -------------------------------------
 
-    QList < QPair<QTreeWidgetItem *, QString> > treeSnapshot = _networkTree->treeSnapshot();
-
-    QList<QTreeWidgetItem*> assignedItems;// = _networkTree->getSelectedItems();
-    for(int i=0 ; i<treeSnapshot.size() ; i++){
-        assignedItems<<treeSnapshot.at(i).first;
-    }
+    QMap<QTreeWidgetItem *, Data> treeSnapshot = _networkTree->treeSnapshot(_boxEdited);
 
     _networkTree->clearEndMsgs();
     if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
@@ -1443,7 +1464,8 @@ void AttributesEditor::snapshotEndAssignment()
             //_networkTree->setAssignedItems(assignedItems);
 
             _networkTree->endMessages()->setMessages(treeSnapshot);
-            _networkTree->assignItems(assignedItems);
+//            _networkTree->assignItems(assignedItems);
+            _networkTree->assignItems(treeSnapshot);
             endMessagesChanged();
 //            _networkTree->assignItems(assignedItems);
             _scene->displayMessage("treeSnapshot successfully captured and applied to box start",INDICATION_LEVEL);

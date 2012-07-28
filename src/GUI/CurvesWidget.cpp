@@ -394,13 +394,16 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
             /* *** AJOUT NICO***  */
             interpolate = true;
             /**********************/
+
             bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
             if (getCurveSuccess) {
                 if (xPercents.empty() && yValues.empty() && values.size() >= 2) {
                     if (values.front() == values.back()) {
                         show = false;
-                        //AJOUT NICO
+
+                        /* *** AJOUT NICO***  */
                         interpolate = false;
+                        /**********************/
                     }
                 }
                 if (show) // Curve showing

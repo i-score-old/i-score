@@ -44,13 +44,13 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <map>
 #include <exception>
 
-unsigned int NAME_COLUMN = 0;
-unsigned int VALUE_COLUMN = 1;
-unsigned int START_COLUMN = 2;
-unsigned int END_COLUMN = 4;
-unsigned int INTERPOLATION_COLUMN = 3;
-unsigned int REDONDANCY_COLUMN = 5;
-unsigned int SR_COLUMN = 6;
+static unsigned int NAME_COLUMN = 0;
+static unsigned int VALUE_COLUMN = 1;
+static unsigned int START_COLUMN = 2;
+static unsigned int END_COLUMN = 4;
+static unsigned int INTERPOLATION_COLUMN = 3;
+static unsigned int REDONDANCY_COLUMN = 5;
+static unsigned int SR_COLUMN = 6;
 
 bool VALUE_MODIFIED;
 
@@ -228,24 +228,30 @@ NetworkTree::loadNetworkTree(AbstractBox *abBox){
     QList< QPair<QTreeWidgetItem *, Message> >::iterator it0;
     QPair<QTreeWidgetItem *, Message> curPair;
 
-    QList<QTreeWidgetItem *>itemsFromMsg;
+//    QList<QTreeWidgetItem *>itemsFromMsg;
+    QMap<QTreeWidgetItem *,Data>itemsFromMsg;
+    Data currentData;
     for(it0 = startItemsAndMsgs.begin() ; it0 != startItemsAndMsgs.end() ; it0++){
         curPair = *it0;
-        itemsFromMsg << curPair.first;
+//        itemsFromMsg << curPair.first;
+        itemsFromMsg.insert(curPair.first,currentData);
     }
 
     QList<QTreeWidgetItem *>itemsFromEndMsg;
     for(it0 = endItemsAndMsgs.begin() ; it0 != endItemsAndMsgs.end() ; it0++){
         curPair = *it0;
-        itemsFromEndMsg << curPair.first;
+//        itemsFromEndMsg << curPair.first;
+        itemsFromMsg.insert(curPair.first,currentData);
     }
 
     QList<QTreeWidgetItem *>::iterator it;
     QTreeWidgetItem *curItem;
     for(it = itemsFromEndMsg.begin() ; it != itemsFromEndMsg.end() ; it++){
         curItem = *it;
-        if(!itemsFromMsg.contains(curItem))
-            itemsFromMsg.append(curItem);
+        if(!itemsFromMsg.contains(curItem)){
+//            itemsFromMsg.append(curItem);
+            itemsFromMsg.insert(curItem,currentData);
+        }
     }
     setAssignedItems(itemsFromMsg);
     NetworkMessages *startMsg = new NetworkMessages();
@@ -272,32 +278,39 @@ NetworkTree::getAbsoluteAddress(QTreeWidgetItem *item) const {
     return address;
 }
 
-QList < QPair<QTreeWidgetItem *, QString> >
-NetworkTree::treeSnapshot() {
+QTreeWidgetItem *
+NetworkTree::getItemFromAddress(string address) const{
 
-    QList < QPair<QTreeWidgetItem *, QString> > snapshots;
+    return _addressMap.key(address);
+}
+
+QMap <QTreeWidgetItem *, Data>
+NetworkTree::treeSnapshot(unsigned int boxID) {
+
+    QMap<QTreeWidgetItem *, Data> snapshots;
     QList<QTreeWidgetItem*> selection = selectedItems();
     if (!selection.empty()) {
         QList<QTreeWidgetItem*>::iterator it;
         vector<string>::iterator it2;
         QTreeWidgetItem *curItem;
-        std::cout<<"\n****** SELECTED ITEMS *******"<<std::endl;
         for (it = selection.begin(); it != selection.end() ; ++it) {
 
             curItem = *it;
-            std::cout<<"\t\t----------------> "<<curItem->text(NAME_COLUMN).toStdString()<<std::endl;
             if(!curItem->text(VALUE_COLUMN).isEmpty()){// >type() != NodeNamespaceType && curItem->type() != NodeNoNamespaceType){
                 QString address = getAbsoluteAddress(*it);
-                QPair<QTreeWidgetItem *, QString> curPair;
+
+                QPair<QTreeWidgetItem *, Data> curPair;
 
                 if (!address.isEmpty()) {
                     vector<string> snapshot = Maquette::getInstance()->requestNetworkSnapShot(address.toStdString());
-                    QString message;
 
+                    Data data;
                     for(it2=snapshot.begin(); it2!=snapshot.end(); it2++){
-                        message = QString::fromStdString(*it2);
-                        curPair = qMakePair(*it,message);
-                        snapshots << curPair;
+                        data.msg = QString::fromStdString(*it2);
+                        data.address = address;
+//                        data.sampleRate = Maquette::getInstance()->getCurveSampleRate(boxID,address.toStdString());
+                        data.hasCurve = false;
+                        snapshots.insert(*it,data);
                     }
                 }
             }
@@ -332,10 +345,15 @@ NetworkTree::snapshot() {
     return snapshots;
 }
 
+bool
+NetworkTree::hasStartEndMsg(QTreeWidgetItem *item){
+    return (_startMessages->getMessages()->contains(item) && _endMessages->getMessages()->contains(item));
+}
 
 /****************************************************************************
  *                          General display tools
  ****************************************************************************/
+
 
 void
 NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
@@ -344,6 +362,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
 
         vector<string> nodes,leaves,attributes,attributesValues;
         QString address = getAbsoluteAddress(curItem);
+        _addressMap.insert(curItem,address.toStdString());
         Maquette::getInstance()->requestNetworkNamespace(address.toStdString(), nodes, leaves, attributes, attributesValues);
         vector<string>::iterator it;
         vector<string>::iterator it2;
@@ -392,15 +411,22 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
 
 void
 NetworkTree::clearColumn(unsigned int column){
-
     if(!_assignedItems.isEmpty()){
         QList<QTreeWidgetItem *>::iterator it;
         QTreeWidgetItem *curIt;
+        QList<QTreeWidgetItem *> assignedItems = _assignedItems.keys();
         QString emptyString;
         emptyString.clear();
-        for (it=_assignedItems.begin(); it!=_assignedItems.end(); it++){            
-            curIt=*it;
-            curIt->setText(column,emptyString);
+
+//        for (it=_assignedItems.begin(); it!=_assignedItems.end(); it++){
+//            curIt=*it;
+//            curIt->setText(column,emptyString);
+//        }
+
+        for (it=assignedItems.begin(); it!=assignedItems.end(); it++){
+
+              curIt=*it;
+              curIt->setText(column,emptyString);
         }
     }
 }
@@ -425,13 +451,10 @@ NetworkTree::updateStartMsgsDisplay(){
     QTreeWidgetItem *curItem;
     Message currentMsg;
 
-    clearColumn(START_COLUMN);
+//    clearColumn(START_COLUMN);
     for(it=items.begin() ; it!=items.end() ; it++){
         curItem = *it;
         currentMsg = _startMessages->getMessages()->value(curItem);
-        if(curItem->text(START_COLUMN).isEmpty()){
-            std::cout<<"LOAD <<<<<<"<<curItem->text(0).toStdString()<<">>>>>>>\n";
-        }
         curItem->setText(START_COLUMN,currentMsg.value);
         fatherColumnCheck(curItem, START_COLUMN);
     }
@@ -463,13 +486,10 @@ NetworkTree::updateEndMsgsDisplay(){
     Message currentMsg;
     QTreeWidgetItem *father;
 
-    clearColumn(END_COLUMN);
+//    clearColumn(END_COLUMN);
     for(it=items.begin() ; it!=items.end() ; it++){
         curItem = *it;
         currentMsg = _endMessages->getMessages()->value(curItem);
-        if(curItem->text(END_COLUMN).isEmpty()){
-            std::cout<<"LOAD <<<<<<"<<curItem->text(NAME_COLUMN).toStdString()<<">>>>>>>\n";
-        }
         curItem->setText(END_COLUMN,currentMsg.value);
 
         fatherColumnCheck(curItem, END_COLUMN);
@@ -553,9 +573,11 @@ NetworkTree::editValue(){
 
 void
 NetworkTree::resetNetworkTree(){
+    clearColumn(SR_COLUMN);
     resetSelectedItems();
     resetAssignedItems();
     resetAssignedNodes();
+
 }
 
 
@@ -571,27 +593,56 @@ NetworkTree::resetNetworkTree(){
  ****************************************************************************/
 
 void
-NetworkTree::assignItem(QTreeWidgetItem *item){
+NetworkTree::assignItem(QTreeWidgetItem *item, Data data){
     QFont font;
     item->setFont(0,font);
     item->setSelected(true);
     item->setCheckState(0,Qt::Checked);
     item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-    addAssignedItem(item);
+    if (hasStartEndMsg(item)){
+        data.hasCurve = true;
+    }
+
+    addAssignedItem(item,data);
     fathersAssignation(item);
 }
 
+//void
+//NetworkTree::assignItems(QList<QTreeWidgetItem*> selectedItems){
+//    QList<QTreeWidgetItem *>::iterator it;
+//    QTreeWidgetItem *curItem;
+//    QMap<QTreeWidgetItem*, Data> itemsToAssign;
+//    //TMP
+//    Data data;
+//    for (it =  selectedItems.begin() ; it !=  selectedItems.end() ; ++it){
+//        curItem = *it;
+//        itemsToAssign.insert(curItem,data);
+//     }
+//    //TMP
+
+//    resetAssignedItems();
+////    setAssignedItems(selectedItems);
+//    setAssignedItems(itemsToAssign);
+
+
+//    for (it =  selectedItems.begin() ; it !=  selectedItems.end() ; ++it){
+//        curItem = *it;
+//        assignItem(curItem);
+//     }
+//}
+
 void
-NetworkTree::assignItems(QList<QTreeWidgetItem*> selectedItems){
+NetworkTree::assignItems(QMap<QTreeWidgetItem*,Data> selectedItems){
+    QList<QTreeWidgetItem *>::iterator it;
+    QList<QTreeWidgetItem *> items = selectedItems.keys();
+    QTreeWidgetItem *curItem;
 
     resetAssignedItems();
     setAssignedItems(selectedItems);
-    QList<QTreeWidgetItem *>::iterator it;
-    QTreeWidgetItem *curItem;
 
-    for (it =  selectedItems.begin() ; it !=  selectedItems.end() ; ++it){
+    for (it =  items.begin() ; it !=  items.end() ; ++it){
         curItem = *it;
-        assignItem(curItem);
+        assignItem(curItem,selectedItems.value(curItem));
      }
 }
 
@@ -744,12 +795,15 @@ NetworkTree::resetAssignedItems(){
     /*
      * LEAVES
      */
-    QList<QTreeWidgetItem *>  assignedLeaves = assignedItems();
+//    QList<QTreeWidgetItem *>  assignedLeaves = assignedItems();
+
+    QList<QTreeWidgetItem *>  assignedLeaves = assignedItems().keys();
 
     for(it = assignedLeaves.begin(); it!= assignedLeaves.end() ; it++){
         curItem = *it;
         unassignItem(curItem);
     }
+
     _assignedItems.clear();
 }
 
@@ -1058,10 +1112,13 @@ NetworkTree::clickInNetworkTree(){
 
 void
 NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
+    Data data;
+    data.hasCurve = false;
+    data.address = getAbsoluteAddress(item);
     if (item->type()==LeaveType && column == START_COLUMN && VALUE_MODIFIED){
         VALUE_MODIFIED = FALSE;
         if(!isAssigned(item)){
-            assignItem(item);
+            assignItem(item,data);
         }
         emit(startValueChanged(item,item->text(START_COLUMN)));
     }
@@ -1069,7 +1126,7 @@ NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
     if (item->type()==LeaveType && column == END_COLUMN && VALUE_MODIFIED){
         VALUE_MODIFIED = FALSE;
         if(!isAssigned(item)){
-            assignItem(item);
+            assignItem(item,data);
         }
         emit(endValueChanged(item,item->text(END_COLUMN)));
 
@@ -1080,20 +1137,19 @@ void
 NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue){
     //Prévoir un assert. Vérifier, le type, range...etc
 
-    std::cout<<"startValueChanged : "<<item->text(0).toStdString()<<std::endl;
     if (!_startMessages->getMessages()->contains(item)){
         QString Qaddress = getAbsoluteAddress(item);
         string address = Qaddress.toStdString();
         Qaddress += " ";
         Qaddress += newValue;
         _startMessages->addMessage(item,Qaddress);
-        emit(startMessageValueChanged(address));
+        emit(startMessageValueChanged(item));
     }
     else{
         if (_startMessages->setValue(item,newValue)){
             Message msg = _startMessages->getMessages()->value(item);
             string address = msg.device.toStdString() + msg.message.toStdString();
-            emit(startMessageValueChanged(address));
+            emit(startMessageValueChanged(item));
         }
         else
              std::cerr << "NetworkTree::changeStartValue : Impossible de créer le networkMessage" << std::endl;
@@ -1102,7 +1158,6 @@ NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue){
 
 void
 NetworkTree::changeEndValue(QTreeWidgetItem *item, QString newValue){
-     std::cout<<"endValueChanged : "<<item->text(0).toStdString()<<std::endl;
     //Prévoir un assert. Vérifier, le type, range...etc
     if (!_endMessages->getMessages()->contains(item)){
         QString Qaddress = getAbsoluteAddress(item);
@@ -1110,13 +1165,13 @@ NetworkTree::changeEndValue(QTreeWidgetItem *item, QString newValue){
         Qaddress += " ";
         Qaddress += newValue;
         _endMessages->addMessage(item,Qaddress);
-        emit(endMessageValueChanged(address));
+        emit(endMessageValueChanged(item));
     }
     else{
         if (_endMessages->setValue(item,newValue)){
             Message msg = _endMessages->getMessages()->value(item);
             string address = msg.device.toStdString() + msg.message.toStdString();
-            emit(endMessageValueChanged(address));
+            emit(endMessageValueChanged(item));
         }
         else{
             std::cerr << "NetworkTree::changeEndValue : Impossible de créer le networkMessage" << std::endl;
@@ -1173,3 +1228,130 @@ NetworkTree::itemCollapsed() {
     }*/
 }
 
+/***********************************************************************
+ *                              Curves
+ ***********************************************************************/
+
+//void
+//NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID){
+//    updateCurve(getAbsoluteAddress(item),boxID);
+//}
+
+unsigned int
+NetworkTree::getSampleRate(QTreeWidgetItem *item){
+    if(isAssigned(item)){
+        if(_assignedItems.value(item).hasCurve){
+            return _assignedItems.value(item).sampleRate;
+        }
+        else{
+#ifdef DEBUG
+            std::cerr<<"NetworkTree::getSampleRate : Impossible to get item's sample rate, item has no curve."<<std::endl;
+#endif
+        }
+    }
+    else{
+#ifdef DEBUG
+        std::cerr<<"NetworkTree::getSampleRate : Impossible to get item's sample rate, item is not assigned."<<std::endl;
+#endif
+    }
+}
+
+
+bool
+NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID)
+{
+    string address = getAbsoluteAddress(item).toStdString();
+    BasicBox *box = Maquette::getInstance()->getBox(boxID);
+    if (box != NULL) // Box Found
+    {
+        if (_assignedItems.value(item).hasCurve){
+        AbstractCurve *abCurve = box->getCurve(address);
+
+        unsigned int sampleRate;
+        bool redundancy,interpolate;
+        vector<float> values,xPercents,yValues,coeff;
+        vector<string> argTypes;
+        vector<short> sectionType;
+
+        if (abCurve != NULL) // Abstract Curve found
+        {
+                std::cout<<"curve found -> we set it"<<std::endl;
+                bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
+                if (getCurveSuccess) {
+                   setSampleRate(item,sampleRate);
+//                   setHasCurve(item,true);
+                }
+         }
+
+
+        else // Abstract Curve not found
+        {
+            std::cout<<"curve not found ";
+            bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
+            if (getCurveSuccess){
+                std::cout<<"-> we set it "<<std::endl;
+               setSampleRate(item,sampleRate);
+//               setHasCurve(item,true);
+            }
+        }
+            item->setText(SR_COLUMN,QString::number(getSampleRate(item)));
+        }
+    }
+    else // Box Not Found
+    {
+        std::cout<<"Box not found"<<std::endl;
+        return false;
+    }
+    return false;
+}
+
+void
+NetworkTree::updateCurves(unsigned int boxID) {
+
+    if (boxID != NO_ID) {
+        vector<string> curvesAddresses = Maquette::getInstance()->getCurvesAddresses(boxID);
+        vector<string>::const_iterator curveAddressIt;
+        QTreeWidgetItem *item;
+        //PRINT
+        QList<QTreeWidgetItem *>list = _assignedItems.keys();
+        QList<QTreeWidgetItem *>::iterator it;
+        for(it=list.begin() ; it!=list.end() ; it++){
+            item = *it;
+            updateCurve(item,boxID);
+        }
+        //PRINT
+//        QTreeWidgetItem *item;
+//        for (curveAddressIt = curvesAddresses.begin() ; curveAddressIt != curvesAddresses.end() ; ++curveAddressIt) {
+//            item = getItemFromAddress(*curveAddressIt);
+//             std::cout<<"ITem : " <<item->text(0).toStdString()<<std::endl;
+//            updateCurve(item,boxID);
+//        }
+    }
+}
+
+bool
+NetworkTree::hasCurve(QTreeWidgetItem *item){
+    return _assignedItems.value(item).hasCurve;
+}
+
+void
+NetworkTree::setSampleRate(QTreeWidgetItem *item, unsigned int sampleRate){
+    Data data = _assignedItems.value(item);
+    data.sampleRate = sampleRate;
+    _assignedItems.insert(item,data);
+    std::cout<<"---SET SAMPLE RATE : "<< item->text(0).toStdString()<<" "<<_assignedItems.value(item).sampleRate<<std::endl;
+}
+
+void
+NetworkTree::setHasCurve(QTreeWidgetItem *item, bool val){
+    Data data = _assignedItems.value(item);
+    data.hasCurve = val;
+    _assignedItems.insert(item,data);
+}
+
+void
+NetworkTree::setCurveActivated(QTreeWidgetItem *item, bool activated){
+    Data data = _assignedItems.value(item);
+    data.curveActivated = activated;
+    _assignedItems.insert(item,data);
+}

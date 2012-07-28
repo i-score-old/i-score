@@ -231,8 +231,8 @@ class AttributesEditor : public QDockWidget
    */
   void resetProfiles();
 
-  void startMessageChanged(const std::string &address);
-  void endMessageChanged(const std::string &address);
+  void startMessageChanged(QTreeWidgetItem *item);
+  void endMessageChanged(QTreeWidgetItem *item);
   void startMessageRemoved(const std::string &address);
   void endMessageRemoved(const std::string &address);
 

@@ -619,8 +619,18 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages){
 }
 
 
+//bool
+//Maquette::setSelectedItemsToSend(unsigned int boxID,  QList<QTreeWidgetItem*> itemsSelected){
+//    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+
+//        _boxes[boxID]->setSelectedItemsToSend(itemsSelected);
+
+//        return true;
+//    }
+//    return false;
+//}
 bool
-Maquette::setSelectedItemsToSend(unsigned int boxID,  QList<QTreeWidgetItem*> itemsSelected){
+Maquette::setSelectedItemsToSend(unsigned int boxID,  QMap<QTreeWidgetItem*,Data> itemsSelected){
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
 
         _boxes[boxID]->setSelectedItemsToSend(itemsSelected);
@@ -997,8 +1007,18 @@ void Maquette::setCurveRedundancy(unsigned int boxID, const string &address, boo
 	_engines->setCurveRedundancy(boxID,address,redundancy);
 }
 
+bool
+Maquette::getCurveRedundancy(unsigned int boxID, const std::string &address){
+    return _engines->getCurveRedundancy(boxID,address);
+}
+
 void Maquette::setCurveSampleRate(unsigned int boxID, const string &address, int sampleRate) {
-	_engines->setCurveSampleRate(boxID,address,sampleRate);
+    _engines->setCurveSampleRate(boxID,address,sampleRate);
+}
+
+unsigned int
+Maquette::getCurveSampleRate(unsigned int boxID, const std::string &address){
+    return _engines->getCurveSampleRate(boxID,address);
 }
 
 void Maquette::setCurveMuteState(unsigned int boxID, const string &address, bool muteState) {
