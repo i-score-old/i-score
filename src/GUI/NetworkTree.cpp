@@ -347,8 +347,9 @@ NetworkTree::snapshot() {
 
 bool
 NetworkTree::hasStartEndMsg(QTreeWidgetItem *item){
-    return (_startMessages->getMessages()->contains(item) && _endMessages->getMessages()->contains(item));
+    return (_startMessages->getMessages()->contains(item) || _endMessages->getMessages()->contains(item));
 }
+
 
 /****************************************************************************
  *                          General display tools
@@ -371,7 +372,9 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
             QStringList list;
             list << QString::fromStdString(*it);
             QTreeWidgetItem *childItem = new QTreeWidgetItem(list,LeaveType);
-            curItem->setCheckState(0,Qt::Unchecked);
+            curItem->setCheckState(NAME_COLUMN,Qt::Unchecked);
+            curItem->setCheckState(START_COLUMN,Qt::Unchecked);
+            curItem->setCheckState(END_COLUMN,Qt::Unchecked);
             curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
             curItem->addChild(childItem);
             list.clear();
@@ -390,7 +393,9 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
                 font.setCapitalization(QFont::SmallCaps);
                 curItem->setText(1,leave_value);
                 curItem->setFont(1,font);
-                curItem->setCheckState(0,Qt::Unchecked);
+                curItem->setCheckState(NAME_COLUMN,Qt::Unchecked);
+                curItem->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
+                curItem->setCheckState(REDONDANCY_COLUMN,Qt::Unchecked);
                 curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
             }
         }
@@ -418,14 +423,13 @@ NetworkTree::clearColumn(unsigned int column){
         QString emptyString;
         emptyString.clear();
 
-//        for (it=_assignedItems.begin(); it!=_assignedItems.end(); it++){
-//            curIt=*it;
-//            curIt->setText(column,emptyString);
-//        }
-
         for (it=assignedItems.begin(); it!=assignedItems.end(); it++){
 
               curIt=*it;
+              if (curIt->checkState(column)){
+
+                  curIt->setCheckState(column,Qt::Unchecked);
+              }
               curIt->setText(column,emptyString);
         }
     }
@@ -574,6 +578,8 @@ NetworkTree::editValue(){
 void
 NetworkTree::resetNetworkTree(){
     clearColumn(SR_COLUMN);
+    clearColumn(INTERPOLATION_COLUMN);
+    clearColumn(REDONDANCY_COLUMN);
     resetSelectedItems();
     resetAssignedItems();
     resetAssignedNodes();
@@ -599,9 +605,8 @@ NetworkTree::assignItem(QTreeWidgetItem *item, Data data){
     item->setSelected(true);
     item->setCheckState(0,Qt::Checked);
     item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-    if (hasStartEndMsg(item)){
+    if (hasStartEndMsg(item))
         data.hasCurve = true;
-    }
 
     addAssignedItem(item,data);
     fathersAssignation(item);
@@ -1117,17 +1122,13 @@ NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
     data.address = getAbsoluteAddress(item);
     if (item->type()==LeaveType && column == START_COLUMN && VALUE_MODIFIED){
         VALUE_MODIFIED = FALSE;
-        if(!isAssigned(item)){
-            assignItem(item,data);
-        }
+        assignItem(item,data);
         emit(startValueChanged(item,item->text(START_COLUMN)));
     }
 
     if (item->type()==LeaveType && column == END_COLUMN && VALUE_MODIFIED){
         VALUE_MODIFIED = FALSE;
-        if(!isAssigned(item)){
-            assignItem(item,data);
-        }
+        assignItem(item,data);
         emit(endValueChanged(item,item->text(END_COLUMN)));
 
     }
@@ -1260,48 +1261,58 @@ NetworkTree::getSampleRate(QTreeWidgetItem *item){
 bool
 NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID)
 {
+
     string address = getAbsoluteAddress(item).toStdString();
     BasicBox *box = Maquette::getInstance()->getBox(boxID);
     if (box != NULL) // Box Found
     {
         if (_assignedItems.value(item).hasCurve){
-        AbstractCurve *abCurve = box->getCurve(address);
+            AbstractCurve *abCurve = box->getCurve(address);
 
-        unsigned int sampleRate;
-        bool redundancy,interpolate;
-        vector<float> values,xPercents,yValues,coeff;
-        vector<string> argTypes;
-        vector<short> sectionType;
+            unsigned int sampleRate;
+            bool redundancy,interpolate;
+            vector<float> values,xPercents,yValues,coeff;
+            vector<string> argTypes;
+            vector<short> sectionType;
 
-        if (abCurve != NULL) // Abstract Curve found
-        {
-                std::cout<<"curve found -> we set it"<<std::endl;
+            if (abCurve != NULL) // Abstract Curve found
+            {
+                std::cout<<"curveFound"<<std::endl;
+
+
                 bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                 if (getCurveSuccess) {
-                   setSampleRate(item,sampleRate);
-//                   setHasCurve(item,true);
+                    if (xPercents.empty() && yValues.empty() && values.size() >= 2) {
+                        if (values.front() == values.back())
+                            interpolate = false;
+                    }
+//                       curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
+//                       box->setCurve(address,curveTab->abstractCurve());
+                    updateLine(item,interpolate,sampleRate,redundancy);
                 }
-         }
-
-
-        else // Abstract Curve not found
-        {
-            std::cout<<"curve not found ";
-            bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
-            if (getCurveSuccess){
-                std::cout<<"-> we set it "<<std::endl;
-               setSampleRate(item,sampleRate);
-//               setHasCurve(item,true);
             }
-        }
-            item->setText(SR_COLUMN,QString::number(getSampleRate(item)));
+
+            else // Abstract Curve not found
+            {
+                interpolate = true;
+                std::cout<<"curve not found ";
+                bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
+                if (getCurveSuccess){
+                    if (xPercents.empty() && yValues.empty() && values.size() >= 2) {
+                        if (values.front() == values.back())
+                            interpolate = false;
+                    }
+                    updateLine(item,interpolate,sampleRate,redundancy);
+                }
+
+            }
         }
     }
     else // Box Not Found
-    {
+        {
         std::cout<<"Box not found"<<std::endl;
         return false;
-    }
+        }
     return false;
 }
 
@@ -1354,4 +1365,33 @@ NetworkTree::setCurveActivated(QTreeWidgetItem *item, bool activated){
     Data data = _assignedItems.value(item);
     data.curveActivated = activated;
     _assignedItems.insert(item,data);
+}
+
+void
+NetworkTree::setRedundancy(QTreeWidgetItem *item, bool activated){
+    Data data = _assignedItems.value(item);
+    data.redundancy = activated;
+    _assignedItems.insert(item,data);
+}
+
+void
+NetworkTree::updateLine(QTreeWidgetItem *item, bool interpolationState, int sampleRate, bool redundancy){
+
+    //INTERPOLATION STATE
+    setCurveActivated(item, interpolationState);
+    if (interpolationState)
+        item->setCheckState(INTERPOLATION_COLUMN,Qt::Checked);
+    else
+        item->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
+
+    //SAMPLE RATE
+    setSampleRate(item,sampleRate);
+    item->setText(SR_COLUMN,QString::number(getSampleRate(item)));
+
+    //REDUNDANCY
+    setRedundancy(item,redundancy);
+    if (interpolationState)
+        item->setCheckState(REDONDANCY_COLUMN,Qt::Checked);
+    else
+        item->setCheckState(REDONDANCY_COLUMN,Qt::Unchecked);
 }

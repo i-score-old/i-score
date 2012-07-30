@@ -1288,7 +1288,6 @@ AttributesEditor::changeColor() {
 void
 AttributesEditor::startMessagesChanged()
 {
-//    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
     QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
     vector<string> networkMsgs = _networkTree->startMessages()->computeMessages();
 
@@ -1323,7 +1322,6 @@ AttributesEditor::endMessagesChanged()
 
 void AttributesEditor::startMessageChanged(QTreeWidgetItem *item) {
     string address = _networkTree->getAbsoluteAddress(item).toStdString();
-    _networkTree->updateCurve(item,_boxEdited);
     //PAS OPTIMAL, NE DEVRAIT MODIFIER QU'UN SEUL ITEM
     QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
     Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
@@ -1334,18 +1332,21 @@ void AttributesEditor::startMessageChanged(QTreeWidgetItem *item) {
     _networkTree->updateStartMsgsDisplay();
     //_networkTree->updateInterpolation();
 //    std::cout<<"---Après update : "<< item->text(0).toStdString()<<" "<<_networkTree->assignedItems().value(item).sampleRate<<std::endl;
+    _networkTree->updateCurve(item,_boxEdited);
     _curvesWidget->updateCurve(address);
 }
 
 void AttributesEditor::endMessageChanged(QTreeWidgetItem *item) {
+    std::cout<<"AttributeEditor::endMessageChanged"<<std::endl;
     string address = _networkTree->getAbsoluteAddress(item).toStdString();
-    _networkTree->updateCurve(item,_boxEdited);
+//    _networkTree->updateCurve(item,_boxEdited);
     QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
     Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
 
     Maquette::getInstance()->setLastMessagesToSend(_boxEdited,_networkTree->endMessages()->computeMessages());
     Maquette::getInstance()->setEndMessages(_boxEdited,_networkTree->endMessages());
 
+    _networkTree->updateCurve(item,_boxEdited);
     _networkTree->updateEndMsgsDisplay();
     _curvesWidget->updateCurve(address);
 }

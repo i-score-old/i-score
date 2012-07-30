@@ -309,7 +309,8 @@ class NetworkTree : public QTreeWidget
         void setSampleRate(QTreeWidgetItem *item, unsigned int sampleRate);
         void setHasCurve(QTreeWidgetItem *item, bool val);
         void setCurveActivated(QTreeWidgetItem *item, bool activated);
-
+        void setRedundancy(QTreeWidgetItem *item, bool activated);
+        void updateLine(QTreeWidgetItem *item, bool interpolationState, int sampleRate, bool redundancy);
 
         virtual void keyPressEvent(QKeyEvent *event);
         virtual void keyReleaseEvent(QKeyEvent *event);

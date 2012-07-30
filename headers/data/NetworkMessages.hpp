@@ -38,6 +38,7 @@ struct Data {
     QString address;
     bool hasCurve;
     bool curveActivated;
+    bool redundancy;
 };
 
 /**!
