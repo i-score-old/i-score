@@ -778,6 +778,8 @@ AttributesEditor::connectSlots()
     //NICO
     connect(_networkTree, SIGNAL(itemExpanded(QTreeWidgetItem *)),this,SLOT(addToExpandedItemsList(QTreeWidgetItem*)));
     connect(_networkTree, SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(removeFromExpandedItemsList(QTreeWidgetItem*)));
+    connect(_networkTree,SIGNAL(curveActivationChanged(QTreeWidgetItem*,bool)),this,SLOT(curveActivationChanged(QTreeWidgetItem*,bool)));
+    connect(_networkTree,SIGNAL(curveRedundancyChanged(QTreeWidgetItem*,bool)),this,SLOT(curveRedundancyChanged(QTreeWidgetItem*,bool)));
 
 	connect(_treeMapLoad, SIGNAL(clicked()), this, SLOT(reloadTreeMap()));
 	connect(_treeMapUp, SIGNAL(clicked()), this, SLOT(upTreeMap()));
@@ -1545,3 +1547,20 @@ AttributesEditor::removeFromExpandedItemsList(QTreeWidgetItem *item){
         Maquette::getInstance()->removeFromExpandedItemsList(_boxEdited,item);
 }
 
+void
+AttributesEditor::curveActivationChanged(QTreeWidgetItem *item, bool activated){
+    string address = _networkTree->getAbsoluteAddress(item).toStdString();
+    if (_boxEdited != NO_ID){
+        Maquette::getInstance()->setCurveMuteState(_boxEdited,address,!activated);
+        _networkTree->updateCurve(item,_boxEdited);
+    }
+}
+
+void
+AttributesEditor::curveRedundancyChanged(QTreeWidgetItem *item, bool activated){
+    string address = _networkTree->getAbsoluteAddress(item).toStdString();
+    if (_boxEdited != NO_ID){
+        Maquette::getInstance()->setCurveRedundancy(_boxEdited,address,activated);
+        _networkTree->updateCurve(item,_boxEdited);
+    }
+}

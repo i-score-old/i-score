@@ -235,6 +235,8 @@ class AttributesEditor : public QDockWidget
   void endMessageChanged(QTreeWidgetItem *item);
   void startMessageRemoved(const std::string &address);
   void endMessageRemoved(const std::string &address);
+  void curveActivationChanged(QTreeWidgetItem *item, bool activated);
+  void curveRedundancyChanged(QTreeWidgetItem *item, bool activated);
 
   /*!
    * \brief Updates box start message

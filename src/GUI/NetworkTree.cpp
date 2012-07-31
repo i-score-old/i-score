@@ -49,7 +49,7 @@ static unsigned int VALUE_COLUMN = 1;
 static unsigned int START_COLUMN = 2;
 static unsigned int END_COLUMN = 4;
 static unsigned int INTERPOLATION_COLUMN = 3;
-static unsigned int REDONDANCY_COLUMN = 5;
+static unsigned int REDUNDANCY_COLUMN = 5;
 static unsigned int SR_COLUMN = 6;
 
 bool VALUE_MODIFIED;
@@ -66,13 +66,13 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     setColumnWidth(START_COLUMN,75);
     setColumnWidth(END_COLUMN,75);
     setColumnWidth(INTERPOLATION_COLUMN,50);
-    setColumnWidth(REDONDANCY_COLUMN,50);
+    setColumnWidth(REDUNDANCY_COLUMN,50);
     setColumnWidth(SR_COLUMN,50);
     setHeaderLabels(list);
     list.clear();    
     VALUE_MODIFIED = false;
     connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(itemCollapsed()));
-    connect(this, SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(clickInNetworkTree()));
+    connect(this, SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(clickInNetworkTree(QTreeWidgetItem *,int)));
     connect(this,SIGNAL(itemChanged(QTreeWidgetItem*,int)), this,SLOT(valueChanged(QTreeWidgetItem*,int)));
     connect(this, SIGNAL(startValueChanged(QTreeWidgetItem*,QString)),this,SLOT(changeStartValue(QTreeWidgetItem*,QString)));
     connect(this, SIGNAL(endValueChanged(QTreeWidgetItem*,QString)),this,SLOT(changeEndValue(QTreeWidgetItem*,QString)));
@@ -104,13 +104,13 @@ NetworkTree::load() {
         QTreeWidgetItem *curItem = NULL;
         if (!(*requestableIt)) {
             curItem = new QTreeWidgetItem(deviceName,NodeNoNamespaceType);
-            curItem->setCheckState(0,Qt::Unchecked);
-            curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+//            curItem->setCheckState(0,Qt::Unchecked);
+//            curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
         }
         else {
             curItem = new QTreeWidgetItem(deviceName,NodeNamespaceType);
-            curItem->setCheckState(0,Qt::Unchecked);
-            curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+//            curItem->setCheckState(0,Qt::Unchecked);
+//            curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
 
             try{
                 treeRecursiveExploration(curItem);
@@ -372,7 +372,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
             QStringList list;
             list << QString::fromStdString(*it);
             QTreeWidgetItem *childItem = new QTreeWidgetItem(list,LeaveType);
-            curItem->setCheckState(NAME_COLUMN,Qt::Unchecked);
+//            curItem->setCheckState(NAME_COLUMN,Qt::Unchecked);
             curItem->setCheckState(START_COLUMN,Qt::Unchecked);
             curItem->setCheckState(END_COLUMN,Qt::Unchecked);
             curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
@@ -393,17 +393,17 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
                 font.setCapitalization(QFont::SmallCaps);
                 curItem->setText(1,leave_value);
                 curItem->setFont(1,font);
-                curItem->setCheckState(NAME_COLUMN,Qt::Unchecked);
+//                curItem->setCheckState(NAME_COLUMN,Qt::Unchecked);
                 curItem->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
-                curItem->setCheckState(REDONDANCY_COLUMN,Qt::Unchecked);
-                curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+                curItem->setCheckState(REDUNDANCY_COLUMN,Qt::Unchecked);
+                curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
             }
         }
         for (it = nodes.begin() ; it != nodes.end() ; ++it) {
             QStringList list;
             list << QString::fromStdString(*it);
             QTreeWidgetItem *childItem = new QTreeWidgetItem(list,NodeNamespaceType);
-            curItem->setCheckState(0,Qt::Unchecked);
+//            curItem->setCheckState(0,Qt::Unchecked);
             curItem->setCheckState(START_COLUMN,Qt::Unchecked);
             curItem->setCheckState(END_COLUMN,Qt::Unchecked);
             curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
@@ -569,7 +569,7 @@ NetworkTree::editValue(){
         if(currentColumn() == END_COLUMN){
             VALUE_MODIFIED = true;
         }
-        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
         item->setSelected(true);
     }
 
@@ -579,7 +579,7 @@ void
 NetworkTree::resetNetworkTree(){
     clearColumn(SR_COLUMN);
     clearColumn(INTERPOLATION_COLUMN);
-    clearColumn(REDONDANCY_COLUMN);
+    clearColumn(REDUNDANCY_COLUMN);
     resetSelectedItems();
     resetAssignedItems();
     resetAssignedNodes();
@@ -601,10 +601,10 @@ NetworkTree::resetNetworkTree(){
 void
 NetworkTree::assignItem(QTreeWidgetItem *item, Data data){
     QFont font;
-    item->setFont(0,font);
+//    item->setFont(NAME_COLUMN,font);
     item->setSelected(true);
-    item->setCheckState(0,Qt::Checked);
-    item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+//    item->setCheckState(0,Qt::Checked);
+//    item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
     if (hasStartEndMsg(item))
         data.hasCurve = true;
 
@@ -1066,11 +1066,9 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event){
         if(currentColumn() == END_COLUMN){
             VALUE_MODIFIED = true;
         }
-        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
         item->setSelected(true);
     }
-
-
 }
 
 void
@@ -1089,19 +1087,40 @@ NetworkTree::keyPressEvent(QKeyEvent *event){
 }
 
 void
-NetworkTree::clickInNetworkTree(){
+NetworkTree::clickInNetworkTree(QTreeWidgetItem *item,int column){
+//    QTreeWidgetItem *item = currentItem();
 
-    QTreeWidgetItem *item = currentItem();
+    if(item!=NULL){
+        if(item->isSelected()){
+            recursiveChildrenSelection(item, true);
+            recursiveFatherSelection(item,true);
+        }
 
-    if(item->isSelected()){
-        recursiveChildrenSelection(item, true);
-        recursiveFatherSelection(item,true);
-    }
+        if(!item->isSelected()){
+            unselectPartially(item);
+            recursiveChildrenSelection(item, false);
+            recursiveFatherSelection(item,false);
+        }
 
-    if(!item->isSelected()){
-        unselectPartially(item);
-        recursiveChildrenSelection(item, false);
-        recursiveFatherSelection(item,false);
+        if (item->type()==LeaveType && column == INTERPOLATION_COLUMN){
+            if(isAssigned(item) && hasCurve(item)){
+                bool activated = item->checkState(column)==Qt::Checked;
+                std::cout<<"<<<curveActivationChanged>>>"<<std::endl;
+                emit(curveActivationChanged(item,activated));
+            }
+            else
+                item->setCheckState(column,Qt::Unchecked);
+        }
+
+        if (item->type()==LeaveType && column == REDUNDANCY_COLUMN){
+            if(isAssigned(item) && hasCurve(item)){
+                bool activated = item->checkState(column)==Qt::Checked;
+                std::cout<<"<<<curveRedundancyChanged>>>"<<std::endl;
+                emit(curveRedundancyChanged(item,activated));
+            }
+            else
+                item->setCheckState(column,Qt::Unchecked);
+        }
     }
 
     if(selectionMode()==QAbstractItemView::ContiguousSelection){
@@ -1115,8 +1134,10 @@ NetworkTree::clickInNetworkTree(){
     }
 }
 
+
 void
 NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
+
     Data data;
     data.hasCurve = false;
     data.address = getAbsoluteAddress(item);
@@ -1130,8 +1151,9 @@ NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
         VALUE_MODIFIED = FALSE;
         assignItem(item,data);
         emit(endValueChanged(item,item->text(END_COLUMN)));
-
     }
+
+
 }
 
 void
@@ -1278,8 +1300,6 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID)
             if (abCurve != NULL) // Abstract Curve found
             {
                 std::cout<<"curveFound"<<std::endl;
-
-
                 bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                 if (getCurveSuccess) {
                     if (xPercents.empty() && yValues.empty() && values.size() >= 2) {
@@ -1288,6 +1308,7 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID)
                     }
 //                       curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
 //                       box->setCurve(address,curveTab->abstractCurve());
+
                     updateLine(item,interpolate,sampleRate,redundancy);
                 }
             }
@@ -1350,7 +1371,6 @@ NetworkTree::setSampleRate(QTreeWidgetItem *item, unsigned int sampleRate){
     Data data = _assignedItems.value(item);
     data.sampleRate = sampleRate;
     _assignedItems.insert(item,data);
-    std::cout<<"---SET SAMPLE RATE : "<< item->text(0).toStdString()<<" "<<_assignedItems.value(item).sampleRate<<std::endl;
 }
 
 void
@@ -1390,8 +1410,9 @@ NetworkTree::updateLine(QTreeWidgetItem *item, bool interpolationState, int samp
 
     //REDUNDANCY
     setRedundancy(item,redundancy);
-    if (interpolationState)
-        item->setCheckState(REDONDANCY_COLUMN,Qt::Checked);
+    if (redundancy)
+        item->setCheckState(REDUNDANCY_COLUMN,Qt::Checked);
     else
-        item->setCheckState(REDONDANCY_COLUMN,Qt::Unchecked);
+        item->setCheckState(REDUNDANCY_COLUMN,Qt::Unchecked);
 }
+

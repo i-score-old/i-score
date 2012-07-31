@@ -323,7 +323,8 @@ class NetworkTree : public QTreeWidget
 //        void startMessageValueChanged(const std::string &address);
         void startMessageValueChanged(QTreeWidgetItem *);
         void endMessageValueChanged(QTreeWidgetItem *);
-
+        void curveActivationChanged(QTreeWidgetItem *, bool);
+        void curveRedundancyChanged(QTreeWidgetItem *, bool);
 
     private :
         void treeRecursiveExploration(QTreeWidgetItem *curItem);
@@ -375,7 +376,7 @@ class NetworkTree : public QTreeWidget
 
 	public slots:
         void itemCollapsed();
-        void clickInNetworkTree();
+        void clickInNetworkTree(QTreeWidgetItem *item,int column);
         void valueChanged(QTreeWidgetItem* item,int column);
         void changeStartValue(QTreeWidgetItem* item,QString newValue);
         void changeEndValue(QTreeWidgetItem* item,QString newValue);
