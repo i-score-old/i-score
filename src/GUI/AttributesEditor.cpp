@@ -780,6 +780,7 @@ AttributesEditor::connectSlots()
     connect(_networkTree, SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(removeFromExpandedItemsList(QTreeWidgetItem*)));
     connect(_networkTree,SIGNAL(curveActivationChanged(QTreeWidgetItem*,bool)),this,SLOT(curveActivationChanged(QTreeWidgetItem*,bool)));
     connect(_networkTree,SIGNAL(curveRedundancyChanged(QTreeWidgetItem*,bool)),this,SLOT(curveRedundancyChanged(QTreeWidgetItem*,bool)));
+    connect(_networkTree,SIGNAL(curveSampleRateChanged(QTreeWidgetItem*,int)),this,SLOT(curveSampleRateChanged(QTreeWidgetItem*,int)));
 
 	connect(_treeMapLoad, SIGNAL(clicked()), this, SLOT(reloadTreeMap()));
 	connect(_treeMapUp, SIGNAL(clicked()), this, SLOT(upTreeMap()));
@@ -1405,15 +1406,15 @@ AttributesEditor::snapshotStartAssignment()
 
 
     //---------------------------------------- Nouvelle version -------------------------------------
-    QList<QTreeWidgetItem*> assignedItems;// = _networkTree->getSelectedItems();
+//    QList<QTreeWidgetItem*> assignedItems;// = _networkTree->getSelectedItems();
     QMap<QTreeWidgetItem *, Data> treeSnapshot = _networkTree->treeSnapshot(_boxEdited);
 
-    vector<string> snapshot = _networkTree->snapshot();//A ENLEVER
+//    vector<string> snapshot = _networkTree->snapshot();//A ENLEVER
     _networkTree->clearStartMsgs();
 
     if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
         if (!treeSnapshot.empty()) {
-            _startMsgsEditor->setMessages(snapshot);//A ENLEVER
+ //           _startMsgsEditor->setMessages(snapshot);//A ENLEVER
 
             _networkTree->startMessages()->setMessages(treeSnapshot);
 
@@ -1441,7 +1442,8 @@ AttributesEditor::snapshotStartAssignment()
 
 void AttributesEditor::snapshotEndAssignment()
 {
-	vector<string> snapshot = _networkTree->snapshot();
+/*
+    vector<string> snapshot = _networkTree->snapshot();
 
 	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 		if (!snapshot.empty()) {
@@ -1455,8 +1457,8 @@ void AttributesEditor::snapshotEndAssignment()
 	}
 	else {
 		_scene->displayMessage("No box selected during snapshot assignment",INDICATION_LEVEL);
-	}
-
+    }
+*/
     //---------------------------------------- AJOUT NICO - Nouvelle version -------------------------------------
 
     QMap<QTreeWidgetItem *, Data> treeSnapshot = _networkTree->treeSnapshot(_boxEdited);
@@ -1561,6 +1563,16 @@ AttributesEditor::curveRedundancyChanged(QTreeWidgetItem *item, bool activated){
     string address = _networkTree->getAbsoluteAddress(item).toStdString();
     if (_boxEdited != NO_ID){
         Maquette::getInstance()->setCurveRedundancy(_boxEdited,address,activated);
+        _networkTree->updateCurve(item,_boxEdited);
+    }
+}
+
+void
+AttributesEditor::curveSampleRateChanged(QTreeWidgetItem *item, int value){
+    string address = _networkTree->getAbsoluteAddress(item).toStdString();
+    if (_boxEdited != NO_ID){
+        Maquette::getInstance()->setCurveSampleRate(_boxEdited,address,value);
+        std::cout<<"New sample rate : "<<value<<std::endl;
         _networkTree->updateCurve(item,_boxEdited);
     }
 }

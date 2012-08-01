@@ -325,6 +325,7 @@ class NetworkTree : public QTreeWidget
         void endMessageValueChanged(QTreeWidgetItem *);
         void curveActivationChanged(QTreeWidgetItem *, bool);
         void curveRedundancyChanged(QTreeWidgetItem *, bool);
+        void curveSampleRateChanged(QTreeWidgetItem *, int);
 
     private :
         void treeRecursiveExploration(QTreeWidgetItem *curItem);

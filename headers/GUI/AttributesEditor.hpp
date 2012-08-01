@@ -127,7 +127,7 @@ class AttributesEditor : public QDockWidget
 	/*!
 	 * \brief Called to specify that no box is currently edited.
 	 */
-	void noBoxEdited();
+    void noBoxEdited();
 
  protected:
   /*!
@@ -237,6 +237,8 @@ class AttributesEditor : public QDockWidget
   void endMessageRemoved(const std::string &address);
   void curveActivationChanged(QTreeWidgetItem *item, bool activated);
   void curveRedundancyChanged(QTreeWidgetItem *item, bool activated);
+  void curveSampleRateChanged(QTreeWidgetItem *item, int value);
+
 
   /*!
    * \brief Updates box start message

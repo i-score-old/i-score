@@ -53,7 +53,7 @@ static unsigned int REDUNDANCY_COLUMN = 5;
 static unsigned int SR_COLUMN = 6;
 
 bool VALUE_MODIFIED;
-
+bool SR_MODIFIED;
 
 NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 {
@@ -71,6 +71,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     setHeaderLabels(list);
     list.clear();    
     VALUE_MODIFIED = false;
+    SR_MODIFIED = false;
     connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(itemCollapsed()));
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(clickInNetworkTree(QTreeWidgetItem *,int)));
     connect(this,SIGNAL(itemChanged(QTreeWidgetItem*,int)), this,SLOT(valueChanged(QTreeWidgetItem*,int)));
@@ -656,7 +657,7 @@ NetworkTree::unassignItem(QTreeWidgetItem *item){
     QFont font;
     font.setBold(false);
     item->setFont(0,font);
-    item->setCheckState(0,Qt::Unchecked);
+//    item->setCheckState(0,Qt::Unchecked);
     removeAssignItem(item);
     //bold
 }
@@ -667,7 +668,7 @@ NetworkTree::assignTotally(QTreeWidgetItem *item){
     item->setSelected(true);
     font.setBold(true);
     item->setFont(0,font);
-    item->setCheckState(0,Qt::Checked);
+//    item->setCheckState(0,Qt::Checked);
     addNodeTotallyAssigned(item);
 }
 
@@ -678,7 +679,7 @@ NetworkTree::assignPartially(QTreeWidgetItem *item){
     item->setSelected(false);
     font.setBold(true);
     item->setFont(0,font);
-    item->setCheckState(0,Qt::PartiallyChecked);
+//    item->setCheckState(0,Qt::PartiallyChecked);
     for(int i=0; i<columnCount(); i++)
         item->setBackground(i,QBrush(Qt::cyan));
 
@@ -695,7 +696,7 @@ NetworkTree::unassignPartially(QTreeWidgetItem *item){
     item->setFont(0,font);
     for(int i=0; i<columnCount(); i++)
         item->setBackground(i,QBrush(Qt::NoBrush));
-    item->setCheckState(0,Qt::Unchecked);
+//    item->setCheckState(0,Qt::Unchecked);
     item->setCheckState(START_COLUMN,Qt::Unchecked);
     item->setCheckState(END_COLUMN,Qt::Unchecked);
     removeNodePartiallyAssigned(item);
@@ -711,7 +712,7 @@ NetworkTree::unassignTotally(QTreeWidgetItem *item){
     item->setFont(0,font);
     for(int i=0; i<columnCount(); i++)
         item->setBackground(i,QBrush(Qt::NoBrush));
-    item->setCheckState(0,Qt::Unchecked);
+//    item->setCheckState(0,Qt::Unchecked);
     item->setSelected(false);
     item->setCheckState(START_COLUMN,Qt::Unchecked);
     item->setCheckState(END_COLUMN,Qt::Unchecked);
@@ -986,7 +987,7 @@ NetworkTree::resetSelectedItems(){
 
         curItem = *it;
         curItem->setSelected(false);
-        curItem->setCheckState(0,Qt::Unchecked);
+//        curItem->setCheckState(0,Qt::Unchecked);
     }
 
     for (it = _nodesWithSelectedChildren.begin() ; it != _nodesWithSelectedChildren.end() ; ++it){
@@ -999,7 +1000,7 @@ NetworkTree::resetSelectedItems(){
 
         curItem->setFont(0,font);
         curItem->setSelected(false);
-        curItem->setCheckState(0,Qt::Unchecked);
+//        curItem->setCheckState(0,Qt::Unchecked);
         curItem->setCheckState(START_COLUMN,Qt::Unchecked);
         curItem->setCheckState(END_COLUMN,Qt::Unchecked);
     }
@@ -1056,19 +1057,25 @@ void
 NetworkTree::mouseDoubleClickEvent(QMouseEvent *event){
 //    mouseDoubleClickEvent(event);
 
-    if(currentColumn() == START_COLUMN || currentColumn() == END_COLUMN){
+    if(currentColumn() == START_COLUMN || currentColumn() == END_COLUMN || currentColumn() == SR_COLUMN){
         QTreeWidgetItem *item = currentItem();
         item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
         editItem(item,currentColumn());
+
         if(currentColumn() == START_COLUMN){
             VALUE_MODIFIED = true;
         }
         if(currentColumn() == END_COLUMN){
             VALUE_MODIFIED = true;
         }
+        if(currentColumn() == SR_COLUMN){
+            SR_MODIFIED = true;
+        }
         item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
         item->setSelected(true);
     }
+
+
 }
 
 void
@@ -1105,7 +1112,6 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item,int column){
         if (item->type()==LeaveType && column == INTERPOLATION_COLUMN){
             if(isAssigned(item) && hasCurve(item)){
                 bool activated = item->checkState(column)==Qt::Checked;
-                std::cout<<"<<<curveActivationChanged>>>"<<std::endl;
                 emit(curveActivationChanged(item,activated));
             }
             else
@@ -1115,7 +1121,6 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item,int column){
         if (item->type()==LeaveType && column == REDUNDANCY_COLUMN){
             if(isAssigned(item) && hasCurve(item)){
                 bool activated = item->checkState(column)==Qt::Checked;
-                std::cout<<"<<<curveRedundancyChanged>>>"<<std::endl;
                 emit(curveRedundancyChanged(item,activated));
             }
             else
@@ -1141,6 +1146,7 @@ NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
     Data data;
     data.hasCurve = false;
     data.address = getAbsoluteAddress(item);
+
     if (item->type()==LeaveType && column == START_COLUMN && VALUE_MODIFIED){
         VALUE_MODIFIED = FALSE;
         assignItem(item,data);
@@ -1153,7 +1159,10 @@ NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
         emit(endValueChanged(item,item->text(END_COLUMN)));
     }
 
-
+    if (item->type()==LeaveType && column == SR_COLUMN && SR_MODIFIED){
+        SR_MODIFIED = FALSE;
+        emit(curveSampleRateChanged(item,(item->text(SR_COLUMN)).toInt()));
+    }
 }
 
 void
