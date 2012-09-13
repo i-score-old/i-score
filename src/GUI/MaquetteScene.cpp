@@ -65,6 +65,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "TextEdit.hpp"
 #include "PreviewArea.hpp"
 #include "PlayingThread.hpp"
+#include "CurvesWidget.hpp"
 
 #include <sstream>
 #include <map>
@@ -125,6 +126,51 @@ MaquetteScene::init()
 	_relationBoxFound = false;
 
 	_mousePos = QPointF(0.,0.);
+
+    //NICO TEST
+    QComboBox *combo = new QComboBox();
+    combo->addItem("BRIT");
+    combo->addItem("CrAT");
+//    QGroupBox *groupBox = new QGroupBox("Contact Details");
+//    QLabel *numberLabel = new QLabel("Telephone number");
+//    QLineEdit *numberEdit = new QLineEdit;
+
+//    QFormLayout *layout = new QFormLayout;
+//    layout->addRow(numberLabel, numberEdit);
+//    groupBox->setLayout(layout);
+
+//    QGraphicsProxyWidget *proxy = addWidget(combo);
+
+    QWidget *widget = new QWidget();
+
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(combo);
+
+    QLineEdit *numberEdit = new QLineEdit;
+    layout->addWidget(numberEdit);
+
+    CurvesWidget *curve = new CurvesWidget(widget);
+
+    layout->addWidget(curve);
+
+    widget->setLayout(layout);
+//    QGraphicsItem *item = new QGraphicsItem;
+
+//    QGraphicsItem *item = new QGraphicsItem();
+    QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget();// = addWidget(widget);
+
+    proxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+
+    proxy->setFlag(QGraphicsItem::ItemIsMovable, true);
+    proxy->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    proxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
+//    proxy->setFlag(ItemSendsGeometryChanges,true);
+    proxy->setVisible(true);
+    proxy->setAcceptsHoverEvents(true);
+    proxy->setZValue(0);
+    proxy->setWidget(widget);
+
+    //NICO TEST end
 }
 
 void
@@ -1213,6 +1259,12 @@ MaquetteScene::addSoundBox(const QPointF &topLeft, const QPointF &bottomRight, c
 	newBox->setPos(newBox->getCenter());
 	newBox->update();
 	addItem(newBox);
+
+    //NICO TEST
+    QWidget *widget = new QWidget();
+    CurvesWidget *curves = new CurvesWidget(widget);
+    addWidget(widget);
+    //NICO TEST end
 
 	_currentZValue++;
 

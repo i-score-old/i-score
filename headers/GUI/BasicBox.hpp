@@ -55,6 +55,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "AbstractBox.hpp"
 #include "CSPTypes.hpp"
 #include "CurvesWidget.hpp"
+#include "BoxWidget.hpp"
 
 class MaquetteScene;
 class QGraphicsTextItem;
@@ -538,6 +539,9 @@ class BasicBox : public QGraphicsItem
    * \return true if this begins before box
    */
   bool operator<(BasicBox *box) const;
+  void updateCurves();
+  void centerWidget();
+  void createWidget();
 
  protected:
   /*!
@@ -620,6 +624,10 @@ class BasicBox : public QGraphicsItem
   std::map<BoxExtremity,TriggerPoint*> _triggerPoints; //!< The trigger points.
   std::map < BoxExtremity,std::map < unsigned int, Relation* > > _relations; //!< The relations.
   std::map<std::string,AbstractCurve*> _abstractCurves; //!< The Curves
+//  BoxWidget *_curvesWidget;
+  BoxWidget *_curvesWidget;
+//  CurvesWidget *_curvesWidget;
+  QWidget *_boxWidget;
 };
 
 #endif

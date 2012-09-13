@@ -97,6 +97,7 @@ private :
 
 	friend class CurveWidget;
 	friend class CurvesWidget;
+    friend class BoxWidget;
 };
 
 #endif

@@ -385,7 +385,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
             QStringList list;
             list << QString::fromStdString(*it + " : " + *it2);
             QTreeWidgetItem *childItem = new QTreeWidgetItem(list,AttributeType);
-            curItem->addChild(childItem);
+//            curItem->addChild(childItem);
             list.clear();
 
             if(it2==attributesValues.begin()){
@@ -1292,7 +1292,6 @@ NetworkTree::getSampleRate(QTreeWidgetItem *item){
 bool
 NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID)
 {
-
     string address = getAbsoluteAddress(item).toStdString();
     BasicBox *box = Maquette::getInstance()->getBox(boxID);
     if (box != NULL) // Box Found

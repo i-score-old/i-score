@@ -56,6 +56,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QBuffer>
 #include <QPainter>
 #include <QProgressBar>
+
 #include "TextEdit.hpp"
 
 #include <vector>

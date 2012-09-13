@@ -124,7 +124,7 @@ AttributesEditor::init() {
 
 	setAcceptDrops(false);
 
-    setMinimumWidth(MINIMUM_WIDTH);
+    //setMinimumWidth(MINIMUM_WIDTH);
 
 	noBoxEdited();
 }
@@ -832,6 +832,7 @@ AttributesEditor::resetProfiles()
 void
 AttributesEditor::setAttributes(AbstractBox *abBox)
 {
+    std::cout<<"AttributesEditor SET ATTRIBUTE "<<std::endl;
 	bool boxModified = (_boxEdited != abBox->ID());
 
 	_boxEdited = abBox->ID();
@@ -889,6 +890,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 	//if (_boxEdited != NO_ID) {
 		_curvesWidget->updateMessages(_boxEdited,false);
         _networkTree->updateCurves(_boxEdited);
+
 	//}
 
 	if (abBox->type() == ABSTRACT_SOUND_BOX_TYPE || abBox->type() == ABSTRACT_CONTROL_BOX_TYPE
@@ -928,13 +930,14 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 void
 AttributesEditor::updateWidgets(bool boxModified)
 {
+    std::cout<<"AttributesEditor::updateWidgets ... ";
 	BasicBox * box = _scene->getBox(_boxEdited);
 	if (box != NULL) {
 		_boxStartValue->setValue(box->beginPos() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
 		double savedLengthValue = _boxLengthValue->value();
 		_boxLengthValue->setValue(box->width() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
 		if (!boxModified && _boxLengthValue->value() != savedLengthValue) {
-			_curvesWidget->updateMessages(_boxEdited,true);
+            _curvesWidget->updateMessages(_boxEdited,true);
 		}
 		_boxName->setText(box->name());
 	}
@@ -1027,6 +1030,7 @@ AttributesEditor::updateWidgets(bool boxModified)
 	pitchStartChanged();
 
 	update();
+    std::cout<<"OK"<<std::endl;
 }
 
 Palette
@@ -1303,6 +1307,10 @@ AttributesEditor::startMessagesChanged()
 //    _networkTree->updateEndMsgsDisplay();
 	_curvesWidget->updateMessages(_boxEdited,true);
     _networkTree->updateCurves(_boxEdited);
+    //NICO
+    BasicBox * box = _scene->getBox(_boxEdited);
+    box->updateCurves();
+    //NICO
 }
 
 void
@@ -1321,6 +1329,10 @@ AttributesEditor::endMessagesChanged()
     _networkTree->updateEndMsgsDisplay();
     _curvesWidget->updateMessages(_boxEdited,true);
     _networkTree->updateCurves(_boxEdited);
+    //NICO
+    BasicBox * box = _scene->getBox(_boxEdited);
+    box->updateCurves();
+    //NICO
 }
 
 void AttributesEditor::startMessageChanged(QTreeWidgetItem *item) {
@@ -1337,6 +1349,10 @@ void AttributesEditor::startMessageChanged(QTreeWidgetItem *item) {
 //    std::cout<<"---Après update : "<< item->text(0).toStdString()<<" "<<_networkTree->assignedItems().value(item).sampleRate<<std::endl;
     _networkTree->updateCurve(item,_boxEdited);
     _curvesWidget->updateCurve(address);
+    //NICO
+    BasicBox * box = _scene->getBox(_boxEdited);
+    box->updateCurves();
+    //NICO
 }
 
 void AttributesEditor::endMessageChanged(QTreeWidgetItem *item) {
@@ -1350,8 +1366,13 @@ void AttributesEditor::endMessageChanged(QTreeWidgetItem *item) {
     Maquette::getInstance()->setEndMessages(_boxEdited,_networkTree->endMessages());
 
     _networkTree->updateCurve(item,_boxEdited);
+
     _networkTree->updateEndMsgsDisplay();
     _curvesWidget->updateCurve(address);
+    //NICO
+    BasicBox * box = _scene->getBox(_boxEdited);
+    box->updateCurves();
+    //NICO
 }
 
 void AttributesEditor::startMessageRemoved(const string &address) {

@@ -50,6 +50,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "TextEdit.hpp"
 #include "MainWindow.hpp"
 #include "Relation.hpp"
+#include "CurveWidget.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -67,6 +68,10 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QKeyEvent>
 #include <QString>
 #include <QTranslator>
+#include <QGraphicsWidget>
+#include <QGraphicsLayout>
+#include <QGraphicsProxyWidget>
+#include <QGridLayout>
 
 using std::string;
 using std::vector;
@@ -75,6 +80,7 @@ using std::map;
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
 : QGraphicsItem()
 {
+
 	_scene = parent;
 
 	int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
@@ -90,9 +96,43 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 	_abstract->setWidth(xmax-xmin);
 	_abstract->setHeight(ymax-ymin);
 
+//    _boxWidget = new QWidget();
+//    _curvesWidget = new CurvesWidget(_boxWidget);
+    createWidget();
+
 	init();
 
-	update();
+    update();
+}
+
+void
+BasicBox::centerWidget(){
+    _boxWidget->move(-(width())/2 + LINE_WIDTH,-(height())/2 + (RESIZE_TOLERANCE - LINE_WIDTH));
+    _boxWidget->resize(width() - 2*LINE_WIDTH,height()-RESIZE_TOLERANCE-LINE_WIDTH);
+}
+
+void
+BasicBox::createWidget(){
+
+    _boxWidget = new QWidget();
+//    _curvesWidget = new CurvesWidget(_boxWidget);
+    _curvesWidget = new BoxWidget(_boxWidget);
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(_curvesWidget);
+
+    _boxWidget->setLayout(layout);
+    _curvesWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
+
+    proxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+    proxy->setFlag(QGraphicsItem::ItemIsMovable, true);
+    proxy->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    proxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
+    proxy->setVisible(true);
+    proxy->setAcceptsHoverEvents(true);
+    proxy->setWidget(_boxWidget);
+
+//    centerWidget();
 }
 
 BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
@@ -105,6 +145,8 @@ BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
 	init();
 
 	update();
+
+
 }
 
 BasicBox::~BasicBox()
@@ -117,12 +159,14 @@ BasicBox::~BasicBox()
 void
 BasicBox::init()
 {
+    std::cout<<"INIT()\n";
 	_hasContextMenu = false;
 	_shift = false;
 
 	_playing = false;
 
 	_comment = NULL;
+
 
 	setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
@@ -134,6 +178,13 @@ BasicBox::init()
 	setAcceptsHoverEvents(true);
 
 	setZValue(0);
+//    createWidget();
+}
+
+void
+BasicBox::updateCurves(){
+    std::cout<<"BBOX UPDATECURVES"<<std::endl;
+    _curvesWidget->updateMessages(_abstract->ID(),true);
 }
 
 int
@@ -293,6 +344,7 @@ BasicBox::resizeWidthEdition(float width)
 		}
 	}
 	_abstract->setWidth(newWidth);
+    centerWidget();
 }
 
 void
@@ -624,7 +676,7 @@ void
 BasicBox::setCurve(const string &address, AbstractCurve *curve)
 {
 	if (curve != NULL) {
-		_abstractCurves[address] = curve;        
+        _abstractCurves[address] = curve;
 	}
 	else {
 		removeCurve(address);
@@ -1127,7 +1179,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
 	if (!playing()) {
 		painter->setPen(Qt::lightGray);
-		painter->setBrush(QBrush(Qt::white,Qt::Dense7Pattern));
+        painter->setBrush(QBrush(Qt::white,Qt::Dense7Pattern));
 		painter->drawRect(boundingRect());
 	}
 
@@ -1136,7 +1188,6 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 	QPen pen(color(),isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
 	painter->setPen(pen);
 	painter->setBrush(brush);
-
 	painter->setRenderHint(QPainter::Antialiasing, true);
 
 	QRectF textRect = QRectF(mapFromScene(getTopLeft()).x(),mapFromScene(getTopLeft()).y(), width(), RESIZE_TOLERANCE - LINE_WIDTH);
@@ -1178,4 +1229,5 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 		painter->drawLine(QPointF(progressPosX,RESIZE_TOLERANCE),QPointF(progressPosX,_abstract->height()));
 	}
 	painter->translate(QPointF(0,0) - boundingRect().topLeft());
+
 }
