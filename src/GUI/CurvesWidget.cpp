@@ -59,12 +59,14 @@ using std::string;
 
 CurvesWidget::CurvesWidget(QWidget *parent)
 : QTabWidget(parent) {
-    setBackgroundRole(QPalette::Base);
+//    setBackgroundRole(QPalette::Base);
+    setAttribute(Qt::WA_TranslucentBackground,true);
     setUsesScrollButtons(true);
     setElideMode(Qt::ElideLeft);
     update();
     _comboBox = new QComboBox(this);
     _tabWidget = new QTabWidget(_comboBox);
+
 //    _tabWidget->setUsesScrollButtons(true);
 //    _tabWidget->setElideMode(Qt::ElideLeft);
     _curvePageWidget = new QWidget(this);

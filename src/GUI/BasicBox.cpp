@@ -108,7 +108,7 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 void
 BasicBox::centerWidget(){
     _boxWidget->move(-(width())/2 + LINE_WIDTH,-(height())/2 + (RESIZE_TOLERANCE - LINE_WIDTH));
-    _boxWidget->resize(width() - 2*LINE_WIDTH,height()-RESIZE_TOLERANCE-LINE_WIDTH);
+    _boxWidget->resize(width() - 2*LINE_WIDTH,height()-1.5*RESIZE_TOLERANCE);
 }
 
 void
@@ -121,15 +121,16 @@ BasicBox::createWidget(){
     layout->addWidget(_curvesWidget);
 
     _boxWidget->setLayout(layout);
+
     _curvesWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
 
     proxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
-    proxy->setFlag(QGraphicsItem::ItemIsMovable, true);
-    proxy->setFlag(QGraphicsItem::ItemIsSelectable, true);
+//    proxy->setFlag(QGraphicsItem::ItemIsMovable, true);
+//    proxy->setFlag(QGraphicsItem::ItemIsSelectable, true);
     proxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
     proxy->setVisible(true);
-    proxy->setAcceptsHoverEvents(true);
+    proxy->setAcceptsHoverEvents(true);    
     proxy->setWidget(_boxWidget);
 
 //    centerWidget();
@@ -904,9 +905,13 @@ void
 BasicBox::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
 
     QGraphicsItem::mouseDoubleClickEvent(event);
+    QRectF textRect(mapFromScene(getTopLeft()).x(),mapFromScene(getTopLeft()).y(), width(), RESIZE_TOLERANCE - LINE_WIDTH);
+    qreal x1,x2,y1,y2;
+    textRect.getCoords(&x1,&y1,&x2,&y2);
+    bool inTextRect = event->pos().x() > x1 && event->pos().x() < x2 && event->pos().y() > y1 && event->pos().y() < y2;
 
-    if (!_scene->playing() && (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor)) {
 
+    if (!_scene->playing() && (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor) && inTextRect) {
         QInputDialog *nameDialog = nameInputDialog();
 
         bool ok = nameDialog->exec();
@@ -919,17 +924,10 @@ BasicBox::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
          }
 
      delete nameDialog;
+    }
 
-//        TextEdit * boxMsgEdit = new TextEdit(_scene->views().first(),QObject::tr("Enter the box name :").toStdString(), this->_abstract->name());
-//        bool ok = boxMsgEdit->exec();
-
-//        if (ok) {
-//            _abstract->setName(boxMsgEdit->value());
-//            this->update();
-//            _scene->displayMessage(QObject::tr("Box's name successfully updated").toStdString(),INDICATION_LEVEL);
-//        }
-//    delete boxMsgEdit;
-
+    else{
+//        emit(doubleClickInBox());
     }
 }
 
@@ -1175,17 +1173,23 @@ void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	Q_UNUSED(option);
-	Q_UNUSED(widget);
+	Q_UNUSED(widget);  
+    QPen penR(Qt::darkGray,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
+//	if (!playing()) {
 
-	if (!playing()) {
-		painter->setPen(Qt::lightGray);
-        painter->setBrush(QBrush(Qt::white,Qt::Dense7Pattern));
+        painter->setPen(penR);
+//		painter->setPen(Qt::lightGray);
+
+//  NICO modif : Points dans la box
+//        painter->setBrush(QBrush(Qt::white,Qt::Dense7Pattern));
+        painter->setBrush(QBrush(Qt::white,Qt::SolidPattern));
 		painter->drawRect(boundingRect());
-	}
+//	}
 
 	QColor bgColor = color().lighter();
-	QBrush brush(Qt::lightGray,isSelected() ? Qt::SolidPattern : Qt::SolidPattern);
-	QPen pen(color(),isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
+
+    QBrush brush(Qt::lightGray,isSelected() ? Qt::SolidPattern : Qt::SolidPattern);
+    QPen pen(color(),isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
 	painter->setPen(pen);
 	painter->setBrush(brush);
 	painter->setRenderHint(QPainter::Antialiasing, true);
@@ -1218,15 +1222,15 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 	painter->translate(boundingRect().topLeft());
 
 	if (_playing) {
-		QPen pen = painter->pen();
-		QBrush brush = painter->brush();
-		brush.setStyle(Qt::NoBrush);
-		painter->setPen(pen);
-		//brush.setColor(Qt::blue);
-		painter->setBrush(brush);
+        QPen pen = painter->pen();
+        QBrush brush = painter->brush();
+        brush.setStyle(Qt::NoBrush);
+        painter->setPen(pen);
+        brush.setColor(Qt::blue);
+        painter->setBrush(brush);
 		const float progressPosX = _scene->getProgression(_abstract->ID())*(_abstract->width());
 		painter->fillRect(0,_abstract->height()-RESIZE_TOLERANCE/2.,progressPosX,RESIZE_TOLERANCE/2.,Qt::darkGreen);
-		painter->drawLine(QPointF(progressPosX,RESIZE_TOLERANCE),QPointF(progressPosX,_abstract->height()));
+		painter->drawLine(QPointF(progressPosX,RESIZE_TOLERANCE),QPointF(progressPosX,_abstract->height()));       
 	}
 	painter->translate(QPointF(0,0) - boundingRect().topLeft());
 

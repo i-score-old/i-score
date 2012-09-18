@@ -84,6 +84,7 @@ enum BoxExtremity {NO_EXTREMITY = -1, BOX_START = BEGIN_CONTROL_POINT_INDEX,
  */
 class BasicBox : public QGraphicsItem
 {
+
  public :
 
   BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent);
@@ -543,6 +544,8 @@ class BasicBox : public QGraphicsItem
   void centerWidget();
   void createWidget();
 
+
+
  protected:
   /*!
    * \brief Create the QInputDialog, for asking new name.
@@ -611,6 +614,8 @@ class BasicBox : public QGraphicsItem
    */
   virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
+
+
   //! Managing main information of the box.
   AbstractBox *_abstract;
 
@@ -628,6 +633,9 @@ class BasicBox : public QGraphicsItem
   BoxWidget *_curvesWidget;
 //  CurvesWidget *_curvesWidget;
   QWidget *_boxWidget;
+
+//signals :
+// void doubleClickInBox();
 };
 
 #endif

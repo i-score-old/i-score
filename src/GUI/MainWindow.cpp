@@ -337,7 +337,7 @@ MainWindow::print()
 void
 MainWindow::about()
 {
-  QMessageBox::about(this, tr("About Acousmoscribe"),
+  QMessageBox::about(this, tr("About i-score"),
 		     tr("A wonderful music software"));
 }
 
@@ -956,7 +956,7 @@ MainWindow::createStatusBar()
 void
 MainWindow::readSettings()
 {
-  QSettings settings("SCRIME", "Acousmoscribe");
+  QSettings settings("SCRIME", "i-score");
   QPoint pos(0,0);
   QSize size(800,600);
   QVariant value = settings.value("pos");
@@ -975,7 +975,7 @@ MainWindow::readSettings()
 void
 MainWindow::writeSettings()
 {
-  QSettings settings("SCRIME", "Acousmoscribe");
+  QSettings settings("SCRIME", "i-score");
   settings.setValue("pos", pos());
   settings.setValue("size", size());
 }
@@ -1029,7 +1029,7 @@ MainWindow::setCurrentFile(const QString &fileName)
   else {
     shownName = strippedName(_curFile);
   }
-  setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("Acousmoscribe")));
+  setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("i-score")));
 }
 
 QString

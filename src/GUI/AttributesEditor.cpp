@@ -531,7 +531,7 @@ AttributesEditor::addWidgetsToLayout()
 	static const unsigned int PREVIEW_AREA_WIDTH = 3;
 	static const unsigned int PREVIEW_AREA_HEIGHT = 3;
 
-	_centralWidget = _tabWidget;
+    _centralWidget = _tabWidget;
 	_paletteLayout->setSpacing(2*BasicBox::LINE_WIDTH);
 
 	/* AttributesEditor Preview Area associated Buttons */
@@ -711,11 +711,14 @@ AttributesEditor::addWidgetsToLayout()
 
 	// Set Central Widget
 	setWidget(_tabWidget);
-	_generalTabIndex = _tabWidget->addTab(_generalTab,"General");
-	_profilesTabIndex = _tabWidget->addTab(_profilesTab,"Profiles");
-	_messagesTabIndex = _tabWidget->addTab(_messagesTab,"Messages");
+    _tabWidget->setBaseSize(MINIMUM_WIDTH,height());
+
+//	_generalTabIndex = _tabWidget->addTab(_generalTab,"General");
+//	_profilesTabIndex = _tabWidget->addTab(_profilesTab,"Profiles");
+//	_messagesTabIndex = _tabWidget->addTab(_messagesTab,"Messages");
 	_explorationTabIndex = _tabWidget->addTab(_explorationTab,"Exploration");
 	_curvesTabIndex = _tabWidget->addTab(_curvesTab,"Curves");
+
 }
 
 void

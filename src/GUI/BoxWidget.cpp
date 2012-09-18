@@ -63,9 +63,12 @@ using std::string;
 BoxWidget::BoxWidget(QWidget *parent)
 : QWidget(parent) {
 
-//    setBackgroundRole(QPalette::Base);
+//    setBackgroundRole(QPalette::Background);
+    setAttribute(Qt::WA_TranslucentBackground,true);
+
 //    setUsesScrollButtons(true);
 //    setElideMode(Qt::ElideLeft);
+
     update();
 
     _curvePageWidget = new QWidget(this);
@@ -76,6 +79,7 @@ BoxWidget::BoxWidget(QWidget *parent)
     _curveWidget = new CurveWidget(NULL);
     _tabWidget = new QTabWidget(this);
     _tabWidget->lower();
+    _tabWidget->setAttribute(Qt::WA_TranslucentBackground,true);
 //    _tabWidget->setUsesScrollButtons(true);
 //    _tabWidget->setElideMode(Qt::ElideLeft);
 
