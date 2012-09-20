@@ -510,3 +510,11 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
 
 	delete painter;
 }
+
+void
+CurveWidget::setLowerStyle(bool state){
+    //idea : TODO
+    if(state){
+
+    }
+}

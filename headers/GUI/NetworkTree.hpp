@@ -320,7 +320,6 @@ class NetworkTree : public QTreeWidget
     signals :
         void startValueChanged(QTreeWidgetItem *, QString newValue);
         void endValueChanged(QTreeWidgetItem *, QString newValue);
-//        void startMessageValueChanged(const std::string &address);
         void startMessageValueChanged(QTreeWidgetItem *);
         void endMessageValueChanged(QTreeWidgetItem *);
         void curveActivationChanged(QTreeWidgetItem *, bool);
@@ -360,11 +359,7 @@ class NetworkTree : public QTreeWidget
         inline void removeNodeTotallyAssigned(QTreeWidgetItem *item){if (_nodesWithAllChildrenAssigned.contains(item)) _nodesWithAllChildrenAssigned.removeAll(item);}
         void assignTotally(QTreeWidgetItem *item);
         void unassignTotally(QTreeWidgetItem *item);
-//        void assignItem(QTreeWidgetItem *item);
         void assignItem(QTreeWidgetItem *item,Data data);
-
-
-
 
         QMap<QTreeWidgetItem *,string> _addressMap;
         QList<QTreeWidgetItem*> _nodesWithSelectedChildren;

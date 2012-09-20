@@ -9,6 +9,7 @@
 
 #include <QTabWidget>
 #include <QComboBox>
+#include <QStackedWidget>
 #include <map>
 #include <vector>
 #include <string>
@@ -43,14 +44,18 @@ public :
     void updateMessages(unsigned int boxID, bool forceUpdate);
 
     bool contains(const std::string &address);
+    virtual void mouseDoubleClickEvent(QMouseEvent *event);
+    void displayCurveWindow(CurveWidget *curve);
 
-public slots :
+
     void curveActivationChanged(const QString &address,bool state);
     void curveRedundancyChanged(const QString &address,bool state);
     void curveSampleRateChanged(const QString &address,int value);
     void curveShowChanged(const QString &address,bool state);
     void updateCurve(const std::string &address);
     void removeCurve(const std::string &address);
+
+public slots :
     void displayCurve(const QString &address);
 
 private :
@@ -68,9 +73,12 @@ private :
     QWidget *_parentWidget;
     QList <CurveWidget *> *_curveWidgetList;
     QTabWidget *_curve;
-    QWidget *_curvePageWidget;
+    QStackedWidget *_stackedWidget;
     QGridLayout *_curvePageLayout;
     CurveWidget *_curveWidget;
+
+signals :
+
 };
 
 #endif // BOXWIDGET_H

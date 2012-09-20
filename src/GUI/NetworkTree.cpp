@@ -1411,6 +1411,7 @@ NetworkTree::updateLine(QTreeWidgetItem *item, bool interpolationState, int samp
         item->setCheckState(INTERPOLATION_COLUMN,Qt::Checked);
     else
         item->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
+    //TODO remove from comboBox
 
     //SAMPLE RATE
     setSampleRate(item,sampleRate);

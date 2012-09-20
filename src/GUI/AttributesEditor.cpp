@@ -1575,10 +1575,17 @@ AttributesEditor::removeFromExpandedItemsList(QTreeWidgetItem *item){
 
 void
 AttributesEditor::curveActivationChanged(QTreeWidgetItem *item, bool activated){
+    string s1;
+    s1 = activated ? "true" : "false";
+
+    std::cout<<"AttributeEditor::ACTIVATION CHANGED "<< s1 <<std::endl;
     string address = _networkTree->getAbsoluteAddress(item).toStdString();
     if (_boxEdited != NO_ID){
         Maquette::getInstance()->setCurveMuteState(_boxEdited,address,!activated);
         _networkTree->updateCurve(item,_boxEdited);
+        BasicBox * box = _scene->getBox(_boxEdited);
+//        box->curveShowChanged(QString::fromStdString(address),activated);
+        box->updateCurves();
     }
 }
 

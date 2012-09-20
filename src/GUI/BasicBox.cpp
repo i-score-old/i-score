@@ -115,18 +115,18 @@ void
 BasicBox::createWidget(){
 
     _boxWidget = new QWidget();
-//    _curvesWidget = new CurvesWidget(_boxWidget);
     _curvesWidget = new BoxWidget(_boxWidget);
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(_curvesWidget);
-
+    layout->setMargin(0);
+    layout->setAlignment(_boxWidget,Qt::AlignLeft);
     _boxWidget->setLayout(layout);
 
     _curvesWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
 
     proxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
-//    proxy->setFlag(QGraphicsItem::ItemIsMovable, true);
+    proxy->setFlag(QGraphicsItem::ItemIsMovable, false);
 //    proxy->setFlag(QGraphicsItem::ItemIsSelectable, true);
     proxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
     proxy->setVisible(true);
@@ -1234,4 +1234,9 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 	}
 	painter->translate(QPointF(0,0) - boundingRect().topLeft());
 
+}
+
+void
+BasicBox::curveShowChanged(const QString &address,bool state){
+    _curvesWidget->curveShowChanged(address,state);
 }

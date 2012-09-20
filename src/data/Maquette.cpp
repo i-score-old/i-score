@@ -1083,6 +1083,7 @@ Maquette::updateBoxesFromEngines()
 				_engines->getBoxBeginTime(it->first)/MaquetteScene::MS_PER_PIXEL),
 				it->second->getSize().y()));
 		it->second->setPos(it->second->getCenter());
+        it->second->centerWidget();
 		it->second->update();        
 	}
 }

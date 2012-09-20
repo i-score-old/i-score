@@ -104,6 +104,7 @@ public :
 			const std::vector<short> &sectionType, const std::vector<float> &coeff);
 
 	void setAttributes(AbstractCurve *abCurve);
+    void setLowerStyle(bool state);
 
 protected :
 	/*!
