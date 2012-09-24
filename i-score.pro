@@ -1,6 +1,6 @@
 TEMPLATE = app
 CONFIG += debug
-TARGET = acousmoscribe
+TARGET = i-score
 DEPENDPATH += . \
 include \
 #lib \
@@ -141,7 +141,7 @@ src/GUI/ViewRelations.cpp \
 src/data/NetworkMessages.cpp \
 src/GUI/BoxWidget.cpp
 
-RESOURCES += acousmoscribe.qrc
+RESOURCES += i-score.qrc
 
 DEFINES += __Types__
 
