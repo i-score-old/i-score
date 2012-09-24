@@ -1,7 +1,9 @@
 *svn*
 *.o
 moc_*
-acousmoscribe.app
+acousmoscribe.app   
+i-score.app     
+i-score.pro.user
 acousmoscribe.xcodeproj
 qrc_acousmoscribe.cpp
 .DS_Store
@@ -14,3 +16,4 @@ installation/acousmoscribe_MacOS_10_6*
 installation/acousmoscribe_MacOS_10_4*
 installation/acousmoscribe_ubuntu32*
 installation/acousmoscribe_ubuntu64*
+/i-score.pro.user
