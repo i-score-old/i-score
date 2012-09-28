@@ -77,14 +77,18 @@ CurveWidget::~CurveWidget() {}
 
 void CurveWidget::init()
 {
+
+//    setAttribute(Qt::WA_PaintOnScreen,true);
+
 	_abstract = new AbstractCurve(NO_ID,"",0,10,false,true,true,1,vector<float>(),map<float,pair<float,float> >());
 
-	setBackgroundRole(QPalette::Base);
+//    setBackgroundRole(QPalette::Base);
 	setCursor(Qt::CrossCursor);
 	setMouseTracking(true);
 
 	_layout = new QGridLayout;
 	_layout->setAlignment(Qt::AlignCenter);
+
 	_scaleX = 1;
 	_scaleY = 1;
 
@@ -425,90 +429,95 @@ CurveWidget::applyChanges() {
 
 void
 CurveWidget::resizeEvent ( QResizeEvent * event ) {
-	QWidget::resizeEvent(event);
-	curveRepresentationOutdated();
+    QWidget::resizeEvent(event);
+    curveRepresentationOutdated();
+}
+
+void
+CurveWidget::paintEngine(){
+
 }
 
 void CurveWidget::paintEvent(QPaintEvent * /* event */) {
-	QPainter *painter = new QPainter(this);
+    QPainter *painter = new QPainter(this);
 
-	painter->setRenderHint(QPainter::Antialiasing, true);
+    painter->setRenderHint(QPainter::Antialiasing, true);
 
-	static const QColor BASE_COLOR(Qt::black);
-	static const QColor AXE_COLOR(Qt::black);
-	static const QColor X_SUBDIV_COLOR(Qt::gray);
-	static const QColor X_DIV_COLOR(Qt::black);
-	static const QColor EXTREMITY_COLOR(Qt::red);
-	static const QColor CURVE_COLOR(Qt::darkRed);
-	static const QColor BREAKPOINT_COLOR(Qt::blue);
-	static const QColor MOVING_BREAKPOINT_COLOR(Qt::darkBlue);
-	static const QColor UNACTIVE_COLOR(Qt::gray);
+    static const QColor BASE_COLOR(Qt::black);
+    static const QColor AXE_COLOR(Qt::black);
+    static const QColor X_SUBDIV_COLOR(Qt::gray);
+    static const QColor X_DIV_COLOR(Qt::black);
+    static const QColor EXTREMITY_COLOR(Qt::red);
+    static const QColor CURVE_COLOR(Qt::darkRed);
+    static const QColor BREAKPOINT_COLOR(Qt::blue);
+    static const QColor MOVING_BREAKPOINT_COLOR(Qt::darkBlue);
+    static const QColor UNACTIVE_COLOR(Qt::gray);
 
-	painter->setPen(AXE_COLOR);
-	painter->drawLine(0,height()/2.,width(),height()/2.); // Abcisses line
-	painter->setPen(BASE_COLOR);
+    painter->setPen(AXE_COLOR);
+    painter->drawLine(0,height()/2.,width(),height()/2.); // Abcisses line
+    painter->setPen(BASE_COLOR);
 
-	vector<float>::iterator it;
-	map<float,pair<float,float> >::iterator it2;
-	float pointSizeX = 4;
-	float pointSizeY = 4;
-	QPointF curPoint(0,0);
-	QPointF precPoint(-1,-1);
+    vector<float>::iterator it;
+    map<float,pair<float,float> >::iterator it2;
+    float pointSizeX = 4;
+    float pointSizeY = 4;
+    QPointF curPoint(0,0);
+    QPointF precPoint(-1,-1);
 
-	unsigned int i = 0;
-	unsigned int Xdiv = _abstract->_curve.size() / 10;
-	unsigned int XsubDiv = std::max((unsigned int)1,Xdiv) / 10;
+    unsigned int i = 0;
+    unsigned int Xdiv = _abstract->_curve.size() / 10;
+    unsigned int XsubDiv = std::max((unsigned int)1,Xdiv) / 10;
 
-	for (it = _abstract->_curve.begin() ; it != _abstract->_curve.end() ; ++it) {
-		curPoint = absoluteCoordinates(QPointF(1,*it));
-		curPoint.setX(i * _interspace * _scaleX);
+    for (it = _abstract->_curve.begin() ; it != _abstract->_curve.end() ; ++it) {
+        curPoint = absoluteCoordinates(QPointF(1,*it));
+        curPoint.setX(i * _interspace * _scaleX);
 
-		if (XsubDiv != 0) {
-			if ((i % XsubDiv) == 0) {
-				painter->setPen(X_SUBDIV_COLOR);
-				painter->drawLine(QPointF(curPoint.x(),height()/2.-5),QPointF(curPoint.x(),height()/2.+5));
-				painter->setPen(BASE_COLOR);
-			}
-		}
+        if (XsubDiv != 0) {
+            if ((i % XsubDiv) == 0) {
+                painter->setPen(X_SUBDIV_COLOR);
+                painter->drawLine(QPointF(curPoint.x(),height()/2.-5),QPointF(curPoint.x(),height()/2.+5));
+                painter->setPen(BASE_COLOR);
+            }
+        }
 
-		if (Xdiv != 0) {
-			if ((i % Xdiv) == 0) {
-				painter->setPen(X_DIV_COLOR);
-				painter->drawLine(QPointF(curPoint.x(),height()/2.-10),QPointF(curPoint.x(),height()/2.+10));
-				painter->setPen(BASE_COLOR);
-			}
-		}
+        if (Xdiv != 0) {
+            if ((i % Xdiv) == 0) {
+                painter->setPen(X_DIV_COLOR);
+                painter->drawLine(QPointF(curPoint.x(),height()/2.-10),QPointF(curPoint.x(),height()/2.+10));
+                painter->setPen(BASE_COLOR);
+            }
+        }
 
-		if (it == _abstract->_curve.begin()) { // First point is represented by a specific color
-			painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),EXTREMITY_COLOR);
-		}
-		if (precPoint != QPointF(-1,-1)) {
-			painter->setPen(_abstract->_interpolate ? CURVE_COLOR : UNACTIVE_COLOR);
-			painter->drawLine(precPoint,curPoint); // Draw lines between values
-			painter->setPen(BASE_COLOR);
-		}
+        if (it == _abstract->_curve.begin()) { // First point is represented by a specific color
+            painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),EXTREMITY_COLOR);
+        }
+        if (precPoint != QPointF(-1,-1)) {
+            painter->setPen(_abstract->_interpolate ? CURVE_COLOR : UNACTIVE_COLOR);
+            painter->drawLine(precPoint,curPoint); // Draw lines between values
+            painter->setPen(BASE_COLOR);
+        }
 
-		precPoint = curPoint;
-		i++;
-	}
-	// Last point is represented by a specific color
-	painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),EXTREMITY_COLOR);
+        precPoint = curPoint;
+        i++;
+    }
+    // Last point is represented by a specific color
+    painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),EXTREMITY_COLOR);
 
-	precPoint = QPointF(-1,-1);
-	for (it2 = _abstract->_breakpoints.begin() ; it2 != _abstract->_breakpoints.end() ; ++it2) {
-		curPoint = absoluteCoordinates(QPointF(it2->first,it2->second.first));
-		// Breakpoints are drawn with rectangles
-		painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),_abstract->_interpolate ? BREAKPOINT_COLOR : UNACTIVE_COLOR);
-		precPoint = curPoint;
-	}
+    precPoint = QPointF(-1,-1);
+    for (it2 = _abstract->_breakpoints.begin() ; it2 != _abstract->_breakpoints.end() ; ++it2) {
+        curPoint = absoluteCoordinates(QPointF(it2->first,it2->second.first));
+        // Breakpoints are drawn with rectangles
+        painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),_abstract->_interpolate ? BREAKPOINT_COLOR : UNACTIVE_COLOR);
+        precPoint = curPoint;
+    }
 
-	if (_movingBreakpointX != -1 && _movingBreakpointY != -1) {
-		QPointF cursor = absoluteCoordinates(QPointF(_movingBreakpointX,_movingBreakpointY));
-		// If a breakpoint is currently being moved, it is represented by a rectangle
-		painter->fillRect(QRectF(cursor - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),_abstract->_interpolate ? MOVING_BREAKPOINT_COLOR : UNACTIVE_COLOR);
-	}
+    if (_movingBreakpointX != -1 && _movingBreakpointY != -1) {
+        QPointF cursor = absoluteCoordinates(QPointF(_movingBreakpointX,_movingBreakpointY));
+        // If a breakpoint is currently being moved, it is represented by a rectangle
+        painter->fillRect(QRectF(cursor - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),_abstract->_interpolate ? MOVING_BREAKPOINT_COLOR : UNACTIVE_COLOR);
+    }
 
-	delete painter;
+    delete painter;
 }
 
 void
@@ -518,3 +527,4 @@ CurveWidget::setLowerStyle(bool state){
 
     }
 }
+

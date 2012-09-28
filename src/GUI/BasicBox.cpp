@@ -38,7 +38,6 @@ The fact that you are presently reading this means that you have had
 knowledge of the CeCILL license and that you accept its terms.
  */
 #include "BasicBox.hpp"
-
 #include "MaquetteScene.hpp"
 #include "Maquette.hpp"
 #include "AbstractBox.hpp"
@@ -70,12 +69,13 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QTranslator>
 #include <QGraphicsWidget>
 #include <QGraphicsLayout>
-#include <QGraphicsProxyWidget>
 #include <QGridLayout>
 
 using std::string;
 using std::vector;
 using std::map;
+
+#define COMBOBOX_WIDTH 120
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
 : QGraphicsItem()
@@ -103,17 +103,32 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 	init();
 
     update();
+    connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),_curvesWidget, SLOT(displayCurve(const QString&)));
+    connect(_comboBox,SIGNAL(activated(const QString&)),_curvesWidget, SLOT(displayCurve(const QString&)));
 }
 
 void
 BasicBox::centerWidget(){
     _boxWidget->move(-(width())/2 + LINE_WIDTH,-(height())/2 + (RESIZE_TOLERANCE - LINE_WIDTH));
     _boxWidget->resize(width() - 2*LINE_WIDTH,height()-1.5*RESIZE_TOLERANCE);
+
+    _comboBox->move(0,-(height()/2 + 2*LINE_WIDTH));
+    _comboBox->resize((width() - 2*LINE_WIDTH)/2,_comboBox->height());
 }
 
 void
 BasicBox::createWidget(){
 
+    QBrush brush;
+    QPixmap pix(200,70);
+    pix.fill(Qt::transparent);
+    brush.setTexture(pix);
+    QPalette palette;
+    palette.setBrush(QPalette::Background,brush);
+
+
+
+    //---------------------- Curve widget ----------------------//
     _boxWidget = new QWidget();
     _curvesWidget = new BoxWidget(_boxWidget);
     QGridLayout *layout = new QGridLayout;
@@ -123,17 +138,26 @@ BasicBox::createWidget(){
     _boxWidget->setLayout(layout);
 
     _curvesWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
+    _curveProxy = new QGraphicsProxyWidget(this);
+    _curveProxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+    _curveProxy->setFlag(QGraphicsItem::ItemIsMovable, false);
+    _curveProxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
+    _curveProxy->setAttribute(Qt::WA_PaintOnScreen);
+    _curveProxy->setVisible(true);
+    _curveProxy->setAcceptsHoverEvents(true);
+    _curveProxy->setWidget(_boxWidget);
+    _curveProxy->setPalette(palette);
 
-    proxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
-    proxy->setFlag(QGraphicsItem::ItemIsMovable, false);
-//    proxy->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    proxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
-    proxy->setVisible(true);
-    proxy->setAcceptsHoverEvents(true);    
-    proxy->setWidget(_boxWidget);
 
-//    centerWidget();
+
+    //---------------- ComboBox (curve list) ------------------//
+    _comboBox = new QComboBox;
+    _comboBox->setBaseSize(_comboBox->width(),_comboBox->height()-2);
+    _comboBoxProxy = new QGraphicsProxyWidget(this);
+    _comboBoxProxy->setWidget(_comboBox);
+    _comboBoxProxy->setPalette(palette);
+    _curvesWidget->setComboBox(_comboBox);
+    _comboBox->resize((width() - 2*LINE_WIDTH)/2,RESIZE_TOLERANCE+1);
 }
 
 BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
@@ -146,8 +170,6 @@ BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
 	init();
 
 	update();
-
-
 }
 
 BasicBox::~BasicBox()
@@ -160,14 +182,12 @@ BasicBox::~BasicBox()
 void
 BasicBox::init()
 {
-    std::cout<<"INIT()\n";
 	_hasContextMenu = false;
 	_shift = false;
 
 	_playing = false;
 
 	_comment = NULL;
-
 
 	setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
@@ -178,8 +198,7 @@ BasicBox::init()
 	setVisible(true);
 	setAcceptsHoverEvents(true);
 
-	setZValue(0);
-//    createWidget();
+    setZValue(0);
 }
 
 void
@@ -1181,8 +1200,8 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 //		painter->setPen(Qt::lightGray);
 
 //  NICO modif : Points dans la box
-//        painter->setBrush(QBrush(Qt::white,Qt::Dense7Pattern));
-        painter->setBrush(QBrush(Qt::white,Qt::SolidPattern));
+        painter->setBrush(QBrush(Qt::white,Qt::Dense7Pattern));
+//        painter->setBrush(QBrush(Qt::white,Qt::SolidPattern));
 		painter->drawRect(boundingRect());
 //	}
 
@@ -1195,6 +1214,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 	painter->setRenderHint(QPainter::Antialiasing, true);
 
 	QRectF textRect = QRectF(mapFromScene(getTopLeft()).x(),mapFromScene(getTopLeft()).y(), width(), RESIZE_TOLERANCE - LINE_WIDTH);
+
 	QFont font;
 	font.setCapitalization(QFont::SmallCaps);
 	painter->setFont(font);
@@ -1203,13 +1223,16 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 		painter->translate(QPointF(RESIZE_TOLERANCE - LINE_WIDTH,0));
 		painter->rotate(90);
 		textRect.setWidth(_abstract->height());
+
+
+
 		//textRect.setHeight(std::min(_abstract->width(),(float)(RESIZE_TOLERANCE - LINE_WIDTH)));
 	}
 	painter->fillRect(0,0,textRect.width(),textRect.height(),isSelected() ? Qt::yellow : Qt::white);
-	painter->drawText(QRectF(0,0,textRect.width(),textRect.height()),Qt::AlignCenter,name());
+    painter->drawText(QRectF(10,0,textRect.width(),textRect.height()),Qt::AlignLeft,name());
 
 	if (_abstract->width() <= 3*RESIZE_TOLERANCE) {
-		painter->rotate(-90);
+		painter->rotate(-90);       
 		painter->translate(-QPointF(RESIZE_TOLERANCE - LINE_WIDTH,0));
 	}
 	painter->translate(QPointF(0,0)-(textRect.topLeft()));

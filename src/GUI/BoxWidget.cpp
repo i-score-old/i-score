@@ -55,7 +55,6 @@ using std::string;
 #include <QGraphicsEffect>
 #include <QGraphicsOpacityEffect>
 
-
 #include "AbstractCurve.hpp"
 #include "BasicBox.hpp"
 #include "CurveWidget.hpp"
@@ -63,55 +62,43 @@ using std::string;
 #include "Interpolation.hpp"
 #include "Maquette.hpp"
 
-#define COMBOBOX_WIDTH 200
+#define COMBOBOX_WIDTH 500
 
 BoxWidget::BoxWidget(QWidget *parent)
 : QWidget(parent) {
 
+    QBrush brush;
+    QPixmap pix(200,70);
+    pix.fill(Qt::transparent);
+    brush.setTexture(pix);
+    QPalette palette;
+    palette.setColor(QPalette::Background,QColor(255, 0, 0, 127));
+    setPalette(palette);
+
 //    setAttribute(Qt::WA_TranslucentBackground,true);
+//    setAttribute(Qt::WA_PaintOnScreen);
 
-//    update();
-
-//    _comboBox = new QComboBox(this);
-//    _curveWidget = new CurveWidget(NULL);
-//    _tabWidget = new QTabWidget(this);
-//    _tabWidget->lower();
-//    _tabWidget->setAttribute(Qt::WA_TranslucentBackground,true);
-
-//    _curvePageLayout = new QGridLayout;
-
-//    _curvePageLayout->addWidget(_tabWidget);
-
-//    setLayout(_curvePageLayout);
-
-//    _parentWidget = parent;
-//    _curveWidgetList = new QList<CurveWidget *>;
-
-//    connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),this, SLOT(displayCurve(const QString&)));
-//    connect(_comboBox,SIGNAL(activated(const QString&)),this, SLOT(displayCurve(const QString&)));
-
-    setAttribute(Qt::WA_TranslucentBackground,true);
-
-    update();
+    update(); 
 
     _comboBox = new QComboBox;
     _curveWidget = new CurveWidget(NULL);
     _tabWidget = new QTabWidget;
     _tabWidget->lower();
     _tabWidget->setAttribute(Qt::WA_TranslucentBackground,true);
-    _stackedWidget = new QStackedWidget;
-    _curvePageLayout = new QGridLayout;
-    _comboBox->setMaximumWidth(COMBOBOX_WIDTH);
+    _stackedWidget = new QStackedWidget(this);
 
-    _curvePageLayout->addWidget(_comboBox);
+    _curvePageLayout = new QGridLayout;
+//    _comboBox->setMaximumWidth(COMBOBOX_WIDTH);
+
+//    _curvePageLayout->addWidget(_comboBox);
     _curvePageLayout->addWidget(_stackedWidget);
     setLayout(_curvePageLayout);
 
     _parentWidget = parent;
     _curveWidgetList = new QList<CurveWidget *>;
 
-    connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),this, SLOT(displayCurve(const QString&)));
-    connect(_comboBox,SIGNAL(activated(const QString&)),this, SLOT(displayCurve(const QString&)));
+//    connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),this, SLOT(displayCurve(const QString&)));
+//    connect(_comboBox,SIGNAL(activated(const QString&)),this, SLOT(displayCurve(const QString&)));
 }
 
 BoxWidget::~BoxWidget(){
@@ -504,4 +491,12 @@ BoxWidget::mouseDoubleClickEvent(QMouseEvent *event){
     //TODO
 }
 
+void
+BoxWidget::paintEngine(){
 
+}
+
+void
+BoxWidget::setComboBox(QComboBox *cbox){
+    _comboBox = cbox;
+}

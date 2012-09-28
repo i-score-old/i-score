@@ -41,7 +41,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #define BASIC_BOX
 
 /*!
- * \file BasicBox.h
+ * \file BasicBox.hpp
  *
  * \author Luc Vercellin, Bruno Valeze
  */
@@ -56,6 +56,9 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "CSPTypes.hpp"
 #include "CurvesWidget.hpp"
 #include "BoxWidget.hpp"
+#include <QComboBox>
+#include <QGraphicsProxyWidget>
+#include <QObject>
 
 class MaquetteScene;
 class QGraphicsTextItem;
@@ -66,6 +69,7 @@ class TriggerPoint;
 class TextEdit;
 class Relation;
 class AbstractCurve;
+class QObject;
 
 /*!
  * \brief Enum used to define Basic Box's item type.
@@ -82,9 +86,9 @@ enum BoxExtremity {NO_EXTREMITY = -1, BOX_START = BEGIN_CONTROL_POINT_INDEX,
  *
  * \brief Base class for all boxes, derived from Qt's QGraphicsItem.
  */
-class BasicBox : public QGraphicsItem
+class BasicBox : public QObject, public QGraphicsItem
 {
-
+//Q_OBJECT
  public :
 
   BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent);
@@ -634,9 +638,10 @@ class BasicBox : public QGraphicsItem
   BoxWidget *_curvesWidget;
 //  CurvesWidget *_curvesWidget;
   QWidget *_boxWidget;
+  QComboBox *_comboBox;
+  QGraphicsProxyWidget *_curveProxy;
+  QGraphicsProxyWidget *_comboBoxProxy;
 
-//signals :
-// void doubleClickInBox();
 };
 
 #endif

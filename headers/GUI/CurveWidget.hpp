@@ -114,6 +114,8 @@ protected :
 	 * \param event : the information about the event
 	 */
 	virtual void paintEvent(QPaintEvent *event);
+    virtual void paintEngine();
+
 	/*!
 	 * \brief Redefinition of QWidget::moussPressEvent(QPaintEvent *event).
 	 * Raised when a mouse press occurs on the curves widget.

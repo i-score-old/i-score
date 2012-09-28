@@ -46,6 +46,7 @@ public :
     bool contains(const std::string &address);
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
     void displayCurveWindow(CurveWidget *curve);
+    virtual void paintEngine();
 
 
     void curveActivationChanged(const QString &address,bool state);
@@ -54,6 +55,7 @@ public :
     void curveShowChanged(const QString &address,bool state);
     void updateCurve(const std::string &address);
     void removeCurve(const std::string &address);
+    void setComboBox(QComboBox *cbox);
 
 public slots :
     void displayCurve(const QString &address);
@@ -77,7 +79,7 @@ private :
     QGridLayout *_curvePageLayout;
     CurveWidget *_curveWidget;
 
-signals :
+
 
 };
 
