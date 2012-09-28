@@ -453,8 +453,8 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
     static const QColor MOVING_BREAKPOINT_COLOR(Qt::darkBlue);
     static const QColor UNACTIVE_COLOR(Qt::gray);
 
-    painter->setPen(AXE_COLOR);
-    painter->drawLine(0,height()/2.,width(),height()/2.); // Abcisses line
+    //painter->setPen(AXE_COLOR);
+    //painter->drawLine(0,height()/2.,width(),height()/2.); // Abcisses line
     painter->setPen(BASE_COLOR);
 
     vector<float>::iterator it;
@@ -472,21 +472,21 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
         curPoint = absoluteCoordinates(QPointF(1,*it));
         curPoint.setX(i * _interspace * _scaleX);
 
-        if (XsubDiv != 0) {
-            if ((i % XsubDiv) == 0) {
-                painter->setPen(X_SUBDIV_COLOR);
-                painter->drawLine(QPointF(curPoint.x(),height()/2.-5),QPointF(curPoint.x(),height()/2.+5));
-                painter->setPen(BASE_COLOR);
-            }
-        }
+//        if (XsubDiv != 0) {
+//            if ((i % XsubDiv) == 0) {
+//                painter->setPen(X_SUBDIV_COLOR);
+//                painter->drawLine(QPointF(curPoint.x(),height()/2.-5),QPointF(curPoint.x(),height()/2.+5));
+//                painter->setPen(BASE_COLOR);
+//            }
+//        }
 
-        if (Xdiv != 0) {
-            if ((i % Xdiv) == 0) {
-                painter->setPen(X_DIV_COLOR);
-                painter->drawLine(QPointF(curPoint.x(),height()/2.-10),QPointF(curPoint.x(),height()/2.+10));
-                painter->setPen(BASE_COLOR);
-            }
-        }
+//        if (Xdiv != 0) {
+//            if ((i % Xdiv) == 0) {
+//                painter->setPen(X_DIV_COLOR);
+//                painter->drawLine(QPointF(curPoint.x(),height()/2.-10),QPointF(curPoint.x(),height()/2.+10));
+//                painter->setPen(BASE_COLOR);
+//            }
+//        }
 
         if (it == _abstract->_curve.begin()) { // First point is represented by a specific color
             painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),EXTREMITY_COLOR);

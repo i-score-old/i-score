@@ -1219,13 +1219,13 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 	font.setCapitalization(QFont::SmallCaps);
 	painter->setFont(font);
 	painter->translate(textRect.topLeft());
+
 	if (_abstract->width() <= 3*RESIZE_TOLERANCE) {
 		painter->translate(QPointF(RESIZE_TOLERANCE - LINE_WIDTH,0));
 		painter->rotate(90);
 		textRect.setWidth(_abstract->height());
-
-
-
+        _comboBoxProxy->hide();
+        _curveProxy->hide();
 		//textRect.setHeight(std::min(_abstract->width(),(float)(RESIZE_TOLERANCE - LINE_WIDTH)));
 	}
 	painter->fillRect(0,0,textRect.width(),textRect.height(),isSelected() ? Qt::yellow : Qt::white);
@@ -1234,6 +1234,8 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 	if (_abstract->width() <= 3*RESIZE_TOLERANCE) {
 		painter->rotate(-90);       
 		painter->translate(-QPointF(RESIZE_TOLERANCE - LINE_WIDTH,0));
+        _comboBoxProxy->setVisible(true);
+        _curveProxy->setVisible(true);
 	}
 	painter->translate(QPointF(0,0)-(textRect.topLeft()));
 
