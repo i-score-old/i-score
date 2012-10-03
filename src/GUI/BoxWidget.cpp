@@ -67,6 +67,8 @@ using std::string;
 BoxWidget::BoxWidget(QWidget *parent)
 : QWidget(parent) {
 
+    _curveMap = new QMap<std::string,CurveWidget *>();
+
     QBrush brush;
     QPixmap pix(200,70);
     pix.fill(Qt::transparent);
@@ -75,9 +77,6 @@ BoxWidget::BoxWidget(QWidget *parent)
     palette.setColor(QPalette::Background,QColor(255, 0, 0, 127));
     setPalette(palette);
 
-//    setAttribute(Qt::WA_TranslucentBackground,true);
-//    setAttribute(Qt::WA_PaintOnScreen);
-
     update(); 
 
     _comboBox = new QComboBox;
@@ -85,20 +84,18 @@ BoxWidget::BoxWidget(QWidget *parent)
     _tabWidget = new QTabWidget;
     _tabWidget->lower();
     _tabWidget->setAttribute(Qt::WA_TranslucentBackground,true);
-    _stackedWidget = new QStackedWidget(this);
+    _stackedLayout = new QStackedLayout;
+    _stackedLayout->setStackingMode(QStackedLayout::StackAll);
+
+//    _stackedWidget = new QStackedWidget(this);
 
     _curvePageLayout = new QGridLayout;
-//    _comboBox->setMaximumWidth(COMBOBOX_WIDTH);
-
-//    _curvePageLayout->addWidget(_comboBox);
-    _curvePageLayout->addWidget(_stackedWidget);
-    setLayout(_curvePageLayout);
+//    _curvePageLayout->addWidget(_stackedWidget);
+    setLayout(_stackedLayout);
+//    setLayout(_curvePageLayout);
 
     _parentWidget = parent;
     _curveWidgetList = new QList<CurveWidget *>;
-
-//    connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),this, SLOT(displayCurve(const QString&)));
-//    connect(_comboBox,SIGNAL(activated(const QString&)),this, SLOT(displayCurve(const QString&)));
 }
 
 BoxWidget::~BoxWidget(){
@@ -137,19 +134,44 @@ void BoxWidget::curveSampleRateChanged(const QString &address,int value) {
     }
 }
 
+
 void BoxWidget::displayCurve(const QString &address){
+    std::cout<<"display : "<<address.toStdString()<<std::endl;
     std::string add = address.toStdString();
-    map<string,CurveWidget *>::iterator curveIt;
+    QMap<string,CurveWidget *>::iterator curveIt, curveIt2;
+
+
     CurveWidget *curveWidget;
 
-    curveIt = _curveMap.find(add);
-    bool curveFound = (curveIt != _curveMap.end());
+    curveIt = _curveMap->find(add);
+    bool curveFound = (curveIt != _curveMap->end());
+
+    /******************* Low curves **********************/
+
+    QList<CurveWidget *> values = _curveMap->values();
+    int count = values.size(), i=0;
+
+    CurveWidget *cur;
+
+    for(i ; i<count ; i++){
+        cur = values.at(i);
+        std::cout<<">>>>>> ";
+        std::cout<< cur->winId() <<std::endl;
+        cur->setLowerStyle(true);
+        cur->repaint();
+    }
+
+    /*****************************************************/
 
     if (curveFound) {
-        curveWidget = curveIt->second;
-        _stackedWidget->setCurrentWidget(curveWidget);
-//        _curvePageLayout->addWidget(curveWidget);
-
+        curveWidget = curveIt.value();
+//        _stackedWidget->setCurrentWidget(curveWidget);
+//        _curvePageLayout->addWidget(curveWidget);     
+        _stackedLayout->setCurrentWidget(curveWidget);
+        std::cout<<">>>>>>>>>>> ";
+        std::cout<< curveWidget->winId() <<std::endl;
+        curveWidget->setLowerStyle(false);
+        curveWidget->repaint();
     }
 }
 
@@ -195,13 +217,13 @@ BoxWidget::updateCurve(const string &address) {
 void
 BoxWidget::removeCurve(const string &address) {
 
-    map<string,CurveWidget *>::iterator curveIt = _curveMap.find(address);
+    QMap<string,CurveWidget *>::iterator curveIt = _curveMap->find(address);
     QString curveAddress = QString::fromStdString(address);
     int index;
 
-    if (curveIt != _curveMap.end()) {
+    if (curveIt != _curveMap->end()) {
 
-        _curveMap.erase(curveIt);
+        _curveMap->erase(curveIt);
         index = _comboBox->findText(curveAddress);
         if(index>-1)
             _comboBox->removeItem(index);
@@ -213,15 +235,24 @@ BoxWidget::removeCurve(const string &address) {
 }
 
 void
-BoxWidget::updateMessages(unsigned int boxID, bool forceUpdate) {
+BoxWidget::clearCurves(){
 
-//    _tabWidget->clear();
-    _curvePageLayout->removeWidget(_curveWidget);
+    //Clear stackedLayout
+    QList<CurveWidget *> widgets = _curveMap->values();
+    for(int i=0 ; i<widgets.size() ; i++)
+        _stackedLayout->removeWidget(widgets.at(i));
+
     _comboBox->clear();
-    _curveMap.clear();
+    _curveMap->clear();
     _curveIndexes.clear();
     _curveWidgetList->clear();
-//    _interpolation->clear();
+}
+
+void
+BoxWidget::updateMessages(unsigned int boxID, bool forceUpdate) {
+
+    clearCurves();
+
     _boxID = boxID;
 
     if (boxID != NO_ID) {
@@ -238,9 +269,12 @@ BoxWidget::updateMessages(unsigned int boxID, bool forceUpdate) {
 void
 BoxWidget::addCurve(QString address, CurveWidget *curveWidget){
 
-    _curveMap[address.toStdString()]=curveWidget;
+    std::cout<<"addCurve "<< address.toStdString() <<std::endl;
+    _curveMap->insert(address.toStdString(),curveWidget);
+
     addToComboBox(address);
-    _stackedWidget->addWidget(curveWidget);
+    _stackedLayout->addWidget(curveWidget);
+    displayCurve(address);
 }
 
 void
@@ -250,19 +284,17 @@ BoxWidget::addToComboBox(const QString address){
 }
 
 bool
-BoxWidget::updateCurve(const string &address, bool forceUpdate)
-{
-    std::cout<<"BoxWidget::UPDATECURVE"<<std::endl;
+BoxWidget::updateCurve(const string &address, bool forceUpdate){
     BasicBox *box = Maquette::getInstance()->getBox(_boxID);
     if (box != NULL) // Box Found
     {
         AbstractCurve *abCurve = box->getCurve(address);
-        map<string,CurveWidget *>::iterator curveIt2 = _curveMap.find(address);
-        bool curveFound = (curveIt2 != _curveMap.end());
+        QMap<string,CurveWidget *>::iterator curveIt2 = _curveMap->find(address);
+        bool curveFound = (curveIt2 != _curveMap->end());
         unsigned int curveTabIndex = 0;
         CurveWidget *curveTab = NULL;
         if (curveFound) {
-            curveTab = curveIt2->second;
+            curveTab = curveIt2.value();
         }
 
         static const bool FORCE_SHOW = true;
@@ -315,8 +347,9 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
                             // Add tab and store
                             addCurve(curveAddressStr,curveTab);
 
-                            _curveMap[address] = curveTab;
-                            displayCurve(_comboBox->currentText());
+                            _curveMap->insert(address, curveTab);
+
+//                            displayCurve(_comboBox->currentText());
 
                             // Set box curve
                             box->setCurve(address,curveTab->abstractCurve());
@@ -334,8 +367,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
                         // Add tab and store
                         addCurve(curveAddressStr,curveTab);
 
-                        _curveMap[address] = curveTab;
-
+                        _curveMap->insert(address, curveTab);
                         displayCurve(_comboBox->currentText());
                     }
                 }

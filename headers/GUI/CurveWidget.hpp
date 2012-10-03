@@ -172,6 +172,7 @@ private :
 	float _movingBreakpointY; //!< Moved break point y coordinate.
 
 	bool _clicked; //!< Clicked state.
+    bool _unactive;
 
 	QGridLayout *_layout; //!< Layout for widget.
 

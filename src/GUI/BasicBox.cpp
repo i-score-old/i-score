@@ -109,8 +109,9 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 
 void
 BasicBox::centerWidget(){
-    _boxWidget->move(-(width())/2 + LINE_WIDTH,-(height())/2 + (RESIZE_TOLERANCE - LINE_WIDTH));
-    _boxWidget->resize(width() - 2*LINE_WIDTH,height()-1.5*RESIZE_TOLERANCE);
+
+    _boxWidget->move(-(width())/2/* + LINE_WIDTH*/,-(height())/2 + (RESIZE_TOLERANCE - LINE_WIDTH));
+    _boxWidget->resize(width()/* - 2*LINE_WIDTH*/,height()-1.5*RESIZE_TOLERANCE);
 
     _comboBox->move(0,-(height()/2 + 2*LINE_WIDTH));
     _comboBox->resize((width() - 2*LINE_WIDTH)/2,_comboBox->height());
@@ -129,15 +130,18 @@ BasicBox::createWidget(){
 
 
     //---------------------- Curve widget ----------------------//
+
     _boxWidget = new QWidget();
     _curvesWidget = new BoxWidget(_boxWidget);
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(_curvesWidget);
     layout->setMargin(0);
+    layout->setContentsMargins(0,0,0,0);
     layout->setAlignment(_boxWidget,Qt::AlignLeft);
     _boxWidget->setLayout(layout);
 
     _curvesWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
     _curveProxy = new QGraphicsProxyWidget(this);
     _curveProxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     _curveProxy->setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -146,8 +150,7 @@ BasicBox::createWidget(){
     _curveProxy->setVisible(true);
     _curveProxy->setAcceptsHoverEvents(true);
     _curveProxy->setWidget(_boxWidget);
-    _curveProxy->setPalette(palette);
-
+    _curveProxy->setPalette(palette);    
 
 
     //---------------- ComboBox (curve list) ------------------//
@@ -202,8 +205,7 @@ BasicBox::init()
 }
 
 void
-BasicBox::updateCurves(){
-    std::cout<<"BBOX UPDATECURVES"<<std::endl;
+BasicBox::updateCurves(){    
     _curvesWidget->updateMessages(_abstract->ID(),true);
 }
 
@@ -1207,6 +1209,9 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
 	QColor bgColor = color().lighter();
 
+    _comboBoxProxy->setVisible(true);
+    _curveProxy->setVisible(true);
+
     QBrush brush(Qt::lightGray,isSelected() ? Qt::SolidPattern : Qt::SolidPattern);
     QPen pen(color(),isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
 	painter->setPen(pen);
@@ -1224,19 +1229,24 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 		painter->translate(QPointF(RESIZE_TOLERANCE - LINE_WIDTH,0));
 		painter->rotate(90);
 		textRect.setWidth(_abstract->height());
-        _comboBoxProxy->hide();
-        _curveProxy->hide();
+
 		//textRect.setHeight(std::min(_abstract->width(),(float)(RESIZE_TOLERANCE - LINE_WIDTH)));
 	}
+
+    if (_abstract->width() <= 5*RESIZE_TOLERANCE) {
+        _comboBoxProxy->setVisible(false);
+        _curveProxy->setVisible(false);
+    }
+
 	painter->fillRect(0,0,textRect.width(),textRect.height(),isSelected() ? Qt::yellow : Qt::white);
     painter->drawText(QRectF(10,0,textRect.width(),textRect.height()),Qt::AlignLeft,name());
 
 	if (_abstract->width() <= 3*RESIZE_TOLERANCE) {
 		painter->rotate(-90);       
-		painter->translate(-QPointF(RESIZE_TOLERANCE - LINE_WIDTH,0));
-        _comboBoxProxy->setVisible(true);
-        _curveProxy->setVisible(true);
+		painter->translate(-QPointF(RESIZE_TOLERANCE - LINE_WIDTH,0));        
 	}
+
+
 	painter->translate(QPointF(0,0)-(textRect.topLeft()));
 
 	if (cursor().shape() == Qt::SizeHorCursor) {

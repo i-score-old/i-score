@@ -48,6 +48,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QMouseEvent>
 #include <QBrush>
 #include <QToolTip>
+#include <QGraphicsOpacityEffect>
 
 using std::map;
 using std::string;
@@ -60,6 +61,8 @@ using std::make_pair;
 #include "AbstractCurve.hpp"
 #include "Engines.hpp"
 #include "Maquette.hpp"
+
+
 
 CurveWidget::CurveWidget(QWidget *parent) : QWidget(parent)
 {
@@ -79,10 +82,11 @@ void CurveWidget::init()
 {
 
 //    setAttribute(Qt::WA_PaintOnScreen,true);
-
+//    setWindowFlags(Qt::Window);
 	_abstract = new AbstractCurve(NO_ID,"",0,10,false,true,true,1,vector<float>(),map<float,pair<float,float> >());
 
 //    setBackgroundRole(QPalette::Base);
+
 	setCursor(Qt::CrossCursor);
 	setMouseTracking(true);
 
@@ -95,12 +99,13 @@ void CurveWidget::init()
 	_interspace = width();
 
 	_clicked = false;
+    _unactive = false;
+
 	_movingBreakpointX = -1;
 	_movingBreakpointY = -1;
     _minY = -100;
     _maxY = 100;
-	_lastPointSelected = false;
-
+	_lastPointSelected = false;    
 	setLayout(_layout);
 }
 
@@ -439,10 +444,17 @@ CurveWidget::paintEngine(){
 }
 
 void CurveWidget::paintEvent(QPaintEvent * /* event */) {
+
     QPainter *painter = new QPainter(this);
 
-    painter->setRenderHint(QPainter::Antialiasing, true);
+    QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect;
 
+    if(_unactive)
+        effect->setOpacity(0.4);
+    else
+        effect->setOpacity(1);
+
+    painter->setRenderHint(QPainter::Antialiasing, true);
     static const QColor BASE_COLOR(Qt::black);
     static const QColor AXE_COLOR(Qt::black);
     static const QColor X_SUBDIV_COLOR(Qt::gray);
@@ -451,10 +463,10 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
     static const QColor CURVE_COLOR(Qt::darkRed);
     static const QColor BREAKPOINT_COLOR(Qt::blue);
     static const QColor MOVING_BREAKPOINT_COLOR(Qt::darkBlue);
-    static const QColor UNACTIVE_COLOR(Qt::gray);
+    static const QColor UNACTIVE_COLOR(Qt::darkGray);
 
-    //painter->setPen(AXE_COLOR);
-    //painter->drawLine(0,height()/2.,width(),height()/2.); // Abcisses line
+    painter->setPen(AXE_COLOR);
+    painter->drawLine(0,height()/2.,width(),height()/2.); // Abcisses line
     painter->setPen(BASE_COLOR);
 
     vector<float>::iterator it;
@@ -492,11 +504,15 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
             painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),EXTREMITY_COLOR);
         }
         if (precPoint != QPointF(-1,-1)) {
-            painter->setPen(_abstract->_interpolate ? CURVE_COLOR : UNACTIVE_COLOR);
+
+            QPen pen(_unactive ? UNACTIVE_COLOR : CURVE_COLOR);
+            pen.setWidth(_unactive ? 1 : 2);
+            painter->setPen(pen);
+//            painter->setPen(_abstract->_interpolate ? CURVE_COLOR : UNACTIVE_COLOR);
             painter->drawLine(precPoint,curPoint); // Draw lines between values
+
             painter->setPen(BASE_COLOR);
         }
-
         precPoint = curPoint;
         i++;
     }
@@ -507,7 +523,7 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
     for (it2 = _abstract->_breakpoints.begin() ; it2 != _abstract->_breakpoints.end() ; ++it2) {
         curPoint = absoluteCoordinates(QPointF(it2->first,it2->second.first));
         // Breakpoints are drawn with rectangles
-        painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),_abstract->_interpolate ? BREAKPOINT_COLOR : UNACTIVE_COLOR);
+        painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),_unactive ? UNACTIVE_COLOR : BREAKPOINT_COLOR);
         precPoint = curPoint;
     }
 
@@ -516,15 +532,14 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
         // If a breakpoint is currently being moved, it is represented by a rectangle
         painter->fillRect(QRectF(cursor - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),_abstract->_interpolate ? MOVING_BREAKPOINT_COLOR : UNACTIVE_COLOR);
     }
-
     delete painter;
 }
 
 void
 CurveWidget::setLowerStyle(bool state){
-    //idea : TODO
-    if(state){
 
-    }
+   _unactive = state;
+//   setGraphicsEffect(effect);
+   repaint();
 }
 

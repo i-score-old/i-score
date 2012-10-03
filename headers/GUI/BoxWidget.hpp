@@ -10,6 +10,8 @@
 #include <QTabWidget>
 #include <QComboBox>
 #include <QStackedWidget>
+#include <QStackedLayout>
+#include <QMap>
 #include <map>
 #include <vector>
 #include <string>
@@ -48,7 +50,6 @@ public :
     void displayCurveWindow(CurveWidget *curve);
     virtual void paintEngine();
 
-
     void curveActivationChanged(const QString &address,bool state);
     void curveRedundancyChanged(const QString &address,bool state);
     void curveSampleRateChanged(const QString &address,int value);
@@ -64,11 +65,13 @@ private :
     bool updateCurve(const std::string &address, bool forceUpdate);
     void addCurve(QString address,CurveWidget *curveWidget);
     void addToComboBox(const QString address);
+    void clearCurves();
     QComboBox *_comboBox;
     QTabWidget *_tabWidget;
     Interpolation *_interpolation;
     std::map<std::string,unsigned int> _curveIndexes; //!< Map of curves tabs' indexes mapped by their addresses
-    std::map<std::string,CurveWidget *> _curveMap; //!< Map of curves tabs mapped by their addresses
+//    std::map<std::string,CurveWidget *> _curveMap; //!< Map of curves tabs mapped by their addresses
+    QMap<std::string,CurveWidget *> *_curveMap; //!< Map of curves tabs mapped by their addresses
     unsigned int _width;
     unsigned int _height;
     unsigned int _boxID;
@@ -76,10 +79,9 @@ private :
     QList <CurveWidget *> *_curveWidgetList;
     QTabWidget *_curve;
     QStackedWidget *_stackedWidget;
+    QStackedLayout *_stackedLayout;
     QGridLayout *_curvePageLayout;
     CurveWidget *_curveWidget;
-
-
 
 };
 
