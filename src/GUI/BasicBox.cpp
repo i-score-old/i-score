@@ -70,6 +70,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QGraphicsWidget>
 #include <QGraphicsLayout>
 #include <QGridLayout>
+#include <QToolTip>
 
 using std::string;
 using std::vector;
@@ -104,7 +105,7 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 
     update();
     connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),_curvesWidget, SLOT(displayCurve(const QString&)));
-    connect(_comboBox,SIGNAL(activated(const QString&)),_curvesWidget, SLOT(displayCurve(const QString&)));
+    connect(_comboBox,SIGNAL(activated(const QString&)),_curvesWidget, SLOT(displayCurve(const QString&)));    
 }
 
 void
@@ -116,6 +117,7 @@ BasicBox::centerWidget(){
     _comboBox->move(0,-(height()/2 + 2*LINE_WIDTH));
     _comboBox->resize((width() - 2*LINE_WIDTH)/2,_comboBox->height());
 }
+
 
 void
 BasicBox::createWidget(){
@@ -155,6 +157,7 @@ BasicBox::createWidget(){
 
     //---------------- ComboBox (curve list) ------------------//
     _comboBox = new QComboBox;
+    _comboBox->setInsertPolicy(QComboBox::InsertAtTop);
     _comboBox->setBaseSize(_comboBox->width(),_comboBox->height()-2);
     _comboBoxProxy = new QGraphicsProxyWidget(this);
     _comboBoxProxy->setWidget(_comboBox);
@@ -956,6 +959,16 @@ void
 BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
 	QGraphicsItem::mouseMoveEvent(event);
+
+    // Draw cursor coordinates as a tooltip
+//    CurveWidget *curve = (static_cast<CurveWidget *>(_curvesWidget->_stackedLayout->currentWidget()));
+//    QPointF mousePos = curve->relativeCoordinates(event->pos());
+//    QRect rect;
+//    QString posStr = QString("%1 ; %2").arg(mousePos.x(),0,'f',2).arg(mousePos.y(),0,'f',2);
+//    QPoint pos = this->getBottomRight().toPoint();
+//    QToolTip::showText(pos, posStr);
+
+
     if (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor) {
 		_scene->selectionMoved();
 	}

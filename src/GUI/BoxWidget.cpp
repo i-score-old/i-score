@@ -138,16 +138,14 @@ void BoxWidget::curveSampleRateChanged(const QString &address,int value) {
 void BoxWidget::displayCurve(const QString &address){
     std::cout<<"display : "<<address.toStdString()<<std::endl;
     std::string add = address.toStdString();
-    QMap<string,CurveWidget *>::iterator curveIt, curveIt2;
-
+    QMap<string,CurveWidget *>::iterator curveIt;
 
     CurveWidget *curveWidget;
 
     curveIt = _curveMap->find(add);
     bool curveFound = (curveIt != _curveMap->end());
 
-    /******************* Low curves **********************/
-
+   //Unactive curves
     QList<CurveWidget *> values = _curveMap->values();
     int count = values.size(), i=0;
 
@@ -156,49 +154,22 @@ void BoxWidget::displayCurve(const QString &address){
     for(i ; i<count ; i++){
         cur = values.at(i);
         std::cout<<">>>>>> ";
-        std::cout<< cur->winId() <<std::endl;
+        std::cout<< cur->winId() <<std::endl;        
         cur->setLowerStyle(true);
         cur->repaint();
-    }
-
-    /*****************************************************/
+    }   
 
     if (curveFound) {
         curveWidget = curveIt.value();
-//        _stackedWidget->setCurrentWidget(curveWidget);
-//        _curvePageLayout->addWidget(curveWidget);     
-        _stackedLayout->setCurrentWidget(curveWidget);
+
         std::cout<<">>>>>>>>>>> ";
         std::cout<< curveWidget->winId() <<std::endl;
         curveWidget->setLowerStyle(false);
         curveWidget->repaint();
+        _stackedLayout->setCurrentWidget(curveWidget);
     }
 }
 
-        //SET OPACITY
-//        for(curveIt2 = _curveMap.begin() ; curveIt2 != _curveMap.end() ; curveIt2++){
-//            curveWidget = curveIt2->second;
-
-//            if(curveIt2 != curveIt){
-//                curveWidget->setGraphicsEffect(effect);
-//                curveWidget->setEnabled(false);
-////                newLayout->addWidget(curveWidget);
-//                _curvePageLayout->addWidget(curveWidget);
-
-//            }
-
-//            else{
-//                curveWidget->setGraphicsEffect(noEffect);
-//                curveWidget->setEnabled(true);
-//                _curvePageLayout->addWidget(curveWidget);
-////                newLayout->addWidget(curveWidget);
-//                _curveWidget = curveWidget;
-//            }
-//        }
-//        _curvePageLayout = newLayout;
-//        setLayout(newLayout);
-//    }
-//}
 
 bool
 BoxWidget::contains(const string &address) {
@@ -264,6 +235,7 @@ BoxWidget::updateMessages(unsigned int boxID, bool forceUpdate) {
             updateCurve(*curveAddressIt,forceUpdate);
         }
     }
+    displayCurve(_comboBox->currentText());
 }
 
 void
@@ -271,9 +243,9 @@ BoxWidget::addCurve(QString address, CurveWidget *curveWidget){
 
     std::cout<<"addCurve "<< address.toStdString() <<std::endl;
     _curveMap->insert(address.toStdString(),curveWidget);
-
     addToComboBox(address);
     _stackedLayout->addWidget(curveWidget);
+//    emit(currentIndexChanged(address));
     displayCurve(address);
 }
 
@@ -281,6 +253,7 @@ void
 BoxWidget::addToComboBox(const QString address){
     if(_comboBox->findText(address,Qt::MatchExactly) == -1)
         _comboBox->addItem(address);
+//    emit(currentIndexChanged(address));
 }
 
 bool
@@ -346,11 +319,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
 
                             // Add tab and store
                             addCurve(curveAddressStr,curveTab);
-
-                            _curveMap->insert(address, curveTab);
-
-//                            displayCurve(_comboBox->currentText());
-
+//                            emit(_comboBox->currentIndexChanged(curveAddressStr));
                             // Set box curve
                             box->setCurve(address,curveTab->abstractCurve());
                         }
@@ -368,7 +337,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
                         addCurve(curveAddressStr,curveTab);
 
                         _curveMap->insert(address, curveTab);
-                        displayCurve(_comboBox->currentText());
+//                        displayCurve(_comboBox->currentText());
                     }
                 }
             }
@@ -409,7 +378,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
                     // Remove curve tab anyway
                     removeCurve(address);
                     _comboBox->setCurrentIndex(curveTabIndex);
-                    displayCurve(_comboBox->currentText());
+//                    displayCurve(_comboBox->currentText());
                     delete curveTab;
                 }
                 else // Curve tab not existing
@@ -464,7 +433,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
                         // Add tab and store
                         addCurve(curveAddressStr,curveTab);
                         std::cout<<"WE WANT TO DISPLAY " <<_comboBox->currentText().toStdString()<<std::endl;
-                        displayCurve(_comboBox->currentText());
+//                        displayCurve(_comboBox->currentText());
                     }
                     else // Curve tab existing
                     {

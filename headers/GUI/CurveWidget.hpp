@@ -106,6 +106,13 @@ public :
 	void setAttributes(AbstractCurve *abCurve);
     void setLowerStyle(bool state);
 
+    /*!
+     * \brief Gets local coordinates of a point.
+     * X => scales, translates and percents
+     * Y => translates, gets symmetrical and scales
+     */
+    QPointF relativeCoordinates(const QPointF &point);
+
 protected :
 	/*!
 	 * \brief Redefinition of QWidget::paintEvent(QPaintEvent *event).
@@ -143,14 +150,10 @@ protected :
 	 */
 	virtual void resizeEvent(QResizeEvent * event);
 
+
 private :
 
-	/*!
-	 * \brief Gets local coordinates of a point.
-	 * X => scales, translates and percents
-	 * Y => translates, gets symmetrical and scales
-	 */
-	QPointF relativeCoordinates(const QPointF &point);
+
 	/*!
 	 * \brief Gets absolute coordinates of a point.
 	 * X => unpercents, scales and translates

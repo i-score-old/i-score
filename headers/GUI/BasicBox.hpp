@@ -88,7 +88,6 @@ enum BoxExtremity {NO_EXTREMITY = -1, BOX_START = BEGIN_CONTROL_POINT_INDEX,
  */
 class BasicBox : public QObject, public QGraphicsItem
 {
-//Q_OBJECT
  public :
 
   BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent);
@@ -641,7 +640,6 @@ class BasicBox : public QObject, public QGraphicsItem
   QComboBox *_comboBox;
   QGraphicsProxyWidget *_curveProxy;
   QGraphicsProxyWidget *_comboBoxProxy;
-
 };
 
 #endif

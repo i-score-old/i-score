@@ -57,9 +57,13 @@ public :
     void updateCurve(const std::string &address);
     void removeCurve(const std::string &address);
     void setComboBox(QComboBox *cbox);
+    QStackedLayout *_stackedLayout;
 
 public slots :
     void displayCurve(const QString &address);
+
+signals :
+    void currentIndexChanged();
 
 private :
     bool updateCurve(const std::string &address, bool forceUpdate);
@@ -78,8 +82,8 @@ private :
     QWidget *_parentWidget;
     QList <CurveWidget *> *_curveWidgetList;
     QTabWidget *_curve;
-    QStackedWidget *_stackedWidget;
-    QStackedLayout *_stackedLayout;
+
+
     QGridLayout *_curvePageLayout;
     CurveWidget *_curveWidget;
 

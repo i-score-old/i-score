@@ -185,9 +185,9 @@ CurveWidget::absoluteCoordinates(const QPointF &point)
 	float pointY = point.y();
 	float scaledY = pointY * (float)_scaleY;
 	float symetricalY = -scaledY;
-	float finalY = symetricalY + height()/2.;
+    float finalY = symetricalY + height()/2.;
 
-	return QPointF(finalX,finalY);
+    return QPointF(finalX,finalY);
 }
 
 void
@@ -285,10 +285,12 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 	QWidget::mouseMoveEvent(event);
 
 	// Draw cursor coordinates as a tooltip
-	QPointF mousePos = relativeCoordinates(event->pos());
-	QRect rect;
-	QString posStr = QString("%1 ; %2").arg(mousePos.x(),0,'f',2).arg(mousePos.y(),0,'f',2);
-	QToolTip::showText(event->globalPos(), posStr, this, rect);
+    QPointF mousePos = relativeCoordinates(event->pos());
+	QRect rect;   
+    QString posStr = QString("%1 ; %2").arg(mousePos.x(),0,'f',2).arg(mousePos.y(),0,'f',2);
+    QPoint pos = mapTo(this->topLevelWidget(),this->geometry().bottomRight());
+    std::cout<<"X = "<<pos.x() <<" Y = "<<pos.y()<<std::endl;
+//    QToolTip::showText(pos, posStr, this);
 
 	// Handle interactions
 	if (_clicked) {
