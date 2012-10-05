@@ -284,13 +284,11 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 {
 	QWidget::mouseMoveEvent(event);
 
+
 	// Draw cursor coordinates as a tooltip
     QPointF mousePos = relativeCoordinates(event->pos());
-	QRect rect;   
     QString posStr = QString("%1 ; %2").arg(mousePos.x(),0,'f',2).arg(mousePos.y(),0,'f',2);
-    QPoint pos = mapTo(this->topLevelWidget(),this->geometry().bottomRight());
-    std::cout<<"X = "<<pos.x() <<" Y = "<<pos.y()<<std::endl;
-//    QToolTip::showText(pos, posStr, this);
+    this->setToolTip(posStr);
 
 	// Handle interactions
 	if (_clicked) {

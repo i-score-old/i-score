@@ -71,6 +71,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QGraphicsLayout>
 #include <QGridLayout>
 #include <QToolTip>
+#include <QAbstractItemView>
+#include <QStyleOptionViewItem>
 
 using std::string;
 using std::vector;
@@ -164,6 +166,7 @@ BasicBox::createWidget(){
     _comboBoxProxy->setPalette(palette);
     _curvesWidget->setComboBox(_comboBox);
     _comboBox->resize((width() - 2*LINE_WIDTH)/2,RESIZE_TOLERANCE+1);
+
 }
 
 BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
@@ -713,8 +716,9 @@ BasicBox::removeCurve(const string &address)
 {
 	map<string,AbstractCurve*>::iterator it = _abstractCurves.find(address);
 	if (it != _abstractCurves.end()) {
-		_abstractCurves.erase(it);
+		_abstractCurves.erase(it);        
 	}
+    _curvesWidget->removeCurve(address);
 }
 
 void
@@ -860,6 +864,18 @@ BasicBox::boundingRect() const
 {
 	// Origine du repere = centre de l'objet
 	return QRectF(-_abstract->width()/2, -_abstract->height()/2, _abstract->width(), _abstract->height());
+}
+
+void
+BasicBox::keyPressEvent(QKeyEvent *event){
+    QGraphicsItem::keyPressEvent(event);
+    this->lock();
+}
+
+void
+BasicBox::keyReleaseEvent(QKeyEvent *event){
+    QGraphicsItem::keyReleaseEvent(event);
+    this->unlock();
 }
 
 void

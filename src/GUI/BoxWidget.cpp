@@ -139,7 +139,6 @@ void BoxWidget::displayCurve(const QString &address){
     std::cout<<"display : "<<address.toStdString()<<std::endl;
     std::string add = address.toStdString();
     QMap<string,CurveWidget *>::iterator curveIt;
-
     CurveWidget *curveWidget;
 
     curveIt = _curveMap->find(add);
@@ -168,6 +167,7 @@ void BoxWidget::displayCurve(const QString &address){
         curveWidget->repaint();
         _stackedLayout->setCurrentWidget(curveWidget);
     }
+
 }
 
 
@@ -193,7 +193,7 @@ BoxWidget::removeCurve(const string &address) {
     int index;
 
     if (curveIt != _curveMap->end()) {
-
+        std::cout<<"REMOVE"<<std::endl;
         _curveMap->erase(curveIt);
         index = _comboBox->findText(curveAddress);
         if(index>-1)
@@ -242,6 +242,7 @@ void
 BoxWidget::addCurve(QString address, CurveWidget *curveWidget){
 
     std::cout<<"addCurve "<< address.toStdString() <<std::endl;
+
     _curveMap->insert(address.toStdString(),curveWidget);
     addToComboBox(address);
     _stackedLayout->addWidget(curveWidget);

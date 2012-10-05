@@ -562,6 +562,8 @@ class BasicBox : public QObject, public QGraphicsItem
    * \param event : the variable containing information about the event
    */
   virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+  virtual void keyPressEvent(QKeyEvent *event);
+  virtual void keyReleaseEvent(QKeyEvent *event);
 
   /*!
    * \brief Redefinition of QGraphicsItem::contextMenuEvent().

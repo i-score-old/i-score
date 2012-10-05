@@ -1584,8 +1584,9 @@ AttributesEditor::curveActivationChanged(QTreeWidgetItem *item, bool activated){
         Maquette::getInstance()->setCurveMuteState(_boxEdited,address,!activated);
         _networkTree->updateCurve(item,_boxEdited);
         BasicBox * box = _scene->getBox(_boxEdited);
+        box->removeCurve(address);
 //        box->curveShowChanged(QString::fromStdString(address),activated);
-        box->updateCurves();
+//        box->updateCurves();
     }
 }
 
