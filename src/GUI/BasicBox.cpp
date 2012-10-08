@@ -83,7 +83,6 @@ using std::map;
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
 : QGraphicsItem()
 {
-
 	_scene = parent;
 
 	int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
