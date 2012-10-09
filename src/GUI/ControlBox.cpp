@@ -170,7 +170,7 @@ ControlBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
 {
 	BasicBox::paint(painter,option,widget);
 
-	painter->translate(boundingRect().topLeft());
+    painter->translate(boxRect().topLeft());
 
   painter->setRenderHint(QPainter::Antialiasing, true);
 

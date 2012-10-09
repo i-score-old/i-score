@@ -276,6 +276,7 @@ class BasicBox : public QObject, public QGraphicsItem
   void setCurve(const std::string &address, AbstractCurve *curve);
   void removeCurve(const std::string &address);
   void curveShowChanged(const QString &address,bool state);
+  QRectF boxRect();
 
   /*!
    * \brief Gets the top left of the box in the scene coordinates.
@@ -527,6 +528,7 @@ class BasicBox : public QObject, public QGraphicsItem
   static const unsigned int LINE_WIDTH = 2;
   //! \brief Handles resizing tolerance.
   static const unsigned int RESIZE_TOLERANCE = 20;
+  static const unsigned int BOX_MARGIN = 10;
 
   /*!
    * \brief Painting method, redefinition of QGraphicsItem::paint().
@@ -547,8 +549,12 @@ class BasicBox : public QObject, public QGraphicsItem
   void updateCurves();
   void centerWidget();
   void createWidget();
-
-
+  void drawInteractionPoints(QPainter *painter);
+  void updateBoxSize();
+  inline QRectF leftEar(){return _leftEar;}
+  inline QRectF rightEar(){return _rightEar;}
+  QPointF getLeftGripPoint();
+  QPointF getRightGripPoint();
 
  protected:
   /*!
@@ -638,6 +644,9 @@ class BasicBox : public QObject, public QGraphicsItem
 //  BoxWidget *_curvesWidget;
   BoxWidget *_curvesWidget;
 //  CurvesWidget *_curvesWidget;
+  QRectF _boxRect;
+  QRectF _leftEar;
+  QRectF _rightEar;
   QWidget *_boxWidget;
   QComboBox *_comboBox;
   QGraphicsProxyWidget *_curveProxy;

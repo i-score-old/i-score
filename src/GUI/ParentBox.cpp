@@ -220,19 +220,19 @@ ParentBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 			}
 			else if (cursor().shape() == Qt::CrossCursor) {
 				lock();
-				if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
+                if (event->pos().x() < boxRect().topLeft().x() + RESIZE_TOLERANCE) {
 					_scene->setRelationFirstBox(_abstract->ID(),BOX_START);
 				}
-				else if (event->pos().x() > boundingRect().topRight().x() - RESIZE_TOLERANCE) {
+                else if (event->pos().x() > boxRect().topRight().x() - RESIZE_TOLERANCE) {
 					_scene->setRelationFirstBox(_abstract->ID(),BOX_END);
 				}
 			}
             else if (cursor().shape() == Qt::PointingHandCursor) {
                 lock();
-                if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
+                if (event->pos().x() < boxRect().topLeft().x() + RESIZE_TOLERANCE) {
                     addTriggerPoint(BOX_START);
 				}
-                else if (event->pos().x() > boundingRect().topRight().x() - RESIZE_TOLERANCE) {
+                else if (event->pos().x() > boxRect().topRight().x() - RESIZE_TOLERANCE) {
 					addTriggerPoint(BOX_END);
 				}
 			}
@@ -275,14 +275,14 @@ ParentBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 			|| cursor().shape() == Qt::SizeHorCursor || cursor().shape() == Qt::SizeFDiagCursor)) {
 		switch (_scene->resizeMode()) {
 		case HORIZONTAL_RESIZE :
-			resizeWidthEdition(_abstract->width() + event->pos().x() - boundingRect().topRight().x());
+            resizeWidthEdition(_abstract->width() + event->pos().x() - boxRect().topRight().x());
 			break;
 		case VERTICAL_RESIZE :
-			resizeHeightEdition(_abstract->height() + event->pos().y() - boundingRect().bottomRight().y());
+            resizeHeightEdition(_abstract->height() + event->pos().y() - boxRect().bottomRight().y());
 			break;
 		case DIAGONAL_RESIZE :
-			resizeAllEdition(_abstract->width() + event->pos().x() - boundingRect().topRight().x(),
-					_abstract->height() + event->pos().y() - boundingRect().bottomRight().y());
+            resizeAllEdition(_abstract->width() + event->pos().x() - boxRect().topRight().x(),
+                    _abstract->height() + event->pos().y() - boxRect().bottomRight().y());
 		}
 		QPainterPath nullPath;
 		nullPath.addRect(QRectF(QPointF(0.,0.),QSizeF(0.,0.)));
