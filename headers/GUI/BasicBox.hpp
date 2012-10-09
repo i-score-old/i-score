@@ -627,7 +627,6 @@ class BasicBox : public QObject, public QGraphicsItem
   virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 
-
   //! Managing main information of the box.
   AbstractBox *_abstract;
 
@@ -641,9 +640,7 @@ class BasicBox : public QObject, public QGraphicsItem
   std::map<BoxExtremity,TriggerPoint*> _triggerPoints; //!< The trigger points.
   std::map < BoxExtremity,std::map < unsigned int, Relation* > > _relations; //!< The relations.
   std::map<std::string,AbstractCurve*> _abstractCurves; //!< The Curves
-//  BoxWidget *_curvesWidget;
   BoxWidget *_curvesWidget;
-//  CurvesWidget *_curvesWidget;
   QRectF _boxRect;
   QRectF _leftEar;
   QRectF _rightEar;

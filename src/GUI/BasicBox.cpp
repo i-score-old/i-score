@@ -898,8 +898,7 @@ BasicBox::boxRect()
 }
 void
 BasicBox::keyPressEvent(QKeyEvent *event){
-    QGraphicsItem::keyPressEvent(event);
-    this->lock();
+    QGraphicsItem::keyPressEvent(event);    
 }
 
 void
@@ -1271,7 +1270,10 @@ BasicBox::drawInteractionPoints(QPainter *painter){
     earWidth = height()/4;
     earHeight = 30 ;
 
-    QPen pen(Qt::black);
+    QPen pen(isSelected() ? Qt::yellow : Qt::white);
+    QBrush brush(Qt::Dense3Pattern);
+    brush.setColor(isSelected() ? Qt::yellow : Qt::white);
+    painter->setBrush(brush);
     painter->setPen(pen);
 
     QRectF rect(0, 0, earWidth, earHeight);
@@ -1279,27 +1281,18 @@ BasicBox::drawInteractionPoints(QPainter *painter){
     int startAngle = 30 * 16;
     int spanAngle = 120 * 16;
     painter->rotate(90);
-//    painter->translate(earHeight/*+width()/2*/,-earWidth/2);
-//    painter->drawRect(rect);
     rect.moveTo(QPointF(-(earWidth/2),-(earHeight/4+width()/2)));
 
     int newX = -(earHeight/4+width()/2);
     int newY = -(earWidth/2);
     _leftEar = QRectF(QPointF(newX,newY),QSize(earHeight/4,earWidth));
 
-//    newX = width()/2 - 3*earHeight/4;
     newX = width()/2;
     _rightEar = QRectF(QPointF(newX,newY),QSize(earHeight/4,earWidth));
 
-//    _leftEar = rect;
-//    std::cout<<"RIGHT : "<<rect.x()<<" "<<rect.y()<<std::endl;
     painter->drawChord(rect,startAngle,spanAngle);
-
-     painter->rotate(-180);
-     painter->drawChord(rect,startAngle,spanAngle);
-//     std::cout<<"LEFT : "<<rect.x()<<" "<<rect.y()<<std::endl;
-//    painter->translate(-earHeight/*-width()/2*/,earWidth/2);
-//    painter->translate(0+earHeight/2,-width()/2+earWidth/2);
+    painter->rotate(-180);
+    painter->drawChord(rect,startAngle,spanAngle);
     painter->rotate(90);
 }
 
@@ -1308,16 +1301,16 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 {
 	Q_UNUSED(option);
 	Q_UNUSED(widget);  
-//    QPen penR(Qt::black,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
-    QPen penR(Qt::black,LINE_WIDTH);
+    QPen penR(Qt::lightGray,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
+//    QPen penR(Qt::lightGray,LINE_WIDTH);
 
     //********** pour afficher le boundingRect **********
     QPen penG(Qt::green);
     penG.setWidth(2);
     painter->setPen(penG);
-    painter->drawRect(boundingRect());
-    painter->drawRect(_leftEar);
-    painter->drawRect(_rightEar);
+//    painter->drawRect(boundingRect());
+//    painter->drawRect(_leftEar);
+//    painter->drawRect(_rightEar);
     //***************************************************/
 
     painter->setPen(penR);
