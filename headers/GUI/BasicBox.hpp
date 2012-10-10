@@ -527,7 +527,7 @@ class BasicBox : public QObject, public QGraphicsItem
   //! \brief Handles line width.
   static const unsigned int LINE_WIDTH = 2;
   //! \brief Handles resizing tolerance.
-  static const unsigned int RESIZE_TOLERANCE = 20;
+  static const unsigned int RESIZE_TOLERANCE = 25;
   static const unsigned int BOX_MARGIN = 10;
 
   /*!
@@ -549,7 +549,8 @@ class BasicBox : public QObject, public QGraphicsItem
   void updateCurves();
   void centerWidget();
   void createWidget();
-  void drawInteractionPoints(QPainter *painter);
+  void drawInteractionGrips(QPainter *painter);
+  void drawTriggerGrips(QPainter *painter);
   void updateBoxSize();
   inline QRectF leftEar(){return _leftEar;}
   inline QRectF rightEar(){return _rightEar;}
@@ -644,6 +645,8 @@ class BasicBox : public QObject, public QGraphicsItem
   QRectF _boxRect;
   QRectF _leftEar;
   QRectF _rightEar;
+  QRectF _startTriggerGrip;
+  QRectF _endTriggerGrip;
   QWidget *_boxWidget;
   QComboBox *_comboBox;
   QGraphicsProxyWidget *_curveProxy;

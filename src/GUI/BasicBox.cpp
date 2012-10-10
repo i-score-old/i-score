@@ -396,6 +396,7 @@ BasicBox::resizeHeightEdition(float height)
 	if (_comment != NULL) {
 		_comment->updatePos();
 	}
+    centerWidget();
 }
 
 void
@@ -739,7 +740,7 @@ void
 BasicBox::lock()
 {
 	setFlag(QGraphicsItem::ItemIsMovable, false);
-	setFlag(QGraphicsItem::ItemIsSelectable, false);
+//    setFlag(QGraphicsItem::ItemIsSelectable, false);
 	setFlag(QGraphicsItem::ItemIsFocusable, false);
 }
 
@@ -747,7 +748,7 @@ void
 BasicBox::unlock()
 {
 	setFlag(QGraphicsItem::ItemIsMovable);
-	setFlag(QGraphicsItem::ItemIsSelectable);
+//    setFlag(QGraphicsItem::ItemIsSelectable);
 	setFlag(QGraphicsItem::ItemIsFocusable);
 }
 
@@ -871,6 +872,8 @@ BasicBox::shape () const
     path.addRect(_boxRect);
     path.addRect(_leftEar);
     path.addRect(_rightEar);
+    path.addRect(_startTriggerGrip);
+    path.addRect(_endTriggerGrip);
 
 //    std::cout<<"box : "<<_boxRect.x()<<" ; "<<_boxRect.y()<<std::endl;
 //    std::cout<<"leftear : "<<_leftEar.x()<<" ; "<<_leftEar.y()<<std::endl;
@@ -888,7 +891,7 @@ BasicBox::boundingRect() const
 {
 	// Origine du repere = centre de l'objet
 //    return QRectF(-_abstract->width()/2, -_abstract->height()/2, _abstract->width(), _abstract->height());
-    return QRectF(-_abstract->width()/2 - BOX_MARGIN, -_abstract->height()/2, _abstract->width() + 2*BOX_MARGIN, _abstract->height());
+    return QRectF(-_abstract->width()/2 - BOX_MARGIN, -_abstract->height()/2 - BOX_MARGIN, _abstract->width() + 2*BOX_MARGIN, _abstract->height()+2*BOX_MARGIN);
 }
 
 QRectF
@@ -904,7 +907,6 @@ BasicBox::keyPressEvent(QKeyEvent *event){
 void
 BasicBox::keyReleaseEvent(QKeyEvent *event){
     QGraphicsItem::keyReleaseEvent(event);
-    this->unlock();
 }
 
 void
@@ -912,7 +914,9 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
 	QGraphicsItem::mousePressEvent(event);
 	if (event->button() == Qt::LeftButton) {
-		if (cursor().shape() == Qt::CrossCursor) {
+
+        setSelected(true);
+        if (cursor().shape() == Qt::CrossCursor) {
             lock();
 //			if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
             if (event->pos().x() < _boxRect.topLeft().x() + RESIZE_TOLERANCE) {
@@ -924,7 +928,7 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 			}
 		}
 		else if (cursor().shape() == Qt::PointingHandCursor) {
-			lock();
+            lock();
 //			if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
             if (event->pos().x() < _boxRect.topLeft().x() + RESIZE_TOLERANCE) {addTriggerPoint(BOX_START);
 			}
@@ -1264,14 +1268,44 @@ BasicBox::hoverLeaveEvent ( QGraphicsSceneHoverEvent * event )
 }
 
 void
-BasicBox::drawInteractionPoints(QPainter *painter){
+BasicBox::drawTriggerGrips(QPainter *painter){
+
+    int earWidth, earHeight;
+    earWidth = width()/16;
+    earHeight = 30 ;
+
+    QPen pen(isSelected() ? Qt::yellow : Qt::white);
+    QBrush brush(Qt::Dense3Pattern);
+    brush.setColor(isSelected() ? Qt::yellow : Qt::white);
+    painter->setBrush(brush);
+    painter->setPen(pen);
+
+    QRectF rect(0, 0, earWidth, earHeight);
+
+    int startAngle = 30 * 16;
+    int spanAngle = 120 * 16;
+    int newX = -width()/2 - LINE_WIDTH;
+    int newY = -height()/2 - earHeight/4;
+    QSize shapeSize(earWidth,earHeight/4);
+    rect.moveTo(newX,newY);
+    _startTriggerGrip = QRectF(QPointF(newX,newY),shapeSize);
+    painter->drawChord(rect,startAngle,spanAngle);
+
+    newX = -newX-earWidth;
+    rect.moveTo(newX,newY);
+    _endTriggerGrip = QRectF(QPointF(newX,newY),shapeSize);
+    painter->drawChord(rect,startAngle,spanAngle);
+}
+
+void
+BasicBox::drawInteractionGrips(QPainter *painter){
 
     int earWidth, earHeight;
     earWidth = height()/4;
     earHeight = 30 ;
 
     QPen pen(isSelected() ? Qt::yellow : Qt::white);
-    QBrush brush(Qt::Dense3Pattern);
+    QBrush brush(Qt::SolidPattern);
     brush.setColor(isSelected() ? Qt::yellow : Qt::white);
     painter->setBrush(brush);
     painter->setPen(pen);
@@ -1302,31 +1336,27 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 	Q_UNUSED(option);
 	Q_UNUSED(widget);  
     QPen penR(Qt::lightGray,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
-//    QPen penR(Qt::lightGray,LINE_WIDTH);
 
-    //********** pour afficher le boundingRect **********
+    //************* pour afficher la shape *************
     QPen penG(Qt::green);
     penG.setWidth(2);
-    painter->setPen(penG);
+//    painter->setPen(penG);
 //    painter->drawRect(boundingRect());
 //    painter->drawRect(_leftEar);
 //    painter->drawRect(_rightEar);
+//    painter->drawRect(_startTriggerGrip);
+//    painter->drawRect(_endTriggerGrip);
     //***************************************************/
 
     painter->setPen(penR);
 
-//  NICO modif : Points dans la box
-        painter->setBrush(QBrush(Qt::white,Qt::Dense7Pattern));
-//        painter->setBrush(QBrush(Qt::white,Qt::SolidPattern));
-//        painter->drawRect(boundingRect());
-        painter->drawRect(_boxRect);
-        drawInteractionPoints(painter);
-//	}
+    painter->setBrush(QBrush(Qt::white,Qt::Dense7Pattern));
+    painter->drawRect(_boxRect);
+    drawInteractionGrips(painter);
+    drawTriggerGrips(painter);
 
-	QColor bgColor = color().lighter();
-
-    _comboBoxProxy->setVisible(true);
-    _curveProxy->setVisible(true);
+    _comboBoxProxy->setVisible(_abstract->height()>RESIZE_TOLERANCE+LINE_WIDTH);
+    _curveProxy->setVisible(_abstract->height()>RESIZE_TOLERANCE+LINE_WIDTH);
 
     QBrush brush(Qt::lightGray,isSelected() ? Qt::SolidPattern : Qt::SolidPattern);
     QPen pen(color(),isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);

@@ -574,12 +574,18 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 	}
 	_savedInteractionMode = _currentInteractionMode;
 	_savedBoxMode = _currentBoxMode;
-    if (mouseEvent->modifiers() == Qt::ControlModifier) {
-		setCurrentMode(CREATION_MODE);
-	}
-    else {
+//    if (mouseEvent->modifiers() == Qt::ControlModifier) {
+//		setCurrentMode(CREATION_MODE);
+//	}
+//    else {
+//        setCurrentMode(SELECTION_MODE);
+//	}
+    if (mouseEvent->modifiers() == Qt::ShiftModifier) {
         setCurrentMode(SELECTION_MODE);
-	}
+    }
+    else {
+        setCurrentMode(CREATION_MODE);
+    }
 	if (itemAt(mouseEvent->scenePos()) != 0) {
         if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::PointingHandCursor && _currentInteractionMode != TRIGGER_MODE) {
             setCurrentMode(TRIGGER_MODE);
@@ -645,8 +651,7 @@ MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 					BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
                     if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE) ||
                             mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
-						_relationBoxFound = true;
-                        std::cout<<"relation found"<<std::endl;
+                        _relationBoxFound = true;
 						update();
 					}
 					else {
