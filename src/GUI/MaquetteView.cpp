@@ -61,7 +61,8 @@ MaquetteView::MaquetteView(MainWindow *mw)
   : QGraphicsView(mw)
 {
   setRenderHint(QPainter::Antialiasing);
-  setBackgroundBrush(QColor(140,176,140));
+//  setBackgroundBrush(QColor(140,176,140));
+  setBackgroundBrush(QColor(222,222,222));
   setCacheMode(QGraphicsView::CacheBackground);
 
   setWindowTitle(tr("Maquette"));
@@ -124,7 +125,8 @@ void
 MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
 {
   QGraphicsView::drawBackground(painter,rect);
-  QPen pen(Qt::darkGreen);
+//  QPen pen(Qt::darkGreen);
+    QPen pen(Qt::black);
 
   painter->setPen(pen);
 

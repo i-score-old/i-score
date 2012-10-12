@@ -97,7 +97,8 @@ static const float S_TO_MS  = 1000.;
 
 AttributesEditor::AttributesEditor(QWidget* parent) : QDockWidget(tr("AttributesEditor"),parent,0)
 {
-	Palette* sharedPalette = new Palette;
+    Palette* sharedPalette = new Palette;
+
 	sharedPalette->setContainer(NULL);
 
 	_profilesPreviewArea = new PreviewArea(parent,sharedPalette); //Creation de la zone d'apercu
@@ -106,7 +107,7 @@ AttributesEditor::AttributesEditor(QWidget* parent) : QDockWidget(tr("Attributes
 	_palette = sharedPalette;
     _boxEdited = NO_ID;
 
-	_palette->setColor(Qt::black);
+    _palette->setColor(Qt::black);
 
 	setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
@@ -155,7 +156,7 @@ void AttributesEditor::noBoxEdited() {
 	//_snapshotTab->setEnabled(false);
 	_messagesTab->setEnabled(false);
 	_curvesWidget->updateMessages(NO_ID,false);
-	_curvesTab->setEnabled(false);
+    _curvesTab->setEnabled(false);
 }
 
 void
@@ -383,7 +384,7 @@ AttributesEditor::createWidgets()
 
 	// Allocations and names
 
-	_tabWidget = new QTabWidget;
+    _tabWidget = new QTabWidget;
 	_generalTab = new QWidget;
 	_profilesTab = new QWidget;
 	_profilesTabs = new QTabWidget;
@@ -391,7 +392,7 @@ AttributesEditor::createWidgets()
 	_messagesTab = new QWidget;
 
 	_messagesTabs = new QTabWidget;
-	_explorationTab = new QTabWidget;
+    _explorationTab = new QTabWidget;
 	_treeMapTab = new QTabWidget;
 	_snapshotTab = new QWidget;
 	_curvesTab = new QWidget;
@@ -712,6 +713,7 @@ AttributesEditor::addWidgetsToLayout()
 	// Set Central Widget
 	setWidget(_tabWidget);
     _tabWidget->setBaseSize(MINIMUM_WIDTH,height());
+
 
 //	_generalTabIndex = _tabWidget->addTab(_generalTab,"General");
 //	_profilesTabIndex = _tabWidget->addTab(_profilesTab,"Profiles");

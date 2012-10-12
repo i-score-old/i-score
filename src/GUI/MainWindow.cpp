@@ -89,7 +89,6 @@ MainWindow::MainWindow()
   // Creation of Graphic Palette
   _editor = new AttributesEditor(this);
   _editor->hide();
-
   addDockWidget(Qt::LeftDockWidgetArea,_editor);
 
   // Creation of Scene and View
@@ -781,7 +780,7 @@ MainWindow::createActions()
   _triggerModeAct->setChecked(false);
   connect(_triggerModeAct,SIGNAL(triggered()), this, SLOT(selectMode()));
 
-  _modeAct = new QActionGroup(this);
+  _modeAct = new QActionGroup(this);  
   _modeAct->addAction(_selectModeAct);
   _modeAct->addAction(_SBModeAct);
   _modeAct->addAction(_CBModeAct);

@@ -693,6 +693,21 @@
 					);
 			};
 		};
+		A25A3876BE4ED864C7D3A6F5 = {
+			isa = PBXFileReference;
+			name = "BoxCurveEdit.cpp";
+			path = "src/GUI/BoxCurveEdit.cpp";
+			refType = 4;
+			lastKnownFileType = "sourcecode.cpp.cpp";
+		};
+		5D3015BF4027605BCE0456D6 = {
+			fileRef = "A25A3876BE4ED864C7D3A6F5";
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					);
+			};
+		};
 		B95006AEFE6773908F66D1C6 = {
 			isa = PBXFileReference;
 			name = "acousmoscribe.icns";
@@ -1082,6 +1097,21 @@
 					);
 			};
 		};
+		FE9B7CC0D91F8891075F5E1E = {
+			isa = PBXFileReference;
+			name = "moc_BoxCurveEdit.cpp";
+			path = "moc/moc_BoxCurveEdit.cpp";
+			refType = 4;
+			lastKnownFileType = "sourcecode.cpp.cpp";
+		};
+		98FC9815077E79F2F65C77EB = {
+			fileRef = "FE9B7CC0D91F8891075F5E1E";
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					);
+			};
+		};
 		5A224ABC9D6D75C7D981C029 = {
 			isa = PBXFileReference;
 			name = "qrc_i-score.cpp";
@@ -1379,6 +1409,12 @@
 			path = "headers/GUI/BoxWidget.hpp";
 			refType = 4;
 		};
+		F46982B2688387B52E8ED692 = {
+			isa = PBXFileReference;
+			name = "BoxCurveEdit.hpp";
+			path = "headers/GUI/BoxCurveEdit.hpp";
+			refType = 4;
+		};
 		71078BD4296B16D83E12B053 = {
 			isa = PBXFileReference;
 			name = "i-score.pro";
@@ -1450,7 +1486,8 @@
 				"A8FE477248686FE84C0AF1F3",
 				"D6140660692472396459E6D4",
 				"504A6F74BDF1390DE5F455D9",
-				"7D9FFD201504D7783386B2D5");
+				"7D9FFD201504D7783386B2D5",
+				"F46982B2688387B52E8ED692");
 			name = "GUI";
 			refType = 4;
 		};
@@ -1522,7 +1559,8 @@
 				"B18FE28CEB3828F02EDFB4E6",
 				"83675F618F779EDCE39A76C5",
 				"7D8C281DE8F85D41EAAF43CB",
-				"D6D855C345DCC3C8D811C1B5");
+				"D6D855C345DCC3C8D811C1B5",
+				"A25A3876BE4ED864C7D3A6F5");
 			name = "GUI";
 			refType = 4;
 		};
@@ -1571,7 +1609,8 @@
 				"865C8AE48BB4052664AE6188",
 				"74F51C88976C501F32D7A5ED",
 				"504C76404A06DA93E9E225E3",
-				"58185FD17225028C3967CC8D");
+				"58185FD17225028C3967CC8D",
+				"FE9B7CC0D91F8891075F5E1E");
 			name = "moc";
 			refType = 4;
 		};
@@ -1656,6 +1695,7 @@
 				"F63D295A6F78E757652883FC",
 				"3B68A266F1F9A1C3A56DD220",
 				"91C5ED25EB071BA6E10F2373",
+				"5D3015BF4027605BCE0456D6",
 				"0B2292BC85745A06F653071B",
 				"FD3B07BA4A94B84DBFB464E8",
 				"86EB7F55602050556A3549AE",
@@ -1681,6 +1721,7 @@
 				"EFFA5DC8C8B71AE488687F2C",
 				"32647F8624F85C810672A0A0",
 				"7197277110A24D12276FD0B2",
+				"98FC9815077E79F2F65C77EB",
 				"7F3E602466E431ABBC2C3ACC");
 			isa = PBXShellScriptBuildPhase;
 			name = "Qt Preprocessors";
@@ -1730,6 +1771,7 @@
 				"F63D295A6F78E757652883FC",
 				"3B68A266F1F9A1C3A56DD220",
 				"91C5ED25EB071BA6E10F2373",
+				"5D3015BF4027605BCE0456D6",
 				"0B2292BC85745A06F653071B",
 				"FD3B07BA4A94B84DBFB464E8",
 				"86EB7F55602050556A3549AE",
@@ -1755,6 +1797,7 @@
 				"EFFA5DC8C8B71AE488687F2C",
 				"32647F8624F85C810672A0A0",
 				"7197277110A24D12276FD0B2",
+				"98FC9815077E79F2F65C77EB",
 				"7F3E602466E431ABBC2C3ACC");
 			shellPath = "/bin/sh";
 			shellScript = "make\ -C\ /Users/nicolashincker/Documents/workspace/acousmoscribe\ -f\ \'i-score.xcodeproj/qt_preprocess.mak\'";
@@ -1807,6 +1850,7 @@
 				"F63D295A6F78E757652883FC",
 				"3B68A266F1F9A1C3A56DD220",
 				"91C5ED25EB071BA6E10F2373",
+				"5D3015BF4027605BCE0456D6",
 				"0B2292BC85745A06F653071B",
 				"FD3B07BA4A94B84DBFB464E8",
 				"86EB7F55602050556A3549AE",
@@ -1832,6 +1876,7 @@
 				"EFFA5DC8C8B71AE488687F2C",
 				"32647F8624F85C810672A0A0",
 				"7197277110A24D12276FD0B2",
+				"98FC9815077E79F2F65C77EB",
 				"7F3E602466E431ABBC2C3ACC");
 			isa = PBXSourcesBuildPhase;
 			name = "Build Sources";

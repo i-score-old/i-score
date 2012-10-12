@@ -548,7 +548,6 @@ class MaquetteScene : public QGraphicsScene
    * \param playing : the playing state
    */
   void setPlaying(unsigned int boxID, bool playing);
-
   //! Integer handling scene's maximal width.
   static const int MAX_SCENE_WIDTH = 100000;
   //! Integer handling scene's maximal height.
@@ -590,6 +589,7 @@ class MaquetteScene : public QGraphicsScene
    * \param mouseEvent : contains the information about the event
    */
   virtual void mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent);
+  virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
   /*!
    * \brief Redefinition of QGraphicsScene::mouseMoveEvent().
    * Called when the mouse pointer is moving on the scene.

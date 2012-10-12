@@ -56,8 +56,10 @@ public :
     void curveShowChanged(const QString &address,bool state);
     void updateCurve(const std::string &address);
     void removeCurve(const std::string &address);
-    void setComboBox(QComboBox *cbox);
-    QStackedLayout *_stackedLayout;
+    void setComboBox(QComboBox *cbox);    
+    inline QStackedLayout *stackedLayout(){return _stackedLayout;}
+    inline QComboBox *comboBox(){return _comboBox;}
+    inline void setStackedLayout(QStackedLayout *slayout){_stackedLayout = slayout;setLayout(_stackedLayout);}
 
 public slots :
     void displayCurve(const QString &address);
@@ -84,7 +86,7 @@ private :
     QTabWidget *_curve;
     QGridLayout *_curvePageLayout;
     CurveWidget *_curveWidget;
-
+    QStackedLayout *_stackedLayout;
 };
 
 #endif // BOXWIDGET_H

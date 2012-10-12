@@ -481,13 +481,11 @@ class BasicBox : public QObject, public QGraphicsItem
    * \param messages : the messages to send at box's start
    */
   void setStartMessages(NetworkMessages *messages);
-//  void setStartMessagesToSend(QMap<QTreeWidgetItem *, Message> messages);
   /*!
    * \brief Sets networkTreeItems to send when the start of the box is reached.
    *
    * \param itemsSelected : the items to send at box's start
    */
-//  void setSelectedItemsToSend(QList<QTreeWidgetItem*> itemsSelected);
   void setSelectedItemsToSend(QMap<QTreeWidgetItem*,Data> itemsSelected);
   /*!
    * \brief Sets networkTreeExpandedItems to send.
@@ -523,7 +521,6 @@ class BasicBox : public QObject, public QGraphicsItem
    * \param messages : the messages to send at box's end
    */
   void setEndMessages(NetworkMessages *messages);
-//    void setEndMessagesToSend(QMap<QTreeWidgetItem *, Message> messages);
   //! \brief Handles line width.
   static const unsigned int LINE_WIDTH = 2;
   //! \brief Handles resizing tolerance.
@@ -554,8 +551,16 @@ class BasicBox : public QObject, public QGraphicsItem
   void updateBoxSize();
   inline QRectF leftEar(){return _leftEar;}
   inline QRectF rightEar(){return _rightEar;}
+  inline BoxWidget *curvesWidget(){return _curvesWidget;}
+  inline QWidget *boxWidget(){return _boxWidget;}
+  inline MaquetteScene *maquetteScene(){return _scene;}
+  inline void setComboBox(QComboBox *cbox){curvesWidget()->setComboBox(cbox);}
+  inline void setStackedLayout(QStackedLayout *slayout){curvesWidget()->setStackedLayout(slayout);}
+  void refresh();
+
   QPointF getLeftGripPoint();
   QPointF getRightGripPoint();
+  void displayCurveEditWindow();
 
  protected:
   /*!

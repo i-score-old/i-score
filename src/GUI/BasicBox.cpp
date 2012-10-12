@@ -50,6 +50,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "MainWindow.hpp"
 #include "Relation.hpp"
 #include "CurveWidget.hpp"
+#include "BoxCurveEdit.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -107,6 +108,7 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
     update();
     connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),_curvesWidget, SLOT(displayCurve(const QString&)));
     connect(_comboBox,SIGNAL(activated(const QString&)),_curvesWidget, SLOT(displayCurve(const QString&)));    
+
 }
 
 void
@@ -988,18 +990,21 @@ BasicBox::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
 
 
     if (!_scene->playing() && (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor) && inTextRect) {
-        QInputDialog *nameDialog = nameInputDialog();
+//        QInputDialog *nameDialog = nameInputDialog();
 
-        bool ok = nameDialog->exec();
-        QString nameValue = nameDialog->textValue();
+//        bool ok = nameDialog->exec();
+//        QString nameValue = nameDialog->textValue();
 
-        if (ok) {
-            _abstract->setName(nameValue.toStdString());
-            this->update();
-            _scene->displayMessage(QObject::tr("Box's name successfully updated").toStdString(),INDICATION_LEVEL);
-         }
+//        if (ok) {
+//            _abstract->setName(nameValue.toStdString());
+//            this->update();
+//            _scene->displayMessage(QObject::tr("Box's name successfully updated").toStdString(),INDICATION_LEVEL);
+//         }
 
-     delete nameDialog;
+//     delete nameDialog;
+//        displayCurveEditWindow();
+        BoxCurveEdit *boxCurveEdit = new BoxCurveEdit(0,this);
+        boxCurveEdit->exec();
     }
 
     else{
@@ -1289,12 +1294,12 @@ BasicBox::drawTriggerGrips(QPainter *painter){
     QSize shapeSize(earWidth,earHeight/4);
     rect.moveTo(newX,newY);
     _startTriggerGrip = QRectF(QPointF(newX,newY),shapeSize);
-    painter->drawChord(rect,startAngle,spanAngle);
+//    painter->drawChord(rect,startAngle,spanAngle);
 
     newX = -newX-earWidth;
     rect.moveTo(newX,newY);
     _endTriggerGrip = QRectF(QPointF(newX,newY),shapeSize);
-    painter->drawChord(rect,startAngle,spanAngle);
+//    painter->drawChord(rect,startAngle,spanAngle);
 }
 
 void
@@ -1423,4 +1428,23 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 void
 BasicBox::curveShowChanged(const QString &address,bool state){
     _curvesWidget->curveShowChanged(address,state);
+}
+
+void
+BasicBox::displayCurveEditWindow(){
+    QWidget *editWindow=new QWidget;
+    editWindow->setWindowModality(Qt::ApplicationModal);
+    QGridLayout *layout = new QGridLayout;
+
+//    layout->addWidget(_curvesWidgetCLONE);
+
+    editWindow->setLayout(layout);
+    editWindow->setGeometry(QRect(_scene->sceneRect().toRect()));
+    editWindow->show();
+
+}
+
+void
+BasicBox::refresh(){
+
 }

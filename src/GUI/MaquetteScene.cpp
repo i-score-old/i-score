@@ -411,7 +411,7 @@ MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
 					painterPath.lineTo(endX-arrowSize,endY + (arrowSize/2.));
 					painterPath.lineTo(endX,endY);
 
-					painter->fillPath(painterPath,QColor(60,60,60));
+                    painter->fillPath(painterPath,QColor(60,60,60));
 				}
 			}
 			else {
@@ -560,9 +560,17 @@ MaquetteScene::dropEvent(QGraphicsSceneDragDropEvent *event)
 }
 
 void
+MaquetteScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
+    QGraphicsScene::mouseDoubleClickEvent(event);
+
+//    if(selectedItems().size()==1){
+//        BasicBox *currentBox = static_cast<BasicBox *>(selectedItems().first());
+//    }
+}
+
+void
 MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-
     QGraphicsScene::mousePressEvent(mouseEvent);
 
 	_clicked = true;
@@ -1868,6 +1876,7 @@ void MaquetteScene::load(const string &fileName)
 	_maquette->load(fileName);
 	setModified(false);
 }
+
 
 void
 MaquetteScene::addToTriggerQueue(TriggerPoint *trigger){
