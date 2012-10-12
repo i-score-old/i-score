@@ -82,8 +82,6 @@ private :
     QWidget *_parentWidget;
     QList <CurveWidget *> *_curveWidgetList;
     QTabWidget *_curve;
-
-
     QGridLayout *_curvePageLayout;
     CurveWidget *_curveWidget;
 

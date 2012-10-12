@@ -115,7 +115,7 @@ void
 Comment::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
   // TODO : solve position BUG
-	QRectF comRect = boundingRect();
+    QRectF comRect = boundingRect();
   painter->save();
   QPen pen = QPen(Qt::darkYellow,BasicBox::LINE_WIDTH);
   painter->setPen(pen);

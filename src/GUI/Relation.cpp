@@ -161,10 +161,13 @@ Relation::updateCoordinates()
   BasicBox *box = _scene->getBox(_abstract->firstBox());
   switch (_abstract->firstExtremity()) {
   case BOX_START :
-    _start = box->getMiddleLeft();
+//    _start = box->getMiddleLeft();
+      _start = box->getLeftGripPoint();
+
     break;
   case BOX_END :
-    _start = box->getMiddleRight();
+//    _start = box->getMiddleRight();
+      _start = box->getRightGripPoint();
     break;
   case NO_EXTREMITY :
     _start = box->getCenter();
@@ -174,12 +177,16 @@ Relation::updateCoordinates()
   box = _scene->getBox(_abstract->secondBox());
   switch (_abstract->secondExtremity()) {
   case BOX_START :
-      if(box!=NULL)
-        _end = box->getMiddleLeft();
+      if(box!=NULL){
+//        _end = box->getMiddleLeft();
+        _end = box->getLeftGripPoint();
+      }
     break;
   case BOX_END :
-      if(box!=NULL)
-        _end = box->getMiddleRight();
+      if(box!=NULL){
+//        _end = box->getMiddleRight();
+          _end = box->getRightGripPoint();
+      }
     break;
   case NO_EXTREMITY :
       if(box!=NULL)

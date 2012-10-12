@@ -83,7 +83,6 @@ using std::map;
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
 : QGraphicsItem()
 {
-
 	_scene = parent;
 
 	int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
@@ -197,6 +196,7 @@ BasicBox::init()
 	_playing = false;
 
 	_comment = NULL;
+    updateBoxSize();
 
 	setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
@@ -230,13 +230,13 @@ BasicBox::abstract() const
 QPointF
 BasicBox::getTopLeft() const
 {
-	return QPointF(_abstract->topLeft().x(),_abstract->topLeft().y());
+    return QPointF(_abstract->topLeft().x(),_abstract->topLeft().y());
 }
 
 QPointF
 BasicBox::getBottomRight() const
 {
-	return QPointF(_abstract->topLeft().x() + _abstract->width(), _abstract->topLeft().y() + _abstract->height());
+    return QPointF(_abstract->topLeft().x() + _abstract->width(), _abstract->topLeft().y() + _abstract->height());
 }
 
 QPointF
@@ -258,6 +258,18 @@ BasicBox::getSize() const
 }
 
 QPointF
+BasicBox::getLeftGripPoint()
+{
+    return QPointF(_abstract->topLeft().x()-leftEar().width(), _abstract->topLeft().y() + _abstract->height()/2.);
+}
+
+QPointF
+BasicBox::getRightGripPoint()
+{
+    return QPointF(_abstract->topLeft().x() + _abstract->width() + _rightEar.width(), _abstract->topLeft().y() + _abstract->height()/2.);
+}
+
+QPointF
 BasicBox::getMiddleRight() const
 {
 	return QPointF(_abstract->topLeft().x() + _abstract->width(), _abstract->topLeft().y() + _abstract->height()/2.);
@@ -271,15 +283,15 @@ BasicBox::getMiddleLeft() const
 
 QPointF
 BasicBox::getShapeTopLeft() const
-{
-	return _abstract->topLeft();
+{ 
+    return _abstract->topLeft();
 }
 
 QPointF
 BasicBox::getShapeTopRight() const
-{
-	return QPointF(_abstract->topLeft().x() + _abstract->width(),
-			_abstract->topLeft().y());
+{   
+    return QPointF(_abstract->topLeft().x() + _abstract->width(),
+            _abstract->topLeft().y());
 }
 
 void
@@ -316,6 +328,7 @@ BasicBox::setSize(const QPointF & size)
 {
 	_abstract->setWidth(std::max((float)size.x(),MaquetteScene::MS_PRECISION / MaquetteScene::MS_PER_PIXEL));
 	_abstract->setHeight(size.y());
+
 	updateStuff();
 }
 
@@ -383,6 +396,7 @@ BasicBox::resizeHeightEdition(float height)
 	if (_comment != NULL) {
 		_comment->updatePos();
 	}
+    centerWidget();
 }
 
 void
@@ -419,6 +433,7 @@ BasicBox::setColor(const QColor & color)
 void
 BasicBox::updateStuff()
 {
+    updateBoxSize();
 	if (_comment != NULL) {
 		_comment->updatePos();
 	}
@@ -725,7 +740,7 @@ void
 BasicBox::lock()
 {
 	setFlag(QGraphicsItem::ItemIsMovable, false);
-	setFlag(QGraphicsItem::ItemIsSelectable, false);
+//    setFlag(QGraphicsItem::ItemIsSelectable, false);
 	setFlag(QGraphicsItem::ItemIsFocusable, false);
 }
 
@@ -733,7 +748,7 @@ void
 BasicBox::unlock()
 {
 	setFlag(QGraphicsItem::ItemIsMovable);
-	setFlag(QGraphicsItem::ItemIsSelectable);
+//    setFlag(QGraphicsItem::ItemIsSelectable);
 	setFlag(QGraphicsItem::ItemIsFocusable);
 }
 
@@ -853,9 +868,21 @@ BasicBox::shape () const
 {
 	QPainterPath path;
 
-	path.addRect(boundingRect());
+//    path.addRect(boundingRect());
+    path.addRect(_boxRect);
+    path.addRect(_leftEar);
+    path.addRect(_rightEar);
+    path.addRect(_startTriggerGrip);
+    path.addRect(_endTriggerGrip);
 
+//    std::cout<<"box : "<<_boxRect.x()<<" ; "<<_boxRect.y()<<std::endl;
+//    std::cout<<"leftear : "<<_leftEar.x()<<" ; "<<_leftEar.y()<<std::endl;
 	return path;
+}
+
+void
+BasicBox::updateBoxSize(){
+    _boxRect = QRectF(-_abstract->width()/2, -_abstract->height()/2, _abstract->width(), _abstract->height());
 }
 
 // Bounding box of the item - useful to detect mouse interaction
@@ -863,19 +890,23 @@ QRectF
 BasicBox::boundingRect() const
 {
 	// Origine du repere = centre de l'objet
-	return QRectF(-_abstract->width()/2, -_abstract->height()/2, _abstract->width(), _abstract->height());
+//    return QRectF(-_abstract->width()/2, -_abstract->height()/2, _abstract->width(), _abstract->height());
+    return QRectF(-_abstract->width()/2 - BOX_MARGIN, -_abstract->height()/2 - BOX_MARGIN, _abstract->width() + 2*BOX_MARGIN, _abstract->height()+2*BOX_MARGIN);
 }
 
+QRectF
+BasicBox::boxRect()
+{
+    return _boxRect;
+}
 void
 BasicBox::keyPressEvent(QKeyEvent *event){
-    QGraphicsItem::keyPressEvent(event);
-    this->lock();
+    QGraphicsItem::keyPressEvent(event);    
 }
 
 void
 BasicBox::keyReleaseEvent(QKeyEvent *event){
     QGraphicsItem::keyReleaseEvent(event);
-    this->unlock();
 }
 
 void
@@ -883,21 +914,26 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
 	QGraphicsItem::mousePressEvent(event);
 	if (event->button() == Qt::LeftButton) {
-		if (cursor().shape() == Qt::CrossCursor) {
+
+        setSelected(true);
+        if (cursor().shape() == Qt::CrossCursor) {
             lock();
-			if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
+//			if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
+            if (event->pos().x() < _boxRect.topLeft().x() + RESIZE_TOLERANCE) {
 				_scene->setRelationFirstBox(_abstract->ID(),BOX_START);
 			}
-			else if (event->pos().x() > boundingRect().topRight().x() - RESIZE_TOLERANCE) {
+//			else if (event->pos().x() > boundingRect().topRight().x() - RESIZE_TOLERANCE) {
+            else if (event->pos().x() > _boxRect.topRight().x() - RESIZE_TOLERANCE) {
 				_scene->setRelationFirstBox(_abstract->ID(),BOX_END);
 			}
 		}
 		else if (cursor().shape() == Qt::PointingHandCursor) {
-			lock();
-			if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
-				addTriggerPoint(BOX_START);
+            lock();
+//			if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
+            if (event->pos().x() < _boxRect.topLeft().x() + RESIZE_TOLERANCE) {addTriggerPoint(BOX_START);
 			}
-			else if (event->pos().x() > boundingRect().topRight().x() - RESIZE_TOLERANCE) {
+//			else if (event->pos().x() > boundingRect().topRight().x() - RESIZE_TOLERANCE) {
+            else if (event->pos().x() > _boxRect.topRight().x() - RESIZE_TOLERANCE) {
 				addTriggerPoint(BOX_END);
 			}
 		}
@@ -991,14 +1027,18 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	else if (_scene->resizeMode() != NO_RESIZE && (cursor().shape() == Qt::SizeVerCursor || cursor().shape() == Qt::SizeHorCursor || cursor().shape() == Qt::SizeFDiagCursor)) {
 		switch (_scene->resizeMode()) {
 		case HORIZONTAL_RESIZE :
-			resizeWidthEdition(_abstract->width() + event->pos().x() - boundingRect().topRight().x());
+//			resizeWidthEdition(_abstract->width() + event->pos().x() - boundingRect().topRight().x());
+            resizeWidthEdition(_abstract->width() + event->pos().x() - _boxRect.topRight().x());
 			break;
 		case VERTICAL_RESIZE :
-			resizeHeightEdition(_abstract->height() + event->pos().y() - boundingRect().bottomRight().y());
+//			resizeHeightEdition(_abstract->height() + event->pos().y() - boundingRect().bottomRight().y());
+            resizeHeightEdition(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y());
 			break;
 		case DIAGONAL_RESIZE :
-			resizeAllEdition(_abstract->width() + event->pos().x() - boundingRect().topRight().x(),
-					_abstract->height() + event->pos().y() - boundingRect().bottomRight().y());
+//			resizeAllEdition(_abstract->width() + event->pos().x() - boundingRect().topRight().x(),
+//					_abstract->height() + event->pos().y() - boundingRect().bottomRight().y());
+            resizeAllEdition(_abstract->width() + event->pos().x() - _boxRect.topRight().x(),
+                    _abstract->height() + event->pos().y() - _boxRect.bottomRight().y());
 		}
 		QPainterPath nullPath;
 		nullPath.addRect(QRectF(QPointF(0.,0.),QSizeF(0.,0.)));
@@ -1027,18 +1067,22 @@ BasicBox::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void
 BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 {
-	QGraphicsItem::hoverEnterEvent(event);
-
+    QGraphicsItem::hoverEnterEvent(event);
 	if (event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::ControlModifier) {
 		setCursor(Qt::SizeAllCursor);
 	}
 	else {
 		const float eventPosX = event->pos().x();
 		const float eventPosY = event->pos().y();
-		const float boxStartX = boundingRect().topLeft().x();
-		const float boxStartY = boundingRect().topLeft().y();
-		const float boxEndX = boundingRect().bottomRight().x();
-		const float boxEndY = boundingRect().bottomRight().y();
+//		const float boxStartX = boundingRect().topLeft().x();
+//		const float boxStartY = boundingRect().topLeft().y();
+//		const float boxEndX = boundingRect().bottomRight().x();
+//		const float boxEndY = boundingRect().bottomRight().y();
+        const float boxStartX = _boxRect.topLeft().x();
+        const float boxStartY = _boxRect.topLeft().y();
+        const float boxEndX = _boxRect.bottomRight().x();
+        const float boxEndY = _boxRect.bottomRight().y();
+
 		const float boxSizeY = boxEndY - boxStartY;
 		const float TRIG_DOWN = boxEndY - 2*boxSizeY/3.;
 		const float REL_UP = TRIG_DOWN;
@@ -1053,7 +1097,7 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 			BORDER_GRIP = LINE_WIDTH;
 		}
 
-		if (_scene->currentMode() == RELATION_MODE) {
+        if (_scene->currentMode() == RELATION_MODE) {
 			if (eventPosX >  boxEndX - BORDER_GRIP) {
 				setCursor(Qt::CrossCursor);
 			}
@@ -1083,29 +1127,29 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 					setCursor(Qt::SizeFDiagCursor);
 				}
 				else if (eventPosY > REL_DOWN && eventPosY <= DIAG_RESIZE_UP) {
-					setCursor(Qt::SizeHorCursor);
+                    setCursor(Qt::SizeHorCursor);
 				}
-				else if (eventPosY > TRIG_DOWN && eventPosY <= REL_DOWN) {
+                else if (eventPosY > TRIG_DOWN && eventPosY <= REL_DOWN) {
 					setCursor(Qt::CrossCursor);
 				}
-				else if (eventPosY <= REL_DOWN) {                    
+                else if (eventPosY <= REL_DOWN) {
 					setCursor(Qt::PointingHandCursor);
 				}
-				else {
+                else {
 					setCursor(Qt::SizeAllCursor);
 				}
 			}
-			else if (eventPosX < boxStartX + BORDER_GRIP) {
-				if (eventPosY > DIAG_RESIZE_UP) {
+            else if (eventPosX < boxStartX + BORDER_GRIP) {
+                if (eventPosY > DIAG_RESIZE_UP) {
 					setCursor(Qt::SizeVerCursor);
 				}
-				else if (eventPosY > REL_UP && eventPosY <= REL_DOWN) {
+                else if (eventPosY > REL_UP && eventPosY <= REL_DOWN) {
 					setCursor(Qt::CrossCursor);
 				}
-				else if (eventPosY <= TRIG_DOWN) {
+                else if (eventPosY <= TRIG_DOWN) {
 					setCursor(Qt::PointingHandCursor);                    
 				}
-				else {
+                else {
 					setCursor(Qt::SizeAllCursor);
 				}
 			}
@@ -1122,19 +1166,23 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 void
 BasicBox::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 {
-	QGraphicsItem::hoverMoveEvent(event);
-
+    QGraphicsItem::hoverMoveEvent(event);
 	if (event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::ControlModifier) {
 		setCursor(Qt::SizeAllCursor);
 	}
 	else {
 		const float eventPosX = event->pos().x();
 		const float eventPosY = event->pos().y();
-		const float boxStartX = boundingRect().topLeft().x();
-		const float boxStartY = boundingRect().topLeft().y();
-		const float boxEndX = boundingRect().bottomRight().x();
-		const float boxEndY = boundingRect().bottomRight().y();
-		const float boxSizeY = boxEndY - boxStartY;
+//		const float boxStartX = boundingRect().topLeft().x();
+//		const float boxStartY = boundingRect().topLeft().y();
+//		const float boxEndX = boundingRect().bottomRight().x();
+//		const float boxEndY = boundingRect().bottomRight().y();
+        const float boxStartX = _boxRect.topLeft().x();
+        const float boxStartY = _boxRect.topLeft().y();
+        const float boxEndX = _boxRect.bottomRight().x();
+        const float boxEndY = _boxRect.bottomRight().y();
+
+        const float boxSizeY = boxEndY - boxStartY;
 		const float TRIG_DOWN = boxEndY - 2*boxSizeY/3.;
 		const float REL_UP = TRIG_DOWN;
 		const float REL_DOWN = boxEndY - boxSizeY/3.;
@@ -1220,26 +1268,95 @@ BasicBox::hoverLeaveEvent ( QGraphicsSceneHoverEvent * event )
 }
 
 void
+BasicBox::drawTriggerGrips(QPainter *painter){
+
+    int earWidth, earHeight;
+    earWidth = width()/16;
+    earHeight = 30 ;
+
+    QPen pen(isSelected() ? Qt::yellow : Qt::white);
+    QBrush brush(Qt::Dense3Pattern);
+    brush.setColor(isSelected() ? Qt::yellow : Qt::white);
+    painter->setBrush(brush);
+    painter->setPen(pen);
+
+    QRectF rect(0, 0, earWidth, earHeight);
+
+    int startAngle = 30 * 16;
+    int spanAngle = 120 * 16;
+    int newX = -width()/2 - LINE_WIDTH;
+    int newY = -height()/2 - earHeight/4;
+    QSize shapeSize(earWidth,earHeight/4);
+    rect.moveTo(newX,newY);
+    _startTriggerGrip = QRectF(QPointF(newX,newY),shapeSize);
+    painter->drawChord(rect,startAngle,spanAngle);
+
+    newX = -newX-earWidth;
+    rect.moveTo(newX,newY);
+    _endTriggerGrip = QRectF(QPointF(newX,newY),shapeSize);
+    painter->drawChord(rect,startAngle,spanAngle);
+}
+
+void
+BasicBox::drawInteractionGrips(QPainter *painter){
+
+    int earWidth, earHeight;
+    earWidth = height()/4;
+    earHeight = 30 ;
+
+    QPen pen(isSelected() ? Qt::yellow : Qt::white);
+    QBrush brush(Qt::SolidPattern);
+    brush.setColor(isSelected() ? Qt::yellow : Qt::white);
+    painter->setBrush(brush);
+    painter->setPen(pen);
+
+    QRectF rect(0, 0, earWidth, earHeight);
+
+    int startAngle = 30 * 16;
+    int spanAngle = 120 * 16;
+    painter->rotate(90);
+    rect.moveTo(QPointF(-(earWidth/2),-(earHeight/4+width()/2)));
+
+    int newX = -(earHeight/4+width()/2);
+    int newY = -(earWidth/2);
+    _leftEar = QRectF(QPointF(newX,newY),QSize(earHeight/4,earWidth));
+
+    newX = width()/2;
+    _rightEar = QRectF(QPointF(newX,newY),QSize(earHeight/4,earWidth));
+
+    painter->drawChord(rect,startAngle,spanAngle);
+    painter->rotate(-180);
+    painter->drawChord(rect,startAngle,spanAngle);
+    painter->rotate(90);
+}
+
+void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	Q_UNUSED(option);
 	Q_UNUSED(widget);  
-    QPen penR(Qt::darkGray,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
-//	if (!playing()) {
+    QPen penR(Qt::lightGray,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
 
-        painter->setPen(penR);
-//		painter->setPen(Qt::lightGray);
+    //************* pour afficher la shape *************
+    QPen penG(Qt::green);
+    penG.setWidth(2);
+//    painter->setPen(penG);
+//    painter->drawRect(boundingRect());
+//    painter->drawRect(_leftEar);
+//    painter->drawRect(_rightEar);
+//    painter->drawRect(_startTriggerGrip);
+//    painter->drawRect(_endTriggerGrip);
+    //***************************************************/
 
-//  NICO modif : Points dans la box
-        painter->setBrush(QBrush(Qt::white,Qt::Dense7Pattern));
-//        painter->setBrush(QBrush(Qt::white,Qt::SolidPattern));
-		painter->drawRect(boundingRect());
-//	}
+    painter->setPen(penR);
 
-	QColor bgColor = color().lighter();
+    painter->setBrush(QBrush(Qt::white,Qt::Dense7Pattern));
+    painter->drawRect(_boxRect);
+    drawInteractionGrips(painter);
+    drawTriggerGrips(painter);
 
-    _comboBoxProxy->setVisible(true);
-    _curveProxy->setVisible(true);
+    _comboBoxProxy->setVisible(_abstract->height()>RESIZE_TOLERANCE+LINE_WIDTH);
+    _curveProxy->setVisible(_abstract->height()>RESIZE_TOLERANCE+LINE_WIDTH);
 
     QBrush brush(Qt::lightGray,isSelected() ? Qt::SolidPattern : Qt::SolidPattern);
     QPen pen(color(),isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
@@ -1267,7 +1384,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         _curveProxy->setVisible(false);
     }
 
-	painter->fillRect(0,0,textRect.width(),textRect.height(),isSelected() ? Qt::yellow : Qt::white);
+    painter->fillRect(0,0,textRect.width(),textRect.height(),isSelected() ? Qt::yellow : Qt::white);
     painter->drawText(QRectF(10,0,textRect.width(),textRect.height()),Qt::AlignLeft,name());
 
 	if (_abstract->width() <= 3*RESIZE_TOLERANCE) {
@@ -1280,10 +1397,12 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
 	if (cursor().shape() == Qt::SizeHorCursor) {
 		static const float S_TO_MS = 1000.;
-		painter->drawText(boundingRect().bottomRight() - QPoint(2*RESIZE_TOLERANCE,0),QString("%1s").arg((double)duration() / S_TO_MS));
+//		painter->drawText(boundingRect().bottomRight() - QPoint(2*RESIZE_TOLERANCE,0),QString("%1s").arg((double)duration() / S_TO_MS));
+        painter->drawText(_boxRect.bottomRight() - QPoint(2*RESIZE_TOLERANCE,0),QString("%1s").arg((double)duration() / S_TO_MS));
 	}
 
-	painter->translate(boundingRect().topLeft());
+//	painter->translate(boundingRect().topLeft());
+    painter->translate(_boxRect.topLeft());
 
 	if (_playing) {
         QPen pen = painter->pen();
@@ -1296,7 +1415,8 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 		painter->fillRect(0,_abstract->height()-RESIZE_TOLERANCE/2.,progressPosX,RESIZE_TOLERANCE/2.,Qt::darkGreen);
 		painter->drawLine(QPointF(progressPosX,RESIZE_TOLERANCE),QPointF(progressPosX,_abstract->height()));       
 	}
-	painter->translate(QPointF(0,0) - boundingRect().topLeft());
+//	painter->translate(QPointF(0,0) - boundingRect().topLeft());
+    painter->translate(QPointF(0,0) - _boxRect.topLeft());
 
 }
 

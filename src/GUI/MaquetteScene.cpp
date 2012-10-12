@@ -290,11 +290,11 @@ MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[]
 		painter->restore();*/
 
 		// Look if the scene rectangle has to be updated
-		if (xmax < items[i]->mapToScene(items[i]->boundingRect().bottomRight()).x()) {
-			xmax = items[i]->mapToScene(items[i]->boundingRect().bottomRight()).x();
+        if (xmax < items[i]->mapToScene(items[i]->boundingRect().bottomRight()).x()) {
+            xmax = items[i]->mapToScene(items[i]->boundingRect().bottomRight()).x();
 		}
-		if (ymax < items[i]->mapToScene(items[i]->boundingRect().bottomRight()).y()) {
-			ymax = items[i]->mapToScene(items[i]->boundingRect().bottomRight()).y();
+        if (ymax < items[i]->mapToScene(items[i]->boundingRect().bottomRight()).y()) {
+            ymax = items[i]->mapToScene(items[i]->boundingRect().bottomRight()).y();
 		}
 	}
 	std::cerr << "MaquetteScene::drawItems" << std::endl;
@@ -317,10 +317,12 @@ MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
 				QPointF start;
 				switch (_relation->firstExtremity()) {
 				case BOX_START :
-					start = box->getMiddleLeft();
+//					start = box->getMiddleLeft();
+                    start = box->getLeftGripPoint();
 					break;
 				case BOX_END :
-					start = box->getMiddleRight();
+//					start = box->getMiddleRight();
+                    start = box->getRightGripPoint();
 					break;
 				case NO_EXTREMITY :
 					start = box->getCenter();
@@ -338,15 +340,19 @@ MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
 						int type = itemAt(_mousePos)->type();
 						if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
 							box = static_cast<BasicBox*>(itemAt(_mousePos));
-							if (_mousePos.x() < (box->mapToScene(box->boundingRect().topLeft()).x()
+                            if (_mousePos.x() < (box->mapToScene(box->boundingRect().topLeft()).x()
 									+ BasicBox::RESIZE_TOLERANCE)) {
-								endX = box->getMiddleLeft().x();
-								endY = box->getMiddleLeft().y();
+//								endX = box->getMiddleLeft().x();
+//								endY = box->getMiddleLeft().y();
+                                endX = box->getLeftGripPoint().x();
+                                endY = box->getLeftGripPoint().y();
 							}
-							else if (_mousePos.x() > (box->mapToScene(box->boundingRect().bottomRight()).x()
+                            else if (_mousePos.x() > (box->mapToScene(box->boundingRect().bottomRight()).x()
 									- BasicBox::RESIZE_TOLERANCE)) {
-								endX = box->getMiddleRight().x();
-								endY = box->getMiddleRight().y();
+//								endX = box->getMiddleRight().x();
+//								endY = box->getMiddleRight().y();
+                                endX = box->getRightGripPoint().x();
+                                endY = box->getRightGripPoint().y();
 							}
 							else {
 								endX = _mousePos.x();
@@ -568,12 +574,18 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 	}
 	_savedInteractionMode = _currentInteractionMode;
 	_savedBoxMode = _currentBoxMode;
-    if (mouseEvent->modifiers() == Qt::ControlModifier) {
-		setCurrentMode(CREATION_MODE);
-	}
-    else {
+//    if (mouseEvent->modifiers() == Qt::ControlModifier) {
+//		setCurrentMode(CREATION_MODE);
+//	}
+//    else {
+//        setCurrentMode(SELECTION_MODE);
+//	}
+    if (mouseEvent->modifiers() == Qt::ShiftModifier) {
         setCurrentMode(SELECTION_MODE);
-	}
+    }
+    else {
+        setCurrentMode(CREATION_MODE);
+    }
 	if (itemAt(mouseEvent->scenePos()) != 0) {
         if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::PointingHandCursor && _currentInteractionMode != TRIGGER_MODE) {
             setCurrentMode(TRIGGER_MODE);
@@ -637,9 +649,9 @@ MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 				int type = itemAt(mouseEvent->scenePos())->type();
 				if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
 					BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
-					if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE) ||
-							mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
-						_relationBoxFound = true;
+                    if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE) ||
+                            mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
+                        _relationBoxFound = true;
 						update();
 					}
 					else {
@@ -700,12 +712,12 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
                 BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
 
                 BasicBox *firstBox = getBox(_relation->firstBox());
-				if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE)) {
+                if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE)) {
                     setRelationSecondBox(secondBox->ID(),BOX_START);
                     addPendingRelation();
                     firstBox->setSelected(true);
 				}
-				else if (mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
+                else if (mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
 					setRelationSecondBox(secondBox->ID(),BOX_END);
                     addPendingRelation();                    
                     firstBox->setSelected(true);
@@ -872,10 +884,10 @@ void MaquetteScene::copyBoxes(bool erasing) {
 			break;
 		}
 		if (!erasing) {
-			topLeft = QPointF(std::min((*it)->mapToScene((*it)->boundingRect().topLeft()).x(),topLeft.x()),
-					std::min((*it)->mapToScene((*it)->boundingRect().topLeft()).y(),topLeft.y()));
-			bottomRight = QPointF(std::max((*it)->mapToScene((*it)->boundingRect().bottomRight()).x(),bottomRight.x()),
-					std::max((*it)->mapToScene((*it)->boundingRect().bottomRight()).y(),bottomRight.y()));
+            topLeft = QPointF(std::min((*it)->mapToScene((*it)->boundingRect().topLeft()).x(),topLeft.x()),
+                    std::min((*it)->mapToScene((*it)->boundingRect().topLeft()).y(),topLeft.y()));
+            bottomRight = QPointF(std::max((*it)->mapToScene((*it)->boundingRect().bottomRight()).x(),bottomRight.x()),
+                    std::max((*it)->mapToScene((*it)->boundingRect().bottomRight()).y(),bottomRight.y()));
 		}
 	}
 	if (topLeft.x() != FLT_MAX && topLeft.y() != FLT_MAX &&
@@ -1622,15 +1634,15 @@ MaquetteScene::boxMoved(unsigned int boxID) {
 	BasicBox * box = _maquette->getBox(boxID);
 	if (box != NULL) {
 		if (! box->hasMother()) {
-			coord.topLeftX = box->mapToScene(box->boundingRect().topLeft()).x();
+            coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x();
 		}
 		else {
-			coord.topLeftX = box->mapToScene(box->boundingRect().topLeft()).x()
+            coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x()
 			- getBox(box->mother())->beginPos();
 		}
-		coord.topLeftY = box->mapToScene(box->boundingRect().topLeft()).y();
-		coord.sizeX = box->boundingRect().size().width();
-		coord.sizeY = box->boundingRect().size().height();
+        coord.topLeftY = box->mapToScene(box->boxRect().topLeft()).y();
+        coord.sizeX = box->boxRect().size().width();
+        coord.sizeY = box->boxRect().size().height();
 	}
 
 	bool ret = 	_maquette->updateBox(boxID,coord);
