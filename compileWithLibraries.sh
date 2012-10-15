@@ -16,16 +16,16 @@ OS=$1
 if [ "$OS" = "LINUX" ] || [ "$OS" = "LINUX64" ]
 then
 {
-DEVICE_MANAGER_PATH='/home/luc/Documents/workspace/Device-Manager'
-LIB_ISCORE_PATH='/home/luc/Documents/workspace/libIscore'
-ACOUSMOSCRIBE_PATH='/home/luc/Documents/workspace/acousmoscribe'
+DEVICE_MANAGER_PATH='/Users/admin/Documents/workspace/DeviceManager'
+LIB_ISCORE_PATH='/Users/admin/Documents/workspace/libIscore'
+I-SCORE_PATH='/Users/admin/Documents/workspace/i-score'
 }
 elif [ "$OS" = "MACOS" ] || [ "$OS" = "MACOS64" ]
 then
 {
-DEVICE_MANAGER_PATH='/Users/luc/Documents/workspace/Device-Manager'
-LIB_ISCORE_PATH='/Users/luc/Documents/workspace/libIscore'
-ACOUSMOSCRIBE_PATH='/Users/luc/Documents/workspace/acousmoscribe'
+DEVICE_MANAGER_PATH='/Users/admin/Documents/workspace/DeviceManager'
+LIB_ISCORE_PATH='/Users/admin/Documents/workspace/libIscore'
+I-SCORE_PATH='/Users/admin/Documents/workspace/i-score'
 }
 fi
 
@@ -43,7 +43,7 @@ echo '-=[START]=-'
 
 echo 'Device-Manager changes tranfert'
 
-cp -r $ACOUSMOSCRIBE_PATH/devManChanges/* $DEVICE_MANAGER_PATH
+cp -r $I-SCORE_PATH/devManChanges/* $DEVICE_MANAGER_PATH
 
 ## Device-Manager Compilation
 
@@ -158,34 +158,34 @@ echo '-=[LibIScore]=- Installing ...'
 chmod u+x install.sh
 ./install.sh
 
-## Acousmoscribe Compilation
-cd $ACOUSMOSCRIBE_PATH
-echo '-=[Acousmoscribe]=- Cleaning ...'
+## i-score Compilation
+cd $I-SCORE_PATH
+echo '-=[i-score]=- Cleaning ...'
 $MAKE_CLEAN
 if [ "$OS" = "LINUX" ]
 then
 {
-echo '-=[Acousmocribe]=- Generating makefile ...'
-$QMAKE_LINUX acousmoscribe.pro
+echo '-=[i-score]=- Generating makefile ...'
+$QMAKE_LINUX i-score.pro
 }
 elif [ "$OS" = "LINUX64" ]
 then
 {
-echo '-=[Acousmocribe]=- Generating makefile ...'
-$QMAKE_LINUX_64 acousmoscribe.pro
+echo '-=[i-score]=- Generating makefile ...'
+$QMAKE_LINUX_64 i-score.pro
 }
 elif [ "$OS" = "MACOS" ] || [ "$OS" = "MACOS64" ]
 then
 {
-echo '-=[Acousmoscribe]=- Generating makefile ...'
-$QMAKE_MACOS acousmoscribe.pro
+echo '-=[i-score]=- Generating makefile ...'
+$QMAKE_MACOS i-score.pro
 }
 else
 {
-echo '-=[Acousmoscribe]=- ERROR : Unhandled OS'
+echo '-=[i-score]=- ERROR : Unhandled OS'
 }
 fi
-echo '-=[Acousmoscribe]=- Compiling  ...'
+echo '-=[i-score]=- Compiling  ...'
 $MAKE
 
 cd $CURRENT_PATH

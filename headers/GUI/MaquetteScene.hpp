@@ -558,6 +558,8 @@ class MaquetteScene : public QGraphicsScene
   static const float MS_PRECISION;
   //! Default trigger message used.
   static const std::string DEFAULT_TRIGGER_MSG;
+  static const int MIN_BOX_WIDTH = 50;
+  static const int MIN_BOX_HEIGHT = 30;
 
  protected :
   /*!

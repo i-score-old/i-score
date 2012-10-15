@@ -21,8 +21,8 @@ ROOT_SHARE_PATH="/usr/local/share/"
 ROOT_FRAMEWORKS_PATH="/Library/Frameworks/"
 
 if [ "$OS" = "UBUNTU32" ] || [ "$OS" = "UBUNTU64" ]
-then
-    ACOUSMOSCRIBE_PATH="/home/luc/Documents/workspace/acousmoscribe/"
+thenfile: 
+    ACOUSMOSCRIBE_PATH="/Users/admin/Documents/workspace/i-score/"
     INSTALL_PATH=$ACOUSMOSCRIBE_PATH"installation/"
     if [ "$OS" = "UBUNTU32" ]
     then
@@ -44,7 +44,7 @@ then
     INSTALL_DEBIAN_PATH=$INSTALL_UBUNTU_PATH"/DEBIAN/"
 elif [ "$OS" = "MACOS32" ] || [ "$OS" = "MACOS64" ]
 then
-    ACOUSMOSCRIBE_PATH="/Users/luc/Documents/workspace/acousmoscribe/"
+    ACOUSMOSCRIBE_PATH="/Users/admin/Documents/workspace/i-score/"
     INSTALL_PATH=$ACOUSMOSCRIBE_PATH"installation/"
     if [ "$OS" = "MACOS32" ]
     then
