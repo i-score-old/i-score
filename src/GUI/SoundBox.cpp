@@ -104,10 +104,11 @@ SoundBox::init()
 
 	_hasContextMenu = true;
 	setAcceptDrops(true);
-    _defaultFirstMsg = name().toStdString()+"/start";
-    _defaultLastMsg = name().toStdString()+"/stop";
+    _defaultFirstMsg = "/start";
+
+    _defaultLastMsg = "/stop";
     _defaultDevice = "MaxDevice";
-	updateMessagesToSend(true);
+    updateMessagesToSend(true);
 }
 
 Abstract*
@@ -216,7 +217,7 @@ SoundBox::updateMessagesToSend(bool init = false) {
 		if (init) {
 			_abstract->_lastMsgs.insert(_abstract->_lastMsgs.begin(),tmp2.str());
 		}
-	}
+	}    
 }
 
 void

@@ -1300,9 +1300,18 @@ AttributesEditor::changeColor() {
 void
 AttributesEditor::startMessagesChanged()
 {
-    QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
-    vector<string> networkMsgs = _networkTree->startMessages()->computeMessages();
+    BasicBox * box = _scene->getBox(_boxEdited);
 
+    //NICO
+    if(box->type()==SOUND_BOX_TYPE){
+        vector<string> msgs = _startMsgsEditor->computeMessages();
+        Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
+    }
+    //NICO
+    else{
+    QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
+
+    vector<string> networkMsgs = _networkTree->startMessages()->computeMessages();
     Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
     Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,networkMsgs);
     Maquette::getInstance()->setStartMessages(_boxEdited,_networkTree->startMessages());
@@ -1313,14 +1322,24 @@ AttributesEditor::startMessagesChanged()
 	_curvesWidget->updateMessages(_boxEdited,true);
     _networkTree->updateCurves(_boxEdited);
     //NICO
-    BasicBox * box = _scene->getBox(_boxEdited);
+
     box->updateCurves();
     //NICO
+    }
 }
 
 void
 AttributesEditor::endMessagesChanged()
 {
+    BasicBox * box = _scene->getBox(_boxEdited);
+
+    //NICO
+    if(box->type()==SOUND_BOX_TYPE){
+        vector<string> msgs = _endMsgsEditor->computeMessages();
+        Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
+    }
+    //NICO
+    else{
 //    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
 
     QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
@@ -1335,8 +1354,9 @@ AttributesEditor::endMessagesChanged()
     _curvesWidget->updateMessages(_boxEdited,true);
     _networkTree->updateCurves(_boxEdited);
     //NICO
-    BasicBox * box = _scene->getBox(_boxEdited);
+
     box->updateCurves();
+    }
     //NICO
 }
 

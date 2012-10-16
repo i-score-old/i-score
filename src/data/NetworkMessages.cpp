@@ -135,6 +135,7 @@ NetworkMessages::computeMessage(const Message &msg) {
 
 vector<string>
 NetworkMessages::computeMessages() {
+
     vector<string> msgs;
     QMap<QTreeWidgetItem *, Message>::iterator it;
     for (it=_messages->begin() ; it!= _messages->end() ; it++){
