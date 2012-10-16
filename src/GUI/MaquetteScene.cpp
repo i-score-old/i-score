@@ -769,11 +769,9 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
             _maquette->updateRelations();
 		}
 		if (resizeMode() == NO_RESIZE && _tempBox) {
-            if (_releasePoint != _pressPoint && (_releasePoint.x()-_pressPoint.x() > MIN_BOX_WIDTH) && (_releasePoint.y()-_pressPoint.y() > MIN_BOX_HEIGHT)) {
-                std::cout << _releasePoint.x() << " ; "<<_releasePoint.y()<<std::endl;
-                std::cout << _pressPoint.x() << " ; "<<_pressPoint.y()<<std::endl;
+            if (_releasePoint != _pressPoint && (_releasePoint.x()-_pressPoint.x() > MIN_BOX_WIDTH) && (_releasePoint.y()-_pressPoint.y() > MIN_BOX_HEIGHT))
 				addBox(BoxCreationMode(_currentBoxMode));
-			}
+
 			else {
 				if (selectedItems().empty()) {
 					_editor->noBoxEdited();

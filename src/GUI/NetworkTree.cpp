@@ -45,12 +45,12 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <exception>
 
 static unsigned int NAME_COLUMN = 0;
-static unsigned int VALUE_COLUMN = 1;
-static unsigned int START_COLUMN = 2;
-static unsigned int END_COLUMN = 4;
-static unsigned int INTERPOLATION_COLUMN = 3;
-static unsigned int REDUNDANCY_COLUMN = 5;
-static unsigned int SR_COLUMN = 6;
+//static unsigned int VALUE_COLUMN = 1;
+static unsigned int START_COLUMN = 1;
+static unsigned int END_COLUMN = 3;
+static unsigned int INTERPOLATION_COLUMN = 2;
+static unsigned int REDUNDANCY_COLUMN = 4;
+static unsigned int SR_COLUMN = 5;
 
 bool VALUE_MODIFIED;
 bool SR_MODIFIED;
@@ -58,11 +58,11 @@ bool SR_MODIFIED;
 NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 {
     init();
-    setColumnCount(6);
+    setColumnCount(5);
     QStringList list;
-    list<<"Name"<<"Value"<<"Start"<<"Interpolation"<<"End"<<"Redundancy"<<"Sample rate";
+    list<<"Name"<</*"Value"<<*/"Start"<<"Interpolation"<<"End"<<"Redundancy"<<"Sample rate";
     setColumnWidth(NAME_COLUMN,150);
-    setColumnWidth(VALUE_COLUMN,75);
+//    setColumnWidth(VALUE_COLUMN,75);
     setColumnWidth(START_COLUMN,40);
     setColumnWidth(END_COLUMN,40);
     setColumnWidth(INTERPOLATION_COLUMN,40);
@@ -297,7 +297,7 @@ NetworkTree::treeSnapshot(unsigned int boxID) {
         for (it = selection.begin(); it != selection.end() ; ++it) {
 
             curItem = *it;
-            if(!curItem->text(VALUE_COLUMN).isEmpty()){// >type() != NodeNamespaceType && curItem->type() != NodeNoNamespaceType){
+            //if(!curItem->text(VALUE_COLUMN).isEmpty()){// >type() != NodeNamespaceType && curItem->type() != NodeNoNamespaceType){
                 QString address = getAbsoluteAddress(*it);
 
                 QPair<QTreeWidgetItem *, Data> curPair;
@@ -314,7 +314,7 @@ NetworkTree::treeSnapshot(unsigned int boxID) {
                         snapshots.insert(*it,data);
                     }
                 }
-            }
+          //  }
         }
     }
 
@@ -392,8 +392,8 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
                 QString leave_value = QString::fromStdString(*it2);
                 QFont font;
                 font.setCapitalization(QFont::SmallCaps);
-                curItem->setText(1,leave_value);
-                curItem->setFont(1,font);
+//                curItem->setText(VALUE_COLUMN,leave_value);
+//                curItem->setFont(VALUE_COLUMN,font);
 //                curItem->setCheckState(NAME_COLUMN,Qt::Unchecked);
                 curItem->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
                 curItem->setCheckState(REDUNDANCY_COLUMN,Qt::Unchecked);

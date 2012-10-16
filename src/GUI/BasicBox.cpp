@@ -160,8 +160,14 @@ BasicBox::createWidget(){
 
     //---------------- ComboBox (curve list) ------------------//
     _comboBox = new QComboBox;
+    _comboBox->view()->setTextElideMode(Qt::ElideMiddle);
     _comboBox->setInsertPolicy(QComboBox::InsertAtTop);
     _comboBox->setBaseSize(_comboBox->width(),_comboBox->height()-2);
+    QFont font;
+    font.setPointSize(10);
+    _comboBox->setFont(font);
+
+
     _comboBoxProxy = new QGraphicsProxyWidget(this);
     _comboBoxProxy->setWidget(_comboBox);
     _comboBoxProxy->setPalette(palette);
@@ -1306,7 +1312,7 @@ void
 BasicBox::drawInteractionGrips(QPainter *painter){
 
     int earWidth, earHeight;
-    earWidth = height()/4;
+    earWidth = 18;
     earHeight = 30 ;
 
     QPen pen(isSelected() ? Qt::yellow : Qt::white);
