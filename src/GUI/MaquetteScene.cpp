@@ -1281,9 +1281,9 @@ MaquetteScene::addSoundBox(const QPointF &topLeft, const QPointF &bottomRight, c
 	addItem(newBox);
 
     //NICO TEST
-    QWidget *widget = new QWidget();
-    CurvesWidget *curves = new CurvesWidget(widget);
-    addWidget(widget);
+//    QWidget *widget = new QWidget();
+//    CurvesWidget *curves = new CurvesWidget(widget);
+//    addWidget(widget);
     //NICO TEST end
 
 	_currentZValue++;

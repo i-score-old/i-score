@@ -120,10 +120,11 @@ void BoxWidget::curveRedundancyChanged(const QString &address,bool state) {
 void BoxWidget::curveShowChanged(const QString &address, bool state) {
     if (_boxID != NO_ID) {
         AbstractCurve * curve = Maquette::getInstance()->getBox(_boxID)->getCurve(address.toStdString());
-        if (curve != NULL) {
+        if (curve != NULL && !state) {
             curve->_show = state;
+
         }
-        updateCurve(address.toStdString(),false);
+    updateCurve(address.toStdString(),true);
     }
 }
 
@@ -167,7 +168,7 @@ void BoxWidget::displayCurve(const QString &address){
         curveWidget->repaint();
         _stackedLayout->setCurrentWidget(curveWidget);
     }
-
+    std::cout<<"OK"<<std::endl;
 }
 
 
@@ -189,19 +190,18 @@ void
 BoxWidget::removeCurve(const string &address) {
 
     QMap<string,CurveWidget *>::iterator curveIt = _curveMap->find(address);
+
     QString curveAddress = QString::fromStdString(address);
     int index;
 
     if (curveIt != _curveMap->end()) {
-        std::cout<<"REMOVE"<<std::endl;
+        CurveWidget *curCurve = curveIt.value();
+        _stackedLayout->removeWidget(curCurve);
+        repaint();
         _curveMap->erase(curveIt);
         index = _comboBox->findText(curveAddress);
         if(index>-1)
             _comboBox->removeItem(index);
-        BasicBox *curveBox = Maquette::getInstance()->getBox(_boxID);
-        if (curveBox != NULL) {
-            curveBox->removeCurve(address);
-        }
     }
 }
 
@@ -259,6 +259,7 @@ BoxWidget::addToComboBox(const QString address){
 
 bool
 BoxWidget::updateCurve(const string &address, bool forceUpdate){
+    std::cout<<"BoxWidget::updateCurve"<<address<<std::endl;
     BasicBox *box = Maquette::getInstance()->getBox(_boxID);
     if (box != NULL) // Box Found
     {

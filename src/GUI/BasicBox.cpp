@@ -724,6 +724,18 @@ BasicBox::getCurve(const std::string &address)
 }
 
 void
+BasicBox::curveActivationChanged(string address, bool activated){
+    _curvesWidget->curveActivationChanged(QString::fromStdString(address),activated);
+    if(activated){
+
+        ;
+    }
+    else{
+        removeCurve(address);
+    }
+}
+
+void
 BasicBox::setCurve(const string &address, AbstractCurve *curve)
 {
 	if (curve != NULL) {
@@ -732,6 +744,11 @@ BasicBox::setCurve(const string &address, AbstractCurve *curve)
 	else {
 		removeCurve(address);
 	}
+}
+
+void
+BasicBox::addCurve(const std::string &address){
+
 }
 
 void

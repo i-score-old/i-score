@@ -717,7 +717,7 @@ AttributesEditor::addWidgetsToLayout()
 
 //	_generalTabIndex = _tabWidget->addTab(_generalTab,"General");
 //	_profilesTabIndex = _tabWidget->addTab(_profilesTab,"Profiles");
-//	_messagesTabIndex = _tabWidget->addTab(_messagesTab,"Messages");
+//    _messagesTabIndex = _tabWidget->addTab(_messagesTab,"Messages");
 	_explorationTabIndex = _tabWidget->addTab(_explorationTab,"Exploration");
 	_curvesTabIndex = _tabWidget->addTab(_curvesTab,"Curves");
 
@@ -1584,9 +1584,9 @@ AttributesEditor::curveActivationChanged(QTreeWidgetItem *item, bool activated){
     string address = _networkTree->getAbsoluteAddress(item).toStdString();
     if (_boxEdited != NO_ID){
         Maquette::getInstance()->setCurveMuteState(_boxEdited,address,!activated);
-        _networkTree->updateCurve(item,_boxEdited);
+//        _networkTree->updateCurve(item,_boxEdited);
         BasicBox * box = _scene->getBox(_boxEdited);
-        box->removeCurve(address);
+        box->curveActivationChanged(address,activated);
 //        box->curveShowChanged(QString::fromStdString(address),activated);
 //        box->updateCurves();
     }

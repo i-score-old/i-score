@@ -100,7 +100,7 @@ void
 SoundBox::init()
 {
 	BasicBox::init();
-	_contextMenu =  new SoundBoxContextMenu(this);
+    _contextMenu =  new SoundBoxContextMenu(this);
 
 	_hasContextMenu = true;
 	setAcceptDrops(true);
@@ -147,13 +147,13 @@ SoundBox::selectMode(const PlayingMode &mode)
 void
 SoundBox::selectSound()
 {
-	QString fileName = QFileDialog::getOpenFileName(_contextMenu,QObject::tr("Choose a sound"),"",QObject::tr("Sound Files (*.wav *.ogg *.aif *.aiff)"));
-	if (!fileName.isEmpty()) {
-		((AbstractSoundBox*)_abstract)->_pal.setSoundFile(fileName);
-	}
-	else {
-		std::cerr << "SoundBox::selectSound : sound selected empty" << std::endl;
-	}
+    QString fileName = QFileDialog::getOpenFileName(_contextMenu,QObject::tr("Choose a sound"),"",QObject::tr("Sound Files (*.wav *.ogg *.aif *.aiff)"));
+    if (!fileName.isEmpty()) {
+        ((AbstractSoundBox*)_abstract)->_pal.setSoundFile(fileName);
+    }
+    else {
+        std::cerr << "SoundBox::selectSound : sound selected empty" << std::endl;
+    }
 }
 
 void
@@ -163,6 +163,7 @@ SoundBox::updateMessagesToSend(bool init = false) {
 
 	switch (((AbstractSoundBox*)_abstract)->pal().playingMode()) {
 	case FileMode :
+
 		tmp << SoundBox::DEFAULT_DEVICE << SoundBox::DEFAULT_FIRST_MSG << " " << ID();
 		if (((AbstractSoundBox*)_abstract)->pal().soundFile().isEmpty()) {
 			std::cerr << "SoundBox::updateMessagesToSend : sound file name empty" << std::endl;
