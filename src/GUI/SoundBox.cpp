@@ -66,9 +66,9 @@ using std::string;
 using std::stringstream;
 using namespace SndBoxProp;
 
-const string SoundBox::DEFAULT_FIRST_MSG = "/box/play";
-const string SoundBox::DEFAULT_LAST_MSG = "/box/stop";
-const string SoundBox::DEFAULT_DEVICE = "MaxDevice";
+//const string SoundBox::DEFAULT_FIRST_MSG = "/box/play";
+//const string SoundBox::DEFAULT_LAST_MSG = "/box/stop";
+//const string SoundBox::DEFAULT_DEVICE = "MaxDevice";
 
 SoundBox::SoundBox(const QPointF &corner1, const QPointF &corner2, MaquetteScene *parent)
 : BasicBox(corner1, corner2, parent)
@@ -104,7 +104,9 @@ SoundBox::init()
 
 	_hasContextMenu = true;
 	setAcceptDrops(true);
-
+    _defaultFirstMsg = name().toStdString()+"/start";
+    _defaultLastMsg = name().toStdString()+"/stop";
+    _defaultDevice = "MaxDevice";
 	updateMessagesToSend(true);
 }
 
@@ -164,13 +166,13 @@ SoundBox::updateMessagesToSend(bool init = false) {
 	switch (((AbstractSoundBox*)_abstract)->pal().playingMode()) {
 	case FileMode :
 
-		tmp << SoundBox::DEFAULT_DEVICE << SoundBox::DEFAULT_FIRST_MSG << " " << ID();
+        tmp << SoundBox::_defaultDevice << SoundBox::_defaultFirstMsg << " " << ID();
 		if (((AbstractSoundBox*)_abstract)->pal().soundFile().isEmpty()) {
 			std::cerr << "SoundBox::updateMessagesToSend : sound file name empty" << std::endl;
 		}
 		break;
 	case SynthMode :
-		tmp << SoundBox::DEFAULT_DEVICE << SoundBox::DEFAULT_FIRST_MSG << " " << ID();
+        tmp << SoundBox::_defaultDevice << SoundBox::_defaultFirstMsg << " " << ID();
 		break;
 	case SpecificMode :
 	{
@@ -179,14 +181,14 @@ SoundBox::updateMessagesToSend(bool init = false) {
 	}
 	}
 
-	static const size_t DEVICE_STR_SIZE = SoundBox::DEFAULT_DEVICE.size();
-	static const size_t FIRST_MSG_STR_SIZE = SoundBox::DEFAULT_FIRST_MSG.size();
-	static const size_t LAST_MSG_STR_SIZE = SoundBox::DEFAULT_LAST_MSG.size();
+    static const size_t DEVICE_STR_SIZE = SoundBox::_defaultDevice.size();
+    static const size_t FIRST_MSG_STR_SIZE = SoundBox::_defaultFirstMsg.size();
+    static const size_t LAST_MSG_STR_SIZE = SoundBox::_defaultLastMsg.size();
 
 	if (_abstract->_firstMsgs.size() > 0) {
 		if (_abstract->_firstMsgs[0].size() >= (DEVICE_STR_SIZE + FIRST_MSG_STR_SIZE)) {
-			if (_abstract->_firstMsgs[0].substr(0,DEVICE_STR_SIZE) == SoundBox::DEFAULT_DEVICE &&
-					_abstract->_firstMsgs[0].substr(DEVICE_STR_SIZE,FIRST_MSG_STR_SIZE) == SoundBox::DEFAULT_FIRST_MSG) {
+            if (_abstract->_firstMsgs[0].substr(0,DEVICE_STR_SIZE) == SoundBox::_defaultDevice &&
+                    _abstract->_firstMsgs[0].substr(DEVICE_STR_SIZE,FIRST_MSG_STR_SIZE) == SoundBox::_defaultFirstMsg) {
 				_abstract->_firstMsgs[0] = tmp.str(); // If first message found, update it
 			}
 		}
@@ -199,13 +201,13 @@ SoundBox::updateMessagesToSend(bool init = false) {
 
 	stringstream tmp2;
 
-	tmp2 << SoundBox::DEFAULT_DEVICE << SoundBox::DEFAULT_LAST_MSG << " " << ID();
+    tmp2 << SoundBox::_defaultDevice << SoundBox::_defaultLastMsg << " " << ID();
 
 
 	if (_abstract->_lastMsgs.size() > 0) {
 		if (_abstract->_lastMsgs[0].size() >= (DEVICE_STR_SIZE + LAST_MSG_STR_SIZE)) {
-			if (_abstract->_lastMsgs[0].substr(0,DEVICE_STR_SIZE) == SoundBox::DEFAULT_DEVICE &&
-					_abstract->_lastMsgs[0].substr(DEVICE_STR_SIZE,LAST_MSG_STR_SIZE) == SoundBox::DEFAULT_LAST_MSG) {
+            if (_abstract->_lastMsgs[0].substr(0,DEVICE_STR_SIZE) == SoundBox::_defaultDevice &&
+                    _abstract->_lastMsgs[0].substr(DEVICE_STR_SIZE,LAST_MSG_STR_SIZE) == SoundBox::_defaultLastMsg) {
 				_abstract->_lastMsgs[0] = tmp2.str(); // If last message found, update it
 			}
 		}

@@ -234,6 +234,9 @@ class SoundBox : public BasicBox
 
   Palette _palette; //!< Palette storing various attributes.
   Palette _importPalette; //! Palette used to import attributes.
+  string _defaultFirstMsg;
+  string _defaultLastMsg;
+  string _defaultDevice;
 };
 
 #endif
