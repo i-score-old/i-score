@@ -171,6 +171,8 @@ class TriggerPoint : public QGraphicsItem
   virtual int type() const
   {return TRIGGER_POINT_TYPE;}
 
+  void drawFlag(QPainter *painter, QColor color);
+
  protected:
 
   virtual void keyPressEvent(QKeyEvent *event);

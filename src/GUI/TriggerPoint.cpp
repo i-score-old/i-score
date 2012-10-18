@@ -58,8 +58,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QInputMethodEvent>
 using std::string;
 
-const float TriggerPoint::WIDTH = 20.;
-const float TriggerPoint::HEIGHT = 40.;
+const float TriggerPoint::WIDTH = BasicBox::TRIGGER_ZONE_WIDTH;
+const float TriggerPoint::HEIGHT = BasicBox::TRIGGER_ZONE_HEIGHT+BasicBox::TRIGGER_ZONE_HEIGHT/4;
 
 TriggerPoint::TriggerPoint(unsigned int boxID, BoxExtremity extremity,
 		const string &message, unsigned int ID, MaquetteScene *parent)
@@ -109,7 +109,7 @@ void
 TriggerPoint::updatePosition()
 {
 	if (_abstract->boxID() != NO_ID) {
-		BasicBox *box = _scene->getBox(_abstract->boxID());
+        BasicBox *box = _scene->getBox(_abstract->boxID());
 		if (box != NULL) {
 			if (_abstract->boxExtremity() == BOX_START) {
 				setPos(QPointF(box->getShapeTopLeft().x() + WIDTH/2., box->getShapeTopLeft().y() - HEIGHT/2.));
@@ -125,7 +125,7 @@ TriggerPoint::updatePosition()
 QRectF
 TriggerPoint::boundingRect() const
 {
-	return QRectF(-WIDTH/2.,-HEIGHT/2., WIDTH, HEIGHT);
+    return QRectF(-WIDTH/2./*-BasicBox::LINE_WIDTH*/,-HEIGHT/2./*-BasicBox::LINE_WIDTH*/, WIDTH/*+BasicBox::LINE_WIDTH*/, HEIGHT);
 }
 
 void
@@ -214,33 +214,101 @@ TriggerPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 
 
 
+//QPainterPath
+//TriggerPoint::shape() const
+//{
+//	QPainterPath path;
+//	QRectF rect = boundingRect();
+//	switch (_abstract->boxExtremity()) {
+//	case BOX_START :
+//		path.moveTo(rect.bottomLeft());
+//		path.lineTo(rect.topLeft());
+//		path.lineTo(rect.topLeft() + QPointF(rect.width(),rect.height()/4.));
+//		path.lineTo(rect.topLeft() + QPointF(0,rect.height()/2.));
+//		path.lineTo(rect.bottomLeft());
+//		break;
+//	case BOX_END :
+//		path.moveTo(rect.bottomRight());
+//		path.lineTo(rect.topRight());
+//		path.lineTo(rect.topRight() + QPointF(-rect.width(),rect.height()/4.));
+//		path.lineTo(rect.topRight() + QPointF(0,rect.height()/2.));
+//		path.lineTo(rect.bottomRight());
+//		break;
+//	default :
+//		break;
+//	}
+
+//	return path;
+//}
+
 QPainterPath
 TriggerPoint::shape() const
 {
-	QPainterPath path;
-	QRectF rect = boundingRect();
-	switch (_abstract->boxExtremity()) {
-	case BOX_START :
-		path.moveTo(rect.bottomLeft());
-		path.lineTo(rect.topLeft());
-		path.lineTo(rect.topLeft() + QPointF(rect.width(),rect.height()/4.));
-		path.lineTo(rect.topLeft() + QPointF(0,rect.height()/2.));
-		path.lineTo(rect.bottomLeft());
-		break;
-	case BOX_END :
-		path.moveTo(rect.bottomRight());
-		path.lineTo(rect.topRight());
-		path.lineTo(rect.topRight() + QPointF(-rect.width(),rect.height()/4.));
-		path.lineTo(rect.topRight() + QPointF(0,rect.height()/2.));
-		path.lineTo(rect.bottomRight());
-		break;
-	default :
-		break;
-	}
+    QPainterPath path;    
+    float line = BasicBox::LINE_WIDTH/2;
+    QPointF adjustX(-line,0);
+    QPointF adjustY(0,-line);
+    QRectF rect = boundingRect();
+    switch (_abstract->boxExtremity()) {
+    case BOX_START :
+        path.moveTo(rect.topLeft()+adjustX);
+        path.lineTo(rect.bottomLeft()+adjustX+adjustY);
+        path.lineTo(rect.bottomRight()+ adjustY);
+        path.lineTo(rect.bottomRight()+ adjustY - QPointF(0,rect.height()/5.));
+        path.quadTo(rect.topRight(),rect.topLeft()+adjustX);
+        break;
+    case BOX_END :
+        path.moveTo(rect.topRight());
+        path.lineTo(rect.bottomRight()+adjustY);
+        path.lineTo(rect.bottomLeft()+adjustY);
+        path.lineTo(rect.bottomLeft() +adjustY - QPointF(0,rect.height()/5.));
+        path.quadTo(rect.topLeft(),rect.topRight());
+        break;
+    default :
+        break;
+    }
 
-	return path;
+    return path;
 }
 
+
+void
+TriggerPoint::drawFlag(QPainter *painter, QColor color){
+    QRectF rect = boundingRect();
+    QPainterPath path;
+
+    QPolygonF polygone;
+
+    switch(_abstract->boxExtremity()) {
+
+    case BOX_START :
+         polygone << QPointF(rect.topLeft() + QPointF(rect.width()/4,3*rect.height()/16))
+                  << QPointF(rect.topLeft() + QPointF(rect.width()/4,9*rect.height()/16))
+                  << QPointF(rect.topLeft() + QPointF(11*rect.width()/16,3*rect.height()/8))
+                  << QPointF(rect.topLeft() + QPointF(rect.width()/4,3*rect.height()/16));
+
+        path.addPolygon(polygone);
+
+        painter->drawPath(path);
+        painter->fillPath(path,QBrush(color));
+
+        break;
+
+    case BOX_END :
+        polygone << QPointF(rect.topRight() - QPointF(rect.width()/4,-3*rect.height()/16))
+                 << QPointF(rect.topRight() - QPointF(rect.width()/4,-9*rect.height()/16))
+                 << QPointF(rect.topRight() - QPointF(11*rect.width()/16,-3*rect.height()/8))
+                 << QPointF(rect.topRight() - QPointF(rect.width()/4,-3*rect.height()/16));
+
+       path.addPolygon(polygone);
+
+       painter->drawPath(path);
+       painter->fillPath(path,QBrush(color));
+        break;
+    default :
+        break;
+    }
+}
 
 void
 TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -255,36 +323,67 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
     if (_abstract->boxID() != NO_ID) {
 
         if ((box = _scene->getBox(_abstract->boxID())) != NULL) {
+
+            //draw bounding rect
+//            QPen penG(Qt::green);
+//            penG.setWidth(2);
+//            painter->setPen(penG);
+//            painter->drawRect(boundingRect());
+
             QPainterPath path = shape();
             QPen pen = painter->pen();
+            pen.setColor(box->isSelected() ? Qt::yellow : Qt::white);
+            QBrush brush = painter->brush();
+            pen.setWidth(2);
+            painter->setPen(pen);
+            painter->drawPath(path);
+            painter->fillPath(path,box->isSelected() ? Qt::yellow : Qt::white);
             pen.setColor(box->color().darker());
-            pen.setWidth(isSelected() ? 2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
+            pen.setWidth(isSelected() ? 1.5 *BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH/2);
+            painter->setPen(pen);
 
             if(!isWaiting()){
-                    painter->fillPath(path,QColor("red"));
-                    painter->setPen(pen);
-                    painter->drawPath(path);
+//                    painter->fillPath(path,QColor("red"));
+//                    brush.setColor(QColor("red"));
+//                    painter->setBrush(brush);
+                    drawFlag(painter,QColor("red"));
+//                    painter->drawPath(path);
             }
 
             else{
 
                 if(/*this->focusItem()&&*/_scene->getTriggersQueueList().first()==this){
-                    painter->fillPath(path,QColor("green"));
-                    painter->setPen(pen);
-                    painter->drawPath(path);
+//                    painter->fillPath(path,QColor("green"));
+//                    brush.setColor(QColor("green"));
+//                    painter->setBrush(brush);
+//                    painter->drawPath(path);
+                    drawFlag(painter,QColor("green"));
                     this->setFocus();
                 }
                 else{
-                    painter->fillPath(path,QColor("orange"));
-                    painter->setPen(pen);
-                    painter->drawPath(path);
+//                    painter->fillPath(path,QColor("orange"));
+                    brush.setColor(QColor("orange"));
+                    painter->setBrush(brush);
+                    drawFlag(painter,QColor("orange"));
+//                    painter->drawPath(path);
                 }
             }
         }
     }
     if (_scene->playing()) {
         if (_abstract->waiting()) {
-            painter->drawText(rect.topLeft(),QString::fromStdString(_abstract->message()));
+            BasicBox *box = _scene->getBox(_abstract->boxID());
+            box->update();
+            switch(_abstract->boxExtremity()){
+                case BOX_START :
+                painter->drawText(rect.topRight()+QPointF(0,rect.height()/2),QString::fromStdString(_abstract->message()));
+                    break;
+                case BOX_END :
+                    painter->drawText(rect.topLeft()+QPointF(-QString::fromStdString(_abstract->message()).length()*7,rect.height()/2),QString::fromStdString(_abstract->message()));
+                    break;
+                default :
+                    break;
+            }
         }
     }
 

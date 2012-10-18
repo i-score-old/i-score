@@ -88,7 +88,7 @@ enum BoxExtremity {NO_EXTREMITY = -1, BOX_START = BEGIN_CONTROL_POINT_INDEX,
  */
 class BasicBox : public QObject, public QGraphicsItem
 {
- public :
+ public :  
 
   BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent);
 
@@ -528,6 +528,10 @@ class BasicBox : public QObject, public QGraphicsItem
   //! \brief Handles resizing tolerance.
   static const unsigned int RESIZE_TOLERANCE = 25;
   static const unsigned int BOX_MARGIN = 10;
+  static const float TRIGGER_ZONE_WIDTH;
+  static const float TRIGGER_ZONE_HEIGHT;
+  static const int COMBOBOX_WIDTH;
+  static const int COMBOBOX_HEIGHT;
 
   /*!
    * \brief Painting method, redefinition of QGraphicsItem::paint().
@@ -658,6 +662,8 @@ class BasicBox : public QObject, public QGraphicsItem
   QComboBox *_comboBox;
   QGraphicsProxyWidget *_curveProxy;
   QGraphicsProxyWidget *_comboBoxProxy;
+
+
 };
 
 #endif

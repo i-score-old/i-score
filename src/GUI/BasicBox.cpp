@@ -79,7 +79,10 @@ using std::string;
 using std::vector;
 using std::map;
 
-#define COMBOBOX_WIDTH 120
+const int BasicBox::COMBOBOX_HEIGHT = 25;
+const int BasicBox::COMBOBOX_WIDTH = 120;
+const float BasicBox::TRIGGER_ZONE_WIDTH = 15.;
+const float BasicBox::TRIGGER_ZONE_HEIGHT = 20.;
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
 : QGraphicsItem()
@@ -117,8 +120,8 @@ BasicBox::centerWidget(){
     _boxWidget->move(-(width())/2/* + LINE_WIDTH*/,-(height())/2 + (RESIZE_TOLERANCE - LINE_WIDTH));
     _boxWidget->resize(width()/* - 2*LINE_WIDTH*/,height()-1.5*RESIZE_TOLERANCE);
 
-    _comboBox->move(0,-(height()/2 + 2*LINE_WIDTH));
-    _comboBox->resize((width() - 2*LINE_WIDTH)/2,_comboBox->height());
+    _comboBox->move(0,-(height()/2+LINE_WIDTH));
+    _comboBox->resize((width() - 2*LINE_WIDTH)/2,/*_comboBox->height()*/COMBOBOX_HEIGHT);
 }
 
 
@@ -162,7 +165,7 @@ BasicBox::createWidget(){
     _comboBox = new QComboBox;
     _comboBox->view()->setTextElideMode(Qt::ElideMiddle);
     _comboBox->setInsertPolicy(QComboBox::InsertAtTop);
-    _comboBox->setBaseSize(_comboBox->width(),_comboBox->height()-2);
+    _comboBox->setBaseSize(_comboBox->width(),COMBOBOX_HEIGHT);
     QFont font;
     font.setPointSize(10);
     _comboBox->setFont(font);
@@ -889,7 +892,7 @@ BasicBox::itemChange(GraphicsItemChange change, const QVariant &value)
 }
 
 QPainterPath
-BasicBox::shape () const
+BasicBox::shape() const
 {
 	QPainterPath path;
 
@@ -900,8 +903,6 @@ BasicBox::shape () const
     path.addRect(_startTriggerGrip);
     path.addRect(_endTriggerGrip);
 
-//    std::cout<<"box : "<<_boxRect.x()<<" ; "<<_boxRect.y()<<std::endl;
-//    std::cout<<"leftear : "<<_leftEar.x()<<" ; "<<_leftEar.y()<<std::endl;
 	return path;
 }
 
@@ -916,7 +917,7 @@ BasicBox::boundingRect() const
 {
 	// Origine du repere = centre de l'objet
 //    return QRectF(-_abstract->width()/2, -_abstract->height()/2, _abstract->width(), _abstract->height());
-    return QRectF(-_abstract->width()/2 - BOX_MARGIN, -_abstract->height()/2 - BOX_MARGIN, _abstract->width() + 2*BOX_MARGIN, _abstract->height()+2*BOX_MARGIN);
+    return QRectF(-_abstract->width()/2 - BOX_MARGIN, -_abstract->height()/2 - 3*BOX_MARGIN, _abstract->width() + 2*BOX_MARGIN, _abstract->height()+4*BOX_MARGIN);
 }
 
 QRectF
@@ -1054,17 +1055,13 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 	}
 	else if (_scene->resizeMode() != NO_RESIZE && (cursor().shape() == Qt::SizeVerCursor || cursor().shape() == Qt::SizeHorCursor || cursor().shape() == Qt::SizeFDiagCursor)) {
 		switch (_scene->resizeMode()) {
-		case HORIZONTAL_RESIZE :
-//			resizeWidthEdition(_abstract->width() + event->pos().x() - boundingRect().topRight().x());
+        case HORIZONTAL_RESIZE :
             resizeWidthEdition(_abstract->width() + event->pos().x() - _boxRect.topRight().x());
 			break;
-		case VERTICAL_RESIZE :
-//			resizeHeightEdition(_abstract->height() + event->pos().y() - boundingRect().bottomRight().y());
+        case VERTICAL_RESIZE :
             resizeHeightEdition(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y());
 			break;
-		case DIAGONAL_RESIZE :
-//			resizeAllEdition(_abstract->width() + event->pos().x() - boundingRect().topRight().x(),
-//					_abstract->height() + event->pos().y() - boundingRect().bottomRight().y());
+        case DIAGONAL_RESIZE :
             resizeAllEdition(_abstract->width() + event->pos().x() - _boxRect.topRight().x(),
                     _abstract->height() + event->pos().y() - _boxRect.bottomRight().y());
 		}
@@ -1101,11 +1098,7 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 	}
 	else {
 		const float eventPosX = event->pos().x();
-		const float eventPosY = event->pos().y();
-//		const float boxStartX = boundingRect().topLeft().x();
-//		const float boxStartY = boundingRect().topLeft().y();
-//		const float boxEndX = boundingRect().bottomRight().x();
-//		const float boxEndY = boundingRect().bottomRight().y();
+        const float eventPosY = event->pos().y();
         const float boxStartX = _boxRect.topLeft().x();
         const float boxStartY = _boxRect.topLeft().y();
         const float boxEndX = _boxRect.bottomRight().x();
@@ -1161,6 +1154,7 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 					setCursor(Qt::CrossCursor);
 				}
                 else if (eventPosY <= REL_DOWN) {
+                    std::cout<<"right zone"<<std::endl;
 					setCursor(Qt::PointingHandCursor);
 				}
                 else {
@@ -1175,6 +1169,7 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 					setCursor(Qt::CrossCursor);
 				}
                 else if (eventPosY <= TRIG_DOWN) {
+                    std::cout<<"left"<<std::endl;
 					setCursor(Qt::PointingHandCursor);                    
 				}
                 else {
@@ -1299,30 +1294,36 @@ void
 BasicBox::drawTriggerGrips(QPainter *painter){
 
     int earWidth, earHeight;
-    earWidth = width()/16;
-    earHeight = 30 ;
+    float adjust = LINE_WIDTH/2;
+    earWidth = TRIGGER_ZONE_WIDTH*2;
+    earHeight = TRIGGER_ZONE_HEIGHT;
 
     QPen pen(isSelected() ? Qt::yellow : Qt::white);
-    QBrush brush(Qt::Dense3Pattern);
+    QBrush brush(Qt::SolidPattern);
     brush.setColor(isSelected() ? Qt::yellow : Qt::white);
     painter->setBrush(brush);
     painter->setPen(pen);
 
     QRectF rect(0, 0, earWidth, earHeight);
 
-    int startAngle = 30 * 16;
-    int spanAngle = 120 * 16;
-    int newX = -width()/2 - LINE_WIDTH;
-    int newY = -height()/2 - earHeight/4;
-    QSize shapeSize(earWidth,earHeight/4);
+    //The left one
+    int startAngle = 0;
+    int spanAngle = 90 * 16;
+    int newX = -width()/2 - adjust - earWidth/2;
+    int newY = -height()/2 - earHeight/2;
+    QSize shapeSize(earWidth/2,earHeight/2);
     rect.moveTo(newX,newY);
-    _startTriggerGrip = QRectF(QPointF(newX,newY),shapeSize);
-//    painter->drawChord(rect,startAngle,spanAngle);
+    _startTriggerGrip = QRectF(QPointF(newX+earWidth/2,newY),shapeSize);
+    painter->drawPie(rect,startAngle,spanAngle);
 
-    newX = -newX-earWidth;
+    //The right one
+    startAngle = 90 * 16;
+    rect.moveTo(0,0);
+    newX = width()/2 - earWidth/2 + adjust;
     rect.moveTo(newX,newY);
     _endTriggerGrip = QRectF(QPointF(newX,newY),shapeSize);
-//    painter->drawChord(rect,startAngle,spanAngle);
+    painter->drawPie(rect,startAngle,spanAngle);
+
 }
 
 void
@@ -1363,7 +1364,8 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 {
 	Q_UNUSED(option);
 	Q_UNUSED(widget);  
-    QPen penR(Qt::lightGray,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
+//    QPen penR(Qt::lightGray,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
+    QPen penR(isSelected() ? Qt::yellow : Qt::white,isSelected() ? 1.5 * LINE_WIDTH : LINE_WIDTH);
 
     //************* pour afficher la shape *************
     QPen penG(Qt::green);

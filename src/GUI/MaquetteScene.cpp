@@ -769,7 +769,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
             _maquette->updateRelations();
 		}
 		if (resizeMode() == NO_RESIZE && _tempBox) {
-            if (_releasePoint != _pressPoint && (_releasePoint.x()-_pressPoint.x() > MIN_BOX_WIDTH) && (_releasePoint.y()-_pressPoint.y() > MIN_BOX_HEIGHT))
+            if (_releasePoint != _pressPoint && ( abs(_releasePoint.x()-_pressPoint.x()) > MIN_BOX_WIDTH && abs(_releasePoint.y()-_pressPoint.y()) > MIN_BOX_HEIGHT) )
 				addBox(BoxCreationMode(_currentBoxMode));
 
 			else {
