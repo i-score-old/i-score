@@ -1578,9 +1578,10 @@ Maquette::load(const string &fileName){
 							ID = addSoundBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),pal,motherID);
 							_scene->addSoundBox(ID);
 						}
-						else if (boxType == "control") {
+                        else if (boxType == "control") {
 							ID = addControlBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);
 							_scene->addControlBox(ID);
+                            _scene->getBox(ID)->updateWidgets();
 						}
 						else if (boxType == "parent") {
 							ID = addParentBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);

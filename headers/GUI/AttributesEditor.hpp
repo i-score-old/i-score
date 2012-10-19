@@ -127,7 +127,12 @@ class AttributesEditor : public QDockWidget
 	/*!
 	 * \brief Called to specify that no box is currently edited.
 	 */
-    void noBoxEdited();
+  void noBoxEdited();
+
+  /*!
+   * \brief Updates values of widgets according to the editor current attributes
+   **/
+  void updateWidgets(bool boxModified);
 
  protected:
   /*!
@@ -149,10 +154,7 @@ class AttributesEditor : public QDockWidget
    * \brief Associates slots with QWidgets' signals.
    **/
   void connectSlots();
-  /*!
-   * \brief Updates values of widgets according to the editor current attributes
-   **/
-  void updateWidgets(bool boxModified);
+
 
   private slots:
 

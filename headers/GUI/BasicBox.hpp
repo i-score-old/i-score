@@ -523,6 +523,7 @@ class BasicBox : public QObject, public QGraphicsItem
    * \param messages : the messages to send at box's end
    */
   void setEndMessages(NetworkMessages *messages);
+  void updateWidgets();
   //! \brief Handles line width.
   static const unsigned int LINE_WIDTH = 2;
   //! \brief Handles resizing tolerance.
@@ -567,6 +568,7 @@ class BasicBox : public QObject, public QGraphicsItem
   QPointF getLeftGripPoint();
   QPointF getRightGripPoint();
   void displayCurveEditWindow();
+  void drawBox(QPainter *painter);
 
  protected:
   /*!
@@ -582,6 +584,7 @@ class BasicBox : public QObject, public QGraphicsItem
   virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
   virtual void keyPressEvent(QKeyEvent *event);
   virtual void keyReleaseEvent(QKeyEvent *event);
+
 
   /*!
    * \brief Redefinition of QGraphicsItem::contextMenuEvent().

@@ -561,6 +561,9 @@ class MaquetteScene : public QGraphicsScene
   static const int MIN_BOX_WIDTH = 50;
   static const int MIN_BOX_HEIGHT = 30;
 
+  inline AttributesEditor *editor(){return _editor;}
+  void updateWidgets();
+
  protected :
   /*!
    * \brief Redifinition of QGraphicsScene::drawItems().

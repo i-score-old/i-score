@@ -852,6 +852,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 //        _networkTree->resetAssignedItems();
 
         if (_boxEdited != NO_ID) {
+
 			_startMsgsEditor->addMessages(abBox->firstMsgs());
             _endMsgsEditor->addMessages(abBox->lastMsgs());
 //           _networkTree->collapseAll();
@@ -937,7 +938,10 @@ AttributesEditor::updateWidgets(bool boxModified)
 {
     std::cout<<"AttributesEditor::updateWidgets ... ";
 	BasicBox * box = _scene->getBox(_boxEdited);
+
 	if (box != NULL) {
+        box->update();
+        box->centerWidget();
 		_boxStartValue->setValue(box->beginPos() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
 		double savedLengthValue = _boxLengthValue->value();
 		_boxLengthValue->setValue(box->width() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);

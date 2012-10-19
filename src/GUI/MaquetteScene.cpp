@@ -186,6 +186,11 @@ MaquetteScene::getPalette() const
 }
 
 void
+MaquetteScene::updateWidgets(){
+    _editor->updateWidgets(true);
+}
+
+void
 MaquetteScene::setAttributes(AbstractBox *abstract)
 {
 	_editor->setAttributes(abstract);
