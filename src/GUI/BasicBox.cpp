@@ -102,8 +102,6 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 	_abstract->setWidth(xmax-xmin);
 	_abstract->setHeight(ymax-ymin);
 
-//    _boxWidget = new QWidget();
-//    _curvesWidget = new CurvesWidget(_boxWidget);
     createWidget();
 
 	init();
@@ -117,8 +115,8 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 void
 BasicBox::centerWidget(){
 
-    _boxWidget->move(-(width())/2,-(height())/2 + (RESIZE_TOLERANCE - LINE_WIDTH));
-    _boxWidget->resize(width(),height()-1.5*RESIZE_TOLERANCE);
+    _boxWidget->move(-(width())/2+LINE_WIDTH,-(height())/2 + (1.2*RESIZE_TOLERANCE));
+    _boxWidget->resize(width()-2*LINE_WIDTH,height()-1.5*RESIZE_TOLERANCE);
 
     _comboBox->move(0,-(height()/2+LINE_WIDTH));
     _comboBox->resize((width() - 2*LINE_WIDTH)/2,COMBOBOX_HEIGHT);
@@ -127,7 +125,6 @@ BasicBox::centerWidget(){
 void
 BasicBox::updateWidgets(){
     centerWidget();
-//    _scene->setAttributes(static_cast<AbstractBox *>(abstract()));
 }
 
 void
@@ -139,7 +136,6 @@ BasicBox::createWidget(){
     brush.setTexture(pix);
     QPalette palette;
     palette.setBrush(QPalette::Background,brush);
-
 
 
     //---------------------- Curve widget ----------------------//
@@ -163,7 +159,7 @@ BasicBox::createWidget(){
     _curveProxy->setVisible(true);
     _curveProxy->setAcceptsHoverEvents(true);
     _curveProxy->setWidget(_boxWidget);
-    _curveProxy->setPalette(palette);    
+//    _curveProxy->setPalette(palette);
 
 
     //---------------- ComboBox (curve list) ------------------//
@@ -214,8 +210,7 @@ BasicBox::init()
 	_comment = NULL;
     updateBoxSize();
 
-	setCacheMode(QGraphicsItem::ItemCoordinateCache);
-
+    setCacheMode(QGraphicsItem::ItemCoordinateCache);
     setFlag(QGraphicsItem::ItemIsMovable, true);
 	setFlag(QGraphicsItem::ItemIsSelectable, true);
 	setFlag(QGraphicsItem::ItemIsFocusable, true);
@@ -465,7 +460,9 @@ BasicBox::updateStuff()
 	for (it2 = _triggerPoints.begin() ; it2 != _triggerPoints.end() ; it2++) {
 		it2->second->updatePosition();
 	}
+    setFlag(QGraphicsItem::ItemIsMovable,true);
 }
+
 
 void
 BasicBox::addRelation(BoxExtremity extremity, Relation *rel)
@@ -670,10 +667,6 @@ BasicBox::setStartMessages(NetworkMessages *messages) {
 
 }
 
-//void
-//BasicBox::setSelectedItemsToSend(QList<QTreeWidgetItem*> itemsSelected){
-//    _abstract->setNetworkTreeItems(itemsSelected);
-//}
 void
 BasicBox::setSelectedItemsToSend(QMap<QTreeWidgetItem*,Data> itemsSelected){
     _abstract->setNetworkTreeItems(itemsSelected);
@@ -945,39 +938,81 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mousePressEvent(event);
     if (event->button() == Qt::LeftButton) {
         setSelected(true);
-
-        if (cursor().shape() == Qt::CrossCursor) {
+        if (cursor().shape() == Qt::ArrowCursor) {
+            lock();
+        }
+        else if (cursor().shape() == Qt::CrossCursor) {
             lock();
             if (event->pos().x() < _boxRect.topLeft().x() + RESIZE_TOLERANCE) {
-				_scene->setRelationFirstBox(_abstract->ID(),BOX_START);
+                _scene->setRelationFirstBox(_abstract->ID(),BOX_START);
             }
             else if (event->pos().x() > _boxRect.topRight().x() - RESIZE_TOLERANCE) {
-				_scene->setRelationFirstBox(_abstract->ID(),BOX_END);
-			}
-		}
-		else if (cursor().shape() == Qt::PointingHandCursor) {
+                _scene->setRelationFirstBox(_abstract->ID(),BOX_END);
+            }
+        }
+        else if (cursor().shape() == Qt::PointingHandCursor) {
             lock();
             if (event->pos().x() < _boxRect.topLeft().x() + RESIZE_TOLERANCE) {addTriggerPoint(BOX_START);
             }
             else if (event->pos().x() > _boxRect.topRight().x() - RESIZE_TOLERANCE) {
-				addTriggerPoint(BOX_END);
-			}
-		}
-		else {
-			if (cursor().shape() == Qt::SizeHorCursor) {
-				_scene->setResizeMode(HORIZONTAL_RESIZE);
-			}
-			else if (cursor().shape() == Qt::SizeVerCursor) {
-				_scene->setResizeMode(VERTICAL_RESIZE);
-			}
-			else if (cursor().shape() == Qt::SizeFDiagCursor) {
-				_scene->setResizeMode(DIAGONAL_RESIZE);
-			}
-			_scene->setResizeBox(_abstract->ID());
-		}
-		update();
-	}
+                addTriggerPoint(BOX_END);
+            }
+        }
+        else if (cursor().shape() == Qt::SizeHorCursor) {
+            _scene->setResizeMode(HORIZONTAL_RESIZE);
+            _scene->setResizeBox(_abstract->ID());
+        }
+        else if (cursor().shape() == Qt::SizeVerCursor) {
+            _scene->setResizeMode(VERTICAL_RESIZE);
+            _scene->setResizeBox(_abstract->ID());
+        }
+        else if (cursor().shape() == Qt::SizeFDiagCursor) {
+            _scene->setResizeMode(DIAGONAL_RESIZE);
+            _scene->setResizeBox(_abstract->ID());
+        }
+        update();
+    }
+
 }
+
+//void
+//BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
+//{
+//    QGraphicsItem::mousePressEvent(event);
+//    if (event->button() == Qt::LeftButton) {
+//        if (cursor().shape() == Qt::CrossCursor) {
+//            lock();
+//            if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
+//                _scene->setRelationFirstBox(_abstract->ID(),BOX_START);
+//            }
+//            else if (event->pos().x() > boundingRect().topRight().x() - RESIZE_TOLERANCE) {
+//                _scene->setRelationFirstBox(_abstract->ID(),BOX_END);
+//            }
+//        }
+//        else if (cursor().shape() == Qt::PointingHandCursor) {
+//            lock();
+//            if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
+//                addTriggerPoint(BOX_START);
+//            }
+//            else if (event->pos().x() > boundingRect().topRight().x() - RESIZE_TOLERANCE) {
+//                addTriggerPoint(BOX_END);
+//            }
+//        }
+//        else {
+//            if (cursor().shape() == Qt::SizeHorCursor) {
+//                _scene->setResizeMode(HORIZONTAL_RESIZE);
+//            }
+//            else if (cursor().shape() == Qt::SizeVerCursor) {
+//                _scene->setResizeMode(VERTICAL_RESIZE);
+//            }
+//            else if (cursor().shape() == Qt::SizeFDiagCursor) {
+//                _scene->setResizeMode(DIAGONAL_RESIZE);
+//            }
+//            _scene->setResizeBox(_abstract->ID());
+//        }
+//        update();
+//    }
+//}
 
 void
 BasicBox::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
@@ -1039,8 +1074,8 @@ BasicBox::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
 void
 BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    QGraphicsItem::mouseMoveEvent(event);
 
+    QGraphicsItem::mouseMoveEvent(event);
     // Draw cursor coordinates as a tooltip
 //    CurveWidget *curve = (static_cast<CurveWidget *>(_curvesWidget->_stackedLayout->currentWidget()));
 //    QPointF mousePos = curve->relativeCoordinates(event->pos());
@@ -1049,32 +1084,28 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 //    QPoint pos = this->getBottomRight().toPoint();
 //    QToolTip::showText(pos, posStr);
 
-
     if (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor) {
-		_scene->selectionMoved();
-	}
-	else if (_scene->resizeMode() != NO_RESIZE && (cursor().shape() == Qt::SizeVerCursor || cursor().shape() == Qt::SizeHorCursor || cursor().shape() == Qt::SizeFDiagCursor)) {
-		switch (_scene->resizeMode()) {
+        _scene->selectionMoved();
+    }
+    else if (_scene->resizeMode() != NO_RESIZE && (cursor().shape() == Qt::SizeVerCursor || cursor().shape() == Qt::SizeHorCursor || cursor().shape() == Qt::SizeFDiagCursor)) {
+        switch (_scene->resizeMode()) {
         case HORIZONTAL_RESIZE :
-            if(cursor().shape() == Qt::SizeHorCursor)
                 resizeWidthEdition(_abstract->width() + event->pos().x() - _boxRect.topRight().x());
-			break;
+            break;
         case VERTICAL_RESIZE :
-            if(cursor().shape() == Qt::SizeVerCursor)
                 resizeHeightEdition(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y());
-			break;
+            break;
         case DIAGONAL_RESIZE :
-            if(cursor().shape() == Qt::SizeFDiagCursor)
                 resizeAllEdition(_abstract->width() + event->pos().x() - _boxRect.topRight().x(),
                         _abstract->height() + event->pos().y() - _boxRect.bottomRight().y());
             break;
         }
-		QPainterPath nullPath;
-		nullPath.addRect(QRectF(QPointF(0.,0.),QSizeF(0.,0.)));
-		_scene->setSelectionArea(nullPath);
-		setSelected(true);
-		_scene->boxResized();
-	}
+        QPainterPath nullPath;
+        nullPath.addRect(QRectF(QPointF(0.,0.),QSizeF(0.,0.)));
+        _scene->setSelectionArea(nullPath);
+        setSelected(true);
+        _scene->boxResized();
+    }
 }
 
 void
@@ -1090,207 +1121,134 @@ BasicBox::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 		unlock();
 	}
 
-	_scene->setResizeMode(NO_RESIZE);
+	_scene->setResizeMode(NO_RESIZE);    
 }
 
 void
 BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 {
     QGraphicsItem::hoverEnterEvent(event);
-	if (event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::ControlModifier) {
-		setCursor(Qt::SizeAllCursor);
-	}
-	else {
-		const float eventPosX = event->pos().x();
-        const float eventPosY = event->pos().y();
-        const float boxStartX = _boxRect.topLeft().x();
-        const float boxStartY = _boxRect.topLeft().y();
-        const float boxEndX = _boxRect.bottomRight().x();
-        const float boxEndY = _boxRect.bottomRight().y();
 
-		const float boxSizeY = boxEndY - boxStartY;
-//        const float TRIG_DOWN = boxEndY - 2*boxSizeY/3.;
-        const float TRIG_DOWN = -_boxRect.height()/2;
-		const float REL_UP = TRIG_DOWN;
-		const float REL_DOWN = boxEndY - boxSizeY/3.;
-		const float HOR_RESIZE_DOWN = boxEndY - boxSizeY/9.;
-		const float DIAG_RESIZE_UP = HOR_RESIZE_DOWN;
-		float BORDER_GRIP;
-		if (_abstract->width() >= 3*RESIZE_TOLERANCE) {
-            BORDER_GRIP = RESIZE_TOLERANCE;
-		}
-		else {
-			BORDER_GRIP = LINE_WIDTH;
-		}
+    const float RESIZE_ZONE_WIDTH = 3*LINE_WIDTH;
 
-        if (_scene->currentMode() == RELATION_MODE) {
-			if (eventPosX >  boxEndX - BORDER_GRIP) {
-				setCursor(Qt::CrossCursor);
-			}
-			else if (eventPosX < boxStartX + BORDER_GRIP) {
-				setCursor(Qt::CrossCursor);
-			}
-            else {
-				setCursor(Qt::SizeAllCursor);
-			}
-		}
-		else if (_scene->currentMode() == TRIGGER_MODE) {
+    QRectF textRect(_boxRect.topLeft(),_boxRect.topRight() + QPointF(0,RESIZE_TOLERANCE));
 
-            if (eventPosX >  boxEndX - BORDER_GRIP) {
-				setCursor(Qt::PointingHandCursor);
-			}
-            else{
-                if (eventPosX < boxStartX + BORDER_GRIP) {
-                    setCursor(Qt::PointingHandCursor);
-                }
-                else{
-                    setCursor(Qt::SizeAllCursor);
-                }
-			}
-		}
-        else {
-            if (eventPosX >  boxEndX - BORDER_GRIP) {
-                if (eventPosY > DIAG_RESIZE_UP) {
-					setCursor(Qt::SizeFDiagCursor);
-				}
-				else if (eventPosY > REL_DOWN && eventPosY <= DIAG_RESIZE_UP) {
-                    setCursor(Qt::SizeHorCursor);
-				}
-                else if (eventPosY > TRIG_DOWN && eventPosY <= REL_DOWN) {
-					setCursor(Qt::CrossCursor);
-				}
-                else if (eventPosY <= REL_DOWN) {
-					setCursor(Qt::PointingHandCursor);
-				}
-                else {
-					setCursor(Qt::SizeAllCursor);
-				}
-			}
-            else if (eventPosX < boxStartX + BORDER_GRIP) {
-                if (eventPosY > DIAG_RESIZE_UP) {
-					setCursor(Qt::SizeVerCursor);
-				}
-                else if (eventPosY > REL_UP && eventPosY <= REL_DOWN) {
-					setCursor(Qt::CrossCursor);
-				}
-                else if (eventPosY <= TRIG_DOWN) {
-					setCursor(Qt::PointingHandCursor);                    
-				}
-                else {
-					setCursor(Qt::SizeAllCursor);
-				}
-			}
-			else if (eventPosY > boxEndY - BORDER_GRIP) {
-				setCursor(Qt::SizeVerCursor);
-			}
-            else {
-				setCursor(Qt::SizeAllCursor);
-            }
-		}
-	}
+    QRectF triggerGripLeft = _startTriggerGrip;
+    QRectF triggerGripRight = _endTriggerGrip;
+
+    QRectF relationGripLeft = _leftEar;
+    QRectF relationGripRight = _rightEar;
+
+    QRectF vertResize_bottom(_boxRect.bottomLeft()+QPointF(0,-RESIZE_ZONE_WIDTH),_boxRect.bottomRight()-QPointF(RESIZE_ZONE_WIDTH,0));
+    QRectF diagResize_bottomRight(_boxRect.bottomRight()-QPointF(RESIZE_ZONE_WIDTH,RESIZE_ZONE_WIDTH),_boxRect.bottomRight());
+
+    //bandeau zone (text rect) - top
+    if(textRect.contains(event->pos())){
+        setCursor(Qt::SizeAllCursor);
+    }
+
+    //Trigger zone - left
+    else if(triggerGripLeft.contains(event->pos())){
+        setCursor(Qt::PointingHandCursor);
+    }
+
+    //Trigger zone - right
+    else if(triggerGripRight.contains(event->pos())){
+        setCursor(Qt::PointingHandCursor);
+    }
+
+    //Relation grip zone - left
+    else if(relationGripLeft.contains(event->pos())){
+        setCursor(Qt::CrossCursor);
+    }
+
+    //Relation grip zone - right
+    else if(relationGripRight.contains(event->pos())){
+        setCursor(Qt::CrossCursor);
+    }
+
+    //Vertical resize zone - bottom
+    else if(vertResize_bottom.contains(event->pos()))
+        setCursor(Qt::SizeVerCursor);
+
+    //Diag resize zone - Bottom right
+    else if(diagResize_bottomRight.contains(event->pos()))
+        setCursor(Qt::SizeFDiagCursor);
+
+    else
+        setCursor(Qt::ArrowCursor);
 }
+
 
 void
 BasicBox::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 {
-    QGraphicsItem::hoverMoveEvent(event);
-	if (event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::ControlModifier) {
-		setCursor(Qt::SizeAllCursor);
-	}
-	else {
-		const float eventPosX = event->pos().x();
-        const float eventPosY = event->pos().y();
-        const float boxStartX = _boxRect.topLeft().x();
-        const float boxStartY = _boxRect.topLeft().y();
-        const float boxEndX = _boxRect.bottomRight().x();
-        const float boxEndY = _boxRect.bottomRight().y();
+    //Bug qui survient parfois :
+    //  Le curseur a mémorisé la forme qu'il avait avant de rentrer dans la zone BoxWidget.
+    //  Même si il est pourtant visible avec la forme ArrowCursor, il exécute au click l'action associée au curseur précédent.
+    //
+    //Solution provisoire :
+    //  Pour palier à cela il y a une zone "vide" (qui met le curseur à ArrowCursor) avant d'entrer dans le widget.
+    //  Seulement si on passe trop vite dessus, il n'a pas le temps de l'affecter.
 
-        const float boxSizeY = boxEndY - boxStartY;
-//		const float TRIG_DOWN = boxEndY - 2*boxSizeY/3.;
-        const float TRIG_DOWN = -_boxRect.height()/2;
-//        const float REL_UP = TRIG_DOWN;
-//        const float REL_DOWN = boxEndY - boxSizeY/3.;
-        const float REL_UP = -_leftEar.height()/2;
-        const float REL_DOWN = _leftEar.height()/2;
-		const float HOR_RESIZE_DOWN = boxEndY - boxSizeY/9.;
-		const float DIAG_RESIZE_UP = HOR_RESIZE_DOWN;
-		float BORDER_GRIP;
-		if (_abstract->width() >= 3*RESIZE_TOLERANCE) {
-            BORDER_GRIP = RESIZE_TOLERANCE;
-		}
-		else {
-            BORDER_GRIP = LINE_WIDTH;
-		}
+    QGraphicsItem::hoverEnterEvent(event);
 
-		if (_scene->currentMode() == RELATION_MODE) {
-            if (eventPosX >  boxEndX - BORDER_GRIP) {
-				setCursor(Qt::CrossCursor);
-			}
-            else if (eventPosX < boxStartX + BORDER_GRIP) {
-				setCursor(Qt::CrossCursor);
-			}
-            else {
-				setCursor(Qt::SizeAllCursor);
-			}
-		}
-		else if (_scene->currentMode() == TRIGGER_MODE) {
-            if (eventPosX >  boxEndX - BORDER_GRIP) {
-				setCursor(Qt::PointingHandCursor);
-			}
-            else if (eventPosX < boxStartX + BORDER_GRIP) {
-				setCursor(Qt::PointingHandCursor);
-			}
-            else {
-				setCursor(Qt::SizeAllCursor);
-			}
-		}
-		else {
-			if (eventPosX >  boxEndX - BORDER_GRIP) {
-				if (eventPosY > DIAG_RESIZE_UP) {
-					setCursor(Qt::SizeFDiagCursor);
-				}
-				else if (eventPosY > REL_DOWN && eventPosY <= DIAG_RESIZE_UP) {
-					setCursor(Qt::SizeHorCursor);
-				}
-                else if (eventPosY > REL_UP && eventPosY <= REL_DOWN) {
-					setCursor(Qt::CrossCursor);
-				}
-                else if (eventPosY <= TRIG_DOWN) {
-					setCursor(Qt::PointingHandCursor);
-				}
-                else {
-                    setCursor(Qt::SizeHorCursor);
-				}
-			}
-            else if (eventPosX < boxStartX) {
-				if (eventPosY > DIAG_RESIZE_UP) {
-					setCursor(Qt::SizeVerCursor);
-				}
-                else if (eventPosY > REL_UP && eventPosY <= REL_DOWN) {
-					setCursor(Qt::CrossCursor);
-				}
-                else if (eventPosY <= TRIG_DOWN) {
-					setCursor(Qt::PointingHandCursor);
-				}
-				else {
-                    setCursor(Qt::SizeAllCursor);
-				}
-			}
-            else if (eventPosY > boxEndY - LINE_WIDTH)
-				setCursor(Qt::SizeVerCursor);
-                else if (eventPosY < boxStartY + BORDER_GRIP && eventPosY > TRIG_DOWN) {
-                    setCursor(Qt::SizeAllCursor);
-                }
-		}
-	}
+    const float RESIZE_ZONE_WIDTH = 3*LINE_WIDTH;
+
+    QRectF textRect(_boxRect.topLeft(),_boxRect.topRight() + QPointF(0,3*RESIZE_TOLERANCE/4));
+
+    QRectF triggerGripLeft = _startTriggerGrip;
+    QRectF triggerGripRight = _endTriggerGrip;
+
+    QRectF relationGripLeft = _leftEar;
+    QRectF relationGripRight = _rightEar;
+
+    QRectF vertResize_bottom(_boxRect.bottomLeft()+QPointF(0,-RESIZE_ZONE_WIDTH),_boxRect.bottomRight()-QPointF(RESIZE_ZONE_WIDTH,0));
+    QRectF diagResize_bottomRight(_boxRect.bottomRight()-QPointF(RESIZE_ZONE_WIDTH,RESIZE_ZONE_WIDTH),_boxRect.bottomRight());
+
+    //bandeau zone (text rect) - top
+    if(textRect.contains(event->pos())){
+        setCursor(Qt::SizeAllCursor);
+    }
+
+    //Trigger zone - left
+    else if(triggerGripLeft.contains(event->pos())){
+        setCursor(Qt::PointingHandCursor);
+    }
+
+    //Trigger zone - right
+    else if(triggerGripRight.contains(event->pos())){
+        setCursor(Qt::PointingHandCursor);
+    }
+
+    //Relation grip zone - left
+    else if(relationGripLeft.contains(event->pos())){
+        setCursor(Qt::CrossCursor);
+    }
+
+    //Relation grip zone - right
+    else if(relationGripRight.contains(event->pos())){
+        setCursor(Qt::CrossCursor);
+    }
+
+    //Vertical resize zone - bottom
+    else if(vertResize_bottom.contains(event->pos()))
+        setCursor(Qt::SizeVerCursor);
+
+    //Diag resize zone - Bottom right
+    else if(diagResize_bottomRight.contains(event->pos()))
+        setCursor(Qt::SizeFDiagCursor);
+
+    else{
+        setCursor(Qt::ArrowCursor);
+    }
 }
-
 
 void
 BasicBox::hoverLeaveEvent ( QGraphicsSceneHoverEvent * event )
 {
-	QGraphicsItem::hoverLeaveEvent(event);
-	setCursor(Qt::ArrowCursor);
+    QGraphicsItem::hoverLeaveEvent(event);
+    setCursor(Qt::ArrowCursor);
 }
 
 void

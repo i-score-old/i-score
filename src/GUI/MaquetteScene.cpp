@@ -125,52 +125,7 @@ MaquetteScene::init()
 	_relation->setSecondBox(NO_ID);
 	_relationBoxFound = false;
 
-	_mousePos = QPointF(0.,0.);
-
-    //NICO TEST
-    QComboBox *combo = new QComboBox();
-    combo->addItem("BRIT");
-    combo->addItem("CrAT");
-//    QGroupBox *groupBox = new QGroupBox("Contact Details");
-//    QLabel *numberLabel = new QLabel("Telephone number");
-//    QLineEdit *numberEdit = new QLineEdit;
-
-//    QFormLayout *layout = new QFormLayout;
-//    layout->addRow(numberLabel, numberEdit);
-//    groupBox->setLayout(layout);
-
-//    QGraphicsProxyWidget *proxy = addWidget(combo);
-
-    QWidget *widget = new QWidget();
-
-    QGridLayout *layout = new QGridLayout;
-    layout->addWidget(combo);
-
-    QLineEdit *numberEdit = new QLineEdit;
-    layout->addWidget(numberEdit);
-
-    CurvesWidget *curve = new CurvesWidget(widget);
-
-    layout->addWidget(curve);
-
-    widget->setLayout(layout);
-//    QGraphicsItem *item = new QGraphicsItem;
-
-//    QGraphicsItem *item = new QGraphicsItem();
-    QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget();// = addWidget(widget);
-
-    proxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
-
-    proxy->setFlag(QGraphicsItem::ItemIsMovable, true);
-    proxy->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    proxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
-//    proxy->setFlag(ItemSendsGeometryChanges,true);
-    proxy->setVisible(true);
-    proxy->setAcceptsHoverEvents(true);
-    proxy->setZValue(0);
-    proxy->setWidget(widget);
-
-    //NICO TEST end
+    _mousePos = QPointF(0.,0.);
 }
 
 void
@@ -441,16 +396,16 @@ MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
 void
 MaquetteScene::setCurrentMode(int inter, BoxCreationMode box) {
 	_currentInteractionMode = inter;
-	if (inter == SELECTION_MODE || inter == RELATION_MODE) {
+    if (inter == SELECTION_MODE || inter == RELATION_MODE) {
 		_view->setDragMode(QGraphicsView::RubberBandDrag);
 	}
 	else if ((inter != CREATION_MODE && box == NB_MODE)
 			|| (inter == CREATION_MODE && box != NB_MODE)) {
 		_currentBoxMode = box;
 		_view->setDragMode(QGraphicsView::NoDrag);
-	}
-	else {
-		_view->setDragMode(QGraphicsView::NoDrag);
+        }
+        else {
+            _view->setDragMode(QGraphicsView::NoDrag);
 	}
 }
 
@@ -495,6 +450,7 @@ MaquetteScene::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
 {
 	if (itemAt(event->scenePos())) {
 		// TODO : handle other boxes drag&drop
+
 		if (itemAt(event->scenePos())->type() == SOUND_BOX_TYPE) {
 			QGraphicsScene::dragMoveEvent(event);
 		}
@@ -564,86 +520,88 @@ MaquetteScene::dropEvent(QGraphicsSceneDragDropEvent *event)
 	}
 }
 
+bool
+MaquetteScene::noBoxSelected(){
+     return selectedItems().isEmpty();
+}
+
 void
 MaquetteScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
     QGraphicsScene::mouseDoubleClickEvent(event);
-
-//    if(selectedItems().size()==1){
-//        BasicBox *currentBox = static_cast<BasicBox *>(selectedItems().first());
-//    }
 }
+
 
 void
 MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     QGraphicsScene::mousePressEvent(mouseEvent);
-
-	_clicked = true;
-
+    _clicked = true;
     if(!playing()){
-	if (_tempBox) {
-		removeItem(_tempBox);
-		_tempBox = NULL;
-	}
-	_savedInteractionMode = _currentInteractionMode;
-	_savedBoxMode = _currentBoxMode;
-//    if (mouseEvent->modifiers() == Qt::ControlModifier) {
-//		setCurrentMode(CREATION_MODE);
-//	}
-//    else {
-//        setCurrentMode(SELECTION_MODE);
-//	}
-    if (mouseEvent->modifiers() == Qt::ShiftModifier) {
-        setCurrentMode(SELECTION_MODE);
-    }
-    else {
-        setCurrentMode(CREATION_MODE);
-    }
-	if (itemAt(mouseEvent->scenePos()) != 0) {
-        if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::PointingHandCursor && _currentInteractionMode != TRIGGER_MODE) {
-            setCurrentMode(TRIGGER_MODE);
+        if (_tempBox) {
+            removeItem(_tempBox);
+            _tempBox = NULL;
+        }
+        _savedInteractionMode = _currentInteractionMode;
+        _savedBoxMode = _currentBoxMode;
 
-		}
-        if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::CrossCursor && _currentInteractionMode != RELATION_MODE) {
-			setCurrentMode(RELATION_MODE);
 
-		}
-	}
+        if (mouseEvent->modifiers() == Qt::ShiftModifier) {
+            setCurrentMode(SELECTION_MODE);
+        }
+        else if (noBoxSelected()){
+            setCurrentMode(CREATION_MODE);
+        }
+        else
+            setCurrentMode(SELECTION_MODE);
 
-	switch (_currentInteractionMode) {
-	case RELATION_MODE :
-		_mousePos = mouseEvent->scenePos();
-		break;
-	case SELECTION_MODE :
-		break;
-	case TEXT_MODE :
-		break;
-	case TRIGGER_MODE :
-		break;
-	case CREATION_MODE :
-		if (itemAt(mouseEvent->scenePos()) == 0) {
-			if (resizeMode() == NO_RESIZE) {
-				// Store the first pressed point
-				_pressPoint = mouseEvent->scenePos();
-				QPen pen(Qt::black);
-				QBrush brush(Qt::NoBrush);
-				// Add the temporary box to the scene
-				_tempBox = addRect(QRectF(_pressPoint.x(), _pressPoint.y(), 0, 0), pen, brush);
-			}
-		}
-		else if (itemAt(mouseEvent->scenePos())->type() == PARENT_BOX_TYPE) {
-			// TODO : see why creation is possible in a parent box during resize mode
-			if (resizeMode() == NO_RESIZE) {
-				// Store the first pressed point
-				_pressPoint = mouseEvent->scenePos();
-				QPen pen(Qt::black);
-				QBrush brush(Qt::NoBrush);
-				// Add the temporary box to the scene
-				_tempBox = addRect(QRectF(_pressPoint.x(), _pressPoint.y(), 0, 0), pen, brush);
-			}
-		}
-		break;
-	}
+        if (itemAt(mouseEvent->scenePos()) != 0) {
+            if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::PointingHandCursor && _currentInteractionMode != TRIGGER_MODE) {
+                setCurrentMode(TRIGGER_MODE);
+
+            }
+            if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::CrossCursor && _currentInteractionMode != RELATION_MODE) {
+                setCurrentMode(RELATION_MODE);
+
+            }
+        }
+
+        switch (_currentInteractionMode) {
+            case RELATION_MODE :
+                _mousePos = mouseEvent->scenePos();
+                break;
+            case SELECTION_MODE :
+                break;
+            case TEXT_MODE :
+                break;
+            case TRIGGER_MODE :
+                break;
+            case CREATION_MODE :
+                if (itemAt(mouseEvent->scenePos()) == 0) {
+                    if (resizeMode() == NO_RESIZE) {
+                        // Store the first pressed point
+                        _pressPoint = mouseEvent->scenePos();
+                        QPen pen(Qt::black);
+                        QBrush brush(Qt::NoBrush);
+                        // Add the temporary box to the scene
+                        _tempBox = addRect(QRectF(_pressPoint.x(), _pressPoint.y(), 0, 0), pen, brush);
+                    }
+                }
+                else if (itemAt(mouseEvent->scenePos())->type() == PARENT_BOX_TYPE) {
+                    // TODO : see why creation is possible in a parent box during resize mode
+                    if (resizeMode() == NO_RESIZE) {
+                        // Store the first pressed point
+                        _pressPoint = mouseEvent->scenePos();
+                        QPen pen(Qt::black);
+                        QBrush brush(Qt::NoBrush);
+                        // Add the temporary box to the scene
+                        _tempBox = addRect(QRectF(_pressPoint.x(), _pressPoint.y(), 0, 0), pen, brush);
+                    }
+                }
+                break;
+
+            case BOX_EDIT_MODE :
+                break;
+            }
     }
 }
 
@@ -653,7 +611,8 @@ MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 
 	switch (_currentInteractionMode) {
 	case RELATION_MODE :
-		if (_clicked) {
+
+        if (_clicked) {
 			_mousePos = mouseEvent->scenePos();
 			if (_relation->firstBox() != NO_ID) {
                 update();
@@ -677,35 +636,40 @@ MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 			}
 		}
 		break;
-	case TEXT_MODE :
+    case TEXT_MODE :
 		break;
-	case TRIGGER_MODE :
+    case TRIGGER_MODE :
 		break;
-	case SELECTION_MODE :
+    case SELECTION_MODE :
 		break;
-	case CREATION_MODE :
-		if (resizeMode() == NO_RESIZE && _tempBox) {
-			int upLeftX, upLeftY, width, height;
+    case CREATION_MODE :
+        if(noBoxSelected()){
+            if (resizeMode() == NO_RESIZE && _tempBox) {
+                int upLeftX, upLeftY, width, height;
 
-			if (_pressPoint.x() < mouseEvent->scenePos().x()) {
-				upLeftX = _pressPoint.x();
-				width = mouseEvent->scenePos().x() - upLeftX;
-			} else {
-				upLeftX = mouseEvent->scenePos().x();
-				width = _pressPoint.x() - upLeftX;
-			}
-			if (_pressPoint.y() < mouseEvent->scenePos().y()) {
-				upLeftY = _pressPoint.y();
-				height = mouseEvent->scenePos().y() - upLeftY;
-			}
-			else {
-				upLeftY = mouseEvent->scenePos().y();
-				height = _pressPoint.y() - upLeftY;
-			}
+                if (_pressPoint.x() < mouseEvent->scenePos().x()) {
+                    upLeftX = _pressPoint.x();
+                    width = mouseEvent->scenePos().x() - upLeftX;
+                } else {
+                    upLeftX = mouseEvent->scenePos().x();
+                    width = _pressPoint.x() - upLeftX;
+                }
+                if (_pressPoint.y() < mouseEvent->scenePos().y()) {
+                    upLeftY = _pressPoint.y();
+                    height = mouseEvent->scenePos().y() - upLeftY;
+                }
+                else {
+                    upLeftY = mouseEvent->scenePos().y();
+                    height = _pressPoint.y() - upLeftY;
+                }
 
-			_tempBox->setRect(upLeftX, upLeftY, width, height);
-		}
+                _tempBox->setRect(upLeftX, upLeftY, width, height);
+            }
+        }
  		break;
+
+    case BOX_EDIT_MODE :
+        break;
 	}
 }
 
@@ -736,8 +700,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
                     firstBox->setSelected(true);
 				}
 				else {
-					if (selectedItems().empty()) {
-//						displayMessage(tr("No relation created").toStdString(),WARNING_LEVEL);
+                    if (selectedItems().empty()) {
 					}
 					else {
 						selectionMoved();
@@ -774,8 +737,9 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
             _maquette->updateRelations();
 		}
 		if (resizeMode() == NO_RESIZE && _tempBox) {
-            if (_releasePoint != _pressPoint && ( abs(_releasePoint.x()-_pressPoint.x()) > MIN_BOX_WIDTH && abs(_releasePoint.y()-_pressPoint.y()) > MIN_BOX_HEIGHT) )
-				addBox(BoxCreationMode(_currentBoxMode));
+            if (_releasePoint != _pressPoint && ( abs(_releasePoint.x()-_pressPoint.x()) > MIN_BOX_WIDTH && abs(_releasePoint.y()-_pressPoint.y()) > MIN_BOX_HEIGHT) ){
+                addBox(BoxCreationMode(_currentBoxMode));
+            }
 
 			else {
 				if (selectedItems().empty()) {

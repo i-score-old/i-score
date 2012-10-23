@@ -102,6 +102,13 @@ BoxWidget::~BoxWidget(){
 
 }
 
+void
+BoxWidget::mousePressEvent(QMouseEvent *event){
+    hide();
+    setWindowModality(Qt::WindowModal);
+    show();
+}
+
 void BoxWidget::curveActivationChanged(const QString &address, bool state) {
     std::cout<<"BoxWidget::CurveActivation Changed"<<std::endl;
     if (_boxID != NO_ID) {

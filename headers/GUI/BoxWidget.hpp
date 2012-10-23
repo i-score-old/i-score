@@ -67,6 +67,9 @@ public slots :
 signals :
     void currentIndexChanged();
 
+protected :
+    virtual void mousePressEvent(QMouseEvent *event);
+
 private :
     bool updateCurve(const std::string &address, bool forceUpdate);
     void addCurve(QString address,CurveWidget *curveWidget);

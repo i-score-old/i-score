@@ -342,50 +342,42 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
             pen.setWidth(isSelected() ? 1.5 *BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH/2);
             painter->setPen(pen);
 
-            if(!isWaiting()){
-//                    painter->fillPath(path,QColor("red"));
-//                    brush.setColor(QColor("red"));
-//                    painter->setBrush(brush);
+            if (_scene->playing()) {
+                if(!isWaiting()){
                     drawFlag(painter,QColor("red"));
-//                    painter->drawPath(path);
-            }
-
-            else{
-
-                if(/*this->focusItem()&&*/_scene->getTriggersQueueList().first()==this){
-//                    painter->fillPath(path,QColor("green"));
-//                    brush.setColor(QColor("green"));
-//                    painter->setBrush(brush);
-//                    painter->drawPath(path);
-                    drawFlag(painter,QColor("green"));
-                    this->setFocus();
                 }
+
                 else{
-//                    painter->fillPath(path,QColor("orange"));
-                    brush.setColor(QColor("orange"));
-                    painter->setBrush(brush);
-                    drawFlag(painter,QColor("orange"));
-//                    painter->drawPath(path);
+                    if(_scene->getTriggersQueueList().first()==this){
+                        drawFlag(painter,QColor("green"));
+                        this->setFocus();
+                    }
+                    else{
+                        brush.setColor(QColor("orange"));
+                        painter->setBrush(brush);
+                        drawFlag(painter,QColor("orange"));
+                    }
+                }
+
+                if (_abstract->waiting()) {
+                    BasicBox *box = _scene->getBox(_abstract->boxID());
+                    box->update();
+                    switch(_abstract->boxExtremity()){
+                        case BOX_START :
+                        painter->drawText(rect.topRight()+QPointF(0,rect.height()/2),QString::fromStdString(_abstract->message()));
+                            break;
+                        case BOX_END :
+                            painter->drawText(rect.topLeft()+QPointF(-QString::fromStdString(_abstract->message()).length()*7,rect.height()/2),QString::fromStdString(_abstract->message()));
+                            break;
+                        default :
+                            break;
+                    }
                 }
             }
-        }
-    }
-    if (_scene->playing()) {
-        if (_abstract->waiting()) {
-            BasicBox *box = _scene->getBox(_abstract->boxID());
-            box->update();
-            switch(_abstract->boxExtremity()){
-                case BOX_START :
-                painter->drawText(rect.topRight()+QPointF(0,rect.height()/2),QString::fromStdString(_abstract->message()));
-                    break;
-                case BOX_END :
-                    painter->drawText(rect.topLeft()+QPointF(-QString::fromStdString(_abstract->message()).length()*7,rect.height()/2),QString::fromStdString(_abstract->message()));
-                    break;
-                default :
-                    break;
+            else{
+                 drawFlag(painter,QColor(Qt::darkGray));
             }
         }
     }
-
     painter->restore();
 }
