@@ -61,10 +61,11 @@ using std::string;
 #include "BoxWidget.hpp"
 #include "Interpolation.hpp"
 #include "Maquette.hpp"
+#include "MaquetteScene.hpp"
 
 #define COMBOBOX_WIDTH 500
 
-BoxWidget::BoxWidget(QWidget *parent)
+BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
 : QWidget(parent) {
 
     _curveMap = new QMap<std::string,CurveWidget *>();
@@ -79,6 +80,7 @@ BoxWidget::BoxWidget(QWidget *parent)
 
     update(); 
 
+    _box = box;
     _comboBox = new QComboBox;
     _curveWidget = new CurveWidget(NULL);
     _tabWidget = new QTabWidget;

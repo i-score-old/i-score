@@ -141,7 +141,7 @@ BasicBox::createWidget(){
     //---------------------- Curve widget ----------------------//
 
     _boxWidget = new QWidget();
-    _curvesWidget = new BoxWidget(_boxWidget);
+    _curvesWidget = new BoxWidget(_boxWidget,this);
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(_curvesWidget);
     layout->setMargin(0);
@@ -162,7 +162,7 @@ BasicBox::createWidget(){
     _curveProxy->setPalette(palette);
 
 
-    //---------------- ComboBox (curve list) ------------------//
+    //---------------- ComboBox (curves list) ------------------//
     _comboBox = new QComboBox;
     _comboBox->view()->setTextElideMode(Qt::ElideMiddle);
     _comboBox->setInsertPolicy(QComboBox::InsertAtTop);
@@ -1062,8 +1062,8 @@ BasicBox::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
 
 //     delete nameDialog;
 //        displayCurveEditWindow();
-        BoxCurveEdit *boxCurveEdit = new BoxCurveEdit(0,this);
-        boxCurveEdit->exec();
+//        BoxCurveEdit *boxCurveEdit = new BoxCurveEdit(0,this);
+//        boxCurveEdit->exec();
     }
 
     else{

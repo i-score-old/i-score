@@ -20,6 +20,7 @@ class QGridLayout;
 class CurveWidget;
 class Interpolation;
 class QString;
+class BasicBox;
 
 /*!
  * \class BoxWidget
@@ -32,7 +33,8 @@ class BoxWidget : public QWidget
     Q_OBJECT
 
 public :
-    BoxWidget(QWidget *parent);
+    BoxWidget(QWidget *parent, BasicBox *box);
+
     ~BoxWidget();
     /*!
      * \brief Updates the widget.
@@ -90,6 +92,7 @@ private :
     QGridLayout *_curvePageLayout;
     CurveWidget *_curveWidget;
     QStackedLayout *_stackedLayout;
+    BasicBox *_box;
 };
 
 #endif // BOXWIDGET_H

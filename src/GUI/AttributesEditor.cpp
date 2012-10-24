@@ -91,7 +91,7 @@ using namespace SndBoxProp;
 #define BOTTOM_MARGIN 5
 #define LEFT_MARGIN 5
 #define RIGHT_MARGIN 5
-#define MINIMUM_WIDTH 600
+#define MINIMUM_WIDTH 1000
 
 static const float S_TO_MS  = 1000.;
 
@@ -125,9 +125,7 @@ AttributesEditor::init() {
 
 	setAcceptDrops(false);
 
-    //setMinimumWidth(MINIMUM_WIDTH);
-
-	noBoxEdited();
+	noBoxEdited();    
 }
 
 AttributesEditor::~AttributesEditor()

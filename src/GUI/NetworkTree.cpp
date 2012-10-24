@@ -52,27 +52,37 @@ static unsigned int INTERPOLATION_COLUMN = 3;
 static unsigned int REDUNDANCY_COLUMN = 5;
 static unsigned int SR_COLUMN = 6;
 
+static unsigned int TEXT_POINT_SIZE = 10;
+
 bool VALUE_MODIFIED;
 bool SR_MODIFIED;
 
 NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 {
     init();
-    setColumnCount(5);
+    setColumnCount(7);
     QStringList list;
-    list<<"Name"<<"Value"<<"Start"<<"Interpolation"<<"End"<<"Redundancy"<<"Sample rate";
+    list<<"Address"<<"Value"<<"Start"<<" ~ "<<"End"<<" = "<<" % ";
     setColumnWidth(NAME_COLUMN,150);
     setColumnWidth(VALUE_COLUMN,75);
-    setColumnWidth(START_COLUMN,40);
-    setColumnWidth(END_COLUMN,40);
-    setColumnWidth(INTERPOLATION_COLUMN,40);
-    setColumnWidth(REDUNDANCY_COLUMN,40);
+    setColumnWidth(START_COLUMN,75);
+    setColumnWidth(END_COLUMN,75);
+    setColumnWidth(INTERPOLATION_COLUMN,25);
+    setColumnWidth(REDUNDANCY_COLUMN,25);
     setColumnWidth(SR_COLUMN,50);
     setHeaderLabels(list);
     list.clear();    
+
+    QFont font;
+    font.setPointSize(TEXT_POINT_SIZE);
+    setFont(font);
+
     VALUE_MODIFIED = false;
     SR_MODIFIED = false;
     hideColumn(VALUE_COLUMN);
+
+
+
     connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(itemCollapsed()));
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(clickInNetworkTree(QTreeWidgetItem *,int)));
     connect(this,SIGNAL(itemChanged(QTreeWidgetItem*,int)), this,SLOT(valueChanged(QTreeWidgetItem*,int)));
@@ -404,7 +414,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
         for (it = nodes.begin() ; it != nodes.end() ; ++it) {
             QStringList list;
             list << QString::fromStdString(*it);
-            QTreeWidgetItem *childItem = new QTreeWidgetItem(list,NodeNamespaceType);
+            QTreeWidgetItem *childItem = new QTreeWidgetItem( list,NodeNamespaceType);
 //            curItem->setCheckState(0,Qt::Unchecked);
             curItem->setCheckState(START_COLUMN,Qt::Unchecked);
             curItem->setCheckState(END_COLUMN,Qt::Unchecked);
@@ -413,7 +423,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
             list.clear();
             treeRecursiveExploration(childItem);
         }
-    }
+    }    
 }
 
 void

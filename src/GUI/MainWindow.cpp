@@ -87,7 +87,7 @@ MainWindow::MainWindow()
   readSettings();
 
   // Creation of Graphic Palette
-  _editor = new AttributesEditor(this);
+  _editor = new AttributesEditor(this);  
   _editor->hide();
   addDockWidget(Qt::LeftDockWidgetArea,_editor);
 
