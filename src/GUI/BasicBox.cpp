@@ -159,7 +159,7 @@ BasicBox::createWidget(){
     _curveProxy->setVisible(true);
     _curveProxy->setAcceptsHoverEvents(true);
     _curveProxy->setWidget(_boxWidget);
-//    _curveProxy->setPalette(palette);
+    _curveProxy->setPalette(palette);
 
 
     //---------------- ComboBox (curve list) ------------------//
