@@ -437,8 +437,11 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
                     {
                         std::cout<<"!curveFound"<<std::endl;
                         // Creating curve tab from engines anyway (no abstract curve)
+
                         // Create and set
                         curveTab = new CurveWidget(NULL);
+                        curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
+                         box->setCurve(address,curveTab->abstractCurve());
                         QString curveAddressStr = QString::fromStdString(address);
 
                         // Add tab and store
@@ -452,9 +455,9 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
                         std::cout<<"curveFound"<<std::endl;
                     }
 
-                    curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
+//                    curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
                     // Set box curve
-                    box->setCurve(address,curveTab->abstractCurve());
+//                    box->setCurve(address,curveTab->abstractCurve());
                 }
                 else // Curve hiding
                 {
