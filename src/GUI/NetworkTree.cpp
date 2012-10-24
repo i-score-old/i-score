@@ -63,13 +63,13 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     setColumnCount(7);
     QStringList list;
     list<<"Address"<<"Value"<<"Start"<<" ~ "<<"End"<<" = "<<" % ";
-    setColumnWidth(NAME_COLUMN,150);
-    setColumnWidth(VALUE_COLUMN,75);
-    setColumnWidth(START_COLUMN,75);
-    setColumnWidth(END_COLUMN,75);
+    setColumnWidth(NAME_COLUMN,160);
+    setColumnWidth(VALUE_COLUMN,65);
+    setColumnWidth(START_COLUMN,65);
+    setColumnWidth(END_COLUMN,65);
     setColumnWidth(INTERPOLATION_COLUMN,25);
     setColumnWidth(REDUNDANCY_COLUMN,25);
-    setColumnWidth(SR_COLUMN,50);
+    setColumnWidth(SR_COLUMN,35);
     setHeaderLabels(list);
     list.clear();    
 
