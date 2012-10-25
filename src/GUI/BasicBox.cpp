@@ -79,6 +79,7 @@ using std::string;
 using std::vector;
 using std::map;
 
+
 const int BasicBox::COMBOBOX_HEIGHT = 25;
 const int BasicBox::COMBOBOX_WIDTH = 120;
 const float BasicBox::TRIGGER_ZONE_WIDTH = 15.;
