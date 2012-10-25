@@ -56,7 +56,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <utility>
 #include <sstream>
 #include "Palette.hpp"
-
+#include "NetworkMessages.hpp"
 #include "CSPTypes.hpp"
 #include "BasicBox.hpp"
 
@@ -759,6 +759,7 @@ class Maquette : public QObject
    * \param endMsgs : the end messages of the box
    */
   void updateCurves(unsigned int boxID, const std::vector<std::string> &startMsgs, const std::vector<std::string> &endMsgs);
+  void updateCurves(unsigned int boxID, NetworkMessages *startMessages, NetworkMessages *endMessages);
   /*!
    * \brief Updates a set of boxes from Engines coordinates.
    *

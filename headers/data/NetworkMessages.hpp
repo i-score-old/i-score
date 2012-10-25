@@ -103,6 +103,9 @@ public :
 
 
     inline QMap<QTreeWidgetItem *, Message> *getMessages(){return _messages;}
+    std::string computeMessage(const Message &msg);
+    std::string computeMessageWithoutValue(const Message &msg);
+    inline QList<Message> messages(){return _messages->values();}
 
 public slots :
     void messageChanged();
@@ -121,7 +124,7 @@ signals :
     void messagesChanged();
 
 private :
-    std::string computeMessage(const Message &msg);
+
     bool messageToString(const Message &msg, string &device, string &message, string &value);
 
     QMap<QTreeWidgetItem *, Message> *_messages; //!<Messages list.

@@ -529,9 +529,11 @@ Maquette::lastMessagesToSend(unsigned int boxID)
 void
 Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, const vector<string> &endMsgs)
 {
+
 	vector<string> curvesAddresses = getCurvesAddresses(boxID);
 	vector<string> startAddresses;
 	vector<string>::const_iterator it;
+
 	for (it = startMsgs.begin() ; it != startMsgs.end() ; ++it) {
 		size_t blankPos;
 		if ((blankPos = it->find_first_of(" ")) != string::npos) {
@@ -549,9 +551,10 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
 
 	vector<string>::iterator startAddressIt;
 	for(startAddressIt = startAddresses.begin() ; startAddressIt != startAddresses.end() ; ++startAddressIt) {
-		string address = *startAddressIt;
+        string address = *startAddressIt;
 		if (std::find(endAddresses.begin(),endAddresses.end(),address) != endAddresses.end()) {
 			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end()) {
+                std::cout<<" add1 > "<<address;
 				_engines->addCurve(boxID,address);
 			}
 		}
@@ -568,6 +571,7 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
 		if (std::find(startAddresses.begin(),startAddresses.end(),address) != startAddresses.end()) {
 			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end()) {
 				_engines->addCurve(boxID,address);
+                std::cout<<" add2 > "<<address;
 			}
 		}
 		else {
@@ -576,11 +580,25 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
 			}
 		}
 	}
+    std::cout<<" ;"<<std::endl;
+}
+
+void
+Maquette::updateCurves(unsigned int boxID, NetworkMessages *startMessages, NetworkMessages *endMessages)
+{
+    //TODO
 }
 
 bool
 Maquette::setFirstMessagesToSend(unsigned int boxID, const vector<string> &firstMsgs) {
-	if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+
+       //PRINT
+           std::cout<<"---- Maquette::setFirstMsgsToSend ----"<<std::endl;
+           for(int i=0 ; i<firstMsgs.size(); i++ )
+               std::cout<< firstMsgs[i]<<std::endl;
+           std::cout<<std::endl<<std::endl;
+       //PRINT
 		_engines->setCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
 		_boxes[boxID]->setFirstMessagesToSend(firstMsgs);
 
@@ -600,7 +618,7 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages){
 
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
         //PRINT
-            std::cout<<"Maquette::SETSTARTMESSAGETOSEND"<<std::endl;
+            std::cout<<"---- Maquette::SETSTARTMESSAGETOSEND ----"<<std::endl;
             for(int i=0 ; i<firstMsgs.size(); i++ )
                 std::cout<< firstMsgs[i]<<std::endl;
             std::cout<<std::endl<<std::endl;
@@ -1582,6 +1600,8 @@ Maquette::load(const string &fileName){
 							ID = addControlBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);
 							_scene->addControlBox(ID);
                             _scene->getBox(ID)->updateWidgets();
+                            //OPEN FILE
+//                            _scene->setAttributes(static_cast<AbstractBox*>(getBox(ID)->abstract()));
 						}
 						else if (boxType == "parent") {
 							ID = addParentBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);

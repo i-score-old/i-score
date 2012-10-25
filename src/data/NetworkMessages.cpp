@@ -133,6 +133,28 @@ NetworkMessages::computeMessage(const Message &msg) {
     return completeMessage.toStdString();
 }
 
+std::string
+NetworkMessages::computeMessageWithoutValue(const Message &msg) {
+    //form : device/message/
+
+    QString completeMessage;
+    string device = "";
+    string message = "";
+    string value = "";
+
+    if(!messageToString(msg,device,message,value)){
+#ifdef DEBUG
+        std::cerr << "NetworkMessages::computeMessage : error while parsing message" << std::endl;
+#endif
+    }
+
+    completeMessage += QString::fromStdString(device);
+    completeMessage += QString::fromStdString(message);
+
+    return completeMessage.toStdString();
+}
+
+
 vector<string>
 NetworkMessages::computeMessages() {
 

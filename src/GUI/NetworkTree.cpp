@@ -1360,10 +1360,7 @@ void
 NetworkTree::updateCurves(unsigned int boxID) {
 
     if (boxID != NO_ID) {
-        vector<string> curvesAddresses = Maquette::getInstance()->getCurvesAddresses(boxID);
-        vector<string>::const_iterator curveAddressIt;
         QTreeWidgetItem *item;
-        //PRINT
         QList<QTreeWidgetItem *>list = _assignedItems.keys();
         QList<QTreeWidgetItem *>::iterator it;
         for(it=list.begin() ; it!=list.end() ; it++){
