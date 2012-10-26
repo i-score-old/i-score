@@ -79,8 +79,6 @@ using std::string;
 using std::vector;
 using std::map;
 
-//TEST BRANCH
-
 const int BasicBox::COMBOBOX_HEIGHT = 25;
 const int BasicBox::COMBOBOX_WIDTH = 120;
 const float BasicBox::TRIGGER_ZONE_WIDTH = 15.;
@@ -110,7 +108,7 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 
     update();
     connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),_curvesWidget, SLOT(displayCurve(const QString&)));
-    connect(_comboBox,SIGNAL(activated(const QString&)),_curvesWidget, SLOT(displayCurve(const QString&)));    
+//    connect(_comboBox,SIGNAL(activated(const QString&)),_curvesWidget, SLOT(displayCurve(const QString&)));
 
 }
 
@@ -173,12 +171,11 @@ BasicBox::createWidget(){
     font.setPointSize(10);
     _comboBox->setFont(font);
 
-
     _comboBoxProxy = new QGraphicsProxyWidget(this);
     _comboBoxProxy->setWidget(_comboBox);
     _comboBoxProxy->setPalette(palette);
     _curvesWidget->setComboBox(_comboBox);
-    _comboBox->resize((width() - 2*LINE_WIDTH)/2,RESIZE_TOLERANCE+1);
+//    _comboBox->resize((width() - 2*LINE_WIDTH)/2,RESIZE_TOLERANCE+1);
 
 }
 

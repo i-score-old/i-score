@@ -112,7 +112,7 @@ BoxWidget::mousePressEvent(QMouseEvent *event){
 }
 
 void BoxWidget::curveActivationChanged(const QString &address, bool state) {
-    std::cout<<"BoxWidget::CurveActivation Changed"<<std::endl;
+//    std::cout<<"BoxWidget::CurveActivation Changed"<<std::endl;
     if (_boxID != NO_ID) {
         Maquette::getInstance()->setCurveMuteState(_boxID,address.toStdString(),!state);
         updateCurve(address.toStdString(),true);
@@ -250,25 +250,23 @@ BoxWidget::updateMessages(unsigned int boxID, bool forceUpdate) {
 void
 BoxWidget::addCurve(QString address, CurveWidget *curveWidget){
 
-//    std::cout<<"BoxWidget::addCurve "<< address.toStdString() <<std::endl;
-
     _curveMap->insert(address.toStdString(),curveWidget);
     addToComboBox(address);
     _stackedLayout->addWidget(curveWidget);
-//    emit(currentIndexChanged(address));
-    displayCurve(address);
+
+    displayCurve(_comboBox->currentText());
 }
 
 void
 BoxWidget::addToComboBox(const QString address){
-    if(_comboBox->findText(address,Qt::MatchExactly) == -1)
+    if(_comboBox->findText(address,Qt::MatchExactly) == -1){
         _comboBox->addItem(address);
-//    emit(currentIndexChanged(address));
+    }
 }
 
 bool
 BoxWidget::updateCurve(const string &address, bool forceUpdate){
-    std::cout<<"\n\n--- BoxWidget::updateCurve ---\n"<<address<<std::endl;
+//    std::cout<<"\n\n--- BoxWidget::updateCurve ---\n"<<address<<std::endl;
     BasicBox *box = Maquette::getInstance()->getBox(_boxID);
 
     if (box != NULL) // Box Found
@@ -291,15 +289,15 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
 
                 /********** Abstract Curve found ***********/
                 if (abCurve != NULL){
-                    std::cout<<"> abstractCurve found"<<std::endl;
+//                    std::cout<<"> abstractCurve found"<<std::endl;
                     if (curveFound){
-                        std::cout<<"  > curve found"<<std::endl;
+//                        std::cout<<"  > curve found"<<std::endl;
                         curveTab = curveIt2.value();
                         curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,abCurve->_show,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
                     }
                     else{
                         //Create
-                        std::cout<<"  > curve !found"<<std::endl;
+//                        std::cout<<"  > curve !found"<<std::endl;
                         curveTab = new CurveWidget(NULL);
                         QString curveAddressStr = QString::fromStdString(address);
                         curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,abCurve->_show,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
@@ -313,7 +311,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
 
                 /******* Abstract Curve not found ********/
                 else{
-                    std::cout<<"> abstractCurve !found"<<std::endl;
+//                    std::cout<<"> abstractCurve !found"<<std::endl;
                     bool show = true;
                     interpolate = true;
                     if (xPercents.empty() && yValues.empty() && values.size() >= 2) {

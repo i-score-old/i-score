@@ -67,7 +67,7 @@ public slots :
     void displayCurve(const QString &address);
 
 signals :
-    void currentIndexChanged();
+    void currentIndexChanged(QString address);
 
 protected :
     virtual void mousePressEvent(QMouseEvent *event);

@@ -301,7 +301,6 @@ NetworkMessages::setMessages(const QList < QPair<QTreeWidgetItem *, QString> > m
 
 void
 NetworkMessages::addMessage(QTreeWidgetItem *item, QString address){
-    std::cout<<"NetworkMessage::addMessage("<<address.toStdString()<<")\n";
     unsigned int msgsCount = 0;
     string msg = address.toStdString();
 
