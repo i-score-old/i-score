@@ -81,8 +81,6 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     SR_MODIFIED = false;
     hideColumn(VALUE_COLUMN);
 
-
-
     connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(itemCollapsed()));
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(clickInNetworkTree(QTreeWidgetItem *,int)));
     connect(this,SIGNAL(itemChanged(QTreeWidgetItem*,int)), this,SLOT(valueChanged(QTreeWidgetItem*,int)));
@@ -1307,52 +1305,50 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID)
     BasicBox *box = Maquette::getInstance()->getBox(boxID);
     if (box != NULL) // Box Found
     {
-        if (_assignedItems.value(item).hasCurve){
-            AbstractCurve *abCurve = box->getCurve(address);
+        if(box->hasCurve(address)){
+            if (_assignedItems.value(item).hasCurve){
+                AbstractCurve *abCurve = box->getCurve(address);
 
-            unsigned int sampleRate;
-            bool redundancy,interpolate;
-            vector<float> values,xPercents,yValues,coeff;
-            vector<string> argTypes;
-            vector<short> sectionType;
+                unsigned int sampleRate;
+                bool redundancy,interpolate;
+                vector<float> values,xPercents,yValues,coeff;
+                vector<string> argTypes;
+                vector<short> sectionType;
 
-            if (abCurve != NULL) // Abstract Curve found
-            {
-                std::cout<<"curveFound"<<std::endl;
                 bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
-                if (getCurveSuccess) {
-                    if (xPercents.empty() && yValues.empty() && values.size() >= 2) {
-                        if (values.front() == values.back())
-                            interpolate = false;
-                    }
-//                       curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
-//                       box->setCurve(address,curveTab->abstractCurve());
-
+                if (getCurveSuccess)
                     updateLine(item,interpolate,sampleRate,redundancy);
-                }
             }
+//            if (abCurve != NULL) // Abstract Curve found
+//            {
+//                bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
+//                if (getCurveSuccess) {
+//                    if (xPercents.empty() && yValues.empty() && values.size() >= 2) {
+//                        if (values.front() == values.back())
+//                            interpolate = false;
+//                    }
+//                    updateLine(item,interpolate,sampleRate,redundancy);
+//                }
+//            }
 
-            else // Abstract Curve not found
-            {
-                interpolate = true;
-                std::cout<<"curve not found ";
-                bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
-                if (getCurveSuccess){
-                    if (xPercents.empty() && yValues.empty() && values.size() >= 2) {
-                        if (values.front() == values.back())
-                            interpolate = false;
-                    }
-                    updateLine(item,interpolate,sampleRate,redundancy);
-                }
+//            else // Abstract Curve not found
+//            {
+//                interpolate = true;
+//                bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
+//                if (getCurveSuccess){
+//                    if (xPercents.empty() && yValues.empty() && values.size() >= 2) {
+//                        if (values.front() == values.back())
+//                            interpolate = false;
+//                    }
+//                    updateLine(item,interpolate,sampleRate,redundancy);
+//                }
 
-            }
+//            }
         }
     }
     else // Box Not Found
-        {
-        std::cout<<"Box not found"<<std::endl;
         return false;
-        }
+
     return false;
 }
 

@@ -745,7 +745,8 @@ class Maquette : public QObject
    */
   unsigned int addParentBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const std::string &name,
 			   unsigned int mother);
-
+  string extractAddress(string msg);
+  string extractValue(string msg);
   /*!
    * \brief Saves a box into doc.
    *
@@ -759,7 +760,6 @@ class Maquette : public QObject
    * \param endMsgs : the end messages of the box
    */
   void updateCurves(unsigned int boxID, const std::vector<std::string> &startMsgs, const std::vector<std::string> &endMsgs);
-  void updateCurves(unsigned int boxID, NetworkMessages *startMessages, NetworkMessages *endMessages);
   /*!
    * \brief Updates a set of boxes from Engines coordinates.
    *

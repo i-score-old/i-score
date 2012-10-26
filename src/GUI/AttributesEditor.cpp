@@ -103,7 +103,7 @@ AttributesEditor::AttributesEditor(QWidget* parent) : QDockWidget(tr("Attributes
 
 	_profilesPreviewArea = new PreviewArea(parent,sharedPalette); //Creation de la zone d'apercu
 	_generalPreviewArea = new PreviewArea(parent,sharedPalette); //Creation de la zone d'apercu
-	_curvesWidget = new CurvesWidget(parent);
+//	_curvesWidget = new CurvesWidget(parent);
 	_palette = sharedPalette;
     _boxEdited = NO_ID;
 
@@ -153,7 +153,7 @@ void AttributesEditor::noBoxEdited() {
 	//_networkTabWidget->setEnabled(false);
 	//_snapshotTab->setEnabled(false);
 	_messagesTab->setEnabled(false);
-	_curvesWidget->updateMessages(NO_ID,false);
+//	_curvesWidget->updateMessages(NO_ID,false);
     _curvesTab->setEnabled(false);
 }
 
@@ -705,7 +705,7 @@ AttributesEditor::addWidgetsToLayout()
 	_pitchAmplitudeComboBox->setDisabled(true);
 	_pitchGradeComboBox->setDisabled(true);
 
-	_curvesLayout->addWidget(_curvesWidget,0,0,3,3);
+//	_curvesLayout->addWidget(_curvesWidget,0,0,3,3);
 	_curvesTab->setLayout(_curvesLayout);
 
 	// Set Central Widget
@@ -835,7 +835,6 @@ AttributesEditor::resetProfiles()
 void
 AttributesEditor::setAttributes(AbstractBox *abBox)
 {
-    std::cout<<"AttributesEditor SET ATTRIBUTE "<<std::endl;
 	bool boxModified = (_boxEdited != abBox->ID());
 
 	_boxEdited = abBox->ID();
@@ -884,7 +883,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
         }
     }
 	//if (_boxEdited != NO_ID) {
-		_curvesWidget->updateMessages(_boxEdited,false);
+//		_curvesWidget->updateMessages(_boxEdited,false);
         _networkTree->updateCurves(_boxEdited);
 
 	//}
@@ -926,7 +925,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 void
 AttributesEditor::updateWidgets(bool boxModified)
 {
-    std::cout<<"AttributesEditor::updateWidgets ... ";
+//    std::cout<<"AttributesEditor::updateWidgets ... ";
 	BasicBox * box = _scene->getBox(_boxEdited);
 
 	if (box != NULL) {
@@ -936,7 +935,7 @@ AttributesEditor::updateWidgets(bool boxModified)
 		double savedLengthValue = _boxLengthValue->value();
 		_boxLengthValue->setValue(box->width() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
 		if (!boxModified && _boxLengthValue->value() != savedLengthValue) {
-            _curvesWidget->updateMessages(_boxEdited,true);
+//            _curvesWidget->updateMessages(_boxEdited,true);
 		}
 		_boxName->setText(box->name());
 	}
@@ -1029,7 +1028,7 @@ AttributesEditor::updateWidgets(bool boxModified)
 	pitchStartChanged();
 
 	update();
-    std::cout<<"OK"<<std::endl;
+//    std::cout<<"OK"<<std::endl;
 }
 
 Palette
@@ -1301,17 +1300,16 @@ AttributesEditor::startMessagesChanged()
         Maquette::getInstance()->setStartMessagesToSend(_boxEdited,_networkTree->startMessages());
     }
     else{
-    QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
+        QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
 
-    vector<string> networkMsgs = _networkTree->startMessages()->computeMessages();
-    Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
-//    Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,networkMsgs);
-    Maquette::getInstance()->setStartMessagesToSend(_boxEdited,_networkTree->startMessages());
+        vector<string> networkMsgs = _networkTree->startMessages()->computeMessages();
+        Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
+    //    Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,networkMsgs);
+        Maquette::getInstance()->setStartMessagesToSend(_boxEdited,_networkTree->startMessages());
 
-    _networkTree->updateStartMsgsDisplay();
-	_curvesWidget->updateMessages(_boxEdited,true);
-    _networkTree->updateCurves(_boxEdited);
-    box->updateCurves();
+        _networkTree->updateStartMsgsDisplay();
+        _networkTree->updateCurves(_boxEdited);
+        box->updateCurves();
     }
 }
 
@@ -1322,7 +1320,8 @@ AttributesEditor::endMessagesChanged()
 
     if(box->type()==SOUND_BOX_TYPE){
         vector<string> msgs = _endMsgsEditor->computeMessages();
-        Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
+//        Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
+        Maquette::getInstance()->setEndMessagesToSend(_boxEdited,_networkTree->endMessages());
     }
     else{
 
@@ -1330,10 +1329,9 @@ AttributesEditor::endMessagesChanged()
         Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
 
         vector<string> networkMsgs = _networkTree->endMessages()->computeMessages();
-        Maquette::getInstance()->setLastMessagesToSend(_boxEdited,networkMsgs);
-        Maquette::getInstance()->setEndMessages(_boxEdited,_networkTree->endMessages());
+//        Maquette::getInstance()->setLastMessagesToSend(_boxEdited,networkMsgs);
+        Maquette::getInstance()->setEndMessagesToSend(_boxEdited,_networkTree->endMessages());
         _networkTree->updateEndMsgsDisplay();
-        _curvesWidget->updateMessages(_boxEdited,true);
         _networkTree->updateCurves(_boxEdited);
 
         box->updateCurves();
@@ -1346,42 +1344,36 @@ void AttributesEditor::startMessageChanged(QTreeWidgetItem *item) {
     QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
     Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
 
-//    Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,_networkTree->startMessages()->computeMessages());
     Maquette::getInstance()->setStartMessagesToSend(_boxEdited,_networkTree->startMessages());
 
-    _networkTree->updateStartMsgsDisplay();
-    //_networkTree->updateInterpolation();
-//    std::cout<<"---Après update : "<< item->text(0).toStdString()<<" "<<_networkTree->assignedItems().value(item).sampleRate<<std::endl;
+    _networkTree->updateStartMsgsDisplay();    
+
     _networkTree->updateCurve(item,_boxEdited);
-    _curvesWidget->updateCurve(address);
-    //NICO
+//    _curvesWidget->updateCurve(address);
+
     BasicBox * box = _scene->getBox(_boxEdited);
     box->updateCurves();
-    //NICO
+
 }
 
 void AttributesEditor::endMessageChanged(QTreeWidgetItem *item) {
-    std::cout<<"AttributeEditor::endMessageChanged"<<std::endl;
+//    std::cout<<"AttributeEditor::endMessageChanged"<<std::endl;
     string address = _networkTree->getAbsoluteAddress(item).toStdString();
-//    _networkTree->updateCurve(item,_boxEdited);
     QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
     Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
 
-    Maquette::getInstance()->setLastMessagesToSend(_boxEdited,_networkTree->endMessages()->computeMessages());
-    Maquette::getInstance()->setEndMessages(_boxEdited,_networkTree->endMessages());
+    Maquette::getInstance()->setEndMessagesToSend(_boxEdited,_networkTree->endMessages());
 
     _networkTree->updateCurve(item,_boxEdited);
 
     _networkTree->updateEndMsgsDisplay();
-    _curvesWidget->updateCurve(address);
-    //NICO
+//    _curvesWidget->updateCurve(address);
     BasicBox * box = _scene->getBox(_boxEdited);
     box->updateCurves();
-    //NICO
 }
 
 void AttributesEditor::startMessageRemoved(const string &address) {
-    //NICO
+
 //    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
     QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
     Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
@@ -1390,15 +1382,15 @@ void AttributesEditor::startMessageRemoved(const string &address) {
 	vector<string> msgs = _startMsgsEditor->computeMessages();
 //    Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
 	Maquette::getInstance()->removeCurve(_boxEdited,address);
-	_curvesWidget->removeCurve(address);
+//	_curvesWidget->removeCurve(address);
 }
 
 void AttributesEditor::endMessageRemoved(const string &address) {
 	vector<string> msgs = _endMsgsEditor->computeMessages();
-	Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
+//	Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
     Maquette::getInstance()->setEndMessagesToSend(_boxEdited,_networkTree->endMessages());
 	Maquette::getInstance()->removeCurve(_boxEdited,address);
-    _curvesWidget->removeCurve(address);
+//    _curvesWidget->removeCurve(address);
 }
 
 void
@@ -1540,7 +1532,7 @@ AttributesEditor::curveSampleRateChanged(QTreeWidgetItem *item, int value){
     string address = _networkTree->getAbsoluteAddress(item).toStdString();
     if (_boxEdited != NO_ID){
         Maquette::getInstance()->setCurveSampleRate(_boxEdited,address,value);
-        std::cout<<"New sample rate : "<<value<<std::endl;
+//        std::cout<<"New sample rate : "<<value<<std::endl;
         _networkTree->updateCurve(item,_boxEdited);
     }
 }

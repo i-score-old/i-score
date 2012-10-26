@@ -526,67 +526,143 @@ Maquette::lastMessagesToSend(unsigned int boxID)
 	return messages;
 }
 
+//void
+//Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, const vector<string> &endMsgs)
+//{
+
+//	vector<string> curvesAddresses = getCurvesAddresses(boxID);
+//	vector<string> startAddresses;
+//	vector<string>::const_iterator it;
+
+//	for (it = startMsgs.begin() ; it != startMsgs.end() ; ++it) {
+//		size_t blankPos;
+//		if ((blankPos = it->find_first_of(" ")) != string::npos) {
+//			startAddresses.push_back(it->substr(0,blankPos));
+//		}
+//	}
+//	vector<string> endAddresses;
+//	vector<string>::const_iterator it2;
+//	for (it2 = endMsgs.begin() ; it2 != endMsgs.end() ; ++it2) {
+//		size_t blankPos;
+//		if ((blankPos = it2->find_first_of(" ")) != string::npos) {
+//			endAddresses.push_back(it2->substr(0,blankPos));
+//		}
+//	}
+
+//	vector<string>::iterator startAddressIt;
+//	for(startAddressIt = startAddresses.begin() ; startAddressIt != startAddresses.end() ; ++startAddressIt) {
+//        string address = *startAddressIt;
+//		if (std::find(endAddresses.begin(),endAddresses.end(),address) != endAddresses.end()) {
+//			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end()) {
+//                std::cout<<" add1 > "<<address;
+//				_engines->addCurve(boxID,address);
+//			}
+//		}
+//		else {
+//			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) != curvesAddresses.end()) {
+//				_engines->removeCurve(boxID,address);
+//			}
+//		}
+//	}
+
+//	vector<string>::iterator endAddressIt;
+//	for(endAddressIt = endAddresses.begin() ; endAddressIt != endAddresses.end() ; ++endAddressIt) {
+//		string address = *endAddressIt;
+//		if (std::find(startAddresses.begin(),startAddresses.end(),address) != startAddresses.end()) {
+//			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end()) {
+//				_engines->addCurve(boxID,address);
+//                std::cout<<" add2 > "<<address;
+//			}
+//		}
+//		else {
+//			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) != curvesAddresses.end()) {
+//				_engines->removeCurve(boxID,address);
+//			}
+//		}
+//	}
+//    std::cout<<" ;"<<std::endl;
+//}
+
 void
 Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, const vector<string> &endMsgs)
 {
+    std::cout<<"\n--- Maquette::UpdateCurve() ---\n";
 
-	vector<string> curvesAddresses = getCurvesAddresses(boxID);
-	vector<string> startAddresses;
-	vector<string>::const_iterator it;
+    //QMap<address,value>
+    QMap<string,string> startMessages;
+    QMap<string,string> endMessages;
+    vector<string> curvesAddresses = getCurvesAddresses(boxID);
 
-	for (it = startMsgs.begin() ; it != startMsgs.end() ; ++it) {
-		size_t blankPos;
-		if ((blankPos = it->find_first_of(" ")) != string::npos) {
-			startAddresses.push_back(it->substr(0,blankPos));
-		}
-	}
-	vector<string> endAddresses;
-	vector<string>::const_iterator it2;
-	for (it2 = endMsgs.begin() ; it2 != endMsgs.end() ; ++it2) {
-		size_t blankPos;
-		if ((blankPos = it2->find_first_of(" ")) != string::npos) {
-			endAddresses.push_back(it2->substr(0,blankPos));
-		}
-	}
+    vector<string>::const_iterator it;
+    string currentMsg;
+    string currentAddress;
+    string currentValue;
 
-	vector<string>::iterator startAddressIt;
-	for(startAddressIt = startAddresses.begin() ; startAddressIt != startAddresses.end() ; ++startAddressIt) {
+    /************  init start messages (QMap)  ************/
+    for (it = startMsgs.begin() ; it != startMsgs.end() ; ++it) {
+        size_t blankPos;
+        currentMsg = *it;
+        if ((blankPos = it->find_first_of(" ")) != string::npos) {
+            currentAddress = currentMsg.substr(0,blankPos);
+            if(blankPos != currentMsg.size())
+                currentValue = currentMsg.substr(blankPos+1,currentMsg.size());
+        }
+        startMessages.insert(currentAddress,currentValue);
+    }
+
+    /************  init end messages (QMap)  ************/
+    for (it = endMsgs.begin() ; it != endMsgs.end() ; ++it) {
+        size_t blankPos;
+        currentMsg = *it;
+        if ((blankPos = it->find_first_of(" ")) != string::npos) {
+            currentAddress = currentMsg.substr(0,blankPos);
+            if(blankPos != currentMsg.size())
+                currentValue = currentMsg.substr(blankPos+1,currentMsg.size());
+        }
+        endMessages.insert(currentAddress,currentValue);
+    }
+
+
+    /************  addCurve if endAddress contains startAddress && endValue != startValue ************/
+    QList<string> startAddresses = startMessages.keys();
+    QList<string>::iterator startAddressIt;
+
+    for(startAddressIt = startAddresses.begin() ; startAddressIt != startAddresses.end() ; ++startAddressIt) {
         string address = *startAddressIt;
-		if (std::find(endAddresses.begin(),endAddresses.end(),address) != endAddresses.end()) {
-			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end()) {
-                std::cout<<" add1 > "<<address;
-				_engines->addCurve(boxID,address);
-			}
-		}
-		else {
-			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) != curvesAddresses.end()) {
-				_engines->removeCurve(boxID,address);
-			}
-		}
-	}
+        if (endMessages.contains(address)) {
+            std::cout<<"endMsgs contains ! "<<address<<std::endl;
+            if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end() && startMessages.value(address)!=endMessages.value(address)) {
+                _engines->addCurve(boxID,address);
+                getBox(boxID)->addCurve(address);
+            }
+        }
+        else {
+            if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) != curvesAddresses.end()) {
+                _engines->removeCurve(boxID,address);
+            }
+        }
+    }
 
-	vector<string>::iterator endAddressIt;
-	for(endAddressIt = endAddresses.begin() ; endAddressIt != endAddresses.end() ; ++endAddressIt) {
-		string address = *endAddressIt;
-		if (std::find(startAddresses.begin(),startAddresses.end(),address) != startAddresses.end()) {
-			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end()) {
-				_engines->addCurve(boxID,address);
-                std::cout<<" add2 > "<<address;
-			}
-		}
-		else {
-			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) != curvesAddresses.end()) {
-				_engines->removeCurve(boxID,address);
-			}
-		}
-	}
-    std::cout<<" ;"<<std::endl;
-}
+    /************  addCurve if startAddress contains endAddress && endValue != startValue ************/
+    QList<string> endAddresses = endMessages.keys();
+    QList<string>::iterator endAddressIt;
 
-void
-Maquette::updateCurves(unsigned int boxID, NetworkMessages *startMessages, NetworkMessages *endMessages)
-{
-    //TODO
+    for(endAddressIt = endAddresses.begin() ; endAddressIt != endAddresses.end() ; ++endAddressIt) {
+        string address = *endAddressIt;
+        if (startMessages.contains(address)) {
+            std::cout<<"startMsgs contains ! "<<address;
+            if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end() && startMessages.value(address)!=endMessages.value(address)) {
+                std::cout<<" add2 > "<<address<<address<<std::endl;
+                _engines->addCurve(boxID,address);
+                getBox(boxID)->addCurve(address);
+            }
+        }
+        else {
+            if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) != curvesAddresses.end()) {
+                _engines->removeCurve(boxID,address);
+            }
+        }
+    }
 }
 
 bool
@@ -594,10 +670,10 @@ Maquette::setFirstMessagesToSend(unsigned int boxID, const vector<string> &first
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
 
        //PRINT
-           std::cout<<"---- Maquette::setFirstMsgsToSend ----"<<std::endl;
-           for(int i=0 ; i<firstMsgs.size(); i++ )
-               std::cout<< firstMsgs[i]<<std::endl;
-           std::cout<<std::endl<<std::endl;
+//           std::cout<<"---- Maquette::setFirstMsgsToSend ----"<<std::endl;
+//           for(int i=0 ; i<firstMsgs.size(); i++ )
+//               std::cout<< firstMsgs[i]<<std::endl;
+//           std::cout<<std::endl<<std::endl;
        //PRINT
 		_engines->setCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
 		_boxes[boxID]->setFirstMessagesToSend(firstMsgs);
@@ -618,14 +694,14 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages){
 
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
         //PRINT
-            std::cout<<"---- Maquette::SETSTARTMESSAGETOSEND ----"<<std::endl;
-            for(int i=0 ; i<firstMsgs.size(); i++ )
-                std::cout<< firstMsgs[i]<<std::endl;
-            std::cout<<std::endl<<std::endl;
+//            std::cout<<"---- Maquette::SETSTARTMESSAGETOSEND ----"<<std::endl;
+//            for(int i=0 ; i<firstMsgs.size(); i++ )
+//                std::cout<< firstMsgs[i]<<std::endl;
+//            std::cout<<std::endl<<std::endl;
         //PRINT
         _engines->setCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
-        _boxes[boxID]->setFirstMessagesToSend(firstMsgs);
-//        _boxes[boxID]->setStartMessagesToSend(*messages->getMessages());
+//        _boxes[boxID]->setFirstMessagesToSend(firstMsgs);
+        _boxes[boxID]->setStartMessages(messages);
 
         vector<string> lastMsgs;
         _engines->getCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
@@ -636,17 +712,6 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages){
     return false;
 }
 
-
-//bool
-//Maquette::setSelectedItemsToSend(unsigned int boxID,  QList<QTreeWidgetItem*> itemsSelected){
-//    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
-
-//        _boxes[boxID]->setSelectedItemsToSend(itemsSelected);
-
-//        return true;
-//    }
-//    return false;
-//}
 bool
 Maquette::setSelectedItemsToSend(unsigned int boxID,  QMap<QTreeWidgetItem*,Data> itemsSelected){
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
@@ -731,8 +796,8 @@ Maquette::setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages) {
     vector<string> lastMsgs = messages->computeMessages();
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
         _engines->setCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
-        _boxes[boxID]->setLastMessagesToSend(lastMsgs);
-//        _boxes[boxID]->setEndMessagesToSend(*messages->getMessages());
+//        _boxes[boxID]->setLastMessagesToSend(lastMsgs);
+        _boxes[boxID]->setEndMessages(messages);
 
         vector<string> firstMsgs;
         _engines->getCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);

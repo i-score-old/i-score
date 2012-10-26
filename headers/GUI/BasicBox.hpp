@@ -563,6 +563,7 @@ class BasicBox : public QObject, public QGraphicsItem
   inline MaquetteScene *maquetteScene(){return _scene;}
   inline void setComboBox(QComboBox *cbox){curvesWidget()->setComboBox(cbox);}
   inline void setStackedLayout(QStackedLayout *slayout){curvesWidget()->setStackedLayout(slayout);}
+  inline bool hasCurve(string address){return _curvesAddresses.contains(address);}
   void refresh();
 
   QPointF getLeftGripPoint();
@@ -665,7 +666,7 @@ class BasicBox : public QObject, public QGraphicsItem
   QComboBox *_comboBox;
   QGraphicsProxyWidget *_curveProxy;
   QGraphicsProxyWidget *_comboBoxProxy;
-
+  QList<string> _curvesAddresses;
 
 };
 
