@@ -750,6 +750,13 @@ BasicBox::setCurve(const string &address, AbstractCurve *curve)
 
 void
 BasicBox::addCurve(const std::string &address){
+    if(!_curvesAddresses.contains(address)){
+        Maquette::getInstance()->addCurve(ID(),address);
+        _curvesAddresses<<address;
+    }
+}
+void
+BasicBox::addCurveAddress(const std::string &address){
     if(!_curvesAddresses.contains(address))
         _curvesAddresses<<address;
 }

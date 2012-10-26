@@ -276,6 +276,7 @@ class BasicBox : public QObject, public QGraphicsItem
   void setCurve(const std::string &address, AbstractCurve *curve);
   void removeCurve(const std::string &address);
   void addCurve(const std::string &address);
+  void addCurveAddress(const std::string &address);
   void curveShowChanged(const QString &address,bool state);
   QRectF boxRect();
   void curveActivationChanged(string address, bool activated);

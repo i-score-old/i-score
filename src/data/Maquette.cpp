@@ -598,6 +598,7 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
     string currentAddress;
     string currentValue;
 
+
     /************  init start messages (QMap)  ************/
     for (it = startMsgs.begin() ; it != startMsgs.end() ; ++it) {
         size_t blankPos;
@@ -622,6 +623,24 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
         endMessages.insert(currentAddress,currentValue);
     }
 
+    /************    Pour le cas open file   ************/
+    std::cout<<"curvesAddresses : ";
+    for (it = curvesAddresses.begin() ; it != curvesAddresses.end() ; ++it) {
+        currentMsg = *it;
+        std::cout<<currentMsg<<std::endl;
+        getBox(boxID)->addCurveAddress(currentMsg);
+        if(startMessages.contains(currentMsg)){
+            std::cout<<"\tSREMOVE "<<currentMsg<<std::endl;
+            startMessages.remove(currentMsg);
+        }
+        if(endMessages.contains(currentMsg)){
+            endMessages.remove(currentMsg);
+            std::cout<<"\tEREMOVE "<<currentMsg<<std::endl;
+        }
+    }
+    std::cout<<std::endl;
+
+
 
     /************  addCurve if endAddress contains startAddress && endValue != startValue ************/
     QList<string> startAddresses = startMessages.keys();
@@ -630,8 +649,9 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
     for(startAddressIt = startAddresses.begin() ; startAddressIt != startAddresses.end() ; ++startAddressIt) {
         string address = *startAddressIt;
         if (endMessages.contains(address)) {
-            std::cout<<"endMsgs contains ! "<<address<<std::endl;
+            std::cout<<"endMsgs contains "<<address<<std::endl;
             if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end() && startMessages.value(address)!=endMessages.value(address)) {
+                std::cout<<"ADDED"<<std::endl;
                 _engines->addCurve(boxID,address);
                 getBox(boxID)->addCurve(address);
             }
@@ -652,7 +672,7 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
         if (startMessages.contains(address)) {
             std::cout<<"startMsgs contains ! "<<address;
             if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end() && startMessages.value(address)!=endMessages.value(address)) {
-                std::cout<<" add2 > "<<address<<address<<std::endl;
+                std::cout<<"ADDED"<<std::endl;
                 _engines->addCurve(boxID,address);
                 getBox(boxID)->addCurve(address);
             }
