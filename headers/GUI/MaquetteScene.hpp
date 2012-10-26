@@ -683,7 +683,7 @@ class MaquetteScene : public QGraphicsScene
   void pause();
   bool noBoxSelected();
   inline void resetSelection(){clearSelection();}
-
+  void updateBoxesWidgets();
  private :
 
   /*!

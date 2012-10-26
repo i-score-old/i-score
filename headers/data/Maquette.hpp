@@ -155,6 +155,7 @@ class Maquette : public QObject
 	 * \brief Initialise the maquette elements.
 	 */
   void init();
+
 	/*!
 	 * \brief Sets a new scene.
 	 *
@@ -697,7 +698,8 @@ class Maquette : public QObject
    * \param waiting : new waiting state of the triggerPoint
    * \param trgID : trigger point ID
    */
-  void crossedTriggerPoint(bool  waiting, unsigned int trgID);
+  void crossedTriggerPoint(bool  waiting, unsigned int trgID);  
+  inline std::map<unsigned int,BasicBox*> getBoxes(){return _boxes;}
 
  private :
 

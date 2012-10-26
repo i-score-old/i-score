@@ -1674,10 +1674,9 @@ Maquette::load(const string &fileName){
 						}
                         else if (boxType == "control") {
 							ID = addControlBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);
-							_scene->addControlBox(ID);
+                            _scene->addControlBox(ID);
                             _scene->getBox(ID)->updateWidgets();
                             //OPEN FILE
-//                            _scene->setAttributes(static_cast<AbstractBox*>(getBox(ID)->abstract()));
 						}
 						else if (boxType == "parent") {
 							ID = addParentBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);
