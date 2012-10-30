@@ -571,6 +571,8 @@ class BasicBox : public QObject, public QGraphicsItem
   QPointF getRightGripPoint();
   void displayCurveEditWindow();
   void drawBox(QPainter *painter);
+  inline bool hasStartMsgs(){return _abstract->hasFirstMsgs();}
+  inline bool hasEndMsgs(){return _abstract->hasLastMsgs();}
 
  protected:
   /*!

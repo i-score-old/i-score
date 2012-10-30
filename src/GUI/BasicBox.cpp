@@ -1352,12 +1352,25 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 //    painter->drawRect(_endTriggerGrip);
     //***************************************************/
 
+    /************   Draw boxRect ************/
     painter->setPen(penR);
-
     painter->setBrush(QBrush(Qt::white,Qt::Dense7Pattern));
     painter->drawRect(_boxRect);
+
+    /************   Draw msgs indicator ************/
+    QRectF startRect(QPointF(_boxRect.topLeft().x(),_boxRect.topLeft().y() + RESIZE_TOLERANCE),QPointF(_boxRect.x()+width()/3,_boxRect.bottomLeft().y()));
+    painter->setPen(Qt::NoPen);
+    QLinearGradient lgradient(startRect.topLeft(),startRect.topRight());
+    lgradient.setColorAt(0,isSelected() ? Qt::yellow : Qt::white);
+    lgradient.setColorAt(1,Qt::transparent);
+    painter->fillRect(startRect,lgradient);
+
+
     drawInteractionGrips(painter);
     drawTriggerGrips(painter);
+
+
+
 
     _comboBoxProxy->setVisible(_abstract->height()>RESIZE_TOLERANCE+LINE_WIDTH);
     _curveProxy->setVisible(_abstract->height()>RESIZE_TOLERANCE+LINE_WIDTH);
@@ -1379,8 +1392,6 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 		painter->translate(QPointF(RESIZE_TOLERANCE - LINE_WIDTH,0));
 		painter->rotate(90);
 		textRect.setWidth(_abstract->height());
-
-		//textRect.setHeight(std::min(_abstract->width(),(float)(RESIZE_TOLERANCE - LINE_WIDTH)));
 	}
 
     if (_abstract->width() <= 5*RESIZE_TOLERANCE) {
@@ -1400,12 +1411,10 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 	painter->translate(QPointF(0,0)-(textRect.topLeft()));
 
 	if (cursor().shape() == Qt::SizeHorCursor) {
-		static const float S_TO_MS = 1000.;
-//		painter->drawText(boundingRect().bottomRight() - QPoint(2*RESIZE_TOLERANCE,0),QString("%1s").arg((double)duration() / S_TO_MS));
+        static const float S_TO_MS = 1000.;
         painter->drawText(_boxRect.bottomRight() - QPoint(2*RESIZE_TOLERANCE,0),QString("%1s").arg((double)duration() / S_TO_MS));
 	}
 
-//	painter->translate(boundingRect().topLeft());
     painter->translate(_boxRect.topLeft());
 
 	if (_playing) {
@@ -1418,8 +1427,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 		const float progressPosX = _scene->getProgression(_abstract->ID())*(_abstract->width());
 		painter->fillRect(0,_abstract->height()-RESIZE_TOLERANCE/2.,progressPosX,RESIZE_TOLERANCE/2.,Qt::darkGreen);
 		painter->drawLine(QPointF(progressPosX,RESIZE_TOLERANCE),QPointF(progressPosX,_abstract->height()));       
-	}
-//	painter->translate(QPointF(0,0) - boundingRect().topLeft());
+    }
     painter->translate(QPointF(0,0) - _boxRect.topLeft());
 
 }
@@ -1434,8 +1442,6 @@ BasicBox::displayCurveEditWindow(){
     QWidget *editWindow=new QWidget;
     editWindow->setWindowModality(Qt::ApplicationModal);
     QGridLayout *layout = new QGridLayout;
-
-//    layout->addWidget(_curvesWidgetCLONE);
 
     editWindow->setLayout(layout);
     editWindow->setGeometry(QRect(_scene->sceneRect().toRect()));
