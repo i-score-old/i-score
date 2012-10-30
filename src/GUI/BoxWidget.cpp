@@ -301,7 +301,8 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
                         curveTab = new CurveWidget(NULL);
                         QString curveAddressStr = QString::fromStdString(address);
                         curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,abCurve->_show,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
-                        addCurve(curveAddressStr,curveTab);
+                        if(interpolate)
+                            addCurve(curveAddressStr,curveTab);
                     }
 
                     //Set attributes
