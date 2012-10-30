@@ -266,8 +266,8 @@ class AbstractBox : public Abstract
     _endMessages->clear();
     _endMessages = new NetworkMessages(endMsgs->getMessages());
     }
-  inline bool hasFirstMsgs(){return !_firstMsgs.empty();}
-  inline bool hasLastMsgs(){return !_lastMsgs.empty();}
+  inline bool hasFirstMsgs(){return !_startMessages->messages().empty();}
+  inline bool hasLastMsgs(){return !_endMessages->messages().empty();}
 
  protected :
 

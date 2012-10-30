@@ -534,6 +534,7 @@ class BasicBox : public QObject, public QGraphicsItem
   static const float TRIGGER_ZONE_HEIGHT;
   static const int COMBOBOX_WIDTH;
   static const int COMBOBOX_HEIGHT;
+  static const float MSGS_INDICATOR_WIDTH;
 
   /*!
    * \brief Painting method, redefinition of QGraphicsItem::paint().
@@ -573,6 +574,7 @@ class BasicBox : public QObject, public QGraphicsItem
   void drawBox(QPainter *painter);
   inline bool hasStartMsgs(){return _abstract->hasFirstMsgs();}
   inline bool hasEndMsgs(){return _abstract->hasLastMsgs();}
+  void drawMsgsIndicators(QPainter *painter);
 
  protected:
   /*!
@@ -660,11 +662,15 @@ class BasicBox : public QObject, public QGraphicsItem
   std::map < BoxExtremity,std::map < unsigned int, Relation* > > _relations; //!< The relations.
   std::map<std::string,AbstractCurve*> _abstractCurves; //!< The Curves
   BoxWidget *_curvesWidget;
+
   QRectF _boxRect;
   QRectF _leftEar;
   QRectF _rightEar;
   QRectF _startTriggerGrip;
   QRectF _endTriggerGrip;
+  QRectF _startMsgsIndicator;
+  QRectF _endMsgsIndicator;
+
   QWidget *_boxWidget;
   QComboBox *_comboBox;
   QGraphicsProxyWidget *_curveProxy;

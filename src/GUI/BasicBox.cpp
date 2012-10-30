@@ -83,6 +83,7 @@ const int BasicBox::COMBOBOX_HEIGHT = 25;
 const int BasicBox::COMBOBOX_WIDTH = 120;
 const float BasicBox::TRIGGER_ZONE_WIDTH = 15.;
 const float BasicBox::TRIGGER_ZONE_HEIGHT = 20.;
+const float BasicBox::MSGS_INDICATOR_WIDTH = 50;
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
 : QGraphicsItem()
@@ -217,12 +218,13 @@ BasicBox::init()
 	setVisible(true);
 	setAcceptsHoverEvents(true);
 
-    setZValue(0);
+    setZValue(0); 
 }
 
 void
 BasicBox::updateCurves(){    
     _curvesWidget->updateMessages(_abstract->ID(),true);
+    update();
 }
 
 int
@@ -898,7 +900,7 @@ BasicBox::itemChange(GraphicsItemChange change, const QVariant &value)
 QPainterPath
 BasicBox::shape() const
 {
-	QPainterPath path;
+    QPainterPath path;
 
 //    path.addRect(boundingRect());
     path.addRect(_boxRect);
@@ -1334,6 +1336,29 @@ BasicBox::drawBox(QPainter *painter){
 }
 
 void
+BasicBox::drawMsgsIndicators(QPainter *painter){
+
+    _startMsgsIndicator = QRectF(QPointF(_boxRect.topLeft().x(),_boxRect.topLeft().y() + RESIZE_TOLERANCE -LINE_WIDTH),QPointF(_boxRect.x()+ MSGS_INDICATOR_WIDTH,_boxRect.bottomLeft().y()));
+    _endMsgsIndicator = QRectF(QPointF(_boxRect.topRight().x(),_boxRect.topRight().y() + RESIZE_TOLERANCE -LINE_WIDTH),QPointF(_boxRect.bottomRight().x() - MSGS_INDICATOR_WIDTH,_boxRect.bottomRight().y()));
+
+    if (hasStartMsgs()){
+        painter->setPen(Qt::NoPen);
+        QLinearGradient lgradient(_startMsgsIndicator.topLeft(),_startMsgsIndicator.topRight());
+        lgradient.setColorAt(0,isSelected() ? Qt::yellow : Qt::white);
+        lgradient.setColorAt(1,Qt::transparent);
+        painter->fillRect(_startMsgsIndicator,lgradient);
+    }
+
+    if (hasEndMsgs()){
+        painter->setPen(Qt::NoPen);
+        QLinearGradient lgradient(_endMsgsIndicator.topLeft(),_endMsgsIndicator.topRight());
+        lgradient.setColorAt(1,Qt::transparent);
+        lgradient.setColorAt(0,isSelected() ? Qt::yellow : Qt::white);
+        painter->fillRect(_endMsgsIndicator,lgradient);
+    }
+}
+
+void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	Q_UNUSED(option);
@@ -1357,20 +1382,9 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     painter->setBrush(QBrush(Qt::white,Qt::Dense7Pattern));
     painter->drawRect(_boxRect);
 
-    /************   Draw msgs indicator ************/
-    QRectF startRect(QPointF(_boxRect.topLeft().x(),_boxRect.topLeft().y() + RESIZE_TOLERANCE),QPointF(_boxRect.x()+width()/3,_boxRect.bottomLeft().y()));
-    painter->setPen(Qt::NoPen);
-    QLinearGradient lgradient(startRect.topLeft(),startRect.topRight());
-    lgradient.setColorAt(0,isSelected() ? Qt::yellow : Qt::white);
-    lgradient.setColorAt(1,Qt::transparent);
-    painter->fillRect(startRect,lgradient);
-
-
+    drawMsgsIndicators(painter);
     drawInteractionGrips(painter);
     drawTriggerGrips(painter);
-
-
-
 
     _comboBoxProxy->setVisible(_abstract->height()>RESIZE_TOLERANCE+LINE_WIDTH);
     _curveProxy->setVisible(_abstract->height()>RESIZE_TOLERANCE+LINE_WIDTH);
