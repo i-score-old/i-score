@@ -84,6 +84,8 @@ const int BasicBox::COMBOBOX_WIDTH = 120;
 const float BasicBox::TRIGGER_ZONE_WIDTH = 15.;
 const float BasicBox::TRIGGER_ZONE_HEIGHT = 20.;
 const float BasicBox::MSGS_INDICATOR_WIDTH = 50;
+const float BasicBox::EAR_WIDTH = 9;
+const float BasicBox::EAR_HEIGHT = 30;
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
 : QGraphicsItem()
@@ -1299,9 +1301,8 @@ BasicBox::drawTriggerGrips(QPainter *painter){
 void
 BasicBox::drawInteractionGrips(QPainter *painter){
 
-    int earWidth, earHeight;
-    earWidth = 18;
-    earHeight = 30 ;
+    float earWidth = EAR_WIDTH*2;
+    float earHeight = EAR_HEIGHT;
 
     QPen pen(isSelected() ? Qt::yellow : Qt::white);
     QBrush brush(Qt::SolidPattern);
@@ -1338,8 +1339,14 @@ BasicBox::drawBox(QPainter *painter){
 void
 BasicBox::drawMsgsIndicators(QPainter *painter){
 
-    _startMsgsIndicator = QRectF(QPointF(_boxRect.topLeft().x(),_boxRect.topLeft().y() + RESIZE_TOLERANCE -LINE_WIDTH),QPointF(_boxRect.x()+ MSGS_INDICATOR_WIDTH,_boxRect.bottomLeft().y()));
-    _endMsgsIndicator = QRectF(QPointF(_boxRect.topRight().x(),_boxRect.topRight().y() + RESIZE_TOLERANCE -LINE_WIDTH),QPointF(_boxRect.bottomRight().x() - MSGS_INDICATOR_WIDTH,_boxRect.bottomRight().y()));
+    if(width()>2*RESIZE_TOLERANCE){
+        _startMsgsIndicator = QRectF(QPointF(_boxRect.topLeft().x(),_boxRect.topLeft().y() + RESIZE_TOLERANCE -LINE_WIDTH),QPointF(_boxRect.x()+ MSGS_INDICATOR_WIDTH,_boxRect.bottomLeft().y()));
+        _endMsgsIndicator = QRectF(QPointF(_boxRect.topRight().x(),_boxRect.topRight().y() + RESIZE_TOLERANCE -LINE_WIDTH),QPointF(_boxRect.bottomRight().x() - MSGS_INDICATOR_WIDTH,_boxRect.bottomRight().y()));
+    }
+    else{
+        _startMsgsIndicator = QRectF(QPointF(_boxRect.topLeft().x(),_boxRect.topLeft().y() + RESIZE_TOLERANCE -LINE_WIDTH),QPointF(_boxRect.x()+ width()/3,_boxRect.bottomLeft().y()));
+        _endMsgsIndicator = QRectF(QPointF(_boxRect.topRight().x(),_boxRect.topRight().y() + RESIZE_TOLERANCE -LINE_WIDTH),QPointF(_boxRect.bottomRight().x() - width()/3,_boxRect.bottomRight().y()));
+    }
 
     if (hasStartMsgs()){
         painter->setPen(Qt::NoPen);

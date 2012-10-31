@@ -128,6 +128,9 @@ class Relation : public QGraphicsItem
    */
   void changeBounds(const float &minBound, const float &maxBound);
 
+  static const float TOLERANCE_X;
+  static const float TOLERANCE_Y;
+
  protected:
   /*!
    * \brief This method must be overloaded for QGraphicsItem derived classes.

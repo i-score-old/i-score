@@ -57,6 +57,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QMenu>
 
 const float Relation::ARROW_SIZE = 12.;
+const float Relation::TOLERANCE_X = 12.;
+const float Relation::TOLERANCE_Y = 12.;
 const float Relation::HANDLE_HEIGHT = 50.;
 const float Relation::HANDLE_WIDTH = 12.;
 
@@ -161,13 +163,13 @@ Relation::updateCoordinates()
   BasicBox *box = _scene->getBox(_abstract->firstBox());
   switch (_abstract->firstExtremity()) {
   case BOX_START :
-//    _start = box->getMiddleLeft();
-      _start = box->getLeftGripPoint();
+    _start = box->getMiddleLeft();
+//      _start = box->getLeftGripPoint();
 
     break;
   case BOX_END :
-//    _start = box->getMiddleRight();
-      _start = box->getRightGripPoint();
+    _start = box->getMiddleRight();
+//      _start = box->getRightGripPoint();
     break;
   case NO_EXTREMITY :
     _start = box->getCenter();
@@ -178,14 +180,14 @@ Relation::updateCoordinates()
   switch (_abstract->secondExtremity()) {
   case BOX_START :
       if(box!=NULL){
-//        _end = box->getMiddleLeft();
-        _end = box->getLeftGripPoint();
+        _end = box->getMiddleLeft();
+//        _end = box->getLeftGripPoint();
       }
     break;
   case BOX_END :
       if(box!=NULL){
-//        _end = box->getMiddleRight();
-          _end = box->getRightGripPoint();
+        _end = box->getMiddleRight();
+//          _end = box->getRightGripPoint();
       }
     break;
   case NO_EXTREMITY :
@@ -226,7 +228,7 @@ void
 Relation::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 {
 	QGraphicsItem::hoverEnterEvent(event);
-  double startX = mapFromScene(_start).x() , startY = mapFromScene(_start).y();
+  double startX = mapFromScene(_start).x()+BasicBox::EAR_WIDTH/2 , startY = mapFromScene(_start).y();
   double endY = mapFromScene(_end).y();
   double sizeY = endY - startY;
   double centerY = startY + sizeY/2.;
@@ -263,7 +265,7 @@ void
 Relation::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 {
 	QGraphicsItem::hoverMoveEvent(event);
-  double startX = mapFromScene(_start).x() , startY = mapFromScene(_start).y();
+  double startX = mapFromScene(_start).x()+BasicBox::EAR_WIDTH/2 , startY = mapFromScene(_start).y();
   double endY = mapFromScene(_end).y();
   double sizeY = endY - startY;
   double centerY = startY + sizeY/2.;
@@ -319,22 +321,22 @@ Relation::mousePressEvent (QGraphicsSceneMouseEvent * event) {
   QGraphicsItem::mousePressEvent(event);
   if (!_scene->playing()) {
   	if (cursor().shape() == Qt::SplitHCursor) {
-  	  double startX = mapFromScene(_start).x() , startY = mapFromScene(_start).y();
+      double startX = mapFromScene(_start).x()+BasicBox::EAR_WIDTH/2 , startY = mapFromScene(_start).y();
   	  double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
   	  double sizeY = endY - startY;
   	  double centerY = startY + sizeY/2.;
   	  double startBound = startX;
   	  if (_abstract->minBound() != NO_BOUND) {
-  	  	startBound = startX + _abstract->minBound();
+        startBound = startX + _abstract->minBound();
   	  }
   	  double endBound = endX;
   	  if (_abstract->maxBound() != NO_BOUND) {
   	  	endBound = startX + _abstract->maxBound();
   	  }
-  	  if (QRectF(startBound,centerY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
+      if (QRectF(startBound,centerY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
   	  	_leftHandleSelected = true;
   	  }
-  	  else if (QRectF(endBound - HANDLE_WIDTH,centerY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
+      else if (QRectF(endBound - HANDLE_WIDTH,centerY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
   	  	_rightHandleSelected = true;
   	  }
   	}
@@ -345,7 +347,7 @@ void
 Relation::mouseMoveEvent (QGraphicsSceneMouseEvent * event) {
   QGraphicsItem::mouseMoveEvent(event);
   double eventPosX = mapFromScene(event->scenePos()).x();
-  double startX = mapFromScene(_start).x();
+  double startX = mapFromScene(_start).x() +BasicBox::EAR_WIDTH/2;
   if (_leftHandleSelected) {
   	_scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,std::min((float)std::max(eventPosX - startX,0.),_abstract->maxBound()),_abstract->maxBound());
   	update();
@@ -366,8 +368,8 @@ Relation::mouseReleaseEvent (QGraphicsSceneMouseEvent * event) {
 QRectF
 Relation::boundingRect() const
 {
-  return QRectF(0.-((fabs(_end.x() - _start.x()))/2.),0.-(std::max(fabs(_end.y() - _start.y())/2.,(double)HANDLE_HEIGHT)),
-		std::max(fabs(_end.x() - _start.x()),(double)_abstract->maxBound()),std::max(fabs(_end.y() - _start.y()),(double)2.*HANDLE_HEIGHT));
+  return QRectF(0.-((fabs(_end.x() - _start.x()))/2.),0.-(std::max(fabs(_end.y() - _start.y())/2.,(double)HANDLE_HEIGHT)) - TOLERANCE_Y,
+        std::max(fabs(_end.x() - _start.x()),(double)_abstract->maxBound()),std::max(fabs(_end.y() - _start.y()),(double)2.*HANDLE_HEIGHT) + 2*TOLERANCE_Y);
 }
 
 QPainterPath
@@ -375,56 +377,66 @@ Relation::shape () const
 {
   QPainterPath path;
   path.moveTo(mapFromScene(_start));
-  double startX = mapFromScene(_start).x() , startY = mapFromScene(_start).y();
+  double startX = mapFromScene(_start).x() + BasicBox::EAR_WIDTH/2 , startY = mapFromScene(_start).y();
   double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
   double sizeX = endX - startX, sizeY = endY - startY;
   double centerX = startX + sizeX/2., centerY = startY + sizeY/2.;
-  double toleranceX = sizeX > 0 ? 2*ARROW_SIZE : -2*ARROW_SIZE;
-  double toleranceY = sizeY > 0 ? 2*ARROW_SIZE : -2*ARROW_SIZE;
+  double toleranceX = sizeX > 0 ? ARROW_SIZE : -ARROW_SIZE;
+  double toleranceY = sizeY > 0 ? ARROW_SIZE : -ARROW_SIZE;
 
   path.moveTo(startX,startY - toleranceY);
-  if (sizeX >= 2 * ARROW_SIZE) {
-    path.lineTo(startX + ARROW_SIZE, startY - toleranceY);
-  }
+  path.lineTo(startX + toleranceX, startY);
+  path.lineTo(startX + toleranceX, endY - toleranceY);
+  path.lineTo(endX, endY - toleranceY);
 
-  path.quadTo(centerX + toleranceX, startY - toleranceY, centerX + toleranceX, centerY - toleranceY);
-  if (sizeX >= 2 * ARROW_SIZE) {
-    path.quadTo(centerX + toleranceX, endY - toleranceY, endX - ARROW_SIZE, endY - toleranceY);
-    path.lineTo(endX,endY - toleranceY);
-  }
-  else {
-    path.quadTo(centerX + toleranceX, endY - toleranceY, endX, endY - toleranceY);
-  }
-
-  path.lineTo(endX , endY + toleranceY);
-
-  if (sizeX >= 2 * ARROW_SIZE) {
-    path.lineTo(endX - toleranceX,endY + toleranceY);
-  }
-
-  path.quadTo(centerX - toleranceX, endY + toleranceY,centerX - toleranceX,centerY + toleranceY);
-  if (sizeX >= 2 * ARROW_SIZE) {
-    path.quadTo(centerX - toleranceX ,startY + toleranceY,startX + toleranceX,startY + toleranceY);
-    path.lineTo(startX,startY + toleranceY);
-  }
-  else {
-    path.quadTo(centerX - toleranceX, startY + toleranceY, startX, startY + toleranceY);
-  }
+  path.lineTo(endX, endY + toleranceY);
+  path.lineTo(startX, endY + toleranceY);
   path.lineTo(startX,startY - toleranceY);
+//  path.moveTo(startX,startY - toleranceY);
+//  if (sizeX >= 2 * ARROW_SIZE) {
+//    path.lineTo(startX + ARROW_SIZE, startY - toleranceY);
+//  }
+
+//  path.quadTo(centerX + toleranceX, startY - toleranceY, centerX + toleranceX, centerY - toleranceY);
+//  if (sizeX >= 2 * ARROW_SIZE) {
+//    path.quadTo(centerX + toleranceX, endY - toleranceY, endX - ARROW_SIZE, endY - toleranceY);
+//    path.lineTo(endX,endY - toleranceY);
+//  }
+//  else {
+//    path.quadTo(centerX + toleranceX, endY - toleranceY, endX, endY - toleranceY);
+//  }
+
+//  path.lineTo(endX , endY + toleranceY);
+
+//  if (sizeX >= 2 * ARROW_SIZE) {
+//    path.lineTo(endX - toleranceX,endY + toleranceY);
+//  }
+
+//  path.quadTo(centerX - toleranceX, endY + toleranceY,centerX - toleranceX,centerY + toleranceY);
+//  if (sizeX >= 2 * ARROW_SIZE) {
+//    path.quadTo(centerX - toleranceX ,startY + toleranceY,startX + toleranceX,startY + toleranceY);
+//    path.lineTo(startX,startY + toleranceY);
+//  }
+//  else {
+//    path.quadTo(centerX - toleranceX, startY + toleranceY, startX, startY + toleranceY);
+//  }
+//  path.lineTo(startX,startY - toleranceY);
+
+
 
   // Handling zones
   double startBound = startX;
   if (_abstract->minBound() != NO_BOUND) {
-  	startBound = startX + _abstract->minBound();
+    startBound = startX + _abstract->minBound();
   }
   double endBound = endX;
   if (_abstract->maxBound() != NO_BOUND) {
-  	endBound = startX + _abstract->maxBound();
+    endBound = startX + _abstract->maxBound();
   }
-  path.moveTo(startBound,centerY - HANDLE_HEIGHT/2.);
-  path.addRect(startBound,centerY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT);
-  path.moveTo(endBound - HANDLE_WIDTH,centerY - HANDLE_HEIGHT/2.);
-  path.addRect(endBound - HANDLE_WIDTH,centerY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT);
+  path.moveTo(startBound,endY - HANDLE_HEIGHT/2.);
+  path.addRect(startBound,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT);
+  path.moveTo(endBound - HANDLE_WIDTH,endY - HANDLE_HEIGHT/2.);
+  path.addRect(endBound - HANDLE_WIDTH,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT);
 
   return path;
 }
@@ -435,108 +447,93 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
   Q_UNUSED(option);
   Q_UNUSED(widget);
 
-  //painter->drawRect(boundingRect());
-  //painter->drawPath(shape());
+//  painter->drawRect(boundingRect());
+  painter->drawPath(shape());
 
   QPainterPath painterPath;
   painterPath.moveTo(mapFromScene(_start));
-  double startX = mapFromScene(_start).x() , startY = mapFromScene(_start).y();
+  double startX = mapFromScene(_start).x() + BasicBox::EAR_WIDTH/2, startY = mapFromScene(_start).y() ;
   double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
   double sizeY = endY - startY;
   double centerY = startY + sizeY/2.;
+  float minBoundLenght = startX + BasicBox::EAR_WIDTH/2;
+  QPen dotLine = QPen(Qt::DotLine);
+  QPen solidLine = QPen(Qt::SolidLine);
 
-  if (fabs(startX-endX) >= 2*ARROW_SIZE) {
-    if (startX <= endX) {
-      painterPath.lineTo(startX + ARROW_SIZE,startY);
-    }
-    else {
-      painterPath.lineTo(startX - ARROW_SIZE,startY);
-    }
-  }
 
-  painterPath.quadTo((startX + endX)/2.,startY,(startX + endX)/2.,(startY + endY)/2.);
-  if (fabs(startX-endX) >= 2*ARROW_SIZE) {
-    if (startX <= endX) {
-      painterPath.quadTo((startX + endX)/2.,endY,endX - ARROW_SIZE,endY);
-    }
-    else {
-      painterPath.quadTo((startX + endX)/2.,endY,endX + ARROW_SIZE,endY);
-    }
-  }
-  else {
-    painterPath.quadTo((startX + endX)/2.,endY,endX,endY);
-  }
+  /************ Draw relation ************/
+
+  //Vertical line
+  painterPath.moveTo(startX,startY);
+  painterPath.lineTo(startX ,endY);
+
+
+  painterPath.lineTo(endX - BasicBox::EAR_WIDTH/2,endY);
+
 
   painter->save();
   QPen localPen;
-  localPen.setWidth(isSelected() ? 2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
+  localPen.setWidth(isSelected() ? 1.5 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
   localPen.setStyle(Qt::DashDotLine);
   painter->setPen(localPen);
   painter->drawPath(painterPath);
   painter->restore();
-  painterPath = QPainterPath();
-  if (startX <= endX) {
-    painterPath.moveTo(endX,endY);
-    painterPath.lineTo(endX-ARROW_SIZE,endY - (ARROW_SIZE/2.));
-    painterPath.lineTo(endX-ARROW_SIZE,endY + (ARROW_SIZE/2.));
-    painterPath.lineTo(endX,endY);
-  }
-  else {
-    painterPath.moveTo(endX,endY);
-    painterPath.lineTo(endX+ARROW_SIZE,endY - (ARROW_SIZE/2.));
-    painterPath.lineTo(endX+ARROW_SIZE,endY + (ARROW_SIZE/2.));
-    painterPath.lineTo(endX,endY);
-  }
-  painter->fillPath(painterPath,QColor(60,60,60));
   painter->setBrush(QBrush(Qt::red));
 
+
+  /****************** bounds ******************/
   QPen rightBoundPen;
   rightBoundPen.setWidth(isSelected() ? 2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
   rightBoundPen.setColor(Qt::cyan);
-	rightBoundPen.setStyle(Qt::DotLine);
+  rightBoundPen.setStyle(Qt::DotLine);
+
   QPen leftBoundPen;
   leftBoundPen.setWidth(isSelected() ? 2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
   leftBoundPen.setColor(Qt::blue);
+
   if (_abstract->minBound() == NO_BOUND) {
-  	if (_abstract->maxBound() == NO_BOUND) {
-  		// All Dashes
-  		leftBoundPen.setStyle(Qt::DotLine);
-  	}
-  	else {
-  		// Dashes Left / Plain right
-  		leftBoundPen.setStyle(Qt::DotLine);
-  	}
+    if (_abstract->maxBound() == NO_BOUND) {
+        // All Dashes
+        leftBoundPen.setStyle(Qt::DotLine);
+    }
+    else {
+        // Dashes Left / Plain right
+        leftBoundPen.setStyle(Qt::DotLine);
+    }
   }
   else { // MinBound has value
-  	if (_abstract->maxBound() == NO_BOUND) {
-  		// Plain Left / Dashes right
-  		leftBoundPen.setStyle(Qt::SolidLine);
-  	}
-  	else {
-  		// All plain
-  		leftBoundPen.setStyle(Qt::SolidLine);
-  	}
+    if (_abstract->maxBound() == NO_BOUND) {
+        // Plain Left / Dashes right
+        leftBoundPen.setStyle(Qt::SolidLine);
+    }
+    else {
+        // All plain
+        leftBoundPen.setStyle(Qt::SolidLine);
+    }
   }
 
 
   double startBound = startX;
   if (_abstract->minBound() != NO_BOUND) {
-  	startBound = startX + _abstract->minBound();
+    startBound = startX + _abstract->minBound();
   }
   double endBound = endX;
   if (_abstract->maxBound() != NO_BOUND) {
-  	endBound = startX + _abstract->maxBound();
+    endBound = startX + _abstract->maxBound();
   }
 
   painter->setPen(leftBoundPen);
-  painter->drawLine(QPointF(startX,centerY), QPointF(startBound,centerY)); // Horizontal
+  painter->drawLine(QPointF(startX,endY), QPointF(startBound,endY)); // Horizontal
   if (_abstract->minBound() != NO_BOUND) { // Left Handle
-  	painter->drawLine(QPointF(startBound,centerY - HANDLE_HEIGHT/2.), QPointF(startBound,centerY + HANDLE_HEIGHT/2.)); // Vertical Left
+//    painter->drawLine(QPointF(startBound,centerY - HANDLE_HEIGHT/2.), QPointF(startBound,centerY + HANDLE_HEIGHT/2.)); // Vertical Left
+      painter->drawLine(QPointF(startBound,endY - HANDLE_HEIGHT/2), QPointF(startBound,endY + HANDLE_HEIGHT/2)); // Vertical left
   }
 
   painter->setPen(rightBoundPen);
-  painter->drawLine(QPointF(startBound,centerY), QPointF(endBound,centerY)); // Horizontal
+//  painter->drawLine(QPointF(startBound,centerY), QPointF(endBound,centerY)); // Horizontal
+  painter->drawLine(QPointF(startBound,endY), QPointF(endBound,endY)); // Horizontal
   if (_abstract->maxBound() != NO_BOUND) {
-  	painter->drawLine(QPointF(endBound,centerY - HANDLE_HEIGHT/2.), QPointF(endBound,centerY + HANDLE_HEIGHT/2.)); // Vertical
+//    painter->drawLine(QPointF(endBound,centerY - HANDLE_HEIGHT/2.), QPointF(endBound,centerY + HANDLE_HEIGHT/2.)); // Vertical
+      painter->drawLine(QPointF(endBound,endY - HANDLE_HEIGHT/2), QPointF(endBound,endY + HANDLE_HEIGHT/2)); // Vertical
   }
 }
