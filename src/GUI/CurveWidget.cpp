@@ -517,20 +517,22 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
         i++;
     }
     // Last point is represented by a specific color
-    painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),EXTREMITY_COLOR);
+    if(!_unactive){
+        painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),EXTREMITY_COLOR);
 
-    precPoint = QPointF(-1,-1);
-    for (it2 = _abstract->_breakpoints.begin() ; it2 != _abstract->_breakpoints.end() ; ++it2) {
-        curPoint = absoluteCoordinates(QPointF(it2->first,it2->second.first));
-        // Breakpoints are drawn with rectangles
-        painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),_unactive ? UNACTIVE_COLOR : BREAKPOINT_COLOR);
-        precPoint = curPoint;
-    }
+        precPoint = QPointF(-1,-1);
+        for (it2 = _abstract->_breakpoints.begin() ; it2 != _abstract->_breakpoints.end() ; ++it2) {
+            curPoint = absoluteCoordinates(QPointF(it2->first,it2->second.first));
+            // Breakpoints are drawn with rectangles
+            painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),_unactive ? UNACTIVE_COLOR : BREAKPOINT_COLOR);
+            precPoint = curPoint;
+        }
 
-    if (_movingBreakpointX != -1 && _movingBreakpointY != -1) {
-        QPointF cursor = absoluteCoordinates(QPointF(_movingBreakpointX,_movingBreakpointY));
-        // If a breakpoint is currently being moved, it is represented by a rectangle
-        painter->fillRect(QRectF(cursor - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),_abstract->_interpolate ? MOVING_BREAKPOINT_COLOR : UNACTIVE_COLOR);
+        if (_movingBreakpointX != -1 && _movingBreakpointY != -1) {
+            QPointF cursor = absoluteCoordinates(QPointF(_movingBreakpointX,_movingBreakpointY));
+            // If a breakpoint is currently being moved, it is represented by a rectangle
+            painter->fillRect(QRectF(cursor - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),_abstract->_interpolate ? MOVING_BREAKPOINT_COLOR : UNACTIVE_COLOR);
+        }
     }
     delete painter;
 }
