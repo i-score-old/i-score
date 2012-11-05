@@ -106,9 +106,11 @@ BoxWidget::~BoxWidget(){
 
 void
 BoxWidget::mousePressEvent(QMouseEvent *event){
-    hide();
-    setWindowModality(Qt::WindowModal);
-    show();
+    if(_box->isSelected()){
+        hide();
+        setWindowModality(Qt::WindowModal);
+        show();
+    }
 }
 
 void BoxWidget::curveActivationChanged(const QString &address, bool state) {

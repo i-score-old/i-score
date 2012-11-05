@@ -149,7 +149,7 @@ BasicBox::createWidget(){
     layout->addWidget(_curvesWidget);
     layout->setMargin(0);
     layout->setContentsMargins(0,0,0,0);
-    layout->setAlignment(_boxWidget,Qt::AlignLeft);
+    layout->setAlignment(_boxWidget,Qt::AlignLeft);    
     _boxWidget->setLayout(layout);
 
     _curvesWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -274,13 +274,13 @@ BasicBox::getSize() const
 QPointF
 BasicBox::getLeftGripPoint()
 {
-    return QPointF(_abstract->topLeft().x()-leftEar().width(), _abstract->topLeft().y() + _abstract->height()/2.);
+    return QPointF(_abstract->topLeft().x(), _abstract->topLeft().y() + _abstract->height()/2.);
 }
 
 QPointF
 BasicBox::getRightGripPoint()
 {
-    return QPointF(_abstract->topLeft().x() + _abstract->width() + _rightEar.width(), _abstract->topLeft().y() + _abstract->height()/2.);
+    return QPointF(_abstract->topLeft().x() + _abstract->width(), _abstract->topLeft().y() + _abstract->height()/2.);
 }
 
 QPointF
@@ -1059,16 +1059,16 @@ BasicBox::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
 
 
     if (!_scene->playing() && (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor) && inTextRect) {
-//        QInputDialog *nameDialog = nameInputDialog();
+        QInputDialog *nameDialog = nameInputDialog();
 
-//        bool ok = nameDialog->exec();
-//        QString nameValue = nameDialog->textValue();
+        bool ok = nameDialog->exec();
+        QString nameValue = nameDialog->textValue();
 
-//        if (ok) {
-//            _abstract->setName(nameValue.toStdString());
-//            this->update();
-//            _scene->displayMessage(QObject::tr("Box's name successfully updated").toStdString(),INDICATION_LEVEL);
-//         }
+        if (ok) {
+            _abstract->setName(nameValue.toStdString());
+            this->update();
+            _scene->displayMessage(QObject::tr("Box's name successfully updated").toStdString(),INDICATION_LEVEL);
+         }
 
 //     delete nameDialog;
 //        displayCurveEditWindow();

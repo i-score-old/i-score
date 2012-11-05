@@ -127,6 +127,8 @@ class Relation : public QGraphicsItem
    * \param maxBound : the new max bound to be set
    */
   void changeBounds(const float &minBound, const float &maxBound);
+  inline QRectF startBoundRect(){return _startBoundRect;}
+  inline QRectF endBoundRect(){return _endBoundRect;}
 
   static const float TOLERANCE_X;
   static const float TOLERANCE_Y;
@@ -205,6 +207,8 @@ class Relation : public QGraphicsItem
   virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 		     QWidget *widget = 0);
 
+
+
  private :
 
   MaquetteScene * _scene; //!< The scene containing relation.
@@ -216,12 +220,17 @@ class Relation : public QGraphicsItem
   QPointF _start; //!< The starting point of the relation.
   QPointF _end; //!< The ending point of the relation.
 
+  QRectF _startBoundRect;
+  QRectF _endBoundRect;
+
   bool _leftHandleSelected; //!< Left handle selection state.
   bool _rightHandleSelected; //!< Right handle selection state.
 
   static const float ARROW_SIZE; //!< The size of the arrow.
   static const float HANDLE_HEIGHT; //!< The height of a handle.
   static const float HANDLE_WIDTH; //!< The width of a handle.
+
+
 };
 
 #endif
