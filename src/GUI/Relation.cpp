@@ -61,6 +61,7 @@ const float Relation::TOLERANCE_X = 12.;
 const float Relation::TOLERANCE_Y = 12.;
 const float Relation::HANDLE_HEIGHT = 25.;
 const float Relation::HANDLE_WIDTH = 12.;
+const float Relation::GRIP_CIRCLE_SIZE = 4;
 
 Relation::Relation(unsigned int firstBoxID, BoxExtremity firstBoxExt, unsigned int secondBoxID,
 		   BoxExtremity secondBoxExt, MaquetteScene *parent)
@@ -272,7 +273,7 @@ Relation::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 {
   QGraphicsItem::hoverMoveEvent(event);
 
-  double startX = mapFromScene(_start).x()+BasicBox::EAR_WIDTH/2, startY = mapFromScene(_start).y();
+  double startX = mapFromScene(_start).x()/*+BasicBox::EAR_WIDTH/2*/, startY = mapFromScene(_start).y();
   double endY = mapFromScene(_end).y();
   double sizeY = endY - startY;
 
@@ -329,7 +330,7 @@ Relation::mousePressEvent (QGraphicsSceneMouseEvent * event) {
 
     if (!_scene->playing()) {
         if (cursor().shape() == Qt::SplitHCursor) {
-          double startX = mapFromScene(_start).x()+BasicBox::EAR_WIDTH/2 , startY = mapFromScene(_start).y();
+          double startX = mapFromScene(_start).x()/*+BasicBox::EAR_WIDTH/2*/ , startY = mapFromScene(_start).y();
           double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
 
           double startBound = startX;
@@ -356,7 +357,7 @@ void
 Relation::mouseMoveEvent (QGraphicsSceneMouseEvent * event) {
   QGraphicsItem::mouseMoveEvent(event);
   double eventPosX = mapFromScene(event->scenePos()).x();
-  double startX = mapFromScene(_start).x()+BasicBox::EAR_WIDTH/2;
+  double startX = mapFromScene(_start).x()/*+BasicBox::EAR_WIDTH/2*/;
   if (_leftHandleSelected) {
     _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,std::min((float)std::max(eventPosX - startX,0.),_abstract->maxBound()),_abstract->maxBound());
   	update();
@@ -444,7 +445,7 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     QPainterPath painterPath;
     painterPath.moveTo(mapFromScene(_start));
 
-    double startX = mapFromScene(_start).x() + BasicBox::EAR_WIDTH/2, startY = mapFromScene(_start).y() ;
+    double startX = mapFromScene(_start).x()/* + BasicBox::EAR_WIDTH/2*/, startY = mapFromScene(_start).y() ;
     double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
     double startBound = startX;
     double endBound = endX;
@@ -453,6 +454,11 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     dotLine.setWidth(isSelected() ? 1.5 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
     QPen solidLine = QPen(Qt::SolidLine);
     solidLine.setWidth(isSelected() ? 1.5 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
+
+    //grips' circles
+    QPainterPath circle;
+    circle.addEllipse( _abstract->firstExtremity() == BOX_END ? startX : startX-GRIP_CIRCLE_SIZE ,startY - GRIP_CIRCLE_SIZE/2,GRIP_CIRCLE_SIZE,GRIP_CIRCLE_SIZE);
+    painter->fillPath(circle,QBrush(Qt::black));
 
     updateFlexibility();
 

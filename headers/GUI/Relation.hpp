@@ -133,6 +133,7 @@ class Relation : public QGraphicsItem
 
   static const float TOLERANCE_X;
   static const float TOLERANCE_Y;
+  static const float GRIP_CIRCLE_SIZE;
 
  protected:
   /*!
