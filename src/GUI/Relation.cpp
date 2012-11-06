@@ -103,7 +103,7 @@ Relation::init()
   setZValue(0);
   _leftHandleSelected = false;
   _rightHandleSelected = false;
-
+  _flexibleRelation = _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START);
 }
 
 Abstract *
@@ -162,6 +162,7 @@ void
 Relation::updateCoordinates()
 {
   BasicBox *box = _scene->getBox(_abstract->firstBox());
+
   switch (_abstract->firstExtremity()) {
   case BOX_START :
 //    _start = box->getMiddleLeft();
@@ -199,6 +200,8 @@ Relation::updateCoordinates()
 
   _abstract->_length = _end.x() - _start.x();
   setPos(getCenter());
+
+
 }
 
 QPointF
@@ -355,7 +358,7 @@ Relation::mouseMoveEvent (QGraphicsSceneMouseEvent * event) {
   double eventPosX = mapFromScene(event->scenePos()).x();
   double startX = mapFromScene(_start).x()+BasicBox::EAR_WIDTH/2;
   if (_leftHandleSelected) {
-  	_scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,std::min((float)std::max(eventPosX - startX,0.),_abstract->maxBound()),_abstract->maxBound());
+    _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,std::min((float)std::max(eventPosX - startX,0.),_abstract->maxBound()),_abstract->maxBound());
   	update();
   }
   else if (_rightHandleSelected) {
@@ -399,114 +402,118 @@ Relation::shape() const
     endBound = startX + _abstract->maxBound();
   }
 
-  path.moveTo(startX,startY - toleranceY);
-  path.lineTo(startX + toleranceX, startY);
+  path.moveTo(startX,startY + toleranceY);
+  path.lineTo(startX + toleranceX, startY + toleranceY);
   path.lineTo(startX + toleranceX, endY - toleranceY);
   path.lineTo(endBound + HANDLE_WIDTH, endY - toleranceY);
 
   path.lineTo(endBound + HANDLE_WIDTH, endY + toleranceY);
   path.lineTo(startX, endY + toleranceY);
-  path.lineTo(startX,startY - toleranceY);
+  path.lineTo(startX,startY + toleranceY);
 
 
   return path;
 }
 
 void
+Relation::updateFlexibility(){
+    std::cout<<"UPDATEFLEX "<<std::endl;
+    _flexibleRelation = _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START);
+    if (!_flexibleRelation){
+        std::cout<<"true"<<std::endl;
+        double endX = mapFromScene(_end).x();
+//        changeBounds(endX,endX);
+    }
+    else{
+//        changeBounds(NO_BOUND,NO_BOUND);
+        std::cout<<"false"<<std::endl;
+    }
+
+//    _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
+}
+
+void
 Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-  Q_UNUSED(option);
-  Q_UNUSED(widget);
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 
 //  painter->drawRect(boundingRect());
 //  painter->drawPath(shape());
 
-  QPainterPath painterPath;
-  painterPath.moveTo(mapFromScene(_start));
+    QPainterPath painterPath;
+    painterPath.moveTo(mapFromScene(_start));
 
-  double startX = mapFromScene(_start).x() + BasicBox::EAR_WIDTH/2, startY = mapFromScene(_start).y() ;
-  double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
-  double sizeY = endY - startY;
-  double centerY = startY + sizeY/2.;
-  float minBoundLenght = startX + BasicBox::EAR_WIDTH/2;
-  QPen dotLine = QPen(Qt::DotLine);
-  QPen solidLine = QPen(Qt::SolidLine);
+    double startX = mapFromScene(_start).x() + BasicBox::EAR_WIDTH/2, startY = mapFromScene(_start).y() ;
+    double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
+    double startBound = startX;
+    double endBound = endX;
 
+    QPen dotLine = QPen(Qt::DotLine);
+    dotLine.setWidth(isSelected() ? 1.5 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
+    QPen solidLine = QPen(Qt::SolidLine);
+    solidLine.setWidth(isSelected() ? 1.5 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
 
-  /************ Draw relation ************/
+    updateFlexibility();
 
-  //Vertical line
-  painterPath.moveTo(startX,startY);
-  painterPath.lineTo(startX ,endY);
+    //----------------------- Flexible relation --------------------------//
 
+    if (_flexibleRelation){
 
-  painterPath.lineTo(endX - BasicBox::EAR_WIDTH/2,endY);
+        /************ Draw relation ************/
 
-
-  painter->save();
-  QPen localPen;
-  localPen.setWidth(isSelected() ? 1.5 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
-  localPen.setStyle(Qt::DashDotLine);
-  painter->setPen(localPen);
-  painter->drawPath(painterPath);
-  painter->restore();
-  painter->setBrush(QBrush(Qt::red));
+        //Vertical line
+        painter->setPen(solidLine);
+        painter->drawLine(startX,startY,startX,endY);
 
 
-  /****************** bounds ******************/
-  QPen rightBoundPen;
-  rightBoundPen.setWidth(isSelected() ? 2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
-  rightBoundPen.setColor(Qt::cyan);
-  rightBoundPen.setStyle(Qt::DotLine);
+        //horizontal line
+        painter->setPen(dotLine);
+        painter->drawLine(startX,endY,endX - BasicBox::EAR_WIDTH/2,endY);
 
-  QPen leftBoundPen;
-  leftBoundPen.setWidth(isSelected() ? 2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
-  leftBoundPen.setColor(Qt::blue);
 
-  if (_abstract->minBound() == NO_BOUND) {
-    if (_abstract->maxBound() == NO_BOUND) {
-        // All Dashes
-        leftBoundPen.setStyle(Qt::DotLine);
+        /****************** bounds ******************/
+        QPen rightBoundPen;
+        rightBoundPen.setWidth(isSelected() ? 2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
+        //  rightBoundPen.setColor(Qt::cyan);
+        rightBoundPen.setStyle(Qt::DotLine);
+
+        QPen leftBoundPen;
+        leftBoundPen.setWidth(isSelected() ? 2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
+        leftBoundPen.setColor(Qt::blue);
+
+
+        if (_abstract->minBound() != NO_BOUND)
+            startBound = startX + _abstract->minBound();
+
+        if (_abstract->maxBound() != NO_BOUND)
+            endBound = startX + _abstract->maxBound();
+
+
+        painter->setPen(leftBoundPen);
+        //  painter->drawLine(QPointF(startX,endY), QPointF(startBound,endY)); // Horizontal
+        if (_abstract->minBound() != NO_BOUND) { // Left Handle
+            painter->drawLine(QPointF(startBound,endY - HANDLE_HEIGHT/2), QPointF(startBound,endY + HANDLE_HEIGHT/2)); // Vertical left
+        }
+
+        painter->setPen(rightBoundPen);
+        //  painter->drawLine(QPointF(startBound,centerY), QPointF(endBound,centerY)); // Horizontal
+        //  painter->drawLine(QPointF(startBound,endY), QPointF(endBound,endY)); // Horizontal
+        if (_abstract->maxBound() != NO_BOUND) {
+            painter->drawLine(QPointF(endBound,endY - HANDLE_HEIGHT/2), QPointF(endBound,endY + HANDLE_HEIGHT/2)); // Vertical
+          }
     }
-    else {
-        // Dashes Left / Plain right
-        leftBoundPen.setStyle(Qt::DotLine);
+
+
+    //-------------------------- Rigid relation --------------------------//
+    else{
+        //Vertical line
+        painter->setPen(solidLine);
+        painter->drawLine(startX,startY,startX,endY);
+
+        //horizontal line
+        painter->drawLine(startX,endY,endX - BasicBox::EAR_WIDTH/2,endY);
     }
-  }
-  else { // MinBound has value
-    if (_abstract->maxBound() == NO_BOUND) {
-        // Plain Left / Dashes right
-        leftBoundPen.setStyle(Qt::SolidLine);
-    }
-    else {
-        // All plain
-        leftBoundPen.setStyle(Qt::SolidLine);
-    }
-  }
-
-
-  double startBound = startX;
-  if (_abstract->minBound() != NO_BOUND) {
-    startBound = startX + _abstract->minBound();
-  }
-  double endBound = endX;
-  if (_abstract->maxBound() != NO_BOUND) {
-    endBound = startX + _abstract->maxBound();
-
-  }
-
-  painter->setPen(leftBoundPen);
-//  painter->drawLine(QPointF(startX,endY), QPointF(startBound,endY)); // Horizontal
-  if (_abstract->minBound() != NO_BOUND) { // Left Handle
-//    painter->drawLine(QPointF(startBound,centerY - HANDLE_HEIGHT/2.), QPointF(startBound,centerY + HANDLE_HEIGHT/2.)); // Vertical Left
-      painter->drawLine(QPointF(startBound,endY - HANDLE_HEIGHT/2), QPointF(startBound,endY + HANDLE_HEIGHT/2)); // Vertical left
-  }
-
-  painter->setPen(rightBoundPen);
-//  painter->drawLine(QPointF(startBound,centerY), QPointF(endBound,centerY)); // Horizontal
-//  painter->drawLine(QPointF(startBound,endY), QPointF(endBound,endY)); // Horizontal
-  if (_abstract->maxBound() != NO_BOUND) {
-//    painter->drawLine(QPointF(endBound,centerY - HANDLE_HEIGHT/2.), QPointF(endBound,centerY + HANDLE_HEIGHT/2.)); // Vertical
-      painter->drawLine(QPointF(endBound,endY - HANDLE_HEIGHT/2), QPointF(endBound,endY + HANDLE_HEIGHT/2)); // Vertical
-  }
 }
+
+

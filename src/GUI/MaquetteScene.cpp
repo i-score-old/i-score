@@ -319,12 +319,10 @@ MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
 								endY = _mousePos.y();
 							}
 							if (_relationBoxFound) {
-								painter->drawEllipse(QPointF(endX,endY),arrowSize/2.,arrowSize/2.);
-                                std::cout<<"ho"<<std::endl;
+                                painter->drawEllipse(QPointF(endX,endY),arrowSize/2.,arrowSize/2.);
 							}
 						}
-						else {
-                            std::cout<<"ha"<<std::endl;
+                        else {
 							endX = _mousePos.x();
 							endY = _mousePos.y();
 							painter->drawEllipse(endX,endY-arrowSize/2.,arrowSize,arrowSize);
@@ -339,29 +337,24 @@ MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
 						endY = _mousePos.y();
 					}
 					if (fabs(startX - endX) >= 2 * arrowSize) {
-						if (startX <= endX) {
-                            std::cout<<"huu"<<std::endl;
+                        if (startX <= endX) {
 							painterPath.lineTo(startX + arrowSize,startY);
 						}
-						else {
-                            std::cout<<"hua"<<std::endl;
+                        else {
 							painterPath.lineTo(startX - arrowSize,startY);
 						}
 					}
 
 					painterPath.quadTo((startX + endX)/2.,startY,(startX + endX)/2.,(startY + endY)/2.);
 					if (fabs(startX-endX) >= 2 * arrowSize) {
-						if (startX <= endX) {
-                            std::cout<<"houch"<<std::endl;
+                        if (startX <= endX) {
 							painterPath.quadTo((startX + endX)/2.,endY,endX - arrowSize,endY);
 						}
-						else {
-                            std::cout<<"houchu"<<std::endl;
+                        else {
 							painterPath.quadTo((startX + endX)/2.,endY,endX + arrowSize,endY);
 						}
 					}
-					else {
-                        std::cout<<"hpi"<<std::endl;
+                    else {
 						painterPath.quadTo((startX + endX)/2.,endY,endX,endY);
 					}
 
@@ -379,7 +372,6 @@ MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
 					painterPath.lineTo(endX,endY);
 
                     painter->fillPath(painterPath,QColor(60,60,60));
-                    std::cout<<"end"<<std::endl;
 				}
 			}
 			else {

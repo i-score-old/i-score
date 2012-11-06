@@ -197,6 +197,7 @@ void RelationEdit::updateRelationConfiguration() {
   		maxBound = NO_BOUND;
   	}
   	_scene->changeRelationBounds(_relID,_timeBox->value() * 1000. / MaquetteScene::MS_PER_PIXEL,minBound,maxBound);
+    std::cout<<"MIN/MAX "<<minBound<<"/"<<maxBound<<std::endl;
   	accept();
   }
   else {

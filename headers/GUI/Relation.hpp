@@ -129,6 +129,7 @@ class Relation : public QGraphicsItem
   void changeBounds(const float &minBound, const float &maxBound);
   inline QRectF startBoundRect(){return _startBoundRect;}
   inline QRectF endBoundRect(){return _endBoundRect;}
+  void updateFlexibility();
 
   static const float TOLERANCE_X;
   static const float TOLERANCE_Y;
@@ -225,6 +226,8 @@ class Relation : public QGraphicsItem
 
   bool _leftHandleSelected; //!< Left handle selection state.
   bool _rightHandleSelected; //!< Right handle selection state.
+
+  bool _flexibleRelation;//!< The relation can be extended
 
   static const float ARROW_SIZE; //!< The size of the arrow.
   static const float HANDLE_HEIGHT; //!< The height of a handle.
