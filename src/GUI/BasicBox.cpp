@@ -593,6 +593,7 @@ BasicBox::addTriggerPoint(BoxExtremity extremity)
             _triggerPoints[extremity]->updatePosition();
         }
         ret = true;
+
     }
 
     unlock();

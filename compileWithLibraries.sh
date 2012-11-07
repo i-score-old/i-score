@@ -23,16 +23,16 @@ I-SCORE_PATH='/Users/admin/Documents/workspace/i-score'
 elif [ "$OS" = "MACOS" ] || [ "$OS" = "MACOS64" ]
 then
 {
-DEVICE_MANAGER_PATH='/Users/admin/Documents/workspace/DeviceManager'
-LIB_ISCORE_PATH='/Users/admin/Documents/workspace/libIscore'
-I-SCORE_PATH='/Users/admin/Documents/workspace/i-score'
+DEVICE_MANAGER_PATH='/Users/josephlarralde/Documents/workspace/i-score/DeviceManager'
+LIB_ISCORE_PATH='/Users/josephlarralde/Documents/workspace/i-score/libIscore'
+I-SCORE_PATH='/Users/josephlarralde/Documents/workspace/i-score/i-score'
 }
 fi
 
 QMAKE_LINUX='qmake -spec linux-g++'
 QMAKE_LINUX_64='qmake -spec linux-g++-64'
 QMAKE_MACOS='qmake -spec macx-g++'
-MAKE='make'
+MAKE='make mac'
 MAKE_LINUX='make linux'
 MAKE_LINUX64='make linux64'
 MAKE_MAC='make mac'
@@ -93,7 +93,7 @@ echo '-=[Device Manager : Library]=- Cleaning ...'
 $MAKE_CLEAN
 echo '-=[Device Manager : Library]=- Compiling  ...'
 pwd
-$MAKE_MAC
+make
 echo '-=[Device Manager : Library]=- Installing ...'
 sudo cp libDeviceManager.a /usr/local/lib/
 sudo mkdir -p /usr/local/include/DeviceManager/
