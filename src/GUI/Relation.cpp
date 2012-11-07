@@ -246,24 +246,27 @@ Relation::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
     startBound = startX + _abstract->minBound();
   }
 
-  if (QRectF(startBound - HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
-    if (startBound != NO_BOUND) {
-        setCursor(Qt::SplitHCursor);
-    }
-    else {
+  if (_flexibleRelation){
+
+      if (QRectF(startBound - HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
+        if (startBound != NO_BOUND) {
+            setCursor(Qt::SplitHCursor);
+        }
+        else {
+            setCursor(Qt::PointingHandCursor);
+        }
+      }
+      else if (QRectF(endBound - HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
+        if (endBound != NO_BOUND) {
+            setCursor(Qt::SplitHCursor);
+        }
+        else {
+            setCursor(Qt::PointingHandCursor);
+        }
+      }
+      else {
         setCursor(Qt::PointingHandCursor);
-    }
-  }
-  else if (QRectF(endBound - HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
-    if (endBound != NO_BOUND) {
-        setCursor(Qt::SplitHCursor);
-    }
-    else {
-        setCursor(Qt::PointingHandCursor);
-    }
-  }
-  else {
-    setCursor(Qt::PointingHandCursor);
+      }
   }
 }
 
@@ -283,25 +286,26 @@ Relation::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
   if (_abstract->minBound() != NO_BOUND) {
     startBound = startX + _abstract->minBound();
   }
-
-  if (QRectF(startBound - HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
-    if (startBound != NO_BOUND) {
-        setCursor(Qt::SplitHCursor);
-    }
-    else {
-        setCursor(Qt::ArrowCursor);
-    }
-  }
-  else if (QRectF(endBound - HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
-    if (endBound != NO_BOUND) {
-        setCursor(Qt::SplitHCursor);
-    }
-    else {
+  if(_flexibleRelation){
+      if (QRectF(startBound - HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
+        if (startBound != NO_BOUND) {
+            setCursor(Qt::SplitHCursor);
+        }
+        else {
+            setCursor(Qt::ArrowCursor);
+        }
+      }
+      else if (QRectF(endBound - HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
+        if (endBound != NO_BOUND) {
+            setCursor(Qt::SplitHCursor);
+        }
+        else {
+            setCursor(Qt::PointingHandCursor);
+        }
+      }
+      else {
         setCursor(Qt::PointingHandCursor);
-    }
-  }
-  else {
-    setCursor(Qt::PointingHandCursor);
+      }
   }
 }
 
@@ -405,11 +409,20 @@ Relation::shape() const
   path.moveTo(startX,startY + toleranceY);
   path.lineTo(startX + toleranceX, startY + toleranceY);
   path.lineTo(startX + toleranceX, endY - toleranceY);
-  path.lineTo(endBound + HANDLE_WIDTH, endY - toleranceY);
+  path.lineTo(endX - HANDLE_WIDTH, endY - toleranceY);
 
-  path.lineTo(endBound + HANDLE_WIDTH, endY + toleranceY);
+  path.lineTo(endX - HANDLE_WIDTH, endY + toleranceY);
   path.lineTo(startX, endY + toleranceY);
-  path.lineTo(startX,startY + toleranceY);
+  path.lineTo(startX,startY + toleranceY);  
+
+  if(_flexibleRelation && endBound>endX+HANDLE_WIDTH/2){
+      path.moveTo(endBound - HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2);
+      path.lineTo(endBound + HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2);
+      path.lineTo(endBound + HANDLE_WIDTH/2,endY + HANDLE_HEIGHT/2);
+      path.lineTo(endBound - HANDLE_WIDTH/2,endY + HANDLE_HEIGHT/2);
+      path.lineTo(endBound - HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2);
+  }
+
 
 
   return path;
@@ -417,6 +430,7 @@ Relation::shape() const
 
 void
 Relation::updateFlexibility(){
+
     _flexibleRelation = _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START);
     double startX = mapFromScene(_start).x();
     double endX = mapFromScene(_end).x();
@@ -459,8 +473,6 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     circle.addEllipse( _abstract->firstExtremity() == BOX_END ? startX : startX-GRIP_CIRCLE_SIZE ,startY - GRIP_CIRCLE_SIZE/2,GRIP_CIRCLE_SIZE,GRIP_CIRCLE_SIZE);
     painter->fillPath(circle,QBrush(Qt::black));
 
-
-//    updateFlexibility();
 
     //----------------------- Flexible relation --------------------------//
 
