@@ -202,7 +202,6 @@ Relation::updateCoordinates()
   _abstract->_length = _end.x() - _start.x();
   setPos(getCenter());
 
-
 }
 
 QPointF
@@ -320,7 +319,7 @@ Relation::mouseDoubleClickEvent (QGraphicsSceneMouseEvent * event) {
   	RelationEdit * relEdit = new RelationEdit(_scene,_abstract->ID(),_scene->views().first());
   	relEdit->move(mapToScene(boundingRect().topLeft()).x(),mapToScene(boundingRect().topLeft()).y());
   	relEdit->exec();
-  	delete relEdit;
+  	delete relEdit;    
 	}
 }
 
@@ -418,19 +417,19 @@ Relation::shape() const
 
 void
 Relation::updateFlexibility(){
-    std::cout<<"UPDATEFLEX "<<std::endl;
     _flexibleRelation = _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START);
+    double startX = mapFromScene(_start).x();
+    double endX = mapFromScene(_end).x();
+
     if (!_flexibleRelation){
-        std::cout<<"true"<<std::endl;
-        double endX = mapFromScene(_end).x();
-//        changeBounds(endX,endX);
+        changeBounds(endX-startX,endX-startX);
+        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,endX-startX,endX-startX);
     }
     else{
-//        changeBounds(NO_BOUND,NO_BOUND);
-        std::cout<<"false"<<std::endl;
-    }
+        changeBounds(NO_BOUND,NO_BOUND);
+        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
 
-//    _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
+    }
 }
 
 void
@@ -460,7 +459,8 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     circle.addEllipse( _abstract->firstExtremity() == BOX_END ? startX : startX-GRIP_CIRCLE_SIZE ,startY - GRIP_CIRCLE_SIZE/2,GRIP_CIRCLE_SIZE,GRIP_CIRCLE_SIZE);
     painter->fillPath(circle,QBrush(Qt::black));
 
-    updateFlexibility();
+
+//    updateFlexibility();
 
     //----------------------- Flexible relation --------------------------//
 
@@ -519,6 +519,8 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
         //horizontal line
         painter->drawLine(startX,endY,endX - BasicBox::EAR_WIDTH/2,endY);
+
+        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,endX-startX,endX-startX);
     }
 }
 
