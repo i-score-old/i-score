@@ -104,7 +104,7 @@ Relation::init()
   setZValue(0);
   _leftHandleSelected = false;
   _rightHandleSelected = false;
-  _flexibleRelation = _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START);
+  _flexibleRelation = _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START) || _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_END);
 }
 
 Abstract *
@@ -431,7 +431,7 @@ Relation::shape() const
 void
 Relation::updateFlexibility(){
 
-    _flexibleRelation = _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START);
+    _flexibleRelation = _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START) || _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_END);
     double startX = mapFromScene(_start).x();
     double endX = mapFromScene(_end).x();
 

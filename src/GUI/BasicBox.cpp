@@ -451,8 +451,17 @@ BasicBox::updateRelations(){
     std::map< unsigned int, Relation* >cur;
 
     Relation *curRel;
-    it = _relations.find(BOX_START);
 
+    it = _relations.find(BOX_START);
+    if (it!=_relations.end()){
+        cur = it->second;
+        for(it2 = cur.begin(); it2!=cur.end(); ++it2){
+            curRel = it2->second;
+            curRel->updateFlexibility();
+        }
+    }
+
+    it = _relations.find(BOX_END);
     if (it!=_relations.end()){
         cur = it->second;
         for(it2 = cur.begin(); it2!=cur.end(); ++it2){
