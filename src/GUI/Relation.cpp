@@ -61,7 +61,7 @@ const float Relation::TOLERANCE_X = 12.;
 const float Relation::TOLERANCE_Y = 12.;
 const float Relation::HANDLE_HEIGHT = 25.;
 const float Relation::HANDLE_WIDTH = 12.;
-const float Relation::GRIP_CIRCLE_SIZE = 4;
+const float Relation::GRIP_CIRCLE_SIZE = 5;
 
 Relation::Relation(unsigned int firstBoxID, BoxExtremity firstBoxExt, unsigned int secondBoxID,
 		   BoxExtremity secondBoxExt, MaquetteScene *parent)
@@ -101,7 +101,7 @@ Relation::init()
 
   setVisible(true);
   setAcceptsHoverEvents(true);
-  setZValue(0);
+  setZValue(1);
   _leftHandleSelected = false;
   _rightHandleSelected = false;
   _flexibleRelation = _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START) || _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_END);
@@ -409,9 +409,11 @@ Relation::shape() const
   path.moveTo(startX,startY + toleranceY);
   path.lineTo(startX + toleranceX, startY + toleranceY);
   path.lineTo(startX + toleranceX, endY - toleranceY);
-  path.lineTo(endX - HANDLE_WIDTH, endY - toleranceY);
 
-  path.lineTo(endX - HANDLE_WIDTH, endY + toleranceY);
+
+  path.lineTo(_abstract->secondExtremity()==BOX_END ? mapFromScene(_scene->getBox(_abstract->secondBox())->getLeftGripPoint()).x()-HANDLE_WIDTH : endX - HANDLE_WIDTH, endY - toleranceY);
+
+  path.lineTo(_abstract->secondExtremity()==BOX_END  ? mapFromScene(_scene->getBox(_abstract->secondBox())->getLeftGripPoint()).x()-HANDLE_WIDTH : endX - HANDLE_WIDTH, endY + toleranceY);
   path.lineTo(startX, endY + toleranceY);
   path.lineTo(startX,startY + toleranceY);  
 
@@ -431,7 +433,15 @@ Relation::shape() const
 void
 Relation::updateFlexibility(){
 
-    _flexibleRelation = _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START) || _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_END);
+    if(_abstract->secondExtremity() == BOX_START && _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START))
+        _flexibleRelation = true;
+
+    else if(_abstract->secondExtremity() == BOX_END && _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_END))
+        _flexibleRelation = true;
+
+    else
+        _flexibleRelation = false;
+
     double startX = mapFromScene(_start).x();
     double endX = mapFromScene(_end).x();
 
@@ -452,13 +462,14 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
+//    setZValue(isSelected() ? 1 : 0);
 //  painter->drawRect(boundingRect());
 //  painter->drawPath(shape());
 
     QPainterPath painterPath;
     painterPath.moveTo(mapFromScene(_start));
 
-    double startX = mapFromScene(_start).x()/* + BasicBox::EAR_WIDTH/2*/, startY = mapFromScene(_start).y() ;
+    double startX = mapFromScene(_start).x(), startY = mapFromScene(_start).y() ;
     double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
     double startBound = startX;
     double endBound = endX;
@@ -469,25 +480,29 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     solidLine.setWidth(isSelected() ? 1.5 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
 
     //grips' circles
-    QPainterPath circle;
-    circle.addEllipse( _abstract->firstExtremity() == BOX_END ? startX : startX-GRIP_CIRCLE_SIZE ,startY - GRIP_CIRCLE_SIZE/2,GRIP_CIRCLE_SIZE,GRIP_CIRCLE_SIZE);
-    painter->fillPath(circle,QBrush(Qt::black));
+    QPainterPath startCircle, endCircle;
+    startCircle.addEllipse( _abstract->firstExtremity() == BOX_END ? startX : startX-GRIP_CIRCLE_SIZE ,startY - GRIP_CIRCLE_SIZE/2,GRIP_CIRCLE_SIZE,GRIP_CIRCLE_SIZE);
+    endCircle.addEllipse( _abstract->secondExtremity() == BOX_START ? endX-GRIP_CIRCLE_SIZE : endX ,endY - GRIP_CIRCLE_SIZE/2,GRIP_CIRCLE_SIZE,GRIP_CIRCLE_SIZE);
+    painter->fillPath(startCircle,QBrush(Qt::black));
+    painter->fillPath(endCircle,QBrush(Qt::black));
 
 
     //----------------------- Flexible relation --------------------------//
-
     if (_flexibleRelation){
 
         /************ Draw relation ************/
 
-        //Vertical line
         painter->setPen(solidLine);
-        painter->drawLine(startX,startY,startX,endY);
 
+        //Horizontal : Point to box
+        painter->drawLine(_abstract->firstExtremity() == BOX_END ? startX : startX-GRIP_CIRCLE_SIZE/2 ,startY, startX,startY);
+
+        //Vertical line
+        painter->drawLine(startX,startY,startX,endY);
 
         //horizontal line
         painter->setPen(dotLine);
-        painter->drawLine(startX,endY,endX - BasicBox::EAR_WIDTH/2,endY);
+        painter->drawLine(startX,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX-GRIP_CIRCLE_SIZE, endY);
 
 
         /****************** bounds ******************/
@@ -509,14 +524,12 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
 
         painter->setPen(leftBoundPen);
-        //  painter->drawLine(QPointF(startX,endY), QPointF(startBound,endY)); // Horizontal
+
         if (_abstract->minBound() != NO_BOUND) { // Left Handle
             painter->drawLine(QPointF(startBound,endY - HANDLE_HEIGHT/2), QPointF(startBound,endY + HANDLE_HEIGHT/2)); // Vertical left
         }
 
         painter->setPen(rightBoundPen);
-        //  painter->drawLine(QPointF(startBound,centerY), QPointF(endBound,centerY)); // Horizontal
-        //  painter->drawLine(QPointF(startBound,endY), QPointF(endBound,endY)); // Horizontal
         if (_abstract->maxBound() != NO_BOUND) {
             painter->drawLine(QPointF(endBound,endY - HANDLE_HEIGHT/2), QPointF(endBound,endY + HANDLE_HEIGHT/2)); // Vertical
           }
@@ -526,11 +539,12 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     //-------------------------- Rigid relation --------------------------//
     else{
         //Vertical line
-        painter->setPen(solidLine);
+        painter->setPen(solidLine);        
+        painter->drawLine(_abstract->firstExtremity() == BOX_END ? startX : startX-GRIP_CIRCLE_SIZE/2 ,startY, startX,startY);
         painter->drawLine(startX,startY,startX,endY);
 
         //horizontal line
-        painter->drawLine(startX,endY,endX - BasicBox::EAR_WIDTH/2,endY);
+        painter->drawLine(startX,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX-GRIP_CIRCLE_SIZE, endY);
 
         _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,endX-startX,endX-startX);
     }
