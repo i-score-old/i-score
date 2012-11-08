@@ -167,7 +167,7 @@ class BasicBox : public QObject, public QGraphicsItem
    * \brief Updates stuff related to the box graphical attributes.
    */
   void updateStuff();
-  void updateRelations();
+  void updateRelations(BoxExtremity extremity);
   /*!
    * \brief Adds a relation to an extremity
    *

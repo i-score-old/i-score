@@ -135,6 +135,7 @@ class Relation : public QGraphicsItem
   static const float TOLERANCE_X;
   static const float TOLERANCE_Y;
   static const float GRIP_CIRCLE_SIZE;
+  static const float RAIL_WIDTH;
 
  protected:
   /*!
@@ -210,7 +211,7 @@ class Relation : public QGraphicsItem
   virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 		     QWidget *widget = 0);
 
-
+  void drawRail(QPainter *painter, double startBound, double endBound);
 
  private :
 

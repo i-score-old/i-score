@@ -445,23 +445,14 @@ BasicBox::setColor(const QColor & color)
 }
 
 void
-BasicBox::updateRelations(){
+BasicBox::updateRelations(BoxExtremity extremity){
     std::map< BoxExtremity,std::map < unsigned int, Relation* > >::iterator it;
     std::map< unsigned int, Relation* >::iterator it2;
     std::map< unsigned int, Relation* >cur;
 
     Relation *curRel;
 
-    it = _relations.find(BOX_START);
-    if (it!=_relations.end()){
-        cur = it->second;
-        for(it2 = cur.begin(); it2!=cur.end(); ++it2){
-            curRel = it2->second;
-            curRel->updateFlexibility();
-        }
-    }
-
-    it = _relations.find(BOX_END);
+    it = _relations.find(extremity);
     if (it!=_relations.end()){
         cur = it->second;
         for(it2 = cur.begin(); it2!=cur.end(); ++it2){
@@ -620,7 +611,7 @@ BasicBox::addTriggerPoint(BoxExtremity extremity)
             _triggerPoints[extremity]->updatePosition();           
         }
         ret = true;
-        updateRelations();
+        updateRelations(extremity);
     }
 
 
@@ -667,7 +658,7 @@ BasicBox::removeTriggerPoint(BoxExtremity extremity) {
     if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
 		_triggerPoints.erase(it);
 	}
-    updateRelations();
+    updateRelations(extremity);
     _scene->update();
 }
 

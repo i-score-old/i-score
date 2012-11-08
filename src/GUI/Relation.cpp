@@ -59,9 +59,10 @@ knowledge of the CeCILL license and that you accept its terms.
 const float Relation::ARROW_SIZE = 12.;
 const float Relation::TOLERANCE_X = 12.;
 const float Relation::TOLERANCE_Y = 12.;
-const float Relation::HANDLE_HEIGHT = 25.;
+const float Relation::HANDLE_HEIGHT = 10.;
 const float Relation::HANDLE_WIDTH = 12.;
 const float Relation::GRIP_CIRCLE_SIZE = 5;
+const float Relation::RAIL_WIDTH = HANDLE_HEIGHT/2;
 
 Relation::Relation(unsigned int firstBoxID, BoxExtremity firstBoxExt, unsigned int secondBoxID,
 		   BoxExtremity secondBoxExt, MaquetteScene *parent)
@@ -104,7 +105,8 @@ Relation::init()
   setZValue(1);
   _leftHandleSelected = false;
   _rightHandleSelected = false;
-  _flexibleRelation = _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START) || _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_END);
+  updateFlexibility();
+
 }
 
 Abstract *
@@ -347,10 +349,12 @@ Relation::mousePressEvent (QGraphicsSceneMouseEvent * event) {
           }
 
           if (QRectF(startBound - HANDLE_WIDTH/2 ,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
+              std::cout<<"leftSelected"<<std::endl;
             _leftHandleSelected = true;
           }
           else if (QRectF(endBound - HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
-            _rightHandleSelected = true;
+            std::cout<<"rightSelected"<<std::endl;
+              _rightHandleSelected = true;
           }
         }
     }
@@ -360,15 +364,17 @@ void
 Relation::mouseMoveEvent (QGraphicsSceneMouseEvent * event) {
   QGraphicsItem::mouseMoveEvent(event);
   double eventPosX = mapFromScene(event->scenePos()).x();
-  double startX = mapFromScene(_start).x()/*+BasicBox::EAR_WIDTH/2*/;
+  double startX = mapFromScene(_start).x();
+
   if (_leftHandleSelected) {
-    _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,std::min((float)std::max(eventPosX - startX,0.),_abstract->maxBound()),_abstract->maxBound());
+    changeBounds(_abstract->maxBound()==NO_BOUND ? std::max(eventPosX - startX,0.) : std::min((float)std::max(eventPosX - startX,0.),_abstract->maxBound()),_abstract->maxBound());
+    _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
   	update();
   }
   else if (_rightHandleSelected) {
-  	_scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),std::max((float)std::max(eventPosX - startX,0.),_abstract->minBound()));
+    _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),std::max((float)std::max(eventPosX - startX,0.),_abstract->minBound()));
   	update();
-  }
+  }  
 }
 
 void
@@ -417,7 +423,7 @@ Relation::shape() const
   path.lineTo(startX, endY + toleranceY);
   path.lineTo(startX,startY + toleranceY);  
 
-  if(_flexibleRelation && endBound>endX+HANDLE_WIDTH/2){
+  if(_flexibleRelation && endBound > endX){
       path.moveTo(endBound - HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2);
       path.lineTo(endBound + HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2);
       path.lineTo(endBound + HANDLE_WIDTH/2,endY + HANDLE_HEIGHT/2);
@@ -457,12 +463,30 @@ Relation::updateFlexibility(){
 }
 
 void
+Relation::drawRail(QPainter *painter, double startBound, double endBound){
+    painter->save();
+
+    double startX = mapFromScene(_start).x(), startY = mapFromScene(_start).y() ;
+    double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
+
+    QPen solidLine = QPen(Qt::SolidLine);
+    solidLine.setWidth(isSelected() ? 1.2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
+    painter->setPen(solidLine);
+
+    if(endY > startY)
+        painter->drawLine(startBound,endY + RAIL_WIDTH,endBound, endY + RAIL_WIDTH);
+    else
+        painter->drawLine(startBound,endY - RAIL_WIDTH, endBound, endY - RAIL_WIDTH);
+
+    painter->restore();
+}
+
+void
 Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-//    setZValue(isSelected() ? 1 : 0);
 //  painter->drawRect(boundingRect());
 //  painter->drawPath(shape());
 
@@ -475,9 +499,9 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     double endBound = endX;
 
     QPen dotLine = QPen(Qt::DotLine);
-    dotLine.setWidth(isSelected() ? 1.5 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
+    dotLine.setWidth(isSelected() ? 1.2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
     QPen solidLine = QPen(Qt::SolidLine);
-    solidLine.setWidth(isSelected() ? 1.5 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
+    solidLine.setWidth(isSelected() ? 1.2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
 
     //grips' circles
     QPainterPath startCircle, endCircle;
@@ -495,25 +519,21 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         painter->setPen(solidLine);
 
         //Horizontal : Point to box
-        painter->drawLine(_abstract->firstExtremity() == BOX_END ? startX : startX-GRIP_CIRCLE_SIZE/2 ,startY, startX,startY);
+        painter->drawLine(_abstract->firstExtremity() == BOX_END ? startX : startX - GRIP_CIRCLE_SIZE/2 ,startY, startX,startY);
 
         //Vertical line
         painter->drawLine(startX,startY,startX,endY);
 
-        //horizontal line
-        painter->setPen(dotLine);
-        painter->drawLine(startX,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX-GRIP_CIRCLE_SIZE, endY);
-
 
         /****************** bounds ******************/
         QPen rightBoundPen;
-        rightBoundPen.setWidth(isSelected() ? 2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
-        //  rightBoundPen.setColor(Qt::cyan);
-        rightBoundPen.setStyle(Qt::DotLine);
+        rightBoundPen.setWidth(isSelected() ? 1.2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
+        rightBoundPen.setStyle(Qt::SolidLine);
 
         QPen leftBoundPen;
-        leftBoundPen.setWidth(isSelected() ? 2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
-        leftBoundPen.setColor(Qt::blue);
+        leftBoundPen.setWidth(isSelected() ? 1.2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
+        leftBoundPen.setStyle(Qt::SolidLine);
+
 
 
         if (_abstract->minBound() != NO_BOUND)
@@ -522,17 +542,31 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         if (_abstract->maxBound() != NO_BOUND)
             endBound = startX + _abstract->maxBound();
 
-
+        // Left Handle
         painter->setPen(leftBoundPen);
+        if (_abstract->minBound() != NO_BOUND)
+            painter->drawLine(QPointF(startBound,endY - HANDLE_HEIGHT/2), QPointF(startBound,endY + HANDLE_HEIGHT/2)); // Vertical left        }
 
-        if (_abstract->minBound() != NO_BOUND) { // Left Handle
-            painter->drawLine(QPointF(startBound,endY - HANDLE_HEIGHT/2), QPointF(startBound,endY + HANDLE_HEIGHT/2)); // Vertical left
-        }
 
+        // Right Handle
         painter->setPen(rightBoundPen);
-        if (_abstract->maxBound() != NO_BOUND) {
+        if (_abstract->maxBound() != NO_BOUND)
             painter->drawLine(QPointF(endBound,endY - HANDLE_HEIGHT/2), QPointF(endBound,endY + HANDLE_HEIGHT/2)); // Vertical
-          }
+
+
+        //horizontal line
+        painter->setPen(solidLine);
+        painter->drawLine(startX,endY,startBound, endY);
+
+        painter->setPen(dotLine);
+        painter->drawLine(startBound,endY,endBound, endY);
+
+        if(_abstract->maxBound() != NO_BOUND)
+            drawRail(painter,startBound,endBound);
+//        painter->drawLine(startBound,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX - GRIP_CIRCLE_SIZE, endY);
+
+//        painter->setPen(solidLine);
+//        painter->drawLine(endBound,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX - GRIP_CIRCLE_SIZE, endY);
     }
 
 
