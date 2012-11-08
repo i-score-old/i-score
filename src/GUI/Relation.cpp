@@ -106,7 +106,7 @@ Relation::init()
   setZValue(1);
   _leftHandleSelected = false;
   _rightHandleSelected = false;
-  _color = QColor(Qt::darkBlue);
+  _color = QColor(Qt::blue);
   updateFlexibility();
 
 }
