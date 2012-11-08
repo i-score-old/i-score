@@ -235,7 +235,7 @@ Relation::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 {
   QGraphicsItem::hoverEnterEvent(event);
   double startX = mapFromScene(_start).x()+BasicBox::EAR_WIDTH/2 , startY = mapFromScene(_start).y();
-  double endY = mapFromScene(_end).y();
+  double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
   double sizeY = endY - startY;
   double centerY = startY + sizeY/2.;
 
@@ -270,6 +270,13 @@ Relation::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
         setCursor(Qt::PointingHandCursor);
       }
   }
+  else{
+      if (QRectF(startX+(endX - startX)/2-HANDLE_WIDTH/2,endY-HANDLE_HEIGHT/2,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
+          setCursor(Qt::SplitHCursor);
+      }
+      else
+          setCursor(Qt::PointingHandCursor);
+  }
 }
 
 void
@@ -278,7 +285,7 @@ Relation::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
   QGraphicsItem::hoverMoveEvent(event);
 
   double startX = mapFromScene(_start).x()/*+BasicBox::EAR_WIDTH/2*/, startY = mapFromScene(_start).y();
-  double endY = mapFromScene(_end).y();
+  double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
   double sizeY = endY - startY;
 
   double endBound = NO_BOUND, startBound = NO_BOUND;
@@ -308,6 +315,13 @@ Relation::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
       else {
         setCursor(Qt::PointingHandCursor);
       }
+  }
+  else{
+      if (QRectF(startX+(endX - startX)/2-HANDLE_WIDTH/2,endY-HANDLE_HEIGHT/2,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
+          setCursor(Qt::SplitHCursor);
+      }
+      else
+          setCursor(Qt::PointingHandCursor);
   }
 }
 
@@ -348,13 +362,14 @@ Relation::mousePressEvent (QGraphicsSceneMouseEvent * event) {
             endBound = startX + _abstract->maxBound();
           }
 
-          if (QRectF(startBound - HANDLE_WIDTH/2 ,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
-              std::cout<<"leftSelected"<<std::endl;
+          if (QRectF(startBound - HANDLE_WIDTH/2 ,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {              
             _leftHandleSelected = true;
           }
-          else if (QRectF(endBound - HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
-            std::cout<<"rightSelected"<<std::endl;
+          else if (QRectF(endBound - HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {            
               _rightHandleSelected = true;
+          }
+          else if(QRectF(startX+(endX - startX)/2-HANDLE_WIDTH/2,endY-HANDLE_HEIGHT/2,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
+              _middleHandleSelected = true;
           }
         }
     }
@@ -375,6 +390,8 @@ Relation::mouseMoveEvent (QGraphicsSceneMouseEvent * event) {
     _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),std::max((float)std::max(eventPosX - startX,0.),_abstract->minBound()));
   	update();
   }  
+  else if (_middleHandleSelected)
+      _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,std::max(2*(eventPosX - startX),0.),std::max(2*(eventPosX - startX),0.));
 }
 
 void
@@ -578,7 +595,20 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         painter->drawLine(startX,startY,startX,endY);
 
         //horizontal line
-        painter->drawLine(startX,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX-GRIP_CIRCLE_SIZE, endY);
+//        painter->drawLine(startX,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX-GRIP_CIRCLE_SIZE, endY);
+        double handleZone = 10;
+        painter->drawLine(startX,endY,startX+(endX - startX)/2 - handleZone,endY);
+        painter->setPen(dotLine);
+        painter->drawLine(startX+(endX - startX)/2 - handleZone,endY,startX+(endX - startX)/2 + handleZone,endY);
+        painter->setPen(solidLine);
+        painter->drawLine(startX+(endX - startX)/2 + handleZone,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX-GRIP_CIRCLE_SIZE, endY);
+
+        //handle
+        QPen handlePen;
+        handlePen.setWidth(BasicBox::LINE_WIDTH);
+        handlePen.setStyle(Qt::SolidLine);
+        painter->setPen(handlePen);
+//        painter->drawLine(startX+(endX - startX)/2,endY-HANDLE_HEIGHT/2,startX+(endX - startX)/2,endY+HANDLE_HEIGHT/2);
 
         _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,endX-startX,endX-startX);
     }

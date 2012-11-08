@@ -229,6 +229,7 @@ class Relation : public QGraphicsItem
 
   bool _leftHandleSelected; //!< Left handle selection state.
   bool _rightHandleSelected; //!< Right handle selection state.
+  bool _middleHandleSelected; //!<Middle handle for rigid relations.
 
   bool _flexibleRelation;//!< The relation can be extended
 
