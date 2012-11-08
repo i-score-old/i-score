@@ -532,8 +532,8 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     QPainterPath startCircle, endCircle;
     startCircle.addEllipse( _abstract->firstExtremity() == BOX_END ? startX : startX-GRIP_CIRCLE_SIZE ,startY - GRIP_CIRCLE_SIZE/2,GRIP_CIRCLE_SIZE,GRIP_CIRCLE_SIZE);
     endCircle.addEllipse( _abstract->secondExtremity() == BOX_START ? endX-GRIP_CIRCLE_SIZE : endX ,endY - GRIP_CIRCLE_SIZE/2,GRIP_CIRCLE_SIZE,GRIP_CIRCLE_SIZE);
-    painter->fillPath(startCircle,QBrush(Qt::black));
-    painter->fillPath(endCircle,QBrush(Qt::black));
+    painter->fillPath(startCircle,QBrush(isSelected() ? _color : Qt::black));
+    painter->fillPath(endCircle,QBrush(isSelected() ? _color : Qt::black));
 
 
     //----------------------- Flexible relation --------------------------//
