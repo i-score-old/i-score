@@ -63,6 +63,7 @@ const float Relation::HANDLE_HEIGHT = 10.;
 const float Relation::HANDLE_WIDTH = 12.;
 const float Relation::GRIP_CIRCLE_SIZE = 5;
 const float Relation::RAIL_WIDTH = HANDLE_HEIGHT/2;
+const float Relation::LINE_WIDTH = 2;
 
 Relation::Relation(unsigned int firstBoxID, BoxExtremity firstBoxExt, unsigned int secondBoxID,
 		   BoxExtremity secondBoxExt, MaquetteScene *parent)
@@ -105,6 +106,7 @@ Relation::init()
   setZValue(1);
   _leftHandleSelected = false;
   _rightHandleSelected = false;
+  _color = QColor(Qt::darkBlue);
   updateFlexibility();
 
 }
@@ -362,15 +364,16 @@ Relation::mousePressEvent (QGraphicsSceneMouseEvent * event) {
             endBound = startX + _abstract->maxBound();
           }
 
-          if (QRectF(startBound - HANDLE_WIDTH/2 ,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {              
+          if(QRectF(startX+(endX - startX)/2-HANDLE_WIDTH/2,endY-HANDLE_HEIGHT/2,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
+              _middleHandleSelected = true;
+          }
+          else if (QRectF(startBound - HANDLE_WIDTH/2 ,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
             _leftHandleSelected = true;
           }
           else if (QRectF(endBound - HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {            
               _rightHandleSelected = true;
           }
-          else if(QRectF(startX+(endX - startX)/2-HANDLE_WIDTH/2,endY-HANDLE_HEIGHT/2,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
-              _middleHandleSelected = true;
-          }
+
         }
     }
 }
@@ -390,8 +393,9 @@ Relation::mouseMoveEvent (QGraphicsSceneMouseEvent * event) {
     _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),std::max((float)std::max(eventPosX - startX,0.),_abstract->minBound()));
   	update();
   }  
-  else if (_middleHandleSelected)
+  else if (_middleHandleSelected){
       _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,std::max(2*(eventPosX - startX),0.),std::max(2*(eventPosX - startX),0.));
+  }
 }
 
 void
@@ -487,7 +491,8 @@ Relation::drawRail(QPainter *painter, double startBound, double endBound){
     double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
 
     QPen solidLine = QPen(Qt::SolidLine);
-    solidLine.setWidth(isSelected() ? 1.2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
+    solidLine.setWidth(LINE_WIDTH);
+    solidLine.setColor(_color);
     painter->setPen(solidLine);
 
     if(endY > startY)
@@ -516,9 +521,12 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     double endBound = endX;
 
     QPen dotLine = QPen(Qt::DotLine);
-    dotLine.setWidth(isSelected() ? 1.2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
+    dotLine.setColor(isSelected() ? _color : Qt::black);
+    dotLine.setWidth(isSelected() ? 1.2 * LINE_WIDTH : LINE_WIDTH);
+
     QPen solidLine = QPen(Qt::SolidLine);
-    solidLine.setWidth(isSelected() ? 1.2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
+    solidLine.setColor(isSelected() ? _color : Qt::black);
+    solidLine.setWidth(isSelected() ? 1.2 * LINE_WIDTH : LINE_WIDTH);
 
     //grips' circles
     QPainterPath startCircle, endCircle;
@@ -544,12 +552,14 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
         /****************** bounds ******************/
         QPen rightBoundPen;
-        rightBoundPen.setWidth(isSelected() ? 1.2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
+        rightBoundPen.setWidth(isSelected() ? 1.2 * LINE_WIDTH : LINE_WIDTH);
         rightBoundPen.setStyle(Qt::SolidLine);
+        rightBoundPen.setColor(isSelected() ? _color : Qt::black);
 
         QPen leftBoundPen;
-        leftBoundPen.setWidth(isSelected() ? 1.2 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH);
+        leftBoundPen.setWidth(isSelected() ? 1.2 * LINE_WIDTH : LINE_WIDTH);
         leftBoundPen.setStyle(Qt::SolidLine);
+        leftBoundPen.setColor(isSelected() ? _color : Qt::black);
 
 
 
@@ -595,20 +605,21 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         painter->drawLine(startX,startY,startX,endY);
 
         //horizontal line
-//        painter->drawLine(startX,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX-GRIP_CIRCLE_SIZE, endY);
-        double handleZone = 10;
-        painter->drawLine(startX,endY,startX+(endX - startX)/2 - handleZone,endY);
-        painter->setPen(dotLine);
-        painter->drawLine(startX+(endX - startX)/2 - handleZone,endY,startX+(endX - startX)/2 + handleZone,endY);
-        painter->setPen(solidLine);
-        painter->drawLine(startX+(endX - startX)/2 + handleZone,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX-GRIP_CIRCLE_SIZE, endY);
+        painter->drawLine(startX,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX-GRIP_CIRCLE_SIZE, endY);
+//        double handleZone = 10;
+//        painter->drawLine(startX,endY,startX+(endX - startX)/2 - handleZone,endY);
+//        painter->setPen(dotLine);
+//        painter->drawLine(startX+(endX - startX)/2 - handleZone,endY,startX+(endX - startX)/2 + handleZone,endY);
+//        painter->setPen(solidLine);
+//        painter->drawLine(startX+(endX - startX)/2 + handleZone,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX-GRIP_CIRCLE_SIZE, endY);
 
         //handle
         QPen handlePen;
-        handlePen.setWidth(BasicBox::LINE_WIDTH);
+        handlePen.setWidth(LINE_WIDTH);
         handlePen.setStyle(Qt::SolidLine);
+        handlePen.setColor(isSelected() ? _color : Qt::black);
         painter->setPen(handlePen);
-//        painter->drawLine(startX+(endX - startX)/2,endY-HANDLE_HEIGHT/2,startX+(endX - startX)/2,endY+HANDLE_HEIGHT/2);
+        painter->drawLine(startX+(endX - startX)/2,endY-HANDLE_HEIGHT/2,startX+(endX - startX)/2,endY+HANDLE_HEIGHT/2);
 
         _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,endX-startX,endX-startX);
     }
