@@ -50,22 +50,22 @@
 #X obj 44 87 makefilename attributes=%c;
 #X msg 44 67 123;
 #X obj 44 175 makefilename %c;
-#X obj 23 134 list append value type range;
 #X msg 23 45 \$1;
-#X connect 0 0 13 0;
+#X obj 23 134 list append value;
+#X connect 0 0 14 0;
 #X connect 1 0 6 0;
 #X connect 2 0 12 0;
 #X connect 3 0 4 0;
 #X connect 3 1 11 0;
 #X connect 3 2 2 0;
-#X connect 4 0 14 0;
+#X connect 4 0 13 0;
 #X connect 5 0 3 0;
-#X connect 9 0 13 1;
+#X connect 9 0 14 1;
 #X connect 10 0 0 1;
 #X connect 11 0 10 0;
 #X connect 12 0 1 1;
-#X connect 13 0 1 0;
-#X connect 14 0 0 0;
+#X connect 13 0 0 0;
+#X connect 14 0 1 0;
 #X restore 293 554 pd \$0-attrb;
 #X obj 195 211 s2l /;
 #N canvas 33 134 269 299 \$0-dumpOSC 0;
@@ -559,12 +559,12 @@
 0;
 #X text 26 636 CICM - MSH Paris Nord - UP8;
 #X obj 560 618 spigot;
-#X obj 601 618 tgl 17 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 601 618 tgl 17 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 560 637 print toOSC;
 #X obj 60 38 t a a;
 #X obj 100 38 spigot;
-#X obj 141 38 tgl 17 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 141 38 tgl 17 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 100 57 print fromOSC;
 #X obj 533 596 t a a;
@@ -574,7 +574,7 @@
 #X obj 276 589 t b;
 #X obj 321 589 t b;
 #X obj 276 631 spigot;
-#X obj 317 631 tgl 17 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 317 631 tgl 17 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 87 111 s \$0-rt1;
 #X obj 220 588 r \$0-rt1;

@@ -1,6 +1,0 @@
-#N canvas 624 151 939 604 10;
-#X floatatom 81 222 5 0 0 0 - - -;
-#X obj 677 82 minuit.device;
-#X obj 179 162 minuit.num sinusoide1/frequence 500;
-#X connect 0 0 2 0;
-#X connect 2 0 0 0;
