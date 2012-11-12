@@ -482,18 +482,15 @@ Relation::updateFlexibility(){
 
     double startX = mapFromScene(_start).x();
     double endX = mapFromScene(_end).x();
-    bool loadFile = _abstract->minBound()==NO_BOUND && _abstract->maxBound()==NO_BOUND;
 
-    if(!loadFile){
-        if (!_flexibleRelation){
-            changeBounds(endX-startX,endX-startX);
-            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
-        }
-        else{
-            changeBounds(0,NO_BOUND);
-            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
+    if (!_flexibleRelation){
+        changeBounds(endX-startX,endX-startX);
+        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
+    }
+    else{
+        changeBounds(0,NO_BOUND);
+        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
 
-        }
     }
 }
 
@@ -585,7 +582,7 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         // Left Handle
         painter->setPen(leftBoundPen);
         if (_abstract->minBound() != NO_BOUND)
-            painter->drawLine(QPointF(startBound,endY - HANDLE_HEIGHT/2), QPointF(startBound,endY + HANDLE_HEIGHT/2)); // Vertical left        }
+            painter->drawLine(QPointF(startBound,endY - HANDLE_HEIGHT/2), QPointF(startBound,endY + HANDLE_HEIGHT/2)); // Vertical left
 
 
         // Right Handle
