@@ -106,6 +106,7 @@ Relation::init()
   _leftHandleSelected = false;
   _rightHandleSelected = false;
   _color = QColor(Qt::blue);
+  _lastMaxBound = -1;
   updateFlexibility();
 
 }
@@ -336,13 +337,21 @@ Relation::hoverLeaveEvent ( QGraphicsSceneHoverEvent * event )
 void
 Relation::mouseDoubleClickEvent (QGraphicsSceneMouseEvent * event) {
     QGraphicsItem::mouseDoubleClickEvent(event);
+    float maxBound;
     if (!_scene->playing()) {
-//      if (event->pos().x()>mapFromScene(_start).x()+_abstract->minBound()){
-        if(_abstract->maxBound()==NO_BOUND){
-            changeBounds(_abstract->minBound(),mapFromScene(_end).x()-mapFromScene(_start).x());
-            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),mapFromScene(_end).x()-mapFromScene(_start).x()+LINE_WIDTH);
+
+        if(_abstract->maxBound()==NO_BOUND || _lastMaxBound!=-1){
+            if(_lastMaxBound != -1)
+                maxBound = std::max(_lastMaxBound, (float)(mapFromScene(_end).x()-mapFromScene(_start).x()+LINE_WIDTH));
+            else
+                maxBound = mapFromScene(_end).x()-mapFromScene(_start).x()+LINE_WIDTH;
+
+            changeBounds(_abstract->minBound(),maxBound);
+            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),maxBound);
+            _lastMaxBound = -1;
         }
         else{
+            _lastMaxBound = _abstract->maxBound();
             changeBounds(_abstract->minBound(),NO_BOUND);
             _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),NO_BOUND);
         }
