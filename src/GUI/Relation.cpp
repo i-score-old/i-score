@@ -74,8 +74,6 @@ Relation::Relation(unsigned int firstBoxID, BoxExtremity firstBoxExt, unsigned i
   _abstract = new AbstractRelation(firstBoxID,firstBoxExt,secondBoxID,secondBoxExt,NO_ID);
 
   init();
-
-  //setPos(getCenter());
 }
 
 Relation::Relation(const AbstractRelation &abstract, MaquetteScene *parent)
@@ -336,13 +334,25 @@ Relation::hoverLeaveEvent ( QGraphicsSceneHoverEvent * event )
 
 void
 Relation::mouseDoubleClickEvent (QGraphicsSceneMouseEvent * event) {
-  QGraphicsItem::mouseDoubleClickEvent(event);
-  if (!_scene->playing()) {
-  	RelationEdit * relEdit = new RelationEdit(_scene,_abstract->ID(),_scene->views().first());
-  	relEdit->move(mapToScene(boundingRect().topLeft()).x(),mapToScene(boundingRect().topLeft()).y());
-  	relEdit->exec();
-  	delete relEdit;    
-	}
+    QGraphicsItem::mouseDoubleClickEvent(event);
+    if (!_scene->playing()) {
+//      if (event->pos().x()>mapFromScene(_start).x()+_abstract->minBound()){
+        if(_abstract->maxBound()==NO_BOUND){
+            changeBounds(_abstract->minBound(),mapFromScene(_end).x()-mapFromScene(_start).x());
+            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),mapFromScene(_end).x()-mapFromScene(_start).x()+LINE_WIDTH);
+        }
+        else{
+            changeBounds(_abstract->minBound(),NO_BOUND);
+            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),NO_BOUND);
+        }
+
+//        else{
+//          RelationEdit * relEdit = new RelationEdit(_scene,_abstract->ID(),_scene->views().first());
+//          relEdit->move(mapToScene(boundingRect().topLeft()).x(),mapToScene(boundingRect().topLeft()).y());
+//          relEdit->exec();
+//          delete relEdit;
+//        }
+    }
 }
 
 void
@@ -471,15 +481,18 @@ Relation::updateFlexibility(){
 
     double startX = mapFromScene(_start).x();
     double endX = mapFromScene(_end).x();
+    bool loadFile = _abstract->minBound()==NO_BOUND && _abstract->maxBound()==NO_BOUND;
 
-    if (!_flexibleRelation){
-        changeBounds(endX-startX,endX-startX);
-        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,endX-startX,endX-startX);
-    }
-    else{
-        changeBounds(NO_BOUND,NO_BOUND);
-        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
+    if(!loadFile){
+        if (!_flexibleRelation){
+            changeBounds(endX-startX,endX-startX);
+            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,endX-startX,endX-startX);
+        }
+        else{
+            changeBounds(0,NO_BOUND);
+            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
 
+        }
     }
 }
 
@@ -492,7 +505,7 @@ Relation::drawRail(QPainter *painter, double startBound, double endBound){
 
     QPen solidLine = QPen(Qt::SolidLine);
     solidLine.setWidth(LINE_WIDTH);
-    solidLine.setColor(_color);
+    solidLine.setColor(isSelected() ? _color : Qt::black);
     painter->setPen(solidLine);
 
     if(endY > startY)

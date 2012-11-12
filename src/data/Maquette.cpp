@@ -1235,20 +1235,19 @@ Maquette::addRelation(unsigned int ID1, BoxExtremity firstExtremum, unsigned int
 
 int
 Maquette::addRelation(const AbstractRelation &abstract) {
-	if (abstract.ID() == NO_ID) {
+    if (abstract.ID() == NO_ID) {
 		return addRelation(abstract.firstBox(),abstract.firstExtremity(),abstract.secondBox(),abstract.secondExtremity(),ANTPOST_ANTERIORITY);
 	}
 	else {
-		Relation* newRel = new Relation(abstract.firstBox(),abstract.firstExtremity(),abstract.secondBox(),abstract.secondExtremity(),_scene);
+        Relation* newRel = new Relation(abstract.firstBox(),abstract.firstExtremity(),abstract.secondBox(),abstract.secondExtremity(),_scene);
 		newRel->setID(abstract.ID());
-		newRel->changeBounds(abstract.minBound(),abstract.maxBound());
+        newRel->changeBounds(abstract.minBound(),abstract.maxBound());
 
 		_relations[abstract.ID()] = newRel;
 		_scene->addItem(newRel);
 		_boxes[abstract.firstBox()]->addRelation(abstract.firstExtremity(),newRel);
         _boxes[abstract.secondBox()]->addRelation(abstract.secondExtremity(),newRel);
-		newRel->updateCoordinates();
-
+		newRel->updateCoordinates();        
 		return (int)abstract.ID();
 	}
 }
@@ -1697,11 +1696,61 @@ Maquette::load(const string &fileName){
 
 	vector<unsigned int> boxesID;
 	_engines->getBoxesId(boxesID);
+    vector<unsigned int>::iterator it;
 
+    /************************ TRIGGER ************************/
+    vector<unsigned int> triggersID;
+    _engines->getTriggersPointId(triggersID);
+
+    for (it = triggersID.begin() ; it != triggersID.end() ; it++){
+        AbstractTriggerPoint abstractTrgPnt;
+        abstractTrgPnt.setID(*it);
+        unsigned int tpBoxID = _engines->getTriggerPointRelatedBoxId(*it);
+        if (tpBoxID != NO_ID) {
+            BasicBox *tpBox = getBox(tpBoxID);
+            if (tpBox != NULL) {
+                abstractTrgPnt.setBoxID(tpBoxID);
+                switch(_engines->getTriggerPointRelatedCtrlPointIndex(*it)) {
+                case BEGIN_CONTROL_POINT_INDEX :
+                    abstractTrgPnt.setBoxExtremity(BOX_START);
+                    break;
+                case END_CONTROL_POINT_INDEX :
+                    abstractTrgPnt.setBoxExtremity(BOX_END);
+                    break;
+                default :
+                    std::cerr << "Maquette::load : unrecognized box extremity for Trigger Point " << *it << std::endl;
+                    abstractTrgPnt.setBoxExtremity(BOX_START);
+                    break;
+                }
+                std::string tpMsg = _engines->getTriggerPointMessage(*it);
+                if (tpMsg != "") {
+                    abstractTrgPnt.setMessage(tpMsg);
+                }
+                else {
+#ifdef DEBUG
+                    std::cerr << "Maquette::load : empty message found for Trigger Point " << *it << std::endl;
+#endif
+                }
+                addTriggerPoint(abstractTrgPnt);
+            }
+            else {
+#ifdef DEBUG
+                std::cerr << "Maquette::load : NULL box found for trigger point " << *it << std::endl;
+#endif
+            }
+        }
+        else {
+#ifdef DEBUG
+            std::cerr << "Maquette::load : box with NO_ID found for trigger point " << *it << std::endl;
+#endif
+        }
+    }
+
+    /************************ RELATIONS ************************/
 	vector<unsigned int> relationsID;
 	_engines->getRelationsId(relationsID);
 
-    vector<unsigned int>::iterator it;
+
 	for (it = relationsID.begin() ; it != relationsID.end() ; it++) {
 		AbstractRelation abstractRel;
 		unsigned int firstBoxID = _engines->getRelationFirstBoxId(*it);
@@ -1739,56 +1788,11 @@ Maquette::load(const string &fileName){
 			abstractRel.setMinBound(minBoundPXL);
 			abstractRel.setMaxBound(maxBoundPXL);
 			abstractRel.setID(*it);
-			addRelation(abstractRel);
+            addRelation(abstractRel);
 		}
 	}
 
-	vector<unsigned int> triggersID;
-	_engines->getTriggersPointId(triggersID);
 
-	for (it = triggersID.begin() ; it != triggersID.end() ; it++){
-		AbstractTriggerPoint abstractTrgPnt;
-		abstractTrgPnt.setID(*it);
-		unsigned int tpBoxID = _engines->getTriggerPointRelatedBoxId(*it);
-		if (tpBoxID != NO_ID) {
-			BasicBox *tpBox = getBox(tpBoxID);
-			if (tpBox != NULL) {
-				abstractTrgPnt.setBoxID(tpBoxID);
-				switch(_engines->getTriggerPointRelatedCtrlPointIndex(*it)) {
-				case BEGIN_CONTROL_POINT_INDEX :
-					abstractTrgPnt.setBoxExtremity(BOX_START);
-					break;
-				case END_CONTROL_POINT_INDEX :
-					abstractTrgPnt.setBoxExtremity(BOX_END);
-					break;
-				default :
-					std::cerr << "Maquette::load : unrecognized box extremity for Trigger Point " << *it << std::endl;
-					abstractTrgPnt.setBoxExtremity(BOX_START);
-					break;
-				}
-				std::string tpMsg = _engines->getTriggerPointMessage(*it);
-				if (tpMsg != "") {
-					abstractTrgPnt.setMessage(tpMsg);
-				}
-				else {
-#ifdef DEBUG
-					std::cerr << "Maquette::load : empty message found for Trigger Point " << *it << std::endl;
-#endif
-				}
-				addTriggerPoint(abstractTrgPnt);
-			}
-			else {
-#ifdef DEBUG
-				std::cerr << "Maquette::load : NULL box found for trigger point " << *it << std::endl;
-#endif
-			}
-		}
-		else {
-#ifdef DEBUG
-			std::cerr << "Maquette::load : box with NO_ID found for trigger point " << *it << std::endl;
-#endif
-		}
-    }
 	delete _doc;
 }
 
