@@ -226,6 +226,7 @@ class Relation : public QGraphicsItem
 
   QRectF _startBoundRect;
   QRectF _endBoundRect;
+  float _zoomFactor;
 
   bool _leftHandleSelected; //!< Left handle selection state.
   bool _rightHandleSelected; //!< Right handle selection state.
@@ -237,6 +238,7 @@ class Relation : public QGraphicsItem
   static const float HANDLE_HEIGHT; //!< The height of a handle.
   static const float HANDLE_WIDTH; //!< The width of a handle.
   static const float LINE_WIDTH;
+
 
 
 
