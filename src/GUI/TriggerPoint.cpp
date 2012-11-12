@@ -94,7 +94,7 @@ TriggerPoint::init()
 	setFlag(QGraphicsItem::ItemIsMovable, false);
 
 	setVisible(true);
-	setZValue(0);
+    setZValue(-1);
 }
 
 Abstract *

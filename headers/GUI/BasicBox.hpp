@@ -538,6 +538,7 @@ class BasicBox : public QObject, public QGraphicsItem
   static const int COMBOBOX_WIDTH;
   static const int COMBOBOX_HEIGHT;
   static const float MSGS_INDICATOR_WIDTH;
+  static const float GRIP_CIRCLE_SIZE;
 
   /*!
    * \brief Painting method, redefinition of QGraphicsItem::paint().
@@ -577,7 +578,8 @@ class BasicBox : public QObject, public QGraphicsItem
   void drawBox(QPainter *painter);
   inline bool hasStartMsgs(){return _abstract->hasFirstMsgs();}
   inline bool hasEndMsgs(){return _abstract->hasLastMsgs();}
-  void drawMsgsIndicators(QPainter *painter);
+  void drawMsgsIndicators(QPainter *painter);  
+  void updateFlexibiliy();
 
  protected:
   /*!
@@ -679,7 +681,7 @@ class BasicBox : public QObject, public QGraphicsItem
   QGraphicsProxyWidget *_curveProxy;
   QGraphicsProxyWidget *_comboBoxProxy;
   QList<string> _curvesAddresses;
-
+  bool _flexible;
 };
 
 #endif

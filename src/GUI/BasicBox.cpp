@@ -86,6 +86,7 @@ const float BasicBox::TRIGGER_ZONE_HEIGHT = 20.;
 const float BasicBox::MSGS_INDICATOR_WIDTH = 50;
 const float BasicBox::EAR_WIDTH = 9;
 const float BasicBox::EAR_HEIGHT = 30;
+const float BasicBox::GRIP_CIRCLE_SIZE = 5;
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
 : QGraphicsItem()
@@ -202,6 +203,11 @@ BasicBox::~BasicBox()
 }
 
 void
+BasicBox::updateFlexibiliy(){
+    _flexible = hasTriggerPoint(BOX_END);
+}
+
+void
 BasicBox::init()
 {
 	_hasContextMenu = false;
@@ -221,6 +227,7 @@ BasicBox::init()
 	setAcceptsHoverEvents(true);
 
     setZValue(0); 
+    updateFlexibiliy();
 }
 
 void
@@ -612,6 +619,7 @@ BasicBox::addTriggerPoint(BoxExtremity extremity)
         }
         ret = true;
         updateRelations(extremity);
+        updateFlexibiliy();
     }
 
 
@@ -634,6 +642,7 @@ BasicBox::addTriggerPoint(const AbstractTriggerPoint &abstractTP)
 			_triggerPoints[abstractTP.boxExtremity()]->updatePosition();
 			_scene->addItem(_triggerPoints[abstractTP.boxExtremity()]);
 		}
+        updateFlexibiliy();
     }
 
 }
@@ -646,6 +655,8 @@ BasicBox::addTriggerPoint(BoxExtremity extremity, TriggerPoint *tp)
 	if ((it = _triggerPoints.find(extremity)) == _triggerPoints.end()) {
 		_triggerPoints[extremity] = tp;
 		_triggerPoints[extremity]->updatePosition();
+        updateRelations(extremity);
+        updateFlexibiliy();
 	}
 	else {
 		std::cerr << "BasicBox::addTriggerPoint : already existing" <<  std::endl;
@@ -659,6 +670,7 @@ BasicBox::removeTriggerPoint(BoxExtremity extremity) {
 		_triggerPoints.erase(it);
 	}
     updateRelations(extremity);
+    updateFlexibiliy();
     _scene->update();
 }
 
@@ -1313,13 +1325,28 @@ BasicBox::drawTriggerGrips(QPainter *painter){
     _startTriggerGrip = QRectF(QPointF(newX+earWidth/2,newY),shapeSize);
     painter->drawPie(rect,startAngle,spanAngle);
 
+    //Point left
+    QPainterPath startCircle, endCircle;
+    startCircle.addEllipse(QPointF(newX+2.5*earWidth/4,newY+earHeight/4),GRIP_CIRCLE_SIZE/2,GRIP_CIRCLE_SIZE/2);
+    painter->fillPath(startCircle,Qt::black);
 
     //The right one
     startAngle = 90 * 16;
-    newX = width()/2 - earWidth/2 + adjust;
-    rect.moveTo(newX,newY);
-    _endTriggerGrip = QRectF(QPointF(newX,newY),shapeSize);
+    float newX2 = width()/2 - earWidth/2 + adjust;
+    rect.moveTo(newX2,newY);
+    _endTriggerGrip = QRectF(QPointF(newX2,newY),shapeSize);
     painter->drawPie(rect,startAngle,spanAngle);
+    endCircle.addEllipse(QPointF(newX2+1.5*earWidth/4,newY+earHeight/4),GRIP_CIRCLE_SIZE/2,GRIP_CIRCLE_SIZE/2);
+    painter->fillPath(endCircle,Qt::black);
+
+    //Interval line
+    painter->save();
+    QPen linePen = QPen(Qt::black);
+    linePen.setWidth(LINE_WIDTH);
+    linePen.setStyle(_flexible ? Qt::DotLine : Qt::SolidLine);
+    painter->setPen(linePen);
+    painter->drawLine(QPointF(newX+2.5*earWidth/4,newY+earHeight/4),QPointF(newX2+1.5*earWidth/4,newY+earHeight/4));
+    painter->restore();
 }
 
 void
