@@ -486,7 +486,7 @@ Relation::updateFlexibility(){
     if(!loadFile){
         if (!_flexibleRelation){
             changeBounds(endX-startX,endX-startX);
-            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,endX-startX,endX-startX);
+            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
         }
         else{
             changeBounds(0,NO_BOUND);
@@ -575,12 +575,11 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         leftBoundPen.setColor(isSelected() ? _color : Qt::black);
 
 
-
         if (_abstract->minBound() != NO_BOUND)
-            startBound = startX + _abstract->minBound();
+            startBound = (startX+ _abstract->minBound()*(16/MaquetteScene::MS_PER_PIXEL));
 
         if (_abstract->maxBound() != NO_BOUND)
-            endBound = startX + _abstract->maxBound();
+            endBound = (startX + _abstract->maxBound()*(16/MaquetteScene::MS_PER_PIXEL));
 
         // Left Handle
         painter->setPen(leftBoundPen);
