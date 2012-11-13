@@ -75,7 +75,6 @@ ParentBox::ParentBox(const QPointF &corner1, const QPointF &corner2, MaquetteSce
   delete _abstract;
 
   _abstract = abstract;
-
 	//_group = new QGraphicsItem(this);
 
   init();
@@ -97,6 +96,7 @@ ParentBox::init()
   BasicBox::init();
   _contextMenu =  new ParentBoxContextMenu(this);
 
+  addToComboBox(BasicBox::SUB_SCENARIO_MODE_TEXT);
   _hasContextMenu = true;
   setAcceptDrops(true);
 }
@@ -212,6 +212,7 @@ void
 ParentBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
 	BasicBox::mousePressEvent(event);
+
     if (event->button() == Qt::LeftButton) {
 		if (_scene->currentMode() != CREATION_MODE) {
             setSelected(true);
@@ -352,22 +353,22 @@ ParentBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 {
 	BasicBox::paint(painter,option,widget);
 
-	painter->save();
+//	painter->save();
 
-	if (_playing) {
-		QPen pen = painter->pen();
-		QBrush brush = painter->brush();
-		brush.setStyle(Qt::NoBrush);
-		painter->setPen(pen);
-		painter->setBrush(brush);
-	}
+//	if (_playing) {
+//		QPen pen = painter->pen();
+//		QBrush brush = painter->brush();
+//		brush.setStyle(Qt::NoBrush);
+//		painter->setPen(pen);
+//		painter->setBrush(brush);
+//	}
 
-	painter->setRenderHint(QPainter::Antialiasing, true);
+//    painter->setRenderHint(QPainter::Antialiasing, true);
 
-	painter->setBrush(Qt::white);
+//	painter->setBrush(Qt::white);
 
-	painter->drawRect(mapFromScene(getTopLeft()).x(),mapFromScene(getTopLeft()).y(),_abstract->width(),_abstract->height());
+//	painter->drawRect(mapFromScene(getTopLeft()).x(),mapFromScene(getTopLeft()).y(),_abstract->width(),_abstract->height());
 
-	painter->translate(0,0);
-	painter->restore();
+//	painter->translate(0,0);
+//	painter->restore();
  }

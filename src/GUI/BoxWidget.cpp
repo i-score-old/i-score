@@ -67,7 +67,6 @@ using std::string;
 
 BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
 : QWidget(parent) {
-
     _curveMap = new QMap<std::string,CurveWidget *>();
 
     QBrush brush;
@@ -89,15 +88,12 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
     _stackedLayout = new QStackedLayout;
     _stackedLayout->setStackingMode(QStackedLayout::StackAll);
 
-//    _stackedWidget = new QStackedWidget(this);
-
     _curvePageLayout = new QGridLayout;
-//    _curvePageLayout->addWidget(_stackedWidget);
     setLayout(_stackedLayout);
-//    setLayout(_curvePageLayout);
 
     _parentWidget = parent;
     _curveWidgetList = new QList<CurveWidget *>;
+
 }
 
 BoxWidget::~BoxWidget(){
@@ -106,6 +102,7 @@ BoxWidget::~BoxWidget(){
 
 void
 BoxWidget::mousePressEvent(QMouseEvent *event){
+
     if(_box->isSelected()){
         hide();
         setWindowModality(Qt::WindowModal);
@@ -149,12 +146,11 @@ void BoxWidget::curveSampleRateChanged(const QString &address,int value) {
 
 void BoxWidget::displayCurve(const QString &address){
 //    std::cout<<"display : "<<address.toStdString()<<std::endl;
+
     std::string add = address.toStdString();
     QMap<string,CurveWidget *>::iterator curveIt;
     CurveWidget *curveWidget;
 
-    curveIt = _curveMap->find(add);
-    bool curveFound = (curveIt != _curveMap->end());
 
    //Unactive curves
     QList<CurveWidget *> values = _curveMap->values();
@@ -164,22 +160,26 @@ void BoxWidget::displayCurve(const QString &address){
 
     for(i ; i<count ; i++){
         cur = values.at(i);
-//        std::cout<<">>>>>> ";
-//        std::cout<< cur->winId() <<std::endl;
         cur->setLowerStyle(true);
         cur->repaint();
-    }   
-
-    if (curveFound) {
-        curveWidget = curveIt.value();
-
-//        std::cout<<">>>>>>>>>>> ";
-//        std::cout<< curveWidget->winId() <<std::endl;
-        curveWidget->setLowerStyle(false);
-        curveWidget->repaint();
-        _stackedLayout->setCurrentWidget(curveWidget);
     }
-//    std::cout<<"OK"<<std::endl;
+
+    if(address!=BasicBox::SUB_SCENARIO_MODE_TEXT){
+        setEnabled(true);
+        curveIt = _curveMap->find(add);
+        bool curveFound = (curveIt != _curveMap->end());
+
+        if (curveFound) {
+            curveWidget = curveIt.value();
+
+            curveWidget->setLowerStyle(false);
+            curveWidget->repaint();
+            _stackedLayout->setCurrentWidget(curveWidget);
+        }
+    }
+    else{
+        setEnabled(false);
+    }
 }
 
 
@@ -224,7 +224,7 @@ BoxWidget::clearCurves(){
     for(int i=0 ; i<widgets.size() ; i++)
         _stackedLayout->removeWidget(widgets.at(i));
 
-    _comboBox->clear();
+//    _comboBox->clear();
     _curveMap->clear();
     _curveIndexes.clear();
     _curveWidgetList->clear();

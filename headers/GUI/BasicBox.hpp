@@ -539,6 +539,7 @@ class BasicBox : public QObject, public QGraphicsItem
   static const int COMBOBOX_HEIGHT;
   static const float MSGS_INDICATOR_WIDTH;
   static const float GRIP_CIRCLE_SIZE;
+  static const QString SUB_SCENARIO_MODE_TEXT;
 
   /*!
    * \brief Painting method, redefinition of QGraphicsItem::paint().
@@ -580,6 +581,10 @@ class BasicBox : public QObject, public QGraphicsItem
   inline bool hasEndMsgs(){return _abstract->hasLastMsgs();}
   void drawMsgsIndicators(QPainter *painter);  
   void updateFlexibiliy();
+  void addToComboBox(QString address);
+  QString currentText();
+  inline qreal currentZvalue(){return _currentZvalue;}
+  void setLowerStyle(bool state);
 
  protected:
   /*!
@@ -682,6 +687,7 @@ class BasicBox : public QObject, public QGraphicsItem
   QGraphicsProxyWidget *_comboBoxProxy;
   QList<string> _curvesAddresses;
   bool _flexible;
+  qreal _currentZvalue;
 };
 
 #endif

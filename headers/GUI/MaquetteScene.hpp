@@ -563,6 +563,8 @@ class MaquetteScene : public QGraphicsScene
 
   inline AttributesEditor *editor(){return _editor;}
   void updateWidgets();
+  QGraphicsItem *getSelectedItem();
+  bool subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent);
 
  protected :
   /*!
