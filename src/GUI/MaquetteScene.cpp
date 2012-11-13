@@ -543,7 +543,10 @@ MaquetteScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
 
 bool
 MaquetteScene::subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent){
-    return (getSelectedItem()->type() == PARENT_BOX_TYPE && static_cast<BasicBox*>(getSelectedItem())->currentText()==BasicBox::SUB_SCENARIO_MODE_TEXT && itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::ArrowCursor);
+    if(getSelectedItem()!=NULL && itemAt(mouseEvent->scenePos()) != 0)
+        return (getSelectedItem()->type() == PARENT_BOX_TYPE && static_cast<BasicBox*>(getSelectedItem())->currentText()==BasicBox::SUB_SCENARIO_MODE_TEXT && itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::ArrowCursor);
+    else
+        return false;
 }
 
 void
@@ -659,7 +662,7 @@ MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) {
     case SELECTION_MODE :
 		break;
     case CREATION_MODE :
-        if(noBoxSelected()){
+        if(noBoxSelected() || subScenarioMode(mouseEvent)){
             if (resizeMode() == NO_RESIZE && _tempBox) {
                 int upLeftX, upLeftY, width, height;
 

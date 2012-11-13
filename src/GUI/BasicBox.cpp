@@ -87,7 +87,7 @@ const float BasicBox::MSGS_INDICATOR_WIDTH = 50;
 const float BasicBox::EAR_WIDTH = 9;
 const float BasicBox::EAR_HEIGHT = 30;
 const float BasicBox::GRIP_CIRCLE_SIZE = 5;
-const QString BasicBox::SUB_SCENARIO_MODE_TEXT = tr("Create a sub-scenario");
+const QString BasicBox::SUB_SCENARIO_MODE_TEXT = tr("Scenario");
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
 : QGraphicsItem()

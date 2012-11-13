@@ -749,14 +749,14 @@ MainWindow::createActions()
   _CBModeAct->setStatusTip(tr("Switch mode to Control Box creation"));
   _CBModeAct->setShortcut(QString("Ctrl+Shift+C"));
   _CBModeAct->setCheckable(true);
-  _CBModeAct->setChecked(true);
+  _CBModeAct->setChecked(false);
   connect(_CBModeAct,SIGNAL(triggered()), this, SLOT(selectMode()));
 
   _PBModeAct = new QAction(QIcon(":/images/parentBox.svg"), tr("Parent Box"), this);
   _PBModeAct->setStatusTip(tr("Switch mode to Parent Box creation"));
   _PBModeAct->setShortcut(QString("Ctrl+Shift+P"));
   _PBModeAct->setCheckable(true);
-  _PBModeAct->setChecked(false);
+  _PBModeAct->setChecked(true);
   connect(_PBModeAct,SIGNAL(triggered()), this, SLOT(selectMode()));
 
   _relationModeAct = new QAction(QIcon(":/images/relation.svg"), tr("Relation"), this);
@@ -899,9 +899,9 @@ MainWindow::createToolBars()
 {
 	_fileToolBar = addToolBar(tr("File"));
 
+    _fileToolBar->addAction(_PBModeAct);
     _fileToolBar->addAction(_CBModeAct);
 	_fileToolBar->addAction(_SBModeAct);	
-	_fileToolBar->addAction(_PBModeAct);
 
 	_fileToolBar->addSeparator();
 
