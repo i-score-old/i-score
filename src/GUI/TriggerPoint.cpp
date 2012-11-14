@@ -93,7 +93,7 @@ TriggerPoint::init()
 	setFlag(QGraphicsItem::ItemIsFocusable, true);
     setFlag(QGraphicsItem::ItemIsMovable, false);
 	setVisible(true);
-    setZValue(-1);
+    setZValue(1);
 }
 
 Abstract *
@@ -116,7 +116,7 @@ TriggerPoint::updatePosition()
 			else if (_abstract->boxExtremity() == BOX_END) {
 				setPos(QPointF(box->getShapeTopRight().x() - WIDTH/2., box->getShapeTopRight().y() - HEIGHT/2.));
 			}
-            setZValue(box->currentZvalue()-1);
+//            setZValue(box->currentZvalue()-1);
 		}
 	}
 	update();
@@ -143,7 +143,7 @@ TriggerPoint::hoverLeaveEvent(QGraphicsSceneHoverEvent *event){
 QRectF
 TriggerPoint::boundingRect() const
 {
-    return QRectF(-WIDTH/2./*-BasicBox::LINE_WIDTH*/,-HEIGHT/2./*-BasicBox::LINE_WIDTH*/, WIDTH/*+BasicBox::LINE_WIDTH*/, HEIGHT);
+    return QRectF(-WIDTH/2.-BasicBox::LINE_WIDTH,-HEIGHT/2./*-BasicBox::LINE_WIDTH*/, WIDTH/*+BasicBox::LINE_WIDTH*/, HEIGHT);
 }
 
 void
@@ -313,16 +313,17 @@ TriggerPoint::drawFlag(QPainter *painter, QColor color){
         break;
 
     case BOX_END :
-        polygone << QPointF(rect.topRight() - QPointF(rect.width()/4,-3*rect.height()/16))
-                 << QPointF(rect.topRight() - QPointF(rect.width()/4,-9*rect.height()/16))
-                 << QPointF(rect.topRight() - QPointF(11*rect.width()/16,-3*rect.height()/8))
-                 << QPointF(rect.topRight() - QPointF(rect.width()/4,-3*rect.height()/16));
+        polygone << QPointF(rect.topRight() - QPointF(rect.width()/4 - 2*BasicBox::LINE_WIDTH,-3*rect.height()/16))
+                 << QPointF(rect.topRight() - QPointF(rect.width()/4 - 2*BasicBox::LINE_WIDTH,-9*rect.height()/16))
+                 << QPointF(rect.topRight() - QPointF(11*rect.width()/16 - 2*BasicBox::LINE_WIDTH,-3*rect.height()/8))
+                 << QPointF(rect.topRight() - QPointF(rect.width()/4 - 2*BasicBox::LINE_WIDTH,-3*rect.height()/16));
 
        path.addPolygon(polygone);
 
        painter->drawPath(path);
        painter->fillPath(path,QBrush(color));
         break;
+
     default :
         break;
     }
@@ -348,14 +349,14 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 //            painter->setPen(penG);
 //            painter->drawRect(boundingRect());
 
-            QPainterPath path = shape();
+//            QPainterPath path = shape();
             QPen pen = painter->pen();
-            pen.setColor(box->isSelected() ? Qt::yellow : Qt::white);
+//            pen.setColor(box->isSelected() ? Qt::yellow : Qt::white);
             QBrush brush = painter->brush();
-            pen.setWidth(2);
-            painter->setPen(pen);
-            painter->drawPath(path);
-            painter->fillPath(path,box->isSelected() ? Qt::yellow : Qt::white);
+//            pen.setWidth(2);
+//            painter->setPen(pen);
+//            painter->drawPath(path);
+//            painter->fillPath(path,box->isSelected() ? Qt::yellow : Qt::white);
             pen.setColor(box->color().darker());
             pen.setWidth(isSelected() ? 1.5 *BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH/2);
             painter->setPen(pen);

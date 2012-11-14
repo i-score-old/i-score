@@ -342,17 +342,9 @@ Relation::mouseDoubleClickEvent (QGraphicsSceneMouseEvent * event) {
     QGraphicsItem::mouseDoubleClickEvent(event);
     float maxBound;
     if (!_scene->playing()) {
-        if(!_flexibleRelation){
+        if(!_flexibleRelation)
             _elasticMode=!_elasticMode;
-            if(_elasticMode){
 
-                std::cout<<"elasticMode > TRUE"<<std::endl;
-            }
-            else
-            {
-                std::cout<<"elasticMode > FALSE"<<std::endl;
-            }
-        }
         else if(_abstract->maxBound()==NO_BOUND || _lastMaxBound!=-1){
             if(_lastMaxBound != -1)
                 maxBound = std::max(_lastMaxBound, (float)(mapFromScene(_end).x()-mapFromScene(_start).x()+LINE_WIDTH));

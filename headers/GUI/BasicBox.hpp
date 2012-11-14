@@ -534,6 +534,8 @@ class BasicBox : public QObject, public QGraphicsItem
   static const unsigned int BOX_MARGIN = 10;
   static const float TRIGGER_ZONE_WIDTH;
   static const float TRIGGER_ZONE_HEIGHT;
+  static const float TRIGGER_EXPANSION_FACTOR;
+  static const float RAIL_HEIGHT;
   static const float EAR_WIDTH;
   static const float EAR_HEIGHT;
   static const int COMBOBOX_WIDTH;

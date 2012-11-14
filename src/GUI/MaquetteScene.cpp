@@ -1149,7 +1149,7 @@ MaquetteScene::removeTriggerPoint(unsigned int trgID)
 			box->removeTriggerPoint(trgPnt->boxExtremity());
 		}
 		removeItem(trgPnt);
-		_maquette->removeTriggerPoint(trgID);
+		_maquette->removeTriggerPoint(trgID);       
 	}
 }
 
