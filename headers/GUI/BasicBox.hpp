@@ -582,12 +582,9 @@ class BasicBox : public QObject, public QGraphicsItem
   void drawMsgsIndicators(QPainter *painter);  
   void updateFlexibiliy();
   void addToComboBox(QString address);
-<<<<<<< HEAD
-=======
   QString currentText();
   inline qreal currentZvalue(){return _currentZvalue;}
   void setLowerStyle(bool state);
->>>>>>> 4d37cb36a98c134a5212a710f9cd4732a2c713cb
 
  protected:
   /*!
