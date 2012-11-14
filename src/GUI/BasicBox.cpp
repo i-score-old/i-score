@@ -979,6 +979,12 @@ BasicBox::boxRect()
 {
     return _boxRect;
 }
+
+QRectF
+BasicBox::boxBody()
+{
+    return QRectF(_boxRect.topLeft()+QPointF(0,RESIZE_TOLERANCE),_boxRect.bottomRight());
+}
 void
 BasicBox::keyPressEvent(QKeyEvent *event){
     QGraphicsItem::keyPressEvent(event);    
@@ -995,8 +1001,8 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mousePressEvent(event);
     if (event->button() == Qt::LeftButton) {
         setSelected(true);
-//        _currentZvalue = 0;
-//        setZValue(_currentZvalue);
+        _currentZvalue = 0;
+        setZValue(_currentZvalue);
         if (cursor().shape() == Qt::ArrowCursor) {
             lock();
         }
@@ -1036,12 +1042,12 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void
 BasicBox::lower(bool state){
-    if(state){
-        setZValue(_currentZvalue-1);
-    }
-    else{
-        setZValue(0);
-    }
+//    if(state){
+//        setZValue(_currentZvalue-1);
+//    }
+//    else{
+//        setZValue(0);
+//    }
 }
 
 //void
@@ -1524,7 +1530,6 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 		painter->drawLine(QPointF(progressPosX,RESIZE_TOLERANCE),QPointF(progressPosX,_abstract->height()));       
     }
     painter->translate(QPointF(0,0) - _boxRect.topLeft());
-
 }
 
 void

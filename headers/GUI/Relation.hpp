@@ -233,6 +233,7 @@ class Relation : public QGraphicsItem
   bool _middleHandleSelected; //!<Middle handle for rigid relations.
   QColor _color;
   bool _flexibleRelation;//!< The relation can be extended
+  bool _elasticMode;//!< For rigid relations
   float _lastMaxBound;
 
   static const float ARROW_SIZE; //!< The size of the arrow.

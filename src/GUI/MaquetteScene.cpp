@@ -544,7 +544,7 @@ MaquetteScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
 bool
 MaquetteScene::subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent){
     if(getSelectedItem()!=NULL && itemAt(mouseEvent->scenePos()) != 0)
-        return (getSelectedItem()->type() == PARENT_BOX_TYPE && static_cast<BasicBox*>(getSelectedItem())->currentText()==BasicBox::SUB_SCENARIO_MODE_TEXT && itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::ArrowCursor);
+        return (getSelectedItem()->type() == PARENT_BOX_TYPE && static_cast<BasicBox*>(getSelectedItem())->currentText()==BasicBox::SUB_SCENARIO_MODE_TEXT && static_cast<BasicBox*>(getSelectedItem())->boxBody().contains(mouseEvent->pos()) && itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::ArrowCursor);
     else
         return false;
 }
@@ -605,7 +605,8 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
                     }
                 }
 //                else if (itemAt(mouseEvent->scenePos())->type() == PARENT_BOX_TYPE) {
-                else if (getSelectedItem()->type() == PARENT_BOX_TYPE && subScenarioMode(mouseEvent)) {
+                else if (getSelectedItem()!=NULL ? getSelectedItem()->type() == PARENT_BOX_TYPE : false && subScenarioMode(mouseEvent)) {
+
                     // TODO : see why creation is possible in a parent box during resize mode
                     if (resizeMode() == NO_RESIZE) {
                         // Store the first pressed point

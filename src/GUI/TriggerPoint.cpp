@@ -91,8 +91,7 @@ TriggerPoint::init()
 {
 	setFlag(QGraphicsItem::ItemIsSelectable, true);
 	setFlag(QGraphicsItem::ItemIsFocusable, true);
-	setFlag(QGraphicsItem::ItemIsMovable, false);
-
+    setFlag(QGraphicsItem::ItemIsMovable, false);
 	setVisible(true);
     setZValue(-1);
 }
@@ -121,6 +120,24 @@ TriggerPoint::updatePosition()
 		}
 	}
 	update();
+}
+
+void
+TriggerPoint::hoverEnterEvent(QGraphicsSceneHoverEvent *event){
+    QGraphicsItem::hoverEnterEvent(event);
+    setCursor(Qt::PointingHandCursor);
+}
+
+void
+TriggerPoint::hoverMoveEvent(QGraphicsSceneHoverEvent *event){
+    QGraphicsItem::hoverMoveEvent(event);
+    setCursor(Qt::PointingHandCursor);
+}
+
+void
+TriggerPoint::hoverLeaveEvent(QGraphicsSceneHoverEvent *event){
+    QGraphicsItem::hoverLeaveEvent(event);
+    setCursor(Qt::ArrowCursor);
 }
 
 QRectF

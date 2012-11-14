@@ -107,6 +107,7 @@ Relation::init()
   _rightHandleSelected = false;
   _color = QColor(Qt::blue);
   _lastMaxBound = -1;
+  _elasticMode = false;
   updateFlexibility();
 
 }
@@ -273,7 +274,8 @@ Relation::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
       }
   }
   else{
-      if (QRectF(startX+(endX - startX)/2-HANDLE_WIDTH/2,endY-HANDLE_HEIGHT/2,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
+      if (QRectF(startX+(endX - startX)/2-HANDLE_WIDTH/2,endY-HANDLE_HEIGHT/2,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())
+          && !_elasticMode) {
           setCursor(Qt::SplitHCursor);
       }
       else
@@ -319,7 +321,8 @@ Relation::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
       }
   }
   else{
-      if (QRectF(startX+(endX - startX)/2-HANDLE_WIDTH/2,endY-HANDLE_HEIGHT/2,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
+      if (QRectF(startX+(endX - startX)/2-HANDLE_WIDTH/2,endY-HANDLE_HEIGHT/2,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())
+          && !_elasticMode) {
           setCursor(Qt::SplitHCursor);
       }
       else
@@ -339,8 +342,18 @@ Relation::mouseDoubleClickEvent (QGraphicsSceneMouseEvent * event) {
     QGraphicsItem::mouseDoubleClickEvent(event);
     float maxBound;
     if (!_scene->playing()) {
+        if(!_flexibleRelation){
+            _elasticMode=!_elasticMode;
+            if(_elasticMode){
 
-        if(_abstract->maxBound()==NO_BOUND || _lastMaxBound!=-1){
+                std::cout<<"elasticMode > TRUE"<<std::endl;
+            }
+            else
+            {
+                std::cout<<"elasticMode > FALSE"<<std::endl;
+            }
+        }
+        else if(_abstract->maxBound()==NO_BOUND || _lastMaxBound!=-1){
             if(_lastMaxBound != -1)
                 maxBound = std::max(_lastMaxBound, (float)(mapFromScene(_end).x()-mapFromScene(_start).x()+LINE_WIDTH));
             else
@@ -624,23 +637,30 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         painter->drawLine(startX,startY,startX,endY);
 
         //horizontal line
-        painter->drawLine(startX,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX-GRIP_CIRCLE_SIZE, endY);
-//        double handleZone = 10;
-//        painter->drawLine(startX,endY,startX+(endX - startX)/2 - handleZone,endY);
-//        painter->setPen(dotLine);
-//        painter->drawLine(startX+(endX - startX)/2 - handleZone,endY,startX+(endX - startX)/2 + handleZone,endY);
-//        painter->setPen(solidLine);
-//        painter->drawLine(startX+(endX - startX)/2 + handleZone,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX-GRIP_CIRCLE_SIZE, endY);
+        if(!_elasticMode){
+            painter->drawLine(startX,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX-GRIP_CIRCLE_SIZE, endY);
 
-        //handle
-        QPen handlePen;
-        handlePen.setWidth(LINE_WIDTH);
-        handlePen.setStyle(Qt::SolidLine);
-        handlePen.setColor(isSelected() ? _color : Qt::black);
-        painter->setPen(handlePen);
-        painter->drawLine(startX+(endX - startX)/2,endY-HANDLE_HEIGHT/2,startX+(endX - startX)/2,endY+HANDLE_HEIGHT/2);
+            //handle
+            QPen handlePen;
+            handlePen.setWidth(LINE_WIDTH);
+            handlePen.setStyle(Qt::SolidLine);
+            handlePen.setColor(isSelected() ? _color : Qt::black);
+            painter->setPen(handlePen);
+            painter->drawLine(startX+(endX - startX)/2,endY-HANDLE_HEIGHT/2,startX+(endX - startX)/2,endY+HANDLE_HEIGHT/2);
 
-        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,endX-startX,endX-startX);
+            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,endX-startX,endX-startX);
+        }
+        else{
+            double handleZone = 10;
+            painter->drawLine(startX,endY,startX+(endX - startX)/2 - handleZone,endY);
+            painter->setPen(dotLine);
+            painter->drawLine(startX+(endX - startX)/2 - handleZone,endY,startX+(endX - startX)/2 + handleZone,endY);
+            painter->setPen(solidLine);
+            painter->drawLine(startX+(endX - startX)/2 + handleZone,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX-GRIP_CIRCLE_SIZE, endY);
+
+            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,NO_BOUND,NO_BOUND);
+        }
+
     }
 }
 

@@ -223,6 +223,9 @@ class TriggerPoint : public QGraphicsItem
    * \brief Create the QInputDialog, for asking new name.
    */
   QInputDialog *nameInputDialog();
+  virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+  virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
+  virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 
  private :
 

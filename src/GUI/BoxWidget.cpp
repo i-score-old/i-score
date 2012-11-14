@@ -175,7 +175,7 @@ void BoxWidget::displayCurve(const QString &address){
             curveWidget->setLowerStyle(false);
             curveWidget->repaint();
             _stackedLayout->setCurrentWidget(curveWidget);
-            _box->lower(true);
+//            _box->lower(true);
         }
     }
     else{
