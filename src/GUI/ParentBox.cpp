@@ -352,7 +352,12 @@ void
 ParentBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	BasicBox::paint(painter,option,widget);
+    if(isSelected()&&currentText()==BasicBox::SUB_SCENARIO_MODE_TEXT){
+        std::map<unsigned int,BasicBox*>::iterator it;
+        for (it = _children.begin() ; it != _children.end() ; ++it) {
 
+            }
+    }
 //	painter->save();
 
 //	if (_playing) {
