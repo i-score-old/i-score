@@ -995,8 +995,8 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mousePressEvent(event);
     if (event->button() == Qt::LeftButton) {
         setSelected(true);
-        _currentZvalue = 0;
-        setZValue(_currentZvalue);
+//        _currentZvalue = 0;
+//        setZValue(_currentZvalue);
         if (cursor().shape() == Qt::ArrowCursor) {
             lock();
         }
@@ -1035,7 +1035,7 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 }
 
 void
-BasicBox::setLowerStyle(bool state){
+BasicBox::lower(bool state){
 
 }
 

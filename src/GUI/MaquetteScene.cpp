@@ -1448,7 +1448,7 @@ MaquetteScene::addParentBox() {
 	QString name;
 	while (name.isEmpty()) {
 
-		name = QString::fromStdString(sequentialName(tr("Parent_Box").toStdString()));
+        name = QString::fromStdString(sequentialName(tr("Box").toStdString()));
 		ok = true;
 		if (!ok) {
 			return NO_ID;

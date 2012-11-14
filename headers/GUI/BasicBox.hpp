@@ -584,7 +584,7 @@ class BasicBox : public QObject, public QGraphicsItem
   void addToComboBox(QString address);
   QString currentText();
   inline qreal currentZvalue(){return _currentZvalue;}
-  void setLowerStyle(bool state);
+  void lower(bool state);
 
  protected:
   /*!
