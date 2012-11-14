@@ -117,6 +117,7 @@ TriggerPoint::updatePosition()
 			else if (_abstract->boxExtremity() == BOX_END) {
 				setPos(QPointF(box->getShapeTopRight().x() - WIDTH/2., box->getShapeTopRight().y() - HEIGHT/2.));
 			}
+            setZValue(box->currentZvalue()-1);
 		}
 	}
 	update();

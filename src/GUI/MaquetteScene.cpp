@@ -525,11 +525,29 @@ MaquetteScene::noBoxSelected(){
      return selectedItems().isEmpty();
 }
 
+QGraphicsItem *
+MaquetteScene::getSelectedItem(){
+    if(noBoxSelected())
+        return NULL;
+    else if(selectedItems().size()>1)
+        return NULL;
+    else
+        return selectedItems().first();
+
+}
+
 void
 MaquetteScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
     QGraphicsScene::mouseDoubleClickEvent(event);
 }
 
+bool
+MaquetteScene::subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent){
+    if(getSelectedItem()!=NULL && itemAt(mouseEvent->scenePos()) != 0)
+        return (getSelectedItem()->type() == PARENT_BOX_TYPE && static_cast<BasicBox*>(getSelectedItem())->currentText()==BasicBox::SUB_SCENARIO_MODE_TEXT && itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::ArrowCursor);
+    else
+        return false;
+}
 
 void
 MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -548,7 +566,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         if (mouseEvent->modifiers() == Qt::ShiftModifier) {
             setCurrentMode(SELECTION_MODE);
         }
-        else if (noBoxSelected()){
+        else if (noBoxSelected() || subScenarioMode(mouseEvent)){
             setCurrentMode(CREATION_MODE);
         }
         else
@@ -586,7 +604,8 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
                         _tempBox = addRect(QRectF(_pressPoint.x(), _pressPoint.y(), 0, 0), pen, brush);
                     }
                 }
-                else if (itemAt(mouseEvent->scenePos())->type() == PARENT_BOX_TYPE) {
+//                else if (itemAt(mouseEvent->scenePos())->type() == PARENT_BOX_TYPE) {
+                else if (getSelectedItem()->type() == PARENT_BOX_TYPE && subScenarioMode(mouseEvent)) {
                     // TODO : see why creation is possible in a parent box during resize mode
                     if (resizeMode() == NO_RESIZE) {
                         // Store the first pressed point
@@ -643,7 +662,7 @@ MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) {
     case SELECTION_MODE :
 		break;
     case CREATION_MODE :
-        if(noBoxSelected()){
+        if(noBoxSelected() || subScenarioMode(mouseEvent)){
             if (resizeMode() == NO_RESIZE && _tempBox) {
                 int upLeftX, upLeftY, width, height;
 

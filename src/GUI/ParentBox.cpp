@@ -96,7 +96,7 @@ ParentBox::init()
   BasicBox::init();
   _contextMenu =  new ParentBoxContextMenu(this);
 
-  addToComboBox(tr("Create a sub-scenario"));
+  addToComboBox(BasicBox::SUB_SCENARIO_MODE_TEXT);
   _hasContextMenu = true;
   setAcceptDrops(true);
 }

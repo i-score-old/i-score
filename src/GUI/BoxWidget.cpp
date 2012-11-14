@@ -165,8 +165,8 @@ void BoxWidget::displayCurve(const QString &address){
         cur->repaint();
     }
 
-    if(address!=tr("Create a sub-scenario")){
-//        _box->setZValue(0);
+    if(address!=BasicBox::SUB_SCENARIO_MODE_TEXT){
+        setEnabled(true);
         curveIt = _curveMap->find(add);
         bool curveFound = (curveIt != _curveMap->end());
 
@@ -174,13 +174,12 @@ void BoxWidget::displayCurve(const QString &address){
             curveWidget = curveIt.value();
 
             curveWidget->setLowerStyle(false);
-            curveWidget->setEnabled(true);
             curveWidget->repaint();
             _stackedLayout->setCurrentWidget(curveWidget);
         }
     }
     else{
-//        _box->setZValue(-1);
+        setEnabled(false);
     }
 }
 

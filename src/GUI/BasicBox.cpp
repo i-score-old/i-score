@@ -87,6 +87,7 @@ const float BasicBox::MSGS_INDICATOR_WIDTH = 50;
 const float BasicBox::EAR_WIDTH = 9;
 const float BasicBox::EAR_HEIGHT = 30;
 const float BasicBox::GRIP_CIRCLE_SIZE = 5;
+const QString BasicBox::SUB_SCENARIO_MODE_TEXT = tr("Scenario");
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
 : QGraphicsItem()
@@ -150,13 +151,14 @@ BasicBox::createWidget(){
     layout->addWidget(_curvesWidget);
     layout->setMargin(0);
     layout->setContentsMargins(0,0,0,0);
-    layout->setAlignment(_boxWidget,Qt::AlignLeft);    
+    layout->setAlignment(_boxWidget,Qt::AlignLeft);
     _boxWidget->setLayout(layout);
-
     _curvesWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
     _curveProxy = new QGraphicsProxyWidget(this);
+
     _curveProxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+    _curveProxy->setAcceptedMouseButtons(Qt::LeftButton);
     _curveProxy->setFlag(QGraphicsItem::ItemIsMovable, false);
     _curveProxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
     _curveProxy->setAttribute(Qt::WA_PaintOnScreen);
@@ -201,6 +203,11 @@ BasicBox::~BasicBox()
 	}
 }
 
+QString
+BasicBox::currentText(){
+    return _comboBox->currentText();
+}
+
 void
 BasicBox::updateFlexibiliy(){
     _flexible = hasTriggerPoint(BOX_END);
@@ -224,8 +231,8 @@ BasicBox::init()
 	setFlag(ItemSendsGeometryChanges,true);
 	setVisible(true);
 	setAcceptsHoverEvents(true);
-
-    setZValue(0); 
+    _currentZvalue = 0;
+    setZValue(_currentZvalue);
     updateFlexibiliy();
 }
 
@@ -988,6 +995,8 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mousePressEvent(event);
     if (event->button() == Qt::LeftButton) {
         setSelected(true);
+        _currentZvalue = 0;
+        setZValue(_currentZvalue);
         if (cursor().shape() == Qt::ArrowCursor) {
             lock();
         }
@@ -1022,6 +1031,11 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
         }
         update();
     }
+
+}
+
+void
+BasicBox::setLowerStyle(bool state){
 
 }
 
