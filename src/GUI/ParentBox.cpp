@@ -96,6 +96,7 @@ ParentBox::init()
   BasicBox::init();
   _contextMenu =  new ParentBoxContextMenu(this);
 
+  addToComboBox(tr("Create a sub-scenario"));
   _hasContextMenu = true;
   setAcceptDrops(true);
 }
@@ -211,6 +212,7 @@ void
 ParentBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
 	BasicBox::mousePressEvent(event);
+
     if (event->button() == Qt::LeftButton) {
 		if (_scene->currentMode() != CREATION_MODE) {
             setSelected(true);

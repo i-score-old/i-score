@@ -732,12 +732,12 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 			addComment(tr("Comment").toStdString(),mouseEvent->scenePos(),NO_ID);
 		}
 		break;
-	case CREATION_MODE :
+    case CREATION_MODE :
 		if (!selectedItems().empty()) {
             _maquette->updateRelations();
 		}
 		if (resizeMode() == NO_RESIZE && _tempBox) {
-            if (_releasePoint != _pressPoint && ( abs(_releasePoint.x()-_pressPoint.x()) > MIN_BOX_WIDTH && abs(_releasePoint.y()-_pressPoint.y()) > MIN_BOX_HEIGHT) ){
+            if (_releasePoint != _pressPoint && ( abs(_releasePoint.x()-_pressPoint.x()) > MIN_BOX_WIDTH && abs(_releasePoint.y()-_pressPoint.y()) > MIN_BOX_HEIGHT) ){                
                 addBox(BoxCreationMode(_currentBoxMode));
             }
 
@@ -1177,15 +1177,15 @@ MaquetteScene::findMother(const QPointF &topLeft, const QPointF &size)
 
 void
 MaquetteScene::addBox(BoxCreationMode mode) {
-	unsigned int boxID = NO_ID;
 
+    unsigned int boxID = NO_ID;
 	if (abs(_pressPoint.x() - _releasePoint.x()) > (MS_PRECISION / MS_PER_PIXEL) ) {
 		switch (mode) {
 		case SB_MODE :
 			boxID = addSoundBox();
 			update();
 			break;
-		case CB_MODE :
+        case CB_MODE :
 			boxID = addControlBox();
 			update();
 			break;
@@ -1304,8 +1304,8 @@ MaquetteScene::addControlBox(unsigned int ID)
 }
 
 unsigned int
-MaquetteScene::addControlBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name) {
-	unsigned int motherID = findMother(topLeft,QPointF(std::fabs(bottomRight.x() - topLeft.x()),
+MaquetteScene::addControlBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name) {    
+    unsigned int motherID = findMother(topLeft,QPointF(std::fabs(bottomRight.x() - topLeft.x()),
 			std::fabs(bottomRight.y() - topLeft.y())));
 	ParentBox *parentBox = NULL;
 	if (motherID != ROOT_BOX_ID && motherID != NO_ID) {

@@ -179,7 +179,6 @@ BasicBox::createWidget(){
     _comboBoxProxy->setWidget(_comboBox);
     _comboBoxProxy->setPalette(palette);
     _curvesWidget->setComboBox(_comboBox);
-//    _comboBox->resize((width() - 2*LINE_WIDTH)/2,RESIZE_TOLERANCE+1);
 
 }
 
@@ -228,6 +227,11 @@ BasicBox::init()
 
     setZValue(0); 
     updateFlexibiliy();
+}
+
+void
+BasicBox::addToComboBox(QString address){
+    _curvesWidget->addToComboBox(address);
 }
 
 void

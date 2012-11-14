@@ -61,7 +61,8 @@ public :
     void setComboBox(QComboBox *cbox);    
     inline QStackedLayout *stackedLayout(){return _stackedLayout;}
     inline QComboBox *comboBox(){return _comboBox;}
-    inline void setStackedLayout(QStackedLayout *slayout){_stackedLayout = slayout;setLayout(_stackedLayout);}
+    inline void setStackedLayout(QStackedLayout *slayout){_stackedLayout = slayout;setLayout(_stackedLayout);}    
+    void addToComboBox(const QString address);
 
 public slots :
     void displayCurve(const QString &address);
@@ -75,7 +76,6 @@ protected :
 private :
     bool updateCurve(const std::string &address, bool forceUpdate);
     void addCurve(QString address,CurveWidget *curveWidget);
-    void addToComboBox(const QString address);
     void clearCurves();
     QComboBox *_comboBox;
     QTabWidget *_tabWidget;

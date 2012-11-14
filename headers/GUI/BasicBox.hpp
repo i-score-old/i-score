@@ -580,6 +580,7 @@ class BasicBox : public QObject, public QGraphicsItem
   inline bool hasEndMsgs(){return _abstract->hasLastMsgs();}
   void drawMsgsIndicators(QPainter *painter);  
   void updateFlexibiliy();
+  void addToComboBox(QString address);
 
  protected:
   /*!
