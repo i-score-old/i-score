@@ -30,6 +30,8 @@ QMAKE_LFLAGS += -L/usr/local/lib/
 }
 macx-g++ {
 QMAKE_LFLAGS += -L/usr/local/lib/ -L/System/Library/Frameworks/ -L/Library/Frameworks/
+QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=10.7
+QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
 }
 
 # Dossier des sources temporaires de Qt
