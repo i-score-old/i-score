@@ -62,6 +62,7 @@ using std::string;
 #include "Interpolation.hpp"
 #include "Maquette.hpp"
 #include "MaquetteScene.hpp"
+#include "ParentBox.hpp"
 
 #define COMBOBOX_WIDTH 500
 
@@ -183,6 +184,62 @@ void BoxWidget::displayCurve(const QString &address){
     }
 }
 
+//void BoxWidget::displayCurve(const QString &address){
+////    std::cout<<"display : "<<address.toStdString()<<std::endl;
+
+//    std::string add = address.toStdString();
+//    QMap<string,CurveWidget *>::iterator curveIt;
+//    CurveWidget *curveWidget;
+
+
+//   //Unactive curves
+//    QList<CurveWidget *> values = _curveMap->values();
+//    int count = values.size(), i=0;
+
+//    CurveWidget *cur;
+
+//    for(i ; i<count ; i++){
+//        cur = values.at(i);
+//        cur->setLowerStyle(true);
+//        cur->repaint();
+//    }
+
+//    if(address!=BasicBox::SUB_SCENARIO_MODE_TEXT){
+//        setEnabled(true);
+//        curveIt = _curveMap->find(add);
+//        bool curveFound = (curveIt != _curveMap->end());
+
+//        if (curveFound) {
+//            curveWidget = curveIt.value();
+
+//            curveWidget->setLowerStyle(false);
+//            curveWidget->repaint();
+//            _stackedLayout->setCurrentWidget(curveWidget);
+////            _box->lower(true);
+//            if(_box->type() == PARENT_BOX_TYPE){
+//                BasicBox *child;
+//                std::map<unsigned int,BasicBox*>::iterator it;
+//                for (it = static_cast<ParentBox*>(_box)->children().begin() ; it != static_cast<ParentBox*>(_box)->children().end() ; ++it){
+//                    child = it->second;//lows tous les _children
+//                    child->setZValue(-10);
+//                    child->setEnabled(false);
+//                }
+//            }
+//        }
+//    }
+//    else{
+//        setEnabled(false);
+//        if(_box->type() == PARENT_BOX_TYPE){
+//            BasicBox *child;
+//            std::map<unsigned int,BasicBox*>::iterator it;
+//            for (it = static_cast<ParentBox*>(_box)->children().begin() ; it != static_cast<ParentBox*>(_box)->children().end() ; ++it){
+//                child = it->second;//lows tous les _children
+//                child->setZValue(0);
+//                child->setEnabled(true);
+//            }
+//        }
+//    }
+//}
 
 bool
 BoxWidget::contains(const string &address) {
