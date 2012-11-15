@@ -205,6 +205,7 @@ void BoxWidget::displayCurve(const QString &address){
 //    }
 
 //    if(address!=BasicBox::SUB_SCENARIO_MODE_TEXT){
+//        std::cout<<"ca passe"<<std::endl;
 //        setEnabled(true);
 //        curveIt = _curveMap->find(add);
 //        bool curveFound = (curveIt != _curveMap->end());
@@ -215,14 +216,17 @@ void BoxWidget::displayCurve(const QString &address){
 //            curveWidget->setLowerStyle(false);
 //            curveWidget->repaint();
 //            _stackedLayout->setCurrentWidget(curveWidget);
-////            _box->lower(true);
+//            _box->lower(true);
 //            if(_box->type() == PARENT_BOX_TYPE){
 //                BasicBox *child;
 //                std::map<unsigned int,BasicBox*>::iterator it;
-//                for (it = static_cast<ParentBox*>(_box)->children().begin() ; it != static_cast<ParentBox*>(_box)->children().end() ; ++it){
-//                    child = it->second;//lows tous les _children
-//                    child->setZValue(-10);
-//                    child->setEnabled(false);
+//                std::map<unsigned int,BasicBox*> children = static_cast<ParentBox*>(_box)->children();
+//                if(!children.empty()){
+//                    for (it = static_cast<ParentBox*>(_box)->children().begin() ; it != static_cast<ParentBox*>(_box)->children().end() ; ++it){
+//                        child = it->second;
+//                        if(child!=NULL)
+//                            child->lower(false);
+//                    }
 //                }
 //            }
 //        }
@@ -232,10 +236,16 @@ void BoxWidget::displayCurve(const QString &address){
 //        if(_box->type() == PARENT_BOX_TYPE){
 //            BasicBox *child;
 //            std::map<unsigned int,BasicBox*>::iterator it;
-//            for (it = static_cast<ParentBox*>(_box)->children().begin() ; it != static_cast<ParentBox*>(_box)->children().end() ; ++it){
-//                child = it->second;//lows tous les _children
-//                child->setZValue(0);
-//                child->setEnabled(true);
+//            std::map<unsigned int,BasicBox*> children = static_cast<ParentBox*>(_box)->children();
+//            if(!children.empty()){
+//                for (it = static_cast<ParentBox*>(_box)->children().begin() ; it != static_cast<ParentBox*>(_box)->children().end() ; ++it){
+
+//                    child = it->second;//lows tous les _children
+//                    if(child!=NULL){
+//                        child->lower(true);
+//                        std::cout<<child->name().toStdString()<<std::endl;
+//                    }
+//                }
 //            }
 //        }
 //    }

@@ -21,9 +21,9 @@
        . Edit compileWithLibraries.sh to specify the folders you've downloaded sources to.
        . Compile :
        	 $ chmod u+x compileWithLibraries.sh
-	 $ ./compile.sh MACOS
+	 $ ./compileWithLibraries.sh MACOS
 	 OR
-	 $ ./compile.sh MACOS64  
+	 $ ./compileWithLibraries.sh MACOS64  
 
        ==<[ Ubuntu (32/64) bits ]>==
 

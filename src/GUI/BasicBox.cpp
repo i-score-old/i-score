@@ -1043,11 +1043,14 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void
 BasicBox::lower(bool state){
+
 //    if(state){
 //        setZValue(_currentZvalue-1);
+//        setEnabled(false);
 //    }
 //    else{
 //        setZValue(0);
+//        setEnabled(true);
 //    }
 }
 
