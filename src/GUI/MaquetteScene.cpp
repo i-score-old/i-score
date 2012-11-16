@@ -552,79 +552,76 @@ MaquetteScene::subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent){
 void
 MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    if(!playing()){
+    QGraphicsScene::mousePressEvent(mouseEvent);
+    _clicked = true;
 
-        QGraphicsScene::mousePressEvent(mouseEvent);
-        _clicked = true;
-
-        if (_tempBox) {
-            removeItem(_tempBox);
-            _tempBox = NULL;
-        }
-        _savedInteractionMode = _currentInteractionMode;
-        _savedBoxMode = _currentBoxMode;
-
-
-        if (mouseEvent->modifiers() == Qt::ShiftModifier) {
-            setCurrentMode(SELECTION_MODE);
-        }
-        else if (noBoxSelected() || subScenarioMode(mouseEvent)){
-            setCurrentMode(CREATION_MODE);
-        }
-        else
-            setCurrentMode(SELECTION_MODE);
-
-        if (itemAt(mouseEvent->scenePos()) != 0) {
-            if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::PointingHandCursor && _currentInteractionMode != TRIGGER_MODE) {
-                setCurrentMode(TRIGGER_MODE);
-
-            }
-            if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::CrossCursor && _currentInteractionMode != RELATION_MODE) {
-                setCurrentMode(RELATION_MODE);
-
-            }
-        }
-
-        switch (_currentInteractionMode) {
-            case RELATION_MODE :
-                _mousePos = mouseEvent->scenePos();
-                break;
-            case SELECTION_MODE :
-                break;
-            case TEXT_MODE :
-                break;
-            case TRIGGER_MODE :
-                break;
-            case CREATION_MODE :
-                if (itemAt(mouseEvent->scenePos()) == 0) {
-                    if (resizeMode() == NO_RESIZE) {
-                        // Store the first pressed point
-                        _pressPoint = mouseEvent->scenePos();
-                        QPen pen(Qt::black);
-                        QBrush brush(Qt::NoBrush);
-                        // Add the temporary box to the scene
-                        _tempBox = addRect(QRectF(_pressPoint.x(), _pressPoint.y(), 0, 0), pen, brush);
-                    }
-                }
-//                else if (itemAt(mouseEvent->scenePos())->type() == PARENT_BOX_TYPE) {
-                else if (getSelectedItem()!=NULL ? getSelectedItem()->type() == PARENT_BOX_TYPE : false && subScenarioMode(mouseEvent)) {
-
-                    // TODO : see why creation is possible in a parent box during resize mode
-                    if (resizeMode() == NO_RESIZE) {
-                        // Store the first pressed point
-                        _pressPoint = mouseEvent->scenePos();
-                        QPen pen(Qt::black);
-                        QBrush brush(Qt::NoBrush);
-                        // Add the temporary box to the scene
-                        _tempBox = addRect(QRectF(_pressPoint.x(), _pressPoint.y(), 0, 0), pen, brush);
-                    }
-                }
-                break;
-
-            case BOX_EDIT_MODE :
-                break;
-            }
+    if (_tempBox) {
+        removeItem(_tempBox);
+        _tempBox = NULL;
     }
+    _savedInteractionMode = _currentInteractionMode;
+    _savedBoxMode = _currentBoxMode;
+
+    if (mouseEvent->modifiers() == Qt::ShiftModifier) {
+        setCurrentMode(SELECTION_MODE);
+    }
+    else if (noBoxSelected() || subScenarioMode(mouseEvent)){
+        setCurrentMode(CREATION_MODE);
+    }
+    else
+        setCurrentMode(SELECTION_MODE);
+
+    if (itemAt(mouseEvent->scenePos()) != 0) {
+        if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::PointingHandCursor && _currentInteractionMode != TRIGGER_MODE) {
+            setCurrentMode(TRIGGER_MODE);
+
+        }
+        if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::CrossCursor && _currentInteractionMode != RELATION_MODE) {
+            setCurrentMode(RELATION_MODE);
+
+        }
+    }
+
+    switch (_currentInteractionMode) {
+        case RELATION_MODE :
+            _mousePos = mouseEvent->scenePos();
+            break;
+        case SELECTION_MODE :
+            break;
+        case TEXT_MODE :
+            break;
+        case TRIGGER_MODE :
+            break;
+        case CREATION_MODE :
+            if (itemAt(mouseEvent->scenePos()) == 0) {
+                if (resizeMode() == NO_RESIZE) {
+                    // Store the first pressed point
+                    _pressPoint = mouseEvent->scenePos();
+                    QPen pen(Qt::black);
+                    QBrush brush(Qt::NoBrush);
+                    // Add the temporary box to the scene
+                    _tempBox = addRect(QRectF(_pressPoint.x(), _pressPoint.y(), 0, 0), pen, brush);
+                }
+            }
+//                else if (itemAt(mouseEvent->scenePos())->type() == PARENT_BOX_TYPE) {
+            else if (getSelectedItem()!=NULL ? getSelectedItem()->type() == PARENT_BOX_TYPE : false && subScenarioMode(mouseEvent)) {
+
+                // TODO : see why creation is possible in a parent box during resize mode
+                if (resizeMode() == NO_RESIZE) {
+                    // Store the first pressed point
+                    _pressPoint = mouseEvent->scenePos();
+                    QPen pen(Qt::black);
+                    QBrush brush(Qt::NoBrush);
+                    // Add the temporary box to the scene
+                    _tempBox = addRect(QRectF(_pressPoint.x(), _pressPoint.y(), 0, 0), pen, brush);
+                }
+            }
+            break;
+
+        case BOX_EDIT_MODE :
+            break;
+        }
+
 }
 
 void
