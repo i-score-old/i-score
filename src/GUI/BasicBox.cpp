@@ -497,10 +497,10 @@ BasicBox::updateStuff()
 			relIt->second->updateCoordinates();
 		}
 	}
-	map<BoxExtremity,TriggerPoint*>::iterator it2;
-	for (it2 = _triggerPoints.begin() ; it2 != _triggerPoints.end() ; it2++) {
-		it2->second->updatePosition();
-	}
+    map<BoxExtremity,TriggerPoint*>::iterator it2;
+    for (it2 = _triggerPoints.begin() ; it2 != _triggerPoints.end() ; it2++) {
+            it2->second->updatePosition();
+    }
     setFlag(QGraphicsItem::ItemIsMovable,true);
 }
 
@@ -602,7 +602,11 @@ BasicBox::setCrossedTriggerPoint(bool waiting, BoxExtremity extremity)
 bool
 BasicBox::hasTriggerPoint(BoxExtremity extremity)
 {
-	return (_triggerPoints.find(extremity) != _triggerPoints.end());
+    if(!_triggerPoints.empty()){
+        return (_triggerPoints.find(extremity) != _triggerPoints.end());
+    }
+    else
+        return false;
 }
 
 bool
@@ -681,9 +685,7 @@ BasicBox::removeTriggerPoint(BoxExtremity extremity) {
 	map<BoxExtremity,TriggerPoint*>::iterator it;
     if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
 		_triggerPoints.erase(it);
-	}    
-    updateRelations(extremity);
-    updateFlexibiliy();
+    }
     _scene->update();
     update();
 }
