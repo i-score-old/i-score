@@ -1296,104 +1296,124 @@ void
 AttributesEditor::startMessagesChanged()
 {
     BasicBox * box = _scene->getBox(_boxEdited);
+    if(_boxEdited!=NO_ID){
+        if(box->type()==SOUND_BOX_TYPE){
+            vector<string> msgs = _startMsgsEditor->computeMessages();
+    //        Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
+            Maquette::getInstance()->setStartMessagesToSend(_boxEdited,_networkTree->startMessages());
+        }
+        else{
+            QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
 
-    if(box->type()==SOUND_BOX_TYPE){
-        vector<string> msgs = _startMsgsEditor->computeMessages();
-//        Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
-        Maquette::getInstance()->setStartMessagesToSend(_boxEdited,_networkTree->startMessages());
+            vector<string> networkMsgs = _networkTree->startMessages()->computeMessages();
+            Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
+        //    Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,networkMsgs);
+            Maquette::getInstance()->setStartMessagesToSend(_boxEdited,_networkTree->startMessages());
+
+            _networkTree->updateStartMsgsDisplay();
+            _networkTree->updateCurves(_boxEdited);
+            box->updateCurves();
+        }
     }
-    else{
-        QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
-
-        vector<string> networkMsgs = _networkTree->startMessages()->computeMessages();
-        Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
-    //    Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,networkMsgs);
-        Maquette::getInstance()->setStartMessagesToSend(_boxEdited,_networkTree->startMessages());
-
-        _networkTree->updateStartMsgsDisplay();
-        _networkTree->updateCurves(_boxEdited);
-        box->updateCurves();
-    }
+    _scene->displayMessage("No box selected",INDICATION_LEVEL);
 }
 
 void
 AttributesEditor::endMessagesChanged()
 {
-    BasicBox * box = _scene->getBox(_boxEdited);
+    if(_boxEdited!=NO_ID){
+        BasicBox * box = _scene->getBox(_boxEdited);
 
-    if(box->type()==SOUND_BOX_TYPE){
-        vector<string> msgs = _endMsgsEditor->computeMessages();
-//        Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
-        Maquette::getInstance()->setEndMessagesToSend(_boxEdited,_networkTree->endMessages());
+        if(box->type()==SOUND_BOX_TYPE){
+            vector<string> msgs = _endMsgsEditor->computeMessages();
+    //        Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
+            Maquette::getInstance()->setEndMessagesToSend(_boxEdited,_networkTree->endMessages());
+        }
+        else{
+
+            QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
+            Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
+
+            vector<string> networkMsgs = _networkTree->endMessages()->computeMessages();
+    //        Maquette::getInstance()->setLastMessagesToSend(_boxEdited,networkMsgs);
+            Maquette::getInstance()->setEndMessagesToSend(_boxEdited,_networkTree->endMessages());
+            _networkTree->updateEndMsgsDisplay();
+            _networkTree->updateCurves(_boxEdited);
+
+            box->updateCurves();
+        }
     }
-    else{
-
-        QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
-        Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
-
-        vector<string> networkMsgs = _networkTree->endMessages()->computeMessages();
-//        Maquette::getInstance()->setLastMessagesToSend(_boxEdited,networkMsgs);
-        Maquette::getInstance()->setEndMessagesToSend(_boxEdited,_networkTree->endMessages());
-        _networkTree->updateEndMsgsDisplay();
-        _networkTree->updateCurves(_boxEdited);
-
-        box->updateCurves();
-    }
+    else
+        _scene->displayMessage("No box selected",INDICATION_LEVEL);
 }
 
 void AttributesEditor::startMessageChanged(QTreeWidgetItem *item) {
-    string address = _networkTree->getAbsoluteAddress(item).toStdString();
-    //PAS OPTIMAL, NE DEVRAIT MODIFIER QU'UN SEUL ITEM
-    QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
-    Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
+    if(_boxEdited!=NO_ID){
+        string address = _networkTree->getAbsoluteAddress(item).toStdString();
+        //PAS OPTIMAL, NE DEVRAIT MODIFIER QU'UN SEUL ITEM
+        QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
+        Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
 
-    Maquette::getInstance()->setStartMessagesToSend(_boxEdited,_networkTree->startMessages());
+        Maquette::getInstance()->setStartMessagesToSend(_boxEdited,_networkTree->startMessages());
 
-    _networkTree->updateStartMsgsDisplay();    
+        _networkTree->updateStartMsgsDisplay();
 
-    _networkTree->updateCurve(item,_boxEdited);
-//    _curvesWidget->updateCurve(address);
+        _networkTree->updateCurve(item,_boxEdited);
+    //    _curvesWidget->updateCurve(address);
 
-    BasicBox * box = _scene->getBox(_boxEdited);
-    box->updateCurves();
-
+        BasicBox * box = _scene->getBox(_boxEdited);
+        box->updateCurves();
+    }
+    else
+        _scene->displayMessage("No box selected",WARNING_LEVEL);
 }
 
 void AttributesEditor::endMessageChanged(QTreeWidgetItem *item) {
 //    std::cout<<"AttributeEditor::endMessageChanged"<<std::endl;
-    string address = _networkTree->getAbsoluteAddress(item).toStdString();
-    QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
-    Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
+    if(_boxEdited!=NO_ID){
+        string address = _networkTree->getAbsoluteAddress(item).toStdString();
+        QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
+        Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
 
-    Maquette::getInstance()->setEndMessagesToSend(_boxEdited,_networkTree->endMessages());
+        Maquette::getInstance()->setEndMessagesToSend(_boxEdited,_networkTree->endMessages());
 
-    _networkTree->updateCurve(item,_boxEdited);
+        _networkTree->updateCurve(item,_boxEdited);
 
-    _networkTree->updateEndMsgsDisplay();
-//    _curvesWidget->updateCurve(address);
-    BasicBox * box = _scene->getBox(_boxEdited);
-    box->updateCurves();
+        _networkTree->updateEndMsgsDisplay();
+    //    _curvesWidget->updateCurve(address);
+        BasicBox * box = _scene->getBox(_boxEdited);
+        box->updateCurves();
+    }
+    else
+        _scene->displayMessage("No box selected",WARNING_LEVEL);
 }
 
 void AttributesEditor::startMessageRemoved(const string &address) {
-
-//    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
-    QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
-    Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
-    Maquette::getInstance()->setStartMessagesToSend(_boxEdited,_networkTree->startMessages());
-    //NICO
-	vector<string> msgs = _startMsgsEditor->computeMessages();
-//    Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
-	Maquette::getInstance()->removeCurve(_boxEdited,address);
-//	_curvesWidget->removeCurve(address);
+    if(_boxEdited!=NO_ID){
+    //    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
+        QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
+        Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
+        Maquette::getInstance()->setStartMessagesToSend(_boxEdited,_networkTree->startMessages());
+        //NICO
+        vector<string> msgs = _startMsgsEditor->computeMessages();
+    //    Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
+        Maquette::getInstance()->removeCurve(_boxEdited,address);
+    //	_curvesWidget->removeCurve(address);
+    }
+    else
+        _scene->displayMessage("No box selected",INDICATION_LEVEL);
 }
 
 void AttributesEditor::endMessageRemoved(const string &address) {
-	vector<string> msgs = _endMsgsEditor->computeMessages();
-//	Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
-    Maquette::getInstance()->setEndMessagesToSend(_boxEdited,_networkTree->endMessages());
-	Maquette::getInstance()->removeCurve(_boxEdited,address);
-//    _curvesWidget->removeCurve(address);
+    if(_boxEdited!=NO_ID){
+        vector<string> msgs = _endMsgsEditor->computeMessages();
+    //	Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
+        Maquette::getInstance()->setEndMessagesToSend(_boxEdited,_networkTree->endMessages());
+        Maquette::getInstance()->removeCurve(_boxEdited,address);
+    //    _curvesWidget->removeCurve(address);
+    }
+    else
+        _scene->displayMessage("No box selected",INDICATION_LEVEL);
 }
 
 void
