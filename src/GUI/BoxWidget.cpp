@@ -145,45 +145,6 @@ void BoxWidget::curveSampleRateChanged(const QString &address,int value) {
 }
 
 
-//void BoxWidget::displayCurve(const QString &address){
-////    std::cout<<"display : "<<address.toStdString()<<std::endl;
-
-//    std::string add = address.toStdString();
-//    QMap<string,CurveWidget *>::iterator curveIt;
-//    CurveWidget *curveWidget;
-
-
-//   //Unactive curves
-//    QList<CurveWidget *> values = _curveMap->values();
-//    int count = values.size(), i=0;
-
-//    CurveWidget *cur;
-
-//    for(i ; i<count ; i++){
-//        cur = values.at(i);
-//        cur->setLowerStyle(true);
-//        cur->repaint();
-//    }
-
-//    if(address!=BasicBox::SUB_SCENARIO_MODE_TEXT){
-//        setEnabled(true);
-//        curveIt = _curveMap->find(add);
-//        bool curveFound = (curveIt != _curveMap->end());
-
-//        if (curveFound) {
-//            curveWidget = curveIt.value();
-
-//            curveWidget->setLowerStyle(false);
-//            curveWidget->repaint();
-//            _stackedLayout->setCurrentWidget(curveWidget);
-////            _box->lower(true);
-//        }
-//    }
-//    else{
-//        setEnabled(false);
-//    }
-//}
-
 void BoxWidget::displayCurve(const QString &address){
 //    std::cout<<"display : "<<address.toStdString()<<std::endl;
 
@@ -205,7 +166,6 @@ void BoxWidget::displayCurve(const QString &address){
     }
 
     if(address!=BasicBox::SUB_SCENARIO_MODE_TEXT){
-        std::cout<<address.toStdString()<<std::endl;
         setEnabled(true);
         curveIt = _curveMap->find(add);
         bool curveFound = (curveIt != _curveMap->end());
@@ -216,47 +176,87 @@ void BoxWidget::displayCurve(const QString &address){
             curveWidget->setLowerStyle(false);
             curveWidget->repaint();
             _stackedLayout->setCurrentWidget(curveWidget);
-
-            if(_box->type() == PARENT_BOX_TYPE){
-                BasicBox *child;
-                std::map<unsigned int,BasicBox*>::iterator it;
-                std::map<unsigned int,BasicBox*> children = static_cast<ParentBox*>(_box)->children();
-                if(!children.empty()){
-                    std::cout<<"Lower -> ";
-
-                    for (it = static_cast<ParentBox*>(_box)->children().begin() ; it != static_cast<ParentBox*>(_box)->children().end() ; ++it){
-                        child = it->second;
-                        if(child!=NULL){
-                            child->lower(true);
-                            std::cout<<child->name().toStdString();
-                        }
-                    }
-                    std::cout<<std::endl;
-                }
-            }
+//            _box->lower(true);
         }
     }
     else{
         setEnabled(false);
-        if(_box->type() == PARENT_BOX_TYPE){
-            BasicBox *child;
-            std::map<unsigned int,BasicBox*>::iterator it;
-            std::map<unsigned int,BasicBox*> children = static_cast<ParentBox*>(_box)->children();
-            if(!children.empty()){
-                for (it = static_cast<ParentBox*>(_box)->children().begin() ; it != static_cast<ParentBox*>(_box)->children().end() ; ++it){
-
-                    child = it->second;//lows tous les _children
-                    std::cout<<"rise -> ";
-                    if(child!=NULL){
-//                        child->lower(false);
-                        std::cout<<child->name().toStdString()<<std::endl;
-                    }
-                    std::cout<<std::endl;
-                }
-            }
-        }
     }
 }
+
+//void BoxWidget::displayCurve(const QString &address){
+////    std::cout<<"display : "<<address.toStdString()<<std::endl;
+
+//    std::string add = address.toStdString();
+//    QMap<string,CurveWidget *>::iterator curveIt;
+//    CurveWidget *curveWidget;
+
+
+//   //Unactive curves
+//    QList<CurveWidget *> values = _curveMap->values();
+//    int count = values.size(), i=0;
+
+//    CurveWidget *cur;
+
+//    for(i ; i<count ; i++){
+//        cur = values.at(i);
+//        cur->setLowerStyle(true);
+//        cur->repaint();
+//    }
+
+//    if(address!=BasicBox::SUB_SCENARIO_MODE_TEXT){
+//        std::cout<<address.toStdString()<<std::endl;
+//        setEnabled(true);
+//        curveIt = _curveMap->find(add);
+//        bool curveFound = (curveIt != _curveMap->end());
+
+//        if (curveFound) {
+//            curveWidget = curveIt.value();
+
+//            curveWidget->setLowerStyle(false);
+//            curveWidget->repaint();
+//            _stackedLayout->setCurrentWidget(curveWidget);
+
+//            if(_box->type() == PARENT_BOX_TYPE){
+//                BasicBox *child;
+//                std::map<unsigned int,BasicBox*>::iterator it;
+//                std::map<unsigned int,BasicBox*> children = static_cast<ParentBox*>(_box)->children();
+//                if(!children.empty()){
+//                    std::cout<<"Lower -> ";
+
+//                    for (it = static_cast<ParentBox*>(_box)->children().begin() ; it != static_cast<ParentBox*>(_box)->children().end() ; ++it){
+//                        child = it->second;
+//                        if(child!=NULL){
+//                            child->lower(true);
+//                            std::cout<<child->name().toStdString();
+//                        }
+//                    }
+//                    std::cout<<std::endl;
+//                }
+//            }
+//        }
+//    }
+//    else{
+//        setEnabled(false);
+//        if(_box->type() == PARENT_BOX_TYPE){
+//            BasicBox *child;
+//            std::map<unsigned int,BasicBox*>::iterator it;
+//            std::map<unsigned int,BasicBox*> children = static_cast<ParentBox*>(_box)->children();
+//            if(!children.empty()){
+//                for (it = static_cast<ParentBox*>(_box)->children().begin() ; it != static_cast<ParentBox*>(_box)->children().end() ; ++it){
+
+//                    child = it->second;//lows tous les _children
+//                    std::cout<<"rise -> ";
+//                    if(child!=NULL){
+////                        child->lower(false);
+//                        std::cout<<child->name().toStdString()<<std::endl;
+//                    }
+//                    std::cout<<std::endl;
+//                }
+//            }
+//        }
+//    }
+//}
 
 bool
 BoxWidget::contains(const string &address) {
