@@ -711,15 +711,16 @@ AttributesEditor::addWidgetsToLayout()
 	_curvesTab->setLayout(_curvesLayout);
 
 	// Set Central Widget
-	setWidget(_tabWidget);
+    setWidget(_tabWidget);
     _tabWidget->setBaseSize(MINIMUM_WIDTH,height());
+
 
 
 //	_generalTabIndex = _tabWidget->addTab(_generalTab,"General");
 //	_profilesTabIndex = _tabWidget->addTab(_profilesTab,"Profiles");
 //    _messagesTabIndex = _tabWidget->addTab(_messagesTab,"Messages");
-	_explorationTabIndex = _tabWidget->addTab(_explorationTab,"Exploration");
-	_curvesTabIndex = _tabWidget->addTab(_curvesTab,"Curves");
+    _explorationTabIndex = _tabWidget->addTab(_explorationTab,"Exploration");
+    _curvesTabIndex = _tabWidget->addTab(_curvesTab,"Curves");
 
 }
 

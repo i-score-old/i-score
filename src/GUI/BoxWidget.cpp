@@ -225,7 +225,7 @@ void BoxWidget::displayCurve(const QString &address){
 //                    for (it = static_cast<ParentBox*>(_box)->children().begin() ; it != static_cast<ParentBox*>(_box)->children().end() ; ++it){
 //                        child = it->second;
 //                        if(child!=NULL)
-//                            child->lower(false);
+//                            child->lower(true);
 //                    }
 //                }
 //            }
@@ -242,7 +242,7 @@ void BoxWidget::displayCurve(const QString &address){
 
 //                    child = it->second;//lows tous les _children
 //                    if(child!=NULL){
-//                        child->lower(true);
+//                        child->lower(false);
 //                        std::cout<<child->name().toStdString()<<std::endl;
 //                    }
 //                }

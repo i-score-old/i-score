@@ -552,9 +552,11 @@ MaquetteScene::subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent){
 void
 MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    QGraphicsScene::mousePressEvent(mouseEvent);
-    _clicked = true;
     if(!playing()){
+
+        QGraphicsScene::mousePressEvent(mouseEvent);
+        _clicked = true;
+
         if (_tempBox) {
             removeItem(_tempBox);
             _tempBox = NULL;
@@ -627,70 +629,73 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void
 MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent) {
-	QGraphicsScene::mouseMoveEvent(mouseEvent);
 
-	switch (_currentInteractionMode) {
-	case RELATION_MODE :
+    if(!_playing){
+        QGraphicsScene::mouseMoveEvent(mouseEvent);
 
-        if (_clicked) {
-			_mousePos = mouseEvent->scenePos();
-			if (_relation->firstBox() != NO_ID) {
-                update();
-			}
-			if (itemAt(mouseEvent->scenePos()) != 0) {
-				int type = itemAt(mouseEvent->scenePos())->type();
-				if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
-					BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
-                    if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE) ||
-                            mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
-                        _relationBoxFound = true;
-						update();
-					}
-					else {
-						_relationBoxFound = false;
-					}
-				}
-				else {
-					_relationBoxFound = false;
-				}
-			}
-		}
-		break;
-    case TEXT_MODE :
-		break;
-    case TRIGGER_MODE :
-		break;
-    case SELECTION_MODE :
-		break;
-    case CREATION_MODE :
-        if(noBoxSelected() || subScenarioMode(mouseEvent)){
-            if (resizeMode() == NO_RESIZE && _tempBox) {
-                int upLeftX, upLeftY, width, height;
+        switch (_currentInteractionMode) {
+        case RELATION_MODE :
 
-                if (_pressPoint.x() < mouseEvent->scenePos().x()) {
-                    upLeftX = _pressPoint.x();
-                    width = mouseEvent->scenePos().x() - upLeftX;
-                } else {
-                    upLeftX = mouseEvent->scenePos().x();
-                    width = _pressPoint.x() - upLeftX;
+            if (_clicked) {
+                _mousePos = mouseEvent->scenePos();
+                if (_relation->firstBox() != NO_ID) {
+                    update();
                 }
-                if (_pressPoint.y() < mouseEvent->scenePos().y()) {
-                    upLeftY = _pressPoint.y();
-                    height = mouseEvent->scenePos().y() - upLeftY;
+                if (itemAt(mouseEvent->scenePos()) != 0) {
+                    int type = itemAt(mouseEvent->scenePos())->type();
+                    if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+                        BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
+                        if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE) ||
+                                mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
+                            _relationBoxFound = true;
+                            update();
+                        }
+                        else {
+                            _relationBoxFound = false;
+                        }
+                    }
+                    else {
+                        _relationBoxFound = false;
+                    }
                 }
-                else {
-                    upLeftY = mouseEvent->scenePos().y();
-                    height = _pressPoint.y() - upLeftY;
-                }
-
-                _tempBox->setRect(upLeftX, upLeftY, width, height);
             }
-        }
- 		break;
+            break;
+        case TEXT_MODE :
+            break;
+        case TRIGGER_MODE :
+            break;
+        case SELECTION_MODE :
+            break;
+        case CREATION_MODE :
+            if(noBoxSelected() || subScenarioMode(mouseEvent)){
+                if (resizeMode() == NO_RESIZE && _tempBox) {
+                    int upLeftX, upLeftY, width, height;
 
-    case BOX_EDIT_MODE :
-        break;
-	}
+                    if (_pressPoint.x() < mouseEvent->scenePos().x()) {
+                        upLeftX = _pressPoint.x();
+                        width = mouseEvent->scenePos().x() - upLeftX;
+                    } else {
+                        upLeftX = mouseEvent->scenePos().x();
+                        width = _pressPoint.x() - upLeftX;
+                    }
+                    if (_pressPoint.y() < mouseEvent->scenePos().y()) {
+                        upLeftY = _pressPoint.y();
+                        height = mouseEvent->scenePos().y() - upLeftY;
+                    }
+                    else {
+                        upLeftY = mouseEvent->scenePos().y();
+                        height = _pressPoint.y() - upLeftY;
+                    }
+
+                    _tempBox->setRect(upLeftX, upLeftY, width, height);
+                }
+            }
+            break;
+
+        case BOX_EDIT_MODE :
+            break;
+        }
+    }
 }
 
 void

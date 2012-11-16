@@ -535,7 +535,7 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     Q_UNUSED(widget);
 
 //  painter->drawRect(boundingRect());
-//  painter->drawPath(shape());
+  painter->drawPath(shape());
 
     QPainterPath painterPath;
     painterPath.moveTo(mapFromScene(_start));
