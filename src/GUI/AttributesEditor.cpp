@@ -1365,7 +1365,7 @@ void AttributesEditor::startMessageChanged(QTreeWidgetItem *item) {
         box->updateCurves();
     }
     else
-        _scene->displayMessage("No box selected",WARNING_LEVEL);
+        _scene->displayMessage("No box selected",INDICATION_LEVEL);
 }
 
 void AttributesEditor::endMessageChanged(QTreeWidgetItem *item) {
@@ -1385,7 +1385,7 @@ void AttributesEditor::endMessageChanged(QTreeWidgetItem *item) {
         box->updateCurves();
     }
     else
-        _scene->displayMessage("No box selected",WARNING_LEVEL);
+        _scene->displayMessage("No box selected",INDICATION_LEVEL);
 }
 
 void AttributesEditor::startMessageRemoved(const string &address) {

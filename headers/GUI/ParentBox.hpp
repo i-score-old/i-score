@@ -126,6 +126,7 @@ public:
 	 * \param width : the new width
 	 */
 	virtual void resizeWidthEdition(int width);
+    virtual void updateDisplay(QString displayMode);
 
 protected :
 

@@ -49,7 +49,6 @@ public :
 
     bool contains(const std::string &address);
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
-    void displayCurveWindow(CurveWidget *curve);
     virtual void paintEngine();
 
     void curveActivationChanged(const QString &address,bool state);
@@ -63,9 +62,11 @@ public :
     inline QComboBox *comboBox(){return _comboBox;}
     inline void setStackedLayout(QStackedLayout *slayout){_stackedLayout = slayout;setLayout(_stackedLayout);}    
     void addToComboBox(const QString address);
+    void displayCurve(const QString &address);
 
 public slots :
-    void displayCurve(const QString &address);
+    void updateDisplay(const QString &address);
+
 
 signals :
     void currentIndexChanged(QString address);

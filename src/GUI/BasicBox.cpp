@@ -114,7 +114,7 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 	init();
 
     update();
-    connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),_curvesWidget, SLOT(displayCurve(const QString&)));
+    connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),_curvesWidget, SLOT(updateDisplay(const QString&)));
 //    connect(_comboBox,SIGNAL(activated(const QString&)),_curvesWidget, SLOT(displayCurve(const QString&)));
 
 }
@@ -128,6 +128,17 @@ BasicBox::centerWidget(){
     _comboBox->move(0,-(height()/2+LINE_WIDTH));
     _comboBox->resize((width() - 2*LINE_WIDTH)/2,COMBOBOX_HEIGHT);
 }
+
+void
+BasicBox::updateMode(QString displayMode){
+    updateDisplay(displayMode);
+}
+
+void
+BasicBox::updateDisplay(QString displayMode){
+        std::cout<<"basicbox"<<std::endl;
+}
+
 
 void
 BasicBox::updateWidgets(){

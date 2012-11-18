@@ -144,6 +144,13 @@ void BoxWidget::curveSampleRateChanged(const QString &address,int value) {
     }
 }
 
+void
+BoxWidget::updateDisplay(const QString &address){
+    _box->updateMode(address);
+
+    if(address != BasicBox::SUB_SCENARIO_MODE_TEXT)
+        displayCurve(address);
+}
 
 void BoxWidget::displayCurve(const QString &address){
 //    std::cout<<"display : "<<address.toStdString()<<std::endl;
@@ -621,11 +628,6 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
 //    return false;
 //}
 
-
-void
-BoxWidget::displayCurveWindow(CurveWidget *curve){
-    //TODO
-}
 
 void
 BoxWidget::mouseDoubleClickEvent(QMouseEvent *event){

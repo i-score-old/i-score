@@ -112,6 +112,31 @@ ParentBox::type() const
   return PARENT_BOX_TYPE;
 }
 
+void
+ParentBox::updateDisplay(QString displayMode){
+    BasicBox *curBox;
+    std::map<unsigned int,BasicBox*>::iterator it;
+
+    if(displayMode==SUB_SCENARIO_MODE_TEXT){
+        boxWidget()->setEnabled(false);
+        //trop radical -> juste mettre les curves disable et non tout le widget
+        for (it = _children.begin() ; it != _children.end() ; ++it) {
+            curBox = it->second;
+            curBox->setZValue(0);
+            curBox->setEnabled(true);
+        }
+    }
+    else{
+        boxWidget()->setEnabled(true);
+
+        for (it = _children.begin() ; it != _children.end() ; ++it) {
+            curBox = it->second;
+            curBox->setZValue(-1);
+            curBox->setEnabled(false);
+        }
+    }
+}
+
 bool
 ParentBox::hasChild(unsigned int childID) const {
 	return (_children.find(childID) != _children.end());
