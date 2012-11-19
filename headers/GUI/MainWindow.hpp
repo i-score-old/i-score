@@ -117,6 +117,7 @@ class MainWindow : public QMainWindow
    * \brief Returns goto value in ms.
    */
   int gotoValue();
+  void setMaquetteSceneTitle(QString name);
 
  protected:
 

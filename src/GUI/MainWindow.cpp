@@ -94,11 +94,13 @@ MainWindow::MainWindow()
   // Creation of Scene and View
   _scene = new MaquetteScene(QRectF(0, 0, width(), height()),_editor);
   _scene->setPlayingMode(SpecificMode);
+
   _view = new MaquetteView(this);
 
   // Initialisation of Scene and View
   _view->setScene(_scene);
   _view->updateScene();
+
   // Store background to increase speed
   _view->setCacheMode(QGraphicsView::CacheBackground);
 
@@ -1029,6 +1031,12 @@ MainWindow::setCurrentFile(const QString &fileName)
     shownName = strippedName(_curFile);
   }
   setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("i-score")));
+
+}
+
+void
+MainWindow::setMaquetteSceneTitle(QString name){
+    _scene->setName(name);
 }
 
 QString

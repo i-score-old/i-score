@@ -221,19 +221,18 @@ BasicBox::currentText(){
 }
 
 void
-BasicBox::updateFlexibiliy(){
-    _flexible = hasTriggerPoint(BOX_END);
+BasicBox::updateFlexibility(){
+    _flexible = hasTriggerPoint(BOX_END);    
 }
 
 void
 BasicBox::init()
 {
 	_hasContextMenu = false;
-	_shift = false;
-
+    _shift = false;
 	_playing = false;
     _low = false;
-
+    _triggerPoints = new QMap<BoxExtremity,TriggerPoint*>();
 	_comment = NULL;
     updateBoxSize();
 
@@ -246,7 +245,7 @@ BasicBox::init()
 	setAcceptsHoverEvents(true);
     _currentZvalue = 0;
     setZValue(_currentZvalue);
-    updateFlexibiliy();
+    updateFlexibility();
 }
 
 void
@@ -481,7 +480,6 @@ BasicBox::updateRelations(BoxExtremity extremity){
     std::map< unsigned int, Relation* >::iterator it2;
     std::map< unsigned int, Relation* >cur;
 
-
     Relation *curRel;
 
     it = _relations.find(extremity);
@@ -510,9 +508,10 @@ BasicBox::updateStuff()
 			relIt->second->updateCoordinates();
 		}
 	}
-    map<BoxExtremity,TriggerPoint*>::iterator it2;
-    for (it2 = _triggerPoints.begin() ; it2 != _triggerPoints.end() ; it2++) {
-            it2->second->updatePosition();
+    QList<BoxExtremity> list = _triggerPoints->keys();
+    QList<BoxExtremity>::iterator it2;
+    for (it2 = list.begin() ; it2 != list.end() ; it2++) {
+        _triggerPoints->value(*it2)->updatePosition();
     }
     setFlag(QGraphicsItem::ItemIsMovable,true);
 }
@@ -604,9 +603,10 @@ BasicBox::setCrossedExtremity(BoxExtremity extremity)
 void
 BasicBox::setCrossedTriggerPoint(bool waiting, BoxExtremity extremity)
 {
-	map<BoxExtremity,TriggerPoint*>::iterator it;
-	if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
-		it->second->setWaiting(waiting);
+    QMap<BoxExtremity,TriggerPoint*>::iterator it;
+//	if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
+    if(_triggerPoints->contains(extremity)){
+        _triggerPoints->value(extremity)->setWaiting(waiting);
 	}
 	update();
 }
@@ -615,16 +615,20 @@ BasicBox::setCrossedTriggerPoint(bool waiting, BoxExtremity extremity)
 bool
 BasicBox::hasTriggerPoint(BoxExtremity extremity)
 {
-    if(!_triggerPoints.empty()){
-        return (_triggerPoints.find(extremity) != _triggerPoints.end());
-    }
-    else
-        return false;
+//    if(!_triggerPoints != NULL){
+//        std::cout<<"bug"<<std::endl;
+        bool result = _triggerPoints->contains(extremity);
+//        std::cout<<"ah non "<<std::endl;
+        return result;
+//    }
+//    else
+//        return false;
 }
 
 bool
 BasicBox::addTriggerPoint(BoxExtremity extremity)
 {
+    std::cout<<"add2"<<std::endl;
     std::string trgName;
 
     switch (extremity) {
@@ -641,17 +645,18 @@ BasicBox::addTriggerPoint(BoxExtremity extremity)
 	}
 
     bool ret = false;
-    if (_triggerPoints.find(extremity) == _triggerPoints.end()) {
+//    if (_triggerPoints.find(extremity) == _triggerPoints.end()) {
+    if(!_triggerPoints->contains(extremity)){
+
         int trgID = _scene->addTriggerPoint(_abstract->ID(),extremity,trgName);
         if (trgID > NO_ID) {
-            _triggerPoints[extremity] = _scene->getTriggerPoint(trgID);
-            _triggerPoints[extremity]->updatePosition();           
+            _triggerPoints->insert(extremity, _scene->getTriggerPoint(trgID));
+            _triggerPoints->value(extremity)->updatePosition();
         }
         ret = true;
         updateRelations(extremity);
-        updateFlexibiliy();
+        updateFlexibility();
     }
-
 
 
     unlock();
@@ -662,17 +667,19 @@ BasicBox::addTriggerPoint(BoxExtremity extremity)
 void
 BasicBox::addTriggerPoint(const AbstractTriggerPoint &abstractTP)
 {
-	if (_triggerPoints.find(abstractTP.boxExtremity()) == _triggerPoints.end()) {
+    std::cout<<"add1"<<std::endl;
+//	if (_triggerPoints.find(abstractTP.boxExtremity()) == _triggerPoints.end()) {
+    if(!_triggerPoints->contains(abstractTP.boxExtremity())){
 		int trgID = abstractTP.ID();
 		if (trgID == NO_ID) {
 			trgID = _scene->addTriggerPoint(_abstract->ID(),abstractTP.boxExtremity(),abstractTP.message());
 		}
 		if (trgID != NO_ID) {
-			_triggerPoints[abstractTP.boxExtremity()] = _scene->getTriggerPoint(trgID);
-			_triggerPoints[abstractTP.boxExtremity()]->updatePosition();
-			_scene->addItem(_triggerPoints[abstractTP.boxExtremity()]);
+            _triggerPoints->insert(abstractTP.boxExtremity(), _scene->getTriggerPoint(trgID));
+            _triggerPoints->value(abstractTP.boxExtremity())->updatePosition();
+            _scene->addItem(_triggerPoints->value(abstractTP.boxExtremity()));
 		}
-        updateFlexibiliy();
+        updateFlexibility();
     }
 
 }
@@ -681,12 +688,14 @@ BasicBox::addTriggerPoint(const AbstractTriggerPoint &abstractTP)
 void
 BasicBox::addTriggerPoint(BoxExtremity extremity, TriggerPoint *tp)
 {
-	map<BoxExtremity,TriggerPoint*>::iterator it;
-	if ((it = _triggerPoints.find(extremity)) == _triggerPoints.end()) {
-		_triggerPoints[extremity] = tp;
-		_triggerPoints[extremity]->updatePosition();
+    std::cout<<"add"<<std::endl;
+    QMap<BoxExtremity,TriggerPoint*>::iterator it;
+//	if ((it = _triggerPoints.find(extremity)) == _triggerPoints.end()) {
+    if(!_triggerPoints->contains(extremity)){
+        _triggerPoints->insert(extremity, tp);
+        _triggerPoints->value(extremity)->updatePosition();
         updateRelations(extremity);
-        updateFlexibiliy();
+        updateFlexibility();
 	}
 	else {
 		std::cerr << "BasicBox::addTriggerPoint : already existing" <<  std::endl;
@@ -695,10 +704,13 @@ BasicBox::addTriggerPoint(BoxExtremity extremity, TriggerPoint *tp)
 
 void
 BasicBox::removeTriggerPoint(BoxExtremity extremity) {
-	map<BoxExtremity,TriggerPoint*>::iterator it;
-    if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
-		_triggerPoints.erase(it);
-    }
+//    QMap<BoxExtremity,TriggerPoint*>::iterator it;
+//    if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
+//    if(_triggerPoints.contains(extremity))
+        _triggerPoints->remove(extremity);
+//    }
+
+    updateRelations(extremity);
     _scene->update();
     update();
 }
@@ -706,19 +718,21 @@ BasicBox::removeTriggerPoint(BoxExtremity extremity) {
 void
 BasicBox::setTriggerPointMessage(BoxExtremity extremity, const string &message)
 {
-	map<BoxExtremity,TriggerPoint*>::iterator it;
-	if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
-		it->second->setMessage(message);
+    QMap<BoxExtremity,TriggerPoint*>::iterator it;
+//	if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
+    if(_triggerPoints->contains(extremity)){
+        _triggerPoints->value(extremity)->setMessage(message);
 	}
 }
 
 string
 BasicBox::triggerPointMessage(BoxExtremity extremity)
 {
-	map<BoxExtremity,TriggerPoint*>::iterator it;
-	if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
-		return it->second->message();
-	}
+//    QMap<BoxExtremity,TriggerPoint*>::iterator it;
+//	if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
+    if(_triggerPoints->contains(extremity))
+        return _triggerPoints->value(extremity)->message();
+
 	else {
 		return "";
 	}

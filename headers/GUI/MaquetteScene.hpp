@@ -560,11 +560,14 @@ class MaquetteScene : public QGraphicsScene
   static const std::string DEFAULT_TRIGGER_MSG;
   static const int MIN_BOX_WIDTH = 50;
   static const int MIN_BOX_HEIGHT = 30;
+  static const float MAQUETTTE_BAR_HEIGHT = 40;
 
   inline AttributesEditor *editor(){return _editor;}
   void updateWidgets();
   QGraphicsItem *getSelectedItem();
   bool subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent);
+  void createMaquetteBarWidget();
+  inline void setName(QString name){_name = name;}
 
  protected :
   /*!
@@ -686,6 +689,8 @@ class MaquetteScene : public QGraphicsScene
   bool noBoxSelected();
   inline void resetSelection(){clearSelection();}
   void updateBoxesWidgets();
+
+
  private :
 
   /*!
@@ -786,6 +791,10 @@ class MaquetteScene : public QGraphicsScene
 
 //  QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
   PlayingThread *_playThread; //!< The thread handling playing.
+
+  QWidget *_maquetteBar;
+  QColor _barColor;
+  QString _name;
 };
 
 #endif

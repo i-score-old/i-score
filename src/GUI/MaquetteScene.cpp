@@ -84,6 +84,8 @@ using namespace SndBoxProp;
 MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
     : QGraphicsScene(rect) {
 
+    _name = tr("");
+    _barColor = QColor(Qt::yellow);
 	_editor = editor;
 	_copyPalette = _editor->getPalette();
 	_clicked = false;
@@ -95,6 +97,8 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 	_relation = new AbstractRelation;
 
 	_playThread = new PlayingThread(this);
+
+    createMaquetteBarWidget();
 }
 
 MaquetteScene::~MaquetteScene() {
@@ -127,6 +131,19 @@ MaquetteScene::init()
 
     _mousePos = QPointF(0.,0.);
 }
+
+void
+MaquetteScene::createMaquetteBarWidget(){
+
+    _maquetteBar = new QWidget;
+    _maquetteBar->setGeometry(0,0,width(),MAQUETTTE_BAR_HEIGHT);
+    _maquetteBar->setPalette(QPalette(_barColor));
+
+    _maquetteBar->setAutoFillBackground(true);
+
+    addWidget(_maquetteBar);
+}
+
 
 void
 MaquetteScene::updateView()
@@ -464,7 +481,7 @@ MaquetteScene::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
 
 void
 MaquetteScene::dropEvent(QGraphicsSceneDragDropEvent *event)
-{
+{    
 	if (itemAt(event->scenePos())) {
 		// TODO : handle other boxes drag&drop
 		if (itemAt(event->scenePos())->type() == SOUND_BOX_TYPE) {
@@ -1116,6 +1133,7 @@ MaquetteScene::removeComment(Comment *comment)
 int
 MaquetteScene::addTriggerPoint(unsigned int boxID, BoxExtremity extremity, const string &message)
 {
+    std::cout<<"addfrom scene ";
 	int trgID = NO_ID;
 
 	if ((trgID = _maquette->addTriggerPoint(boxID, extremity, message)) > NO_ID) {
@@ -1152,7 +1170,7 @@ MaquetteScene::removeTriggerPoint(unsigned int trgID)
 			box->removeTriggerPoint(trgPnt->boxExtremity());
 		}
 		removeItem(trgPnt);
-		_maquette->removeTriggerPoint(trgID);       
+        _maquette->removeTriggerPoint(trgID);
 	}
 }
 
@@ -1703,8 +1721,8 @@ MaquetteScene::removeBox(unsigned int boxID)
 		}
 
 		box->removeComment();
-		box->removeTriggerPoint(BOX_START);
-		box->removeTriggerPoint(BOX_END);
+//        box->removeTriggerPoint(BOX_START);
+//        box->removeTriggerPoint(BOX_END);
 
 		delete box;
 		setModified(true);

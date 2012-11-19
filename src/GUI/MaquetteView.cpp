@@ -66,6 +66,7 @@ MaquetteView::MaquetteView(MainWindow *mw)
   setCacheMode(QGraphicsView::CacheBackground);
 
   setWindowTitle(tr("Maquette"));
+
   setAlignment(Qt::AlignLeft | Qt::AlignTop);
   centerOn(0,0);
   _zoom = 1;

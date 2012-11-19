@@ -583,7 +583,7 @@ class BasicBox : public QObject, public QGraphicsItem
   inline bool hasStartMsgs(){return _abstract->hasFirstMsgs();}
   inline bool hasEndMsgs(){return _abstract->hasLastMsgs();}
   void drawMsgsIndicators(QPainter *painter);  
-  void updateFlexibiliy();
+  void updateFlexibility();
   void addToComboBox(QString address);
   QString currentText();
   inline qreal currentZvalue(){return _currentZvalue;}
@@ -672,7 +672,7 @@ class BasicBox : public QObject, public QGraphicsItem
   bool _playing; //!< State of playing.
   TextEdit *_trgPntMsgEdit; //!< The trigger point editing dialog.
   Comment *_comment; //!< The box comment.
-  std::map<BoxExtremity,TriggerPoint*> _triggerPoints; //!< The trigger points.
+  QMap<BoxExtremity,TriggerPoint*> *_triggerPoints; //!< The trigger points.
   std::map < BoxExtremity,std::map < unsigned int, Relation* > > _relations; //!< The relations.
   std::map<std::string,AbstractCurve*> _abstractCurves; //!< The Curves
   BoxWidget *_curvesWidget;
