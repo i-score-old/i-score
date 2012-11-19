@@ -235,7 +235,7 @@ ParentBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
 		if (_scene->currentMode() != CREATION_MODE) {
             setSelected(true);
-			if (cursor().shape() == Qt::SizeAllCursor) {
+            if (cursor().shape() == Qt::ClosedHandCursor) {
 				unlock();
 			}
 			else if (cursor().shape() == Qt::CrossCursor) {
@@ -274,7 +274,7 @@ ParentBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 			update();
 		}
 		else {
-			if (cursor().shape() == Qt::SizeAllCursor && event->modifiers() == Qt::ControlModifier) {
+            if (cursor().shape() == Qt::OpenHandCursor && event->modifiers() == Qt::ControlModifier) {
 				lock();
 			}
 		}
@@ -288,7 +288,7 @@ void
 ParentBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
 	QGraphicsItem::mouseMoveEvent(event);
-	if (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor) {
+    if (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::ClosedHandCursor) {
 		_scene->selectionMoved();
 	}
 	else if (_scene->resizeMode() != NO_RESIZE && (cursor().shape() == Qt::SizeVerCursor

@@ -1019,6 +1019,8 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mousePressEvent(event);
     if (event->button() == Qt::LeftButton) {
         setSelected(true);
+        if(cursor().shape() == Qt::OpenHandCursor)
+            setCursor(Qt::ClosedHandCursor);
         if (cursor().shape() == Qt::ArrowCursor) {
             lock();
         }
@@ -1108,7 +1110,7 @@ BasicBox::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
     bool inTextRect = event->pos().x() > x1 && event->pos().x() < x2 && event->pos().y() > y1 && event->pos().y() < y2;
 
 
-    if (!_scene->playing() && (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor) && inTextRect) {
+    if (!_scene->playing() && (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::OpenHandCursor) && inTextRect) {
         QInputDialog *nameDialog = nameInputDialog();
 
         bool ok = nameDialog->exec();
@@ -1144,7 +1146,7 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 //    QPoint pos = this->getBottomRight().toPoint();
 //    QToolTip::showText(pos, posStr);
 
-    if (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::SizeAllCursor) {
+    if (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::ClosedHandCursor) {
         _scene->selectionMoved();
     }
     else if (_scene->resizeMode() != NO_RESIZE && (cursor().shape() == Qt::SizeVerCursor || cursor().shape() == Qt::SizeHorCursor || cursor().shape() == Qt::SizeFDiagCursor)) {
@@ -1174,6 +1176,8 @@ BasicBox::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 	QGraphicsItem::mouseReleaseEvent(event);
 
     if (event->button() == Qt::LeftButton) {
+        if(cursor().shape() == Qt::ClosedHandCursor)
+            setCursor(Qt::OpenHandCursor);
 		_scene->setAttributes(_abstract);
 	}
 
@@ -1204,7 +1208,7 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 
     //bandeau zone (text rect) - top
     if(textRect.contains(event->pos())){
-        setCursor(Qt::SizeAllCursor);
+        setCursor(Qt::OpenHandCursor);
     }
 
     //Trigger zone - left
@@ -1268,7 +1272,7 @@ BasicBox::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 
     //bandeau zone (text rect) - top
     if(textRect.contains(event->pos())){
-        setCursor(Qt::SizeAllCursor);
+        setCursor(Qt::OpenHandCursor);
     }
 
     //Trigger zone - left

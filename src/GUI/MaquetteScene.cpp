@@ -555,6 +555,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     QGraphicsScene::mousePressEvent(mouseEvent);
     _clicked = true;
 
+
     if (_tempBox) {
         removeItem(_tempBox);
         _tempBox = NULL;
