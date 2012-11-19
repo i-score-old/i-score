@@ -213,10 +213,12 @@ void
 Relation::lower(bool state){
     if(state){
         setEnabled(false);
+        setZValue(-1);
         setOpacity(0.5);
     }
     else{
         setEnabled(true);
+        setZValue(1);
         setOpacity(1);
     }
 }
