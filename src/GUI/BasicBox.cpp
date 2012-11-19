@@ -136,7 +136,6 @@ BasicBox::updateMode(QString displayMode){
 
 void
 BasicBox::updateDisplay(QString displayMode){
-        std::cout<<"basicbox"<<std::endl;
 }
 
 
@@ -233,6 +232,7 @@ BasicBox::init()
 	_shift = false;
 
 	_playing = false;
+    _low = false;
 
 	_comment = NULL;
     updateBoxSize();
@@ -481,6 +481,7 @@ BasicBox::updateRelations(BoxExtremity extremity){
     std::map< unsigned int, Relation* >::iterator it2;
     std::map< unsigned int, Relation* >cur;
 
+
     Relation *curRel;
 
     it = _relations.find(extremity);
@@ -488,6 +489,7 @@ BasicBox::updateRelations(BoxExtremity extremity){
         cur = it->second;
         for(it2 = cur.begin(); it2!=cur.end(); ++it2){
             curRel = it2->second;
+            curRel->lower(_low);
             curRel->updateFlexibility();
         }
     }
@@ -1056,55 +1058,21 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void
 BasicBox::lower(bool state){
+    _low = state;
 
-    if(state){
-        setZValue(_currentZvalue-1);
+    if(_low){
+        setZValue(-1);
         setEnabled(false);
+        setOpacity(0.5);
     }
     else{
+        setOpacity(1);
         setZValue(0);
         setEnabled(true);
     }
+    updateRelations(BOX_START);
+    updateRelations(BOX_END);
 }
-
-//void
-//BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
-//{
-//    QGraphicsItem::mousePressEvent(event);
-//    if (event->button() == Qt::LeftButton) {
-//        if (cursor().shape() == Qt::CrossCursor) {
-//            lock();
-//            if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
-//                _scene->setRelationFirstBox(_abstract->ID(),BOX_START);
-//            }
-//            else if (event->pos().x() > boundingRect().topRight().x() - RESIZE_TOLERANCE) {
-//                _scene->setRelationFirstBox(_abstract->ID(),BOX_END);
-//            }
-//        }
-//        else if (cursor().shape() == Qt::PointingHandCursor) {
-//            lock();
-//            if (event->pos().x() < boundingRect().topLeft().x() + RESIZE_TOLERANCE) {
-//                addTriggerPoint(BOX_START);
-//            }
-//            else if (event->pos().x() > boundingRect().topRight().x() - RESIZE_TOLERANCE) {
-//                addTriggerPoint(BOX_END);
-//            }
-//        }
-//        else {
-//            if (cursor().shape() == Qt::SizeHorCursor) {
-//                _scene->setResizeMode(HORIZONTAL_RESIZE);
-//            }
-//            else if (cursor().shape() == Qt::SizeVerCursor) {
-//                _scene->setResizeMode(VERTICAL_RESIZE);
-//            }
-//            else if (cursor().shape() == Qt::SizeFDiagCursor) {
-//                _scene->setResizeMode(DIAGONAL_RESIZE);
-//            }
-//            _scene->setResizeBox(_abstract->ID());
-//        }
-//        update();
-//    }
-//}
 
 void
 BasicBox::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )

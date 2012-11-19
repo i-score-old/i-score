@@ -692,6 +692,8 @@ class BasicBox : public QObject, public QGraphicsItem
   QList<string> _curvesAddresses;
   bool _flexible;
   qreal _currentZvalue;
+
+  bool _low;
 };
 
 #endif

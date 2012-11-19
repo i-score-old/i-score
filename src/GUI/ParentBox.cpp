@@ -118,21 +118,15 @@ ParentBox::updateDisplay(QString displayMode){
     std::map<unsigned int,BasicBox*>::iterator it;
 
     if(displayMode==SUB_SCENARIO_MODE_TEXT){
-        boxWidget()->setEnabled(false);
-        //trop radical -> juste mettre les curves disable et non tout le widget
         for (it = _children.begin() ; it != _children.end() ; ++it) {
             curBox = it->second;
-            curBox->setZValue(0);
-            curBox->setEnabled(true);
+            curBox->lower(false);
         }
     }
     else{
-        boxWidget()->setEnabled(true);
-
         for (it = _children.begin() ; it != _children.end() ; ++it) {
             curBox = it->second;
-            curBox->setZValue(-1);
-            curBox->setEnabled(false);
+            curBox->lower(true);
         }
     }
 }

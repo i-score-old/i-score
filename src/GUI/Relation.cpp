@@ -209,6 +209,18 @@ Relation::updateCoordinates()
 
 }
 
+void
+Relation::lower(bool state){
+    if(state){
+        setEnabled(false);
+        setOpacity(0.5);
+    }
+    else{
+        setEnabled(true);
+        setOpacity(1);
+    }
+}
+
 QPointF
 Relation::getCenter() const
 {

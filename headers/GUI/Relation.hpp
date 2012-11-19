@@ -131,6 +131,7 @@ class Relation : public QGraphicsItem
   inline QRectF endBoundRect(){return _endBoundRect;}
   inline void setFlexible(bool flexible){_flexibleRelation = flexible;}
   void updateFlexibility();
+  void lower(bool state);
 
   static const float TOLERANCE_X;
   static const float TOLERANCE_Y;

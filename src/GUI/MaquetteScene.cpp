@@ -1078,7 +1078,7 @@ MaquetteScene::sequentialName(const string &name)
 	std::stringstream tmp;
 	tmp << curID;
 
-	return name + "_" + tmp.str();
+    return name + "." + tmp.str();
 }
 
 QString

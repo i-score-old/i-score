@@ -147,9 +147,7 @@ void BoxWidget::curveSampleRateChanged(const QString &address,int value) {
 void
 BoxWidget::updateDisplay(const QString &address){
     _box->updateMode(address);
-
-    if(address != BasicBox::SUB_SCENARIO_MODE_TEXT)
-        displayCurve(address);
+    displayCurve(address);
 }
 
 void BoxWidget::displayCurve(const QString &address){
@@ -183,7 +181,6 @@ void BoxWidget::displayCurve(const QString &address){
             curveWidget->setLowerStyle(false);
             curveWidget->repaint();
             _stackedLayout->setCurrentWidget(curveWidget);
-//            _box->lower(true);
         }
     }
     else{
