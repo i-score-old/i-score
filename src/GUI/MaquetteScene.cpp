@@ -138,19 +138,33 @@ MaquetteScene::createMaquetteBarWidget(){
     _maquetteBar = new QWidget;
     _maquetteBar->setGeometry(0,0,width(),MAQUETTTE_BAR_HEIGHT);
     _maquetteBar->setPalette(QPalette(_barColor));
-
     _maquetteBar->setAutoFillBackground(true);
 
     QGridLayout *layout= new QGridLayout;
+
+    //START BUTTON
+    _playAct = new QAction(QIcon(":/images/play.svg"), tr("Play"), _maquetteBar);
+    _playAct->setStatusTip(tr("Play composition audio preview"));
+    _playAct->setCheckable(true);
+    connect(_playAct,SIGNAL(triggered()), this, SLOT(play()));
+
+    //TITLE
     _maquetteTitle = new QLabel(_name);
     QFont *font = new QFont();
     font->setPointSize(NAME_POINT_SIZE);
     _maquetteTitle->setFont(*font);
 
+    //BUTTONS WIDGET
+    QWidget *buttonWidget = new QWidget;
+    buttonWidget->addAction(_playAct);
+
+    layout->addWidget(buttonWidget);
     layout->addWidget(_maquetteTitle);
 
+
     _maquetteBar->setLayout(layout);
-    addWidget(_maquetteBar);
+
+//    addWidget(_maquetteBar);
 }
 
 void

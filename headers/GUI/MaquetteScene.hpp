@@ -48,6 +48,7 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #include <QGraphicsScene>
 #include <QLabel>
+#include <QAction>
 
 #include "Maquette.hpp"
 #include "Palette.hpp"
@@ -798,6 +799,7 @@ class MaquetteScene : public QGraphicsScene
   QColor _barColor;
   QString _name;
   QLabel *_maquetteTitle;
+  QAction *_playAct;
 };
 
 #endif
