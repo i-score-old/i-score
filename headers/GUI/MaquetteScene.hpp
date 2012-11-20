@@ -49,6 +49,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QGraphicsScene>
 #include <QLabel>
 #include <QAction>
+#include <QToolBar>
 
 #include "Maquette.hpp"
 #include "Palette.hpp"
@@ -562,7 +563,7 @@ class MaquetteScene : public QGraphicsScene
   static const std::string DEFAULT_TRIGGER_MSG;
   static const int MIN_BOX_WIDTH = 50;
   static const int MIN_BOX_HEIGHT = 30;
-  static const float MAQUETTTE_BAR_HEIGHT = 10;
+  static const float MAQUETTTE_BAR_HEIGHT;
   static const int NAME_POINT_SIZE = 20;
 
   inline AttributesEditor *editor(){return _editor;}
@@ -800,6 +801,7 @@ class MaquetteScene : public QGraphicsScene
   QString _name;
   QLabel *_maquetteTitle;
   QAction *_playAct;
+  QToolBar *_toolBar;
 };
 
 #endif
