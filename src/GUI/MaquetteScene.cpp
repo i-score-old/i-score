@@ -84,7 +84,7 @@ using namespace SndBoxProp;
 MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
     : QGraphicsScene(rect) {
 
-    _name = tr("");
+    _name = tr("SCENARIO");
     _barColor = QColor(Qt::yellow);
 	_editor = editor;
 	_copyPalette = _editor->getPalette();
@@ -141,9 +141,23 @@ MaquetteScene::createMaquetteBarWidget(){
 
     _maquetteBar->setAutoFillBackground(true);
 
+    QGridLayout *layout= new QGridLayout;
+    _maquetteTitle = new QLabel(_name);
+    QFont *font = new QFont();
+    font->setPointSize(NAME_POINT_SIZE);
+    _maquetteTitle->setFont(*font);
+
+    layout->addWidget(_maquetteTitle);
+
+    _maquetteBar->setLayout(layout);
     addWidget(_maquetteBar);
 }
 
+void
+MaquetteScene::setName(QString name){
+    _name = name;
+    _maquetteTitle->setText(_name);
+}
 
 void
 MaquetteScene::updateView()

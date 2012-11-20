@@ -1031,7 +1031,7 @@ MainWindow::setCurrentFile(const QString &fileName)
     shownName = strippedName(_curFile);
   }
   setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("i-score")));
-
+  setMaquetteSceneTitle(tr("%1").arg(shownName));
 }
 
 void
