@@ -310,7 +310,12 @@ BasicBox::getLeftGripPoint()
 QPointF
 BasicBox::getRightGripPoint()
 {
-    return QPointF(_abstract->topLeft().x() + _abstract->width(), _abstract->topLeft().y() + _abstract->height()/2.);
+    try{
+        return QPointF(_abstract->topLeft().x() + _abstract->width(), _abstract->topLeft().y() + _abstract->height()/2.);}
+    catch (const std::exception & e){
+        std::cerr << "BasicBox::getRightGripPoint() : " << e.what();
+    }
+
 }
 
 QPointF
@@ -704,11 +709,8 @@ BasicBox::addTriggerPoint(BoxExtremity extremity, TriggerPoint *tp)
 
 void
 BasicBox::removeTriggerPoint(BoxExtremity extremity) {
-//    QMap<BoxExtremity,TriggerPoint*>::iterator it;
-//    if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
-//    if(_triggerPoints.contains(extremity))
-        _triggerPoints->remove(extremity);
-//    }
+    _triggerPoints->remove(extremity);
+    updateFlexibility();
 
     updateRelations(extremity);
     _scene->update();
@@ -1192,7 +1194,7 @@ BasicBox::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         if(cursor().shape() == Qt::ClosedHandCursor)
             setCursor(Qt::OpenHandCursor);
-		_scene->setAttributes(_abstract);
+        _scene->setAttributes(_abstract);
 	}
 
 	if (!playing()) {

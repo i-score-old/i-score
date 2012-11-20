@@ -499,14 +499,20 @@ Relation::shape() const
 void
 Relation::updateFlexibility(){
 
-    if(_abstract->secondExtremity() == BOX_START && _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START))
-        _flexibleRelation = true;
+    if(_scene->getBox(_abstract->secondBox())!=NULL){
+        if(_abstract->secondExtremity() == BOX_START && _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START))
+            _flexibleRelation = true;
 
-    else if(_abstract->secondExtremity() == BOX_END && _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_END))
-        _flexibleRelation = true;
-
+        else if(_abstract->secondExtremity() == BOX_END && _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_END))
+            _flexibleRelation = true;
+        else
+            _flexibleRelation = false;
+    }
     else
         _flexibleRelation = false;
+
+
+
 
     double startX = mapFromScene(_start).x();
     double endX = mapFromScene(_end).x();
