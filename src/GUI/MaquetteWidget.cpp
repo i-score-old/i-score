@@ -52,12 +52,86 @@ using std::string;
 #include <QGraphicsOpacityEffect>
 
 #include "MaquetteWidget.hpp"
+#include "MaquetteScene.hpp"
+
+const float MaquetteWidget::HEADER_HEIGHT = 40;
+const float MaquetteWidget::NAME_POINT_SIZE = 20;
 
 MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view)
     : QWidget(parent){
+
     _view = view;
+    _color = QColor(Qt::white);
+    _maquetteLayout = new QGridLayout();
+    _nameLabel = new QLabel;
+    _toolBar = new QToolBar;
+    _header = new QWidget(NULL);
+
+    createActions();
+    createToolBar();
+    createNameLabel();
+    createHeader();
+
+    _maquetteLayout->addWidget(_header);
+    _maquetteLayout->addWidget(_view);
+    _maquetteLayout->setContentsMargins(0,0,0,0);
+    _maquetteLayout->setVerticalSpacing(0);
+    setLayout(_maquetteLayout);
+}
+
+void
+MaquetteWidget::init(){
+
 }
 
 MaquetteWidget::~MaquetteWidget(){
 
+}
+
+void
+MaquetteWidget::createNameLabel(){
+    QFont *font = new QFont();
+    font->setPointSize(NAME_POINT_SIZE);
+    _nameLabel->setFont(*font);
+    _nameLabel->setText("Scenario");
+}
+
+void
+MaquetteWidget::createActions(){
+    _playAction = new QAction(QIcon(":/images/play.svg"), tr("Play"), this);
+    _playAction->setStatusTip(tr("Play composition"));
+    _playAction->setCheckable(true);
+
+    connect(_playAction,SIGNAL(triggered()), this, SLOT(play()));
+}
+
+void
+MaquetteWidget::createToolBar(){
+    _toolBar->addAction(_playAction);
+}
+
+void
+MaquetteWidget::createHeader(){
+    _header->setGeometry(0,0,width(),HEADER_HEIGHT);
+//    _header->setMaximumHeight(HEADER_HEIGHT);
+    _header->setPalette(QPalette(_color));
+    _header->setAutoFillBackground(true);
+
+    QGridLayout *layout= new QGridLayout;
+    layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+
+    layout->addWidget(_toolBar,0,0);
+    layout->addWidget(_nameLabel,0,1);
+    layout->setContentsMargins(0,0,0,0);
+    _header->setLayout(layout);
+}
+
+void
+MaquetteWidget::play(){
+    emit(beginPlaying());
+}
+
+void
+MaquetteWidget::setName(QString name){
+    _nameLabel->setText(name);
 }

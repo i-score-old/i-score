@@ -48,6 +48,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "NetworkConfig.hpp"
 #include "SoundBox.hpp"
 #include "ViewRelations.hpp"
+#include "MaquetteWidget.hpp"
 
 #include <QResource>
 #include <QString>
@@ -87,7 +88,7 @@ MainWindow::MainWindow()
   readSettings();
 
   // Creation of Graphic Palette
-  _editor = new AttributesEditor(this);  
+  _editor = new AttributesEditor(this);
   _editor->hide();
   addDockWidget(Qt::LeftDockWidgetArea,_editor);
 
@@ -112,8 +113,8 @@ MainWindow::MainWindow()
   _editor->show();
 
   // Central Widget
-  _maquetteWidget = new QWidget;
-  createMaquetteWidget();
+  _maquetteWidget = new MaquetteWidget(this,_view);
+//  createMaquetteWidget();
   setCentralWidget(_maquetteWidget);
 //  setCentralWidget(_view);
 
@@ -126,52 +127,53 @@ MainWindow::MainWindow()
   setCurrentFile("");
 
   setAcceptDrops(false);
+  connect(_maquetteWidget,SIGNAL(beginPlaying()),this,SLOT(play()));
 }
 
-void
-MainWindow::createMaquetteWidget(){
+//void
+//MainWindow::createMaquetteWidget(){
 
-    int MAQUETTTE_HEADER_HEIGHT = 40;
-    int NAME_POINT_SIZE = 20;
+//    int MAQUETTTE_HEADER_HEIGHT = 40;
+//    int NAME_POINT_SIZE = 20;
 
-    QColor maquetteHeaderColor = QColor(Qt::white);
+//    QColor maquetteHeaderColor = QColor(Qt::white);
 
-    QWidget *maquetteHeader = new QWidget;
-    maquetteHeader->setGeometry(0,0,width(),MAQUETTTE_HEADER_HEIGHT);
-    maquetteHeader->setMaximumHeight(MAQUETTTE_HEADER_HEIGHT);
-    maquetteHeader->setPalette(QPalette(maquetteHeaderColor));
-    maquetteHeader->setAutoFillBackground(true);
+//    QWidget *maquetteHeader = new QWidget;
+//    maquetteHeader->setGeometry(0,0,width(),MAQUETTTE_HEADER_HEIGHT);
+//    maquetteHeader->setMaximumHeight(MAQUETTTE_HEADER_HEIGHT);
+//    maquetteHeader->setPalette(QPalette(maquetteHeaderColor));
+//    maquetteHeader->setAutoFillBackground(true);
 
-    QGridLayout *layout= new QGridLayout;
-    layout->setContentsMargins(QMargins(0,0,0,0));
-    //TITLE
-    _maquetteTitle = new QLabel;
-    QFont *font = new QFont();
-    font->setPointSize(NAME_POINT_SIZE);
-    _maquetteTitle->setFont(*font);
+//    QGridLayout *layout= new QGridLayout;
+//    layout->setContentsMargins(QMargins(0,0,0,0));
+//    //TITLE
+//    _maquetteTitle = new QLabel;
+//    QFont *font = new QFont();
+//    font->setPointSize(NAME_POINT_SIZE);
+//    _maquetteTitle->setFont(*font);
 
-    //BUTTONS
-    QToolBar *maquetteToolBar = new QToolBar;
+//    //BUTTONS
+//    QToolBar *maquetteToolBar = new QToolBar;
 
-    //start button
+//    //start button
 
 
-//    maquetteToolBar->addAction(_playAct);
+////    maquetteToolBar->addAction(_playAct);
 
-//    layout->addWidget(maquetteToolBar,0,0);
+////    layout->addWidget(maquetteToolBar,0,0);
 
-    layout->addWidget(_maquetteTitle,0,0);
+//    layout->addWidget(_maquetteTitle,0,0);
 
-    maquetteHeader->setLayout(layout);
+//    maquetteHeader->setLayout(layout);
 
-    QGridLayout *maquetteLayout = new QGridLayout;
-    maquetteLayout->setContentsMargins(QMargins(0,0,0,0));
-    maquetteLayout->setSpacing(0);
-    maquetteLayout->addWidget(maquetteHeader);
-    maquetteLayout->addWidget(_view);
-    _maquetteWidget->setLayout(maquetteLayout);
+//    QGridLayout *maquetteLayout = new QGridLayout;
+//    maquetteLayout->setContentsMargins(QMargins(0,0,0,0));
+//    maquetteLayout->setSpacing(0);
+//    maquetteLayout->addWidget(maquetteHeader);
+//    maquetteLayout->addWidget(_view);
+//    _maquetteWidget->setLayout(maquetteLayout);
 
-}
+//}
 
 MainWindow::~MainWindow()
 {
@@ -241,7 +243,7 @@ MainWindow::displayMessage(const QString &mess, unsigned int warningLevel) {
     break;
   default :
     std::cerr << "MainWindow::displayMessage : Unknown warning level type for displaying : "
-     	      << std::endl << mess.toStdString() << std::endl;
+              << std::endl << mess.toStdString() << std::endl;
     break;
   }
 }
@@ -253,17 +255,17 @@ MainWindow::closeEvent(QCloseEvent *event)
   if (_scene->documentModified()) {
 
     int ret = QMessageBox::question(_view, tr("Document modified"),
-				    tr("The document was modified.\n\nDo you want to save before leaving ?"),
-				    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-				    QMessageBox::Cancel);
+                    tr("The document was modified.\n\nDo you want to save before leaving ?"),
+                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                    QMessageBox::Cancel);
     switch (ret) {
     case QMessageBox::Yes :
       if (saveAs()) {
-	event->accept();
-	QWidget::close();
+    event->accept();
+    QWidget::close();
       }
       else {
-	event->ignore();
+    event->ignore();
       }
       break;
     case QMessageBox::No :
@@ -286,13 +288,13 @@ MainWindow::newFile()
 {
   if (_scene->documentModified()) {
     int ret = QMessageBox::question(_view, tr("Document modified"),
-				    tr("The document was modified.\n\nDo you want to save before creating a new file ?"),
-				    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-				    QMessageBox::Cancel);
+                    tr("The document was modified.\n\nDo you want to save before creating a new file ?"),
+                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                    QMessageBox::Cancel);
     switch (ret) {
     case QMessageBox::Yes :
       if (!saveAs()) {
-	return;
+    return;
       }
       break;
     case QMessageBox::No :
@@ -313,13 +315,13 @@ MainWindow::open()
 {
   if (_scene->documentModified()) {
     int ret = QMessageBox::question(_view, tr("Document modified"),
-				    tr("The document was modified.\n\nDo you want to save before opening another file ?"),
-				    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-				    QMessageBox::Cancel);
+                    tr("The document was modified.\n\nDo you want to save before opening another file ?"),
+                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                    QMessageBox::Cancel);
     switch (ret) {
     case QMessageBox::Yes :
       if (!saveAs()) {
-	return;
+    return;
       }
       break;
     case QMessageBox::No :
@@ -363,8 +365,8 @@ MainWindow::exporting()
   QString fileName = QFileDialog::getSaveFileName(this,tr("Export File"),"",tr("PNG Files (*.png)"));
 
   if (!fileName.isEmpty()) {
-  	displayMessage(tr("Exporting file : ")+fileName,INDICATION_LEVEL);
-  	QPixmap pixmap = QPixmap::grabWidget(_view);
+    displayMessage(tr("Exporting file : ")+fileName,INDICATION_LEVEL);
+    QPixmap pixmap = QPixmap::grabWidget(_view);
     pixmap.save(fileName);
   }
 }
@@ -372,7 +374,7 @@ MainWindow::exporting()
 void
 MainWindow::print()
 {
-	displayMessage(tr("Printing ..."),INDICATION_LEVEL);
+    displayMessage(tr("Printing ..."),INDICATION_LEVEL);
 
   QPrinter printer;
   if (QPrintDialog(&printer).exec() == QDialog::Accepted) {
@@ -386,7 +388,7 @@ void
 MainWindow::about()
 {
   QMessageBox::about(this, tr("About i-score"),
-		     tr("A wonderful music software"));
+             tr("A wonderful music software"));
 }
 
 void
@@ -451,21 +453,21 @@ MainWindow::pasteSelection()
 void
 MainWindow::accelerationChanged(int value)
 {
-	double newValue = _accelerationSlider->accelerationValue(value);
+    double newValue = _accelerationSlider->accelerationValue(value);
 
-	if (_accelerationDisplay->value() != newValue) {
-		_accelerationDisplay->setValue(newValue);
-	}
+    if (_accelerationDisplay->value() != newValue) {
+        _accelerationDisplay->setValue(newValue);
+    }
 }
 
 void
 MainWindow::accelerationValueEntered(double value)
 {
-	int newValue = _accelerationSlider->valueForAcceleration(value);
+    int newValue = _accelerationSlider->valueForAcceleration(value);
 
-	Maquette::getInstance()->setAccelerationFactor(value);
+    Maquette::getInstance()->setAccelerationFactor(value);
 
-	_accelerationSlider->setValue(newValue);
+    _accelerationSlider->setValue(newValue);
 }
 
 void
@@ -474,19 +476,19 @@ MainWindow::gotoChanged()
     double newValue = _gotoSlider->value();
 
     Maquette::getInstance()->setGotoValue(newValue);
-	_view->setGotoValue(newValue);
+    _view->setGotoValue(newValue);
 
-	_gotoDisplay->setValue(newValue / S_TO_MS);
+    _gotoDisplay->setValue(newValue / S_TO_MS);
     _view->repaint();
 }
 
 void
 MainWindow::gotoValueEntered(double value) {
-	Maquette::getInstance()->setGotoValue(value * S_TO_MS);
-	_gotoSlider->setTracking(false);
-	_gotoSlider->setValue(value * S_TO_MS);
-	_gotoSlider->setTracking(true);
-	_view->setGotoValue(value * S_TO_MS);
+    Maquette::getInstance()->setGotoValue(value * S_TO_MS);
+    _gotoSlider->setTracking(false);
+    _gotoSlider->setValue(value * S_TO_MS);
+    _gotoSlider->setTracking(true);
+    _view->setGotoValue(value * S_TO_MS);
 }
 /*
 void
@@ -514,9 +516,9 @@ void
 MainWindow::returnKeyPressed()
 {
   if (_scene->playing()) {
-  	std::stringstream msg;
-  	msg << tr("Triggering with message : '").toStdString() << MaquetteScene::DEFAULT_TRIGGER_MSG << "'";
-  	displayMessage(QString::fromStdString(msg.str()),INDICATION_LEVEL);
+    std::stringstream msg;
+    msg << tr("Triggering with message : '").toStdString() << MaquetteScene::DEFAULT_TRIGGER_MSG << "'";
+    displayMessage(QString::fromStdString(msg.str()),INDICATION_LEVEL);
     _scene->trigger(MaquetteScene::DEFAULT_TRIGGER_MSG);
   }
 }
@@ -643,14 +645,14 @@ MainWindow::selectMode(const InteractionMode &mode,const BoxCreationMode &boxMod
     {
       switch (boxMode) {
       case NB_MODE :
-	_selectModeAct->setChecked(true);
-	break;
+    _selectModeAct->setChecked(true);
+    break;
       case SB_MODE :
-	_SBModeAct->setChecked(true);
-	break;
+    _SBModeAct->setChecked(true);
+    break;
       default :
-	std::cerr << "MainWindow::selectMode : Box Creation Mode Unknown" << std::endl;
-	break;
+    std::cerr << "MainWindow::selectMode : Box Creation Mode Unknown" << std::endl;
+    break;
       }
       break;
     }
@@ -685,19 +687,19 @@ void
 MainWindow::createActions()
 {
   _newAct = new QAction(//QApplication::style()->standardIcon(QStyle::SP_FileIcon),
-  		tr("&New"), this);
+        tr("&New"), this);
   _newAct->setShortcut(QKeySequence::New);
   _newAct->setStatusTip(tr("Create a new file"));
   connect(_newAct, SIGNAL(triggered()), this, SLOT(newFile()));
 
   _openAct = new QAction(//QApplication::style()->standardIcon(QStyle::SP_DirOpenIcon),
-  		tr("&Open..."), this);
+        tr("&Open..."), this);
   _openAct->setShortcut(QKeySequence::Open);
   _openAct->setStatusTip(tr("Open an existing file"));
   connect(_openAct, SIGNAL(triggered()), this, SLOT(open()));
 
   _saveAct = new QAction(//QApplication::style()->standardIcon(QStyle::SP_DialogSaveButton),
-  		tr("&Save"), this);
+        tr("&Save"), this);
   _saveAct->setShortcut(QKeySequence::Save);
   _saveAct->setStatusTip(tr("Save the document to disk"));
   connect(_saveAct, SIGNAL(triggered()), this, SLOT(save()));
@@ -829,7 +831,7 @@ MainWindow::createActions()
   _triggerModeAct->setChecked(false);
   connect(_triggerModeAct,SIGNAL(triggered()), this, SLOT(selectMode()));
 
-  _modeAct = new QActionGroup(this);  
+  _modeAct = new QActionGroup(this);
   _modeAct->addAction(_selectModeAct);
   _modeAct->addAction(_SBModeAct);
   _modeAct->addAction(_CBModeAct);
@@ -886,7 +888,7 @@ MainWindow::createActions()
   _gotoSlider->setSingleStep(1);
   _gotoSlider->setPageStep(10);
   _gotoSlider->setStyleSheet("QSlider::handle:horizontal { background: white; width: 3px; "
-		  "border-left: 3px solid black; border-right : 3px solid black;  border-top: 0px; border-bottom: 0px;}");
+          "border-left: 3px solid black; border-right : 3px solid black;  border-top: 0px; border-bottom: 0px;}");
 
   connect(_gotoSlider,SIGNAL(valueChanged(int)),this,SLOT(gotoChanged()));
 
@@ -894,7 +896,7 @@ MainWindow::createActions()
   static const float S_TO_MS = 1000.;
   _gotoDisplay = new QDoubleSpinBox;
   _gotoDisplay->setStatusTip(tr("Goto"));
-  _gotoDisplay->setRange(0.,MaquetteScene::MAX_SCENE_WIDTH * MaquetteScene::MS_PER_PIXEL / S_TO_MS);  
+  _gotoDisplay->setRange(0.,MaquetteScene::MAX_SCENE_WIDTH * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
   _gotoDisplay->setDecimals(GOTO_PRECISION);
   _gotoDisplay->setKeyboardTracking(false);
   connect(_gotoDisplay, SIGNAL(valueChanged(double)), this, SLOT(gotoValueEntered(double)));
@@ -946,19 +948,19 @@ MainWindow::createMenus()
 void
 MainWindow::createToolBars()
 {
-	_fileToolBar = addToolBar(tr("File"));
+    _fileToolBar = addToolBar(tr("File"));
 
     _fileToolBar->addAction(_PBModeAct);
     _fileToolBar->addAction(_CBModeAct);
-	_fileToolBar->addAction(_SBModeAct);	
+    _fileToolBar->addAction(_SBModeAct);
 
-	_fileToolBar->addSeparator();
+    _fileToolBar->addSeparator();
 
-	_fileToolBar->addAction(_copyAct);
-	_fileToolBar->addAction(_cutAct);
-	_fileToolBar->addAction(_pasteAct);
+    _fileToolBar->addAction(_copyAct);
+    _fileToolBar->addAction(_cutAct);
+    _fileToolBar->addAction(_pasteAct);
 
-	_fileToolBar->addSeparator();
+    _fileToolBar->addSeparator();
 
   _fileToolBar->addAction(_zoomOutAct);
   _fileToolBar->addAction(_zoomInAct);
@@ -992,7 +994,7 @@ MainWindow::createToolBars()
 
 int
 MainWindow::gotoValue() {
-	return _gotoSlider->value();
+    return _gotoSlider->value();
 }
 
 void
@@ -1072,7 +1074,7 @@ MainWindow::setCurrentFile(const QString &fileName)
   setWindowModified(false);
   QString shownName;
   if (_curFile.isEmpty()) {
-    shownName = tr("New file");
+    shownName = tr("New scenario");
   }
   else {
     shownName = strippedName(_curFile);
@@ -1084,8 +1086,7 @@ MainWindow::setCurrentFile(const QString &fileName)
 
 void
 MainWindow::setMaquetteSceneTitle(QString name){
-//    _scene->setName(name);
-//    _maquetteTitle->setText(name);
+    _maquetteWidget->setName(name);
 }
 
 QString

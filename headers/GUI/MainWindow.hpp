@@ -53,6 +53,7 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #include "Palette.hpp"
 #include "MaquetteScene.hpp"
+#include "MaquetteWidget.hpp"
 
 class MaquetteView;
 class AttributesEditor;
@@ -118,7 +119,6 @@ class MainWindow : public QMainWindow
    */
   int gotoValue();
   void setMaquetteSceneTitle(QString name);
-  void createMaquetteWidget();
 
  protected:
 
@@ -330,8 +330,8 @@ class MainWindow : public QMainWindow
   QSlider *_gotoSlider; //!< Slider handling goto value.
   QDoubleSpinBox *_gotoDisplay; //!< Goto value.
 
-  QWidget *_maquetteWidget;
-  QLabel *_maquetteTitle;
+  MaquetteWidget *_maquetteWidget;
+//  QLabel *_maquetteTitle;
 };
 
 #endif
