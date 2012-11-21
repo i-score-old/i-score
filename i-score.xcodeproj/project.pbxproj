@@ -1127,6 +1127,21 @@
 					);
 			};
 		};
+		9CDE5B52CBCFDAA86606AFA7 = {
+			isa = PBXFileReference;
+			name = "moc_MaquetteWidget.cpp";
+			path = "moc/moc_MaquetteWidget.cpp";
+			refType = 4;
+			lastKnownFileType = "sourcecode.cpp.cpp";
+		};
+		DCE00115E769ABE2329459C1 = {
+			fileRef = "9CDE5B52CBCFDAA86606AFA7";
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					);
+			};
+		};
 		5A224ABC9D6D75C7D981C029 = {
 			isa = PBXFileReference;
 			name = "qrc_i-score.cpp";
@@ -1633,7 +1648,8 @@
 				"74F51C88976C501F32D7A5ED",
 				"504C76404A06DA93E9E225E3",
 				"58185FD17225028C3967CC8D",
-				"FE9B7CC0D91F8891075F5E1E");
+				"FE9B7CC0D91F8891075F5E1E",
+				"9CDE5B52CBCFDAA86606AFA7");
 			name = "moc";
 			refType = 4;
 		};
@@ -1746,6 +1762,7 @@
 				"32647F8624F85C810672A0A0",
 				"7197277110A24D12276FD0B2",
 				"98FC9815077E79F2F65C77EB",
+				"DCE00115E769ABE2329459C1",
 				"7F3E602466E431ABBC2C3ACC");
 			isa = PBXShellScriptBuildPhase;
 			name = "Qt Preprocessors";
@@ -1823,6 +1840,7 @@
 				"32647F8624F85C810672A0A0",
 				"7197277110A24D12276FD0B2",
 				"98FC9815077E79F2F65C77EB",
+				"DCE00115E769ABE2329459C1",
 				"7F3E602466E431ABBC2C3ACC");
 			shellPath = "/bin/sh";
 			shellScript = "make\ -C\ /Users/nicolashincker/Documents/workspace/acousmoscribe\ -f\ \'i-score.xcodeproj/qt_preprocess.mak\'";
@@ -1903,6 +1921,7 @@
 				"32647F8624F85C810672A0A0",
 				"7197277110A24D12276FD0B2",
 				"98FC9815077E79F2F65C77EB",
+				"DCE00115E769ABE2329459C1",
 				"7F3E602466E431ABBC2C3ACC");
 			isa = PBXSourcesBuildPhase;
 			name = "Build Sources";
