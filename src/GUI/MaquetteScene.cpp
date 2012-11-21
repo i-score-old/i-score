@@ -170,7 +170,7 @@ MaquetteScene::createMaquetteBarWidget(){
 
     _maquetteBar->setLayout(layout);
 
-    addWidget(_maquetteBar);
+//    addWidget(_maquetteBar);
 }
 
 void
