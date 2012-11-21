@@ -796,12 +796,6 @@ class MaquetteScene : public QGraphicsScene
 //  QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
   PlayingThread *_playThread; //!< The thread handling playing.
 
-  QWidget *_maquetteBar;
-  QColor _barColor;
-  QString _name;
-  QLabel *_maquetteTitle;
-  QAction *_playAct;
-  QToolBar *_toolBar;
 };
 
 #endif

@@ -60,6 +60,7 @@ static const int SCROLL_BAR_INCREMENT = 1000 / MaquetteScene::MS_PER_PIXEL;
 MaquetteView::MaquetteView(MainWindow *mw)
   : QGraphicsView(mw)
 {
+  _mainWindow = mw;
   setRenderHint(QPainter::Antialiasing);
 //  setBackgroundBrush(QColor(140,176,140));
   setBackgroundBrush(QColor(160,160,160));
