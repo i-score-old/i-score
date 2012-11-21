@@ -16,7 +16,7 @@
 			neededFileNames = (
 				);
 			shellPath = "/bin/sh";
-			shellScript = "make\ -C\ /Users/josephlarralde/Documents/workspace/i-score\ -f\ \'i-score.xcodeproj/qt_makeqmake.mak\'";
+			shellScript = "make\ -C\ /Users/nicolashincker/Documents/workspace/acousmoscribe\ -f\ \'i-score.xcodeproj/qt_makeqmake.mak\'";
 		};
 		118FCBAABA162BA17933C789 = {
 			isa = PBXFileReference;
@@ -702,6 +702,21 @@
 		};
 		5D3015BF4027605BCE0456D6 = {
 			fileRef = "A25A3876BE4ED864C7D3A6F5";
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					);
+			};
+		};
+		BA8D814134C12D0523477057 = {
+			isa = PBXFileReference;
+			name = "MaquetteWidget.cpp";
+			path = "src/GUI/MaquetteWidget.cpp";
+			refType = 4;
+			lastKnownFileType = "sourcecode.cpp.cpp";
+		};
+		A47C3E4E0F07119890974EDE = {
+			fileRef = "BA8D814134C12D0523477057";
 			isa = PBXBuildFile;
 			settings = {
 				ATTRIBUTES = (
@@ -1415,6 +1430,12 @@
 			path = "headers/GUI/BoxCurveEdit.hpp";
 			refType = 4;
 		};
+		FB5D4873C9FF5F7BB38886E5 = {
+			isa = PBXFileReference;
+			name = "MaquetteWidget.hpp";
+			path = "headers/GUI/MaquetteWidget.hpp";
+			refType = 4;
+		};
 		71078BD4296B16D83E12B053 = {
 			isa = PBXFileReference;
 			name = "i-score.pro";
@@ -1487,7 +1508,8 @@
 				"D6140660692472396459E6D4",
 				"504A6F74BDF1390DE5F455D9",
 				"7D9FFD201504D7783386B2D5",
-				"F46982B2688387B52E8ED692");
+				"F46982B2688387B52E8ED692",
+				"FB5D4873C9FF5F7BB38886E5");
 			name = "GUI";
 			refType = 4;
 		};
@@ -1560,7 +1582,8 @@
 				"83675F618F779EDCE39A76C5",
 				"7D8C281DE8F85D41EAAF43CB",
 				"D6D855C345DCC3C8D811C1B5",
-				"A25A3876BE4ED864C7D3A6F5");
+				"A25A3876BE4ED864C7D3A6F5",
+				"BA8D814134C12D0523477057");
 			name = "GUI";
 			refType = 4;
 		};
@@ -1696,6 +1719,7 @@
 				"3B68A266F1F9A1C3A56DD220",
 				"91C5ED25EB071BA6E10F2373",
 				"5D3015BF4027605BCE0456D6",
+				"A47C3E4E0F07119890974EDE",
 				"0B2292BC85745A06F653071B",
 				"FD3B07BA4A94B84DBFB464E8",
 				"86EB7F55602050556A3549AE",
@@ -1772,6 +1796,7 @@
 				"3B68A266F1F9A1C3A56DD220",
 				"91C5ED25EB071BA6E10F2373",
 				"5D3015BF4027605BCE0456D6",
+				"A47C3E4E0F07119890974EDE",
 				"0B2292BC85745A06F653071B",
 				"FD3B07BA4A94B84DBFB464E8",
 				"86EB7F55602050556A3549AE",
@@ -1800,7 +1825,7 @@
 				"98FC9815077E79F2F65C77EB",
 				"7F3E602466E431ABBC2C3ACC");
 			shellPath = "/bin/sh";
-			shellScript = "make\ -C\ /Users/josephlarralde/Documents/workspace/i-score\ -f\ \'i-score.xcodeproj/qt_preprocess.mak\'";
+			shellScript = "make\ -C\ /Users/nicolashincker/Documents/workspace/acousmoscribe\ -f\ \'i-score.xcodeproj/qt_preprocess.mak\'";
 		};
 		C29B8785722055ED95EF7B57 = {
 			buildActionMask = 2147483647;
@@ -1851,6 +1876,7 @@
 				"3B68A266F1F9A1C3A56DD220",
 				"91C5ED25EB071BA6E10F2373",
 				"5D3015BF4027605BCE0456D6",
+				"A47C3E4E0F07119890974EDE",
 				"0B2292BC85745A06F653071B",
 				"FD3B07BA4A94B84DBFB464E8",
 				"86EB7F55602050556A3549AE",
@@ -1985,7 +2011,7 @@
 			path = "";
 			refType = 4;
 		};
-		0417B780FF9BF3824CC83ADD = {
+		A4219A1AAFF00763FF569FFA = {
 			isa = PBXFileReference;
 			explicitFileType = "wrapper.application";
 			path = "i-score.app";
@@ -1994,12 +2020,12 @@
 		};
 		068F80C7519D0528FB08E821 = {
 			children = (
-				"0417B780FF9BF3824CC83ADD");
+				"A4219A1AAFF00763FF569FFA");
 			isa = PBXGroup;
 			name = "Products";
 			refType = 4;
 		};
-		F8D8828D37F3030701617275 = {
+		3149615A3D7AD6BDF230035A = {
 			buildPhases = (
 				"D7BA7D76DAB5DD13389D6332",
 				"A0A52A2ADF7A1E2A99738674",
@@ -2016,7 +2042,7 @@
 				WARNING_CFLAGS = "";
 				PREBINDING = NO;
 				INFOPLIST_FILE = "Info.plist";
-				BUILD_ROOT = "/Users/josephlarralde/Documents/workspace/i-score";
+				BUILD_ROOT = "/Users/nicolashincker/Documents/workspace/acousmoscribe";
 				OTHER_LDFLAGS = (
 						"-headerpad_max_install_names",
 						"-L/Library/Frameworks",
@@ -2030,7 +2056,7 @@
 			};
 			dependencies = (
 				);
-			productReference = "0417B780FF9BF3824CC83ADD";
+			productReference = "A4219A1AAFF00763FF569FFA";
 			shouldUseHeadermap = 1;
 			buildConfigurationList = 17B3380A4D6A7D415E7F2E1E;
 			isa = PBXNativeTarget;
@@ -2043,7 +2069,7 @@
 	<string>acousmoscribe.icns</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
- 	<key>CFBundleGetInfoString</key>
+    <key>CFBundleGetInfoString</key>
 	<string>Created by Qt/QMake</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
@@ -2251,7 +2277,7 @@
 			buildConfigurationList = "CC82A9286117DFED018F418F";
 			projectDirPath = "";
 			targets = (
-				"F8D8828D37F3030701617275");
+				"3149615A3D7AD6BDF230035A");
 		};
 	};
 	rootObject = "91B15E841AA80083484172DE";

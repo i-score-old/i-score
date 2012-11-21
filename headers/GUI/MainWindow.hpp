@@ -118,6 +118,7 @@ class MainWindow : public QMainWindow
    */
   int gotoValue();
   void setMaquetteSceneTitle(QString name);
+  void createMaquetteWidget();
 
  protected:
 
@@ -328,6 +329,9 @@ class MainWindow : public QMainWindow
   QDoubleSpinBox *_accelerationDisplay; //!< Acceleration value.
   QSlider *_gotoSlider; //!< Slider handling goto value.
   QDoubleSpinBox *_gotoDisplay; //!< Goto value.
+
+  QWidget *_maquetteWidget;
+  QLabel *_maquetteTitle;
 };
 
 #endif

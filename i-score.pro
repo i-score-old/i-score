@@ -96,7 +96,8 @@ headers/GUI/TreeMapElement.hpp \
 headers/GUI/ViewRelations.hpp \
 headers/data/NetworkMessages.hpp \
 headers/GUI/BoxWidget.hpp \
-headers/GUI/BoxCurveEdit.hpp
+headers/GUI/BoxCurveEdit.hpp \
+    headers/GUI/MaquetteWidget.hpp
 
 SOURCES += main.cpp \
 src/data/Abstract.cpp \
@@ -143,7 +144,8 @@ src/GUI/TreeMapElement.cpp \
 src/GUI/ViewRelations.cpp \
 src/data/NetworkMessages.cpp \
 src/GUI/BoxWidget.cpp \
-src/GUI/BoxCurveEdit.cpp
+src/GUI/BoxCurveEdit.cpp \
+    src/GUI/MaquetteWidget.cpp
 
 RESOURCES += i-score.qrc
 

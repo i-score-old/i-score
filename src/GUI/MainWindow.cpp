@@ -111,7 +111,11 @@ MainWindow::MainWindow()
   _editor->init();
   _editor->show();
 
-  setCentralWidget(_view);
+  // Central Widget
+  _maquetteWidget = new QWidget;
+  createMaquetteWidget();
+  setCentralWidget(_maquetteWidget);
+//  setCentralWidget(_view);
 
   // Creating widgets
   createActions();
@@ -124,7 +128,50 @@ MainWindow::MainWindow()
   setAcceptDrops(false);
 }
 
+void
+MainWindow::createMaquetteWidget(){
 
+    int MAQUETTTE_HEADER_HEIGHT = 40;
+    int NAME_POINT_SIZE = 20;
+
+    QColor maquetteHeaderColor = QColor(Qt::white);
+
+    QWidget *maquetteHeader = new QWidget;
+    maquetteHeader->setGeometry(0,0,width(),MAQUETTTE_HEADER_HEIGHT);
+    maquetteHeader->setMaximumHeight(MAQUETTTE_HEADER_HEIGHT);
+    maquetteHeader->setPalette(QPalette(maquetteHeaderColor));
+    maquetteHeader->setAutoFillBackground(true);
+
+    QGridLayout *layout= new QGridLayout;
+    layout->setContentsMargins(QMargins(0,0,0,0));
+    //TITLE
+    _maquetteTitle = new QLabel;
+    QFont *font = new QFont();
+    font->setPointSize(NAME_POINT_SIZE);
+    _maquetteTitle->setFont(*font);
+
+    //BUTTONS
+    QToolBar *maquetteToolBar = new QToolBar;
+
+    //start button
+
+
+//    maquetteToolBar->addAction(_playAct);
+
+//    layout->addWidget(maquetteToolBar,0,0);
+
+    layout->addWidget(_maquetteTitle,0,0);
+
+    maquetteHeader->setLayout(layout);
+
+    QGridLayout *maquetteLayout = new QGridLayout;
+    maquetteLayout->setContentsMargins(QMargins(0,0,0,0));
+    maquetteLayout->setSpacing(0);
+    maquetteLayout->addWidget(maquetteHeader);
+    maquetteLayout->addWidget(_view);
+    _maquetteWidget->setLayout(maquetteLayout);
+
+}
 
 MainWindow::~MainWindow()
 {
@@ -1031,12 +1078,14 @@ MainWindow::setCurrentFile(const QString &fileName)
     shownName = strippedName(_curFile);
   }
   setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("i-score")));
+
   setMaquetteSceneTitle(tr("%1").arg(shownName));
 }
 
 void
 MainWindow::setMaquetteSceneTitle(QString name){
-    _scene->setName(name);
+//    _scene->setName(name);
+//    _maquetteTitle->setText(name);
 }
 
 QString
