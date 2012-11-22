@@ -115,8 +115,8 @@ MainWindow::MainWindow()
   // Central Widget
   _maquetteWidget = new MaquetteWidget(this,_view,_scene);
 //  createMaquetteWidget();
-  setCentralWidget(_maquetteWidget);
-//  setCentralWidget(_view);
+//  setCentralWidget(_maquetteWidget);
+  setCentralWidget(_view);
 
   // Creating widgets
   createActions();
