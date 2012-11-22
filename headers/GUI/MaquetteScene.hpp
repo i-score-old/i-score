@@ -654,6 +654,11 @@ class MaquetteScene : public QGraphicsScene
    */
   virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
 
+  signals:
+
+signals:
+  void stopPlaying();
+
   public slots :
 
   /*!

@@ -1842,9 +1842,11 @@ MaquetteScene::removeSelectedItems()
 void
 MaquetteScene::timeEndReached()
 {
-    static_cast<MaquetteView*>(views().first())->mainWindow()->timeEndReached();
+//    static_cast<MaquetteView*>(views().first())->mainWindow()->timeEndReached();
 	_playing = false;
-	_maquette->stopPlaying();
+    _maquette->stopPlaying();
+
+    emit(stopPlaying());
 	update();
 }
 

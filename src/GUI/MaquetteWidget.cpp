@@ -57,15 +57,17 @@ using std::string;
 const float MaquetteWidget::HEADER_HEIGHT = 40;
 const float MaquetteWidget::NAME_POINT_SIZE = 20;
 
-MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view)
+MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScene *scene)
     : QWidget(parent){
 
     _view = view;
+    _scene = scene;
     _color = QColor(Qt::white);
     _maquetteLayout = new QGridLayout();
     _nameLabel = new QLabel;
     _toolBar = new QToolBar;
     _header = new QWidget(NULL);
+    _comboBox = new QComboBox;
 
     createActions();
     createToolBar();
@@ -77,6 +79,8 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view)
     _maquetteLayout->setContentsMargins(0,0,0,0);
     _maquetteLayout->setVerticalSpacing(0);
     setLayout(_maquetteLayout);
+
+    connect(_scene,SIGNAL(stopPlaying()),this,SLOT(stop()));
 }
 
 void
@@ -102,7 +106,18 @@ MaquetteWidget::createActions(){
     _playAction->setStatusTip(tr("Play composition"));
     _playAction->setCheckable(true);
 
+    _stopAction = new QAction(QIcon(":/images/stop.svg"), tr("Stop"), this);
+    _stopAction->setStatusTip(tr("Stop composition audio preview"));
+    _stopAction->setCheckable(true);
+
+    _accelerationSlider = new LogarithmicSlider(Qt::Horizontal,this);
+    _accelerationSlider->setStatusTip(tr("Acceleration"));
+    _accelerationSlider->setFixedWidth(100);
+    _accelerationSlider->setSliderPosition(50);
+
+//    connect(_accelerationSlider,SIGNAL(valueChanged(int)),this,SLOT(accelerationChanged(int)));
     connect(_playAction,SIGNAL(triggered()), this, SLOT(play()));
+    connect(_stopAction,SIGNAL(triggered()), this, SLOT(stop()));
 }
 
 void
@@ -113,7 +128,6 @@ MaquetteWidget::createToolBar(){
 void
 MaquetteWidget::createHeader(){
     _header->setGeometry(0,0,width(),HEADER_HEIGHT);
-//    _header->setMaximumHeight(HEADER_HEIGHT);
     _header->setPalette(QPalette(_color));
     _header->setAutoFillBackground(true);
 
@@ -122,16 +136,49 @@ MaquetteWidget::createHeader(){
 
     layout->addWidget(_toolBar,0,0);
     layout->addWidget(_nameLabel,0,1);
+//    layout->addWidget(_accelerationSlider,0,2);
     layout->setContentsMargins(0,0,0,0);
     _header->setLayout(layout);
 }
 
 void
+MaquetteWidget::timeEndReached(){
+    if(_scene->playing())
+         std::cout<<"playing"<<std::endl;
+    else
+         std::cout<<"not playing"<<std::endl;
+    setAvailableAction(_playAction);
+//    updateHeader();
+//    std::cout<<"OK"<<std::endl;
+}
+
+void
 MaquetteWidget::play(){
-    emit(beginPlaying());
+    _scene->play();
+    updateHeader();
+}
+
+void
+MaquetteWidget::stop(){
+    _scene->stop();
+    updateHeader();
+}
+
+void
+MaquetteWidget::updateHeader(){
+    setAvailableAction(_scene->playing() ? _stopAction : _playAction);
 }
 
 void
 MaquetteWidget::setName(QString name){
     _nameLabel->setText(name);
 }
+
+void
+MaquetteWidget::setAvailableAction(QAction *action){
+    if(!_toolBar->actions().empty()){
+        _toolBar->removeAction(_toolBar->actions().first());
+        _toolBar->addAction(action);
+    }
+}
+

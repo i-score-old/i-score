@@ -113,7 +113,7 @@ MainWindow::MainWindow()
   _editor->show();
 
   // Central Widget
-  _maquetteWidget = new MaquetteWidget(this,_view);
+  _maquetteWidget = new MaquetteWidget(this,_view,_scene);
 //  createMaquetteWidget();
   setCentralWidget(_maquetteWidget);
 //  setCentralWidget(_view);
@@ -127,53 +127,8 @@ MainWindow::MainWindow()
   setCurrentFile("");
 
   setAcceptDrops(false);
-  connect(_maquetteWidget,SIGNAL(beginPlaying()),this,SLOT(play()));
+//  connect(_maquetteWidget,SIGNAL(beginPlaying()),this,SLOT(play()));
 }
-
-//void
-//MainWindow::createMaquetteWidget(){
-
-//    int MAQUETTTE_HEADER_HEIGHT = 40;
-//    int NAME_POINT_SIZE = 20;
-
-//    QColor maquetteHeaderColor = QColor(Qt::white);
-
-//    QWidget *maquetteHeader = new QWidget;
-//    maquetteHeader->setGeometry(0,0,width(),MAQUETTTE_HEADER_HEIGHT);
-//    maquetteHeader->setMaximumHeight(MAQUETTTE_HEADER_HEIGHT);
-//    maquetteHeader->setPalette(QPalette(maquetteHeaderColor));
-//    maquetteHeader->setAutoFillBackground(true);
-
-//    QGridLayout *layout= new QGridLayout;
-//    layout->setContentsMargins(QMargins(0,0,0,0));
-//    //TITLE
-//    _maquetteTitle = new QLabel;
-//    QFont *font = new QFont();
-//    font->setPointSize(NAME_POINT_SIZE);
-//    _maquetteTitle->setFont(*font);
-
-//    //BUTTONS
-//    QToolBar *maquetteToolBar = new QToolBar;
-
-//    //start button
-
-
-////    maquetteToolBar->addAction(_playAct);
-
-////    layout->addWidget(maquetteToolBar,0,0);
-
-//    layout->addWidget(_maquetteTitle,0,0);
-
-//    maquetteHeader->setLayout(layout);
-
-//    QGridLayout *maquetteLayout = new QGridLayout;
-//    maquetteLayout->setContentsMargins(QMargins(0,0,0,0));
-//    maquetteLayout->setSpacing(0);
-//    maquetteLayout->addWidget(maquetteHeader);
-//    maquetteLayout->addWidget(_view);
-//    _maquetteWidget->setLayout(maquetteLayout);
-
-//}
 
 MainWindow::~MainWindow()
 {
@@ -560,6 +515,7 @@ MainWindow::escapeKeyPressed() {
 
 void
 MainWindow::timeEndReached() {
+
   _accelerationSlider->setEnabled(true);
   _accelerationDisplay->setEnabled(true);
   _playAct->setChecked(false);

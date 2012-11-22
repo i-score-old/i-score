@@ -665,6 +665,7 @@ class Maquette : public QObject
 	 */
 	void updateBoxesFromEngines();
 
+
   public slots :
 
   /*!
