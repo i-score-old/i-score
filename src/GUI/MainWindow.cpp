@@ -136,6 +136,7 @@ MainWindow::~MainWindow()
   delete _view;
   delete _scene;
   delete _editor;
+  delete _maquetteWidget;
 
   delete _menuBar;
   delete _fileMenu;

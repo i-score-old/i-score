@@ -92,7 +92,21 @@ MaquetteWidget::init(){
 }
 
 MaquetteWidget::~MaquetteWidget(){
+    delete _view;
+    delete _scene;
 
+    delete _header;
+    delete _headerLayout;
+    delete _toolBar;
+    delete _nameLabel;
+
+    delete _playAction;
+    delete _stopAction;
+
+    delete _maquetteLayout;
+    delete _accelerationSlider;
+    delete _accelerationDisplay;
+    delete _readingSpeedWidget;
 }
 
 void
@@ -130,12 +144,14 @@ MaquetteWidget::createReadingSpeedWidget(){
 
 void
 MaquetteWidget::createActions(){
-    _playAction = new QAction(QIcon(":/images/play.svg"), tr("Play"), this);
+
+
+    _playAction = new QAction(QIcon(":/images/playSimple.svg"), tr("Play"), this);
     _playAction->setShortcut(QString("Space"));
     _playAction->setStatusTip(tr("Play composition"));
     _playAction->setCheckable(true);
 
-    _stopAction = new QAction(QIcon(":/images/stop.svg"), tr("Stop"), this);
+    _stopAction = new QAction(QIcon(":/images/stopSimple.svg"), tr("Stop"), this);
     _stopAction->setShortcut(QString("Enter"));
     _stopAction->setStatusTip(tr("Stop composition audio preview"));
     _stopAction->setCheckable(true);

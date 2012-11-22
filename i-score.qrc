@@ -47,5 +47,7 @@
         <file>documentation/interaction.htm</file>
         <file>translations/acousmoscribe_fr.qm</file>
         <file>translations/acousmoscribe_en.qm</file>
+        <file>images/playSimple.svg</file>
+        <file>images/stopSimple.svg</file>
     </qresource>
 </RCC>
