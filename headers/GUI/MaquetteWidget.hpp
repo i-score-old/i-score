@@ -41,7 +41,6 @@ public :
 
     void init();
     void setName(QString name);
-    void timeEndReached();
     void updateHeader();
 
     static const float HEADER_HEIGHT;
@@ -50,10 +49,12 @@ public :
 signals:
     void beginPlaying();
     void stopSignal();
+    void accelerationValueChanged(int);
 
 public slots:
     void play();
     void stop();
+    void accelerationValueModified(int value);
 
 private:
     void createActions();

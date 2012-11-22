@@ -128,6 +128,7 @@ MainWindow::MainWindow()
 
   setAcceptDrops(false);
 //  connect(_maquetteWidget,SIGNAL(beginPlaying()),this,SLOT(play()));
+  connect(_maquetteWidget,SIGNAL(accelerationValueChanged(int)),this,SLOT(accelerationChanged(int)));
 }
 
 MainWindow::~MainWindow()
