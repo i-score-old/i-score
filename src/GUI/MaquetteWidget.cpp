@@ -69,8 +69,9 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
     _nameLabel = new QLabel;
     _toolBar = new QToolBar;
     _header = new QWidget(NULL);
-    _comboBox = new QComboBox;
+    _readingSpeedWidget = new QWidget;
 
+    createReadingSpeedWidget();
     createActions();
     createToolBar();
     createNameLabel();
@@ -103,6 +104,31 @@ MaquetteWidget::createNameLabel(){
 }
 
 void
+MaquetteWidget::createReadingSpeedWidget(){
+    QHBoxLayout *layout = new QHBoxLayout;
+
+    _accelerationSlider = new LogarithmicSlider(Qt::Horizontal,this);
+    _accelerationSlider->setStatusTip(tr("Acceleration"));
+    _accelerationSlider->setFixedWidth(200);
+    _accelerationSlider->setSliderPosition(50);
+
+    _accelerationDisplay = new QDoubleSpinBox(this);
+    _accelerationDisplay->setStatusTip(tr("Acceleration"));
+    _accelerationDisplay->setRange(0.,5);
+    _accelerationDisplay->setDecimals(1);
+    _accelerationDisplay->setValue(_accelerationSlider->accelerationValue(_accelerationSlider->value()));
+    _accelerationDisplay->setKeyboardTracking(false);
+
+    layout->addWidget(_accelerationSlider);
+    layout->addWidget(_accelerationDisplay);
+
+    _readingSpeedWidget->setLayout(layout);
+
+    connect(_accelerationDisplay, SIGNAL(valueChanged(double)), this, SLOT(accelerationValueEntered(double)));
+    connect(_accelerationSlider,SIGNAL(valueChanged(int)),this,SLOT(accelerationValueModified(int)));
+}
+
+void
 MaquetteWidget::createActions(){
     _playAction = new QAction(QIcon(":/images/play.svg"), tr("Play"), this);
     _playAction->setShortcut(QString("Space"));
@@ -114,12 +140,6 @@ MaquetteWidget::createActions(){
     _stopAction->setStatusTip(tr("Stop composition audio preview"));
     _stopAction->setCheckable(true);
 
-    _accelerationSlider = new LogarithmicSlider(Qt::Horizontal,this);
-    _accelerationSlider->setStatusTip(tr("Acceleration"));
-    _accelerationSlider->setFixedWidth(200);
-    _accelerationSlider->setSliderPosition(50);
-
-    connect(_accelerationSlider,SIGNAL(valueChanged(int)),this,SLOT(accelerationValueModified(int)));
     connect(_playAction,SIGNAL(triggered()), this, SLOT(play()));
     connect(_stopAction,SIGNAL(triggered()), this, SLOT(stop()));
 }
@@ -135,32 +155,29 @@ MaquetteWidget::createHeader(){
     _header->setPalette(QPalette(_color));
     _header->setAutoFillBackground(true);
 
-//    QGridLayout *layout= new QGridLayout;
-//    layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    _headerLayout= new QBoxLayout(QBoxLayout::LeftToRight);
+    _headerLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
-//    layout->addWidget(_toolBar,0,0);
-//    layout->addWidget(_nameLabel,0,1);
-//    layout->addWidget(_accelerationSlider,0,2);
-//    layout->setAlignment(_accelerationSlider,Qt::AlignRight);
-//    layout->setContentsMargins(0,0,0,0);
-//    _header->setLayout(layout);
+    _headerLayout->addWidget(_toolBar);
+    _headerLayout->addWidget(_nameLabel);
+    _headerLayout->addWidget(_readingSpeedWidget);
 
-    QBoxLayout *layout= new QBoxLayout(QBoxLayout::LeftToRight);
-    layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    _headerLayout->insertSpacing(5,20);
 
-    layout->addWidget(_toolBar);
-    layout->addWidget(_nameLabel);
-    layout->addWidget(_accelerationSlider);
-    layout->insertStretch(2,_scene->width()/2);
-    layout->insertSpacing(4,20);
-    layout->setAlignment(_accelerationSlider,Qt::AlignRight);
-    layout->setContentsMargins(0,0,0,0);
-    _header->setLayout(layout);
+    _headerLayout->insertStretch(2,_scene->width()/2);
+    _headerLayout->setAlignment(_accelerationSlider,Qt::AlignRight);
+    _headerLayout->setContentsMargins(0,0,0,0);
+    _header->setLayout(_headerLayout);
 }
 
 void
 MaquetteWidget::accelerationValueModified(int value){
     emit(accelerationValueChanged(value));
+
+    double newValue = _accelerationSlider->accelerationValue(value);
+
+    if (_accelerationDisplay->value() != newValue)
+        _accelerationDisplay->setValue(newValue);
 }
 
 void
@@ -186,6 +203,11 @@ MaquetteWidget::setName(QString name){
 }
 
 void
+MaquetteWidget::setAvailableMenu(QWidget *widget){
+    //TODO
+}
+
+void
 MaquetteWidget::setAvailableAction(QAction *action){
     if(!_toolBar->actions().empty()){
         _toolBar->removeAction(_toolBar->actions().first());
@@ -193,3 +215,9 @@ MaquetteWidget::setAvailableAction(QAction *action){
     }
 }
 
+void
+MaquetteWidget::accelerationValueEntered(double value){
+    int newValue = _accelerationSlider->valueForAcceleration(value);
+    Maquette::getInstance()->setAccelerationFactor(value);
+    _accelerationSlider->setValue(newValue);
+}

@@ -15,6 +15,7 @@
 #include <QAction>
 #include <QColor>
 #include <QLabel>
+#include <QSpinBox>
 
 #include "MaquetteView.hpp"
 #include "LogarithmicSlider.hpp"
@@ -55,27 +56,37 @@ public slots:
     void play();
     void stop();
     void accelerationValueModified(int value);
+    void accelerationValueEntered(double value);
 
 private:
     void createActions();
     void createToolBar();
     void createNameLabel();
     void createHeader();    
+    void createMenuWidget();
+    void createReadingSpeedWidget();
+
     void setAvailableAction(QAction *action);
+    void setAvailableMenu(QWidget *widget);
 
 
     MaquetteView *_view;
     MaquetteScene *_scene;
 
     QWidget *_header;
-    QLabel *_nameLabel;
+    QBoxLayout *_headerLayout;
     QToolBar *_toolBar;
+    QLabel *_nameLabel;
+
     QAction *_playAction;
     QAction *_stopAction;
+
     QColor _color;
     QGridLayout *_maquetteLayout;
-    LogarithmicSlider *_accelerationSlider;
-    QComboBox *_comboBox;
+    LogarithmicSlider *_accelerationSlider;    
+    QDoubleSpinBox *_accelerationDisplay;
+    QWidget *_readingSpeedWidget;
+
 };
 
 
