@@ -1118,7 +1118,6 @@ MaquetteScene::removeComment(Comment *comment)
 int
 MaquetteScene::addTriggerPoint(unsigned int boxID, BoxExtremity extremity, const string &message)
 {
-    std::cout<<"addfrom scene ";
 	int trgID = NO_ID;
 
 	if ((trgID = _maquette->addTriggerPoint(boxID, extremity, message)) > NO_ID) {

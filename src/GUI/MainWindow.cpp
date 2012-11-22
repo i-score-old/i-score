@@ -1044,6 +1044,7 @@ MainWindow::setCurrentFile(const QString &fileName)
 
 void
 MainWindow::setMaquetteSceneTitle(QString name){
+    name.remove(".xml");
     _maquetteWidget->setName(name);
 }
 
