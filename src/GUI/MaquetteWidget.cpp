@@ -145,13 +145,14 @@ MaquetteWidget::createReadingSpeedWidget(){
 void
 MaquetteWidget::createActions(){
 
-
-    _playAction = new QAction(QIcon(":/images/playSimple.svg"), tr("Play"), this);
+    QIcon playIcon(":/images/playSimple.svg");
+    _playAction = new QAction(playIcon, tr("Play"), this);
     _playAction->setShortcut(QString("Space"));
     _playAction->setStatusTip(tr("Play composition"));
     _playAction->setCheckable(true);
 
-    _stopAction = new QAction(QIcon(":/images/stopSimple.svg"), tr("Stop"), this);
+    QIcon stopIcon(":/images/stopSimple.svg");
+    _stopAction = new QAction(stopIcon, tr("Stop"), this);
     _stopAction->setShortcut(QString("Enter"));
     _stopAction->setStatusTip(tr("Stop composition audio preview"));
     _stopAction->setCheckable(true);

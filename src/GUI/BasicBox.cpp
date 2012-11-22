@@ -671,7 +671,6 @@ BasicBox::addTriggerPoint(BoxExtremity extremity)
 void
 BasicBox::addTriggerPoint(const AbstractTriggerPoint &abstractTP)
 {
-//	if (_triggerPoints.find(abstractTP.boxExtremity()) == _triggerPoints.end()) {
     if(!_triggerPoints->contains(abstractTP.boxExtremity())){
 		int trgID = abstractTP.ID();
 		if (trgID == NO_ID) {
@@ -692,7 +691,6 @@ void
 BasicBox::addTriggerPoint(BoxExtremity extremity, TriggerPoint *tp)
 {
     QMap<BoxExtremity,TriggerPoint*>::iterator it;
-//	if ((it = _triggerPoints.find(extremity)) == _triggerPoints.end()) {
     if(!_triggerPoints->contains(extremity)){
         _triggerPoints->insert(extremity, tp);
         _triggerPoints->value(extremity)->updatePosition();
