@@ -115,13 +115,13 @@ MainWindow::MainWindow()
   // Central Widget
   _maquetteWidget = new MaquetteWidget(this,_view,_scene);
 //  createMaquetteWidget();
-//  setCentralWidget(_maquetteWidget);
-  setCentralWidget(_view);
+  setCentralWidget(_maquetteWidget);
+//  setCentralWidget(_view);
 
   // Creating widgets
   createActions();
   createMenus();
-  createToolBars();
+//  createToolBars();
   createStatusBar();
 
   setCurrentFile("");
@@ -824,12 +824,12 @@ MainWindow::createActions()
   _playModeAct->addAction(_synthPlayAct);
   _playModeAct->setExclusive(true);
 
-  _accelerationSlider = new LogarithmicSlider(Qt::Horizontal,this);
+  _accelerationSlider = new LogarithmicSlider(Qt::Horizontal,0);
   _accelerationSlider->setStatusTip(tr("Acceleration"));
   _accelerationSlider->setFixedWidth(100);
   connect(_accelerationSlider,SIGNAL(valueChanged(int)),this,SLOT(accelerationChanged(int)));
 
-  _accelerationDisplay = new QDoubleSpinBox(this);
+  _accelerationDisplay = new QDoubleSpinBox;
   _accelerationDisplay->setStatusTip(tr("Acceleration"));
   _accelerationDisplay->setRange(0.,5);
   _accelerationDisplay->setDecimals(1);
@@ -838,7 +838,7 @@ MainWindow::createActions()
 
   _accelerationSlider->setSliderPosition(50);
 
-  _gotoSlider = new QSlider(this);
+  _gotoSlider = new QSlider;
   _gotoSlider->setStatusTip(tr("Goto"));
   _gotoSlider->setOrientation(Qt::Horizontal);
   //_gotoSlider->setTickPosition(QSlider::TicksBelow);

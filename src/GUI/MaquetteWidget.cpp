@@ -168,6 +168,7 @@ MaquetteWidget::createToolBar(){
 
 void
 MaquetteWidget::createHeader(){
+
     _header->setGeometry(0,0,width(),HEADER_HEIGHT);
     _header->setPalette(QPalette(_color));
     _header->setAutoFillBackground(true);
@@ -179,9 +180,9 @@ MaquetteWidget::createHeader(){
     _headerLayout->addWidget(_nameLabel);
     _headerLayout->addWidget(_readingSpeedWidget);
 
-    _headerLayout->insertSpacing(5,20);
+    _headerLayout->insertSpacing(_headerLayout->count(),20);
 
-    _headerLayout->insertStretch(2,_scene->width()/2);
+    _headerLayout->insertStretch(_headerLayout->indexOf(_readingSpeedWidget),_scene->width()/2);
     _headerLayout->setAlignment(_accelerationSlider,Qt::AlignRight);
     _headerLayout->setContentsMargins(0,0,0,0);
     _header->setLayout(_headerLayout);
