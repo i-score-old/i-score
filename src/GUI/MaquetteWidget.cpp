@@ -56,7 +56,7 @@ using std::string;
 #include "MaquetteScene.hpp"
 #include "MainWindow.hpp"
 
-const float MaquetteWidget::HEADER_HEIGHT = 40;
+const float MaquetteWidget::HEADER_HEIGHT = 35;
 const float MaquetteWidget::NAME_POINT_SIZE = 20;
 
 MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScene *scene)
@@ -120,25 +120,29 @@ MaquetteWidget::createNameLabel(){
 void
 MaquetteWidget::createReadingSpeedWidget(){
     QHBoxLayout *layout = new QHBoxLayout;
+    QSizePolicy *ignoredPolicy = new QSizePolicy(QSizePolicy::Ignored,QSizePolicy::Ignored);
+
 
     _accelerationSlider = new LogarithmicSlider(Qt::Horizontal,this);
     _accelerationSlider->setStatusTip(tr("Acceleration"));
     _accelerationSlider->setFixedWidth(200);
     _accelerationSlider->setSliderPosition(50);
+//    _accelerationSlider->setSizePolicy(*ignoredPolicy);
 
     _accelerationDisplay = new QDoubleSpinBox(this);
     _accelerationDisplay->setStatusTip(tr("Acceleration"));
-    _accelerationDisplay->setRange(0.,5);
-    _accelerationDisplay->setDecimals(1);
+    _accelerationDisplay->setRange(0.,20.);
+    _accelerationDisplay->setDecimals(2);
     _accelerationDisplay->setValue(_accelerationSlider->accelerationValue(_accelerationSlider->value()));
     _accelerationDisplay->setKeyboardTracking(false);
+//    _accelerationDisplay->setSizePolicy(*ignoredPolicy);
 
     layout->addWidget(_accelerationSlider);
     layout->addWidget(_accelerationDisplay);
 
     _readingSpeedWidget->setLayout(layout);
 
-    connect(_accelerationDisplay, SIGNAL(valueChanged(double)), this, SLOT(accelerationValueEntered(double)));
+//    connect(_accelerationDisplay, SIGNAL(valueChanged(double)), this, SLOT(accelerationValueEntered(double)));
     connect(_accelerationSlider,SIGNAL(valueChanged(int)),this,SLOT(accelerationValueModified(int)));
 }
 

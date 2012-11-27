@@ -68,7 +68,7 @@ public :
 	double accelerationValue(int value) const;
 	int valueForAcceleration(double value) const;
 	static const int MINIMUM_VALUE = 0; //!< Slider minimum value
-	static const int MAXIMUM_VALUE = 100; //!< Slider maximum value
+    static const int MAXIMUM_VALUE = 150; //!< Slider maximum value
 protected :
 	virtual void mouseDoubleClickEvent(QMouseEvent *event);
 };
