@@ -95,15 +95,14 @@ using namespace SndBoxProp;
 
 static const float S_TO_MS  = 1000.;
 
-AttributesEditor::AttributesEditor(QWidget* parent) : QDockWidget(tr("AttributesEditor"),parent,0)
+AttributesEditor::AttributesEditor(QWidget* parent) : QDockWidget(tr("Inspector"),parent,0)
 {
     Palette* sharedPalette = new Palette;
 
 	sharedPalette->setContainer(NULL);
 
 	_profilesPreviewArea = new PreviewArea(parent,sharedPalette); //Creation de la zone d'apercu
-	_generalPreviewArea = new PreviewArea(parent,sharedPalette); //Creation de la zone d'apercu
-//	_curvesWidget = new CurvesWidget(parent);
+    _generalPreviewArea = new PreviewArea(parent,sharedPalette); //Creation de la zone d'apercu
 	_palette = sharedPalette;
     _boxEdited = NO_ID;
 
@@ -151,11 +150,8 @@ void AttributesEditor::noBoxEdited() {
 	_boxStartValue->clear();
 	_boxLengthValue->clear();
 	_boxName->clear();
-	_generalTab->setEnabled(false);
-	//_networkTabWidget->setEnabled(false);
-	//_snapshotTab->setEnabled(false);
-	_messagesTab->setEnabled(false);
-//	_curvesWidget->updateMessages(NO_ID,false);
+    _generalTab->setEnabled(false);
+    _messagesTab->setEnabled(false);
     _curvesTab->setEnabled(false);
 }
 
@@ -533,7 +529,7 @@ AttributesEditor::addWidgetsToLayout()
 	static const unsigned int PREVIEW_AREA_HEIGHT = 3;
 
 //    _centralWidget = _explorationTab;
-    _centralWidget = _tabWidget;
+    _centralWidget = _snapshotTab;
 	_paletteLayout->setSpacing(2*BasicBox::LINE_WIDTH);
 
 	/* AttributesEditor Preview Area associated Buttons */
@@ -709,19 +705,21 @@ AttributesEditor::addWidgetsToLayout()
 	_pitchGradeComboBox->setDisabled(true);
 
 //	_curvesLayout->addWidget(_curvesWidget,0,0,3,3);
-	_curvesTab->setLayout(_curvesLayout);
+//	_curvesTab->setLayout(_curvesLayout);
 
 	// Set Central Widget
-    setWidget(_tabWidget);
-    _tabWidget->setBaseSize(MINIMUM_WIDTH,height());
+ //   setWidget(_tabWidget);
+ //   _tabWidget->setBaseSize(MINIMUM_WIDTH,height());
+    setWidget(_snapshotTab);
+    _snapshotTab->setMinimumSize(MINIMUM_WIDTH,height());
 
 
 
 //	_generalTabIndex = _tabWidget->addTab(_generalTab,"General");
 //	_profilesTabIndex = _tabWidget->addTab(_profilesTab,"Profiles");
 //    _messagesTabIndex = _tabWidget->addTab(_messagesTab,"Messages");
-    _explorationTabIndex = _tabWidget->addTab(_explorationTab,"Exploration");
-    _curvesTabIndex = _tabWidget->addTab(_curvesTab,"Curves");
+//    _explorationTabIndex = _tabWidget->addTab(_explorationTab,"Exploration");
+//    _curvesTabIndex = _tabWidget->addTab(_curvesTab,"Curves");
 
 }
 
