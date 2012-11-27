@@ -54,6 +54,7 @@ class QButtonGroup;
 class QRadioButton;
 class QGridLayout;
 class QVBoxLayout;
+class QHBoxLayout;
 class QLabel;
 class QPushButton;
 class QCheckBox;
@@ -430,6 +431,7 @@ class AttributesEditor : public QDockWidget
 
   //QGridLayout * _snapshotTopLayout; //!< Layout handling network assign buttons
   QGridLayout * _snapshotLayout; //!< Layout handling snapshot
+  QHBoxLayout *_boxEditLayout;
 
   QLabel *_snapshotAssignLabel;
   QPushButton *_snapshotAssignStart;

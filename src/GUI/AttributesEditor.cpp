@@ -508,6 +508,7 @@ AttributesEditor::createWidgets()
 	_snapshotAssignStart = new QPushButton;
 	_snapshotAssignEnd = new QPushButton;
 	_snapshotAssignLabel = new QLabel;
+    _boxEditLayout = new QHBoxLayout;
 
 	_networkTree->load();
 
@@ -676,10 +677,18 @@ AttributesEditor::addWidgetsToLayout()
 
 //    _networkTree->setSelectionBehavior(QAbstractItemView::SelectItems);
     _networkTree->setSelectionMode(QAbstractItemView:: MultiSelection);
-	_snapshotLayout->addWidget(_snapshotAssignLabel,0,0,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
-	_snapshotLayout->addWidget(_snapshotAssignStart,0,1,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
-	_snapshotLayout->addWidget(_snapshotAssignEnd,0,2,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
+//	_snapshotLayout->addWidget(_snapshotAssignLabel,0,0,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
+
+    _boxEditLayout->addWidget(_snapshotAssignStart);
+    _boxEditLayout->addWidget(_boxName);
+    _boxEditLayout->addWidget(_generalColorButton);
+    _boxEditLayout->addWidget(_snapshotAssignEnd);
+
+//    _snapshotLayout->addWidget(_snapshotAssignStart,0,1,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop | Qt::AlignLeft);
+//    _snapshotLayout->addWidget(_boxName,0,1,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop | Qt::AlignCenter);
+//    _snapshotLayout->addWidget(_snapshotAssignEnd,0,2,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop | Qt::AlignRight);
     //_snapshotLayout->addWidget(_networkTree,1,0,1,5);
+    _snapshotLayout->addLayout(_boxEditLayout,0,1,Qt::AlignTop);
     _snapshotLayout->addWidget(_networkTree,1,0,1,5);
 
 	_snapshotTab->setLayout(_snapshotLayout);
