@@ -386,7 +386,7 @@ AttributesEditor::createWidgets()
 
     _tabWidget = new QTabWidget;
 	_generalTab = new QWidget;
-	_profilesTab = new QWidget;
+    _profilesTab = new QWidget;
 	_profilesTabs = new QTabWidget;
 	_networkTabWidget = new QTabWidget;
 	_messagesTab = new QWidget;
@@ -532,6 +532,7 @@ AttributesEditor::addWidgetsToLayout()
 	static const unsigned int PREVIEW_AREA_WIDTH = 3;
 	static const unsigned int PREVIEW_AREA_HEIGHT = 3;
 
+//    _centralWidget = _explorationTab;
     _centralWidget = _tabWidget;
 	_paletteLayout->setSpacing(2*BasicBox::LINE_WIDTH);
 
