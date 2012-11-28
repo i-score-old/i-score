@@ -70,6 +70,7 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
     _toolBar = new QToolBar;
     _header = new QWidget(NULL);
     _readingSpeedWidget = new QWidget;
+    _sliderMoved = false;
 
     createReadingSpeedWidget();
     createActions();
@@ -142,8 +143,8 @@ MaquetteWidget::createReadingSpeedWidget(){
 
     _readingSpeedWidget->setLayout(layout);
 
-//    connect(_accelerationDisplay, SIGNAL(valueChanged(double)), this, SLOT(accelerationValueEntered(double)));
     connect(_accelerationSlider,SIGNAL(valueChanged(int)),this,SLOT(accelerationValueModified(int)));
+    connect(_accelerationDisplay, SIGNAL(valueChanged(double)), this, SLOT(accelerationValueEntered(double)));
 }
 
 void
@@ -158,7 +159,7 @@ MaquetteWidget::createActions(){
     QIcon stopIcon(":/images/stopSimple.svg");
     _stopAction = new QAction(stopIcon, tr("Stop"), this);
     _stopAction->setShortcut(QString("Enter"));
-    _stopAction->setStatusTip(tr("Stop composition audio preview"));
+    _stopAction->setStatusTip(tr("Stop composition"));
     _stopAction->setCheckable(true);
 
     connect(_playAction,SIGNAL(triggered()), this, SLOT(play()));
@@ -198,8 +199,10 @@ MaquetteWidget::accelerationValueModified(int value){
 
     double newValue = _accelerationSlider->accelerationValue(value);
 
-    if (_accelerationDisplay->value() != newValue)
+    if (_accelerationDisplay->value() != newValue){
+        _sliderMoved = true;
         _accelerationDisplay->setValue(newValue);
+    }
 }
 
 void
@@ -239,7 +242,10 @@ MaquetteWidget::setAvailableAction(QAction *action){
 
 void
 MaquetteWidget::accelerationValueEntered(double value){
-    int newValue = _accelerationSlider->valueForAcceleration(value);
-    Maquette::getInstance()->setAccelerationFactor(value);
-    _accelerationSlider->setValue(newValue);
+    if(!_sliderMoved){
+        int newValue = _accelerationSlider->valueForAcceleration(value);
+        Maquette::getInstance()->setAccelerationFactor(value);
+        _accelerationSlider->setValue(newValue);
+    }
+    _sliderMoved = false;
 }

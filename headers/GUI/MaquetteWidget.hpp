@@ -86,6 +86,7 @@ private:
     LogarithmicSlider *_accelerationSlider;    
     QDoubleSpinBox *_accelerationDisplay;
     QWidget *_readingSpeedWidget;
+    bool _sliderMoved;
 
 };
 
