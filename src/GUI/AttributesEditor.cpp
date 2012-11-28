@@ -393,7 +393,7 @@ AttributesEditor::createWidgets()
 	_snapshotTab = new QWidget;
 	_curvesTab = new QWidget;
 	_profilesColorButton = new QPushButton;
-	_generalColorButton = new QPushButton;
+    _generalColorButton = new QPushButton;
 	_profilesResetButton = new QPushButton;
 
 	_boxStartValue = new QDoubleSpinBox;
@@ -1296,6 +1296,9 @@ AttributesEditor::changeColor() {
 		_profilesColorButton->setAutoFillBackground(true);
         _profilesPreviewArea->setColor(color);
 		_palette->setColor(color);
+        BasicBox * box = _scene->getBox(_boxEdited);
+        if(_boxEdited!=NO_ID)
+            box->changeColor(color);
 		profilesChanged();
 	}
 }

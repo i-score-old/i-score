@@ -121,14 +121,13 @@ MaquetteWidget::createNameLabel(){
 void
 MaquetteWidget::createReadingSpeedWidget(){
     QHBoxLayout *layout = new QHBoxLayout;
-    QSizePolicy *ignoredPolicy = new QSizePolicy(QSizePolicy::Ignored,QSizePolicy::Ignored);
-
+    QSizePolicy *ignoredPolicy = new QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Ignored);
 
     _accelerationSlider = new LogarithmicSlider(Qt::Horizontal,this);
     _accelerationSlider->setStatusTip(tr("Acceleration"));
     _accelerationSlider->setFixedWidth(200);
     _accelerationSlider->setSliderPosition(50);
-//    _accelerationSlider->setSizePolicy(*ignoredPolicy);
+    _accelerationSlider->setSizePolicy(*ignoredPolicy);
 
     _accelerationDisplay = new QDoubleSpinBox(this);
     _accelerationDisplay->setStatusTip(tr("Acceleration"));
@@ -136,7 +135,7 @@ MaquetteWidget::createReadingSpeedWidget(){
     _accelerationDisplay->setDecimals(2);
     _accelerationDisplay->setValue(_accelerationSlider->accelerationValue(_accelerationSlider->value()));
     _accelerationDisplay->setKeyboardTracking(false);
-//    _accelerationDisplay->setSizePolicy(*ignoredPolicy);
+    _accelerationDisplay->setSizePolicy(*ignoredPolicy);
 
     layout->addWidget(_accelerationSlider);
     layout->addWidget(_accelerationDisplay);
@@ -151,6 +150,7 @@ void
 MaquetteWidget::createActions(){
 
     QIcon playIcon(":/images/playSimple.svg");
+
     _playAction = new QAction(playIcon, tr("Play"), this);
     _playAction->setShortcut(QString("Space"));
     _playAction->setStatusTip(tr("Play composition"));

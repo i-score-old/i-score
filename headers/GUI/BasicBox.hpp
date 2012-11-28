@@ -589,6 +589,7 @@ class BasicBox : public QObject, public QGraphicsItem
   inline qreal currentZvalue(){return _currentZvalue;}
   void lower(bool state);
   void updateMode(QString displayMode);
+  void changeColor(QColor color);
 
  protected:
   /*!
@@ -692,7 +693,7 @@ class BasicBox : public QObject, public QGraphicsItem
   QList<string> _curvesAddresses;
   bool _flexible;
   qreal _currentZvalue;
-
+  QColor _color;
   bool _low;
 };
 

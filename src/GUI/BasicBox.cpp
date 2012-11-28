@@ -234,6 +234,8 @@ BasicBox::init()
     _low = false;
     _triggerPoints = new QMap<BoxExtremity,TriggerPoint*>();
 	_comment = NULL;
+    _color = QColor(Qt::yellow);
+
     updateBoxSize();
 
     setCacheMode(QGraphicsItem::ItemCoordinateCache);
@@ -246,6 +248,12 @@ BasicBox::init()
     _currentZvalue = 0;
     setZValue(_currentZvalue);
     updateFlexibility();
+}
+
+void
+BasicBox::changeColor(QColor color){
+    _color = color;
+    update();
 }
 
 void
@@ -465,6 +473,7 @@ void
 BasicBox::setName(const QString & name)
 {
 	_abstract->setName(name.toStdString());
+    update();
 }
 
 QColor
@@ -1367,9 +1376,9 @@ BasicBox::drawTriggerGrips(QPainter *painter){
         rectRight = QRectF(0, 0, earWidth, earHeight);
     }
 
-    QPen pen(isSelected() ? Qt::yellow : Qt::white);
+    QPen pen(isSelected() ? _color : Qt::white);
     QBrush brush(Qt::SolidPattern);
-    brush.setColor(isSelected() ? Qt::yellow : Qt::white);
+    brush.setColor(isSelected() ? _color : Qt::white);
     painter->setBrush(brush);
     painter->setPen(pen);
 
@@ -1414,9 +1423,9 @@ BasicBox::drawInteractionGrips(QPainter *painter){
     float earWidth = EAR_WIDTH*2;
     float earHeight = EAR_HEIGHT;
 
-    QPen pen(isSelected() ? Qt::yellow : Qt::white);
+    QPen pen(isSelected() ? _color : Qt::white);
     QBrush brush(Qt::SolidPattern);
-    brush.setColor(isSelected() ? Qt::yellow : Qt::white);
+    brush.setColor(isSelected() ? _color : Qt::white);
     painter->setBrush(brush);
     painter->setPen(pen);
 
@@ -1461,7 +1470,7 @@ BasicBox::drawMsgsIndicators(QPainter *painter){
     if (hasStartMsgs()){
         painter->setPen(Qt::NoPen);
         QLinearGradient lgradient(_startMsgsIndicator.topLeft(),_startMsgsIndicator.topRight());
-        lgradient.setColorAt(0,isSelected() ? Qt::yellow : Qt::white);
+        lgradient.setColorAt(0,isSelected() ? _color : Qt::white);
         lgradient.setColorAt(1,Qt::transparent);
         painter->fillRect(_startMsgsIndicator,lgradient);
     }
@@ -1470,7 +1479,7 @@ BasicBox::drawMsgsIndicators(QPainter *painter){
         painter->setPen(Qt::NoPen);
         QLinearGradient lgradient(_endMsgsIndicator.topLeft(),_endMsgsIndicator.topRight());
         lgradient.setColorAt(1,Qt::transparent);
-        lgradient.setColorAt(0,isSelected() ? Qt::yellow : Qt::white);
+        lgradient.setColorAt(0,isSelected() ? _color : Qt::white);
         painter->fillRect(_endMsgsIndicator,lgradient);
     }
 }
@@ -1481,7 +1490,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 	Q_UNUSED(option);
 	Q_UNUSED(widget);  
 //    QPen penR(Qt::lightGray,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
-    QPen penR(isSelected() ? Qt::yellow : Qt::white,isSelected() ? 1.5 * LINE_WIDTH : LINE_WIDTH);
+    QPen penR(isSelected() ? _color : Qt::white,isSelected() ? 1.5 * LINE_WIDTH : LINE_WIDTH);
 
     //************* pour afficher la shape *************
     QPen penG(Qt::green);
@@ -1530,7 +1539,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         _curveProxy->setVisible(false);
     }
 
-    painter->fillRect(0,0,textRect.width(),textRect.height(),isSelected() ? Qt::yellow : Qt::white);
+    painter->fillRect(0,0,textRect.width(),textRect.height(),isSelected() ? _color : Qt::white);
     painter->drawText(QRectF(10,0,textRect.width(),textRect.height()),Qt::AlignLeft,name());
 
 	if (_abstract->width() <= 3*RESIZE_TOLERANCE) {
