@@ -590,6 +590,7 @@ class BasicBox : public QObject, public QGraphicsItem
   void lower(bool state);
   void updateMode(QString displayMode);
   void changeColor(QColor color);
+  inline QColor currentColor(){return _color;}
 
  protected:
   /*!
@@ -694,6 +695,7 @@ class BasicBox : public QObject, public QGraphicsItem
   bool _flexible;
   qreal _currentZvalue;
   QColor _color;
+  QColor _colorUnselected;
   bool _low;
 };
 

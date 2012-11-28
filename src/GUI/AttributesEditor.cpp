@@ -92,6 +92,7 @@ using namespace SndBoxProp;
 #define LEFT_MARGIN 5
 #define RIGHT_MARGIN 5
 #define MINIMUM_WIDTH 400
+#define COLOR_ICON_SIZE 21
 
 static const float S_TO_MS  = 1000.;
 
@@ -126,7 +127,7 @@ AttributesEditor::init() {
 
 	noBoxEdited();    
 
-    setMinimumWidth(MINIMUM_WIDTH);
+//    setMinimumWidth(MINIMUM_WIDTH);
 }
 
 AttributesEditor::~AttributesEditor()
@@ -150,6 +151,8 @@ void AttributesEditor::noBoxEdited() {
 	_boxStartValue->clear();
 	_boxLengthValue->clear();
 	_boxName->clear();
+    _colorButtonPixmap->fill(Qt::gray);
+    _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
     _generalTab->setEnabled(false);
     _messagesTab->setEnabled(false);
     _curvesTab->setEnabled(false);
@@ -236,7 +239,8 @@ AttributesEditor::nameWidgets(int language)
 	assignEnd = tr("End");
 
 	_profilesColorButton->setText(color);
-	_generalColorButton->setText(color);
+//	_generalColorButton->setText(color);
+
 	_profilesResetButton->setText(reset);
 	_profilesLabel->setText(profiles);
 	_shapeLabel->setText(shapeLabel);
@@ -379,7 +383,6 @@ AttributesEditor::createWidgets()
 	_languageComboBox->addItem(tr("English"));
 
 	// Allocations and names
-
     _tabWidget = new QTabWidget;
 	_generalTab = new QWidget;
     _profilesTab = new QWidget;
@@ -394,6 +397,15 @@ AttributesEditor::createWidgets()
 	_curvesTab = new QWidget;
 	_profilesColorButton = new QPushButton;
     _generalColorButton = new QPushButton;
+    _generalColorButton->setIconSize(QSize(COLOR_ICON_SIZE,COLOR_ICON_SIZE));
+//    _generalColorButton->setFixedSize(COLOR_ICON_SIZE,COLOR_ICON_SIZE);
+
+
+    _colorButtonPixmap = new QPixmap(4*COLOR_ICON_SIZE/3,4*COLOR_ICON_SIZE/3);
+    _colorButtonPixmap->fill(QColor(Qt::gray));
+
+    _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
+
 	_profilesResetButton = new QPushButton;
 
 	_boxStartValue = new QDoubleSpinBox;
@@ -680,9 +692,10 @@ AttributesEditor::addWidgetsToLayout()
 //	_snapshotLayout->addWidget(_snapshotAssignLabel,0,0,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop);
 
     _boxEditLayout->addWidget(_snapshotAssignStart);
-    _boxEditLayout->addWidget(_boxName);
+    _boxEditLayout->addWidget(_boxName);    
     _boxEditLayout->addWidget(_generalColorButton);
     _boxEditLayout->addWidget(_snapshotAssignEnd);
+    _boxEditLayout->setSpacing(15);
 
 //    _snapshotLayout->addWidget(_snapshotAssignStart,0,1,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop | Qt::AlignLeft);
 //    _snapshotLayout->addWidget(_boxName,0,1,LABEL_HEIGHT,LABEL_WIDTH,Qt::AlignTop | Qt::AlignCenter);
@@ -720,7 +733,7 @@ AttributesEditor::addWidgetsToLayout()
  //   setWidget(_tabWidget);
  //   _tabWidget->setBaseSize(MINIMUM_WIDTH,height());
     setWidget(_snapshotTab);
-    _snapshotTab->setMinimumSize(MINIMUM_WIDTH,height());
+//    _snapshotTab->setMinimumSize(MINIMUM_WIDTH,height());
 
 
 
@@ -948,8 +961,12 @@ AttributesEditor::updateWidgets(bool boxModified)
 		if (!boxModified && _boxLengthValue->value() != savedLengthValue) {
 //            _curvesWidget->updateMessages(_boxEdited,true);
 		}
-		_boxName->setText(box->name());
+        _boxName->setText(box->name());
+
+        _colorButtonPixmap->fill(box->currentColor());
+        _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
 	}
+
 
 	Shape shape = Shape(_palette->shape());
 
@@ -1296,6 +1313,8 @@ AttributesEditor::changeColor() {
 		_profilesColorButton->setAutoFillBackground(true);
         _profilesPreviewArea->setColor(color);
 		_palette->setColor(color);
+        _colorButtonPixmap->fill(color);
+        _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
         BasicBox * box = _scene->getBox(_boxEdited);
         if(_boxEdited!=NO_ID)
             box->changeColor(color);

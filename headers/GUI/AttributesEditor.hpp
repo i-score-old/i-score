@@ -331,6 +331,7 @@ class AttributesEditor : public QDockWidget
 	QGridLayout * _generalTopLayout; //!< Layout handling preview area and QButtons.
 	PreviewArea *_generalPreviewArea; //!< Editor's preview area
 	QPushButton *_generalColorButton; //!< Color button.
+    QPixmap *_colorButtonPixmap;
   QComboBox * _languageComboBox; //!< Language selection list.
 
 	// GENERAL
