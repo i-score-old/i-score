@@ -398,7 +398,6 @@ AttributesEditor::createWidgets()
 	_profilesColorButton = new QPushButton;
     _generalColorButton = new QPushButton;
     _generalColorButton->setIconSize(QSize(COLOR_ICON_SIZE,COLOR_ICON_SIZE));
-//    _generalColorButton->setFixedSize(COLOR_ICON_SIZE,COLOR_ICON_SIZE);
 
 
     _colorButtonPixmap = new QPixmap(4*COLOR_ICON_SIZE/3,4*COLOR_ICON_SIZE/3);
@@ -1310,15 +1309,19 @@ AttributesEditor::changeColor() {
 	// Passer plutot par un QtColorPicker pour limiter le nb de couleurs?
 	QColor color = QColorDialog::getColor(Qt::white, this);
 	if (color.isValid()) {
-		_profilesColorButton->setAutoFillBackground(true);
-        _profilesPreviewArea->setColor(color);
-		_palette->setColor(color);
-        _colorButtonPixmap->fill(color);
-        _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
-        BasicBox * box = _scene->getBox(_boxEdited);
-        if(_boxEdited!=NO_ID)
+        if(_boxEdited!=NO_ID){
+            _profilesColorButton->setAutoFillBackground(true);
+            _profilesPreviewArea->setColor(color);
+            _palette->setColor(color);
+            _colorButtonPixmap->fill(color);
+            _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
+            BasicBox * box = _scene->getBox(_boxEdited);
             box->changeColor(color);
-		profilesChanged();
+            profilesChanged();
+        }
+        else{
+            _scene->displayMessage("No box selected",INDICATION_LEVEL);
+        }
 	}
 }
 

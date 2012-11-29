@@ -43,6 +43,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QList>
 #include <map>
 #include <exception>
+#include <QTreeView>
 
 static unsigned int NAME_COLUMN = 0;
 static unsigned int VALUE_COLUMN = 1;
@@ -63,7 +64,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     setColumnCount(7);
     QStringList list;
     list<<"Address"<<"Value"<<"Start"<<" ~ "<<"End"<<" = "<<" % ";
-    setColumnWidth(NAME_COLUMN,160);
+    setColumnWidth(NAME_COLUMN,160);    
     setColumnWidth(VALUE_COLUMN,65);
     setColumnWidth(START_COLUMN,65);
     setColumnWidth(END_COLUMN,65);
@@ -71,8 +72,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     setColumnWidth(REDUNDANCY_COLUMN,25);
     setColumnWidth(SR_COLUMN,35);
     setHeaderLabels(list);
-    list.clear();    
-
+    list.clear();
     QFont font;
     font.setPointSize(TEXT_POINT_SIZE);
     setFont(font);
@@ -83,7 +83,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 
     connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(itemCollapsed()));
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(clickInNetworkTree(QTreeWidgetItem *,int)));
-    connect(this,SIGNAL(itemChanged(QTreeWidgetItem*,int)), this,SLOT(valueChanged(QTreeWidgetItem*,int)));
+    connect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this,SLOT(valueChanged(QTreeWidgetItem*,int)));
     connect(this, SIGNAL(startValueChanged(QTreeWidgetItem*,QString)),this,SLOT(changeStartValue(QTreeWidgetItem*,QString)));
     connect(this, SIGNAL(endValueChanged(QTreeWidgetItem*,QString)),this,SLOT(changeEndValue(QTreeWidgetItem*,QString)));
 }
@@ -96,6 +96,68 @@ void
 NetworkTree::init(){
     _startMessages = new NetworkMessages;
     _endMessages = new NetworkMessages;
+
+    setStyleSheet(
+//                "QTreeView::branch:has-siblings:!adjoins-item {"
+//                    "border-image: url(:/images/stylesheet-vline.png) 0;"
+//                "}"
+
+//                "QTreeView::branch:has-siblings:adjoins-item {"
+//                    "border-image: url(:/images/stylesheet-branch-more.png) 0;"
+//                "}"
+
+//                "QTreeView::branch:!has-children:!has-siblings:adjoins-item {"
+//                    "border-image: url(:/images/stylesheet-branch-end.png) 0;"
+//                "}"
+
+//                "QTreeView::branch:has-children:!has-siblings:closed,"
+//                "QTreeView::branch:closed:has-children:has-siblings {"
+//                        "border-image:none;"
+//                "image: url(:/images/stylesheet-branch-closed.png);"
+//                 "}"
+
+//                "QTreeView::branch:open:has-children:!has-siblings,"
+//                "QTreeView::branch:open:has-children:has-siblings{"
+//                    "border-image:none;"
+//                    "image: url(:/images/stylesheet-branch-open.png);"
+//                "}"
+
+
+                //--------------------------------//
+
+                "QTreeView {"
+                     "show-decoration-selected: 1;"
+                "}"
+
+                 "QTreeView::item {"
+                      "border-right: 1px solid #d9d9d9;"
+                     "border-top-color: transparent;"
+                     "border-bottom-color: transparent;"
+                "}"
+
+                 "QTreeView::item:hover {"
+                     "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);"
+                     "border: 1px solid #bfcde4;"
+                "}"
+
+
+                "QTreeView::item:selected {"
+                     "border: 1px solid #567dbc;"
+                "}"
+
+                "QTreeView::item:selected:active{"
+                     "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6ea1f1, stop: 1 #567dbc);"
+                "}"
+
+                 "QTreeView::item:selected:!active {"
+                     "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6b9be8, stop: 1 #577fbf);"
+                "}"
+
+//                //--------------------------------//
+
+            );
+
+
 }
 
 void

@@ -138,20 +138,20 @@ MaquetteWidget::createReadingSpeedWidget(){
     _accelerationDisplay->setSizePolicy(*ignoredPolicy);
 
     layout->addWidget(_accelerationSlider);
-    layout->addWidget(_accelerationDisplay);
-
+    layout->addWidget(_accelerationDisplay);    
     _readingSpeedWidget->setLayout(layout);
-
     connect(_accelerationSlider,SIGNAL(valueChanged(int)),this,SLOT(accelerationValueModified(int)));
     connect(_accelerationDisplay, SIGNAL(valueChanged(double)), this, SLOT(accelerationValueEntered(double)));
 }
 
 void
 MaquetteWidget::createActions(){
-
+    QPixmap pix(30,30);
+    pix.fill(Qt::white);
     QIcon playIcon(":/images/playSimple.svg");
-
+    playIcon.addPixmap(pix);
     _playAction = new QAction(playIcon, tr("Play"), this);
+
     _playAction->setShortcut(QString("Space"));
     _playAction->setStatusTip(tr("Play composition"));
     _playAction->setCheckable(true);
@@ -190,7 +190,12 @@ MaquetteWidget::createHeader(){
     _headerLayout->insertStretch(_headerLayout->indexOf(_readingSpeedWidget),_scene->width()/2);
     _headerLayout->setAlignment(_accelerationSlider,Qt::AlignRight);
     _headerLayout->setContentsMargins(0,0,0,0);
+
+
+    addAction(_playAction);
     _header->setLayout(_headerLayout);
+
+
 }
 
 void
