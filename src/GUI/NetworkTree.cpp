@@ -98,33 +98,6 @@ NetworkTree::init(){
     _endMessages = new NetworkMessages;
 
     setStyleSheet(
-//                "QTreeView::branch:has-siblings:!adjoins-item {"
-//                    "border-image: url(:/images/stylesheet-vline.png) 0;"
-//                "}"
-
-//                "QTreeView::branch:has-siblings:adjoins-item {"
-//                    "border-image: url(:/images/stylesheet-branch-more.png) 0;"
-//                "}"
-
-//                "QTreeView::branch:!has-children:!has-siblings:adjoins-item {"
-//                    "border-image: url(:/images/stylesheet-branch-end.png) 0;"
-//                "}"
-
-//                "QTreeView::branch:has-children:!has-siblings:closed,"
-//                "QTreeView::branch:closed:has-children:has-siblings {"
-//                        "border-image:none;"
-//                "image: url(:/images/stylesheet-branch-closed.png);"
-//                 "}"
-
-//                "QTreeView::branch:open:has-children:!has-siblings,"
-//                "QTreeView::branch:open:has-children:has-siblings{"
-//                    "border-image:none;"
-//                    "image: url(:/images/stylesheet-branch-open.png);"
-//                "}"
-
-
-                //--------------------------------//
-
                 "QTreeView {"
                      "show-decoration-selected: 1;"
                 "}"
@@ -152,9 +125,6 @@ NetworkTree::init(){
                  "QTreeView::item:selected:!active {"
                      "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6b9be8, stop: 1 #577fbf);"
                 "}"
-
-//                //--------------------------------//
-
             );
 
 
