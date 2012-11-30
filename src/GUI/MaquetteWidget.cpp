@@ -146,21 +146,16 @@ MaquetteWidget::createReadingSpeedWidget(){
 
 void
 MaquetteWidget::createActions(){
-    QPixmap pix(30,30);
-    pix.fill(Qt::white);
-    QIcon playIcon(":/images/playSimple.svg");
-    playIcon.addPixmap(pix);
-    _playAction = new QAction(playIcon, tr("Play"), this);
 
+    QIcon playIcon(":/images/playSimple.svg");
+    _playAction = new QAction(playIcon, tr("Play"), this);
     _playAction->setShortcut(QString("Space"));
     _playAction->setStatusTip(tr("Play composition"));
-    _playAction->setCheckable(true);
 
     QIcon stopIcon(":/images/stopSimple.svg");
     _stopAction = new QAction(stopIcon, tr("Stop"), this);
     _stopAction->setShortcut(QString("Enter"));
     _stopAction->setStatusTip(tr("Stop composition"));
-    _stopAction->setCheckable(true);
 
     connect(_playAction,SIGNAL(triggered()), this, SLOT(play()));
     connect(_stopAction,SIGNAL(triggered()), this, SLOT(stop()));
@@ -168,6 +163,17 @@ MaquetteWidget::createActions(){
 
 void
 MaquetteWidget::createToolBar(){
+    _toolBar->setStyleSheet("QToolBar{border :none; }"
+                            "QToolBar::handle {"
+                            "border: none;"
+                            "}"
+                            "QToolBar:top, QToolBar:bottom {"
+                             "border :none; background :white;"
+                            "}"
+                            "QToolBar:left, QToolBar:right {"
+                            "border :none;background :white;"
+                            "}"
+                            );
     _toolBar->addAction(_playAction);
 }
 
@@ -191,8 +197,6 @@ MaquetteWidget::createHeader(){
     _headerLayout->setAlignment(_accelerationSlider,Qt::AlignRight);
     _headerLayout->setContentsMargins(0,0,0,0);
 
-
-    addAction(_playAction);
     _header->setLayout(_headerLayout);
 
 
@@ -242,10 +246,8 @@ MaquetteWidget::setAvailableMenu(QWidget *widget){
 
 void
 MaquetteWidget::setAvailableAction(QAction *action){
-    if(!_toolBar->actions().empty()){
-        _toolBar->removeAction(_toolBar->actions().first());
-        _toolBar->addAction(action);
-    }
+    _toolBar->clear();
+    _toolBar->addAction(action);
 }
 
 void
