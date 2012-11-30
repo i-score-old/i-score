@@ -46,8 +46,8 @@ knowledge of the CeCILL license and that you accept its terms.
 LogarithmicSlider::LogarithmicSlider(Qt::Orientation orientation, QWidget *parent = 0)
 : QSlider(orientation,parent) {
   setRange(MINIMUM_VALUE,MAXIMUM_VALUE);
-  setSingleStep((MAXIMUM_VALUE - MINIMUM_VALUE) / 150);
-  setPageStep((MAXIMUM_VALUE - MINIMUM_VALUE) / 15);
+  setSingleStep((MAXIMUM_VALUE - MINIMUM_VALUE) / 100);
+  setPageStep((MAXIMUM_VALUE - MINIMUM_VALUE) / 10);
   setTickPosition(QSlider::TicksBelow);
 }
 

@@ -87,7 +87,7 @@ private:
     QDoubleSpinBox *_accelerationDisplay;
     QWidget *_readingSpeedWidget;
     bool _sliderMoved;
-
+    bool _valueEntered;
 };
 
 

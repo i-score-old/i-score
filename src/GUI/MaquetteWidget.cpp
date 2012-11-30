@@ -131,7 +131,7 @@ MaquetteWidget::createReadingSpeedWidget(){
 
     _accelerationDisplay = new QDoubleSpinBox(this);
     _accelerationDisplay->setStatusTip(tr("Acceleration"));
-    _accelerationDisplay->setRange(0.,20.);
+    _accelerationDisplay->setRange(0.,100.);
     _accelerationDisplay->setDecimals(2);
     _accelerationDisplay->setValue(_accelerationSlider->accelerationValue(_accelerationSlider->value()));
     _accelerationDisplay->setKeyboardTracking(false);
@@ -200,14 +200,17 @@ MaquetteWidget::createHeader(){
 
 void
 MaquetteWidget::accelerationValueModified(int value){
-    emit(accelerationValueChanged(value));
+    if(!_valueEntered){
+        emit(accelerationValueChanged(value));
 
-    double newValue = _accelerationSlider->accelerationValue(value);
+        double newValue = _accelerationSlider->accelerationValue(value);
 
-    if (_accelerationDisplay->value() != newValue){
-        _sliderMoved = true;
-        _accelerationDisplay->setValue(newValue);
+        if (_accelerationDisplay->value() != newValue){
+            _sliderMoved = true;
+            _accelerationDisplay->setValue(newValue);
+        }
     }
+    _valueEntered = false;
 }
 
 void
@@ -250,7 +253,12 @@ MaquetteWidget::accelerationValueEntered(double value){
     if(!_sliderMoved){
         int newValue = _accelerationSlider->valueForAcceleration(value);
         Maquette::getInstance()->setAccelerationFactor(value);
-        _accelerationSlider->setValue(newValue);
+        if(newValue<LogarithmicSlider::MAXIMUM_VALUE)
+            _accelerationSlider->setValue(newValue);
+        else{
+            _valueEntered = true;
+            _accelerationSlider->setValue(_accelerationSlider->valueForAcceleration(LogarithmicSlider::MAXIMUM_VALUE));
+        }
     }
     _sliderMoved = false;
 }

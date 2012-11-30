@@ -21,7 +21,6 @@
         <file>images/trigger.svg</file>
         <file>images/zoomin.svg</file>
         <file>images/zoomout.svg</file>
-        <file>images/acousmoscribe.icns</file>
         <file>images/BoxInteraction.png</file>
         <file>images/Relation.png</file>
         <file>images/GeneralTab.png</file>
@@ -49,5 +48,6 @@
         <file>translations/acousmoscribe_en.qm</file>
         <file>images/playSimple.svg</file>
         <file>images/stopSimple.svg</file>
+        <file>images/i-score.icns</file>
     </qresource>
 </RCC>
