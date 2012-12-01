@@ -234,8 +234,8 @@ BasicBox::init()
     _low = false;
     _triggerPoints = new QMap<BoxExtremity,TriggerPoint*>();
 	_comment = NULL;
-    _color = QColor(Qt::yellow);
-    _colorUnselected = QColor(Qt::yellow);
+    _color = QColor(Qt::white);
+    _colorUnselected = QColor(Qt::white);
 
     updateBoxSize();
 
