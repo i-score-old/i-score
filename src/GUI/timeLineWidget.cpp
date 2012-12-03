@@ -42,15 +42,67 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <iostream>
 #include <map>
 #include <vector>
+#include <QPainter>
 
-#include "timeLineWidget.hpp"
+#include "TimeLineWidget.hpp"
 
-timeLineWidget::timeLineWidget(QWidget *parent, MaquetteScene *scene)
+class MaquetteScene;
+
+const float TimeLineWidget::TIME_BAR_HEIGHT =  15.;
+const float TimeLineWidget::LEFT_MARGIN =  2.;
+const float TimeLineWidget::NUMBERS_POINT_SIZE =  10.;
+
+TimeLineWidget::TimeLineWidget(QWidget *parent, MaquetteScene *scene)
     :QWidget(parent){
 
     _scene = scene;
+    _rect = QRect(LEFT_MARGIN,0,_scene->width(),TIME_BAR_HEIGHT);
+    _zoom = 1.;
+    setGeometry(_rect);
+    setFixedHeight(height());
 }
 
-timeLineWidget::~timeLineWidget(){
+TimeLineWidget::~TimeLineWidget(){
 
+}
+
+void
+TimeLineWidget::paintEngine(){
+
+}
+
+void
+TimeLineWidget::mousePressEvent(QMouseEvent *){
+    std::cout<<"Timeline :: mouse press event"<<std::endl;
+}
+
+void
+TimeLineWidget::drawBackground(QPainter *painter, QRect rect){
+    painter->save();
+
+    static const int S_TO_MS = 1000;
+    const int WIDTH = width();
+    const int HEIGHT = TIME_BAR_HEIGHT;
+
+    int i_PXL;
+    QFont *font = new QFont();
+    font->setPointSize(NUMBERS_POINT_SIZE);
+    painter->setFont(*font);
+    for (double i = 0 ; i <= (WIDTH * MaquetteScene::MS_PER_PIXEL) / S_TO_MS ; i++) { // for each second
+        i_PXL = i * S_TO_MS / MaquetteScene::MS_PER_PIXEL + LEFT_MARGIN;
+        painter->drawText(QPointF(i_PXL, 2*HEIGHT/3),QString("%1").arg(i));
+        painter->drawLine(QPointF(i_PXL, 3*HEIGHT/4), QPointF(i_PXL, HEIGHT));
+    }
+
+    painter->restore();
+}
+
+void
+TimeLineWidget::paintEvent(QPaintEvent *){
+    QPainter *painter = new QPainter(this);
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    QPen *pen = new QPen;
+    painter->drawRect(_rect);
+    drawBackground(painter,_rect);
+    delete painter;
 }

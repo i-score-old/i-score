@@ -71,6 +71,7 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
     _header = new QWidget(NULL);
     _readingSpeedWidget = new QWidget;
     _sliderMoved = false;
+    _timeLine = new TimeLineWidget(this,_scene);
 
     createReadingSpeedWidget();
     createActions();
@@ -79,7 +80,9 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
     createHeader();
 
     _maquetteLayout->addWidget(_header);
-    _maquetteLayout->addWidget(_view);
+    _maquetteLayout->addWidget(_timeLine);
+    _maquetteLayout->addWidget(_view);    
+
     _maquetteLayout->setContentsMargins(0,0,0,0);
     _maquetteLayout->setVerticalSpacing(0);
     setLayout(_maquetteLayout);
@@ -108,6 +111,7 @@ MaquetteWidget::~MaquetteWidget(){
     delete _accelerationSlider;
     delete _accelerationDisplay;
     delete _readingSpeedWidget;
+    delete _timeLine;
 }
 
 void
@@ -198,8 +202,6 @@ MaquetteWidget::createHeader(){
     _headerLayout->setContentsMargins(0,0,0,0);
 
     _header->setLayout(_headerLayout);
-
-
 }
 
 void

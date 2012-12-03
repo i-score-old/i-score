@@ -128,7 +128,8 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
 {
   QGraphicsView::drawBackground(painter,rect);
 //  QPen pen(Qt::darkGreen);
-  QPen pen(QColor(100,100,100));
+  QPen pen(QColor(130,130,130));
+
   painter->setPen(pen);
 
   QPointF upperPoint,downPoint;
@@ -140,13 +141,14 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
   	if (_zoom < 1 && ((i % (int)(1./_zoom)) != 0 )) {
   		continue;
   	}
- 	 painter->drawText(QPointF(i_PXL, 10),QString("%1").arg(i));
+// 	 painter->drawText(QPointF(i_PXL, 10),QString("%1").arg(i));
  	 painter->drawLine(QPointF(i_PXL, 0), QPointF(i_PXL, HEIGHT));
 
    if (_zoom > 1) {
-	 	 QPen pen = painter->pen();
+         QPen pen = painter->pen();
 	 	 QPen savePen = pen;
-	 	 pen.setColor(Qt::darkGray);
+
+
 	 	 painter->setPen(pen);
   	 for (float j = i ; j < i+1 ; j+=1./_zoom) {
     		if (i != j) {

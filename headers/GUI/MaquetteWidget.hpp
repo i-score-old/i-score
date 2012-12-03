@@ -19,6 +19,7 @@
 
 #include "MaquetteView.hpp"
 #include "LogarithmicSlider.hpp"
+#include "TimeLineWidget.hpp"
 
 class QGridLayout;
 class QString;
@@ -86,6 +87,7 @@ private:
     LogarithmicSlider *_accelerationSlider;    
     QDoubleSpinBox *_accelerationDisplay;
     QWidget *_readingSpeedWidget;
+    TimeLineWidget *_timeLine;
 
     bool _sliderMoved;
     bool _valueEntered;

@@ -129,15 +129,6 @@ BasicBox::centerWidget(){
     _comboBox->resize((width() - 2*LINE_WIDTH)/2,COMBOBOX_HEIGHT);
 }
 
-void
-BasicBox::updateMode(QString displayMode){
-    updateDisplay(displayMode);
-}
-
-void
-BasicBox::updateDisplay(QString displayMode){
-}
-
 
 void
 BasicBox::updateWidgets(){

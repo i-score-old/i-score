@@ -587,8 +587,7 @@ class BasicBox : public QObject, public QGraphicsItem
   void addToComboBox(QString address);
   QString currentText();
   inline qreal currentZvalue(){return _currentZvalue;}
-  void lower(bool state);
-  void updateMode(QString displayMode);
+  void lower(bool state);  
   void changeColor(QColor color);
   inline QColor currentColor(){return _color;}
 
@@ -606,7 +605,6 @@ class BasicBox : public QObject, public QGraphicsItem
   virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
   virtual void keyPressEvent(QKeyEvent *event);
   virtual void keyReleaseEvent(QKeyEvent *event);
-  virtual void updateDisplay(QString displayMode);
 
   /*!
    * \brief Redefinition of QGraphicsItem::contextMenuEvent().

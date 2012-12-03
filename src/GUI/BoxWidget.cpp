@@ -146,7 +146,6 @@ void BoxWidget::curveSampleRateChanged(const QString &address,int value) {
 
 void
 BoxWidget::updateDisplay(const QString &address){
-    _box->updateMode(address);
     displayCurve(address);
 }
 

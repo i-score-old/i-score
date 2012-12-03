@@ -98,7 +98,7 @@ headers/data/NetworkMessages.hpp \
 headers/GUI/BoxWidget.hpp \
 headers/GUI/BoxCurveEdit.hpp \
 headers/GUI/MaquetteWidget.hpp \
-headers/GUI/timeLineWidget.hpp
+headers/GUI/TimeLineWidget.hpp
 
 SOURCES += main.cpp \
 src/data/Abstract.cpp \
@@ -147,7 +147,7 @@ src/data/NetworkMessages.cpp \
 src/GUI/BoxWidget.cpp \
 src/GUI/BoxCurveEdit.cpp \
 src/GUI/MaquetteWidget.cpp \
-src/GUI/timeLineWidget.cpp
+src/GUI/TimeLineWidget.cpp
 
 RESOURCES += i-score.qrc
 
