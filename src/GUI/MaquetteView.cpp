@@ -44,7 +44,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "MainWindow.hpp"
 #include "MaquetteScene.hpp"
 #include "AttributesEditor.hpp"
-
+#include "timeLineWidget.hpp"
 #include "Maquette.hpp"
 
 #include <QGraphicsSceneDragDropEvent>
@@ -72,6 +72,7 @@ MaquetteView::MaquetteView(MainWindow *mw)
   centerOn(0,0);
   _zoom = 1;
   _gotoValue = 0;
+
 }
 
 MaquetteView::~MaquetteView()

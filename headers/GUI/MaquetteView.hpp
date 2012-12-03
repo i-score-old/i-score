@@ -50,6 +50,7 @@ knowledge of the CeCILL license and that you accept its terms.
 class BasicBox;
 class MainWindow;
 class MaquetteScene;
+
 /**!
  * \class MaquetteView
  *

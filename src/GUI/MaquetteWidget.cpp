@@ -56,8 +56,8 @@ using std::string;
 #include "MaquetteScene.hpp"
 #include "MainWindow.hpp"
 
-const float MaquetteWidget::HEADER_HEIGHT = 35;
-const float MaquetteWidget::NAME_POINT_SIZE = 20;
+const float MaquetteWidget::HEADER_HEIGHT = 35.;
+const float MaquetteWidget::NAME_POINT_SIZE = 20.;
 
 MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScene *scene)
     : QWidget(parent){
@@ -81,7 +81,8 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
 
     _maquetteLayout->addWidget(_header);
     _maquetteLayout->addWidget(_timeLine);
-    _maquetteLayout->addWidget(_view);    
+    _maquetteLayout->addWidget(_view);
+
 
     _maquetteLayout->setContentsMargins(0,0,0,0);
     _maquetteLayout->setVerticalSpacing(0);
