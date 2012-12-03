@@ -1307,22 +1307,27 @@ void
 AttributesEditor::changeColor() {
 
 	// Passer plutot par un QtColorPicker pour limiter le nb de couleurs?
-	QColor color = QColorDialog::getColor(Qt::white, this);
-	if (color.isValid()) {
-        if(_boxEdited!=NO_ID){
+
+    if(_boxEdited!=NO_ID){
+        BasicBox * box = _scene->getBox(_boxEdited);
+
+        QColor color = QColorDialog::getColor(box->currentColor(), this);
+
+        if (color.isValid()) {
             _profilesColorButton->setAutoFillBackground(true);
             _profilesPreviewArea->setColor(color);
             _palette->setColor(color);
             _colorButtonPixmap->fill(color);
             _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
-            BasicBox * box = _scene->getBox(_boxEdited);
+
             box->changeColor(color);
             profilesChanged();
         }
-        else{
-            _scene->displayMessage("No box selected",INDICATION_LEVEL);
-        }
-	}
+    }
+    else{
+        _scene->displayMessage("No box selected",INDICATION_LEVEL);
+    }
+
 }
 
 void
