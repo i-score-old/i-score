@@ -134,7 +134,7 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
 
   QGraphicsView::drawBackground(painter,rect);
 //  QPen pen(Qt::darkGreen);
-  QPen pen(QColor(130,130,130));
+  QPen pen(QColor(145,145,145));
 
   painter->setPen(pen);
 

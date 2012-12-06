@@ -64,14 +64,14 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     setColumnCount(7);
     QStringList list;
     list<<"Address"<<"Value"<<"Start"<<" ~ "<<"End"<<" = "<<" % ";
-    setColumnWidth(NAME_COLUMN,160);    
+    setColumnWidth(NAME_COLUMN,130);
     setColumnWidth(VALUE_COLUMN,65);
     setColumnWidth(START_COLUMN,65);
     setColumnWidth(END_COLUMN,65);
     setColumnWidth(INTERPOLATION_COLUMN,25);
     setColumnWidth(REDUNDANCY_COLUMN,25);
-    setColumnWidth(SR_COLUMN,35);
-    setIndentation(15);
+    setColumnWidth(SR_COLUMN,32);
+    setIndentation(12);
     setHeaderLabels(list);
     list.clear();
     QFont font;
@@ -110,7 +110,7 @@ NetworkTree::init(){
                 "}"
 
                  "QTreeView::item:hover {"
-                     "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);"
+                     "background: qlineargradient(x1: -5, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);"
                      "border: 1px solid #bfcde4;"
                 "}"
 
