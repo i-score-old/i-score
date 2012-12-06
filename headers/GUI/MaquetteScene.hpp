@@ -568,6 +568,7 @@ class MaquetteScene : public QGraphicsScene
   static const int NAME_POINT_SIZE = 20;
 
   inline AttributesEditor *editor(){return _editor;}
+  inline MaquetteView *view(){return _view;}
   void updateWidgets();
   QGraphicsItem *getSelectedItem();
   bool subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent);
@@ -661,7 +662,6 @@ signals:
 
 
   public slots :
-  void sceneRectChanged(const QRectF &rect);
   void verticalScroll(int value);
 
   /*!

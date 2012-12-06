@@ -133,10 +133,6 @@ MaquetteScene::init()
     _mousePos = QPointF(0.,0.);
 }
 
-void
-MaquetteScene::sceneRectChanged(const QRectF &rect){
-    std::cout<<rect.y()<<std::endl;
-}
 
 void
 MaquetteScene::updateView()

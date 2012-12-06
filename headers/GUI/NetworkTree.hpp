@@ -55,6 +55,7 @@ knowledge of the CeCILL license and that you accept its terms.
 using std::vector;
 using std::string;
 using std::map;
+class QTreeView;
 
 enum {NodeNamespaceType = QTreeWidgetItem::UserType + 1, NodeNoNamespaceType = QTreeWidgetItem::UserType + 2 ,
 	LeaveType = QTreeWidgetItem::UserType + 3, AttributeType = QTreeWidgetItem::UserType + 4};
