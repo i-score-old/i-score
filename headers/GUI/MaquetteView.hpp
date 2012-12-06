@@ -74,6 +74,9 @@ class MaquetteView : public QGraphicsView
   void setGotoValue(int value);
   inline MainWindow *mainWindow(){return _mainWindow;}
 
+  signals:
+    void horizontalScroll(float newValue);
+
   public slots :
 
   /*!

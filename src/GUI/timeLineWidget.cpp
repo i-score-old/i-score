@@ -49,14 +49,14 @@ knowledge of the CeCILL license and that you accept its terms.
 class MaquetteScene;
 
 const float TimeLineWidget::TIME_BAR_HEIGHT =  15.;
-const float TimeLineWidget::LEFT_MARGIN =  2.;
+const float TimeLineWidget::LEFT_MARGIN =  0.5;
 const float TimeLineWidget::NUMBERS_POINT_SIZE =  10.;
 
 TimeLineWidget::TimeLineWidget(QWidget *parent, MaquetteScene *scene)
     :QWidget(parent){
 
     _scene = scene;
-    _rect = QRect(LEFT_MARGIN,0,_scene->width(),TIME_BAR_HEIGHT);
+    _rect = QRect(LEFT_MARGIN,0,_scene->sceneRect().width(),TIME_BAR_HEIGHT);
     _zoom = 1.;
     setGeometry(_rect);
     setFixedHeight(height());
@@ -64,6 +64,11 @@ TimeLineWidget::TimeLineWidget(QWidget *parent, MaquetteScene *scene)
 
 TimeLineWidget::~TimeLineWidget(){
 
+}
+
+void
+TimeLineWidget::horizontalScroll(float newValue){
+    std::cout<<"TimeLineWidget "<<newValue<<std::endl;
 }
 
 void
@@ -98,7 +103,7 @@ TimeLineWidget::drawBackground(QPainter *painter, QRect rect){
 }
 
 void
-TimeLineWidget::paintEvent(QPaintEvent *){
+TimeLineWidget::paintEvent(QPaintEvent *event){
     QPainter *painter = new QPainter(this);
     painter->setRenderHint(QPainter::Antialiasing, true);
     QPen *pen = new QPen;

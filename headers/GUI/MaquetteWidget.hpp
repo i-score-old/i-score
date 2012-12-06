@@ -44,7 +44,7 @@ public :
     void init();
     void setName(QString name);
     void updateHeader();
-
+    inline TimeLineWidget *timeBar(){return _timeLine;}
     static const float HEADER_HEIGHT;
     static const float NAME_POINT_SIZE;
 
@@ -52,6 +52,7 @@ signals:
     void beginPlaying();
     void stopSignal();
     void accelerationValueChanged(int);
+
 
 public slots:
     void play();

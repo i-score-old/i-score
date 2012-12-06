@@ -16,8 +16,11 @@ class TimeLineWidget : public QWidget{
     static const float LEFT_MARGIN;
     static const float NUMBERS_POINT_SIZE;
 
+public slots:
+    void horizontalScroll(float newValue);
+
 protected:
-    virtual void paintEvent(QPaintEvent *);
+    virtual void paintEvent(QPaintEvent *event);
     virtual void paintEngine();
     virtual void mousePressEvent(QMouseEvent *);
 

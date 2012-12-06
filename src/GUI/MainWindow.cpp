@@ -71,6 +71,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QKeyEvent>
 #include <QLCDNumber>
 #include <QDoubleSpinBox>
+#include <QScrollBar>
+#include <QtGui>
 
 #include <iostream>
 #include <math.h>
@@ -114,6 +116,7 @@ MainWindow::MainWindow()
 
   // Central Widget
   _maquetteWidget = new MaquetteWidget(this,_view,_scene);
+
 //  createMaquetteWidget();
   setCentralWidget(_maquetteWidget);
 //  setCentralWidget(_view);
@@ -129,6 +132,7 @@ MainWindow::MainWindow()
   setAcceptDrops(false);
 //  connect(_maquetteWidget,SIGNAL(beginPlaying()),this,SLOT(play()));
   connect(_maquetteWidget,SIGNAL(accelerationValueChanged(int)),this,SLOT(accelerationChanged(int)));
+  connect(_view->verticalScrollBar(),SIGNAL(valueChanged(int)),_scene,SLOT(verticalScroll(int)));
 }
 
 MainWindow::~MainWindow()

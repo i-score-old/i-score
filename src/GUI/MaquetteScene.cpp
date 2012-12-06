@@ -66,6 +66,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "PreviewArea.hpp"
 #include "PlayingThread.hpp"
 #include "CurvesWidget.hpp"
+#include "TimeLineWidget.hpp"
+#include<QGraphicsProxyWidget>
 
 #include <sstream>
 #include <map>
@@ -78,7 +80,6 @@ using std::string;
 const string MaquetteScene::DEFAULT_TRIGGER_MSG = "/trigger";
 float MaquetteScene::MS_PER_PIXEL = 16;
 const float MaquetteScene::MS_PRECISION = 10;
-const float MaquetteScene::MAQUETTTE_BAR_HEIGHT = 60;
 
 using namespace SndBoxProp;
 
@@ -95,12 +96,15 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 
 	_relation = new AbstractRelation;
 
-	_playThread = new PlayingThread(this);
+    _playThread = new PlayingThread(this);
+
+    _timeBar = new TimeLineWidget(0,this);
+
+    addWidget(_timeBar,Qt::Popup);
 }
 
 MaquetteScene::~MaquetteScene() {
-	delete _tempBox;
-	//delete _timeLine;
+    delete _tempBox;
 	delete _maquette;
 }
 
@@ -129,6 +133,10 @@ MaquetteScene::init()
     _mousePos = QPointF(0.,0.);
 }
 
+void
+MaquetteScene::sceneRectChanged(const QRectF &rect){
+    std::cout<<rect.y()<<std::endl;
+}
 
 void
 MaquetteScene::updateView()
@@ -144,6 +152,7 @@ MaquetteScene::getPalette() const
 
 void
 MaquetteScene::updateWidgets(){
+
     _editor->updateWidgets(true);
 }
 
@@ -265,6 +274,8 @@ MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[]
 
 void
 MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
+
+
 	QGraphicsScene::drawForeground(painter, rect);
 
 	painter->setPen(QPen(Qt::black));
@@ -1921,4 +1932,10 @@ MaquetteScene::addToTriggerQueue(TriggerPoint *trigger){
             _triggersQueueList.insert(it,trigger);
         }
     }*/
+}
+
+void
+MaquetteScene::verticalScroll(int value){
+    _timeBar->move(0,value);
+    _view->repaint();
 }

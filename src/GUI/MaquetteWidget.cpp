@@ -80,15 +80,18 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
     createHeader();
 
     _maquetteLayout->addWidget(_header);
-    _maquetteLayout->addWidget(_timeLine);
+//    _maquetteLayout->addWidget(_timeLine);
     _maquetteLayout->addWidget(_view);
-
 
     _maquetteLayout->setContentsMargins(0,0,0,0);
     _maquetteLayout->setVerticalSpacing(0);
     setLayout(_maquetteLayout);
 
-    connect(_scene,SIGNAL(stopPlaying()),this,SLOT(stop()));
+
+
+
+    connect(_scene,SIGNAL(stopPlaying()),this,SLOT(stop()));    
+//    connect(_view,SIGNAL(horizontalScroll(float)),_timeLine,SLOT(horizontalScroll(float)));
 }
 
 void

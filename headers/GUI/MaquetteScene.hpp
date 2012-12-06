@@ -59,6 +59,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "AbstractControlBox.hpp"
 #include "AbstractParentBox.hpp"
 #include "BasicBox.hpp"
+#include "TimeLineWidget.hpp"
 
 #include <map>
 #include <vector>
@@ -74,6 +75,7 @@ class Relation;
 class Comment;
 class TriggerPoint;
 class PlayingThread;
+class TimeLineWidget;
 
 /*!
  * \class MaquetteScene
@@ -554,7 +556,7 @@ class MaquetteScene : public QGraphicsScene
   //! Integer handling scene's maximal width.
   static const int MAX_SCENE_WIDTH = 100000;
   //! Integer handling scene's maximal height.
-  static const int MAX_SCENE_HEIGHT = 100000;
+  static const int MAX_SCENE_HEIGHT = 1000;
   //! Integer handling scene's milliseconds per pixel rate.
   static float MS_PER_PIXEL;
   //! Float handling scene's precision in milliseconds.
@@ -563,7 +565,6 @@ class MaquetteScene : public QGraphicsScene
   static const std::string DEFAULT_TRIGGER_MSG;
   static const int MIN_BOX_WIDTH = 50;
   static const int MIN_BOX_HEIGHT = 30;
-  static const float MAQUETTTE_BAR_HEIGHT;
   static const int NAME_POINT_SIZE = 20;
 
   inline AttributesEditor *editor(){return _editor;}
@@ -654,12 +655,14 @@ class MaquetteScene : public QGraphicsScene
    */
   virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
 
-  signals:
 
 signals:
   void stopPlaying();
 
+
   public slots :
+  void sceneRectChanged(const QRectF &rect);
+  void verticalScroll(int value);
 
   /*!
    * \brief Cuts selected boxes.
@@ -698,7 +701,6 @@ signals:
   bool noBoxSelected();
   inline void resetSelection(){clearSelection();}
   void updateBoxesWidgets();
-
 
  private :
 
@@ -800,6 +802,8 @@ signals:
 
 //  QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
   PlayingThread *_playThread; //!< The thread handling playing.
+
+  TimeLineWidget *_timeBar;
 
 };
 

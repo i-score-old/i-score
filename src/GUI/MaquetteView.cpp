@@ -52,14 +52,14 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QBuffer>
 #include <QKeyEvent>
 #include <QScrollBar>
+#include <QPushButton>
 
 using namespace SndBoxProp;
 
 static const int SCROLL_BAR_INCREMENT = 1000 / MaquetteScene::MS_PER_PIXEL;
 
 MaquetteView::MaquetteView(MainWindow *mw)
-  : QGraphicsView(mw)
-{
+  : QGraphicsView(mw){
   _mainWindow = mw;
   setRenderHint(QPainter::Antialiasing);
 //  setBackgroundBrush(QColor(140,176,140));
@@ -73,20 +73,26 @@ MaquetteView::MaquetteView(MainWindow *mw)
   _zoom = 1;
   _gotoValue = 0;
 
+
 }
 
-MaquetteView::~MaquetteView()
-{
+MaquetteView::~MaquetteView(){
 }
 
 void
 MaquetteView::wheelEvent(QWheelEvent *event){
 
     if(event->orientation()==Qt::Horizontal){
-        if(event->delta()<0) //up
+        if(event->delta()<0){ //up
             horizontalScrollBar()->setValue(horizontalScrollBar()->value()+SCROLL_BAR_INCREMENT);
-        else //down
+            std::cout<<"SIG maquetteView.... ";
+            emit horizontalScroll(horizontalScrollBar()->value()+SCROLL_BAR_INCREMENT);
+        }
+        else{ //down
             horizontalScrollBar()->setValue(horizontalScrollBar()->value()-SCROLL_BAR_INCREMENT);
+            std::cout<<"SIG maquetteView.... ";
+            emit horizontalScroll(horizontalScrollBar()->value()-SCROLL_BAR_INCREMENT);
+        }
     }
 
     if(event->orientation()==Qt::Vertical){
@@ -114,8 +120,7 @@ MaquetteView::updateSceneWithoutCenterOn(){
 }
 
 void
-MaquetteView::updateScene()
-{
+MaquetteView::updateScene(){
   _scene = static_cast<MaquetteScene*>(scene());
   centerOn(0,0);
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -125,8 +130,8 @@ MaquetteView::updateScene()
 }
 
 void
-MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
-{
+MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
+
   QGraphicsView::drawBackground(painter,rect);
 //  QPen pen(Qt::darkGreen);
   QPen pen(QColor(130,130,130));
@@ -148,8 +153,6 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
    if (_zoom > 1) {
          QPen pen = painter->pen();
 	 	 QPen savePen = pen;
-
-
 	 	 painter->setPen(pen);
   	 for (float j = i ; j < i+1 ; j+=1./_zoom) {
     		if (i != j) {
