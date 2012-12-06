@@ -66,7 +66,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "PreviewArea.hpp"
 #include "PlayingThread.hpp"
 #include "CurvesWidget.hpp"
-#include "TimeLineWidget.hpp"
+#include "TimeBarWidget.hpp"
 #include<QGraphicsProxyWidget>
 
 #include <sstream>
@@ -98,9 +98,9 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 
     _playThread = new PlayingThread(this);
 
-    _timeBar = new TimeLineWidget(0,this);
+    _timeBar = new TimeBarWidget(0,this);
 
-    addWidget(_timeBar,Qt::Popup);
+    addWidget(_timeBar);
 }
 
 MaquetteScene::~MaquetteScene() {

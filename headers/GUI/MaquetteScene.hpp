@@ -59,7 +59,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "AbstractControlBox.hpp"
 #include "AbstractParentBox.hpp"
 #include "BasicBox.hpp"
-#include "TimeLineWidget.hpp"
+#include "TimeBarWidget.hpp"
 
 #include <map>
 #include <vector>
@@ -75,7 +75,7 @@ class Relation;
 class Comment;
 class TriggerPoint;
 class PlayingThread;
-class TimeLineWidget;
+class TimeBarWidget;
 
 /*!
  * \class MaquetteScene
@@ -803,7 +803,7 @@ signals:
 //  QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
   PlayingThread *_playThread; //!< The thread handling playing.
 
-  TimeLineWidget *_timeBar;
+  TimeBarWidget *_timeBar;
 
 };
 

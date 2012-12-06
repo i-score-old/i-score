@@ -44,7 +44,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "MainWindow.hpp"
 #include "MaquetteScene.hpp"
 #include "AttributesEditor.hpp"
-#include "timeLineWidget.hpp"
+#include "TimeBarWidget.hpp"
 #include "Maquette.hpp"
 
 #include <QGraphicsSceneDragDropEvent>

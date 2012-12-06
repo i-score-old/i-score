@@ -19,7 +19,7 @@
 
 #include "MaquetteView.hpp"
 #include "LogarithmicSlider.hpp"
-#include "TimeLineWidget.hpp"
+#include "TimeBarWidget.hpp"
 
 class QGridLayout;
 class QString;
@@ -44,7 +44,7 @@ public :
     void init();
     void setName(QString name);
     void updateHeader();
-    inline TimeLineWidget *timeBar(){return _timeLine;}
+    inline TimeBarWidget *timeBar(){return _timeBar;}
     static const float HEADER_HEIGHT;
     static const float NAME_POINT_SIZE;
 
@@ -88,7 +88,7 @@ private:
     LogarithmicSlider *_accelerationSlider;    
     QDoubleSpinBox *_accelerationDisplay;
     QWidget *_readingSpeedWidget;
-    TimeLineWidget *_timeLine;
+    TimeBarWidget *_timeBar;
 
     bool _sliderMoved;
     bool _valueEntered;

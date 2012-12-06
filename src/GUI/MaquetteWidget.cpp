@@ -71,7 +71,7 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
     _header = new QWidget(NULL);
     _readingSpeedWidget = new QWidget;
     _sliderMoved = false;
-    _timeLine = new TimeLineWidget(this,_scene);
+    _timeBar = new TimeBarWidget(this,_scene);
 
     createReadingSpeedWidget();
     createActions();
@@ -87,11 +87,7 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
     _maquetteLayout->setVerticalSpacing(0);
     setLayout(_maquetteLayout);
 
-
-
-
-    connect(_scene,SIGNAL(stopPlaying()),this,SLOT(stop()));    
-//    connect(_view,SIGNAL(horizontalScroll(float)),_timeLine,SLOT(horizontalScroll(float)));
+    connect(_scene,SIGNAL(stopPlaying()),this,SLOT(stop()));
 }
 
 void
@@ -115,7 +111,7 @@ MaquetteWidget::~MaquetteWidget(){
     delete _accelerationSlider;
     delete _accelerationDisplay;
     delete _readingSpeedWidget;
-    delete _timeLine;
+    delete _timeBar;
 }
 
 void

@@ -723,15 +723,15 @@
 					);
 			};
 		};
-		FA85C980602490C130424617 = {
+		173EB5EE74998E45E257A7BA = {
 			isa = PBXFileReference;
-			name = "timeLineWidget.cpp";
-			path = "src/GUI/timeLineWidget.cpp";
+			name = "TimeBarWidget.cpp";
+			path = "src/GUI/TimeBarWidget.cpp";
 			refType = 4;
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
-		2BA454AF93B59B7F32920912 = {
-			fileRef = "FA85C980602490C130424617";
+		3EEEFD562F282A4C7920667E = {
+			fileRef = "173EB5EE74998E45E257A7BA";
 			isa = PBXBuildFile;
 			settings = {
 				ATTRIBUTES = (
@@ -1157,15 +1157,15 @@
 					);
 			};
 		};
-		A9E7319CF179E37166A13D72 = {
+		A7A44BD6F49C7F74B9AF3AFC = {
 			isa = PBXFileReference;
-			name = "moc_timeLineWidget.cpp";
-			path = "moc/moc_timeLineWidget.cpp";
+			name = "moc_TimeBarWidget.cpp";
+			path = "moc/moc_TimeBarWidget.cpp";
 			refType = 4;
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
-		1F13B3B35D2358BF95A77C4C = {
-			fileRef = "A9E7319CF179E37166A13D72";
+		2E94610D0FF6EBB39B408BF1 = {
+			fileRef = "A7A44BD6F49C7F74B9AF3AFC";
 			isa = PBXBuildFile;
 			settings = {
 				ATTRIBUTES = (
@@ -1481,10 +1481,10 @@
 			path = "headers/GUI/MaquetteWidget.hpp";
 			refType = 4;
 		};
-		4D778667B79A25C3DE0EE80B = {
+		A9EE3D73828716AB26E22349 = {
 			isa = PBXFileReference;
-			name = "timeLineWidget.hpp";
-			path = "headers/GUI/timeLineWidget.hpp";
+			name = "TimeBarWidget.hpp";
+			path = "headers/GUI/TimeBarWidget.hpp";
 			refType = 4;
 		};
 		71078BD4296B16D83E12B053 = {
@@ -1561,7 +1561,7 @@
 				"7D9FFD201504D7783386B2D5",
 				"F46982B2688387B52E8ED692",
 				"FB5D4873C9FF5F7BB38886E5",
-				"4D778667B79A25C3DE0EE80B");
+				"A9EE3D73828716AB26E22349");
 			name = "GUI";
 			refType = 4;
 		};
@@ -1636,7 +1636,7 @@
 				"D6D855C345DCC3C8D811C1B5",
 				"A25A3876BE4ED864C7D3A6F5",
 				"BA8D814134C12D0523477057",
-				"FA85C980602490C130424617");
+				"173EB5EE74998E45E257A7BA");
 			name = "GUI";
 			refType = 4;
 		};
@@ -1688,7 +1688,7 @@
 				"58185FD17225028C3967CC8D",
 				"FE9B7CC0D91F8891075F5E1E",
 				"9CDE5B52CBCFDAA86606AFA7",
-				"A9E7319CF179E37166A13D72");
+				"A7A44BD6F49C7F74B9AF3AFC");
 			name = "moc";
 			refType = 4;
 		};
@@ -1775,7 +1775,7 @@
 				"91C5ED25EB071BA6E10F2373",
 				"5D3015BF4027605BCE0456D6",
 				"A47C3E4E0F07119890974EDE",
-				"2BA454AF93B59B7F32920912",
+				"3EEEFD562F282A4C7920667E",
 				"0B2292BC85745A06F653071B",
 				"FD3B07BA4A94B84DBFB464E8",
 				"86EB7F55602050556A3549AE",
@@ -1803,7 +1803,7 @@
 				"7197277110A24D12276FD0B2",
 				"98FC9815077E79F2F65C77EB",
 				"DCE00115E769ABE2329459C1",
-				"1F13B3B35D2358BF95A77C4C",
+				"2E94610D0FF6EBB39B408BF1",
 				"7F3E602466E431ABBC2C3ACC");
 			isa = PBXShellScriptBuildPhase;
 			name = "Qt Preprocessors";
@@ -1855,7 +1855,7 @@
 				"91C5ED25EB071BA6E10F2373",
 				"5D3015BF4027605BCE0456D6",
 				"A47C3E4E0F07119890974EDE",
-				"2BA454AF93B59B7F32920912",
+				"3EEEFD562F282A4C7920667E",
 				"0B2292BC85745A06F653071B",
 				"FD3B07BA4A94B84DBFB464E8",
 				"86EB7F55602050556A3549AE",
@@ -1883,7 +1883,7 @@
 				"7197277110A24D12276FD0B2",
 				"98FC9815077E79F2F65C77EB",
 				"DCE00115E769ABE2329459C1",
-				"1F13B3B35D2358BF95A77C4C",
+				"2E94610D0FF6EBB39B408BF1",
 				"7F3E602466E431ABBC2C3ACC");
 			shellPath = "/bin/sh";
 			shellScript = "make\ -C\ /Users/nicolashincker/Documents/workspace/acousmoscribe\ -f\ \'i-score.xcodeproj/qt_preprocess.mak\'";
@@ -1938,7 +1938,7 @@
 				"91C5ED25EB071BA6E10F2373",
 				"5D3015BF4027605BCE0456D6",
 				"A47C3E4E0F07119890974EDE",
-				"2BA454AF93B59B7F32920912",
+				"3EEEFD562F282A4C7920667E",
 				"0B2292BC85745A06F653071B",
 				"FD3B07BA4A94B84DBFB464E8",
 				"86EB7F55602050556A3549AE",
@@ -1966,7 +1966,7 @@
 				"7197277110A24D12276FD0B2",
 				"98FC9815077E79F2F65C77EB",
 				"DCE00115E769ABE2329459C1",
-				"1F13B3B35D2358BF95A77C4C",
+				"2E94610D0FF6EBB39B408BF1",
 				"7F3E602466E431ABBC2C3ACC");
 			isa = PBXSourcesBuildPhase;
 			name = "Build Sources";
