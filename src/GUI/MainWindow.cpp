@@ -438,7 +438,6 @@ MainWindow::gotoChanged()
 
     Maquette::getInstance()->setGotoValue(newValue);
     _view->setGotoValue(newValue);
-
     _gotoDisplay->setValue(newValue / S_TO_MS);
     _view->repaint();
 }

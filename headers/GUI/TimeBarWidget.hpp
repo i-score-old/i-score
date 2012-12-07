@@ -16,13 +16,13 @@ class TimeBarWidget : public QWidget{
     static const float LEFT_MARGIN;
     static const float NUMBERS_POINT_SIZE;
 
-public slots:
-
+signals:
+    virtual void gotoValueEntered(double value);
 
 protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual void paintEngine();
-    virtual void mousePressEvent(QMouseEvent *);
+    virtual void mousePressEvent(QMouseEvent *event);
 
   private:
     void drawBackground(QPainter *painter, QRect rect);    

@@ -53,6 +53,7 @@ class MaquetteScene;
 const float TimeBarWidget::TIME_BAR_HEIGHT =  15.;
 const float TimeBarWidget::LEFT_MARGIN =  0.5;
 const float TimeBarWidget::NUMBERS_POINT_SIZE =  10.;
+static const int S_TO_MS = 1000;
 
 TimeBarWidget::TimeBarWidget(QWidget *parent, MaquetteScene *scene)
     :QWidget(parent){
@@ -74,15 +75,16 @@ TimeBarWidget::paintEngine(){
 }
 
 void
-TimeBarWidget::mousePressEvent(QMouseEvent *){
+TimeBarWidget::mousePressEvent(QMouseEvent *event){
     std::cout<<"TimeBar :: mouse press event"<<std::endl;
+    emit gotoValueEntered(pos().x()* MaquetteScene::MS_PER_PIXEL);
+    std::cout<<event->pos().x()* MaquetteScene::MS_PER_PIXEL<<std::endl;
 }
 
 void
 TimeBarWidget::drawBackground(QPainter *painter, QRect rect){
     painter->save();
 
-    static const int S_TO_MS = 1000;
     const int WIDTH = width();
     const int HEIGHT = TIME_BAR_HEIGHT;
 

@@ -661,8 +661,9 @@ signals:
   void stopPlaying();
 
 
-  public slots :
+public slots :
   void verticalScroll(int value);
+  void gotoChanged(double value);
 
   /*!
    * \brief Cuts selected boxes.

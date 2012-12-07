@@ -125,8 +125,7 @@ NetworkTree::init(){
                  "QTreeView::item:selected:!active {"
                      "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6b9be8, stop: 1 #577fbf);"
                 "}"
-
-            );
+                );
 
 
 }

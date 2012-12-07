@@ -101,6 +101,8 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
     _timeBar = new TimeBarWidget(0,this);
 
     addWidget(_timeBar);
+
+    connect(_timeBar,SIGNAL(gotoValueEntered(double)),this,SLOT(gotoChanged(double)));
 }
 
 MaquetteScene::~MaquetteScene() {
@@ -133,6 +135,13 @@ MaquetteScene::init()
     _mousePos = QPointF(0.,0.);
 }
 
+void
+MaquetteScene::gotoChanged(double value){
+    std::cout<<"goto changed "<<value<<std::endl;
+    Maquette::getInstance()->setGotoValue(value);
+    _view->setGotoValue(value);
+    _view->repaint();
+}
 
 void
 MaquetteScene::updateView()
