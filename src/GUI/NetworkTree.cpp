@@ -71,7 +71,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     setColumnWidth(INTERPOLATION_COLUMN,25);
     setColumnWidth(REDUNDANCY_COLUMN,25);
     setColumnWidth(SR_COLUMN,32);
-    setIndentation(12);
+    setIndentation(13);
     setHeaderLabels(list);
     list.clear();
     QFont font;

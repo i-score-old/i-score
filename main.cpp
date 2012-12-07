@@ -11,8 +11,8 @@ int main(int argc, char *argv[])
   QApplication app(argc, argv);
 
   QTranslator translator;
-  //translator.load("acousmoscribe_en");
-  translator.load(":/translations/acousmoscribe_fr");
+  translator.load("acousmoscribe_en");
+  //translator.load(":/translations/acousmoscribe_fr");
   //translator.load(":/translations/acousmoscribe_en");
   app.installTranslator(&translator);
 
