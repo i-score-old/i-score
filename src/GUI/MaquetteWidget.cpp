@@ -72,6 +72,7 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
     _readingSpeedWidget = new QWidget;
     _sliderMoved = false;
     _timeBar = new TimeBarWidget(this,_scene);
+    _zoom = 1.;
 
     createReadingSpeedWidget();
     createActions();
@@ -88,11 +89,19 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
     setLayout(_maquetteLayout);
 
     connect(_scene,SIGNAL(stopPlaying()),this,SLOT(stop()));
+    connect(_view,SIGNAL(zoomChanged(float)),this,SLOT(changeZoom(float)));
+//    connect(_view,SIGNAL(zoomChanged(float)),_timeBar,SLOT(updateZoom(float)));
 }
 
 void
 MaquetteWidget::init(){
 
+}
+
+void
+MaquetteWidget::changeZoom(float value){
+    _zoom = value;
+    _timeBar->setZoomValue(value);
 }
 
 MaquetteWidget::~MaquetteWidget(){
@@ -144,6 +153,7 @@ MaquetteWidget::createReadingSpeedWidget(){
     layout->addWidget(_accelerationSlider);
     layout->addWidget(_accelerationDisplay);    
     _readingSpeedWidget->setLayout(layout);
+
     connect(_accelerationSlider,SIGNAL(valueChanged(int)),this,SLOT(accelerationValueModified(int)));
     connect(_accelerationDisplay, SIGNAL(valueChanged(double)), this, SLOT(accelerationValueEntered(double)));
 }

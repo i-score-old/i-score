@@ -59,6 +59,7 @@ public slots:
     void stop();
     void accelerationValueModified(int value);
     void accelerationValueEntered(double value);
+    void changeZoom(float value);
 
 private:
     void createActions();
@@ -89,6 +90,7 @@ private:
     QDoubleSpinBox *_accelerationDisplay;
     QWidget *_readingSpeedWidget;
     TimeBarWidget *_timeBar;
+    float _zoom;
 
     bool _sliderMoved;
     bool _valueEntered;

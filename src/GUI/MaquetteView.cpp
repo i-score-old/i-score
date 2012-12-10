@@ -72,8 +72,6 @@ MaquetteView::MaquetteView(MainWindow *mw)
   centerOn(0,0);
   _zoom = 1;
   _gotoValue = 0;
-
-
 }
 
 MaquetteView::~MaquetteView(){
@@ -85,13 +83,9 @@ MaquetteView::wheelEvent(QWheelEvent *event){
     if(event->orientation()==Qt::Horizontal){
         if(event->delta()<0){ //up
             horizontalScrollBar()->setValue(horizontalScrollBar()->value()+SCROLL_BAR_INCREMENT);
-            std::cout<<"SIG maquetteView.... ";
-            emit horizontalScroll(horizontalScrollBar()->value()+SCROLL_BAR_INCREMENT);
         }
         else{ //down
             horizontalScrollBar()->setValue(horizontalScrollBar()->value()-SCROLL_BAR_INCREMENT);
-            std::cout<<"SIG maquetteView.... ";
-            emit horizontalScroll(horizontalScrollBar()->value()-SCROLL_BAR_INCREMENT);
         }
     }
 
@@ -236,9 +230,12 @@ MaquetteView::zoomIn()
 	if (MaquetteScene::MS_PER_PIXEL > 0.125) {
 		MaquetteScene::MS_PER_PIXEL /= 2;
 		_zoom *= 2;
-		resetCachedContent();
+
+        resetCachedContent();
         _scene->update();
+
 		Maquette::getInstance()->updateBoxesFromEngines();
+        emit(zoomChanged(_zoom));
 	}
 }
 
@@ -257,6 +254,7 @@ MaquetteView::zoomOut()
     MaquetteScene::MS_PER_PIXEL *= 2;
 
     _zoom /= 2.;
+    emit(zoomChanged(_zoom));
     resetCachedContent();
     _scene->update();
     Maquette::getInstance()->updateBoxesFromEngines();

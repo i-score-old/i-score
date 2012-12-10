@@ -75,7 +75,7 @@ class MaquetteView : public QGraphicsView
   inline MainWindow *mainWindow(){return _mainWindow;}
 
   signals:
-    void horizontalScroll(float newValue);
+    void zoomChanged(float newValue);
 
   public slots :
 

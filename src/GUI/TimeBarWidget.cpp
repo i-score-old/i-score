@@ -60,10 +60,15 @@ TimeBarWidget::TimeBarWidget(QWidget *parent, MaquetteScene *scene)
 
     _scene = scene;
     _rect = QRect(LEFT_MARGIN,0,MaquetteScene::MAX_SCENE_WIDTH,TIME_BAR_HEIGHT);
-    _zoom = 1.;
+
     setGeometry(_rect);
     setFixedHeight(height());
-    setWindowState(Qt::WindowActive);
+    init();
+}
+
+void
+TimeBarWidget::init(){
+    _zoom = 1.;
 }
 
 TimeBarWidget::~TimeBarWidget(){
@@ -78,9 +83,21 @@ TimeBarWidget::paintEngine(){
 void
 TimeBarWidget::mousePressEvent(QMouseEvent *event){
     int value = event->pos().x()* MaquetteScene::MS_PER_PIXEL;
-    std::cout<<value<<std::endl;
     emit gotoValueEntered(value);
 
+}
+
+void
+TimeBarWidget::setZoomValue(float value){
+    _zoom = value;
+    update();
+}
+
+void
+TimeBarWidget::updateZoom(float newValue){
+
+    _zoom = newValue;
+    update();
 }
 
 void
@@ -90,25 +107,43 @@ TimeBarWidget::drawBackground(QPainter *painter, QRect rect){
     const int WIDTH = width();
     const int HEIGHT = TIME_BAR_HEIGHT;
 
-    int i_PXL;
+    float j_PXL,i_PXL;
     QFont *font = new QFont();
     font->setPointSize(NUMBERS_POINT_SIZE);
     painter->setFont(*font);
-    for (double i = 0 ; i <= (WIDTH * MaquetteScene::MS_PER_PIXEL) / S_TO_MS ; i++) { // for each second
+
+    float zoom = 16/MaquetteScene::MS_PER_PIXEL;
+    float factor = ((float)1)/zoom;
+//    float textIndic = 0.;
+
+    for (float i = 0; i <= (WIDTH * MaquetteScene::MS_PER_PIXEL) / S_TO_MS ; i+=factor) { // for each second
 
         i_PXL = i * S_TO_MS / MaquetteScene::MS_PER_PIXEL + LEFT_MARGIN;
-        painter->drawText(QPointF(i_PXL, 2*HEIGHT/3),QString("%1").arg(i));
+
         painter->drawLine(QPointF(i_PXL, 3*HEIGHT/4), QPointF(i_PXL, HEIGHT));
-    }
+        painter->drawText(QPointF(i_PXL, 2*HEIGHT/3),QString("%1").arg(i));
+        }
+
+
+//    for (float j = 0; j <= (WIDTH * MaquetteScene::MS_PER_PIXEL) / S_TO_MS ; j+=factor) { // for each second
+
+////        i_PXL = i * S_TO_MS / MaquetteScene::MS_PER_PIXEL + LEFT_MARGIN;
+//        j_PXL = j * S_TO_MS / MaquetteScene::MS_PER_PIXEL + LEFT_MARGIN;
+//        painter->drawLine(QPointF(j_PXL, 3*HEIGHT/4), QPointF(j_PXL, HEIGHT));
+//        if(j==textIndic){
+//        painter->drawText(QPointF(j_PXL, 2*HEIGHT/3),QString("%1").arg(j));
+//            textIndic++;
+//        }
+//    }
 
     painter->restore();
 }
 
 void
 TimeBarWidget::paintEvent(QPaintEvent *event){
-
     QPainter *painter = new QPainter(this);
     painter->setRenderHint(QPainter::Antialiasing, true);
+
     QPen *pen = new QPen;
     painter->drawRect(_rect);
     drawBackground(painter,_rect);

@@ -15,14 +15,20 @@ class TimeBarWidget : public QWidget{
     static const float TIME_BAR_HEIGHT;
     static const float LEFT_MARGIN;
     static const float NUMBERS_POINT_SIZE;
+    void init();
+    void setZoomValue(float value);
 
 signals:
-    virtual void gotoValueEntered(double value);
+    void gotoValueEntered(double value);
+
+public slots:
+    void updateZoom(float newValue);
 
 protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual void paintEngine();
     virtual void mousePressEvent(QMouseEvent *event);
+    float _zoom;
 
   private:
     void drawBackground(QPainter *painter, QRect rect);    
@@ -30,7 +36,7 @@ protected:
     MaquetteScene *_scene;
     float _sceneHeight;
     QRect _rect;
-    float _zoom;
+
 };
 
 #endif // TIMEBARWIDGET_HPP
