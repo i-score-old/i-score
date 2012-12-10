@@ -170,13 +170,13 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
 
   QPen reSavedPen = painter->pen();
   QPen pen3(Qt::black);
-  pen3.setWidth(5);
+  pen3.setWidth(3);
   painter->setPen(pen3);
   painter->drawLine(QPointF(progressBarPosX,0),QPointF(progressBarPosX,HEIGHT));
-  pen3.setColor(Qt::white);
-  pen3.setWidth(1);
-  painter->setPen(pen3);
-  painter->drawLine(QPointF(progressBarPosX,0),QPointF(progressBarPosX,HEIGHT));
+//  pen3.setColor(Qt::white);
+//  pen3.setWidth(1);
+//  painter->setPen(pen3);
+//  painter->drawLine(QPointF(progressBarPosX,0),QPointF(progressBarPosX,HEIGHT));
   painter->setPen(reSavedPen);
 
   if (_scene->tracksView()) {

@@ -137,7 +137,6 @@ MaquetteScene::init()
 
 void
 MaquetteScene::gotoChanged(double value){
-    std::cout<<"goto changed "<<value<<std::endl;
     Maquette::getInstance()->setGotoValue(value);
     _view->setGotoValue(value);
     _view->repaint();

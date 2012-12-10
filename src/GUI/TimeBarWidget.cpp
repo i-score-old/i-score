@@ -63,6 +63,7 @@ TimeBarWidget::TimeBarWidget(QWidget *parent, MaquetteScene *scene)
     _zoom = 1.;
     setGeometry(_rect);
     setFixedHeight(height());
+    setWindowState(Qt::WindowActive);
 }
 
 TimeBarWidget::~TimeBarWidget(){
@@ -76,9 +77,10 @@ TimeBarWidget::paintEngine(){
 
 void
 TimeBarWidget::mousePressEvent(QMouseEvent *event){
-    std::cout<<"TimeBar :: mouse press event"<<std::endl;
-    emit gotoValueEntered(pos().x()* MaquetteScene::MS_PER_PIXEL);
-    std::cout<<event->pos().x()* MaquetteScene::MS_PER_PIXEL<<std::endl;
+    int value = event->pos().x()* MaquetteScene::MS_PER_PIXEL;
+    std::cout<<value<<std::endl;
+    emit gotoValueEntered(value);
+
 }
 
 void
@@ -104,6 +106,7 @@ TimeBarWidget::drawBackground(QPainter *painter, QRect rect){
 
 void
 TimeBarWidget::paintEvent(QPaintEvent *event){
+
     QPainter *painter = new QPainter(this);
     painter->setRenderHint(QPainter::Antialiasing, true);
     QPen *pen = new QPen;
