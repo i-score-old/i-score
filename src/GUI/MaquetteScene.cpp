@@ -279,14 +279,15 @@ MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[]
 void
 MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
 
+    if (_playing) {
+        QPen pen(Qt::black);
+        pen.setWidth(3);
+        painter->setPen(pen);
+        painter->drawLine(QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL, 0), QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL, 2*height()));
+    }
 
-	QGraphicsScene::drawForeground(painter, rect);
-
-	painter->setPen(QPen(Qt::black));
-	//   if (_playing || _paused) {
-	//     painter->drawLine(QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL, 0), QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL, 2*height()));
-	//   }
-
+    else{
+    QGraphicsScene::drawForeground(painter, rect);
 	if (_currentInteractionMode == RELATION_MODE) {
 		if (_clicked) {
 			if (_relation->firstBox() != NO_ID) {
@@ -408,6 +409,7 @@ MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
 		std::cerr << "MaquetteScene::drawForeground : not in relation mode" << std::endl;
 #endif
 	}
+    }
 }
 
 void
@@ -1785,12 +1787,16 @@ void MaquetteScene::setPlaying(unsigned int boxID, bool playing)
 }
 
 void MaquetteScene::updatePlayingBoxes() {
+
 	map<unsigned int,BasicBox*>::iterator it;
 
     for (it = _playingBoxes.begin() ; it != _playingBoxes.end() ; ++it) {
         it->second->update();
     }
+
+    update();
 }
+
 
 void
 MaquetteScene::play() {
@@ -1891,6 +1897,7 @@ void MaquetteScene::load(const string &fileName)
 
 void
 MaquetteScene::updateBoxesWidgets(){
+
     std::map<unsigned int,BasicBox*>::iterator it;
     std::map<unsigned int,BasicBox*> boxes = _maquette->getBoxes();
     for(it = boxes.begin() ; it!=boxes.end() ; it++){

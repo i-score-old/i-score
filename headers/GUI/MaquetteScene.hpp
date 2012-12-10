@@ -598,6 +598,7 @@ class MaquetteScene : public QGraphicsScene
    * \param rect : the bounding rectangle
    */
   virtual void drawForeground ( QPainter * painter, const QRectF & rect );
+
   /*!
    * \brief Redefinition of QGraphicsScene::mousePressEvent().
    * Called when a mouse button is pressed on the scene.
