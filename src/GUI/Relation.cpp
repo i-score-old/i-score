@@ -64,6 +64,8 @@ const float Relation::HANDLE_WIDTH = 12.;
 const float Relation::GRIP_CIRCLE_SIZE = 5;
 const float Relation::RAIL_WIDTH = HANDLE_HEIGHT/2;
 const float Relation::LINE_WIDTH = 2;
+const float Relation::RIGID_TOLERANCE = 0.01;
+
 
 Relation::Relation(unsigned int firstBoxID, BoxExtremity firstBoxExt, unsigned int secondBoxID,
 		   BoxExtremity secondBoxExt, MaquetteScene *parent)
@@ -259,10 +261,10 @@ Relation::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 
   double endBound = NO_BOUND, startBound = NO_BOUND;
   if (_abstract->maxBound() != NO_BOUND) {
-    endBound = startX + _abstract->maxBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL);
+    endBound = startX + _abstract->maxBound();
   }
-  if (_abstract->minBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL) != NO_BOUND) {
-    startBound = startX + _abstract->minBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL);
+  if (_abstract->minBound() != NO_BOUND) {
+    startBound = startX + _abstract->minBound();
   }
 
   if (_flexibleRelation){
@@ -308,10 +310,10 @@ Relation::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 
   double endBound = NO_BOUND, startBound = NO_BOUND;
   if (_abstract->maxBound() != NO_BOUND) {
-    endBound = startX + _abstract->maxBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL);
+    endBound = startX + _abstract->maxBound();
   }
-  if (_abstract->minBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL) != NO_BOUND) {
-    startBound = startX + _abstract->minBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL);
+  if (_abstract->minBound() != NO_BOUND) {
+    startBound = startX + _abstract->minBound();
   }
   if(_flexibleRelation){
       if (QRectF(startBound - HANDLE_WIDTH/2,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
@@ -361,17 +363,17 @@ Relation::mouseDoubleClickEvent (QGraphicsSceneMouseEvent * event) {
 
         else if(_abstract->maxBound()==NO_BOUND || _lastMaxBound!=-1){
             if(_lastMaxBound != -1)
-                maxBound = std::max(_lastMaxBound, (float)(mapFromScene(_end).x()-mapFromScene(_start).x()+LINE_WIDTH))*(_zoomFactor/MaquetteScene::MS_PER_PIXEL);
+                maxBound = std::max(_lastMaxBound, (float)(mapFromScene(_end).x()-mapFromScene(_start).x()+LINE_WIDTH));
             else
-                maxBound = (mapFromScene(_end).x()-mapFromScene(_start).x()+LINE_WIDTH)*(_zoomFactor/MaquetteScene::MS_PER_PIXEL);
+                maxBound = (mapFromScene(_end).x()-mapFromScene(_start).x()+LINE_WIDTH);
 
-            changeBounds(_abstract->minBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL),maxBound);
-            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL),maxBound);
+            changeBounds(_abstract->minBound(),maxBound);
+            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),maxBound);
             _lastMaxBound = -1;
         }
         else{
-            _lastMaxBound = _abstract->maxBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL);
-            changeBounds(_abstract->minBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL),NO_BOUND);
+            _lastMaxBound = _abstract->maxBound();
+            changeBounds(_abstract->minBound(),NO_BOUND);
             _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),NO_BOUND);
         }
 
@@ -395,12 +397,12 @@ Relation::mousePressEvent (QGraphicsSceneMouseEvent * event) {
 
           double startBound = startX;
           if (_abstract->minBound() != NO_BOUND) {
-            startBound = startX + _abstract->minBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL);
+            startBound = startX + _abstract->minBound();
           }
 
           double endBound = endX;
           if (_abstract->maxBound() != NO_BOUND) {
-            endBound = startX + _abstract->maxBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL);
+            endBound = startX + _abstract->maxBound();
           }
 
           if(QRectF(startX+(endX - startX)/2-HANDLE_WIDTH/2,endY-HANDLE_HEIGHT/2,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
@@ -448,7 +450,7 @@ QRectF
 Relation::boundingRect() const
 {
   return QRectF(0.-((fabs(_end.x() - _start.x()))/2.),0.-(std::max(fabs(_end.y() - _start.y())/2.,(double)HANDLE_HEIGHT)) - TOLERANCE_Y,
-        std::max(fabs(_end.x() - _start.x()),(double)_abstract->maxBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL)+HANDLE_WIDTH),std::max(fabs(_end.y() - _start.y()),(double)2.*HANDLE_HEIGHT) + 2*TOLERANCE_Y);
+        std::max(fabs(_end.x() - _start.x()),(double)_abstract->maxBound()+HANDLE_WIDTH),std::max(fabs(_end.y() - _start.y()),(double)2.*HANDLE_HEIGHT) + 2*TOLERANCE_Y);
 }
 
 QPainterPath
@@ -465,11 +467,11 @@ Relation::shape() const
   // Handling zones
   double startBound = startX;
   if (_abstract->minBound() != NO_BOUND) {
-    startBound = startX + _abstract->minBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL);
+    startBound = startX + _abstract->minBound();
   }
   double endBound = endX;
   if (_abstract->maxBound() != NO_BOUND) {
-    endBound = startX + _abstract->maxBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL);
+    endBound = startX + _abstract->maxBound();
   }
 
   path.moveTo(startX,startY + toleranceY);
@@ -519,11 +521,11 @@ Relation::updateFlexibility(){
 
     if (!_flexibleRelation){
         changeBounds(endX-startX,endX-startX);
-        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL),_abstract->maxBound());
+        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
     }
     else{
         changeBounds(0,NO_BOUND);
-        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL),_abstract->maxBound());
+        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
 
     }
 }
@@ -607,11 +609,11 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         leftBoundPen.setColor(isSelected() ? _color : Qt::black);
 
 
-        if (_abstract->minBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL) != NO_BOUND)
-            startBound = (startX+ _abstract->minBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL));
+        if (_abstract->minBound() != NO_BOUND)
+            startBound = (startX+ _abstract->minBound());
 
         if (_abstract->maxBound() != NO_BOUND)
-            endBound = (startX + _abstract->maxBound()*(_zoomFactor/MaquetteScene::MS_PER_PIXEL));
+            endBound = (startX + _abstract->maxBound());
 
         // Left Handle
         painter->setPen(leftBoundPen);
@@ -660,7 +662,7 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
             painter->setPen(handlePen);
             painter->drawLine(startX+(endX - startX)/2,endY-HANDLE_HEIGHT/2,startX+(endX - startX)/2,endY+HANDLE_HEIGHT/2);
 
-            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,(endX-startX)*(_zoomFactor/MaquetteScene::MS_PER_PIXEL),(endX-startX)*(_zoomFactor/MaquetteScene::MS_PER_PIXEL));
+            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,(endX-startX),(endX-startX)+RIGID_TOLERANCE);
         }
         else{
             double handleZone = 10;

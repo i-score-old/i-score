@@ -241,10 +241,7 @@ class Relation : public QGraphicsItem
   static const float HANDLE_HEIGHT; //!< The height of a handle.
   static const float HANDLE_WIDTH; //!< The width of a handle.
   static const float LINE_WIDTH;
-
-
-
-
+  static const float RIGID_TOLERANCE;//!< To avoid the bug (processor running hard)
 };
 
 #endif
