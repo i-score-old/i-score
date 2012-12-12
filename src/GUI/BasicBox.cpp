@@ -136,6 +136,11 @@ BasicBox::updateWidgets(){
 }
 
 void
+BasicBox::updateDisplay(QString displayMode){
+
+}
+
+void
 BasicBox::createWidget(){
 
     QBrush brush;

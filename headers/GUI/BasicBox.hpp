@@ -94,6 +94,7 @@ class BasicBox : public QObject, public QGraphicsItem
 
   BasicBox(AbstractBox *abstract, MaquetteScene *parent);
 
+  virtual void updateDisplay(QString displayMode);
   virtual ~BasicBox();
   /*!
    * \brief Redefinition of QGraphicsItem::type(). Used for Item casting.

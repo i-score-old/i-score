@@ -146,6 +146,7 @@ void BoxWidget::curveSampleRateChanged(const QString &address,int value) {
 
 void
 BoxWidget::updateDisplay(const QString &address){
+    _box->updateDisplay(address);
     displayCurve(address);
 }
 
@@ -176,7 +177,6 @@ void BoxWidget::displayCurve(const QString &address){
 
         if (curveFound) {
             curveWidget = curveIt.value();
-
             curveWidget->setLowerStyle(false);
             curveWidget->repaint();
             _stackedLayout->setCurrentWidget(curveWidget);

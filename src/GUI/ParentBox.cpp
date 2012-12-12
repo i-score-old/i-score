@@ -116,17 +116,20 @@ void
 ParentBox::updateDisplay(QString displayMode){
     BasicBox *curBox;
     std::map<unsigned int,BasicBox*>::iterator it;
-
+    std::cout<<"pbox updateDisplay\n";
     if(displayMode==SUB_SCENARIO_MODE_TEXT){
         for (it = _children.begin() ; it != _children.end() ; ++it) {
             curBox = it->second;
             curBox->lower(false);
+            curBox->setEnabled(true);
         }
     }
     else{
         for (it = _children.begin() ; it != _children.end() ; ++it) {
+            std::cout<<"curve\n";
             curBox = it->second;
             curBox->lower(true);
+            curBox->setEnabled(false);
         }
     }
 }
