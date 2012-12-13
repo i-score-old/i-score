@@ -1627,6 +1627,7 @@ Maquette::save(const string &fileName) {
     _doc = new QDomDocument(impl.createDocumentType(typeId,publicId,systemId));
 
     QDomElement root = _doc->createElement("GRAPHICS");
+    root.setAttribute("zoom",_scene->zoom());
     _doc->appendChild(root);
     QDomElement boxesNode = _doc->createElement("boxes");
     root.appendChild(boxesNode);

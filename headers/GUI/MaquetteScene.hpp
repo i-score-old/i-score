@@ -574,6 +574,8 @@ class MaquetteScene : public QGraphicsScene
   bool subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent);
   void createMaquetteBarWidget();
   void setName(QString name);
+  inline void setZoom(float value){_zoom = value;}
+  inline float zoom(){return _zoom;}
 
  protected :
   /*!
@@ -806,7 +808,7 @@ public slots :
   PlayingThread *_playThread; //!< The thread handling playing.
 
   TimeBarWidget *_timeBar;
-
+  float _zoom;
 };
 
 #endif
