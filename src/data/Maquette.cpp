@@ -415,7 +415,6 @@ Maquette::addParentBox(unsigned int ID, const unsigned int date, const unsigned 
 {
     QPointF corner1(date/MaquetteScene::MS_PER_PIXEL,topLeftY);
     QPointF corner2((date+duration)/MaquetteScene::MS_PER_PIXEL,topLeftY+sizeY);
-    std::cout<<"sizeY "<<topLeftY+sizeY<<std::endl;
 
     vector<string> firstMsgs;
     vector<string> lastMsgs;
@@ -568,62 +567,6 @@ Maquette::lastMessagesToSend(unsigned int boxID)
 	return messages;
 }
 
-//void
-//Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, const vector<string> &endMsgs)
-//{
-
-//	vector<string> curvesAddresses = getCurvesAddresses(boxID);
-//	vector<string> startAddresses;
-//	vector<string>::const_iterator it;
-
-//	for (it = startMsgs.begin() ; it != startMsgs.end() ; ++it) {
-//		size_t blankPos;
-//		if ((blankPos = it->find_first_of(" ")) != string::npos) {
-//			startAddresses.push_back(it->substr(0,blankPos));
-//		}
-//	}
-//	vector<string> endAddresses;
-//	vector<string>::const_iterator it2;
-//	for (it2 = endMsgs.begin() ; it2 != endMsgs.end() ; ++it2) {
-//		size_t blankPos;
-//		if ((blankPos = it2->find_first_of(" ")) != string::npos) {
-//			endAddresses.push_back(it2->substr(0,blankPos));
-//		}
-//	}
-
-//	vector<string>::iterator startAddressIt;
-//	for(startAddressIt = startAddresses.begin() ; startAddressIt != startAddresses.end() ; ++startAddressIt) {
-//        string address = *startAddressIt;
-//		if (std::find(endAddresses.begin(),endAddresses.end(),address) != endAddresses.end()) {
-//			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end()) {
-//                std::cout<<" add1 > "<<address;
-//				_engines->addCurve(boxID,address);
-//			}
-//		}
-//		else {
-//			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) != curvesAddresses.end()) {
-//				_engines->removeCurve(boxID,address);
-//			}
-//		}
-//	}
-
-//	vector<string>::iterator endAddressIt;
-//	for(endAddressIt = endAddresses.begin() ; endAddressIt != endAddresses.end() ; ++endAddressIt) {
-//		string address = *endAddressIt;
-//		if (std::find(startAddresses.begin(),startAddresses.end(),address) != startAddresses.end()) {
-//			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end()) {
-//				_engines->addCurve(boxID,address);
-//                std::cout<<" add2 > "<<address;
-//			}
-//		}
-//		else {
-//			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) != curvesAddresses.end()) {
-//				_engines->removeCurve(boxID,address);
-//			}
-//		}
-//	}
-//    std::cout<<" ;"<<std::endl;
-//}
 
 void
 Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, const vector<string> &endMsgs)
@@ -1585,7 +1528,6 @@ Maquette::saveBox(unsigned int boxID)
     boxNode.appendChild(positionNode);
 
     QDomElement colorNode = _doc->createElement("color");
-    std::cout<<color.red()<<" "<<color.green()<<" "<<color.blue()<<std::endl;
     colorNode.setAttribute("red",color.red());
     colorNode.setAttribute("green",color.green());
     colorNode.setAttribute("blue",color.blue());
@@ -2019,7 +1961,6 @@ Maquette::load(const string &fileName){
                     WARNING_LEVEL);
         }
     }
-    std::cout<<_doc->doctype().nodeName().toStdString()<<std::endl;
 
     if(_doc->doctype().nodeName()!="i-scoreSave"){
         loadOLD(fileName);
