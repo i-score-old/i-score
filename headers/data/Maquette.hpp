@@ -472,7 +472,7 @@ class Maquette : public QObject
    * \param mother : the mother of the box
    * \return the ID of created parent box
    */
-  unsigned int addParentBox(const QPointF & corner1, const QPointF & corner2, const std::string & name, unsigned int mother);
+  unsigned int addParentBox(const QPointF & corner1, const QPointF & corner2, const std::string & name, unsigned int mother);  
   /*!
    * \brief Adds a new parent box to the maquette with specific information.
    *
@@ -636,6 +636,7 @@ class Maquette : public QObject
    * \param fileName : the file to load composition from
    */
   void load(const std::string &fileName);
+  void loadOLD(const std::string &fileName);
   /*!
    * \brief Gets the current execution time in ms.
    *
@@ -748,8 +749,12 @@ class Maquette : public QObject
    */
   unsigned int addParentBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const std::string &name,
 			   unsigned int mother);
+  unsigned int addParentBox(unsigned int ID, const unsigned int date, const unsigned int topLeftY, const unsigned int sizeY, const unsigned int duration, const std::string &name,
+                            unsigned int mother, QColor color);
+
   string extractAddress(string msg);
   string extractValue(string msg);
+
   /*!
    * \brief Saves a box into doc.
    *

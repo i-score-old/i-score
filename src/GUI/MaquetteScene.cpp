@@ -1399,14 +1399,12 @@ MaquetteScene::addControlBox() {
 		if (name.isEmpty()) {
 			QMessageBox::warning(_view,tr("Warning"),tr("Please Enter a Name"));
 		}
-	}
-
+    }
 	return addControlBox(_pressPoint, _releasePoint, name.toStdString());
 }
 
 unsigned int
-MaquetteScene::addParentBox(unsigned int ID)
-{
+MaquetteScene::addParentBox(unsigned int ID){
 	if (ID != NO_ID) {
 		if (_maquette->getBox(ID)->type() == PARENT_BOX_TYPE) {
 			ParentBox *parentBox = static_cast<ParentBox*>(_maquette->getBox(ID));
@@ -1435,8 +1433,7 @@ MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, 
 	}
 	else {
 		motherID = ROOT_BOX_ID;
-	}
-
+    }
 	unsigned int newBoxID = _maquette->addParentBox(topLeft,bottomRight,name,motherID);
 
 	ParentBox *newBox = static_cast<ParentBox*>(getBox(newBoxID));
