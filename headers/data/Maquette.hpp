@@ -60,6 +60,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "CSPTypes.hpp"
 #include "BasicBox.hpp"
 
+#include "TTScore.h"
+
 //! Default network host.
 
 #define NETWORK_LOCALHOST "127.0.0.1"
@@ -773,7 +775,7 @@ class Maquette : public QObject
   //! The MaquetteScene managing display and interaction.
   MaquetteScene *_scene;
   //! The Engines object managing temporal constraints.
-  Engines *_engines;
+  TTEnginePtr _engines;
 
   //! The map of boxes (identified by IDs) managed by the maquette.
   std::map<unsigned int,BasicBox*> _boxes;
