@@ -1215,7 +1215,7 @@ NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue){
         string address = Qaddress.toStdString();
         Qaddress += " ";
         Qaddress += newValue;
-        _startMessages->addMessage(item,Qaddress);
+        _startMessages->addMessageSimple(item,Qaddress);
         emit(startMessageValueChanged(item));
     }
     else{
@@ -1237,7 +1237,7 @@ NetworkTree::changeEndValue(QTreeWidgetItem *item, QString newValue){
         string address = Qaddress.toStdString();
         Qaddress += " ";
         Qaddress += newValue;
-        _endMessages->addMessage(item,Qaddress);
+        _endMessages->addMessageSimple(item,Qaddress);
         emit(endMessageValueChanged(item));
     }
     else{

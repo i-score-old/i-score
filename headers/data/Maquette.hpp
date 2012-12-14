@@ -57,7 +57,6 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <sstream>
 #include "Palette.hpp"
 #include "NetworkMessages.hpp"
-#include "CSPTypes.hpp"
 #include "BasicBox.hpp"
 
 #include "TTScore.h"

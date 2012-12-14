@@ -88,17 +88,17 @@ public :
 	 * return a list filled with messages
 	 */
 	std::vector<std::string> computeMessages();
-	/*!
-	 * \brief Adds a message to send with a specific device.
-	 *
-	 * \param device : the device to use
-	 * \param msg : the message to send
-	 */
-	void addMessage(const std::string &device, const std::string &msg, const std::string &value);
-	/*!
+    /*!
+     * \brief Adds a message to send with a specific device.
+     *
+     * \param device : the device to use
+     * \param msg : the message to send
+     */
+    void addOneMessage(const std::string &device, const std::string &msg, const std::string &value);
+    /*!
 	 * \brief Adds a list of messages.
 	 */
-	void addMessages(const std::vector<std::string> &messages);
+    void addMessages(const std::vector<std::string> &messages);
 	/*!
 	 * \brief Clears messages contained in the editor.
 	 */
