@@ -46,6 +46,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "AttributesEditor.hpp"
 #include "TimeBarWidget.hpp"
 #include "Maquette.hpp"
+#include "math.h"
 
 #include <QGraphicsSceneDragDropEvent>
 #include <QMimeData>
@@ -234,8 +235,7 @@ MaquetteView::zoomIn()
         resetCachedContent();
         _scene->update();
 
-		Maquette::getInstance()->updateBoxesFromEngines();
-        emit(zoomChanged(_zoom));
+        Maquette::getInstance()->updateBoxesFromEngines();
 	}
 }
 
@@ -243,6 +243,34 @@ QPointF
 MaquetteView::getCenterCoordinates(){
     QPointF centerCoordinates;
     return centerCoordinates;
+}
+
+void
+MaquetteView::setZoom(float value){
+    int nb_zoom ;
+
+    //zoom out
+    if(value>1){
+        nb_zoom = log2(value);
+        for(int i = 0; i<nb_zoom; i++)
+            MaquetteScene::MS_PER_PIXEL /= 2;
+    }
+
+    //zoom in
+    else if(value<1){
+        int c=0;
+        while(value!=1){
+            value*=2;
+            c++;
+        }
+        nb_zoom = c;
+        for(int i = 0; i<nb_zoom; i++)
+            MaquetteScene::MS_PER_PIXEL *= 2;
+    }
+
+    resetCachedContent();
+    _scene->update();
+    Maquette::getInstance()->updateBoxesFromEngines();
 }
 
 /**
@@ -254,7 +282,6 @@ MaquetteView::zoomOut()
     MaquetteScene::MS_PER_PIXEL *= 2;
 
     _zoom /= 2.;
-    emit(zoomChanged(_zoom));
     resetCachedContent();
     _scene->update();
     Maquette::getInstance()->updateBoxesFromEngines();

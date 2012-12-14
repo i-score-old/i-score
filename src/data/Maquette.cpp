@@ -1952,7 +1952,9 @@ Maquette::load(const string &fileName){
     float zoom;
 
     zoom = root.attribute("zoom","1").toFloat();
+
     std::cout<<"load zoom = "<<zoom<<std::endl;
+    _scene->view()->setZoom(zoom);
     QMap<int,unsigned int> hashMap;
     QDomNode mainNode = root.firstChild(); // Boxes
     while (!mainNode.isNull()) {
