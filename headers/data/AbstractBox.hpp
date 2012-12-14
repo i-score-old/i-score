@@ -51,12 +51,13 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <string>
 #include <map>
 #include "Abstract.hpp"
-#include "CSPTypes.hpp"
 #include <QPoint>
 #include <QColor>
 #include <math.h>
 #include <QTreeWidgetItem>
 #include "NetworkMessages.hpp"
+
+#include "TTScore.h"
 
 //! Defines abstract basic box type.
 enum {ABSTRACT_BOX_TYPE = 1};
