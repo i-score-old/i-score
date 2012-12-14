@@ -59,7 +59,7 @@ using std::make_pair;
 #include "BasicBox.hpp"
 #include "CurveWidget.hpp"
 #include "AbstractCurve.hpp"
-#include "Engines.hpp"
+#include "TTEngine.h"
 #include "Maquette.hpp"
 
 
@@ -320,7 +320,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 					else if (it->second.first > mousePosY){ // mouse above : pow between 1 and 6
 						pow = 1 + std::min(it->second.first - mousePosY,(float)50.) / 10.;
 					}
-					it->second = std::make_pair<float,float>(it->second.first,pow);
+                    it->second = std::make_pair(it->second.first,pow);
 					_movingBreakpointY = -1;
 					curveChanged();
 				}
@@ -332,7 +332,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 			if (_movingBreakpointX != -1) {
 				map<float,pair<float,float> >::iterator it;
 				if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
-					it->second = std::make_pair<float,float>(relativePoint.y(),it->second.second);
+                    it->second = std::make_pair(relativePoint.y(),it->second.second);
 				}
 				else {
 					_abstract->_breakpoints[_movingBreakpointX] = std::make_pair<float,float>(relativePoint.y(),1.);
