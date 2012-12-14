@@ -86,6 +86,7 @@ Maquette::init() {
 
     args = TTValue(SCENARIO_SIZE);
     args.append(pluginsDir);
+
     err = TTObjectInstantiate(TTSymbol("Engine"), TTObjectHandle(&_engines), args);
 
     if (!err) {
@@ -143,7 +144,7 @@ Maquette::init() {
     }
 }
 
-Maquette::Maquette() {
+Maquette::Maquette():_engines(NULL) {
 	//init();
 }
 
