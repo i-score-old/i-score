@@ -139,9 +139,9 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
   const int HEIGHT = sceneRect().height();
   for (int i = 0 ; i <= (WIDTH * MaquetteScene::MS_PER_PIXEL) / S_TO_MS ; i++) { // for each second
   	int i_PXL = i * S_TO_MS / MaquetteScene::MS_PER_PIXEL;
-  	if (_zoom < 1 && ((i % (int)(1./_zoom)) != 0 )) {
-  		continue;
-  	}
+    if (_zoom < 1 && ((i % (int)(1./_zoom)) != 0 )) {
+        continue;
+    }
 // 	 painter->drawText(QPointF(i_PXL, 10),QString("%1").arg(i));
      painter->drawLine(QPointF(i_PXL, 0), QPointF(i_PXL, HEIGHT));
    if (_zoom > 1) {
@@ -247,10 +247,12 @@ MaquetteView::getCenterCoordinates(){
 
 void
 MaquetteView::setZoom(float value){
+    _zoom=value;
     int nb_zoom ;
 
     //zoom out
     if(value>1){
+
         nb_zoom = log2(value);
         for(int i = 0; i<nb_zoom; i++)
             MaquetteScene::MS_PER_PIXEL /= 2;
@@ -258,16 +260,19 @@ MaquetteView::setZoom(float value){
 
     //zoom in
     else if(value<1){
-        int c=0;
-        while(value!=1){
-            value*=2;
-            c++;
+        if (MaquetteScene::MS_PER_PIXEL > 0.125) {
+            int c=0;
+            while(value<1){
+                value*=2;
+                c++;
+            }
+            nb_zoom = c;
+            for(int i = 0; i<nb_zoom; i++)
+                MaquetteScene::MS_PER_PIXEL *= 2;
         }
-        nb_zoom = c;
-        for(int i = 0; i<nb_zoom; i++)
-            MaquetteScene::MS_PER_PIXEL *= 2;
     }
-
+    std::cout<<"nb zoom "<<nb_zoom<<std::endl;
+    repaint();
     resetCachedContent();
     _scene->update();
     Maquette::getInstance()->updateBoxesFromEngines();

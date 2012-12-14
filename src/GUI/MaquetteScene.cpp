@@ -1554,7 +1554,7 @@ MaquetteScene::changeRelationBounds(unsigned int relID, const float &length, con
 	Relation *rel = getRelation(relID);
 	if (rel != NULL) {
 		_maquette->changeRelationBounds(relID,minBound,maxBound);
-		rel->changeBounds(minBound,maxBound);
+        rel->changeBounds(minBound,maxBound);
 		if (length != NO_LENGTH){
 			AbstractRelation *abRel = static_cast<AbstractRelation*>(rel->abstract());
 			float oldLength = abRel->length();

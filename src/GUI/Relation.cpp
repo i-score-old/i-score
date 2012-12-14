@@ -245,8 +245,8 @@ Relation::setID(unsigned int ID)
 
 void
 Relation::changeBounds(const float &minBound, const float &maxBound) {
-	_abstract->setMinBound(minBound);
-	_abstract->setMaxBound(maxBound);
+    _abstract->setMinBound(minBound);
+    _abstract->setMaxBound(maxBound);
 }
 
 void
@@ -513,9 +513,6 @@ Relation::updateFlexibility(){
     else
         _flexibleRelation = false;
 
-
-
-
     double startX = mapFromScene(_start).x();
     double endX = mapFromScene(_end).x();
 
@@ -553,12 +550,13 @@ Relation::drawRail(QPainter *painter, double startBound, double endBound){
 void
 Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
 //  painter->drawRect(boundingRect());
 //  painter->drawPath(shape());
-
+    painter->setRenderHint(QPainter::Antialiasing, true);
     QPainterPath painterPath;
     painterPath.moveTo(mapFromScene(_start));
 
@@ -611,20 +609,19 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
         if (_abstract->minBound() != NO_BOUND)
             startBound = (startX+ _abstract->minBound());
-
         if (_abstract->maxBound() != NO_BOUND)
             endBound = (startX + _abstract->maxBound());
 
         // Left Handle
         painter->setPen(leftBoundPen);
         if (_abstract->minBound()!= NO_BOUND)
-            painter->drawLine(QPointF(startBound,endY - HANDLE_HEIGHT/2), QPointF(startBound,endY + HANDLE_HEIGHT/2)); // Vertical left
+            painter->drawLine(QPointF(startBound*16/MaquetteScene::MS_PER_PIXEL,endY - HANDLE_HEIGHT/2), QPointF(startBound*16/MaquetteScene::MS_PER_PIXEL/1000,endY + HANDLE_HEIGHT/2));
 
 
         // Right Handle
         painter->setPen(rightBoundPen);
         if (_abstract->maxBound() != NO_BOUND)
-            painter->drawLine(QPointF(endBound,endY - HANDLE_HEIGHT/2), QPointF(endBound,endY + HANDLE_HEIGHT/2)); // Vertical
+            painter->drawLine(QPointF(endBound*16/MaquetteScene::MS_PER_PIXEL,endY - HANDLE_HEIGHT/2), QPointF(endBound*16/MaquetteScene::MS_PER_PIXEL/1000,endY + HANDLE_HEIGHT/2));
 
 
         //horizontal line

@@ -875,13 +875,13 @@ bool Maquette::updateBox(unsigned int boxID, const Coords &coord) {
 		BasicBox *box = _boxes[boxID];
 		if (moveAccepted = _engines->performBoxEditing(boxID, coord.topLeftX * MaquetteScene::MS_PER_PIXEL,
 				coord.topLeftX * MaquetteScene::MS_PER_PIXEL +
-				coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
+                coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
 			box->setRelativeTopLeft(QPoint(coord.topLeftX,coord.topLeftY));
 			box->setSize(QPoint(coord.sizeX,coord.sizeY));
 			box->setPos(box->getCenter());
 			box->update();
 		}
-		else {
+        else {
 			box->setRelativeTopLeft(QPoint(_engines->getBoxBeginTime(boxID)/MaquetteScene::MS_PER_PIXEL,
 					box->getTopLeft().y()));
 			box->setSize(QPoint((_engines->getBoxEndTime(boxID)/MaquetteScene::MS_PER_PIXEL -
@@ -901,8 +901,10 @@ bool Maquette::updateBox(unsigned int boxID, const Coords &coord) {
 #ifdef DEBUG
 			std::cerr << "Maquette::updateBoxes : box moved : " << *it << std::endl;
 #endif
-			if (_boxes[*it]->relativeBeginPos() != _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL ||
-					(_engines->getBoxEndTime(*it)/MaquetteScene::MS_PER_PIXEL - _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL) != _boxes[*it]->width()) {
+            if ((_boxes[*it]->relativeBeginPos() != _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL ||
+                 (_engines->getBoxEndTime(*it)/MaquetteScene::MS_PER_PIXEL - _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL) != _boxes[*it]->width())&& _engines->getBoxBeginTime(*it)) {
+
+
 				_boxes[*it]->setRelativeTopLeft(QPoint(_engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL,
 						_boxes[*it]->getTopLeft().y()));
 				_boxes[*it]->setSize(QPoint((_engines->getBoxEndTime(*it)/MaquetteScene::MS_PER_PIXEL -
@@ -1136,9 +1138,9 @@ Maquette::updateBoxesFromEngines(const vector<unsigned int> &movedBoxes)
 {
 	vector<unsigned int>::const_iterator it;
 	if (!movedBoxes.empty()) {
-		for (it = movedBoxes.begin() ; it != movedBoxes.end() ; it++) {
-			if (_boxes[*it]->relativeBeginPos() != _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL ||
-					(_engines->getBoxEndTime(*it)/MaquetteScene::MS_PER_PIXEL - _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL) != _boxes[*it]->width()) {
+        for (it = movedBoxes.begin() ; it != movedBoxes.end() ; it++) {
+            if ((_boxes[*it]->relativeBeginPos() != _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL ||
+                    (_engines->getBoxEndTime(*it)/MaquetteScene::MS_PER_PIXEL - _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL) != _boxes[*it]->width())) {
 				_boxes[*it]->setRelativeTopLeft(QPoint(_engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL,
 						_boxes[*it]->getTopLeft().y()));
 				_boxes[*it]->setSize(QPoint((_engines->getBoxEndTime(*it)/MaquetteScene::MS_PER_PIXEL -
