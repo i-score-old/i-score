@@ -91,7 +91,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 	_clicked = false;
     _playing = false;
 	_paused = false;
-    _zoom = 1.;
+
 	_modified = false;
 
 	_relation = new AbstractRelation;

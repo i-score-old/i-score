@@ -95,6 +95,7 @@ class MaquetteView : public QGraphicsView
    * \brief Performs zoom out of the entire scene.
    */
   void zoomOut();
+  inline float zoom(){return _zoom;}
 
  protected :
   /*!

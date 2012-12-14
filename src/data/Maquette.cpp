@@ -1571,42 +1571,6 @@ Maquette::saveBox(unsigned int boxID)
     //return true;
 }
 
-//void
-//Maquette::save(const string &fileName) {
-//	_engines->store(fileName+".simone");
-
-//	QFile file(QString::fromStdString(fileName));
-
-//	if (!file.open(QFile::WriteOnly | QFile::Text)) {
-//		_scene->displayMessage(((QString("Cannot write file %1:\n%2.")).arg(QString::fromStdString(fileName)).
-//				arg(file.errorString())).toStdString(),WARNING_LEVEL);
-//		//return false;
-//	}
-
-//	QDomImplementation impl = QDomDocument().implementation();
-
-//	QString publicId = "Acousmoscribe 2009";
-//	QString systemId = "http://scrime.labri.fr";
-//	QString typeId = "acousmoscribeSave";
-//	_doc = new QDomDocument(impl.createDocumentType(typeId,publicId,systemId));
-
-//	QDomElement root = _doc->createElement("GRAPHICS");
-//	_doc->appendChild(root);
-//	QDomElement boxesNode = _doc->createElement("boxes");
-//	root.appendChild(boxesNode);
-
-//	QString boxType;
-//	for(BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; ++it ) {
-//		saveBox(it->first);
-//	}
-
-//	QTextStream ts(&file);
-//	ts << _doc->toString();
-//	file.close();
-
-//	delete _doc;
-//}
-
 void
 Maquette::save(const string &fileName) {
     _engines->store(fileName+".simone");
@@ -1985,6 +1949,10 @@ Maquette::load(const string &fileName){
     QColor color(1.,1.,1.);
     Palette pal;
     int boxID,motherID;
+    float zoom;
+
+    zoom = root.attribute("zoom","1").toFloat();
+    std::cout<<"load zoom = "<<zoom<<std::endl;
     QMap<int,unsigned int> hashMap;
     QDomNode mainNode = root.firstChild(); // Boxes
     while (!mainNode.isNull()) {
