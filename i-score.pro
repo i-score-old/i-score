@@ -1,14 +1,15 @@
 TEMPLATE = app
+QMAKE_CXX = /usr/bin/clang++ -std=c++11 -stdlib=libc++ -O0 -fPIC -msse3
+QMAKE_LFLAGS += -std=c++11 -stdlib=libc++ -O0 -fPIC -msse3
 CONFIG += debug
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
 TARGET = i-score
 DEPENDPATH += . \
 include \
-#lib \
 headers/data \
 headers/GUI \
 src/data \
 src/GUI \
-lib/Editor/CSP
 
 linux-g++ {
 INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2
@@ -17,7 +18,10 @@ linux-g++-64 {
 INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2
 }
 macx-g++ {
-INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /Library/Frameworks/ /usr/local/include/libxml2
+INCLUDEPATH += . headers/GUI headers/data /Library/Frameworks/ /usr/local/include/libxml2
+}
+macx-clang {
+INCLUDEPATH += . headers/GUI headers/data /Library/Frameworks/ /usr/local/jamoma/includes /usr/local/include/libxml2
 }
 
 QT += network xml svg
@@ -30,6 +34,11 @@ QMAKE_LFLAGS += -L/usr/local/lib/
 }
 macx-g++ {
 QMAKE_LFLAGS += -L/usr/local/lib/ -L/System/Library/Frameworks/ -L/Library/Frameworks/
+QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=10.7
+QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
+}
+macx-clang {
+QMAKE_LFLAGS += -L/usr/local/lib/ -L/usr/local/jamoma/lib -L/System/Library/Frameworks/ -L/Library/Frameworks/
 QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=10.7
 QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
 }
@@ -48,9 +57,13 @@ LIBS += -lIscore -lDeviceManager -lxml2 -lgecodeint -lgecodesearch -lgecodedrive
 macx-g++ {
 LIBS += -lIscore -lDeviceManager -framework gecode -lxml2
 }
+macx-clang {
+LIBS += /usr/local/jamoma/lib/JamomaFoundation.dylib /usr/local/jamoma/lib/JamomaScore.dylib -lDeviceManager -framework gecode -lxml2
+}
+
 # Input
-HEADERS += /usr/local/include/IScore/Engines.hpp \
-/usr/local/include/IScore/CSPTypes.hpp \
+HEADERS += /usr/local/jamoma/includes/TTScore.h \
+/usr/local/jamoma/includes/CSPTypes.hpp \
 headers/data/Abstract.hpp \
 headers/data/AbstractBox.hpp \
 headers/data/AbstractComment.hpp \
@@ -112,7 +125,6 @@ src/data/AbstractSoundBox.cpp \
 src/data/AbstractTriggerPoint.cpp \
 src/data/Maquette.cpp \
 src/data/Palette.cpp \
-src/GUI/AttributesEditor.cpp \
 src/GUI/BasicBox.cpp \
 src/GUI/BoxContextMenu.cpp \
 src/GUI/ChooseTemporalRelation.cpp \
@@ -147,7 +159,8 @@ src/data/NetworkMessages.cpp \
 src/GUI/BoxWidget.cpp \
 src/GUI/BoxCurveEdit.cpp \
 src/GUI/MaquetteWidget.cpp \
-src/GUI/TimeBarWidget.cpp
+src/GUI/TimeBarWidget.cpp \
+    src/GUI/AttributeEditor.cpp
 
 RESOURCES += i-score.qrc
 
