@@ -615,13 +615,13 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         // Left Handle
         painter->setPen(leftBoundPen);
         if (_abstract->minBound()!= NO_BOUND)
-            painter->drawLine(QPointF(startBound*16/MaquetteScene::MS_PER_PIXEL,endY - HANDLE_HEIGHT/2), QPointF(startBound*16/MaquetteScene::MS_PER_PIXEL/1000,endY + HANDLE_HEIGHT/2));
+            painter->drawLine(QPointF(startBound,endY - HANDLE_HEIGHT/2), QPointF(startBound,endY + HANDLE_HEIGHT/2));
 
 
         // Right Handle
         painter->setPen(rightBoundPen);
         if (_abstract->maxBound() != NO_BOUND)
-            painter->drawLine(QPointF(endBound*16/MaquetteScene::MS_PER_PIXEL,endY - HANDLE_HEIGHT/2), QPointF(endBound*16/MaquetteScene::MS_PER_PIXEL/1000,endY + HANDLE_HEIGHT/2));
+            painter->drawLine(QPointF(endBound,endY - HANDLE_HEIGHT/2), QPointF(endBound,endY + HANDLE_HEIGHT/2));
 
 
         //horizontal line

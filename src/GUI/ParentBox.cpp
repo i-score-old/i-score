@@ -116,7 +116,6 @@ void
 ParentBox::updateDisplay(QString displayMode){
     BasicBox *curBox;
     std::map<unsigned int,BasicBox*>::iterator it;
-    std::cout<<"pbox updateDisplay\n";
     if(displayMode==SUB_SCENARIO_MODE_TEXT){
         for (it = _children.begin() ; it != _children.end() ; ++it) {
             curBox = it->second;
