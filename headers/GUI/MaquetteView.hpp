@@ -101,9 +101,13 @@ class MaquetteView : public QGraphicsView
    * \param value : the zoom factor value
    */
   void setZoom(float value);
-
   inline float zoom(){return _zoom;}
-
+  /*!
+   * \brief Gets the coordinates of the center of the scene.
+   *
+   * \return the center, as a QPointF.
+   */
+  QPointF getCenterCoordinates();
  protected :
   /*!
    * \brief Redefinition of QGraphicsView::drawBackground().
@@ -125,12 +129,7 @@ class MaquetteView : public QGraphicsView
    * \param event : the information about the event
    */
   virtual void wheelEvent(QWheelEvent *event);
-  /*!
-   * \brief Gets the coordinates of the center of the scene.
-   *
-   * \return the center, as a QPointF.
-   */
-  QPointF getCenterCoordinates();
+
 
  private :
 

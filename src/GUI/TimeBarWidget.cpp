@@ -84,7 +84,6 @@ void
 TimeBarWidget::mousePressEvent(QMouseEvent *event){
     int value = event->pos().x()* MaquetteScene::MS_PER_PIXEL;
     emit gotoValueEntered(value);
-
 }
 
 void

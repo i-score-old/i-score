@@ -241,7 +241,7 @@ MaquetteView::zoomIn()
 
 QPointF
 MaquetteView::getCenterCoordinates(){
-    QPointF centerCoordinates;
+    QPointF centerCoordinates =  mapToScene(viewport()->rect().center());
     return centerCoordinates;
 }
 

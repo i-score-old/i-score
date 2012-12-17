@@ -1594,6 +1594,8 @@ Maquette::save(const string &fileName) {
 
     QDomElement root = _doc->createElement("GRAPHICS");
     root.setAttribute("zoom",_scene->zoom());
+    root.setAttribute("centerX",_scene->view()->getCenterCoordinates().x());
+    root.setAttribute("centerY",_scene->view()->getCenterCoordinates().y());
     _doc->appendChild(root);
     QDomElement boxesNode = _doc->createElement("boxes");
     root.appendChild(boxesNode);
@@ -1666,7 +1668,7 @@ Maquette::loadOLD(const string &fileName){
 
     _scene->clear();
 
-    QPointF topLeft,size,bottomRight;
+    QPointF topLeft,size,bottomRight;    
     QString name,boxType,relType;
     QColor color(1.,1.,1.);
     Palette pal;
@@ -1952,11 +1954,15 @@ Maquette::load(const string &fileName){
     Palette pal;
     int boxID,motherID;
     float zoom;
+    QPointF centerCoordinates;
 
     zoom = root.attribute("zoom","1").toFloat();
+    centerCoordinates = QPointF(root.attribute("centerX","0.").toFloat(),root.attribute("centerY","0.").toFloat());
 
     std::cout<<"load zoom = "<<zoom<<std::endl;
     _scene->view()->setZoom(zoom);
+    _scene->view()->centerOn(centerCoordinates);
+
     QMap<int,unsigned int> hashMap;
     QDomNode mainNode = root.firstChild(); // Boxes
     while (!mainNode.isNull()) {
