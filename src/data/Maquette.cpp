@@ -1277,11 +1277,11 @@ Maquette::changeRelationBounds(unsigned int relID, const float &minBound, const 
 	vector<unsigned int> movedBoxes;
 	int minBoundMS = NO_BOUND;
 	if (minBound != NO_BOUND) {
-		minBoundMS = minBound * MaquetteScene::MS_PER_PIXEL;
+        minBoundMS = minBound * (MaquetteScene::MS_PER_PIXEL*_scene->zoom());
 	}
 	int maxBoundMS = NO_BOUND;
 	if (maxBound != NO_BOUND) {
-		maxBoundMS = maxBound * MaquetteScene::MS_PER_PIXEL;
+        maxBoundMS = maxBound * (MaquetteScene::MS_PER_PIXEL*_scene->zoom());
 	}
 	_engines->changeTemporalRelationBounds(relID,minBoundMS,maxBoundMS,movedBoxes);
 	updateBoxesFromEngines(movedBoxes);
@@ -2158,12 +2158,12 @@ Maquette::load(const string &fileName){
             int minBoundMS = _engines->getRelationMinBound(*it);
             float minBoundPXL = NO_BOUND;
             if (minBoundMS != NO_BOUND) {
-                minBoundPXL = (float)minBoundMS/MaquetteScene::MS_PER_PIXEL;
+                minBoundPXL = (float)minBoundMS/(MaquetteScene::MS_PER_PIXEL*zoom);
             }
             int maxBoundMS = _engines->getRelationMaxBound(*it);
             float maxBoundPXL = NO_BOUND;
             if (maxBoundMS != NO_BOUND) {
-                maxBoundPXL = (float)maxBoundMS/MaquetteScene::MS_PER_PIXEL;
+                maxBoundPXL = (float)maxBoundMS/(MaquetteScene::MS_PER_PIXEL*zoom);
             }
             abstractRel.setMinBound(minBoundPXL);
             abstractRel.setMaxBound(maxBoundPXL);
