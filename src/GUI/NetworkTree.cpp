@@ -44,6 +44,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <map>
 #include <exception>
 #include <QTreeView>
+#include <QByteArray>
 
 static unsigned int NAME_COLUMN = 0;
 static unsigned int VALUE_COLUMN = 1;
@@ -397,6 +398,12 @@ NetworkTree::hasStartEndMsg(QTreeWidgetItem *item){
  *                          General display tools
  ****************************************************************************/
 
+//QString
+//NetworkTree::parse(string value){
+//    QString valueParsed = QString::fromStdString(value);
+
+//    QByteArray =
+//}
 
 void
 NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){

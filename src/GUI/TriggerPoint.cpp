@@ -349,7 +349,7 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 //            painter->setPen(penG);
 //            painter->drawRect(boundingRect());
 
-//            QPainterPath path = shape();
+//
             QPen pen = painter->pen();
 //            pen.setColor(box->isSelected() ? Qt::yellow : Qt::white);
             QBrush brush = painter->brush();

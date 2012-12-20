@@ -696,6 +696,7 @@ class BasicBox : public QObject, public QGraphicsItem
   QColor _color;
   QColor _colorUnselected;
   bool _low;
+  bool _hover;
 };
 
 #endif

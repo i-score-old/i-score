@@ -1314,6 +1314,18 @@ Maquette::getProgression(unsigned int boxID)
 
 void
 Maquette::setGotoValue(int gotoValue) {
+//    std::cout<<"GOTO "<<gotoValue<<std::endl;
+//    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
+//        unsigned int boxID = it->first;
+//        std::cout<<" "<<boxID<<" "<< _engines->getBoxBeginTime(boxID)<<" " <<_engines->getBoxEndTime(boxID)<<std::endl;
+//        if(_engines->getBoxBeginTime(boxID)<gotoValue){
+//            std::cout<<"MUTED "<<std::endl;
+//            _engines->setCtrlPointMutingState(boxID,1,true);
+//        }
+//        else{
+//            _engines->setCtrlPointMutingState(boxID,1,true);
+//        }
+//    }
 	_engines->setGotoValue(gotoValue);
 }
 
