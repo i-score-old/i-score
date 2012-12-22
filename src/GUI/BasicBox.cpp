@@ -232,6 +232,7 @@ BasicBox::init()
     _comment = NULL;
     _color = QColor(Qt::white);
     _colorUnselected = QColor(Qt::white);
+    _hover=false;
 
     updateBoxSize();
 
@@ -990,7 +991,6 @@ BasicBox::shape() const
 {
     QPainterPath path;
 
-//    path.addRect(boundingRect());
     path.addRect(_boxRect);
     path.addRect(_leftEar);
     path.addRect(_rightEar);
@@ -1214,6 +1214,7 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 {
     QGraphicsItem::hoverEnterEvent(event);
 
+    _hover=true;
     const float RESIZE_ZONE_WIDTH = 3*LINE_WIDTH;
 
     QRectF textRect(_boxRect.topLeft(),_boxRect.topRight() + QPointF(0,RESIZE_TOLERANCE));
@@ -1277,7 +1278,7 @@ BasicBox::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
     //  Seulement si on passe trop vite dessus, il n'a pas le temps de l'affecter.
 
     QGraphicsItem::hoverEnterEvent(event);
-
+    _hover=true;
     const float RESIZE_ZONE_WIDTH = 3*LINE_WIDTH;
 
     QRectF textRect(_boxRect.topLeft(),_boxRect.topRight() + QPointF(0,3*RESIZE_TOLERANCE/4));
@@ -1334,6 +1335,7 @@ BasicBox::hoverLeaveEvent ( QGraphicsSceneHoverEvent * event )
 {
     QGraphicsItem::hoverLeaveEvent(event);
     setCursor(Qt::ArrowCursor);
+    _hover=false;
 }
 
 void
@@ -1500,10 +1502,14 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
 
     //************* pour afficher la shape *************
-    QPen penG(Qt::green);
-    penG.setWidth(2);
-//    painter->setPen(penG);
-//    painter->drawRect(boundingRect());
+    QPen penG(Qt::blue);
+    penG.setWidth(4);
+//    if(_hover){
+//        painter->setPen(penG);
+//        painter->drawRect(boundingRect());
+//        QPainterPath path = shape();
+//        painter->drawPath(path);
+//    }
 //    painter->drawRect(_leftEar);
 //    painter->drawRect(_rightEar);
 //    painter->drawRect(_startTriggerGrip);
