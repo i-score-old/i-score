@@ -164,12 +164,12 @@ MaquetteWidget::createActions(){
     QIcon playIcon(":/images/playSimple.svg");
     _playAction = new QAction(playIcon, tr("Play"), this);
     _playAction->setShortcut(QString("Space"));
-    _playAction->setStatusTip(tr("Play composition"));
+    _playAction->setStatusTip(tr("Play scenario"));
 
     QIcon stopIcon(":/images/stopSimple.svg");
     _stopAction = new QAction(stopIcon, tr("Stop"), this);
     _stopAction->setShortcut(QString("Enter"));
-    _stopAction->setStatusTip(tr("Stop composition"));
+    _stopAction->setStatusTip(tr("Stop scenario"));
 
     connect(_playAction,SIGNAL(triggered()), this, SLOT(play()));
     connect(_stopAction,SIGNAL(triggered()), this, SLOT(stop()));
@@ -177,7 +177,7 @@ MaquetteWidget::createActions(){
 
 void
 MaquetteWidget::createToolBar(){
-    _toolBar->setStyleSheet("QToolBar{border :none; }"
+/*    _toolBar->setStyleSheet("QToolBar{border :none; }"
                             "QToolBar::handle {"
                             "border: none;"
                             "}"
@@ -187,8 +187,9 @@ MaquetteWidget::createToolBar(){
                             "QToolBar:left, QToolBar:right {"
                             "border :none;background :white;"
                             "}"
-                            );
+                            );*/
     _toolBar->addAction(_playAction);
+    _toolBar->raise();
 }
 
 void
