@@ -215,7 +215,7 @@ MaquetteWidget::createActions(){
 
 void
 MaquetteWidget::createToolBar(){
-/*    _toolBar->setStyleSheet("QToolBar{border :none; }"
+    _toolBar->setStyleSheet("QToolBar{border :none; }"
                             "QToolBar::handle {"
                             "border: none;"
                             "}"
@@ -225,7 +225,7 @@ MaquetteWidget::createToolBar(){
                             "QToolBar:left, QToolBar:right {"
                             "border :none;background :white;"
                             "}"
-                            );*/
+                            );
     _toolBar->addAction(_playAction);
     _toolBar->raise();
 }
