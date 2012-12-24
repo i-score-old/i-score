@@ -56,7 +56,7 @@ using std::string;
 #include "MaquetteScene.hpp"
 #include "MainWindow.hpp"
 
-const float MaquetteWidget::HEADER_HEIGHT = 35.;
+const float MaquetteWidget::HEADER_HEIGHT = 42.;
 const float MaquetteWidget::NAME_POINT_SIZE = 20.;
 
 MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScene *scene)
@@ -88,9 +88,37 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
     _maquetteLayout->setVerticalSpacing(0);
     setLayout(_maquetteLayout);
 
+
     connect(_scene,SIGNAL(stopPlaying()),this,SLOT(stop()));
     connect(_view,SIGNAL(zoomChanged(float)),this,SLOT(changeZoom(float)));
 //    connect(_view,SIGNAL(zoomChanged(float)),_timeBar,SLOT(updateZoom(float)));
+}
+
+void
+MaquetteWidget::paintEvent(QPaintEvent *event){
+    QWidget::paintEvent(event);
+
+//    QPainterPath path;
+//    float line = 2;
+//    QPointF adjustX(0,0);
+//    QPointF adjustY(0,0);
+//    QRectF rect = this->rect();
+
+//    path.moveTo(rect.topLeft()+adjustX);
+
+////    path.lineTo(rect.bottomLeft()+adjustX+adjustY);
+////    path.lineTo(rect.bottomRight()+ adjustY);
+////    path.lineTo(rect.bottomRight()+ adjustY - QPointF(0,rect.height()/5.));
+////    path.quadTo(rect.topRight(),rect.topLeft()+adjustX);
+
+//    QPainter *painter=new QPainter();
+//    QPen pen(Qt::black);
+//    pen.setWidth(5);
+//    painter->setPen(pen);
+//    painter->drawRect(QRect(0,3,10,10));
+////    painter->drawPath(path);
+//    std::cout<<"PINA"<<std::endl;
+//    delete painter;
 }
 
 void
@@ -158,15 +186,25 @@ MaquetteWidget::createReadingSpeedWidget(){
     connect(_accelerationDisplay, SIGNAL(valueChanged(double)), this, SLOT(accelerationValueEntered(double)));
 }
 
+
 void
 MaquetteWidget::createActions(){
 
-    QIcon playIcon(":/images/playSimple.svg");
+    QPixmap pix = QPixmap(35,35);
+    pix.fill(Qt::transparent);
+
+    QIcon playIcon;
+    QImage play(":/images/playSimple.svg");
+    if (!play.isNull())
+        playIcon.addPixmap(QPixmap::fromImage(play));
     _playAction = new QAction(playIcon, tr("Play"), this);
     _playAction->setShortcut(QString("Space"));
     _playAction->setStatusTip(tr("Play scenario"));
 
-    QIcon stopIcon(":/images/stopSimple.svg");
+    QIcon stopIcon;
+    QImage stop(":/images/stopSimple.svg");
+    if (!stop.isNull())
+        stopIcon.addPixmap(QPixmap::fromImage(stop));
     _stopAction = new QAction(stopIcon, tr("Stop"), this);
     _stopAction->setShortcut(QString("Enter"));
     _stopAction->setStatusTip(tr("Stop scenario"));
@@ -196,6 +234,7 @@ void
 MaquetteWidget::createHeader(){
 
     _header->setGeometry(0,0,width(),HEADER_HEIGHT);
+    _header->setFixedHeight(HEADER_HEIGHT);
     _header->setPalette(QPalette(_color));
     _header->setAutoFillBackground(true);
 

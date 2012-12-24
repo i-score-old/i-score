@@ -23,9 +23,9 @@ I-SCORE_PATH='/Users/WALL-E/Documents/Iscore/i-score'
 elif [ "$OS" = "MACOS" ] || [ "$OS" = "MACOS64" ]
 then
 {
-DEVICE_MANAGER_PATH='/Users/WALL-E/Documents/Iscore/Device-Manager'
-LIB_ISCORE_PATH='/Users/WALL-E/Documents/Iscore/libIscore'
-I-SCORE_PATH='/Users/WALL-E/Documents/Iscore/i-score'
+DEVICE_MANAGER_PATH='/Users/josephlarralde/Documents/workspace/DeviceManager'
+LIB_ISCORE_PATH='/Users/josephlarralde/Documents/workspace/libIscore'
+I-SCORE_PATH='/Users/josephlarralde/Documents/workspace/DeviceManager/i-score'
 }
 fi
 
