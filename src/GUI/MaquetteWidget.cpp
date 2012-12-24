@@ -193,18 +193,22 @@ MaquetteWidget::createActions(){
     QPixmap pix = QPixmap(35,35);
     pix.fill(Qt::transparent);
 
-    QIcon playIcon;
+    QIcon playIcon(":/images/playSimple.svg");
+/*    QIcon playIcon;
     QImage play(":/images/playSimple.svg");
     if (!play.isNull())
         playIcon.addPixmap(QPixmap::fromImage(play));
+*/
     _playAction = new QAction(playIcon, tr("Play"), this);
     _playAction->setShortcut(QString("Space"));
     _playAction->setStatusTip(tr("Play scenario"));
 
-    QIcon stopIcon;
+     QIcon stopIcon(":/images/stopSimple.svg");
+/*    QIcon stopIcon;
     QImage stop(":/images/stopSimple.svg");
     if (!stop.isNull())
         stopIcon.addPixmap(QPixmap::fromImage(stop));
+*/
     _stopAction = new QAction(stopIcon, tr("Stop"), this);
     _stopAction->setShortcut(QString("Enter"));
     _stopAction->setStatusTip(tr("Stop scenario"));
