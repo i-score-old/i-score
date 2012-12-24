@@ -61,6 +61,9 @@ public slots:
     void accelerationValueEntered(double value);
     void changeZoom(float value);
 
+protected :
+    virtual void paintEvent(QPaintEvent *event);
+
 private:
     void createActions();
     void createToolBar();
