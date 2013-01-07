@@ -106,6 +106,7 @@ public :
     std::string computeMessage(const Message &msg);
     std::string computeMessageWithoutValue(const Message &msg);
     inline QList<Message> messages(){return _messages->values();}
+    QMap<QString, QString> toMapAddressValue();
 
 public slots :
     void messageChanged();

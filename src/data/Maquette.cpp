@@ -1339,10 +1339,70 @@ Maquette::generateTriggerQueue(){
 }
 
 void
+Maquette::initSceneState(){
+
+    double gotoValue = (double)_engines->getGotoValue();
+    unsigned int boxID;
+    QMap<QString,QPair<QString,unsigned int> > msgs, boxMsgs;
+    QList<QString> boxAddresses;
+
+
+    //Pour toutes les boîtes avant le goto, on récupère leur état final (on simule leur exécution)
+    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
+        boxID = it->first;
+
+        //réinit : On démute toutes les boîtes, elles ont potentiellement pu être mutée  à la fin de l'algo
+        _engines->setCtrlPointMutingState(boxID,1,false);
+        _engines->setCtrlPointMutingState(boxID,2,false);
+
+        if((*it).second->date()<gotoValue){
+            std::cout<<it->first<<" ";
+
+            boxMsgs = (it->second)->getFinalState();
+            boxAddresses = boxMsgs.keys();
+
+            //Pour le cas où le même paramètre est modifié par plusieurs boîte (avant le goto), on ne garde que la dernière modif.
+            for(QList<QString>::iterator it = boxAddresses.begin() ; it!=boxAddresses.end() ; it++){
+                if(msgs.contains(*it)){
+                    if(msgs.value(*it).second < boxMsgs.value(*it).second && boxMsgs.value(*it).second < gotoValue)
+                        msgs.insert(*it,boxMsgs.value(*it));
+                }
+                //sinon on ajoute dans la liste de messages
+                else
+                    if(boxMsgs.value(*it).second < gotoValue)
+                        msgs.insert(*it,boxMsgs.value(*it));
+            }
+
+            //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
+            //    Start messages
+                _engines->setCtrlPointMutingState(boxID,1,true);
+            //    End messages
+            if((*it).second->date()+(*it).second->duration()<gotoValue)
+                _engines->setCtrlPointMutingState(boxID,2,true);
+        }
+
+    }
+
+    //traduction en QMap<QString,QString>, on supprime le champs date des messages
+    QList<QString> addresses = msgs.keys();
+
+    std::cout<<"****************************"<<std::endl;
+    QString message;
+    for(QList<QString>::iterator it = addresses.begin() ; it != addresses.end() ; it++){
+         message = *it+" "+msgs.value(*it).first;
+         sendMessage(message.toStdString());
+         std::cout<<message.toStdString()<<std::endl;
+    }
+    std::cout<<"****************************"<<std::endl;
+
+
+}
+
+void
 Maquette::startPlaying()
 {
     double gotoValue = (double)_engines->getGotoValue();
-
+    initSceneState();
     generateTriggerQueue();
     int nbTrg = _scene->_triggersQueueList.size();
 
@@ -1361,11 +1421,11 @@ Maquette::startPlaying()
 
 	for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
 		it->second->lock();
-		if (it->second->type() == SOUND_BOX_TYPE) {
+        if (it->second->type() == SOUND_BOX_TYPE) {
 			if (it->second->date() >= _engines->getGotoValue()) {
                 sendMessage(static_cast<SoundBox*>(it->second)->getPalette().toString());
 			}
-		}
+        }
 	}
 
     _engines->play();

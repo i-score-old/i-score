@@ -703,6 +703,12 @@ class Maquette : public QObject
   void crossedTriggerPoint(bool  waiting, unsigned int trgID);  
   inline std::map<unsigned int,BasicBox*> getBoxes(){return _boxes;}
 
+  /*!
+   * \brief When a goto value is entered, the scenario before this value is simulated.
+   * Messages (final state of each boxes) are sended to the engine.
+   */
+  void initSceneState();
+
  private :
 
   /*!

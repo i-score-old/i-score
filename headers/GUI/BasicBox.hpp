@@ -49,6 +49,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QGraphicsItem>
 #include <QGraphicsSvgItem>
 #include <map>
+#include <QMap>
 #include <vector>
 #include <string>
 #include <QInputDialog>
@@ -591,6 +592,12 @@ class BasicBox : public QObject, public QGraphicsItem
   void lower(bool state);  
   void changeColor(QColor color);
   inline QColor currentColor(){return _color;}
+
+  /*!
+   * \brief Return the messages list, like if the box just ended its execution.
+   * \return QMap <message address, QPair<value, date> >
+   */
+  QMap<QString,QPair<QString,unsigned int> > getFinalState();
 
  protected:
   /*!
