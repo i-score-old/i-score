@@ -1599,6 +1599,8 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
     if (_playing) {
         QPen pen = painter->pen();
+        pen.setColor(Qt::black);
+        pen.setWidth(3);
         QBrush brush = painter->brush();
         brush.setStyle(Qt::NoBrush);
         painter->setPen(pen);
@@ -1606,6 +1608,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         painter->setBrush(brush);
         const float progressPosX = _scene->getProgression(_abstract->ID())*(_abstract->width());
         painter->fillRect(0,_abstract->height()-RESIZE_TOLERANCE/2.,progressPosX,RESIZE_TOLERANCE/2.,Qt::darkGreen);
+
         painter->drawLine(QPointF(progressPosX,RESIZE_TOLERANCE),QPointF(progressPosX,_abstract->height()));
     }
     painter->translate(QPointF(0,0) - _boxRect.topLeft());

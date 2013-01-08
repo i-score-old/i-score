@@ -58,6 +58,7 @@ PlayingThread::run()
 {
 	while (_scene->playing()) {
         _scene->updatePlayingBoxes();
+        _scene->updateProgressBar();
 //        std::cout<<_scene->getCurrentTime()<<std::endl;
         msleep(10);
 	}

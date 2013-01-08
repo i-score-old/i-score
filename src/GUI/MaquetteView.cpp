@@ -161,6 +161,7 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
     }
   }
 
+
   double progressBarPosX = _gotoValue/(float)MaquetteScene::MS_PER_PIXEL;
 
   QPen reSavedPen = painter->pen();
@@ -183,7 +184,7 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
     painter->setPen(pen2);
 
     for (int i = 0 ; i <= MaquetteScene::MAX_SCENE_HEIGHT ; i=i+150) {
-    	painter->drawLine(QPointF(0,i), QPointF(MaquetteScene::MAX_SCENE_WIDTH, i));
+        painter->drawLine(QPointF(0,i), QPointF(MaquetteScene::MAX_SCENE_WIDTH, i));
     }
   }
 }

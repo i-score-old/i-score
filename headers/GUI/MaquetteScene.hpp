@@ -576,6 +576,7 @@ class MaquetteScene : public QGraphicsScene
   void createMaquetteBarWidget();
   void setName(QString name);
   inline float zoom(){return _view->zoom();}
+  void updateProgressBar();
 
  protected :
   /*!

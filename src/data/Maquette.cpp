@@ -376,7 +376,6 @@ Maquette::addControlBox(const AbstractControlBox &abstract)
 unsigned int
 Maquette::addParentBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
 {
-    std::cout<<"Maquette:addPBox 1"<<std::endl;
 	vector<string> firstMsgs;
 	vector<string> lastMsgs;
 	_engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
@@ -1356,21 +1355,20 @@ Maquette::initSceneState(){
         _engines->setCtrlPointMutingState(boxID,2,false);
 
         if((*it).second->date()<gotoValue){
-            std::cout<<it->first<<" ";
 
             boxMsgs = (it->second)->getFinalState();
             boxAddresses = boxMsgs.keys();
 
             //Pour le cas où le même paramètre est modifié par plusieurs boîte (avant le goto), on ne garde que la dernière modif.
-            for(QList<QString>::iterator it = boxAddresses.begin() ; it!=boxAddresses.end() ; it++){
-                if(msgs.contains(*it)){
-                    if(msgs.value(*it).second < boxMsgs.value(*it).second && boxMsgs.value(*it).second < gotoValue)
-                        msgs.insert(*it,boxMsgs.value(*it));
+            for(QList<QString>::iterator it2 = boxAddresses.begin() ; it2!=boxAddresses.end() ; it2++){
+                if(msgs.contains(*it2)){
+                    if(msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second < gotoValue)
+                        msgs.insert(*it2,boxMsgs.value(*it2));
                 }
                 //sinon on ajoute dans la liste de messages
                 else
-                    if(boxMsgs.value(*it).second < gotoValue)
-                        msgs.insert(*it,boxMsgs.value(*it));
+                    if(boxMsgs.value(*it2).second < gotoValue)
+                        msgs.insert(*it2,boxMsgs.value(*it2));
             }
 
             //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
@@ -1386,14 +1384,11 @@ Maquette::initSceneState(){
     //traduction en QMap<QString,QString>, on supprime le champs date des messages
     QList<QString> addresses = msgs.keys();
 
-    std::cout<<"****************************"<<std::endl;
     QString message;
     for(QList<QString>::iterator it = addresses.begin() ; it != addresses.end() ; it++){
          message = *it+" "+msgs.value(*it).first;
-         sendMessage(message.toStdString());
-         std::cout<<message.toStdString()<<std::endl;
+         sendMessage(message.toStdString());         
     }
-    std::cout<<"****************************"<<std::endl;
 
 
 }
@@ -2031,7 +2026,6 @@ Maquette::load(const string &fileName){
     zoom = root.attribute("zoom","1").toFloat();
     centerCoordinates = QPointF(root.attribute("centerX","0.").toFloat(),root.attribute("centerY","0.").toFloat());
 
-    std::cout<<"load zoom = "<<zoom<<std::endl;
     _scene->view()->setZoom(zoom);
     _scene->view()->centerOn(centerCoordinates);
 

@@ -67,7 +67,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "PlayingThread.hpp"
 #include "CurvesWidget.hpp"
 #include "TimeBarWidget.hpp"
-#include<QGraphicsProxyWidget>
+#include <QGraphicsProxyWidget>
 
 #include <sstream>
 #include <map>
@@ -136,6 +136,11 @@ MaquetteScene::init()
 }
 
 void
+MaquetteScene::updateProgressBar(){
+    update(QRectF(QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL-4, 0), QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL+4, height())));
+}
+
+void
 MaquetteScene::gotoChanged(double value){
     Maquette::getInstance()->setGotoValue(value);
     _view->setGotoValue(value);
@@ -143,8 +148,7 @@ MaquetteScene::gotoChanged(double value){
 }
 
 void
-MaquetteScene::updateView()
-{
+MaquetteScene::updateView(){
 	_view = static_cast<MaquetteView*>(views().front());
 }
 
@@ -279,136 +283,137 @@ MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[]
 void
 MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
 
+//    QGraphicsScene::drawForeground(painter, rect);
     if (_playing) {
         QPen pen(Qt::black);
         pen.setWidth(3);
         painter->setPen(pen);
+
         painter->drawLine(QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL, 0), QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL, 2*height()));
     }
 
     else{
-    QGraphicsScene::drawForeground(painter, rect);
-	if (_currentInteractionMode == RELATION_MODE) {
-		if (_clicked) {
-			if (_relation->firstBox() != NO_ID) {
-				BasicBox *box = getBox(_relation->firstBox());
-				QPointF start;
-				switch (_relation->firstExtremity()) {
-				case BOX_START :
+        if (_currentInteractionMode == RELATION_MODE) {
+        if (_clicked) {
+            if (_relation->firstBox() != NO_ID) {
+                BasicBox *box = getBox(_relation->firstBox());
+                QPointF start;
+                switch (_relation->firstExtremity()) {
+                case BOX_START :
 //					start = box->getMiddleLeft();
                     start = box->getLeftGripPoint();
-					break;
-				case BOX_END :
+                    break;
+                case BOX_END :
 //					start = box->getMiddleRight();
                     start = box->getRightGripPoint();
-					break;
-				case NO_EXTREMITY :
-					start = box->getCenter();
-					break;
-				}
+                    break;
+                case NO_EXTREMITY :
+                    start = box->getCenter();
+                    break;
+                }
 
-				if (_mousePos != _releasePoint && _mousePos != QPointF(0.,0)) {
-					QPainterPath painterPath;
-					painterPath.moveTo(start);
-					double startX = start.x(),startY = start.y();
-					double endX = 0.,endY = 0.;
-					static const double arrowSize = 12.;
-					BasicBox *box = NULL;
-					if (itemAt(_mousePos) != 0) {
-						int type = itemAt(_mousePos)->type();
-						if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
-							box = static_cast<BasicBox*>(itemAt(_mousePos));
+                if (_mousePos != _releasePoint && _mousePos != QPointF(0.,0)) {
+                    QPainterPath painterPath;
+                    painterPath.moveTo(start);
+                    double startX = start.x(),startY = start.y();
+                    double endX = 0.,endY = 0.;
+                    static const double arrowSize = 12.;
+                    BasicBox *box = NULL;
+                    if (itemAt(_mousePos) != 0) {
+                        int type = itemAt(_mousePos)->type();
+                        if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+                            box = static_cast<BasicBox*>(itemAt(_mousePos));
                             if (_mousePos.x() < (box->mapToScene(box->boundingRect().topLeft()).x()
-									+ BasicBox::RESIZE_TOLERANCE)) {
+                                    + BasicBox::RESIZE_TOLERANCE)) {
 //								endX = box->getMiddleLeft().x();
 //								endY = box->getMiddleLeft().y();
                                 endX = box->getLeftGripPoint().x();
                                 endY = box->getLeftGripPoint().y();
-							}
+                            }
                             else if (_mousePos.x() > (box->mapToScene(box->boundingRect().bottomRight()).x()
-									- BasicBox::RESIZE_TOLERANCE)) {
+                                    - BasicBox::RESIZE_TOLERANCE)) {
 //								endX = box->getMiddleRight().x();
 //								endY = box->getMiddleRight().y();
                                 endX = box->getRightGripPoint().x();
                                 endY = box->getRightGripPoint().y();
-							}
-							else {
-								endX = _mousePos.x();
-								endY = _mousePos.y();
-							}
-							if (_relationBoxFound) {
+                            }
+                            else {
+                                endX = _mousePos.x();
+                                endY = _mousePos.y();
+                            }
+                            if (_relationBoxFound) {
                                 painter->drawEllipse(QPointF(endX,endY),arrowSize/2.,arrowSize/2.);
-							}
-						}
+                            }
+                        }
                         else {
-							endX = _mousePos.x();
-							endY = _mousePos.y();
-							painter->drawEllipse(endX,endY-arrowSize/2.,arrowSize,arrowSize);
-							painter->drawLine(QPointF(endX, endY - arrowSize/2.),
-									QPointF(endX + arrowSize,endY + arrowSize/2.));
-							painter->drawLine(QPointF(endX, endY + arrowSize/2.),
-									QPointF(endX + arrowSize,endY - arrowSize/2.));
-						}
-					}
-					else {
-						endX = _mousePos.x();
-						endY = _mousePos.y();
-					}
-					if (fabs(startX - endX) >= 2 * arrowSize) {
-                        if (startX <= endX) {
-							painterPath.lineTo(startX + arrowSize,startY);
-						}
-                        else {
-							painterPath.lineTo(startX - arrowSize,startY);
-						}
-					}
-
-					painterPath.quadTo((startX + endX)/2.,startY,(startX + endX)/2.,(startY + endY)/2.);
-					if (fabs(startX-endX) >= 2 * arrowSize) {
-                        if (startX <= endX) {
-							painterPath.quadTo((startX + endX)/2.,endY,endX - arrowSize,endY);
-						}
-                        else {
-							painterPath.quadTo((startX + endX)/2.,endY,endX + arrowSize,endY);
-						}
-					}
+                            endX = _mousePos.x();
+                            endY = _mousePos.y();
+                            painter->drawEllipse(endX,endY-arrowSize/2.,arrowSize,arrowSize);
+                            painter->drawLine(QPointF(endX, endY - arrowSize/2.),
+                                    QPointF(endX + arrowSize,endY + arrowSize/2.));
+                            painter->drawLine(QPointF(endX, endY + arrowSize/2.),
+                                    QPointF(endX + arrowSize,endY - arrowSize/2.));
+                        }
+                    }
                     else {
-						painterPath.quadTo((startX + endX)/2.,endY,endX,endY);
-					}
+                        endX = _mousePos.x();
+                        endY = _mousePos.y();
+                    }
+                    if (fabs(startX - endX) >= 2 * arrowSize) {
+                        if (startX <= endX) {
+                            painterPath.lineTo(startX + arrowSize,startY);
+                        }
+                        else {
+                            painterPath.lineTo(startX - arrowSize,startY);
+                        }
+                    }
 
-					painter->save();
-					QPen localPen;
-					localPen.setWidth(BasicBox::LINE_WIDTH);
-					localPen.setStyle(Qt::DashDotLine);
-					painter->setPen(localPen);
-					painter->drawPath(painterPath);
-					painter->restore();
-					painterPath = QPainterPath();
-					painterPath.moveTo(endX,endY);
-					painterPath.lineTo(endX-arrowSize,endY - (arrowSize/2.));
-					painterPath.lineTo(endX-arrowSize,endY + (arrowSize/2.));
-					painterPath.lineTo(endX,endY);
+                    painterPath.quadTo((startX + endX)/2.,startY,(startX + endX)/2.,(startY + endY)/2.);
+                    if (fabs(startX-endX) >= 2 * arrowSize) {
+                        if (startX <= endX) {
+                            painterPath.quadTo((startX + endX)/2.,endY,endX - arrowSize,endY);
+                        }
+                        else {
+                            painterPath.quadTo((startX + endX)/2.,endY,endX + arrowSize,endY);
+                        }
+                    }
+                    else {
+                        painterPath.quadTo((startX + endX)/2.,endY,endX,endY);
+                    }
+
+                    painter->save();
+                    QPen localPen;
+                    localPen.setWidth(BasicBox::LINE_WIDTH);
+                    localPen.setStyle(Qt::DashDotLine);
+                    painter->setPen(localPen);
+                    painter->drawPath(painterPath);
+                    painter->restore();
+                    painterPath = QPainterPath();
+                    painterPath.moveTo(endX,endY);
+                    painterPath.lineTo(endX-arrowSize,endY - (arrowSize/2.));
+                    painterPath.lineTo(endX-arrowSize,endY + (arrowSize/2.));
+                    painterPath.lineTo(endX,endY);
 
                     painter->fillPath(painterPath,QColor(60,60,60));
-				}
-			}
-			else {
+                }
+            }
+            else {
 #ifdef DEBUG
-				std::cerr << "MaquetteScene::drawForeground : box with NO_ID found" << std::endl;
+                std::cerr << "MaquetteScene::drawForeground : box with NO_ID found" << std::endl;
 #endif
-			}
-		}
-		else {
+            }
+        }
+        else {
 #ifdef DEBUG
-			std::cerr << "MaquetteScene::drawForeground : not clicked" << std::endl;
+            std::cerr << "MaquetteScene::drawForeground : not clicked" << std::endl;
 #endif
-		}
-	}
-	else {
+        }
+    }
+    else {
 #ifdef DEBUG
-		std::cerr << "MaquetteScene::drawForeground : not in relation mode" << std::endl;
+        std::cerr << "MaquetteScene::drawForeground : not in relation mode" << std::endl;
 #endif
-	}
+    }
     }
 }
 
@@ -1790,8 +1795,6 @@ void MaquetteScene::updatePlayingBoxes() {
     for (it = _playingBoxes.begin() ; it != _playingBoxes.end() ; ++it) {
         it->second->update();
     }
-
-    update();
 }
 
 
@@ -1800,11 +1803,11 @@ MaquetteScene::play() {
 	displayMessage(tr("Playing ...").toStdString(),INDICATION_LEVEL);
 	if (_paused) {
 		_paused = false;
-		_playing = true;
+        _playing = true;
 		_maquette->setAccelerationFactor(1.);
 	}
 	else {
-		_playing = true;
+        _playing = true;
 		_maquette->startPlaying();
 		_playThread->start();
 		_startingValue = 0;
@@ -1815,7 +1818,7 @@ void
 MaquetteScene::pause() {
 	displayMessage(tr("Paused").toStdString(),INDICATION_LEVEL);
 	_maquette->setAccelerationFactor(0.);
-	_paused = true;
+    _paused = true;
 }
 
 void
@@ -1825,7 +1828,7 @@ MaquetteScene::stop() {
 	_paused = false;
     _maquette->stopPlaying();
     _playThread->quit();
-	_playingBoxes.clear();
+    _playingBoxes.clear();
 	update();
 }
 

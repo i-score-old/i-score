@@ -1971,6 +1971,18 @@
 			isa = PBXSourcesBuildPhase;
 			name = "Build Sources";
 		};
+		DA138F75C9F545CDAE7FB264 = {
+			isa = PBXFrameworkReference;
+			name = "Carbon.framework";
+			path = "/System/Library/Frameworks/Carbon.framework";
+			refType = 0;
+		};
+		C8FD4A1AAA37CF2CA2824CCF = {
+			fileRef = "DA138F75C9F545CDAE7FB264";
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		2D7FF9EBB69BCF2C19DC629B = {
 			isa = PBXFrameworkReference;
 			name = "QtSvg.framework";
@@ -2033,6 +2045,7 @@
 		};
 		ED1E82605DD74B483AF3C982 = {
 			children = (
+				"DA138F75C9F545CDAE7FB264",
 				"2D7FF9EBB69BCF2C19DC629B",
 				"9B36DA7E32F0304E780E7972",
 				"7BC2E65A5E699A5E5D834CA2",
@@ -2046,6 +2059,7 @@
 		2A1043669E6E5A7426EA502A = {
 			buildActionMask = 2147483647;
 			files = (
+				"C8FD4A1AAA37CF2CA2824CCF",
 				"08D8EC4D0C273BC5E194E43D",
 				"501667F26B3C1FF6767A7C12",
 				"069D05B0128AE5DC7EE31738",
@@ -2110,11 +2124,14 @@
 				OTHER_LDFLAGS = (
 						"-headerpad_max_install_names",
 						"-L/Library/Frameworks",
-						"-F/Library/Frameworks");
+						"-F/Library/Frameworks",
+						"$(QTDIR)/lib/libqt.a",
+						"-lz");
 				DYLIB_CURRENT_VERSION = "1.0.0";
 				DYLIB_COMPATIBILITY_VERSION = "1.0";
 				MACOSX_DEPLOYMENT_TARGET = "10.4";
 				PRODUCT_NAME = "i-score";
+				QTDIR = "";
 			};
 			conditionalBuildSettings = {
 			};
@@ -2174,7 +2191,8 @@
 					"/System/Library/Frameworks/CarbonCore.framework/Headers",
 					"/usr/local/Qt4.8/mkspecs/macx-xcode");
 				LIBRARY_SEARCH_PATHS = (
-					"/Library/Frameworks");
+					"/Library/Frameworks",
+					"/System/Library/Frameworks/");
 				FRAMEWORK_SEARCH_PATHS = (
 					"/Library/Frameworks",
 					"/Library/Frameworks");
@@ -2206,7 +2224,9 @@
 				OTHER_LDFLAGS = (
 						"-headerpad_max_install_names",
 						"-L/Library/Frameworks",
-						"-F/Library/Frameworks");
+						"-F/Library/Frameworks",
+						"$(QTDIR)/lib/libqt.a",
+						"-lz");
 				ARCHS = "x86_64";
 			};
 			name = "Debug";
@@ -2257,7 +2277,8 @@
 					"/System/Library/Frameworks/CarbonCore.framework/Headers",
 					"/usr/local/Qt4.8/mkspecs/macx-xcode");
 				LIBRARY_SEARCH_PATHS = (
-					"/Library/Frameworks");
+					"/Library/Frameworks",
+					"/System/Library/Frameworks/");
 				FRAMEWORK_SEARCH_PATHS = (
 					"/Library/Frameworks",
 					"/Library/Frameworks");
@@ -2289,7 +2310,9 @@
 				OTHER_LDFLAGS = (
 						"-headerpad_max_install_names",
 						"-L/Library/Frameworks",
-						"-F/Library/Frameworks");
+						"-F/Library/Frameworks",
+						"$(QTDIR)/lib/libqt.a",
+						"-lz");
 				ARCHS = "x86_64";
 			};
 			name = "Release";

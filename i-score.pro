@@ -157,3 +157,4 @@ ICON = images/acousmoscribe.icns
 
 TRANSLATIONS = acousmoscribe_en.ts \
                acousmoscribe_fr.ts
+
