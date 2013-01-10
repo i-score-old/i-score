@@ -82,6 +82,7 @@ class AbstractParentBox;
 class AbstractRelation;
 class Relation;
 class TriggerPoint;
+class QApplication;
 
 //! Enum containing various error messages.
 typedef enum {SUCCESS = 1, NO_MODIFICATION = 0, RETURN_ERROR = -1,

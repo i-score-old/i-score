@@ -61,6 +61,7 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #include <stdio.h>
 #include <assert.h>
+#include <QCoreApplication>
 
 using std::vector;
 using std::map;
@@ -83,13 +84,63 @@ Maquette::init() {
 	pluginsDir.append(buf);
 	pluginsDir.append("/plugins");*/
 	string pluginsDir = "/usr/local/lib/IScore";
+
 	_engines = new Engines(SCENARIO_SIZE,pluginsDir);
 
 	vector<string> pluginsLoaded;
 
-	_engines->getLoadedNetworkPlugins(pluginsLoaded,_listeningPorts);
+    _engines->getLoadedNetworkPlugins(pluginsLoaded,_listeningPorts);
 
-	if (!pluginsLoaded.empty()) {
+    if(pluginsLoaded.empty()){
+        string pluginsDir =  (QCoreApplication::applicationDirPath()+"/../plugins/IScore").toStdString();
+        _engines = new Engines(SCENARIO_SIZE,pluginsDir);
+        _engines->getLoadedNetworkPlugins(pluginsLoaded,_listeningPorts);
+        if(pluginsLoaded.empty()){
+            string error;
+            error.append(tr("No network plugins found in ").toStdString());
+            error.append(pluginsDir);
+            _scene->displayMessage(error,ERROR_LEVEL);
+        }
+        else{
+            vector<string>::iterator it;
+            vector<unsigned int>::iterator it2;
+            for (it = pluginsLoaded.begin(), it2 = _listeningPorts.begin();
+                (it != pluginsLoaded.end()) && (it2 != _listeningPorts.end()) ;
+                it++,it2++) {
+                stringstream deviceName;
+                deviceName << *it << "Device";
+                MyDevice device(deviceName.str(),*it,*it2,NETWORK_LOCALHOST);
+                _devices[device.name] = device;
+                stringstream devicePort;
+                devicePort << device.networkPort;
+                _engines->addNetworkDevice(device.name,device.plugin,device.networkHost,devicePort.str());
+            }
+            map<string,MyDevice>::iterator deviceIt;
+            deviceIt = _devices.find("OSCDevice");
+            if (deviceIt != _devices.end()) {
+                MyDevice maxDevice = deviceIt->second;
+                maxDevice.name = "MaxDevice";
+                maxDevice.networkPort = 7000;
+                maxDevice.networkHost = "127.0.0.1";
+                _devices[maxDevice.name] = maxDevice;
+                stringstream port;
+                port << maxDevice.networkPort;
+                _engines->addNetworkDevice(maxDevice.name,maxDevice.plugin,maxDevice.networkHost,port.str());
+            }
+            deviceIt = _devices.find("MinuitDevice");
+            if (deviceIt != _devices.end()) {
+                MyDevice minuitDevice = deviceIt->second;
+                minuitDevice.name = "MinuitDevice1";
+                minuitDevice.networkPort = 9998;
+                minuitDevice.networkHost = "127.0.0.1";
+                _devices[minuitDevice.name] = minuitDevice;
+                stringstream port;
+                port << minuitDevice.networkPort;
+                _engines->addNetworkDevice(minuitDevice.name,minuitDevice.plugin,minuitDevice.networkHost,port.str());
+            }
+        }
+    }
+    else{
 		vector<string>::iterator it;
 		vector<unsigned int>::iterator it2;
 		for (it = pluginsLoaded.begin(), it2 = _listeningPorts.begin();
@@ -126,13 +177,7 @@ Maquette::init() {
 			port << minuitDevice.networkPort;
 			_engines->addNetworkDevice(minuitDevice.name,minuitDevice.plugin,minuitDevice.networkHost,port.str());
 		}
-	}
-	else {
-		string error;
-		error.append(tr("No network plugins found in ").toStdString());
-		error.append(pluginsDir);
-		_scene->displayMessage(error,ERROR_LEVEL);
-	}
+    }
 
 	_engines->addCrossingCtrlPointCallback(&crossTransitionCallback);
     _engines->addCrossingTrgPointCallback(&crossTriggerPointCallback);
