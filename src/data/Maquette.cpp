@@ -92,7 +92,7 @@ Maquette::init() {
     _engines->getLoadedNetworkPlugins(pluginsLoaded,_listeningPorts);
 
     if(pluginsLoaded.empty()){
-        string pluginsDir =  (QCoreApplication::applicationDirPath()+"/../plugins/IScore").toStdString();
+        string pluginsDir =  (QCoreApplication::applicationDirPath()+"/../plugins/i-score").toStdString();
         _engines = new Engines(SCENARIO_SIZE,pluginsDir);
         _engines->getLoadedNetworkPlugins(pluginsLoaded,_listeningPorts);
         if(pluginsLoaded.empty()){
