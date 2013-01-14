@@ -283,13 +283,12 @@ MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[]
 void
 MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
 
-//    QGraphicsScene::drawForeground(painter, rect);
     if (_playing) {
         QPen pen(Qt::black);
         pen.setWidth(3);
         painter->setPen(pen);
 
-        painter->drawLine(QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL, 0), QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL, 2*height()));
+        painter->drawLine(QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL, _view->sceneRect().top()), QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL,_view->sceneRect().height()));
     }
 
     else{

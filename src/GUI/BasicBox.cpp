@@ -427,6 +427,7 @@ BasicBox::height() const
 
 QMap<QString,QPair<QString,unsigned int> >
 BasicBox::getFinalState(){
+    //QMap <Address, QPair<MessageValue, MessageDate> >
 
     QMap<QString,QString> startMsgs, endMsgs;
     QMap<QString,QPair<QString, unsigned int> > finalMessages;
@@ -447,6 +448,23 @@ BasicBox::getFinalState(){
 
     return finalMessages;
 }
+
+QMap<QString,QPair<QString,unsigned int> >
+BasicBox::getStartState(){
+    //QMap <Address, QPair<MessageValue, MessageDate> >
+
+    QMap<QString,QString> startMsgs;
+    QMap<QString,QPair<QString, unsigned int> > finalMessages;
+    startMsgs = _abstract->startMessages()->toMapAddressValue();
+
+    //Start values
+    QList<QString> startAddresses = startMsgs.keys();
+    for(QList<QString>::iterator it = startAddresses.begin() ; it!=startAddresses.end() ; it++)
+        finalMessages.insert(*it,QPair<QString,unsigned int>(startMsgs.value(*it),date()));
+
+    return finalMessages;
+}
+
 
 void
 BasicBox::resizeWidthEdition(float width)

@@ -1389,22 +1389,30 @@ Maquette::initSceneState(){
     unsigned int boxID;
     QMap<QString,QPair<QString,unsigned int> > msgs, boxMsgs;
     QList<QString> boxAddresses;
-
+    BasicBox *currentBox;
 
     //Pour toutes les boîtes avant le goto, on récupère leur état final (on simule leur exécution)
     for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
         boxID = it->first;
+        currentBox = (*it).second;
 
-        //réinit : On démute toutes les boîtes, elles ont potentiellement pu être mutée  à la fin de l'algo
+        //réinit : On démute toutes les boîtes, elles ont potentiellement pu être mutées  à la fin de l'algo
         _engines->setCtrlPointMutingState(boxID,1,false);
         _engines->setCtrlPointMutingState(boxID,2,false);
 
-        if((*it).second->date()<gotoValue){
+        if(currentBox->date() < gotoValue && (currentBox->date()+currentBox->duration()) < gotoValue ){
 
-            boxMsgs = (it->second)->getFinalState();
-            boxAddresses = boxMsgs.keys();
+            boxMsgs = currentBox->getFinalState();
 
-            //Pour le cas où le même paramètre est modifié par plusieurs boîte (avant le goto), on ne garde que la dernière modif.
+        }
+        else
+            //goto au milieu d'une boîte : On envoie la valeur du début de boîte
+            if(gotoValue > currentBox->date() && gotoValue < (currentBox->date()+currentBox->duration()))
+                boxMsgs = currentBox->getStartState();
+
+        boxAddresses = boxMsgs.keys();
+
+            //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
             for(QList<QString>::iterator it2 = boxAddresses.begin() ; it2!=boxAddresses.end() ; it2++){
                 if(msgs.contains(*it2)){
                     if(msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second < gotoValue)
@@ -1420,11 +1428,9 @@ Maquette::initSceneState(){
             //    Start messages
                 _engines->setCtrlPointMutingState(boxID,1,true);
             //    End messages
-            if((*it).second->date()+(*it).second->duration()<gotoValue)
+            if(currentBox->date()+currentBox->duration()<gotoValue)
                 _engines->setCtrlPointMutingState(boxID,2,true);
         }
-
-    }
 
     //traduction en QMap<QString,QString>, on supprime le champs date des messages
     QList<QString> addresses = msgs.keys();

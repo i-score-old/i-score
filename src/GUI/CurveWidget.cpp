@@ -284,7 +284,6 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 {
 	QWidget::mouseMoveEvent(event);
 
-
 	// Draw cursor coordinates as a tooltip
     QPointF mousePos = relativeCoordinates(event->pos());
     QString posStr = QString("%1 ; %2").arg(mousePos.x(),0,'f',2).arg(mousePos.y(),0,'f',2);
@@ -297,6 +296,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 		case Qt::ShiftModifier : // POW
 		{
 			if (_lastPointSelected) {
+
 				float mousePosY = event->pos().y();
 				float pow = 1.;
 				QPointF lastPoint = absoluteCoordinates(QPointF(1,_abstract->_curve.back()));
@@ -305,20 +305,21 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 				}
                 else if (lastPoint.y() > mousePosY){ // mouse above : pow between 1 and 6
 					pow = 1 + std::min((float)(lastPoint.y() - mousePosY),(float)50.) / 10.;
-				}
+                }
 				_abstract->_lastPointCoeff = pow;
 				curveChanged();
 			}
-			else if (_movingBreakpointX != -1) {
+            else if (_movingBreakpointX != -1) {
 				map<float,pair<float,float> >::iterator it;
 				if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
+
 					float mousePosY = relativePoint.y();
-					float pow = 1.;
-					if (mousePosY > it->second.first) { // mouse under : pow between 0 and 1
-						pow = 1 - std::min(mousePosY - it->second.first,(float)50.) / 50.;
+                    float pow = 1.;
+                    if (mousePosY > it->second.first) { // mouse under : pow between 0 and 1
+                        pow = 1 - std::min(mousePosY - it->second.first,(float)50.) / 50.;
 					}
-					else if (it->second.first > mousePosY){ // mouse above : pow between 1 and 6
-						pow = 1 + std::min(it->second.first - mousePosY,(float)50.) / 10.;
+                    else if (it->second.first > mousePosY){ // mouse above : pow between 1 and 6
+                        pow = 1 + std::min(it->second.first - mousePosY,(float)50.) / 10.;
 					}
 					it->second = std::make_pair<float,float>(it->second.first,pow);
 					_movingBreakpointY = -1;
@@ -394,7 +395,7 @@ CurveWidget::curveChanged() {
 	vector<float> coeff;
 	map<float,pair<float,float> >::iterator it;
 	for (it = _abstract->_breakpoints.begin() ; it != _abstract->_breakpoints.end() ; ++it) {
-		xPercents.push_back(it->first * 100);
+        xPercents.push_back(it->first * 100);
         yValues.push_back(it->second.first);
 		coeff.push_back(it->second.second);
 
@@ -403,7 +404,7 @@ CurveWidget::curveChanged() {
 	sectionType.push_back(CURVE_POW);
 	coeff.push_back(_abstract->_lastPointCoeff);
 
-	if (Maquette::getInstance()->setCurveSections(_abstract->_boxID, _abstract->_address, 0 ,xPercents, yValues, sectionType, coeff)) {
+    if (Maquette::getInstance()->setCurveSections(_abstract->_boxID, _abstract->_address, 0 ,xPercents, yValues, sectionType, coeff)) {
 		unsigned int sampleRate;
 		bool redundancy,interpolate;
 		vector<string> argTypes;

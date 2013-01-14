@@ -143,7 +143,8 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
         continue;
     }
 // 	 painter->drawText(QPointF(i_PXL, 10),QString("%1").arg(i));
-     painter->drawLine(QPointF(i_PXL, 0), QPointF(i_PXL, HEIGHT));
+   painter->drawLine(QPointF(i_PXL, 0), QPointF(i_PXL, HEIGHT));
+
    if (_zoom > 1) {
          QPen pen = painter->pen();
 	 	 QPen savePen = pen;

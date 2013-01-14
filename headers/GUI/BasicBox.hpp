@@ -598,6 +598,7 @@ class BasicBox : public QObject, public QGraphicsItem
    * \return QMap <message address, QPair<value, date> >
    */
   QMap<QString,QPair<QString,unsigned int> > getFinalState();
+  QMap<QString,QPair<QString,unsigned int> > getStartState();
 
  protected:
   /*!
