@@ -1384,12 +1384,14 @@ Maquette::generateTriggerQueue(){
 
 void
 Maquette::initSceneState(){
+    //Pour palier au bug du moteur (qui envoyait tous les messages début et fin de toutes les boîtes < Goto)
 
     double gotoValue = (double)_engines->getGotoValue();
     unsigned int boxID;
     QMap<QString,QPair<QString,unsigned int> > msgs, boxMsgs;
     QList<QString> boxAddresses;
     BasicBox *currentBox;
+    std::vector<string> curvesList;
 
     //Pour toutes les boîtes avant le goto, on récupère leur état final (on simule leur exécution)
     for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
@@ -1407,8 +1409,10 @@ Maquette::initSceneState(){
         }
         else
             //goto au milieu d'une boîte : On envoie la valeur du début de boîte
-            if(gotoValue > currentBox->date() && gotoValue < (currentBox->date()+currentBox->duration()))
+            if(gotoValue > currentBox->date() && gotoValue < (currentBox->date()+currentBox->duration())){
                 boxMsgs = currentBox->getStartState();
+                curvesList = _engines->getCurvesAddress(boxID);
+            }
 
         boxAddresses = boxMsgs.keys();
 
@@ -1430,6 +1434,10 @@ Maquette::initSceneState(){
             //    End messages
             if(currentBox->date()+currentBox->duration()<gotoValue)
                 _engines->setCtrlPointMutingState(boxID,2,true);
+
+            //On supprime les messages si ils sont déjà associés à une courbe (le moteur les envoie automatiquement)
+            for (int i=0 ; i<curvesList.size() ; i++)
+                msgs.remove(QString::fromStdString(curvesList[i]));
         }
 
     //traduction en QMap<QString,QString>, on supprime le champs date des messages
