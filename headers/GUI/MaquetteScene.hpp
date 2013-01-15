@@ -699,6 +699,7 @@ public slots :
    * \brief Stops playing the composition.
    */
   void stop();
+  void stopGotoStart();
   /*!
    * \brief Pauses playing the composition.
    */

@@ -1370,7 +1370,8 @@ Maquette::setGotoValue(int gotoValue) {
 //            _engines->setCtrlPointMutingState(boxID,1,true);
 //        }
 //    }
-	_engines->setGotoValue(gotoValue);
+    _scene->view()->setGotoValue(gotoValue);
+    _engines->setGotoValue(gotoValue);
 }
 
 void
@@ -1486,13 +1487,34 @@ Maquette::startPlaying()
 }
 
 void
+Maquette::stopPlayingGotoStart()
+{
+    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
+        it->second->unlock();
+    }
+
+    _engines->stop();
+
+    BoxesMap::iterator it;
+    for (it = _boxes.begin() ; it != _boxes.end() ; it++) {
+        int type = it->second->type();
+        if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+            static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
+        }
+    }
+    _scene->getTriggersQueueList().clear();
+
+    setGotoValue(0);
+}
+
+void
 Maquette::stopPlaying()
 {
+    unsigned int gotoValue = _scene->getCurrentTime();
 	for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
 		it->second->unlock();
-	}
-
-	_engines->stop();
+    }
+    _engines->stop();
 
 	BoxesMap::iterator it;
 	for (it = _boxes.begin() ; it != _boxes.end() ; it++) {
@@ -1500,8 +1522,9 @@ Maquette::stopPlaying()
 		if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
             static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
 		}
-	}
+    }
     _scene->getTriggersQueueList().clear();
+    setGotoValue(gotoValue);
 }
 
 //void
