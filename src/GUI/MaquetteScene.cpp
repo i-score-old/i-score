@@ -1077,8 +1077,8 @@ void
 MaquetteScene::clear()
 {
 	selectAll();
-	removeSelectedItems();
-
+    removeSelectedItems();
+    gotoChanged(0);
 	setModified(true);
 }
 

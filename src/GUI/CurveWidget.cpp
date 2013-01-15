@@ -63,7 +63,6 @@ using std::make_pair;
 #include "Maquette.hpp"
 
 
-
 CurveWidget::CurveWidget(QWidget *parent) : QWidget(parent)
 {
 	init();
@@ -295,38 +294,37 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 		switch (event->modifiers()) {
 		case Qt::ShiftModifier : // POW
 		{
-			if (_lastPointSelected) {
+            if (_lastPointSelected) {
 
 				float mousePosY = event->pos().y();
 				float pow = 1.;
 				QPointF lastPoint = absoluteCoordinates(QPointF(1,_abstract->_curve.back()));
                 if (mousePosY > lastPoint.y()) { // mouse under : pow between 0 and 1
-					pow = 1 - std::min((float)(mousePosY - lastPoint.y()),(float)50.) / 50.;
+					pow = 1 - std::min((float)(mousePosY - lastPoint.y()),(float)50.) / 50.;                    
 				}
                 else if (lastPoint.y() > mousePosY){ // mouse above : pow between 1 and 6
 					pow = 1 + std::min((float)(lastPoint.y() - mousePosY),(float)50.) / 10.;
                 }
-				_abstract->_lastPointCoeff = pow;
+                _abstract->_lastPointCoeff = pow;
 				curveChanged();
-			}
+            }
             else if (_movingBreakpointX != -1) {
-				map<float,pair<float,float> >::iterator it;
-				if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
-
-					float mousePosY = relativePoint.y();
+                map<float,pair<float,float> >::iterator it;
+                if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
+                    float mousePosY = relativePoint.y();
                     float pow = 1.;
                     if (mousePosY > it->second.first) { // mouse under : pow between 0 and 1
                         pow = 1 - std::min(mousePosY - it->second.first,(float)50.) / 50.;
-					}
+                    }
                     else if (it->second.first > mousePosY){ // mouse above : pow between 1 and 6
                         pow = 1 + std::min(it->second.first - mousePosY,(float)50.) / 10.;
-					}
-					it->second = std::make_pair<float,float>(it->second.first,pow);
-					_movingBreakpointY = -1;
-					curveChanged();
-				}
-			}
-			break;
+                    }
+                    it->second = std::make_pair<float,float>(it->second.first,pow);
+                    _movingBreakpointY = -1;
+                    curveChanged();
+                }
+            }
+            break;
 		}
 		case Qt::ControlModifier : // VERTICAL SLIDE
 		{
