@@ -207,6 +207,8 @@ BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
 BasicBox::~BasicBox()
 {
     if (_abstract) {
+        removeRelations(BOX_START);
+        removeRelations(BOX_END);
         delete static_cast<AbstractBox*>(_abstract);
     }
 }

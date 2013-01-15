@@ -892,17 +892,21 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
             _networkTree->updateEndMsgsDisplay();
             _networkTree->assignItems(_networkTree->assignedItems());
 
-            //PRINT
+            //PRINT MESSAGES
 //            QList<QTreeWidgetItem *> items = _networkTree->assignedItems().keys();
 //            QList<QTreeWidgetItem *>::iterator i;
 //            QTreeWidgetItem *curIt;
 //            std::cout<<"\nAFFICHAGE START\n";
-//            for(i=items.begin() ; i!=items.end() ; i++){
-//                curIt=*i;
-//                std::cout<<curIt->text(0).toStdString()<<" "<<_networkTree->getSampleRate(curIt)<<std::endl;
+//            vector<string> startMessages = _networkTree->startMessages()->computeMessages();
+//            for(int i=0; i<startMessages.size(); i++){
+//                std::cout<<startMessages[i]<<std::endl;
 //            }
-//            std::cout<<"--AFFICHAGE END\n\n";
-            //PRINT
+//            std::cout<<"--AFFICHAGE END\n";
+//            vector<string> endMessages = _networkTree->endMessages()->computeMessages();
+//            for(int i=0; i<endMessages.size(); i++){
+//                std::cout<<endMessages[i]<<std::endl;
+//            }
+            //END PRINT
         }
     }
 	//if (_boxEdited != NO_ID) {

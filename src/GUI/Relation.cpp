@@ -64,8 +64,7 @@ const float Relation::HANDLE_WIDTH = 12.;
 const float Relation::GRIP_CIRCLE_SIZE = 5;
 const float Relation::RAIL_WIDTH = HANDLE_HEIGHT/2;
 const float Relation::LINE_WIDTH = 2;
-const float Relation::RIGID_TOLERANCE = 0.01;
-
+const float Relation::RIGID_TOLERANCE = 2.;
 
 Relation::Relation(unsigned int firstBoxID, BoxExtremity firstBoxExt, unsigned int secondBoxID,
            BoxExtremity secondBoxExt, MaquetteScene *parent)
@@ -672,8 +671,7 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
             painter->drawLine(startX+(endX - startX)/2 + handleZone,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX-GRIP_CIRCLE_SIZE, endY);
 
             _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,NO_BOUND,NO_BOUND);
-        }
-
+        }        
     }
 }
 

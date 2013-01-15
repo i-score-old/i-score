@@ -62,8 +62,6 @@ using std::make_pair;
 #include "Engines.hpp"
 #include "Maquette.hpp"
 
-
-
 CurveWidget::CurveWidget(QWidget *parent) : QWidget(parent)
 {
 	init();
@@ -308,7 +306,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
                 }
 				_abstract->_lastPointCoeff = pow;
 				curveChanged();
-			}
+			}            
             else if (_movingBreakpointX != -1) {
 				map<float,pair<float,float> >::iterator it;
 				if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
