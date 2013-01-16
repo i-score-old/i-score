@@ -265,10 +265,8 @@ MainWindow::newFile()
       break;
     }
   }
-
-  setCurrentFile("");
-
   _scene->clear();
+  setCurrentFile("");  
 }
 
 void

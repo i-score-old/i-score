@@ -72,10 +72,12 @@ class MaquetteView : public QGraphicsView
    * \param value : the goto value in ms
    */
   void setGotoValue(int value);
+  inline int gotoValue(){return _gotoValue;}
   inline MainWindow *mainWindow(){return _mainWindow;}
 
   signals:
     void zoomChanged(float newValue);
+    void playModeChanged();
 
   public slots :
 

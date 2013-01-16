@@ -89,8 +89,9 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
     setLayout(_maquetteLayout);
 
 
-    connect(_scene,SIGNAL(stopPlaying()),this,SLOT(stop()));
+//    connect(_scene,SIGNAL(stopPlaying()),this,SLOT(stop()));
     connect(_view,SIGNAL(zoomChanged(float)),this,SLOT(changeZoom(float)));
+    connect(_view,SIGNAL(playModeChanged()),this,SLOT(updateHeader()));
 //    connect(_view,SIGNAL(zoomChanged(float)),_timeBar,SLOT(updateZoom(float)));
 }
 
@@ -194,23 +195,13 @@ MaquetteWidget::createActions(){
     pix.fill(Qt::transparent);
 
     QIcon playIcon(":/images/playSimple.svg");
-/*    QIcon playIcon;
-    QImage play(":/images/playSimple.svg");
-    if (!play.isNull())
-        playIcon.addPixmap(QPixmap::fromImage(play));
-*/
     _playAction = new QAction(playIcon, tr("Play"), this);
-    _playAction->setShortcut(QString("Space"));
+//    _playAction->setShortcut(QString("Space"));
     _playAction->setStatusTip(tr("Play scenario"));
 
      QIcon stopIcon(":/images/stopSimple.svg");
-/*    QIcon stopIcon;
-    QImage stop(":/images/stopSimple.svg");
-    if (!stop.isNull())
-        stopIcon.addPixmap(QPixmap::fromImage(stop));
-*/
     _stopAction = new QAction(stopIcon, tr("Stop"), this);
-    _stopAction->setShortcut(QString("Enter"));
+//    _stopAction->setShortcut(QString("Enter"));
     _stopAction->setStatusTip(tr("Stop scenario"));
 
     connect(_playAction,SIGNAL(triggered()), this, SLOT(play()));
@@ -282,6 +273,12 @@ MaquetteWidget::play(){
 void
 MaquetteWidget::stop(){
     _scene->stop();
+    updateHeader();
+}
+
+void
+MaquetteWidget::pause(){
+    _scene->pause();
     updateHeader();
 }
 

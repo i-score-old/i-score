@@ -286,12 +286,27 @@ MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
     if (_playing) {
         QPen pen(Qt::black);
         pen.setWidth(3);
-        painter->setPen(pen);
-
+        painter->setPen(pen);        
         painter->drawLine(QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL, _view->sceneRect().top()), QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL,_view->sceneRect().height()));
     }
 
     else{
+
+        //drawGotoBar
+        double gotoBarPosX = _view->gotoValue()/(float)MS_PER_PIXEL;
+        QPen reSavedPen = painter->pen();
+        QPen pen3(Qt::black);
+        pen3.setWidth(3);
+        painter->setPen(pen3);
+        painter->drawLine(QPointF(gotoBarPosX,0),QPointF(gotoBarPosX,sceneRect().height()));
+
+      //  pen3.setColor(Qt::white);
+      //  pen3.setWidth(1);
+      //  painter->setPen(pen3);
+      //  painter->drawLine(QPointF(progressBarPosX,0),QPointF(progressBarPosX,HEIGHT));
+
+        painter->setPen(reSavedPen);
+
         if (_currentInteractionMode == RELATION_MODE) {
         if (_clicked) {
             if (_relation->firstBox() != NO_ID) {
@@ -1076,7 +1091,7 @@ void MaquetteScene::pasteBoxes()
 void
 MaquetteScene::clear()
 {
-	selectAll();
+    selectAll();
     removeSelectedItems();
     gotoChanged(0);
 	setModified(true);
@@ -1824,11 +1839,22 @@ void
 MaquetteScene::stop() {
 	displayMessage(tr("Stopped").toStdString(),INDICATION_LEVEL);
 	_playing = false;
-	_paused = false;
+    _paused = false;
     _maquette->stopPlaying();
     _playThread->quit();
     _playingBoxes.clear();
-	update();
+    update();
+}
+
+void
+MaquetteScene::stopGotoStart() {
+    displayMessage(tr("Stopped and go to start").toStdString(),INDICATION_LEVEL);
+    _playing = false;
+    _paused = false;
+    _maquette->stopPlayingGotoStart();
+    _playThread->quit();
+    _playingBoxes.clear();
+    update();
 }
 
 void
@@ -1863,7 +1889,6 @@ MaquetteScene::timeEndReached()
 {
     static_cast<MaquetteView*>(views().first())->mainWindow()->timeEndReached();
 	_playing = false;
-    _maquette->stopPlaying();
 
     emit(stopPlaying());
 	update();

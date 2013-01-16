@@ -306,7 +306,8 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 					pow = 1 + std::min((float)(lastPoint.y() - mousePosY),(float)50.) / 10.;
                 }
                 _abstract->_lastPointCoeff = pow;
-				curveChanged();
+                curveChanged();
+
             }
             else if (_movingBreakpointX != -1) {
                 map<float,pair<float,float> >::iterator it;

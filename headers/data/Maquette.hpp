@@ -667,7 +667,6 @@ class Maquette : public QObject
 	 */
 	void updateBoxesFromEngines();
 
-
   public slots :
 
   /*!
@@ -682,6 +681,7 @@ class Maquette : public QObject
    * \brief Stops the playing process.
    */
   void stopPlaying();
+  void stopPlayingGotoStart();
   /*!
    * \brief Sets a new acceleration factor.
    *

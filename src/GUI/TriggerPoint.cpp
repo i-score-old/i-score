@@ -159,7 +159,7 @@ TriggerPoint::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 void
 TriggerPoint::keyPressEvent(QKeyEvent *event){
 
-    if(event->key() == Qt::Key_Space){
+    if(event->key() == Qt::Key_Right || event->key() == Qt::Key_0 ){
         if (_abstract->waiting()) {
             _scene->trigger(_abstract->message());
             setSelected(false);

@@ -162,21 +162,23 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
     }
   }
 
+//  if(!_scene->playing()){
+//      //drawGotoBar
+//      std::cout<<"not playing"<<std::endl;
+//      double gotoBarPosX = _gotoValue/(float)MaquetteScene::MS_PER_PIXEL;
+//      QPen reSavedPen = painter->pen();
+//      QPen pen3(Qt::black);
+//      pen3.setWidth(3);
+//      painter->setPen(pen3);
+//      painter->drawLine(QPointF(gotoBarPosX,0),QPointF(gotoBarPosX,HEIGHT));
 
-  double progressBarPosX = _gotoValue/(float)MaquetteScene::MS_PER_PIXEL;
+//    //  pen3.setColor(Qt::white);
+//    //  pen3.setWidth(1);
+//    //  painter->setPen(pen3);
+//    //  painter->drawLine(QPointF(progressBarPosX,0),QPointF(progressBarPosX,HEIGHT));
 
-  QPen reSavedPen = painter->pen();
-  QPen pen3(Qt::black);
-  pen3.setWidth(3);
-  painter->setPen(pen3);
-  painter->drawLine(QPointF(progressBarPosX,0),QPointF(progressBarPosX,HEIGHT));
-
-//  pen3.setColor(Qt::white);
-//  pen3.setWidth(1);
-//  painter->setPen(pen3);
-//  painter->drawLine(QPointF(progressBarPosX,0),QPointF(progressBarPosX,HEIGHT));
-
-  painter->setPen(reSavedPen);
+//      painter->setPen(reSavedPen);
+//  }
 
   if (_scene->tracksView()) {
     QPen pen2(Qt::darkGray);
@@ -217,10 +219,17 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
     else if (event->key()==Qt::Key_Space && !_scene->playing()) {
         _scene->play();
         _scene->displayMessage(tr("Start playing").toStdString(),INDICATION_LEVEL);
+        emit(playModeChanged());
     }
-    else if (event->key()==Qt::Key_Enter || event->key()==Qt::Key_Return) {
+    else if (event->key()==Qt::Key_Space && _scene->playing()) {
         _scene->stop();
         _scene->displayMessage(tr("Stop playing").toStdString(),INDICATION_LEVEL);
+        emit(playModeChanged());
+    }
+    else if (event->key()==Qt::Key_Enter || event->key()==Qt::Key_Return) {
+        _scene->stopGotoStart();
+        _scene->displayMessage(tr("Stop playing and go to start").toStdString(),INDICATION_LEVEL);
+        emit(playModeChanged());
     }
 }
 
@@ -273,7 +282,6 @@ MaquetteView::setZoom(float value){
                 MaquetteScene::MS_PER_PIXEL *= 2;
         }
     }
-    std::cout<<"nb zoom "<<nb_zoom<<std::endl;
     repaint();
     resetCachedContent();
     _scene->update();
