@@ -188,8 +188,7 @@ BasicBox::createWidget(){
     _comboBoxProxy = new QGraphicsProxyWidget(this);
     _comboBoxProxy->setWidget(_comboBox);
     _comboBoxProxy->setPalette(palette);
-    _curvesWidget->setComboBox(_comboBox);
-
+    _curvesWidget->setComboBox(_comboBox);    
 }
 
 BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
