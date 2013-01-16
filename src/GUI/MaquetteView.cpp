@@ -222,7 +222,9 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
         emit(playModeChanged());
     }
     else if (event->key()==Qt::Key_Space && _scene->playing()) {
-        _scene->stop();
+//        _scene->stop();
+        _scene->stopWithGoto();
+//        _scene->pause();
         _scene->displayMessage(tr("Stop playing").toStdString(),INDICATION_LEVEL);
         emit(playModeChanged());
     }

@@ -1831,12 +1831,16 @@ void MaquetteScene::updatePlayingBoxes() {
 }
 
 void
-MaquetteScene::play() {
+MaquetteScene:: play() {
 	displayMessage(tr("Playing ...").toStdString(),INDICATION_LEVEL);
 	if (_paused) {
-		_paused = false;
+        std::cout<<"PAUSED"<<std::endl;
+        _paused = false;
         _playing = true;
-		_maquette->setAccelerationFactor(1.);
+        _maquette->setAccelerationFactor(1.);
+        _playThread->start();
+        _maquette->startPlaying();
+
 	}
 	else {        
         _playing = true;
@@ -1848,31 +1852,54 @@ MaquetteScene::play() {
 
 void
 MaquetteScene::pause() {
-	displayMessage(tr("Paused").toStdString(),INDICATION_LEVEL);
-	_maquette->setAccelerationFactor(0.);
+    displayMessage(tr("Paused").toStdString(),INDICATION_LEVEL);
+    _playing = false;
     _paused = true;
+    _playThread->quit();
+    _maquette->setAccelerationFactor(0.);
+    update();
+}
+
+
+void
+MaquetteScene::stop(){
+//TODO : Without goto
+    std::cout<<"Stopped : compile - good version"<<std::endl;
 }
 
 void
-MaquetteScene::stop() {
-	displayMessage(tr("Stopped").toStdString(),INDICATION_LEVEL);
-	_playing = false;
+MaquetteScene::stopWithGoto() {
+    displayMessage(tr("Stopped").toStdString(),INDICATION_LEVEL);
+    std::cout<<"Stopped : compile - with goto current time"<<std::endl;
+    _playing = false;
     _paused = false;
-    _maquette->stopPlaying();
+    _maquette->stopPlayingWithGoto();
     _playThread->quit();
     _playingBoxes.clear();
     update();
 }
+
+//void
+//MaquetteScene::stop() {
+//    displayMessage(tr("Stopped").toStdString(),INDICATION_LEVEL);
+//    _playing = false;
+//    _paused = true;
+//    _playThread->quit();
+//    _maquette->stopPlaying();
+//    _maquette->setAccelerationFactor(0.);
+//    update();
+//}
 
 void
 MaquetteScene::stopGotoStart() {
     displayMessage(tr("Stopped and go to start").toStdString(),INDICATION_LEVEL);
     _playing = false;
     _paused = false;
+    _maquette->setAccelerationFactor(1.);
     _maquette->stopPlayingGotoStart();
     _playThread->quit();
     _playingBoxes.clear();
-    update();
+    update();    
 }
 
 void

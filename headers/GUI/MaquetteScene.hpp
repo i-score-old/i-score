@@ -701,6 +701,7 @@ public slots :
    */
   void stop();
   void stopGotoStart();
+  void stopWithGoto();
   /*!
    * \brief Pauses playing the composition.
    */

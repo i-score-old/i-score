@@ -169,7 +169,6 @@ BasicBox::createWidget(){
     _curveProxy->setAcceptedMouseButtons(Qt::LeftButton);
     _curveProxy->setFlag(QGraphicsItem::ItemIsMovable, false);
     _curveProxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
-    _curveProxy->setAttribute(Qt::WA_PaintOnScreen);
     _curveProxy->setVisible(true);
     _curveProxy->setAcceptsHoverEvents(true);
     _curveProxy->setWidget(_boxWidget);

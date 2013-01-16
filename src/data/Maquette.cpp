@@ -1456,34 +1456,41 @@ Maquette::initSceneState(){
 void
 Maquette::startPlaying()
 {
-    double gotoValue = (double)_engines->getGotoValue();
-    initSceneState();
-    generateTriggerQueue();
-    int nbTrg = _scene->_triggersQueueList.size();
-
-    try{
-        for(int i=0 ; i<nbTrg ; i++){
-            if( gotoValue >= _scene->_triggersQueueList.first()->date() ){
-                _scene->_triggersQueueList.removeFirst();
-            }
-            else
-                break;
-        }
+    if(_scene->paused()){
+        std::cout<<"paused"<<std::endl;
+//        _engines->pause(false);
+        _engines->play();
     }
-    catch (const std::exception & e){
-       std::cerr << e.what();
-   }
+    else{
+        double gotoValue = (double)_engines->getGotoValue();
+        initSceneState();
+        generateTriggerQueue();
+        int nbTrg = _scene->_triggersQueueList.size();
 
-	for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
-		it->second->lock();
-        if (it->second->type() == SOUND_BOX_TYPE) {
-			if (it->second->date() >= _engines->getGotoValue()) {
-                sendMessage(static_cast<SoundBox*>(it->second)->getPalette().toString());
-			}
+        try{
+            for(int i=0 ; i<nbTrg ; i++){
+                if( gotoValue >= _scene->_triggersQueueList.first()->date() ){
+                    _scene->_triggersQueueList.removeFirst();
+                }
+                else
+                    break;
+            }
         }
-	}
+        catch (const std::exception & e){
+           std::cerr << e.what();
+       }
 
-    _engines->play();
+        for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
+            it->second->lock();
+            if (it->second->type() == SOUND_BOX_TYPE) {
+                if (it->second->date() >= _engines->getGotoValue()) {
+                    sendMessage(static_cast<SoundBox*>(it->second)->getPalette().toString());
+                }
+            }
+        }
+
+        _engines->play();
+    }
 }
 
 void
@@ -1508,119 +1515,43 @@ Maquette::stopPlayingGotoStart()
 }
 
 void
-Maquette::stopPlaying()
-{
+Maquette::stopPlaying(){
     unsigned int gotoValue = _scene->getCurrentTime();
-	for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
-		it->second->unlock();
+    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
+        it->second->unlock();
     }
     _engines->stop();
 
-	BoxesMap::iterator it;
-	for (it = _boxes.begin() ; it != _boxes.end() ; it++) {
-		int type = it->second->type();
-		if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+    BoxesMap::iterator it;
+    for (it = _boxes.begin() ; it != _boxes.end() ; it++) {
+        int type = it->second->type();
+        if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
             static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
-		}
+        }
     }
     _scene->getTriggersQueueList().clear();
     setGotoValue(gotoValue);
 }
 
-//void
-//Maquette::saveBox(unsigned int boxID)
-//{
-//	// TODO : handle others boxes further attributes during save
-//	QString boxType = "unknown";
-//	if (_boxes[boxID]->type() == SOUND_BOX_TYPE) {
-//		boxType = QString("sound");
-//	}
-//	else if (_boxes[boxID]->type() == CONTROL_BOX_TYPE) {
-//		boxType = QString("control");
-//	}
-//	else if (_boxes[boxID]->type() == PARENT_BOX_TYPE) {
-//		boxType = QString("parent");
-//	}
-//	else {
-//		boxType = QString("unknown");
-//	}
+void
+Maquette::stopPlayingWithGoto()
+{
+    unsigned int gotoValue = _scene->getCurrentTime();
+    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
+        it->second->unlock();
+    }
+    _engines->stop();
 
-//	/* Provided for convenience */
-//	BasicBox *box = _boxes[boxID];
-//	QPointF topLeft = box->getTopLeft();
-//	QPointF size = box->getSize();
-//	QColor color = box->color();
-//	QString name = box->name();
-//	int mother = box->mother();
-
-//	// root node
-//	QDomElement root = _doc->documentElement();
-//	QDomElement boxNode = _doc->createElement("box");
-//	root.firstChild().appendChild(boxNode);
-
-//	boxNode.setAttribute("type",boxType);
-//	boxNode.setAttribute("ID",boxID);
-//	boxNode.setAttribute("name",name);
-//	boxNode.setAttribute("mother",mother);
-
-//	QDomElement positionNode = _doc->createElement("position");
-
-//	QDomElement topLeftNode = _doc->createElement("top-left");
-//	topLeftNode.setAttribute("x",topLeft.x());
-//	topLeftNode.setAttribute("y",topLeft.y());
-
-//	QDomElement sizeNode = _doc->createElement("size");
-//	sizeNode.setAttribute("x",size.x());
-//	sizeNode.setAttribute("y",size.y());
-
-//	positionNode.appendChild(topLeftNode);
-//	positionNode.appendChild(sizeNode);
-
-//	boxNode.appendChild(positionNode);
-
-//	QDomElement colorNode = _doc->createElement("color");
-//	colorNode.setAttribute("red",color.redF());
-//	colorNode.setAttribute("green",color.greenF());
-//	colorNode.setAttribute("blue",color.blueF());
-
-//	boxNode.appendChild(colorNode);
-
-//	if (boxType == "sound") {
-//		Palette pal = static_cast<SoundBox*>(box)->getPalette();
-//		QString soundFile = static_cast<SoundBox*>(box)->soundSelected();
-//		QDomElement attributesNode = _doc->createElement("attributes");
-//		QDomElement dynamicNode = _doc->createElement("dynamic");
-//		dynamicNode.setAttribute("shape",pal.shape());
-//		attributesNode.appendChild(dynamicNode);
-//		QDomElement rythmNode = _doc->createElement("rythm");
-//		rythmNode.setAttribute("speed",pal.speed());
-//		rythmNode.setAttribute("speed-variation",pal.speedVariation());
-//		rythmNode.setAttribute("grain",pal.grain());
-//		attributesNode.appendChild(rythmNode);
-//		QDomElement melodicNode = _doc->createElement("melodic");
-//		melodicNode.setAttribute("pitch-start",pal.pitchStart());
-//		melodicNode.setAttribute("pitch-random",pal.pitchRandom());
-//		melodicNode.setAttribute("pitch-vibrato",pal.pitchVibrato());
-//		melodicNode.setAttribute("pitch-end",pal.pitchEnd());
-//		melodicNode.setAttribute("pitch-amplitude",pal.pitchAmplitude());
-//		melodicNode.setAttribute("pitch-grade",pal.pitchGrade());
-//		attributesNode.appendChild(melodicNode);
-//		QDomElement harmonicNode = _doc->createElement("harmonic");
-//		harmonicNode.setAttribute("harmony",pal.harmo());
-//		harmonicNode.setAttribute("harmony-variation",pal.harmoVariation());
-//		attributesNode.appendChild(harmonicNode);
-//		QDomElement impulsiveNode = _doc->createElement("impulsive");
-//		impulsiveNode.setAttribute("state",pal.impulsive());
-//		attributesNode.appendChild(impulsiveNode);
-//		QDomElement soundNode = _doc->createElement("sound");
-//		soundNode.setAttribute("mode",pal.playingMode());
-//		soundNode.setAttribute("file",soundFile);
-//		attributesNode.appendChild(soundNode);
-//		boxNode.appendChild(attributesNode);
-//	}
-
-//	//return true;
-//}
+    BoxesMap::iterator it;
+    for (it = _boxes.begin() ; it != _boxes.end() ; it++) {
+        int type = it->second->type();
+        if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+            static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
+        }
+    }
+    _scene->getTriggersQueueList().clear();
+    setGotoValue(gotoValue);
+}
 
 void
 Maquette::saveBox(unsigned int boxID)
