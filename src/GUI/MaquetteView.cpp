@@ -47,6 +47,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "TimeBarWidget.hpp"
 #include "Maquette.hpp"
 #include "math.h"
+#include "TriggerPoint.hpp"
 
 #include <QGraphicsSceneDragDropEvent>
 #include <QMimeData>
@@ -54,6 +55,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QKeyEvent>
 #include <QScrollBar>
 #include <QPushButton>
+
 
 using namespace SndBoxProp;
 
@@ -101,7 +103,7 @@ MaquetteView::wheelEvent(QWheelEvent *event){
 void
 MaquetteView::setGotoValue(int value) {
 	_gotoValue = value;
-    _scene->updateProgressBar();
+    _scene->updateProgressBar();    
     updateSceneWithoutCenterOn();
 }
 
@@ -223,8 +225,8 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
     }
     else if (event->key()==Qt::Key_Space && _scene->playing()) {
 //        _scene->stop();
-        _scene->stopWithGoto();
-//        _scene->pause();
+//        _scene->stopWithGoto();
+        _scene->pause();
         _scene->displayMessage(tr("Stop playing").toStdString(),INDICATION_LEVEL);
         emit(playModeChanged());
     }
@@ -232,6 +234,13 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
         _scene->stopGotoStart();
         _scene->displayMessage(tr("Stop playing and go to start").toStdString(),INDICATION_LEVEL);
         emit(playModeChanged());
+    }
+    else if (event->key()==Qt::Key_1){
+        TriggerPoint *currentTrigger;
+        for(QList<TriggerPoint *>::iterator it = _scene->_triggersQueueList.begin() ; it<_scene->_triggersQueueList.end();it++){
+            currentTrigger = *it;
+            std::cout<<" > "<<currentTrigger->message()<<std::endl;
+        }
     }
 }
 

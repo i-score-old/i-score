@@ -1457,40 +1457,35 @@ void
 Maquette::startPlaying()
 {
     if(_scene->paused()){
-        std::cout<<"paused"<<std::endl;
-//        _engines->pause(false);
-        _engines->play();
+        setAccelerationFactor(1.);
     }
-    else{
-        double gotoValue = (double)_engines->getGotoValue();
-        initSceneState();
-        generateTriggerQueue();
-        int nbTrg = _scene->_triggersQueueList.size();
+    double gotoValue = (double)_engines->getGotoValue();
+    initSceneState();
+    generateTriggerQueue();
+    int nbTrg = _scene->_triggersQueueList.size();
 
-        try{
-            for(int i=0 ; i<nbTrg ; i++){
-                if( gotoValue >= _scene->_triggersQueueList.first()->date() ){
-                    _scene->_triggersQueueList.removeFirst();
-                }
-                else
-                    break;
+    try{
+        for(int i=0 ; i<nbTrg ; i++){
+            if( gotoValue >= _scene->_triggersQueueList.first()->date() ){
+                _scene->_triggersQueueList.removeFirst();
+            }
+            else
+                break;
+        }
+    }
+    catch (const std::exception & e){
+       std::cerr << e.what();
+   }
+
+    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
+        it->second->lock();
+        if (it->second->type() == SOUND_BOX_TYPE) {
+            if (it->second->date() >= _engines->getGotoValue()) {
+                sendMessage(static_cast<SoundBox*>(it->second)->getPalette().toString());
             }
         }
-        catch (const std::exception & e){
-           std::cerr << e.what();
-       }
-
-        for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
-            it->second->lock();
-            if (it->second->type() == SOUND_BOX_TYPE) {
-                if (it->second->date() >= _engines->getGotoValue()) {
-                    sendMessage(static_cast<SoundBox*>(it->second)->getPalette().toString());
-                }
-            }
-        }
-
-        _engines->play();
     }
+    _engines->play();
 }
 
 void
@@ -1516,7 +1511,6 @@ Maquette::stopPlayingGotoStart()
 
 void
 Maquette::stopPlaying(){
-    unsigned int gotoValue = _scene->getCurrentTime();
     for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
         it->second->unlock();
     }
@@ -1530,7 +1524,6 @@ Maquette::stopPlaying(){
         }
     }
     _scene->getTriggersQueueList().clear();
-    setGotoValue(gotoValue);
 }
 
 void

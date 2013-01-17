@@ -161,8 +161,10 @@ MaquetteScene::updateProgressBar(){
 
 void
 MaquetteScene::gotoChanged(double value){
+    if(_paused){
+        stop();
+    }
     Maquette::getInstance()->setGotoValue(value);
-    _view->setGotoValue(value);
     _view->repaint();
 }
 
@@ -1833,20 +1835,18 @@ void MaquetteScene::updatePlayingBoxes() {
 void
 MaquetteScene:: play() {
 	displayMessage(tr("Playing ...").toStdString(),INDICATION_LEVEL);
-	if (_paused) {
-        std::cout<<"PAUSED"<<std::endl;
-        _paused = false;
+    if (_paused) {
         _playing = true;
         _maquette->setAccelerationFactor(1.);
         _playThread->start();
         _maquette->startPlaying();
-
+        _paused = false;
 	}
 	else {        
         _playing = true;
 		_maquette->startPlaying();
         _playThread->start();
-		_startingValue = 0;
+        _startingValue = _view->gotoValue();
 	}
 }
 
@@ -1863,8 +1863,11 @@ MaquetteScene::pause() {
 
 void
 MaquetteScene::stop(){
-//TODO : Without goto
-    std::cout<<"Stopped : compile - good version"<<std::endl;
+    _playing = false;
+    _maquette->stopPlaying();
+    _playThread->quit();
+    _playingBoxes.clear();
+    update();
 }
 
 void
