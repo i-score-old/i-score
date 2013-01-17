@@ -61,6 +61,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "BasicBox.hpp"
 #include "TimeBarWidget.hpp"
 #include "MaquetteView.hpp"
+#include <QTimeLine>
 
 #include <map>
 #include <vector>
@@ -109,7 +110,7 @@ class MaquetteScene : public QGraphicsScene
   QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
   MaquetteScene(const QRectF & rect, AttributesEditor *palette);
   virtual ~MaquetteScene();
-
+  QTimeLine *_timeLine;
   /*!
    * \brief Initialises scene parameters.
    */
@@ -700,6 +701,7 @@ public slots :
    */
   void stop();
   void stopGotoStart();
+  void stopWithGoto();
   /*!
    * \brief Pauses playing the composition.
    */
@@ -810,6 +812,8 @@ public slots :
   PlayingThread *_playThread; //!< The thread handling playing.
 
   TimeBarWidget *_timeBar;
+  QGraphicsLineItem *_progressLine;
+
 };
 
 #endif

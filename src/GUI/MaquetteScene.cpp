@@ -68,6 +68,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "CurvesWidget.hpp"
 #include "TimeBarWidget.hpp"
 #include <QGraphicsProxyWidget>
+#include <QGraphicsLineItem>
 
 #include <sstream>
 #include <map>
@@ -99,6 +100,13 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
     _playThread = new PlayingThread(this);
 
     _timeBar = new TimeBarWidget(0,this);
+
+//    _progressLine = new QGraphicsLineItem(QLineF(50,sceneRect().topLeft().y(),50,sceneRect().bottomLeft().y()));
+    _progressLine = new QGraphicsLineItem(QLineF(sceneRect().topLeft().x(),sceneRect().topLeft().y(),sceneRect().bottomLeft().x(),MAX_SCENE_HEIGHT));
+
+    _progressLine->setZValue(2);
+
+    addItem(_progressLine);
 
     addWidget(_timeBar);
 
@@ -137,7 +145,18 @@ MaquetteScene::init()
 
 void
 MaquetteScene::updateProgressBar(){
-    update(QRectF(QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL-4, 0), QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL+4, height())));
+//    update(QRectF(QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL-4, 0), QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL+4, height())));
+    if(_playing){
+        _progressLine->setPos(_maquette->getCurrentTime()/MS_PER_PIXEL,sceneRect().topLeft().y());
+        invalidate(sceneRect(),ItemLayer);
+    }
+    else{
+        _progressLine->setPos(_view->gotoValue()/MS_PER_PIXEL,sceneRect().topLeft().y());
+        invalidate(sceneRect(),ItemLayer);
+    }
+
+//    _progressLine->moveBy(_maquette->getCurrentTime()/MS_PER_PIXEL - _progressLine->pos().x(),0);
+
 }
 
 void
@@ -282,12 +301,11 @@ MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[]
 
 void
 MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
-
     if (_playing) {
         QPen pen(Qt::black);
         pen.setWidth(3);
         painter->setPen(pen);        
-        painter->drawLine(QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL, _view->sceneRect().top()), QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL,_view->sceneRect().height()));
+//        painter->drawLine(QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL, _view->sceneRect().top()), QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL,_view->sceneRect().height()));
     }
 
     else{
@@ -298,7 +316,7 @@ MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
         QPen pen3(Qt::black);
         pen3.setWidth(3);
         painter->setPen(pen3);
-        painter->drawLine(QPointF(gotoBarPosX,0),QPointF(gotoBarPosX,sceneRect().height()));
+//        painter->drawLine(QPointF(gotoBarPosX,0),QPointF(gotoBarPosX,sceneRect().height()));
 
       //  pen3.setColor(Qt::white);
       //  pen3.setWidth(1);
@@ -1809,52 +1827,79 @@ void MaquetteScene::updatePlayingBoxes() {
     for (it = _playingBoxes.begin() ; it != _playingBoxes.end() ; ++it) {
         it->second->update();
     }
+    _progressLine->update();
 }
 
-
 void
-MaquetteScene::play() {
+MaquetteScene:: play() {
 	displayMessage(tr("Playing ...").toStdString(),INDICATION_LEVEL);
 	if (_paused) {
-		_paused = false;
+        std::cout<<"PAUSED"<<std::endl;
+        _paused = false;
         _playing = true;
-		_maquette->setAccelerationFactor(1.);
+        _maquette->setAccelerationFactor(1.);
+        _playThread->start();
+        _maquette->startPlaying();
+
 	}
-	else {
+	else {        
         _playing = true;
 		_maquette->startPlaying();
-		_playThread->start();
+        _playThread->start();
 		_startingValue = 0;
 	}
 }
 
 void
 MaquetteScene::pause() {
-	displayMessage(tr("Paused").toStdString(),INDICATION_LEVEL);
-	_maquette->setAccelerationFactor(0.);
+    displayMessage(tr("Paused").toStdString(),INDICATION_LEVEL);
+    _playing = false;
     _paused = true;
+    _playThread->quit();
+    _maquette->setAccelerationFactor(0.);
+    update();
+}
+
+
+void
+MaquetteScene::stop(){
+//TODO : Without goto
+    std::cout<<"Stopped : compile - good version"<<std::endl;
 }
 
 void
-MaquetteScene::stop() {
-	displayMessage(tr("Stopped").toStdString(),INDICATION_LEVEL);
-	_playing = false;
+MaquetteScene::stopWithGoto() {
+    displayMessage(tr("Stopped").toStdString(),INDICATION_LEVEL);
+    std::cout<<"Stopped : compile - with goto current time"<<std::endl;
+    _playing = false;
     _paused = false;
-    _maquette->stopPlaying();
+    _maquette->stopPlayingWithGoto();
     _playThread->quit();
     _playingBoxes.clear();
     update();
 }
+
+//void
+//MaquetteScene::stop() {
+//    displayMessage(tr("Stopped").toStdString(),INDICATION_LEVEL);
+//    _playing = false;
+//    _paused = true;
+//    _playThread->quit();
+//    _maquette->stopPlaying();
+//    _maquette->setAccelerationFactor(0.);
+//    update();
+//}
 
 void
 MaquetteScene::stopGotoStart() {
     displayMessage(tr("Stopped and go to start").toStdString(),INDICATION_LEVEL);
     _playing = false;
     _paused = false;
+    _maquette->setAccelerationFactor(1.);
     _maquette->stopPlayingGotoStart();
     _playThread->quit();
     _playingBoxes.clear();
-    update();
+    update();    
 }
 
 void

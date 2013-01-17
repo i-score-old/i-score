@@ -101,6 +101,7 @@ MaquetteView::wheelEvent(QWheelEvent *event){
 void
 MaquetteView::setGotoValue(int value) {
 	_gotoValue = value;
+    _scene->updateProgressBar();
     updateSceneWithoutCenterOn();
 }
 
@@ -126,7 +127,6 @@ MaquetteView::updateScene(){
 
 void
 MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
-
   QGraphicsView::drawBackground(painter,rect);
 //  QPen pen(Qt::darkGreen);
   QPen pen(QColor(145,145,145));
@@ -222,7 +222,9 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
         emit(playModeChanged());
     }
     else if (event->key()==Qt::Key_Space && _scene->playing()) {
-        _scene->stop();
+//        _scene->stop();
+        _scene->stopWithGoto();
+//        _scene->pause();
         _scene->displayMessage(tr("Stop playing").toStdString(),INDICATION_LEVEL);
         emit(playModeChanged());
     }

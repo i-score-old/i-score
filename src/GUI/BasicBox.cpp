@@ -169,7 +169,6 @@ BasicBox::createWidget(){
     _curveProxy->setAcceptedMouseButtons(Qt::LeftButton);
     _curveProxy->setFlag(QGraphicsItem::ItemIsMovable, false);
     _curveProxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
-    _curveProxy->setAttribute(Qt::WA_PaintOnScreen);
     _curveProxy->setVisible(true);
     _curveProxy->setAcceptsHoverEvents(true);
     _curveProxy->setWidget(_boxWidget);
@@ -188,8 +187,7 @@ BasicBox::createWidget(){
     _comboBoxProxy = new QGraphicsProxyWidget(this);
     _comboBoxProxy->setWidget(_comboBox);
     _comboBoxProxy->setPalette(palette);
-    _curvesWidget->setComboBox(_comboBox);
-
+    _curvesWidget->setComboBox(_comboBox);    
 }
 
 BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
