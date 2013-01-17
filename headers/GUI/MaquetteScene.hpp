@@ -815,7 +815,7 @@ public slots :
   TimeBarWidget *_timeBar;
   QGraphicsLineItem *_progressLine;
   double _accelerationFactorSave;
-
+  double _accelerationFactor;
 };
 
 #endif

@@ -129,6 +129,7 @@ MaquetteScene::init()
 	_resizeMode = NO_RESIZE;
 	_tracksView = false;
     _accelerationFactorSave = 1.;
+    _accelerationFactor = 1.;
 
 	_maquette = Maquette::getInstance();
 	_maquette->setScene(this);
@@ -1838,7 +1839,7 @@ MaquetteScene:: play() {
     displayMessage(tr("Playing ...").toStdString(),INDICATION_LEVEL);
     if (_paused) {
         _playing = true;
-        setAccelerationFactor(_accelerationFactorSave);
+        _maquette->setAccelerationFactor(_accelerationFactor);
         _maquette->startPlaying();
         _playThread->start();        
         _paused = false;
@@ -1859,7 +1860,7 @@ MaquetteScene::pause() {
     _maquette->pause();
     _playThread->quit();
     _accelerationFactorSave = _maquette->accelerationFactor();
-    setAccelerationFactor(0.);
+    _maquette->setAccelerationFactor(0.);
     update();
 }
 
@@ -1887,7 +1888,7 @@ MaquetteScene::stopWithGoto() {
 void
 MaquetteScene::setAccelerationFactor(double value){
     _maquette->setAccelerationFactor(value);
-//    emit(accelerationValueChanged(value));
+    _accelerationFactor = value;
 }
 
 void
@@ -1895,7 +1896,7 @@ MaquetteScene::stopGotoStart() {
     displayMessage(tr("Stopped and go to start").toStdString(),INDICATION_LEVEL);
     _playing = false;
     _paused = false;
-    setAccelerationFactor(1.);
+    _maquette->setAccelerationFactor(1.);
     emit(accelerationValueChanged(1.));
     _maquette->stopPlayingGotoStart();
     _playThread->quit();

@@ -1455,14 +1455,13 @@ Maquette::initSceneState(){
 
 void
 Maquette::pause(){
+    _engines->pause(true);
 }
 
 void
 Maquette::startPlaying()
 {
-//    if(_scene->paused()){
-//        setAccelerationFactor(1.);
-//    }
+    _engines->pause(false);
     double gotoValue = (double)_engines->getGotoValue();
     initSceneState();
     generateTriggerQueue();

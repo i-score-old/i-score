@@ -260,6 +260,7 @@ MaquetteWidget::accelerationValueModified(int value){
         if (_accelerationDisplay->value() != newValue){
             _sliderMoved = true;
             _accelerationDisplay->setValue(newValue);
+
         }
     }
     _valueEntered = false;
@@ -309,7 +310,6 @@ MaquetteWidget::accelerationValueEntered(double value){
     if(!_sliderMoved){
         int newValue = _accelerationSlider->valueForAcceleration(value);
         _accelerationDisplay->setValue(value);
-        Maquette::getInstance()->setAccelerationFactor(value);
         if(newValue<LogarithmicSlider::MAXIMUM_VALUE)
             _accelerationSlider->setValue(newValue);
         else{
@@ -317,5 +317,6 @@ MaquetteWidget::accelerationValueEntered(double value){
             _accelerationSlider->setValue(_accelerationSlider->valueForAcceleration(LogarithmicSlider::MAXIMUM_VALUE));
         }
     }
+    _scene->setAccelerationFactor(value);
     _sliderMoved = false;
 }
