@@ -1456,9 +1456,9 @@ Maquette::initSceneState(){
 void
 Maquette::startPlaying()
 {
-    if(_scene->paused()){
-        setAccelerationFactor(1.);
-    }
+//    if(_scene->paused()){
+//        setAccelerationFactor(1.);
+//    }
     double gotoValue = (double)_engines->getGotoValue();
     initSceneState();
     generateTriggerQueue();
@@ -2254,10 +2254,14 @@ Maquette::load(const string &fileName){
     delete _doc;
 }
 
+double
+Maquette::accelerationFactor(){
+    return _engines->getExecutionSpeedFactor();
+}
 
 void
 Maquette::setAccelerationFactor(const float &factor) {
-	_engines->setExecutionSpeedFactor(factor);
+    _engines->setExecutionSpeedFactor(factor);
 }
 
 void

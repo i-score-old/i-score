@@ -689,6 +689,7 @@ class Maquette : public QObject
    * \param factor : the new acceleration factor value between 0 and 1
    */
   void setAccelerationFactor(const float &factor);
+  double accelerationFactor();
   /*!
    * \brief Called by the callback when a transition is crossed.
    *

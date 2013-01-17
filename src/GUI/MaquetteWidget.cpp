@@ -169,7 +169,7 @@ MaquetteWidget::createReadingSpeedWidget(){
     _accelerationSlider->setStatusTip(tr("Acceleration"));
     _accelerationSlider->setFixedWidth(200);
     _accelerationSlider->setSliderPosition(50);
-    _accelerationSlider->setSizePolicy(*ignoredPolicy);
+    _accelerationSlider->setSizePolicy(*ignoredPolicy);    
 
     _accelerationDisplay = new QDoubleSpinBox(this);
     _accelerationDisplay->setStatusTip(tr("Acceleration"));
@@ -184,7 +184,8 @@ MaquetteWidget::createReadingSpeedWidget(){
     _readingSpeedWidget->setLayout(layout);
 
     connect(_accelerationSlider,SIGNAL(valueChanged(int)),this,SLOT(accelerationValueModified(int)));
-    connect(_accelerationDisplay, SIGNAL(valueChanged(double)), this, SLOT(accelerationValueEntered(double)));
+    connect(_accelerationDisplay, SIGNAL(valueChanged(double)), this, SLOT(accelerationValueEntered(double)));    
+    connect(_scene, SIGNAL(accelerationValueChanged(double)), this, SLOT(accelerationValueEntered(double)));
 }
 
 
@@ -307,6 +308,7 @@ void
 MaquetteWidget::accelerationValueEntered(double value){
     if(!_sliderMoved){
         int newValue = _accelerationSlider->valueForAcceleration(value);
+        _accelerationDisplay->setValue(value);
         Maquette::getInstance()->setAccelerationFactor(value);
         if(newValue<LogarithmicSlider::MAXIMUM_VALUE)
             _accelerationSlider->setValue(newValue);

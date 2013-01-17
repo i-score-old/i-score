@@ -578,6 +578,7 @@ class MaquetteScene : public QGraphicsScene
   void setName(QString name);
   inline float zoom(){return _view->zoom();}
   void updateProgressBar();
+  void setAccelerationFactor(double value);
 
  protected :
   /*!
@@ -664,7 +665,7 @@ class MaquetteScene : public QGraphicsScene
 
 signals:
   void stopPlaying();
-
+  void accelerationValueChanged(double value);
 
 public slots :
   void verticalScroll(int value);
@@ -813,6 +814,7 @@ public slots :
 
   TimeBarWidget *_timeBar;
   QGraphicsLineItem *_progressLine;
+  double _accelerationFactorSave;
 
 };
 

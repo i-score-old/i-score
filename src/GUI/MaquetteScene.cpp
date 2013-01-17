@@ -128,6 +128,7 @@ MaquetteScene::init()
 	_savedBoxMode = _currentBoxMode;
 	_resizeMode = NO_RESIZE;
 	_tracksView = false;
+    _accelerationFactorSave = 1.;
 
 	_maquette = Maquette::getInstance();
 	_maquette->setScene(this);
@@ -1834,15 +1835,15 @@ void MaquetteScene::updatePlayingBoxes() {
 
 void
 MaquetteScene:: play() {
-	displayMessage(tr("Playing ...").toStdString(),INDICATION_LEVEL);
+    displayMessage(tr("Playing ...").toStdString(),INDICATION_LEVEL);
     if (_paused) {
         _playing = true;
-        _maquette->setAccelerationFactor(1.);
+        setAccelerationFactor(_accelerationFactorSave);
         _playThread->start();
         _maquette->startPlaying();
         _paused = false;
 	}
-	else {        
+    else {
         _playing = true;
 		_maquette->startPlaying();
         _playThread->start();
@@ -1856,7 +1857,8 @@ MaquetteScene::pause() {
     _playing = false;
     _paused = true;
     _playThread->quit();
-    _maquette->setAccelerationFactor(0.);
+    _accelerationFactorSave = _maquette->accelerationFactor();
+    setAccelerationFactor(0.);
     update();
 }
 
@@ -1882,23 +1884,19 @@ MaquetteScene::stopWithGoto() {
     update();
 }
 
-//void
-//MaquetteScene::stop() {
-//    displayMessage(tr("Stopped").toStdString(),INDICATION_LEVEL);
-//    _playing = false;
-//    _paused = true;
-//    _playThread->quit();
-//    _maquette->stopPlaying();
-//    _maquette->setAccelerationFactor(0.);
-//    update();
-//}
+void
+MaquetteScene::setAccelerationFactor(double value){
+    _maquette->setAccelerationFactor(value);
+//    emit(accelerationValueChanged(value));
+}
 
 void
 MaquetteScene::stopGotoStart() {
     displayMessage(tr("Stopped and go to start").toStdString(),INDICATION_LEVEL);
     _playing = false;
     _paused = false;
-    _maquette->setAccelerationFactor(1.);
+    setAccelerationFactor(1.);
+    emit(accelerationValueChanged(1.));
     _maquette->stopPlayingGotoStart();
     _playThread->quit();
     _playingBoxes.clear();
