@@ -1839,8 +1839,8 @@ MaquetteScene:: play() {
     if (_paused) {
         _playing = true;
         setAccelerationFactor(_accelerationFactorSave);
-        _playThread->start();
         _maquette->startPlaying();
+        _playThread->start();        
         _paused = false;
 	}
     else {
@@ -1856,6 +1856,7 @@ MaquetteScene::pause() {
     displayMessage(tr("Paused").toStdString(),INDICATION_LEVEL);
     _playing = false;
     _paused = true;
+    _maquette->pause();
     _playThread->quit();
     _accelerationFactorSave = _maquette->accelerationFactor();
     setAccelerationFactor(0.);
@@ -1875,7 +1876,6 @@ MaquetteScene::stop(){
 void
 MaquetteScene::stopWithGoto() {
     displayMessage(tr("Stopped").toStdString(),INDICATION_LEVEL);
-    std::cout<<"Stopped : compile - with goto current time"<<std::endl;
     _playing = false;
     _paused = false;
     _maquette->stopPlayingWithGoto();

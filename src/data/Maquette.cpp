@@ -1454,6 +1454,10 @@ Maquette::initSceneState(){
 }
 
 void
+Maquette::pause(){
+}
+
+void
 Maquette::startPlaying()
 {
 //    if(_scene->paused()){

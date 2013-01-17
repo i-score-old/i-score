@@ -683,6 +683,7 @@ class Maquette : public QObject
   void stopPlaying();
   void stopPlayingGotoStart();
   void stopPlayingWithGoto();
+  void pause();
   /*!
    * \brief Sets a new acceleration factor.
    *
