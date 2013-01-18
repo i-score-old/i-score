@@ -1217,8 +1217,9 @@ MaquetteScene::removeTriggerPoint(unsigned int trgID)
 }
 
 void
-MaquetteScene::trigger(const string &message) {
-	_maquette->simulateTriggeringMessage(message);
+MaquetteScene::trigger(TriggerPoint *triggerPoint) {
+    _maquette->simulateTriggeringMessage(static_cast<AbstractTriggerPoint *>(triggerPoint->abstract())->message());
+    removeFromTriggerQueue(triggerPoint);
 }
 
 bool

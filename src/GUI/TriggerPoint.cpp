@@ -151,7 +151,7 @@ TriggerPoint::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     QGraphicsItem::mousePressEvent(event);
     setSelected(false);
     if (_abstract->waiting()) {
-        _scene->trigger(_abstract->message());
+        _scene->trigger(this);
 		setSelected(false);
 	}
 }
@@ -161,7 +161,7 @@ TriggerPoint::keyPressEvent(QKeyEvent *event){
 
     if(event->key() == Qt::Key_Right || event->key() == Qt::Key_0 ){
         if (_abstract->waiting()) {
-            _scene->trigger(_abstract->message());
+            _scene->trigger(this);
             setSelected(false);
         }
     }
@@ -229,35 +229,6 @@ TriggerPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 		setSelected(false);
 	}
 }
-
-
-
-//QPainterPath
-//TriggerPoint::shape() const
-//{
-//	QPainterPath path;
-//	QRectF rect = boundingRect();
-//	switch (_abstract->boxExtremity()) {
-//	case BOX_START :
-//		path.moveTo(rect.bottomLeft());
-//		path.lineTo(rect.topLeft());
-//		path.lineTo(rect.topLeft() + QPointF(rect.width(),rect.height()/4.));
-//		path.lineTo(rect.topLeft() + QPointF(0,rect.height()/2.));
-//		path.lineTo(rect.bottomLeft());
-//		break;
-//	case BOX_END :
-//		path.moveTo(rect.bottomRight());
-//		path.lineTo(rect.topRight());
-//		path.lineTo(rect.topRight() + QPointF(-rect.width(),rect.height()/4.));
-//		path.lineTo(rect.topRight() + QPointF(0,rect.height()/2.));
-//		path.lineTo(rect.bottomRight());
-//		break;
-//	default :
-//		break;
-//	}
-
-//	return path;
-//}
 
 QPainterPath
 TriggerPoint::shape() const
@@ -367,7 +338,7 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
                 }
 
                 else{
-                    if(_scene->getTriggersQueueList().first()==this){
+                    if(_scene->triggersQueueList().first()==this){
                         drawFlag(painter,QColor("green"));
                         this->setFocus();
                     }

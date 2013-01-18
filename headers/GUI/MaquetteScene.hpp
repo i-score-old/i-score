@@ -107,7 +107,6 @@ class MaquetteScene : public QGraphicsScene
   Q_OBJECT
 
   public :
-  QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
   MaquetteScene(const QRectF & rect, AttributesEditor *palette);
   virtual ~MaquetteScene();
   QTimeLine *_timeLine;
@@ -207,7 +206,7 @@ class MaquetteScene : public QGraphicsScene
 
    * \return the triggersQueueList.
    */
-  inline QList<TriggerPoint *> getTriggersQueueList(){return _triggersQueueList;}
+  inline QList<TriggerPoint *> triggersQueueList(){return _triggersQueueList;}
   /*!
    * \brief Adds a trigger to the queue list.
    *
@@ -424,7 +423,7 @@ class MaquetteScene : public QGraphicsScene
    *
    * \param message : the message to send for triggering
    */
-  void trigger(const std::string &message);
+  void trigger(TriggerPoint *triggerPoint);
   /*!
    * \brief Set trigger point 's message.
    *
@@ -816,6 +815,8 @@ public slots :
   QGraphicsLineItem *_progressLine;
   double _accelerationFactorSave;
   double _accelerationFactor;
+
+  QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
 };
 
 #endif

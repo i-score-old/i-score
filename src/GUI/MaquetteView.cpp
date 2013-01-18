@@ -235,13 +235,34 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
         _scene->displayMessage(tr("Stop playing and go to start").toStdString(),INDICATION_LEVEL);
         emit(playModeChanged());
     }
-    else if (event->key()==Qt::Key_1){
+//    else if (event->key()==Qt::Key_0){
+//        QList<TriggerPoint *>::iterator it = triggersQueueList().begin();
+//        TriggerPoint *currentTrigger;
+//        while(it!=triggersQueueList().end()){
+//            currentTrigger = *it;
+//            if(currentTrigger->isWaiting()){
+//                _scene->trigger(static_cast<AbstractTriggerPoint *>(currentTrigger->abstract())->message());
+//                currentTrigger->setSelected(false);
+//                updateScene();
+//                break;
+//            }
+//            else{
+//                it++;
+//            }
+//        }
+//    }
+    else if (event->key()==Qt::Key_1 || event->key()==Qt::Key_2 || event->key()==Qt::Key_3){
         TriggerPoint *currentTrigger;
-        for(QList<TriggerPoint *>::iterator it = _scene->_triggersQueueList.begin() ; it<_scene->_triggersQueueList.end();it++){
+        for(QList<TriggerPoint *>::iterator it = _scene->triggersQueueList().begin() ; it<_scene->triggersQueueList().end();it++){
             currentTrigger = *it;
             std::cout<<" > "<<currentTrigger->message()<<std::endl;
         }
     }
+}
+
+QList<TriggerPoint *>
+MaquetteView::triggersQueueList(){
+    return _scene->triggersQueueList();
 }
 
 /**

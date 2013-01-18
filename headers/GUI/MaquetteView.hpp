@@ -47,6 +47,7 @@ knowledge of the CeCILL license and that you accept its terms.
  */
 #include<QGraphicsView>
 
+class TriggerPoint;
 class BasicBox;
 class MainWindow;
 class MaquetteScene;
@@ -73,6 +74,7 @@ class MaquetteView : public QGraphicsView
    */
   void setGotoValue(int value);
   inline int gotoValue(){return _gotoValue;}
+  QList<TriggerPoint *> triggersQueueList();
   inline MainWindow *mainWindow(){return _mainWindow;}
 
   signals:
