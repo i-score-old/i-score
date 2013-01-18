@@ -259,14 +259,12 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
 		_scene->removeSelectedItems();
 		_scene->displayMessage(tr("Selection removed").toStdString(),INDICATION_LEVEL);
     }
-    else if (event->key()==Qt::Key_Space && !_scene->playing()) {
+    else if ((event->key()==Qt::Key_Space || event->key()==Qt::Key_Comma || event->key()==Qt::Key_Period) && !_scene->playing()) {
         _scene->play();
         _scene->displayMessage(tr("Start playing").toStdString(),INDICATION_LEVEL);
         emit(playModeChanged());
     }
-    else if (event->key()==Qt::Key_Space && _scene->playing()) {
-//        _scene->stop();
-//        _scene->stopWithGoto();
+    else if ((event->key()==Qt::Key_Space || event->key()==Qt::Key_Comma || event->key()==Qt::Key_Period) && _scene->playing()) {
         _scene->pause();
         _scene->displayMessage(tr("Stop playing").toStdString(),INDICATION_LEVEL);
         emit(playModeChanged());
