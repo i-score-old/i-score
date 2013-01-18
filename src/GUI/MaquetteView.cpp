@@ -195,6 +195,47 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
 }
 
 void
+MaquetteView::triggerShortcut(int shorcut){
+    QList<TriggerPoint *>::iterator it = triggersQueueList().begin();
+    TriggerPoint *currentTrigger;
+    int waitingTriggers;
+
+    int triggerNumero;
+
+    switch (shorcut){
+        case Qt::Key_0 :
+            triggerNumero = 1;
+            break;
+
+        case Qt::Key_1 :
+            triggerNumero = 2;
+            break;
+
+        case Qt::Key_2 :
+            triggerNumero = 3;
+            break;
+
+        case Qt::Key_3 :
+            triggerNumero = 4;
+            break;
+    }
+
+    if(triggersQueueList().size() >= triggerNumero){
+        waitingTriggers = 0;
+
+        while(it!=triggersQueueList().end() && waitingTriggers<triggerNumero){
+            currentTrigger = *it;
+            if(currentTrigger->isWaiting())
+                waitingTriggers++;
+
+            it++;
+        }
+        if(triggerNumero==waitingTriggers)
+            _scene->trigger(currentTrigger);
+    }
+}
+
+void
 MaquetteView::keyPressEvent(QKeyEvent *event)
 {
     QGraphicsView::keyPressEvent(event);
@@ -235,29 +276,18 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
         _scene->displayMessage(tr("Stop playing and go to start").toStdString(),INDICATION_LEVEL);
         emit(playModeChanged());
     }
-//    else if (event->key()==Qt::Key_0){
-//        QList<TriggerPoint *>::iterator it = triggersQueueList().begin();
-//        TriggerPoint *currentTrigger;
-//        while(it!=triggersQueueList().end()){
-//            currentTrigger = *it;
-//            if(currentTrigger->isWaiting()){
-//                _scene->trigger(static_cast<AbstractTriggerPoint *>(currentTrigger->abstract())->message());
-//                currentTrigger->setSelected(false);
-//                updateScene();
-//                break;
-//            }
-//            else{
-//                it++;
-//            }
-//        }
-//    }
-    else if (event->key()==Qt::Key_1 || event->key()==Qt::Key_2 || event->key()==Qt::Key_3){
-        TriggerPoint *currentTrigger;
-        for(QList<TriggerPoint *>::iterator it = _scene->triggersQueueList().begin() ; it<_scene->triggersQueueList().end();it++){
-            currentTrigger = *it;
-            std::cout<<" > "<<currentTrigger->message()<<std::endl;
+    else if (event->key()==Qt::Key_0){
+        if(!_scene->playing()){
+            _scene->play();
+            _scene->displayMessage(tr("Start playing").toStdString(),INDICATION_LEVEL);
+            emit(playModeChanged());
         }
+        else
+            triggerShortcut(Qt::Key_0);
     }
+    else if (event->key()==Qt::Key_1 || event->key()==Qt::Key_2 || event->key()==Qt::Key_3)
+        triggerShortcut(event->key());
+
 }
 
 QList<TriggerPoint *>

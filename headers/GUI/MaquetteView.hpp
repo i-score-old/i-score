@@ -76,6 +76,7 @@ class MaquetteView : public QGraphicsView
   inline int gotoValue(){return _gotoValue;}
   QList<TriggerPoint *> triggersQueueList();
   inline MainWindow *mainWindow(){return _mainWindow;}
+  void triggerShortcut(int shortcut);
 
   signals:
     void zoomChanged(float newValue);

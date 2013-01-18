@@ -1220,6 +1220,7 @@ void
 MaquetteScene::trigger(TriggerPoint *triggerPoint) {
     _maquette->simulateTriggeringMessage(static_cast<AbstractTriggerPoint *>(triggerPoint->abstract())->message());
     removeFromTriggerQueue(triggerPoint);
+    triggerPoint->setSelected(false);
 }
 
 bool
