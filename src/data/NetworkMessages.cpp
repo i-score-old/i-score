@@ -188,6 +188,9 @@ NetworkMessages::computeMessages() {
 
 void
 NetworkMessages::addMessage(QTreeWidgetItem *treeItem, const QString &device, const QString &message, const QString &value){
+    std::cout<<">>>>> "<<device.toStdString()<<std::endl;
+    std::cout<<">>>>> "<<message.toStdString()<<std::endl;
+    std::cout<<">>>>> "<<value.toStdString()<<std::endl;
     Message msg = {device, message, value};
     _messages->insert(treeItem,msg);
 }

@@ -119,12 +119,12 @@ class NetworkTree : public QTreeWidget
          * \brief Adds start messages.
          * \param The messages to add.
          */
-        inline void addStartMessage();
+        inline void addOSCStartMessage(QTreeWidgetItem *item, QString msg){_OSCStartMessages->addMessage(item,msg);}
         /*!
          * \brief Adds start messages.
          * \param The messages to add.
          */
-        inline void addEndMessage();
+        inline void addOSCEndMessage(QTreeWidgetItem *item, QString msg){_OSCEndMessages->addMessage(item,msg);}
         /*!
          * \brief Getter.
          * \return Start messages.
@@ -312,6 +312,7 @@ class NetworkTree : public QTreeWidget
         void setCurveActivated(QTreeWidgetItem *item, bool activated);
         void setRedundancy(QTreeWidgetItem *item, bool activated);
         void updateLine(QTreeWidgetItem *item, bool interpolationState, int sampleRate, bool redundancy);
+        void addOSCMessage();
 
         virtual void keyPressEvent(QKeyEvent *event);
         virtual void keyReleaseEvent(QKeyEvent *event);
@@ -370,7 +371,10 @@ class NetworkTree : public QTreeWidget
 
         NetworkMessages *_startMessages;
         NetworkMessages *_endMessages;
+        NetworkMessages *_OSCStartMessages;
+        NetworkMessages *_OSCEndMessages;
 
+        QTreeWidgetItem *_OSCNodeRoot;
         int _OSCMessageCount;
 
 	public slots:

@@ -105,6 +105,10 @@ NetworkTree::init(){
     _startMessages = new NetworkMessages;
     _endMessages = new NetworkMessages;
     _OSCMessageCount = 0;
+    _OSCNodeRoot = NULL;
+    _OSCStartMessages = new NetworkMessages;
+    _OSCEndMessages = new NetworkMessages;
+
     setStyleSheet(
                 "QTreeView {"
                      "show-decoration-selected: 1;"
@@ -166,6 +170,7 @@ NetworkTree::load() {
         if (!(*requestableIt)) {
             //OSCDevice
             curItem = new QTreeWidgetItem(deviceName,OSCNamespace);
+            _OSCNodeRoot = curItem;
             curItem->setFlags(Qt::ItemIsEnabled);
             createOCSBranch(curItem);
 //            curItem->setCheckState(0,Qt::Unchecked);
@@ -283,6 +288,33 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
     }
 }
     return itemsMatchedList;
+}
+
+void
+NetworkTree::addOSCMessage(){
+    QString number = QString("%1").arg(_OSCMessageCount);
+    QString name = QString("/OSCMessage"+number);
+
+    QStringList OSCname = QStringList(name);
+    QTreeWidgetItem *newItem = new QTreeWidgetItem(OSCname,OSCNode);
+    newItem->setText(START_COLUMN,tr("/Start"));
+    newItem->setText(END_COLUMN,tr("/End"));
+    newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    _OSCNodeRoot->insertChild(_OSCMessageCount++,newItem);
+
+    _OSCStartMessages->addMessage(newItem,_OSCNodeRoot->text(NAME_COLUMN),newItem->text(NAME_COLUMN),newItem->text(START_COLUMN));
+    _OSCEndMessages->addMessage(newItem,_OSCNodeRoot->text(NAME_COLUMN),newItem->text(NAME_COLUMN),newItem->text(END_COLUMN));
+
+    vector<string> startList = _OSCStartMessages->computeMessages();
+    std::cout<<"OSC START MESSAGES : "<<std::endl;
+    for(int i=0 ; i<startList.size() ; i++){
+        std::cout<<startList[i]<<std::endl;
+    }
+    vector<string> endList = _OSCEndMessages->computeMessages();
+    std::cout<<"\nOSC END MESSAGES : "<<std::endl;
+    for(int i=0 ; i<endList.size() ; i++){
+        std::cout<<endList[i]<<std::endl;
+    }
 }
 
 void
@@ -1225,15 +1257,9 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item,int column){
         }
     }
 
-    if(item->text(0)== OSC_ADD_NODE_TEXT && item->type()==OSCNode){
-        QString number = QString("%1").arg(_OSCMessageCount);
-        QString name = QString("OSCMessage"+number);
-//        name<<number
-        QStringList OSCname = QStringList(name);
-        QTreeWidgetItem *newItem = new QTreeWidgetItem(OSCname,OSCNode);
-        newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
-        item->parent()->insertChild(_OSCMessageCount++,newItem);
-    }
+    if(item->text(0)== OSC_ADD_NODE_TEXT && item->type()==OSCNode)
+        addOSCMessage();
+
 }
 
 
