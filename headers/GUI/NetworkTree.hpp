@@ -58,7 +58,7 @@ using std::map;
 class QTreeView;
 
 enum {NodeNamespaceType = QTreeWidgetItem::UserType + 1, NodeNoNamespaceType = QTreeWidgetItem::UserType + 2 ,
-	LeaveType = QTreeWidgetItem::UserType + 3, AttributeType = QTreeWidgetItem::UserType + 4};
+    LeaveType = QTreeWidgetItem::UserType + 3, AttributeType = QTreeWidgetItem::UserType + 4, OSCNamespace = QTreeWidgetItem::UserType + 5, OSCNode = QTreeWidgetItem::UserType + 6};
 
 
 
@@ -329,6 +329,7 @@ class NetworkTree : public QTreeWidget
 
     private :
         void treeRecursiveExploration(QTreeWidgetItem *curItem);
+        void createOCSBranch(QTreeWidgetItem *curItem);
 
 
         /***********************************************************************

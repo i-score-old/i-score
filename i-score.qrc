@@ -49,5 +49,6 @@
         <file>images/playSimple.svg</file>
         <file>images/stopSimple.svg</file>
         <file>images/i-score.icns</file>
+        <file>images/addANode.png</file>
     </qresource>
 </RCC>

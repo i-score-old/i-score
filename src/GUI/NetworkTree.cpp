@@ -45,6 +45,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <exception>
 #include <QTreeView>
 #include <QByteArray>
+#include <QMessageBox>
 
 static unsigned int NAME_COLUMN = 0;
 static unsigned int VALUE_COLUMN = 1;
@@ -53,6 +54,7 @@ static unsigned int END_COLUMN = 4;
 static unsigned int INTERPOLATION_COLUMN = 3;
 static unsigned int REDUNDANCY_COLUMN = 5;
 static unsigned int SR_COLUMN = 6;
+static QString OSC_ADD_NODE_TEXT = QString("Add a node");
 
 static unsigned int TEXT_POINT_SIZE = 10;
 
@@ -139,7 +141,6 @@ NetworkTree::load() {
     vector<string>::iterator nameIt;
     vector<bool>::iterator requestableIt;
 
-
     QList<QTreeWidgetItem*> itemsList;
 
     for (nameIt = deviceNames.begin(), requestableIt = deviceRequestable.begin() ; nameIt != deviceNames.end(), requestableIt != deviceRequestable.end() ;	++nameIt,++requestableIt) {
@@ -159,8 +160,9 @@ NetworkTree::load() {
 
         QTreeWidgetItem *curItem = NULL;
         if (!(*requestableIt)) {
-
-            curItem = new QTreeWidgetItem(deviceName,NodeNoNamespaceType);
+            //OSCDevice
+            curItem = new QTreeWidgetItem(deviceName,OSCNamespace);
+            createOCSBranch(curItem);
 //            curItem->setCheckState(0,Qt::Unchecked);
 //            curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
         }
@@ -320,6 +322,15 @@ NetworkTree::loadNetworkTree(AbstractBox *abBox){
     setEndMessages(endMsg);
 }
 
+void
+NetworkTree::createOCSBranch(QTreeWidgetItem *curItem){
+    if(!curItem->isDisabled()){
+        QTreeWidgetItem *addANodeItem = new QTreeWidgetItem(QStringList(OSC_ADD_NODE_TEXT),OSCNode);
+        addANodeItem->setIcon(0,QIcon(":/images/addANode.png"));
+        curItem->addChild(addANodeItem);
+    }
+}
+
 QString
 NetworkTree::getAbsoluteAddress(QTreeWidgetItem *item) const {
     QString address;
@@ -424,56 +435,57 @@ void
 NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
 
     if (!curItem->isDisabled()) {
-
         vector<string> nodes,leaves,attributes,attributesValues;
         QString address = getAbsoluteAddress(curItem);
         _addressMap.insert(curItem,address.toStdString());
-        Maquette::getInstance()->requestNetworkNamespace(address.toStdString(), nodes, leaves, attributes, attributesValues);
-        vector<string>::iterator it;
-        vector<string>::iterator it2;
 
-        for (it = leaves.begin() ; it != leaves.end() ; ++it) {
-            QStringList list;
-            list << QString::fromStdString(*it);
-            QTreeWidgetItem *childItem = new QTreeWidgetItem(list,LeaveType);
-//            curItem->setCheckState(NAME_COLUMN,Qt::Unchecked);
-            curItem->setCheckState(START_COLUMN,Qt::Unchecked);
-            curItem->setCheckState(END_COLUMN,Qt::Unchecked);
-            curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-            curItem->addChild(childItem);
-            list.clear();
-            treeRecursiveExploration(childItem);
-        }
-        for (it = attributes.begin(),it2 = attributesValues.begin() ; it != attributes.end(), it2 != attributesValues.end() ; ++it , ++it2) {
-            QStringList list;
-            list << QString::fromStdString(*it + " : " + *it2);
-            QTreeWidgetItem *childItem = new QTreeWidgetItem(list,AttributeType);
-//            curItem->addChild(childItem);
-            list.clear();
+        int request = Maquette::getInstance()->requestNetworkNamespace(address.toStdString(), nodes, leaves, attributes, attributesValues);
+        bool requestSuccess = request>0;
 
-            if(it2==attributesValues.begin()){
-                QString leave_value = QString::fromStdString(*it2);
-                QFont font;
-                font.setCapitalization(QFont::SmallCaps);
-                curItem->setText(VALUE_COLUMN,leave_value);
-                curItem->setFont(VALUE_COLUMN,font);
-//                curItem->setCheckState(NAME_COLUMN,Qt::Unchecked);
-                curItem->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
-                curItem->setCheckState(REDUNDANCY_COLUMN,Qt::Unchecked);
-                curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
+        if(requestSuccess){
+            std::cout<<"success"<<std::endl;
+            vector<string>::iterator it;
+            vector<string>::iterator it2;
+            for (it = leaves.begin() ; it != leaves.end() ; ++it) {
+                QStringList list;
+                list << QString::fromStdString(*it);
+                QTreeWidgetItem *childItem = new QTreeWidgetItem(list,LeaveType);
+                curItem->setCheckState(START_COLUMN,Qt::Unchecked);
+                curItem->setCheckState(END_COLUMN,Qt::Unchecked);
+                curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+                curItem->addChild(childItem);
+                list.clear();
+                treeRecursiveExploration(childItem);
             }
-        }
-        for (it = nodes.begin() ; it != nodes.end() ; ++it) {
-            QStringList list;
-            list << QString::fromStdString(*it);
-            QTreeWidgetItem *childItem = new QTreeWidgetItem( list,NodeNamespaceType);
-//            curItem->setCheckState(0,Qt::Unchecked);
-            curItem->setCheckState(START_COLUMN,Qt::Unchecked);
-            curItem->setCheckState(END_COLUMN,Qt::Unchecked);
-            curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-            curItem->addChild(childItem);
-            list.clear();
-            treeRecursiveExploration(childItem);
+            for (it = attributes.begin(),it2 = attributesValues.begin() ; it != attributes.end(), it2 != attributesValues.end() ; ++it , ++it2) {
+                QStringList list;
+                list << QString::fromStdString(*it + " : " + *it2);
+                list.clear();
+
+                if(it2==attributesValues.begin()){
+                    QString leave_value = QString::fromStdString(*it2);
+                    QFont font;
+                    font.setCapitalization(QFont::SmallCaps);
+                    curItem->setText(VALUE_COLUMN,leave_value);
+                    curItem->setFont(VALUE_COLUMN,font);
+                    curItem->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
+                    curItem->setCheckState(REDUNDANCY_COLUMN,Qt::Unchecked);
+                    curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
+                }
+            }
+            for (it = nodes.begin() ; it != nodes.end() ; ++it) {
+                QStringList list;
+                list << QString::fromStdString(*it);
+                QTreeWidgetItem *childItem = new QTreeWidgetItem( list,NodeNamespaceType);
+    //            curItem->setCheckState(0,Qt::Unchecked);
+                curItem->setCheckState(START_COLUMN,Qt::Unchecked);
+                curItem->setCheckState(END_COLUMN,Qt::Unchecked);
+                curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+                curItem->addChild(childItem);
+                list.clear();
+                std::cout<<"child "<<childItem->text(0).toStdString()<<std::endl;
+                treeRecursiveExploration(childItem);
+            }
         }
     }    
 }
