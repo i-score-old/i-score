@@ -135,22 +135,36 @@ void
 NetworkTree::load() {
     vector<string> deviceNames;
     vector<bool> deviceRequestable;
-    Maquette::getInstance()->getNetworkDeviceNames(deviceNames, deviceRequestable);
+    Maquette::getInstance()->getNetworkDeviceNames(deviceNames, deviceRequestable);    
     vector<string>::iterator nameIt;
     vector<bool>::iterator requestableIt;
+
 
     QList<QTreeWidgetItem*> itemsList;
 
     for (nameIt = deviceNames.begin(), requestableIt = deviceRequestable.begin() ; nameIt != deviceNames.end(), requestableIt != deviceRequestable.end() ;	++nameIt,++requestableIt) {
         QStringList deviceName;
+
+        //delete MaxDevice and MinuitDevice nodes
+        if(QString::fromStdString(*nameIt) == tr("MaxDevice")){
+            deviceNames.erase(nameIt);
+            deviceRequestable.erase(requestableIt);
+        }
+        if(QString::fromStdString(*nameIt) == tr("MinuitDevice")){
+            deviceNames.erase(nameIt);
+            deviceRequestable.erase(requestableIt);
+        }
+
         deviceName << QString::fromStdString(*nameIt);
+
         QTreeWidgetItem *curItem = NULL;
         if (!(*requestableIt)) {
+
             curItem = new QTreeWidgetItem(deviceName,NodeNoNamespaceType);
 //            curItem->setCheckState(0,Qt::Unchecked);
 //            curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
         }
-        else {
+        else {            
             curItem = new QTreeWidgetItem(deviceName,NodeNamespaceType);
 //            curItem->setCheckState(0,Qt::Unchecked);
 //            curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
@@ -164,6 +178,7 @@ NetworkTree::load() {
         itemsList << curItem;
     }
     addTopLevelItems(itemsList);
+
 }
 
 /*
