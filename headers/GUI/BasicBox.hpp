@@ -53,12 +53,13 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <string>
 #include <QInputDialog>
 #include "AbstractBox.hpp"
-#include "CSPTypes.hpp"
 #include "CurvesWidget.hpp"
 #include "BoxWidget.hpp"
 #include <QComboBox>
 #include <QGraphicsProxyWidget>
 #include <QObject>
+
+#include "TTScore.h"
 
 class MaquetteScene;
 class QGraphicsTextItem;
