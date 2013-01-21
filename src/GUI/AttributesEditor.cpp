@@ -74,6 +74,7 @@ using std::map;
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QSizePolicy>
+#include <QTreeView>
 #include "NetworkMessagesEditor.hpp"
 #include "NetworkMessages.hpp"
 #include "CurvesWidget.hpp"
@@ -516,6 +517,7 @@ AttributesEditor::createWidgets()
 	_treeMapLayout->setContentsMargins(LEFT_MARGIN , TOP_MARGIN , RIGHT_MARGIN , BOTTOM_MARGIN);
 
 	_networkTree = new NetworkTree(this);
+
 	_snapshotAssignStart = new QPushButton;
 	_snapshotAssignEnd = new QPushButton;
 	_snapshotAssignLabel = new QLabel;

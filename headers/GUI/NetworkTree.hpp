@@ -317,7 +317,6 @@ class NetworkTree : public QTreeWidget
         virtual void keyReleaseEvent(QKeyEvent *event);
         virtual void mouseDoubleClickEvent(QMouseEvent *event);
 
-
     signals :
         void startValueChanged(QTreeWidgetItem *, QString newValue);
         void endValueChanged(QTreeWidgetItem *, QString newValue);
@@ -371,6 +370,8 @@ class NetworkTree : public QTreeWidget
 
         NetworkMessages *_startMessages;
         NetworkMessages *_endMessages;
+
+        int _OSCMessageCount;
 
 	public slots:
         void itemCollapsed();

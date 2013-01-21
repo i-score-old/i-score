@@ -46,6 +46,9 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QTreeView>
 #include <QByteArray>
 #include <QMessageBox>
+#include <QAbstractItemModel>
+#include <QAbstractItemView>
+#include <QTreeView>
 
 static unsigned int NAME_COLUMN = 0;
 static unsigned int VALUE_COLUMN = 1;
@@ -98,9 +101,10 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
  ****************************************************************************/
 void
 NetworkTree::init(){
+
     _startMessages = new NetworkMessages;
     _endMessages = new NetworkMessages;
-
+    _OSCMessageCount = 0;
     setStyleSheet(
                 "QTreeView {"
                      "show-decoration-selected: 1;"
@@ -162,6 +166,7 @@ NetworkTree::load() {
         if (!(*requestableIt)) {
             //OSCDevice
             curItem = new QTreeWidgetItem(deviceName,OSCNamespace);
+            curItem->setFlags(Qt::ItemIsEnabled);
             createOCSBranch(curItem);
 //            curItem->setCheckState(0,Qt::Unchecked);
 //            curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
@@ -326,6 +331,7 @@ void
 NetworkTree::createOCSBranch(QTreeWidgetItem *curItem){
     if(!curItem->isDisabled()){
         QTreeWidgetItem *addANodeItem = new QTreeWidgetItem(QStringList(OSC_ADD_NODE_TEXT),OSCNode);
+        addANodeItem->setFlags(Qt::ItemIsEnabled);
         addANodeItem->setIcon(0,QIcon(":/images/addANode.png"));
         curItem->addChild(addANodeItem);
     }
@@ -1130,29 +1136,33 @@ NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select){
  *                         SLOTS - Virtual methods
  ************************************************************************/
 
+
+
 void
 NetworkTree::mouseDoubleClickEvent(QMouseEvent *event){
 //    mouseDoubleClickEvent(event);
-
-    if(currentColumn() == START_COLUMN || currentColumn() == END_COLUMN || currentColumn() == SR_COLUMN){
-        QTreeWidgetItem *item = currentItem();
-        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
-        editItem(item,currentColumn());
-
-        if(currentColumn() == START_COLUMN){
-            VALUE_MODIFIED = true;
-        }
-        if(currentColumn() == END_COLUMN){
-            VALUE_MODIFIED = true;
-        }
-        if(currentColumn() == SR_COLUMN){
-            SR_MODIFIED = true;
-        }
-        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
-        item->setSelected(true);
+    if(currentItem()->type() == OSCNode){
+        editItem(currentItem(),currentColumn());
     }
+    else{
+        if(currentColumn() == START_COLUMN || currentColumn() == END_COLUMN || currentColumn() == SR_COLUMN){
+            QTreeWidgetItem *item = currentItem();
+            item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
+            editItem(item,currentColumn());
 
-
+            if(currentColumn() == START_COLUMN){
+                VALUE_MODIFIED = true;
+            }
+            if(currentColumn() == END_COLUMN){
+                VALUE_MODIFIED = true;
+            }
+            if(currentColumn() == SR_COLUMN){
+                SR_MODIFIED = true;
+            }
+            item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
+            item->setSelected(true);
+        }
+    }
 }
 
 void
@@ -1213,6 +1223,16 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item,int column){
             curIt = *it;
             recursiveChildrenSelection(curIt, true);
         }
+    }
+
+    if(item->text(0)== OSC_ADD_NODE_TEXT && item->type()==OSCNode){
+        QString number = QString("%1").arg(_OSCMessageCount);
+        QString name = QString("OSCMessage"+number);
+//        name<<number
+        QStringList OSCname = QStringList(name);
+        QTreeWidgetItem *newItem = new QTreeWidgetItem(OSCname,OSCNode);
+        newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+        item->parent()->insertChild(_OSCMessageCount++,newItem);
     }
 }
 
