@@ -172,7 +172,7 @@ NetworkTree::load() {
 //            curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
 
             try{
-                treeRecursiveExploration(curItem);
+                treeRecursiveExploration(curItem,true);
             }catch (const std::exception & e){
                 std::cerr << *nameIt << " : " << e.what();
             }
@@ -432,7 +432,7 @@ NetworkTree::hasStartEndMsg(QTreeWidgetItem *item){
 //}
 
 void
-NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
+NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict){
 
     if (!curItem->isDisabled()) {
         vector<string> nodes,leaves,attributes,attributesValues;
@@ -443,7 +443,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
         bool requestSuccess = request>0;
 
         if(requestSuccess){
-            std::cout<<"success"<<std::endl;
+            conflict = false;
             vector<string>::iterator it;
             vector<string>::iterator it2;
             for (it = leaves.begin() ; it != leaves.end() ; ++it) {
@@ -455,7 +455,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
                 curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
                 curItem->addChild(childItem);
                 list.clear();
-                treeRecursiveExploration(childItem);
+                treeRecursiveExploration(childItem,conflict);
             }
             for (it = attributes.begin(),it2 = attributesValues.begin() ; it != attributes.end(), it2 != attributesValues.end() ; ++it , ++it2) {
                 QStringList list;
@@ -483,8 +483,12 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
                 curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
                 curItem->addChild(childItem);
                 list.clear();
-                std::cout<<"child "<<childItem->text(0).toStdString()<<std::endl;
-                treeRecursiveExploration(childItem);
+                treeRecursiveExploration(childItem,conflict);
+            }
+        }
+        else{
+            if(conflict){
+                QMessageBox::warning(this,"","Application conflict : Another instance is working");
             }
         }
     }    

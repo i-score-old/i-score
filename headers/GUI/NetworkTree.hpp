@@ -328,7 +328,7 @@ class NetworkTree : public QTreeWidget
         void curveSampleRateChanged(QTreeWidgetItem *, int);
 
     private :
-        void treeRecursiveExploration(QTreeWidgetItem *curItem);
+        void treeRecursiveExploration(QTreeWidgetItem *curItem, bool onflict);
         void createOCSBranch(QTreeWidgetItem *curItem);
 
 
