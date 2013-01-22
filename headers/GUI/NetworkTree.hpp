@@ -295,8 +295,9 @@ class NetworkTree : public QTreeWidget
         /*!
          * \brief Reset the display of assigned fathers (full and partial nodes) and clear lists.
          */
-        void resetAssignedNodes();
-        void addOSCMessage(unsigned int boxID);
+        void resetAssignedNodes();        
+        void addOSCMessage();
+        void assignOCSMsg(QTreeWidgetItem *item);
 
         /***********************************************************************
          *                              Curves
@@ -324,7 +325,8 @@ class NetworkTree : public QTreeWidget
         void curveActivationChanged(QTreeWidgetItem *, bool);
         void curveRedundancyChanged(QTreeWidgetItem *, bool);
         void curveSampleRateChanged(QTreeWidgetItem *, int);
-        void addOSCNodeClicked();
+        void startOSCMessageChanged(QTreeWidgetItem *item, QString newValue);
+        void endOSCMessageChanged(QTreeWidgetItem *item, QString newValue);
 
     private :
         void treeRecursiveExploration(QTreeWidgetItem *curItem, bool onflict);

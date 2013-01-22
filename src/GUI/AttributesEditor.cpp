@@ -804,8 +804,7 @@ AttributesEditor::connectSlots()
     connect(_networkTree, SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(removeFromExpandedItemsList(QTreeWidgetItem*)));
     connect(_networkTree,SIGNAL(curveActivationChanged(QTreeWidgetItem*,bool)),this,SLOT(curveActivationChanged(QTreeWidgetItem*,bool)));
     connect(_networkTree,SIGNAL(curveRedundancyChanged(QTreeWidgetItem*,bool)),this,SLOT(curveRedundancyChanged(QTreeWidgetItem*,bool)));
-    connect(_networkTree,SIGNAL(curveSampleRateChanged(QTreeWidgetItem*,int)),this,SLOT(curveSampleRateChanged(QTreeWidgetItem*,int)));
-    connect(_networkTree,SIGNAL(addOSCNodeClicked()),this,SLOT(addDefaultOSCNode()));
+    connect(_networkTree,SIGNAL(curveSampleRateChanged(QTreeWidgetItem*,int)),this,SLOT(curveSampleRateChanged(QTreeWidgetItem*,int)));    
 
 	connect(_treeMapLoad, SIGNAL(clicked()), this, SLOT(reloadTreeMap()));
 	connect(_treeMapUp, SIGNAL(clicked()), this, SLOT(upTreeMap()));
@@ -1172,14 +1171,6 @@ AttributesEditor::speedHeldChanged() {
 		_palette->setSpeed(speed);
 
 	profilesChanged();
-}
-
-void
-AttributesEditor::addDefaultOSCNode(){
-    if(_boxEdited!=NO_ID)
-        _networkTree->addOSCMessage(_boxEdited);
-    else
-        _scene->displayMessage("No box selected",INDICATION_LEVEL);
 }
 
 void

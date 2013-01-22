@@ -36,7 +36,6 @@ BoxCurveEdit::closeEvent(QCloseEvent *){
 
 void
 BoxCurveEdit::resetBox(){
-    std::cout<<">>>>>>reset box widget<<<<<"<<std::endl;
     _basicBox->setComboBox(_comboBox);
     _basicBox->setStackedLayout(_stackedLayout);
     _basicBox->update();
