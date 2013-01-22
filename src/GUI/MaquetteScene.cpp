@@ -1537,7 +1537,7 @@ MaquetteScene::addRelation(const AbstractRelation &abstractRel) {
 			newRel->setID(relationID);
 			newRel->setPos(newRel->getCenter());
 			newRel->update();
-			addItem(newRel);
+//			addItem(newRel);
 			BasicBox *box = NULL;
             if ((box = getBox(abstractRel.firstBox())) != NULL) {
 				box->addRelation(abstractRel.firstExtremity(),newRel);
