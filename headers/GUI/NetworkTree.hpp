@@ -79,7 +79,6 @@ class NetworkTree : public QTreeWidget
          ***********************************************************************/
 
 
-
         QMap<QTreeWidgetItem *, Data> treeSnapshot(unsigned int boxID);
 
 		std::vector<std::string> snapshot();
@@ -297,7 +296,7 @@ class NetworkTree : public QTreeWidget
          * \brief Reset the display of assigned fathers (full and partial nodes) and clear lists.
          */
         void resetAssignedNodes();
-
+        void addOSCMessage(unsigned int boxID);
 
         /***********************************************************************
          *                              Curves
@@ -311,8 +310,7 @@ class NetworkTree : public QTreeWidget
         void setHasCurve(QTreeWidgetItem *item, bool val);
         void setCurveActivated(QTreeWidgetItem *item, bool activated);
         void setRedundancy(QTreeWidgetItem *item, bool activated);
-        void updateLine(QTreeWidgetItem *item, bool interpolationState, int sampleRate, bool redundancy);
-        void addOSCMessage();
+        void updateLine(QTreeWidgetItem *item, bool interpolationState, int sampleRate, bool redundancy);        
 
         virtual void keyPressEvent(QKeyEvent *event);
         virtual void keyReleaseEvent(QKeyEvent *event);
@@ -326,6 +324,7 @@ class NetworkTree : public QTreeWidget
         void curveActivationChanged(QTreeWidgetItem *, bool);
         void curveRedundancyChanged(QTreeWidgetItem *, bool);
         void curveSampleRateChanged(QTreeWidgetItem *, int);
+        void addOSCNodeClicked();
 
     private :
         void treeRecursiveExploration(QTreeWidgetItem *curItem, bool onflict);

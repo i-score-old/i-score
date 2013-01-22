@@ -290,30 +290,40 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
     return itemsMatchedList;
 }
 
+
+
 void
-NetworkTree::addOSCMessage(){
-    QString number = QString("%1").arg(_OSCMessageCount);
-    QString name = QString("/OSCMessage"+number);
+NetworkTree::addOSCMessage(unsigned int boxID){
 
-    QStringList OSCname = QStringList(name);
-    QTreeWidgetItem *newItem = new QTreeWidgetItem(OSCname,OSCNode);
-    newItem->setText(START_COLUMN,tr("/Start"));
-    newItem->setText(END_COLUMN,tr("/End"));
-    newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
-    _OSCNodeRoot->insertChild(_OSCMessageCount++,newItem);
+    BasicBox *box = Maquette::getInstance()->getBox(boxID);
 
-    _OSCStartMessages->addMessage(newItem,_OSCNodeRoot->text(NAME_COLUMN),newItem->text(NAME_COLUMN),newItem->text(START_COLUMN));
-    _OSCEndMessages->addMessage(newItem,_OSCNodeRoot->text(NAME_COLUMN),newItem->text(NAME_COLUMN),newItem->text(END_COLUMN));
+    if (box != NULL){
+//        QString number = QString("%1").arg(_OSCMessageCount);
+        QString name = QString("/OSC"+box->name());
+        QStringList OSCname = QStringList(name);
 
-    vector<string> startList = _OSCStartMessages->computeMessages();
-    std::cout<<"OSC START MESSAGES : "<<std::endl;
-    for(int i=0 ; i<startList.size() ; i++){
-        std::cout<<startList[i]<<std::endl;
-    }
-    vector<string> endList = _OSCEndMessages->computeMessages();
-    std::cout<<"\nOSC END MESSAGES : "<<std::endl;
-    for(int i=0 ; i<endList.size() ; i++){
-        std::cout<<endList[i]<<std::endl;
+        QTreeWidgetItem *newItem = new QTreeWidgetItem(OSCname,OSCNode);
+        newItem->setText(START_COLUMN,tr("/Start"));
+        newItem->setText(END_COLUMN,tr("/End"));
+        newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+        _OSCNodeRoot->insertChild(_OSCMessageCount++,newItem);
+
+        _OSCStartMessages->addMessage(newItem,_OSCNodeRoot->text(NAME_COLUMN),newItem->text(NAME_COLUMN),newItem->text(START_COLUMN));
+        _OSCEndMessages->addMessage(newItem,_OSCNodeRoot->text(NAME_COLUMN),newItem->text(NAME_COLUMN),newItem->text(END_COLUMN));
+
+        //***********************     PRINT     ***************************
+        vector<string> startList = _OSCStartMessages->computeMessages();
+
+        std::cout<<"OSC START MESSAGES : "<<std::endl;
+        for(int i=0 ; i<startList.size() ; i++){
+            std::cout<<startList[i]<<std::endl;
+        }
+        vector<string> endList = _OSCEndMessages->computeMessages();
+        std::cout<<"\nOSC END MESSAGES : "<<std::endl;
+        for(int i=0 ; i<endList.size() ; i++){
+            std::cout<<endList[i]<<std::endl;
+        }
+        //******************************************************************
     }
 }
 
@@ -526,7 +536,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict){
         }
         else{
             if(conflict){
-                QMessageBox::warning(this,"","Application conflict : Another instance is working");
+                QMessageBox::warning(this,"","Network connection failed : Please check if your remote application is running or if another i-score instance is not already working");
             }
         }
     }    
@@ -1258,7 +1268,9 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item,int column){
     }
 
     if(item->text(0)== OSC_ADD_NODE_TEXT && item->type()==OSCNode)
-        addOSCMessage();
+        emit(addOSCNodeClicked());
+
+//        addOSCMessage();
 
 }
 
@@ -1545,7 +1557,6 @@ NetworkTree::updateLine(QTreeWidgetItem *item, bool interpolationState, int samp
         item->setCheckState(INTERPOLATION_COLUMN,Qt::Checked);
     else
         item->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
-    //TODO remove from comboBox
 
     //SAMPLE RATE
     setSampleRate(item,sampleRate);

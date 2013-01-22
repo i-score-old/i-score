@@ -789,31 +789,28 @@ AttributesEditor::connectSlots()
 	connect(_endMsgClearButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(clear()));
 
 	connect(_startMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(startMessagesChanged()));
-//	connect(_startMsgsEditor,SIGNAL(messageChanged(const std::string &)),this,SLOT(startMessageChanged(const std::string &)));
 
-    //NICO
-//    connect(_networkTree,SIGNAL(startMessageValueChanged(const std::string &)),this,SLOT(startMessageChanged(const std::string &)));
     connect(_networkTree,SIGNAL(startMessageValueChanged(QTreeWidgetItem *)),this,SLOT(startMessageChanged(QTreeWidgetItem *)));
     connect(_networkTree,SIGNAL(endMessageValueChanged(QTreeWidgetItem *)),this,SLOT(endMessageChanged(QTreeWidgetItem *)));
 
 	connect(_startMsgsEditor,SIGNAL(messageRemoved(const std::string &)),this,SLOT(startMessageRemoved(const std::string &)));
 	connect(_endMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(endMessagesChanged()));
-//	connect(_endMsgsEditor,SIGNAL(messageChanged(const std::string &)),this,SLOT(endMessageChanged(const std::string &)));
 	connect(_endMsgsEditor,SIGNAL(messageRemoved(const std::string &)),this,SLOT(endMessageRemoved(const std::string &)));
 
 	connect(_snapshotAssignStart, SIGNAL(clicked()),this,SLOT(snapshotStartAssignment()));
 	connect(_snapshotAssignEnd, SIGNAL(clicked()),this,SLOT(snapshotEndAssignment()));
-    //NICO
+
     connect(_networkTree, SIGNAL(itemExpanded(QTreeWidgetItem *)),this,SLOT(addToExpandedItemsList(QTreeWidgetItem*)));
     connect(_networkTree, SIGNAL(itemCollapsed(QTreeWidgetItem *)),this,SLOT(removeFromExpandedItemsList(QTreeWidgetItem*)));
     connect(_networkTree,SIGNAL(curveActivationChanged(QTreeWidgetItem*,bool)),this,SLOT(curveActivationChanged(QTreeWidgetItem*,bool)));
     connect(_networkTree,SIGNAL(curveRedundancyChanged(QTreeWidgetItem*,bool)),this,SLOT(curveRedundancyChanged(QTreeWidgetItem*,bool)));
     connect(_networkTree,SIGNAL(curveSampleRateChanged(QTreeWidgetItem*,int)),this,SLOT(curveSampleRateChanged(QTreeWidgetItem*,int)));
+    connect(_networkTree,SIGNAL(addOSCNodeClicked()),this,SLOT(addDefaultOSCNode()));
 
 	connect(_treeMapLoad, SIGNAL(clicked()), this, SLOT(reloadTreeMap()));
 	connect(_treeMapUp, SIGNAL(clicked()), this, SLOT(upTreeMap()));
 	connect(_treeMapAssignStart, SIGNAL(clicked()),this,SLOT(treeMapStartAssignment()));
-	connect(_treeMapAssignEnd, SIGNAL(clicked()),this,SLOT(treeMapEndAssignment()));
+	connect(_treeMapAssignEnd, SIGNAL(clicked()),this,SLOT(treeMapEndAssignment()));        
 }
 
 void
@@ -1060,8 +1057,7 @@ AttributesEditor::updateWidgets(bool boxModified)
 	shapeChanged();
 	pitchStartChanged();
 
-	update();
-//    std::cout<<"OK"<<std::endl;
+    update();
 }
 
 Palette
@@ -1176,6 +1172,14 @@ AttributesEditor::speedHeldChanged() {
 		_palette->setSpeed(speed);
 
 	profilesChanged();
+}
+
+void
+AttributesEditor::addDefaultOSCNode(){
+    if(_boxEdited!=NO_ID)
+        _networkTree->addOSCMessage(_boxEdited);
+    else
+        _scene->displayMessage("No box selected",INDICATION_LEVEL);
 }
 
 void
@@ -1341,17 +1345,11 @@ AttributesEditor::startMessagesChanged()
 {
     BasicBox * box = _scene->getBox(_boxEdited);
     if(_boxEdited!=NO_ID){
-        if(box->type()==SOUND_BOX_TYPE){
-            vector<string> msgs = _startMsgsEditor->computeMessages();
-    //        Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,msgs);
-            Maquette::getInstance()->setStartMessagesToSend(_boxEdited,_networkTree->startMessages());
-        }
+        if(box->type()==SOUND_BOX_TYPE)
+            Maquette::getInstance()->setStartMessagesToSend(_boxEdited,_networkTree->startMessages());        
         else{
             QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
-
-            vector<string> networkMsgs = _networkTree->startMessages()->computeMessages();
             Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
-        //    Maquette::getInstance()->setFirstMessagesToSend(_boxEdited,networkMsgs);
             Maquette::getInstance()->setStartMessagesToSend(_boxEdited,_networkTree->startMessages());
 
             _networkTree->updateStartMsgsDisplay();

@@ -488,6 +488,7 @@ class BasicBox : public QObject, public QGraphicsItem
    * \param messages : the messages to send at box's start
    */
   void setStartMessages(NetworkMessages *messages);
+  void setStartOSCMessages(NetworkMessages *messages);
   /*!
    * \brief Sets networkTreeItems to send when the start of the box is reached.
    *
@@ -528,6 +529,7 @@ class BasicBox : public QObject, public QGraphicsItem
    * \param messages : the messages to send at box's end
    */
   void setEndMessages(NetworkMessages *messages);
+  void setEndOSCMessages(NetworkMessages *messages);
   void updateWidgets();
   //! \brief Handles line width.
   static const unsigned int LINE_WIDTH = 2;

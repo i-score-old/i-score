@@ -64,7 +64,7 @@ const float Relation::HANDLE_WIDTH = 12.;
 const float Relation::GRIP_CIRCLE_SIZE = 5;
 const float Relation::RAIL_WIDTH = HANDLE_HEIGHT/2;
 const float Relation::LINE_WIDTH = 2;
-const float Relation::RIGID_TOLERANCE = 2.;
+const float Relation::RIGID_TOLERANCE = 0.;
 
 Relation::Relation(unsigned int firstBoxID, BoxExtremity firstBoxExt, unsigned int secondBoxID,
            BoxExtremity secondBoxExt, MaquetteScene *parent)
@@ -355,9 +355,10 @@ Relation::mouseDoubleClickEvent (QGraphicsSceneMouseEvent * event) {
     QGraphicsItem::mouseDoubleClickEvent(event);
     float maxBound;
     if (!_scene->playing()) {
-        if(!_flexibleRelation)
-            _elasticMode=!_elasticMode;
-
+        if(!_flexibleRelation){
+            _elasticMode=!_elasticMode;            
+            updateFlexibility();
+        }
         else if(_abstract->maxBound()==NO_BOUND || _lastMaxBound!=-1){
             if(_lastMaxBound != -1)
                 maxBound = std::max(_lastMaxBound*_scene->zoom(), (float)(mapFromScene(_end).x()-mapFromScene(_start).x()+LINE_WIDTH));
@@ -418,28 +419,27 @@ Relation::mousePressEvent (QGraphicsSceneMouseEvent * event) {
 
 void
 Relation::mouseMoveEvent (QGraphicsSceneMouseEvent * event) {
-  QGraphicsItem::mouseMoveEvent(event);
-  double eventPosX = mapFromScene(event->scenePos()).x();
-  double startX = mapFromScene(_start).x();
-  double endX = mapFromScene(_end).x();
+    QGraphicsItem::mouseMoveEvent(event);
+    double eventPosX = mapFromScene(event->scenePos()).x();
+    double startX = mapFromScene(_start).x();
 
-  if (_leftHandleSelected) {
-    changeBounds(_abstract->maxBound()==NO_BOUND ? std::max((eventPosX - startX)/_scene->zoom(),0.) : std::min((float)std::max((eventPosX - startX)/_scene->zoom(),0.),_abstract->maxBound()),_abstract->maxBound());
+    if (_leftHandleSelected) {
+    changeBounds(_abstract->maxBound()==NO_BOUND ? std::max(eventPosX - startX,0.) : std::min((float)std::max(eventPosX - startX,0.),_abstract->maxBound()),_abstract->maxBound());
     _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
     update();
-  }
-  else if (_rightHandleSelected) {
-    _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),std::max((float)std::max((eventPosX - startX)/_scene->zoom(),0.),_abstract->minBound()));
+    }
+    else if (_rightHandleSelected) {
+    _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),std::max((float)std::max(eventPosX - startX,0.),_abstract->minBound()));
     update();
-  }
-  else if (_middleHandleSelected){
-      _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,std::max(2*(eventPosX -startX)/_scene->zoom(),0.),std::max(2*(eventPosX -startX)/_scene->zoom(),0.));
-  }
+    }
+    else if (_middleHandleSelected){
+      _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,std::max(2*(eventPosX - startX),0.),std::max(2*(eventPosX - startX),0.));
+    }
 }
 
 void
 Relation::mouseReleaseEvent (QGraphicsSceneMouseEvent * event) {
-  QGraphicsItem::mouseReleaseEvent(event);
+    QGraphicsItem::mouseReleaseEvent(event);
     _leftHandleSelected = false;
     _rightHandleSelected = false;
 }
@@ -512,14 +512,15 @@ Relation::updateFlexibility(){
         _flexibleRelation = false;
 
 
-
-
     double startX = mapFromScene(_start).x();
     double endX = mapFromScene(_end).x();
 
-    if (!_flexibleRelation){
-        changeBounds(endX-startX,endX-startX);
-        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
+    if(_elasticMode)
+        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,NO_BOUND,NO_BOUND);
+    else if (!_flexibleRelation){
+        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,(endX-startX)/_scene->zoom(),(endX-startX)/_scene->zoom()+RIGID_TOLERANCE);
+//        changeBounds(endX-startX,endX-startX);
+//        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
     }
     else{
         changeBounds(0,NO_BOUND);
@@ -660,7 +661,7 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
             painter->setPen(handlePen);
             painter->drawLine(startX+(endX - startX)/2,endY-HANDLE_HEIGHT/2,startX+(endX - startX)/2,endY+HANDLE_HEIGHT/2);
 
-            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,(endX-startX)/_scene->zoom(),(endX-startX)/_scene->zoom()+RIGID_TOLERANCE);
+//            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,(endX-startX)/_scene->zoom(),(endX-startX)/_scene->zoom()+RIGID_TOLERANCE);
         }
         else{
             double handleZone = 10;
@@ -670,7 +671,7 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
             painter->setPen(solidLine);
             painter->drawLine(startX+(endX - startX)/2 + handleZone,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX-GRIP_CIRCLE_SIZE, endY);
 
-            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,NO_BOUND,NO_BOUND);
+//            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,NO_BOUND,NO_BOUND);
         }        
     }
 }

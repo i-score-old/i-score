@@ -795,7 +795,11 @@ BasicBox::setFirstMessagesToSend(const vector<string> &messages) {
 void
 BasicBox::setStartMessages(NetworkMessages *messages) {
     _abstract->setStartMessages(messages);
+}
 
+void
+BasicBox::setStartOSCMessages(NetworkMessages *messages) {
+    _abstract->setStartOSCMessages(messages);
 }
 
 void
@@ -831,6 +835,11 @@ BasicBox::setLastMessagesToSend(const vector<string> &messages) {
 void
 BasicBox::setEndMessages(NetworkMessages *messages) {
     _abstract->setEndMessages(messages);
+}
+
+void
+BasicBox::setEndOSCMessages(NetworkMessages *messages) {
+    _abstract->setEndOSCMessages(messages);
 }
 
 vector<string>

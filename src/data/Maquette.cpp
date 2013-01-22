@@ -753,6 +753,30 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages){
 }
 
 bool
+Maquette::setStartOSCMessagesToSend(unsigned int boxID, NetworkMessages *messages){
+
+//    vector<string> firstMsgs = messages->computeMessages();
+
+    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+        //PRINT
+//            std::cout<<"---- Maquette::SETSTARTMESSAGETOSEND ----"<<std::endl;
+//            for(int i=0 ; i<firstMsgs.size(); i++ )
+//                std::cout<< firstMsgs[i]<<std::endl;
+//            std::cout<<std::endl<<std::endl;
+        //PRINT
+//        _engines->setCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
+        _boxes[boxID]->setStartOSCMessages(messages);
+
+//        vector<string> lastMsgs;
+//        _engines->getCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
+//        updateCurves(boxID,firstMsgs,lastMsgs);
+
+        return true;
+    }
+    return false;
+}
+
+bool
 Maquette::setSelectedItemsToSend(unsigned int boxID,  QMap<QTreeWidgetItem*,Data> itemsSelected){
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
 
@@ -847,6 +871,25 @@ Maquette::setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages) {
     }
     return false;
 }
+
+bool
+Maquette::setEndOSCMessagesToSend(unsigned int boxID, NetworkMessages *messages) {
+    vector<string> lastMsgs = messages->computeMessages();
+    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+        //TODO send to engine
+//        _engines->setCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
+
+        _boxes[boxID]->setEndOSCMessages(messages);
+
+        vector<string> firstMsgs;
+//        _engines->getCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
+//        updateCurves(boxID,firstMsgs,lastMsgs);
+
+        return true;
+    }
+    return false;
+}
+
 
 bool
 Maquette::sendMessage(const string &message) {
@@ -1327,8 +1370,8 @@ Maquette::changeRelationBounds(unsigned int relID, const float &minBound, const 
 	if (maxBound != NO_BOUND) {
         maxBoundMS = maxBound * (MaquetteScene::MS_PER_PIXEL*_scene->zoom());
 	}
-	_engines->changeTemporalRelationBounds(relID,minBoundMS,maxBoundMS,movedBoxes);
-	updateBoxesFromEngines(movedBoxes);
+    _engines->changeTemporalRelationBounds(relID,minBoundMS,maxBoundMS,movedBoxes);
+    updateBoxesFromEngines(movedBoxes);
 }
 
 int

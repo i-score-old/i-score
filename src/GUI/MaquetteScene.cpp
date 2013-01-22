@@ -766,9 +766,10 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
     switch (_currentInteractionMode) {
 	case RELATION_MODE :
 
-		if (itemAt(mouseEvent->scenePos()) != 0) {
+        if (itemAt(mouseEvent->scenePos()) != 0) {
 			int type = itemAt(mouseEvent->scenePos())->type();
             if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+
                 BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
 
                 BasicBox *firstBox = getBox(_relation->firstBox());
@@ -790,7 +791,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 					}
 				}
 			}
-			else {
+            else {
 				_relationBoxFound = false;
 				delete _relation;
 				_relation = new AbstractRelation;
@@ -1544,9 +1545,7 @@ MaquetteScene::addRelation(const AbstractRelation &abstractRel) {
             if ((box = getBox(abstractRel.secondBox())) != NULL) {
 				box->addRelation(abstractRel.secondExtremity(),newRel);
 			}
-
-
-
+            newRel->updateFlexibility();
 
 			ret = SUCCESS;
 		}
@@ -1593,23 +1592,22 @@ MaquetteScene::addPendingRelation()
 void
 MaquetteScene::changeRelationBounds(unsigned int relID, const float &length, const float &minBound, const float &maxBound)
 {
-
-	Relation *rel = getRelation(relID);
-	if (rel != NULL) {
-		_maquette->changeRelationBounds(relID,minBound,maxBound);
+    Relation *rel = getRelation(relID);
+    if (rel != NULL) {
+        _maquette->changeRelationBounds(relID,minBound,maxBound);
         rel->changeBounds(minBound,maxBound);
-		if (length != NO_LENGTH){
-			AbstractRelation *abRel = static_cast<AbstractRelation*>(rel->abstract());
-			float oldLength = abRel->length();
-			BasicBox *secondBox = getBox(abRel->secondBox());
-			if (secondBox != NULL) {
-				secondBox->moveBy(length - oldLength,0.);
-				vector<unsigned int> boxMoved;
-				boxMoved.push_back(secondBox->ID());
-				boxesMoved(boxMoved);
-			}
-		}
-	}
+        if (length != NO_LENGTH){
+            AbstractRelation *abRel = static_cast<AbstractRelation*>(rel->abstract());
+            float oldLength = abRel->length();
+            BasicBox *secondBox = getBox(abRel->secondBox());
+            if (secondBox != NULL) {
+                secondBox->moveBy(length - oldLength,0.);
+                vector<unsigned int> boxMoved;
+                boxMoved.push_back(secondBox->ID());
+                boxesMoved(boxMoved);
+            }
+        }
+    }
 }
 
 bool

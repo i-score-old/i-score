@@ -134,6 +134,7 @@ class AttributesEditor : public QDockWidget
    * \brief Updates values of widgets according to the editor current attributes
    **/
   void updateWidgets(bool boxModified);
+  void addDefaultOSCNode();
 
  protected:
   /*!
