@@ -536,7 +536,8 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict){
         }
         else{
             if(conflict){
-                QMessageBox::warning(this,"","Network connection failed : Please check if your remote application is running or if another i-score instance is not already working");
+                curItem->setIcon(NAME_COLUMN,QIcon(":/images/error-icon.png"));
+                curItem->setToolTip(NAME_COLUMN,tr("Network connection failed : Please check if your remote application is running or if another i-score instance is not already working"));
             }
         }
     }    
