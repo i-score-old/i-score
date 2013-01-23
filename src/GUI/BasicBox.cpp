@@ -798,8 +798,8 @@ BasicBox::setStartMessages(NetworkMessages *messages) {
 }
 
 void
-BasicBox::setStartOSCMessages(NetworkMessages *messages) {
-    _abstract->setStartOSCMessages(messages);
+BasicBox::addStartOSCMessage(QTreeWidgetItem *item, QString message) {
+    _abstract->addStartOSCMessage(item,message);
 }
 
 void
@@ -838,8 +838,8 @@ BasicBox::setEndMessages(NetworkMessages *messages) {
 }
 
 void
-BasicBox::setEndOSCMessages(NetworkMessages *messages) {
-    _abstract->setEndOSCMessages(messages);
+BasicBox::addEndOSCMessage(QTreeWidgetItem *item, QString message) {
+    _abstract->addEndOSCMessage(item,message);
 }
 
 vector<string>

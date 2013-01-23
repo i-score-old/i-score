@@ -212,9 +212,8 @@ class AbstractBox : public Abstract
     _startMessages->clear();
     _startMessages = new NetworkMessages(startMsgs->getMessages());
     }
-  inline void setStartOSCMessages(NetworkMessages *startMsgs){
-    _startOSCMessages->clear();
-    _startOSCMessages = new NetworkMessages(startMsgs->getMessages());
+  inline void addStartOSCMessage(QTreeWidgetItem *item, QString message){
+    _startOSCMessages->addMessage(item,message);
     }
   /*!
    * \brief Sets the items to send at box start.
@@ -270,14 +269,15 @@ class AbstractBox : public Abstract
     _endMessages->clear();
     _endMessages = new NetworkMessages(endMsgs->getMessages());
     }
-  inline void setEndOSCMessages(NetworkMessages *endMsgs){
-    _endOSCMessages->clear();
-    _endOSCMessages = new NetworkMessages(endMsgs->getMessages());
+  inline void addEndOSCMessage(QTreeWidgetItem *item, QString message){
+    _endOSCMessages->addMessage(item,message);
     }
   inline bool hasFirstMsgs(){return !_startMessages->messages().empty();}
   inline bool hasLastMsgs(){return !_endMessages->messages().empty();}
   inline bool hasStartOSCMsgs(){return !_startOSCMessages->messages().empty();}
   inline bool hasEndOSCMsgs(){return !_endOSCMessages->messages().empty();}
+  inline NetworkMessages *startOSCMsgs(){return _startOSCMessages;}
+  inline NetworkMessages *endOSCMsgs(){return _endOSCMessages;}
 
  protected :
 

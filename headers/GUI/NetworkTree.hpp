@@ -88,6 +88,7 @@ class NetworkTree : public QTreeWidget
 		  * \param item : the item to get address for
 		  */
 		QString getAbsoluteAddress(QTreeWidgetItem *item) const;
+        QString getAbsoluteAddressWithValue(QTreeWidgetItem *item, int column) const;
         /*!
          * \brief Gets the absolute address of an item in the snapshot tree.
          *
@@ -102,6 +103,10 @@ class NetworkTree : public QTreeWidget
          * \brief Sets start messages.
          * \param The messages to set.
          */
+        inline void setStartOSCMessages(NetworkMessages *messages){
+             _OSCStartMessages->clear();
+             _OSCStartMessages = new NetworkMessages(messages->getMessages());
+        }
         inline void setStartMessages(NetworkMessages *messages){
              _startMessages->clear();
              _startMessages = new NetworkMessages(messages->getMessages());
@@ -114,16 +119,20 @@ class NetworkTree : public QTreeWidget
             _endMessages->clear();
             _endMessages = new NetworkMessages(messages->getMessages());
         }
+        inline void setEndOSCMessages(NetworkMessages *messages){
+            _OSCEndMessages->clear();
+            _OSCEndMessages = new NetworkMessages(messages->getMessages());
+        }
         /*!
          * \brief Adds start messages.
          * \param The messages to add.
          */
-        inline void addOSCStartMessage(QTreeWidgetItem *item, QString msg){_OSCStartMessages->addMessage(item,msg);}
+        void addOSCStartMessage(QTreeWidgetItem *item, QString msg);
         /*!
          * \brief Adds start messages.
          * \param The messages to add.
          */
-        inline void addOSCEndMessage(QTreeWidgetItem *item, QString msg){_OSCEndMessages->addMessage(item,msg);}
+        void addOSCEndMessage(QTreeWidgetItem *item, QString msg);
         /*!
          * \brief Getter.
          * \return Start messages.
@@ -156,14 +165,18 @@ class NetworkTree : public QTreeWidget
          * \brief Resets the network tree display (assigned/selected items).
          */
         void resetNetworkTree();
+        void clearOSCMessages();
+        void displayBoxContent(AbstractBox *abBox);
         /*!
          * \brief Refreshes the display of start messages.
          */
         void updateStartMsgsDisplay();
+        void updateStartOSCMsgsDisplay();
         /*!
          * \brief Refreshes the display of end messages.
          */
         void updateEndMsgsDisplay();
+        void updateEndOSCMsgsDisplay();
         /*!
          * \brief Clears a columns.
          * \param column : the column numero.
@@ -317,6 +330,19 @@ class NetworkTree : public QTreeWidget
         virtual void keyReleaseEvent(QKeyEvent *event);
         virtual void mouseDoubleClickEvent(QMouseEvent *event);
 
+        static unsigned int NAME_COLUMN ;
+        static unsigned int VALUE_COLUMN ;
+        static unsigned int START_COLUMN ;
+        static unsigned int END_COLUMN ;
+        static unsigned int INTERPOLATION_COLUMN ;
+        static unsigned int REDUNDANCY_COLUMN ;
+        static unsigned int SR_COLUMN ;
+        static QString OSC_ADD_NODE_TEXT ;
+        static unsigned int TEXT_POINT_SIZE ;
+
+        bool VALUE_MODIFIED;
+        bool SR_MODIFIED;
+
     signals :
         void startValueChanged(QTreeWidgetItem *, QString newValue);
         void endValueChanged(QTreeWidgetItem *, QString newValue);
@@ -325,8 +351,12 @@ class NetworkTree : public QTreeWidget
         void curveActivationChanged(QTreeWidgetItem *, bool);
         void curveRedundancyChanged(QTreeWidgetItem *, bool);
         void curveSampleRateChanged(QTreeWidgetItem *, int);
-        void startOSCMessageChanged(QTreeWidgetItem *item, QString newValue);
-        void endOSCMessageChanged(QTreeWidgetItem *item, QString newValue);
+        void startOSCMessageChanged(QTreeWidgetItem *item, QString message);
+        void startOSCMessageAdded(QTreeWidgetItem *item, QString message);
+        void startOSCMessageRemoved(QTreeWidgetItem *item);
+        void endOSCMessageChanged(QTreeWidgetItem *item, QString message);
+        void endOSCMessageAdded(QTreeWidgetItem *item, QString message);
+        void endOSCMessageRemoved(QTreeWidgetItem *item);
 
     private :
         void treeRecursiveExploration(QTreeWidgetItem *curItem, bool onflict);

@@ -50,19 +50,17 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QAbstractItemView>
 #include <QTreeView>
 
-static unsigned int NAME_COLUMN = 0;
-static unsigned int VALUE_COLUMN = 1;
-static unsigned int START_COLUMN = 2;
-static unsigned int END_COLUMN = 4;
-static unsigned int INTERPOLATION_COLUMN = 3;
-static unsigned int REDUNDANCY_COLUMN = 5;
-static unsigned int SR_COLUMN = 6;
-static QString OSC_ADD_NODE_TEXT = QString("Add a node");
+unsigned int NetworkTree::NAME_COLUMN = 0;
+unsigned int NetworkTree::VALUE_COLUMN = 1;
+unsigned int NetworkTree::START_COLUMN = 2;
+unsigned int NetworkTree::END_COLUMN = 4;
+unsigned int NetworkTree::INTERPOLATION_COLUMN = 3;
+unsigned int NetworkTree::REDUNDANCY_COLUMN = 5;
+unsigned int NetworkTree::SR_COLUMN = 6;
+QString NetworkTree::OSC_ADD_NODE_TEXT = QString("Add a node");
 
-static unsigned int TEXT_POINT_SIZE = 10;
+unsigned int NetworkTree::TEXT_POINT_SIZE = 10;
 
-bool VALUE_MODIFIED;
-bool SR_MODIFIED;
 
 NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 {
@@ -381,11 +379,11 @@ NetworkTree::getAbsoluteAddress(QTreeWidgetItem *item) const {
     QTreeWidgetItem * curItem = item;
     while (curItem != NULL) {
         QString node;
-        if (curItem->parent() != NULL) {
+        if (curItem->parent() != NULL && !curItem->text(NAME_COLUMN).startsWith("/")) {
             node.append("/");
         }
-        node.append(curItem->text(0));
-        address.insert(0,node);
+        node.append(curItem->text(NAME_COLUMN));
+        address.insert(NAME_COLUMN,node);
         curItem = curItem->parent();
     }
     return address;
@@ -574,9 +572,57 @@ NetworkTree::clearEndMsgs(){
 }
 
 void
+NetworkTree::displayBoxContent(AbstractBox *abBox){
+    setStartMessages(abBox->startMessages());
+    setEndMessages(abBox->endMessages());
+    updateStartMsgsDisplay();
+    updateEndMsgsDisplay();
+    assignItems(assignedItems());
+
+    setStartOSCMessages(abBox->startOSCMsgs());
+    setEndOSCMessages(abBox->endOSCMsgs());
+    updateStartOSCMsgsDisplay();
+    updateEndOSCMsgsDisplay();
+}
+
+void
+NetworkTree::updateStartOSCMsgsDisplay(){
+    QList<QTreeWidgetItem *> items = _OSCStartMessages->getItems();
+    QList<QTreeWidgetItem *>::iterator it;
+    QTreeWidgetItem *curItem;
+    Message currentMsg;
+    QFont font;
+    font.setBold(true);
+
+    for(it=items.begin() ; it!=items.end() ; it++){
+        curItem = *it;
+        currentMsg = _OSCStartMessages->getMessages()->value(curItem);
+        curItem->setText(START_COLUMN,currentMsg.value);
+        curItem->setFont(NAME_COLUMN,font);
+    }
+}
+
+void
+NetworkTree::updateEndOSCMsgsDisplay(){
+    QList<QTreeWidgetItem *> items = _OSCEndMessages->getItems();
+    QList<QTreeWidgetItem *>::iterator it;
+    QTreeWidgetItem *curItem;
+    Message currentMsg;
+    QFont font;
+    font.setBold(true);
+
+    for(it=items.begin() ; it!=items.end() ; it++){
+        curItem = *it;
+        currentMsg = _OSCEndMessages->getMessages()->value(curItem);
+        curItem->setText(END_COLUMN,currentMsg.value);
+        curItem->setFont(NAME_COLUMN,font);
+    }
+}
+
+void
 NetworkTree::updateStartMsgsDisplay(){
 
-    QList<QTreeWidgetItem *> items = _startMessages->getMessages()->keys();
+    QList<QTreeWidgetItem *> items = _startMessages->getItems();
     QList<QTreeWidgetItem *>::iterator it;
     QTreeWidgetItem *curItem;
     Message currentMsg;
@@ -610,7 +656,7 @@ NetworkTree::fatherColumnCheck(QTreeWidgetItem *item, int column){
 void
 NetworkTree::updateEndMsgsDisplay(){
 
-    QList<QTreeWidgetItem *> items = _endMessages->getMessages()->keys();
+    QList<QTreeWidgetItem *> items = _endMessages->getItems();
     QList<QTreeWidgetItem *>::iterator it;
     QTreeWidgetItem *curItem;
     Message currentMsg;
@@ -702,14 +748,45 @@ NetworkTree::editValue(){
 }
 
 void
+NetworkTree::clearOSCMessages(){
+    QFont font;
+    font.setBold(false);
+
+    QList<QTreeWidgetItem *> items = _OSCStartMessages->getItems();
+    QString emptyString;
+
+    QList<QTreeWidgetItem *>::iterator it;
+    QTreeWidgetItem *curIt;
+    for (it=items.begin() ; it!=items.end() ; it++){
+        curIt=*it;
+        curIt->setText(START_COLUMN,emptyString);
+        curIt->setFont(NAME_COLUMN,font);
+    }
+    _OSCStartMessages->clear();
+
+    items = _OSCEndMessages->getItems();
+    for (it=items.begin() ; it!=items.end() ; it++){
+        curIt=*it;
+        curIt->setText(END_COLUMN,emptyString);
+        curIt->setFont(NAME_COLUMN,font);
+    }
+    _OSCEndMessages->clear();
+}
+
+void
 NetworkTree::resetNetworkTree(){
     clearColumn(SR_COLUMN);
     clearColumn(INTERPOLATION_COLUMN);
     clearColumn(REDUNDANCY_COLUMN);
+
     resetSelectedItems();
     resetAssignedItems();
     resetAssignedNodes();
 
+    clearStartMsgs();
+    clearEndMsgs();
+
+    clearOSCMessages();
 }
 
 
@@ -779,7 +856,7 @@ void
 NetworkTree::unassignItem(QTreeWidgetItem *item){
     QFont font;
     font.setBold(false);
-    item->setFont(0,font);
+    item->setFont(NAME_COLUMN,font);
 //    item->setCheckState(0,Qt::Unchecked);
     removeAssignItem(item);
     //bold
@@ -790,7 +867,7 @@ NetworkTree::assignTotally(QTreeWidgetItem *item){
     QFont font;
     item->setSelected(true);
     font.setBold(true);
-    item->setFont(0,font);
+    item->setFont(NAME_COLUMN,font);
 //    item->setCheckState(0,Qt::Checked);
     addNodeTotallyAssigned(item);
 }
@@ -1282,7 +1359,6 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item,int column){
 
 void
 NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
-    std::cout<<"SLOTvalueChanged"<<std::endl;
     Data data;
     data.hasCurve = false;
     data.address = getAbsoluteAddress(item);
@@ -1305,7 +1381,6 @@ NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
     }
 
     if (item->type()==OSCNode && column == START_COLUMN && VALUE_MODIFIED){
-        std::cout<<"<<<startValueChanged>>>>"<<std::endl;
         VALUE_MODIFIED = FALSE;
         emit(startValueChanged(item,item->text(START_COLUMN)));
     }
@@ -1321,17 +1396,40 @@ NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
     }
 }
 
+QString
+NetworkTree::getAbsoluteAddressWithValue(QTreeWidgetItem *item, int column)const {
+
+    QString address = getAbsoluteAddress(item);
+    QString value;
+    if(column == START_COLUMN || column == END_COLUMN){
+        value = item->text(column);
+        address += " ";
+        address += value;
+    }
+    else
+        std::cerr << "NetworkTree::getAbsoluteAddressWithValue : incorrect column" << std::endl;
+
+    return address;
+}
+
 void
 NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue){
     //Prévoir un assert. Vérifier, le type, range...etc
     if(item->type()==OSCNode){
-        if(newValue.isEmpty())
-            ;
-        else if (!_OSCStartMessages->getMessages()->contains(item)){
-            addOSCStartMessage(item,newValue);
+        if(newValue.isEmpty()){
+            _OSCStartMessages->removeMessage(item);
+            emit(startOSCMessageRemoved(item));
         }
-        else
-            ;
+//        else if (!_OSCStartMessages->getMessages()->contains(item)){
+//            QString message = getAbsoluteAddressWithValue(item,START_COLUMN);
+//            std::cout<<"NetworkTree getAbsoluteMessage : "<<message.toStdString()<<std::endl;
+//            addOSCStartMessage(item,message);
+//            emit(startOSCMessageAdded(item,message));
+//        }
+        else{
+            QString message = getAbsoluteAddressWithValue(item,START_COLUMN);
+            emit(startOSCMessageAdded(item,message));
+        }
     }
     else{
         if(newValue.isEmpty()){
@@ -1365,29 +1463,47 @@ void
 NetworkTree::changeEndValue(QTreeWidgetItem *item, QString newValue){
     //Prévoir un assert. Vérifier, le type, range...etc
 
-    if(newValue.isEmpty()){
-        _endMessages->removeMessage(item);
-        if(!startMessages()->getMessages()->contains(item))
-            removeAssignItem(item);
-        emit(endMessageValueChanged(item));
+    if(item->type()==OSCNode){
+        if(newValue.isEmpty()){
+            _OSCEndMessages->removeMessage(item);
+            emit(endOSCMessageRemoved(item));
+        }
+//        else if (!_OSCStartMessages->getMessages()->contains(item)){
+//            QString message = getAbsoluteAddressWithValue(item,START_COLUMN);
+//            std::cout<<"NetworkTree getAbsoluteMessage : "<<message.toStdString()<<std::endl;
+//            addOSCStartMessage(item,message);
+//            emit(startOSCMessageAdded(item,message));
+//        }
+        else{
+            QString message = getAbsoluteAddressWithValue(item,END_COLUMN);
+            emit(endOSCMessageAdded(item,message));
+        }
     }
     else{
-        if (!_endMessages->getMessages()->contains(item)){
-            QString Qaddress = getAbsoluteAddress(item);
-            string address = Qaddress.toStdString();
-            Qaddress += " ";
-            Qaddress += newValue;
-            _endMessages->addMessage(item,Qaddress);
+        if(newValue.isEmpty()){
+            _endMessages->removeMessage(item);
+            if(!startMessages()->getMessages()->contains(item))
+                removeAssignItem(item);
             emit(endMessageValueChanged(item));
         }
         else{
-            if (_endMessages->setValue(item,newValue)){
-                Message msg = _endMessages->getMessages()->value(item);
-                string address = msg.device.toStdString() + msg.message.toStdString();
+            if (!_endMessages->getMessages()->contains(item)){
+                QString Qaddress = getAbsoluteAddress(item);
+                string address = Qaddress.toStdString();
+                Qaddress += " ";
+                Qaddress += newValue;
+                _endMessages->addMessage(item,Qaddress);
                 emit(endMessageValueChanged(item));
             }
             else{
-                std::cerr << "NetworkTree::changeEndValue : Impossible de créer le networkMessage" << std::endl;
+                if (_endMessages->setValue(item,newValue)){
+                    Message msg = _endMessages->getMessages()->value(item);
+                    string address = msg.device.toStdString() + msg.message.toStdString();
+                    emit(endMessageValueChanged(item));
+                }
+                else{
+                    std::cerr << "NetworkTree::changeEndValue : Impossible de créer le networkMessage" << std::endl;
+                }
             }
         }
     }
@@ -1530,6 +1646,22 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID)
         return false;
 
     return false;
+}
+
+void
+NetworkTree::addOSCStartMessage(QTreeWidgetItem *item, QString msg){
+    QFont font;
+    font.setBold(true);
+    item->setFont(NAME_COLUMN, font);
+    _OSCStartMessages->addMessage(item,msg);
+}
+
+void
+NetworkTree::addOSCEndMessage(QTreeWidgetItem *item, QString msg){
+    QFont font;
+    font.setBold(true);
+    item->setFont(NAME_COLUMN, font);
+    _OSCEndMessages->addMessage(item,msg);
 }
 
 void

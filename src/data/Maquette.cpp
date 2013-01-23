@@ -753,10 +753,10 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages){
 }
 
 bool
-Maquette::setStartOSCMessagesToSend(unsigned int boxID, NetworkMessages *messages){
+Maquette::addStartOSCMessageToSend(unsigned int boxID, QTreeWidgetItem *item, QString message){
 
 //    vector<string> firstMsgs = messages->computeMessages();
-
+    std::cout<<"Maquette::addStartOSCMessageToSend"<<std::endl;
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
         //PRINT
 //            std::cout<<"---- Maquette::SETSTARTMESSAGETOSEND ----"<<std::endl;
@@ -765,7 +765,7 @@ Maquette::setStartOSCMessagesToSend(unsigned int boxID, NetworkMessages *message
 //            std::cout<<std::endl<<std::endl;
         //PRINT
 //        _engines->setCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
-        _boxes[boxID]->setStartOSCMessages(messages);
+        _boxes[boxID]->addStartOSCMessage(item, message);
 
 //        vector<string> lastMsgs;
 //        _engines->getCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
@@ -873,15 +873,15 @@ Maquette::setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages) {
 }
 
 bool
-Maquette::setEndOSCMessagesToSend(unsigned int boxID, NetworkMessages *messages) {
-    vector<string> lastMsgs = messages->computeMessages();
+Maquette::addEndOSCMessageToSend(unsigned int boxID, QTreeWidgetItem *item, QString message) {
+//    vector<string> lastMsgs = messages->computeMessages();
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
         //TODO send to engine
 //        _engines->setCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
 
-        _boxes[boxID]->setEndOSCMessages(messages);
+        _boxes[boxID]->addEndOSCMessage(item,message);
 
-        vector<string> firstMsgs;
+//        vector<string> firstMsgs;
 //        _engines->getCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
 //        updateCurves(boxID,firstMsgs,lastMsgs);
 

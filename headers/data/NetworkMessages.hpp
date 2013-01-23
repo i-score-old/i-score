@@ -103,6 +103,7 @@ public :
 
 
     inline QMap<QTreeWidgetItem *, Message> *getMessages(){return _messages;}
+    inline QList<QTreeWidgetItem *> getItems(){return _messages->keys();}
     std::string computeMessage(const Message &msg);
     std::string computeMessageWithoutValue(const Message &msg);
     inline QList<Message> messages(){return _messages->values();}

@@ -792,6 +792,8 @@ AttributesEditor::connectSlots()
 
     connect(_networkTree,SIGNAL(startMessageValueChanged(QTreeWidgetItem *)),this,SLOT(startMessageChanged(QTreeWidgetItem *)));
     connect(_networkTree,SIGNAL(endMessageValueChanged(QTreeWidgetItem *)),this,SLOT(endMessageChanged(QTreeWidgetItem *)));
+    connect(_networkTree,SIGNAL(startOSCMessageAdded(QTreeWidgetItem*,QString)),this,SLOT(startOSCMessageAdded(QTreeWidgetItem*,QString)));
+    connect(_networkTree,SIGNAL(endOSCMessageAdded(QTreeWidgetItem*,QString)),this,SLOT(endOSCMessageAdded(QTreeWidgetItem*,QString)));
 
 	connect(_startMsgsEditor,SIGNAL(messageRemoved(const std::string &)),this,SLOT(startMessageRemoved(const std::string &)));
 	connect(_endMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(endMessagesChanged()));
@@ -863,8 +865,6 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
     if (boxModified || (_boxEdited == NO_ID)) {
 		_startMsgsEditor->reset();
         _endMsgsEditor->reset();
-        _networkTree->clearStartMsgs();
-        _networkTree->clearEndMsgs();
         _networkTree->resetNetworkTree();
 
         if (_boxEdited != NO_ID) {
@@ -884,11 +884,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
                 _networkTree->expandItems(abBox->networkTreeExpandedItems());
             }
 
-            _networkTree->setStartMessages(abBox->startMessages());
-            _networkTree->setEndMessages(abBox->endMessages());
-            _networkTree->updateStartMsgsDisplay();            
-            _networkTree->updateEndMsgsDisplay();
-            _networkTree->assignItems(_networkTree->assignedItems());
+             _networkTree->displayBoxContent(abBox);
 
             //PRINT MESSAGES
 //            QList<QTreeWidgetItem *> items = _networkTree->assignedItems().keys();
@@ -905,6 +901,22 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 //                std::cout<<endMessages[i]<<std::endl;
 //            }
             //END PRINT
+
+            std::cout<<"\n-----------------------"<<std::endl;
+            std::cout<<"BOX - Start OSC messages"<<std::endl;
+            vector<string> startOSC = abBox->startOSCMsgs()->computeMessages();
+            for(int i=0 ; i<startOSC.size() ; i++){
+                std::cout<<startOSC[i]<<std::endl;
+            }
+            std::cout<<std::endl;
+
+            std::cout<<"BOX - END OSC messages"<<std::endl;
+            vector<string> endOSC = abBox->endOSCMsgs()->computeMessages();
+            for(int i=0 ; i<endOSC.size() ; i++){
+                std::cout<<endOSC[i]<<std::endl;
+            }
+            std::cout<<"-----------------------"<<std::endl;
+
         }
     }
 	//if (_boxEdited != NO_ID) {
@@ -1447,6 +1459,51 @@ void AttributesEditor::endMessageRemoved(const string &address) {
     }
     else
         _scene->displayMessage("No box selected",INDICATION_LEVEL);
+}
+
+void
+AttributesEditor::startOSCMessageAdded(QTreeWidgetItem *item,QString message) {
+
+    if(_boxEdited!=NO_ID){
+        Maquette::getInstance()->addStartOSCMessageToSend(_boxEdited,item,message);
+        _networkTree->addOSCStartMessage(item,message);
+    }
+    else{
+        _scene->displayMessage("No box selected",INDICATION_LEVEL);
+        item->setText(NetworkTree::START_COLUMN,"");
+    }
+}
+
+void
+AttributesEditor::endOSCMessageAdded(QTreeWidgetItem *item, QString message){
+    if(_boxEdited!=NO_ID){
+        Maquette::getInstance()->addEndOSCMessageToSend(_boxEdited,item,message);
+        _networkTree->addOSCEndMessage(item,message);
+    }
+    else{
+        _scene->displayMessage("No box selected",INDICATION_LEVEL);
+        item->setText(NetworkTree::END_COLUMN,"");
+    }
+}
+
+void
+AttributesEditor::startOSCMessageRemoved(QTreeWidgetItem *item, QString message){
+
+}
+
+void
+AttributesEditor::endOSCMessageRemoved(QTreeWidgetItem *item, QString message){
+
+}
+
+void
+AttributesEditor::startOSCMessageChanged(QTreeWidgetItem *item, QString message){
+
+}
+
+void
+AttributesEditor::endOSCMessageChanged(QTreeWidgetItem *item, QString message){
+
 }
 
 void

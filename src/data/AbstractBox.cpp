@@ -50,6 +50,8 @@ AbstractBox::AbstractBox(const QPointF &newTopLeft, const float &newWidth, const
 {
     _startMessages = new NetworkMessages;
     _endMessages = new NetworkMessages;
+    _startOSCMessages = new NetworkMessages;
+    _endOSCMessages = new NetworkMessages;
 }
 
 AbstractBox::AbstractBox(const AbstractBox &other) :
