@@ -108,7 +108,7 @@ Maquette::init() {
                 _engines->addNetworkDevice(device.name,device.plugin,device.networkHost,devicePort.str());
             }
             map<string,MyDevice>::iterator deviceIt;
-            deviceIt = _devices.find("OSCDevice");
+            deviceIt = _devices.find("ASCDevice");
             if (deviceIt != _devices.end()) {
                 MyDevice maxDevice = deviceIt->second;
                 maxDevice.name = "MaxDevice";

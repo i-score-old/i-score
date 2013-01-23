@@ -60,6 +60,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "BasicBox.hpp"
 
 #include "TTScore.h"
+#include "TTModular.h"
 
 //! Default network host.
 

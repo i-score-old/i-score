@@ -58,12 +58,13 @@ macx-g++ {
 LIBS += -lIscore -lDeviceManager -framework gecode -lxml2
 }
 macx-clang {
-LIBS += /usr/local/jamoma/lib/JamomaFoundation.dylib /usr/local/jamoma/lib/JamomaScore.dylib -lDeviceManager -framework gecode -lxml2
+LIBS += /usr/local/jamoma/lib/JamomaFoundation.dylib /usr/local/jamoma/lib/JamomaScore.dylib /usr/local/jamoma/lib/JamomaModular.dylib -lDeviceManager -framework gecode -lxml2
 }
 
 # Input
 HEADERS += /usr/local/jamoma/includes/TTScore.h \
 /usr/local/jamoma/includes/CSPTypes.hpp \
+/usr/local/jamoma/includes/TTModular.h \
 headers/data/Abstract.hpp \
 headers/data/AbstractBox.hpp \
 headers/data/AbstractComment.hpp \
