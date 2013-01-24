@@ -433,7 +433,6 @@ BasicBox::getFinalState(){
     QMap<QString,QPair<QString, unsigned int> > finalMessages;
     startMsgs = _abstract->startMessages()->toMapAddressValue();
     endMsgs = _abstract->endMessages()->toMapAddressValue();
-    endMsgs.unite(_abstract->endOSCMsgs()->toMapAddressValue());
 
     //End values
     QList<QString> endAddresses = endMsgs.keys();
@@ -457,7 +456,6 @@ BasicBox::getStartState(){
     QMap<QString,QString> startMsgs;
     QMap<QString,QPair<QString, unsigned int> > finalMessages;
     startMsgs = _abstract->startMessages()->toMapAddressValue();
-    startMsgs.unite(_abstract->startOSCMsgs()->toMapAddressValue());
 
     //Start values
     QList<QString> startAddresses = startMsgs.keys();
@@ -800,11 +798,6 @@ BasicBox::setStartMessages(NetworkMessages *messages) {
 }
 
 void
-BasicBox::addStartOSCMessage(QTreeWidgetItem *item, QString message) {
-    _abstract->addStartOSCMessage(item,message);
-}
-
-void
 BasicBox::setSelectedItemsToSend(QMap<QTreeWidgetItem*,Data> itemsSelected){
     _abstract->setNetworkTreeItems(itemsSelected);
 }
@@ -837,11 +830,6 @@ BasicBox::setLastMessagesToSend(const vector<string> &messages) {
 void
 BasicBox::setEndMessages(NetworkMessages *messages) {
     _abstract->setEndMessages(messages);
-}
-
-void
-BasicBox::addEndOSCMessage(QTreeWidgetItem *item, QString message) {
-    _abstract->addEndOSCMessage(item,message);
 }
 
 vector<string>

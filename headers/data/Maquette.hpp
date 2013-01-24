@@ -349,7 +349,6 @@ class Maquette : public QObject
    * \return if messages could be set
    */
   bool setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages);
-  bool addStartOSCMessageToSend(unsigned int boxID, QTreeWidgetItem *item, QString message);
   /*!
    * \brief Sets the set of treeItems to send for the beginning of a box.
    *
@@ -424,7 +423,6 @@ class Maquette : public QObject
    * \return if messages could be set
    */
   bool setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages);
-  bool addEndOSCMessageToSend(unsigned int boxID, QTreeWidgetItem *item, QString message);
   /*!
    * \brief Sends a specific message with current device.
    *

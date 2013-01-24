@@ -242,13 +242,6 @@ class AttributesEditor : public QDockWidget
   void curveRedundancyChanged(QTreeWidgetItem *item, bool activated);
   void curveSampleRateChanged(QTreeWidgetItem *item, int value);
 
-  void startOSCMessageAdded(QTreeWidgetItem *item, QString message);
-  void endOSCMessageAdded(QTreeWidgetItem *item, QString message);
-  void startOSCMessageRemoved(QTreeWidgetItem *item, QString message);
-  void endOSCMessageRemoved(QTreeWidgetItem *item, QString message);
-  void startOSCMessageChanged(QTreeWidgetItem *item, QString message);
-  void endOSCMessageChanged(QTreeWidgetItem *item, QString message);
-
   /*!
    * \brief Updates box start message
    */

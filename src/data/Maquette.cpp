@@ -753,27 +753,6 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages){
 }
 
 bool
-Maquette::addStartOSCMessageToSend(unsigned int boxID, QTreeWidgetItem *item, QString message){
-
-    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
-
-        _boxes[boxID]->addStartOSCMessage(item, message);
-
-        vector<string> startOSCMsgs = static_cast<AbstractBox *>(getBox(boxID)->abstract())->startOSCMsgs()->computeMessages();
-        for(int i=0; i<startOSCMsgs.size() ; i++)
-            std::cout<<"--- "<<startOSCMsgs[i]<<std::endl;
-        _engines->setCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,startOSCMsgs);
-
-        vector<string> endOSCMsgs;
-        _engines->getCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,endOSCMsgs);
-        updateCurves(boxID,startOSCMsgs,endOSCMsgs);
-
-        return true;
-    }
-    return false;
-}
-
-bool
 Maquette::setSelectedItemsToSend(unsigned int boxID,  QMap<QTreeWidgetItem*,Data> itemsSelected){
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
 
@@ -868,25 +847,6 @@ Maquette::setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages) {
     }
     return false;
 }
-
-bool
-Maquette::addEndOSCMessageToSend(unsigned int boxID, QTreeWidgetItem *item, QString message) {
-
-    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
-
-        _boxes[boxID]->addEndOSCMessage(item,message);
-        vector<string> endOSCMsgs = static_cast<AbstractBox *>(getBox(boxID)->abstract())->endOSCMsgs()->computeMessages();
-        _engines->setCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,endOSCMsgs);
-
-        vector<string> startOSCMsgs;
-        _engines->getCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,startOSCMsgs);
-        updateCurves(boxID,startOSCMsgs,endOSCMsgs);
-
-        return true;
-    }
-    return false;
-}
-
 
 bool
 Maquette::sendMessage(const string &message) {
@@ -1428,7 +1388,6 @@ Maquette::initSceneState(){
     //Pour palier au bug du moteur (qui envoyait tous les messages début et fin de toutes les boîtes < Goto)
 
     double gotoValue = (double)_engines->getGotoValue();
-    std::cout<<"Goto "<<gotoValue<<std::endl;
 
     unsigned int boxID;
     QMap<QString,QPair<QString,unsigned int> > msgs, boxMsgs;
@@ -1718,7 +1677,6 @@ Maquette::save(const string &fileName) {
     QDomElement boxesNode = _doc->createElement("boxes");
     root.appendChild(boxesNode);
 
-    QString boxType;
     for(BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; ++it ) {
         saveBox(it->first);
     }

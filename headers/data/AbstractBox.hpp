@@ -212,9 +212,6 @@ class AbstractBox : public Abstract
     _startMessages->clear();
     _startMessages = new NetworkMessages(startMsgs->getMessages());
     }
-  inline void addStartOSCMessage(QTreeWidgetItem *item, QString message){
-    _startOSCMessages->addMessage(item,message);
-    }
   /*!
    * \brief Sets the items to send at box start.
    * \param items : the items to send at box start
@@ -269,15 +266,8 @@ class AbstractBox : public Abstract
     _endMessages->clear();
     _endMessages = new NetworkMessages(endMsgs->getMessages());
     }
-  inline void addEndOSCMessage(QTreeWidgetItem *item, QString message){
-    _endOSCMessages->addMessage(item,message);
-    }
-  inline bool hasFirstMsgs(){return !_startMessages->messages().empty() || !_startOSCMessages->messages().isEmpty();}
-  inline bool hasLastMsgs(){return !_endMessages->messages().empty() || !_endOSCMessages->messages().isEmpty();}
-  inline bool hasStartOSCMsgs(){return !_startOSCMessages->messages().empty();}
-  inline bool hasEndOSCMsgs(){return !_endOSCMessages->messages().empty();}
-  inline NetworkMessages *startOSCMsgs(){return _startOSCMessages;}
-  inline NetworkMessages *endOSCMsgs(){return _endOSCMessages;}
+  inline bool hasFirstMsgs(){return !_startMessages->messages().empty();}
+  inline bool hasLastMsgs(){return !_endMessages->messages().empty();}
 
  protected :
 
@@ -292,9 +282,6 @@ class AbstractBox : public Abstract
   std::vector<std::string> _lastMsgs; //!< Messages linked to the end of the box
   NetworkMessages *_startMessages; //!< pairs QTreeWidgetItem-Message
   NetworkMessages *_endMessages; //!< pairs QTreeWidgetItem-Message
-  NetworkMessages *_startOSCMessages; //!< pairs QTreeWidgetItem-OSCMessage
-  NetworkMessages *_endOSCMessages; //!< pairs QTreeWidgetItem-OSCMessage
-//  QList<QTreeWidgetItem*> _networkTreeItems;
   QMap<QTreeWidgetItem*,Data> _networkTreeItems;
   QList<QTreeWidgetItem*> _networkTreeExpandedItems;
 };

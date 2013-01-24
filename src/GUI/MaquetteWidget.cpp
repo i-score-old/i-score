@@ -274,7 +274,10 @@ MaquetteWidget::play(){
 
 void
 MaquetteWidget::stop(){
-    _scene->pause();
+    if(_scene->playing())
+        _scene->pause();
+    else
+        _scene->stopGotoStart();
     updateHeader();
 }
 
