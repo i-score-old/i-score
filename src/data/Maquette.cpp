@@ -1428,6 +1428,8 @@ Maquette::initSceneState(){
     //Pour palier au bug du moteur (qui envoyait tous les messages début et fin de toutes les boîtes < Goto)
 
     double gotoValue = (double)_engines->getGotoValue();
+    std::cout<<"Goto "<<gotoValue<<std::endl;
+
     unsigned int boxID;
     QMap<QString,QPair<QString,unsigned int> > msgs, boxMsgs;
     QList<QString> boxAddresses;
@@ -1455,31 +1457,33 @@ Maquette::initSceneState(){
                 curvesList = _engines->getCurvesAddress(boxID);
             }
 
+
         boxAddresses = boxMsgs.keys();
 
-            //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
-            for(QList<QString>::iterator it2 = boxAddresses.begin() ; it2!=boxAddresses.end() ; it2++){
-                if(msgs.contains(*it2)){
-                    if(msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second < gotoValue)
-                        msgs.insert(*it2,boxMsgs.value(*it2));
-                }
-                //sinon on ajoute dans la liste de messages
-                else
-                    if(boxMsgs.value(*it2).second < gotoValue)
-                        msgs.insert(*it2,boxMsgs.value(*it2));
+        //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
+        for(QList<QString>::iterator it2 = boxAddresses.begin() ; it2!=boxAddresses.end() ; it2++){
+            if(msgs.contains(*it2)){
+                if(msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second < gotoValue)
+                    msgs.insert(*it2,boxMsgs.value(*it2));
             }
-
-            //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
-            //    Start messages
-                _engines->setCtrlPointMutingState(boxID,1,true);
-            //    End messages
-            if(currentBox->date()+currentBox->duration()<gotoValue)
-                _engines->setCtrlPointMutingState(boxID,2,true);
-
-            //On supprime les messages si ils sont déjà associés à une courbe (le moteur les envoie automatiquement)
-            for (int i=0 ; i<curvesList.size() ; i++)
-                msgs.remove(QString::fromStdString(curvesList[i]));
+            //sinon on ajoute dans la liste de messages
+            else
+                if(boxMsgs.value(*it2).second < gotoValue)
+                    msgs.insert(*it2,boxMsgs.value(*it2));
         }
+
+        //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
+        //    Start messages
+        if(currentBox->date() < gotoValue)
+            _engines->setCtrlPointMutingState(boxID,1,true);
+        //    End messages
+        if(currentBox->date()+currentBox->duration()<gotoValue)
+            _engines->setCtrlPointMutingState(boxID,2,true);
+
+        //On supprime les messages si ils sont déjà associés à une courbe (le moteur les envoie automatiquement)
+        for (int i=0 ; i<curvesList.size() ; i++)
+            msgs.remove(QString::fromStdString(curvesList[i]));
+    }
 
     //traduction en QMap<QString,QString>, on supprime le champs date des messages
     QList<QString> addresses = msgs.keys();
@@ -1487,10 +1491,8 @@ Maquette::initSceneState(){
     QString message;
     for(QList<QString>::iterator it = addresses.begin() ; it != addresses.end() ; it++){
          message = *it+" "+msgs.value(*it).first;
-         sendMessage(message.toStdString());         
+         sendMessage(message.toStdString());
     }
-
-
 }
 
 void
