@@ -1467,6 +1467,8 @@ AttributesEditor::startOSCMessageAdded(QTreeWidgetItem *item,QString message) {
     if(_boxEdited!=NO_ID){
         Maquette::getInstance()->addStartOSCMessageToSend(_boxEdited,item,message);
         _networkTree->addOSCStartMessage(item,message);
+        BasicBox * box = _scene->getBox(_boxEdited);
+        box->updateCurves();
     }
     else{
         _scene->displayMessage("No box selected",INDICATION_LEVEL);
@@ -1479,6 +1481,8 @@ AttributesEditor::endOSCMessageAdded(QTreeWidgetItem *item, QString message){
     if(_boxEdited!=NO_ID){
         Maquette::getInstance()->addEndOSCMessageToSend(_boxEdited,item,message);
         _networkTree->addOSCEndMessage(item,message);
+        BasicBox * box = _scene->getBox(_boxEdited);
+        box->updateCurves();
     }
     else{
         _scene->displayMessage("No box selected",INDICATION_LEVEL);

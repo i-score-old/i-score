@@ -272,8 +272,8 @@ class AbstractBox : public Abstract
   inline void addEndOSCMessage(QTreeWidgetItem *item, QString message){
     _endOSCMessages->addMessage(item,message);
     }
-  inline bool hasFirstMsgs(){return !_startMessages->messages().empty();}
-  inline bool hasLastMsgs(){return !_endMessages->messages().empty();}
+  inline bool hasFirstMsgs(){return !_startMessages->messages().empty() || !_startOSCMessages->messages().isEmpty();}
+  inline bool hasLastMsgs(){return !_endMessages->messages().empty() || !_endOSCMessages->messages().isEmpty();}
   inline bool hasStartOSCMsgs(){return !_startOSCMessages->messages().empty();}
   inline bool hasEndOSCMsgs(){return !_endOSCMessages->messages().empty();}
   inline NetworkMessages *startOSCMsgs(){return _startOSCMessages;}
