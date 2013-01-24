@@ -840,7 +840,6 @@ NetworkTree::assignItems(QMap<QTreeWidgetItem*,Data> selectedItems){
 
 void
 NetworkTree::unassignItem(QTreeWidgetItem *item){
-    std::cout<<"unassign"<<std::endl;
     QFont font;
     font.setBold(false);
     item->setFont(NAME_COLUMN,font);
@@ -876,7 +875,6 @@ NetworkTree::assignPartially(QTreeWidgetItem *item){
 
 void
 NetworkTree::unassignPartially(QTreeWidgetItem *item){
-    std::cout<<"unassign1"<<std::endl;
     /*
      * NODES
      */
@@ -893,7 +891,6 @@ NetworkTree::unassignPartially(QTreeWidgetItem *item){
 
 void
 NetworkTree::unassignTotally(QTreeWidgetItem *item){
-    std::cout<<"unassign2"<<std::endl;
     /*
      * NODES
      */
