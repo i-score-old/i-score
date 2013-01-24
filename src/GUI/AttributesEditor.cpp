@@ -1396,7 +1396,6 @@ AttributesEditor::endMessagesChanged()
 
 void AttributesEditor::startMessageChanged(QTreeWidgetItem *item) {
     if(_boxEdited!=NO_ID){
-        string address = _networkTree->getAbsoluteAddress(item).toStdString();
         //PAS OPTIMAL, NE DEVRAIT MODIFIER QU'UN SEUL ITEM
         QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
         Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
@@ -1410,8 +1409,10 @@ void AttributesEditor::startMessageChanged(QTreeWidgetItem *item) {
         BasicBox * box = _scene->getBox(_boxEdited);
         box->updateCurves();
     }
-    else
+    else{
         _scene->displayMessage("No box selected",INDICATION_LEVEL);
+        item->setText(NetworkTree::START_COLUMN,"");
+    }
 }
 
 void AttributesEditor::endMessageChanged(QTreeWidgetItem *item) {
@@ -1430,8 +1431,10 @@ void AttributesEditor::endMessageChanged(QTreeWidgetItem *item) {
         BasicBox * box = _scene->getBox(_boxEdited);
         box->updateCurves();
     }
-    else
+    else{
         _scene->displayMessage("No box selected",INDICATION_LEVEL);
+        item->setText(NetworkTree::END_COLUMN,"");
+    }
 }
 
 void AttributesEditor::startMessageRemoved(const string &address) {
