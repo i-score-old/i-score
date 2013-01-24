@@ -61,7 +61,6 @@ QString NetworkTree::OSC_ADD_NODE_TEXT = QString("Add a node");
 
 unsigned int NetworkTree::TEXT_POINT_SIZE = 10;
 
-
 NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 {
     init();
@@ -1405,6 +1404,7 @@ NetworkTree::getAbsoluteAddressWithValue(QTreeWidgetItem *item, int column)const
         value = item->text(column);
         address += " ";
         address += value;
+        std::cout<<"ss<... "<<address.toStdString()<<std::endl;
     }
     else
         std::cerr << "NetworkTree::getAbsoluteAddressWithValue : incorrect column" << std::endl;

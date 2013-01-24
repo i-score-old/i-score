@@ -794,6 +794,8 @@ AttributesEditor::connectSlots()
     connect(_networkTree,SIGNAL(endMessageValueChanged(QTreeWidgetItem *)),this,SLOT(endMessageChanged(QTreeWidgetItem *)));
     connect(_networkTree,SIGNAL(startOSCMessageAdded(QTreeWidgetItem*,QString)),this,SLOT(startOSCMessageAdded(QTreeWidgetItem*,QString)));
     connect(_networkTree,SIGNAL(endOSCMessageAdded(QTreeWidgetItem*,QString)),this,SLOT(endOSCMessageAdded(QTreeWidgetItem*,QString)));
+    connect(_networkTree,SIGNAL(startOSCMessageRemoved(QTreeWidgetItem*,QString)),this,SLOT(startOSCMessageRemoved(QTreeWidgetItem*,QString)));
+    connect(_networkTree,SIGNAL(endOSCMessageRemoved(QTreeWidgetItem*,QString)),this,SLOT(endOSCMessageRemoved(QTreeWidgetItem*,QString)));
 
 	connect(_startMsgsEditor,SIGNAL(messageRemoved(const std::string &)),this,SLOT(startMessageRemoved(const std::string &)));
 	connect(_endMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(endMessagesChanged()));
@@ -1398,7 +1400,6 @@ void AttributesEditor::startMessageChanged(QTreeWidgetItem *item) {
         //PAS OPTIMAL, NE DEVRAIT MODIFIER QU'UN SEUL ITEM
         QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
         Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
-
         Maquette::getInstance()->setStartMessagesToSend(_boxEdited,_networkTree->startMessages());
 
         _networkTree->updateStartMsgsDisplay();
@@ -1497,7 +1498,16 @@ AttributesEditor::startOSCMessageRemoved(QTreeWidgetItem *item, QString message)
 
 void
 AttributesEditor::endOSCMessageRemoved(QTreeWidgetItem *item, QString message){
-
+    if(_boxEdited!=NO_ID){
+        Maquette::getInstance()->addEndOSCMessageToSend(_boxEdited,item,message);
+        _networkTree->addOSCEndMessage(item,message);
+        BasicBox * box = _scene->getBox(_boxEdited);
+        box->updateCurves();
+    }
+    else{
+        _scene->displayMessage("No box selected",INDICATION_LEVEL);
+        item->setText(NetworkTree::END_COLUMN,"");
+    }
 }
 
 void

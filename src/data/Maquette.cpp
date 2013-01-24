@@ -755,21 +755,18 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages){
 bool
 Maquette::addStartOSCMessageToSend(unsigned int boxID, QTreeWidgetItem *item, QString message){
 
-//    vector<string> firstMsgs = messages->computeMessages();
-    std::cout<<"Maquette::addStartOSCMessageToSend"<<std::endl;
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
-        //PRINT
-//            std::cout<<"---- Maquette::SETSTARTMESSAGETOSEND ----"<<std::endl;
-//            for(int i=0 ; i<firstMsgs.size(); i++ )
-//                std::cout<< firstMsgs[i]<<std::endl;
-//            std::cout<<std::endl<<std::endl;
-        //PRINT
-//        _engines->setCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
+
         _boxes[boxID]->addStartOSCMessage(item, message);
 
-//        vector<string> lastMsgs;
-//        _engines->getCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
-//        updateCurves(boxID,firstMsgs,lastMsgs);
+        vector<string> startOSCMsgs = static_cast<AbstractBox *>(getBox(boxID)->abstract())->startOSCMsgs()->computeMessages();
+        for(int i=0; i<startOSCMsgs.size() ; i++)
+            std::cout<<"--- "<<startOSCMsgs[i]<<std::endl;
+        _engines->setCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,startOSCMsgs);
+
+        vector<string> endOSCMsgs;
+        _engines->getCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,endOSCMsgs);
+        updateCurves(boxID,startOSCMsgs,endOSCMsgs);
 
         return true;
     }
@@ -874,16 +871,16 @@ Maquette::setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages) {
 
 bool
 Maquette::addEndOSCMessageToSend(unsigned int boxID, QTreeWidgetItem *item, QString message) {
-//    vector<string> lastMsgs = messages->computeMessages();
+
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
-        //TODO send to engine
-//        _engines->setCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
 
         _boxes[boxID]->addEndOSCMessage(item,message);
+        vector<string> endOSCMsgs = static_cast<AbstractBox *>(getBox(boxID)->abstract())->endOSCMsgs()->computeMessages();
+        _engines->setCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,endOSCMsgs);
 
-//        vector<string> firstMsgs;
-//        _engines->getCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
-//        updateCurves(boxID,firstMsgs,lastMsgs);
+        vector<string> startOSCMsgs;
+        _engines->getCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,startOSCMsgs);
+        updateCurves(boxID,startOSCMsgs,endOSCMsgs);
 
         return true;
     }

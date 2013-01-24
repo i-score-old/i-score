@@ -433,6 +433,7 @@ BasicBox::getFinalState(){
     QMap<QString,QPair<QString, unsigned int> > finalMessages;
     startMsgs = _abstract->startMessages()->toMapAddressValue();
     endMsgs = _abstract->endMessages()->toMapAddressValue();
+    endMsgs.unite(_abstract->endOSCMsgs()->toMapAddressValue());
 
     //End values
     QList<QString> endAddresses = endMsgs.keys();
@@ -456,6 +457,7 @@ BasicBox::getStartState(){
     QMap<QString,QString> startMsgs;
     QMap<QString,QPair<QString, unsigned int> > finalMessages;
     startMsgs = _abstract->startMessages()->toMapAddressValue();
+    startMsgs.unite(_abstract->startOSCMsgs()->toMapAddressValue());
 
     //Start values
     QList<QString> startAddresses = startMsgs.keys();
