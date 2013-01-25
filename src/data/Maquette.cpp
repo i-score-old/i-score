@@ -1681,7 +1681,6 @@ Maquette::save(const string &fileName) {
     root.setAttribute("centerY",_scene->view()->getCenterCoordinates().y());
     _doc->appendChild(root);
 
-
     QDomElement boxesNode = _doc->createElement("boxes");
     root.appendChild(boxesNode);
 
@@ -1694,11 +1693,10 @@ Maquette::save(const string &fileName) {
     QList<QString> OSCMessages = _scene->editor()->networkTree()->OSCMessages();
     QDomElement OSCMessageNode;
     for(QList<QString>::iterator it=OSCMessages.begin() ; it!=OSCMessages.end() ; it++){
-        std::cout<<"SAVE> "<<(*it).toStdString()<<std::endl;
-        QDomElement OSCMessageNode = _doc->createElement(*it);
-        OSCMessagesNode.appendChild(OSCMessageNode);
+        OSCMessageNode = _doc->createElement(*it);
+        OSCMessagesNode.setAttribute("message",*it);
     }
-    _doc->appendChild(OSCMessagesNode);
+    root.appendChild(OSCMessagesNode);
 
     QTextStream ts(&file);
     ts << _doc->toString();
@@ -2031,7 +2029,9 @@ Maquette::load(const string &fileName){
         return;
     }
 
-    QDomElement root = _doc->documentElement();
+    QDomElement root = _doc->firstChild().toElement();// documentElement();
+
+    std::cout<<root.tagName().toStdString()<<std::endl;
     if (root.tagName() != "GRAPHICS") {
         _scene->displayMessage((tr("Unvailable xml document %1").
                 arg(QString::fromStdString(fileName))).toStdString(),
