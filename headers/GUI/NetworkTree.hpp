@@ -310,6 +310,7 @@ class NetworkTree : public QTreeWidget
          */
         void resetAssignedNodes();        
         void addOSCMessage();
+        void addOSCMessage(QString message);
         void assignOCSMsg(QTreeWidgetItem *item);
         inline QList<QString> OSCMessages(){return _OSCMessages;}
 
@@ -326,6 +327,8 @@ class NetworkTree : public QTreeWidget
         void setCurveActivated(QTreeWidgetItem *item, bool activated);
         void setRedundancy(QTreeWidgetItem *item, bool activated);
         void updateLine(QTreeWidgetItem *item, bool interpolationState, int sampleRate, bool redundancy);        
+        void createItemsFromMessages(QList<QString> messageslist);
+        void createItemFromMessage(QString messages);
 
         virtual void keyPressEvent(QKeyEvent *event);
         virtual void keyReleaseEvent(QKeyEvent *event);
@@ -343,6 +346,7 @@ class NetworkTree : public QTreeWidget
 
         bool VALUE_MODIFIED;
         bool SR_MODIFIED;
+        bool NAME_MODIFIED;
 
     signals :
         void startValueChanged(QTreeWidgetItem *, QString newValue);

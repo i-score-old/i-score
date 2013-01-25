@@ -1693,8 +1693,9 @@ Maquette::save(const string &fileName) {
     QList<QString> OSCMessages = _scene->editor()->networkTree()->OSCMessages();
     QDomElement OSCMessageNode;
     for(QList<QString>::iterator it=OSCMessages.begin() ; it!=OSCMessages.end() ; it++){
-        OSCMessageNode = _doc->createElement(*it);
-        OSCMessagesNode.setAttribute("message",*it);
+        OSCMessageNode = _doc->createElement("OSC");
+        OSCMessageNode.setAttribute("message",*it);
+        OSCMessagesNode.appendChild(OSCMessageNode);
     }
     root.appendChild(OSCMessagesNode);
 
@@ -2029,9 +2030,8 @@ Maquette::load(const string &fileName){
         return;
     }
 
-    QDomElement root = _doc->firstChild().toElement();// documentElement();
+    QDomElement root = _doc->documentElement();
 
-    std::cout<<root.tagName().toStdString()<<std::endl;
     if (root.tagName() != "GRAPHICS") {
         _scene->displayMessage((tr("Unvailable xml document %1").
                 arg(QString::fromStdString(fileName))).toStdString(),
@@ -2270,6 +2270,25 @@ Maquette::load(const string &fileName){
         }
     }
 
+    /************************ OSC ************************/
+    std::cout<<"root childs : "<<root.childNodes().size()<<std::endl;
+    if(root.childNodes().size()>=2){
+        std::cout<<"attention : "<<root.childNodes().size()<<std::endl;
+        QDomElement OSC = root.childNodes().at(1).toElement();
+
+        if (OSC.tagName() != "OSCMessages") {
+            _scene->displayMessage((tr("Unvailable xml document %1 - OSC Messages problem").
+                    arg(QString::fromStdString(fileName))).toStdString(),
+                    WARNING_LEVEL);
+            file.close();
+            return;
+        }
+        QList<QString> OSCMessagesList;
+        for(int i=0 ; i<OSC.childNodes().size() ; i++)
+            OSCMessagesList<<OSC.childNodes().at(i).toElement().attribute("message");
+
+        _scene->editor()->networkTree()->createItemsFromMessages(OSCMessagesList);
+    }
 
     delete _doc;
 }
