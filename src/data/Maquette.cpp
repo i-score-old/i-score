@@ -1698,7 +1698,7 @@ Maquette::save(const string &fileName) {
         QDomElement OSCMessageNode = _doc->createElement(*it);
         OSCMessagesNode.appendChild(OSCMessageNode);
     }
-    root.appendChild(OSCMessagesNode);
+    _doc->appendChild(OSCMessagesNode);
 
     QTextStream ts(&file);
     ts << _doc->toString();

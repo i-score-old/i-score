@@ -310,7 +310,7 @@ NetworkTree::addOSCMessage(){
     QString message = "OSCDevice/"+name;
     _OSCMessages.push_back(message);
 
-    _OSCNodeRoot->insertChild(_OSCMessageCount++,newItem);
+    _OSCNodeRoot->insertChild(_OSCMessageCount++,newItem);    
 }
 
 //void
