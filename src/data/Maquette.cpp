@@ -58,6 +58,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "TriggerPoint.hpp"
 #include <algorithm>
 #include <QTextStream>
+#include "AttributesEditor.hpp"
+#include "NetworkTree.hpp"
 
 #include <stdio.h>
 #include <assert.h>
@@ -1613,6 +1615,10 @@ Maquette::saveBox(unsigned int boxID)
 
     boxNode.appendChild(colorNode);
 
+    colorNode.setAttribute("red",color.red());
+    colorNode.setAttribute("green",color.green());
+    colorNode.setAttribute("blue",color.blue());
+
     if (boxType == "sound") {
         Palette pal = static_cast<SoundBox*>(box)->getPalette();
         QString soundFile = static_cast<SoundBox*>(box)->soundSelected();
@@ -1674,12 +1680,25 @@ Maquette::save(const string &fileName) {
     root.setAttribute("centerX",_scene->view()->getCenterCoordinates().x());
     root.setAttribute("centerY",_scene->view()->getCenterCoordinates().y());
     _doc->appendChild(root);
+
+
     QDomElement boxesNode = _doc->createElement("boxes");
     root.appendChild(boxesNode);
 
     for(BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; ++it ) {
         saveBox(it->first);
     }
+
+    //OSC Messages
+    QDomElement OSCMessagesNode = _doc->createElement("OSCMessages");
+    QList<QString> OSCMessages = _scene->editor()->networkTree()->OSCMessages();
+    QDomElement OSCMessageNode;
+    for(QList<QString>::iterator it=OSCMessages.begin() ; it!=OSCMessages.end() ; it++){
+        std::cout<<"SAVE> "<<(*it).toStdString()<<std::endl;
+        QDomElement OSCMessageNode = _doc->createElement(*it);
+        OSCMessagesNode.appendChild(OSCMessageNode);
+    }
+    root.appendChild(OSCMessagesNode);
 
     QTextStream ts(&file);
     ts << _doc->toString();
@@ -2038,7 +2057,6 @@ Maquette::load(const string &fileName){
     _scene->view()->setZoom(zoom);
     _scene->view()->centerOn(centerCoordinates);
 
-    QMap<int,unsigned int> hashMap;
     QDomNode mainNode = root.firstChild(); // Boxes
     while (!mainNode.isNull()) {
         QDomNode node1 = mainNode.firstChild(); // Box
@@ -2064,7 +2082,6 @@ Maquette::load(const string &fileName){
                         while (!node3.isNull()) {
                             QDomElement elt3 = node3.toElement();
                             if (elt2.tagName() == "position") {
-                                QPointF tmp(elt3.attribute("x","0").toInt(),elt3.attribute("y","0").toInt());
                                 if (elt3.tagName() == "date") {
                                     begin = elt3.attribute("begin","0").toInt();
                                     duration = elt3.attribute("duration","0").toInt();

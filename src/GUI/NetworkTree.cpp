@@ -209,19 +209,19 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
 
     if(!itemsName.empty()){
     //Boucle sur liste message
-    for(it=itemsName.begin() ; it!=itemsName.end() ; ++it){
-        curName = QString::fromStdString(*it);
-        address = curName.split(" ");
+        for(it=itemsName.begin() ; it!=itemsName.end() ; ++it){
+            curName = QString::fromStdString(*it);
+            address = curName.split(" ");
 
-        splitAddress = address.first().split("/");
-        int nbSection = splitAddress.size();
-        if (nbSection>=2){
-            curName = address.first();
-            msg.value = address.at(1);//second value
-            msg.device = curName.section('/',0,0);
-            msg.message= tr("/");
-            msg.message += curName.section('/',1,nbSection);
-        }
+            splitAddress = address.first().split("/");
+            int nbSection = splitAddress.size();
+            if (nbSection>=2){
+                curName = address.first();
+                msg.value = address.at(1);//second value
+                msg.device = curName.section('/',0,0);
+                msg.message= tr("/");
+                msg.message += curName.section('/',1,nbSection);
+            }
         //--------------------PROVISOIRE--------------------
 //        Considère les noeuds avec un nombre fixe de parents, NB_PARENT_MAX. Mis en place pour le cas de l'ancienne version de jamoma où peut mettre des noms contenant des "/"
 //        int NB_PARENT_MAX = 2;
@@ -247,43 +247,49 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
 //         }
          //--------------------------------------------------
 
-        itemsFound = this->findItems(splitAddress.last(), Qt::MatchRecursive, 0);
-        if(itemsFound.size()>1){
-            QList<QTreeWidgetItem *>::iterator it3;
-            QTreeWidgetItem *curIt;
-            QTreeWidgetItem *father;
-            bool found=false;
-            for(it3=itemsFound.begin(); it3!=itemsFound.end(); ++it3){
-                curIt = *it3;
-                int i=splitAddress.size()-2;
-                while(curIt->parent()!=NULL){
+            itemsFound = this->findItems(splitAddress.last(), Qt::MatchRecursive, 0);
+            if(itemsFound.size()>1){
+                QList<QTreeWidgetItem *>::iterator it3;
+                QTreeWidgetItem *curIt;
+                QTreeWidgetItem *father;
+                bool found=false;
+                for(it3=itemsFound.begin(); it3!=itemsFound.end(); ++it3){
+                    curIt = *it3;
+                    int i=splitAddress.size()-2;
+                    while(curIt->parent()!=NULL){
 
-                    father=curIt->parent();
-                    if(father->text(0)!=splitAddress.at(i)){
-                        found=false;
+                        father=curIt->parent();
+                        if(father->text(0)!=splitAddress.at(i)){
+                            found=false;
+                            break;
+                        }
+                        else{
+                            found=true;
+                            curIt=father;
+                            i--;
+                        }
+                    }
+                    if(found==true){
+                        QPair<QTreeWidgetItem *,Message> newPair = qMakePair(*it3,msg);
+                        itemsMatchedList<<newPair;
                         break;
                     }
-                    else{
-                        found=true;
-                        curIt=father;
-                        i--;
-                    }
-                }
-                if(found==true){
-                    QPair<QTreeWidgetItem *,Message> newPair = qMakePair(*it3,msg);
-                    itemsMatchedList<<newPair;
-                    break;
                 }
             }
-        }
-        else{
-            if(!itemsFound.isEmpty()){
-                QPair<QTreeWidgetItem *,Message> newPair = qMakePair(itemsFound.first(),msg);
-                itemsMatchedList<<newPair;
+            else{
+                if(!itemsFound.isEmpty()){
+                    QPair<QTreeWidgetItem *,Message> newPair = qMakePair(itemsFound.first(),msg);
+                    std::cout<<newPair.second.device.toStdString()<<std::endl;
+                    itemsMatchedList<<newPair;
+                }
+                else{//No item in tree
+                    if(msg.device == "OSCDevice"){
+                        std::cout<<"OSC > "<<msg.message.toStdString()<<std::endl;
+                    }
+                }
             }
         }
     }
-}
     return itemsMatchedList;
 }
 
@@ -293,7 +299,7 @@ NetworkTree::addOSCMessage(){
     _OSCNodeRoot->setCheckState(END_COLUMN,Qt::Unchecked);
 
     QString number = QString("%1").arg(_OSCMessageCount);
-    QString name = QString("/OSCMessage"+number);
+    QString name = QString("OSCMessage"+number);
     QStringList OSCname = QStringList(name);
 
     QTreeWidgetItem *newItem = new QTreeWidgetItem(OSCname,OSCNode);
@@ -301,12 +307,57 @@ NetworkTree::addOSCMessage(){
     newItem->setCheckState(REDUNDANCY_COLUMN,Qt::Unchecked);
     newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
 
+    QString message = "OSCDevice/"+name;
+    _OSCMessages.push_back(message);
+
     _OSCNodeRoot->insertChild(_OSCMessageCount++,newItem);
 }
 
+//void
+//NetworkTree::loadNetworkTree(AbstractBox *abBox){
+//    std::cout<<"load NT"<<std::endl;
+//    QList< QPair<QTreeWidgetItem *, Message> > startItemsAndMsgs = getItemsFromMsg(abBox->firstMsgs());
+//    QList< QPair<QTreeWidgetItem *, Message> > endItemsAndMsgs = getItemsFromMsg(abBox->lastMsgs());
+//    QList< QPair<QTreeWidgetItem *, Message> >::iterator it0;
+//    QPair<QTreeWidgetItem *, Message> curPair;
+
+////    QList<QTreeWidgetItem *>itemsFromMsg;
+//    QMap<QTreeWidgetItem *,Data>itemsFromMsg;
+//    Data currentData;
+//    for(it0 = startItemsAndMsgs.begin() ; it0 != startItemsAndMsgs.end() ; it0++){
+//        curPair = *it0;
+////        itemsFromMsg << curPair.first;
+//        itemsFromMsg.insert(curPair.first,currentData);
+//    }
+
+//    QList<QTreeWidgetItem *>itemsFromEndMsg;
+//    for(it0 = endItemsAndMsgs.begin() ; it0 != endItemsAndMsgs.end() ; it0++){
+//        curPair = *it0;
+////        itemsFromEndMsg << curPair.first;
+//        itemsFromMsg.insert(curPair.first,currentData);
+//    }
+
+//    QList<QTreeWidgetItem *>::iterator it;
+//    QTreeWidgetItem *curItem;
+//    for(it = itemsFromEndMsg.begin() ; it != itemsFromEndMsg.end() ; it++){
+//        curItem = *it;
+//        if(!itemsFromMsg.contains(curItem)){
+////            itemsFromMsg.append(curItem);
+//            itemsFromMsg.insert(curItem,currentData);
+//        }
+//    }
+//    setAssignedItems(itemsFromMsg);
+//    NetworkMessages *startMsg = new NetworkMessages();
+//    NetworkMessages *endMsg = new NetworkMessages();
+//    startMsg->setMessages(startItemsAndMsgs);
+//    endMsg->setMessages(endItemsAndMsgs);
+//    setStartMessages(startMsg);
+//    setEndMessages(endMsg);
+//}
+
 void
 NetworkTree::loadNetworkTree(AbstractBox *abBox){
-
+    std::cout<<"load NT"<<std::endl;
     QList< QPair<QTreeWidgetItem *, Message> > startItemsAndMsgs = getItemsFromMsg(abBox->firstMsgs());
     QList< QPair<QTreeWidgetItem *, Message> > endItemsAndMsgs = getItemsFromMsg(abBox->lastMsgs());
     QList< QPair<QTreeWidgetItem *, Message> >::iterator it0;
@@ -345,6 +396,7 @@ NetworkTree::loadNetworkTree(AbstractBox *abBox){
     setStartMessages(startMsg);
     setEndMessages(endMsg);
 }
+
 
 void
 NetworkTree::createOCSBranch(QTreeWidgetItem *curItem){

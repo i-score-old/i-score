@@ -311,6 +311,7 @@ class NetworkTree : public QTreeWidget
         void resetAssignedNodes();        
         void addOSCMessage();
         void assignOCSMsg(QTreeWidgetItem *item);
+        inline QList<QString> OSCMessages(){return _OSCMessages;}
 
         /***********************************************************************
          *                              Curves
@@ -404,6 +405,7 @@ class NetworkTree : public QTreeWidget
         NetworkMessages *_endMessages;
         NetworkMessages *_OSCStartMessages;
         NetworkMessages *_OSCEndMessages;
+        QList<QString> _OSCMessages;
 
         QTreeWidgetItem *_OSCNodeRoot;
         int _OSCMessageCount;

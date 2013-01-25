@@ -78,6 +78,7 @@ class Comment;
 class TriggerPoint;
 class PlayingThread;
 class TimeBarWidget;
+class NetworkTree;
 
 /*!
  * \class MaquetteScene
@@ -578,6 +579,7 @@ class MaquetteScene : public QGraphicsScene
   inline float zoom(){return _view->zoom();}
   void updateProgressBar();
   void setAccelerationFactor(double value);
+  inline NetworkTree *networkTreeAssociated(){return _networkTreeAssociated;}
 
  protected :
   /*!
@@ -817,6 +819,7 @@ public slots :
   double _accelerationFactor;
 
   QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
+  NetworkTree *_networkTreeAssociated;
 };
 
 #endif
