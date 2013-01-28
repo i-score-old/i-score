@@ -418,7 +418,7 @@ NetworkTree::addOSCMessage(QString message){
 
 void
 NetworkTree::loadNetworkTree(AbstractBox *abBox){
-    std::cout<<"load NT"<<std::endl;
+
     QList< QPair<QTreeWidgetItem *, Message> > startItemsAndMsgs = getItemsFromMsg(abBox->firstMsgs());
     QList< QPair<QTreeWidgetItem *, Message> > endItemsAndMsgs = getItemsFromMsg(abBox->lastMsgs());
     QList< QPair<QTreeWidgetItem *, Message> >::iterator it0;
