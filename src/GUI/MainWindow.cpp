@@ -117,6 +117,8 @@ MainWindow::MainWindow()
   // Central Widget
   _maquetteWidget = new MaquetteWidget(this,_view,_scene);
 
+  _networkConfig = new NetworkConfig(_scene,this);
+
 //  createMaquetteWidget();
   setCentralWidget(_maquetteWidget);
 //  setCentralWidget(_view);
@@ -133,6 +135,7 @@ MainWindow::MainWindow()
 //  connect(_maquetteWidget,SIGNAL(beginPlaying()),this,SLOT(play()));
   connect(_maquetteWidget,SIGNAL(accelerationValueChanged(int)),this,SLOT(accelerationChanged(int)));
   connect(_view->verticalScrollBar(),SIGNAL(valueChanged(int)),_scene,SLOT(verticalScroll(int)));
+  connect(_scene,SIGNAL(networkConfigChanged(std::string,std::string)),this,SLOT(changeNetworkConfig(std::string,std::string)));
 }
 
 MainWindow::~MainWindow()
@@ -183,6 +186,7 @@ MainWindow::~MainWindow()
   delete _freePlayAct;
 
   delete _helpDialog;
+  delete _networkConfig;
 }
 
 void
@@ -298,7 +302,7 @@ MainWindow::open()
 
 bool
 MainWindow::save()
-{
+{    
   if (_curFile.isEmpty()) {
     return saveAs();
   }
@@ -631,8 +635,8 @@ MainWindow::selectMode(const InteractionMode &mode,const BoxCreationMode &boxMod
 }
 
 void MainWindow::networkConfig() {
-  NetworkConfig network(_scene, this);
-  network.exec();
+//  NetworkConfig network (_scene, this);
+  _networkConfig->exec();
 }
 
 bool
@@ -1052,4 +1056,9 @@ QString
 MainWindow::strippedName(const QString &fullFileName)
 {
   return QFileInfo(fullFileName).fileName();
+}
+
+void
+MainWindow::changeNetworkConfig(std::string IP, std::string port){
+    _networkConfig->setNetworkConfig(IP,port);
 }

@@ -802,7 +802,8 @@ class Maquette : public QObject
   std::map<unsigned int,TriggerPoint*> _triggerPoints;
 
   //! The next ID to be used for sequential name purpose
-  //unsigned int _currentID;
+//  unsigned int _currentID;
+  std::string _currentDevice;
 
   //! The set of handled devices.
   std::map<std::string,MyDevice> _devices;

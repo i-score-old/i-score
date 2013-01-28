@@ -393,7 +393,7 @@ class MaquetteScene : public QGraphicsScene
    * \param IP : the new IP for device
    * \param port : the new port for device
    */
-  void changeNetworkDevice(const std::string &deviceName, const std::string &pluginName, const std::string &IP, const std::string &port);
+  void changeNetworkDevice(string deviceName, string pluginName, string IP, string port);
   /*!
    * \brief Updates messages to send for a specific box.
    *
@@ -667,10 +667,12 @@ class MaquetteScene : public QGraphicsScene
 signals:
   void stopPlaying();
   void accelerationValueChanged(double value);
+  void networkConfigChanged(std::string IP, std::string port);
 
 public slots :
   void verticalScroll(int value);
   void gotoChanged(double value);
+
 
   /*!
    * \brief Cuts selected boxes.

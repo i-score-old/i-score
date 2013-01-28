@@ -66,6 +66,7 @@ class QLCDNumber;
 class LogarithmicSlider;
 class Help;
 class QDoubleSpinBox;
+class NetworkConfig;
 
 /*!
  * \class MainWindow
@@ -223,6 +224,7 @@ class MainWindow : public QMainWindow
    * \brief Selects the whole set of boxes.
    */
   void selectAll();
+  void changeNetworkConfig(std::string IP, std::string port);
 
  private :
   /*!
@@ -332,6 +334,7 @@ class MainWindow : public QMainWindow
   QDoubleSpinBox *_gotoDisplay; //!< Goto value.
 
   MaquetteWidget *_maquetteWidget;
+  NetworkConfig *_networkConfig;
 };
 
 #endif

@@ -74,6 +74,8 @@ class NetworkConfig : public QDialog
   NetworkConfig(MainWindow *parent);
   NetworkConfig(MaquetteScene *scene, QWidget *parent);
 
+  void setNetworkConfig(std::string IP, std::string port);
+
   private slots :
 
   /*!
@@ -91,6 +93,7 @@ class NetworkConfig : public QDialog
    */
   void updateNetworkConfiguration();
 
+
  private :
 
   MaquetteScene *_scene; //!< Logical representation of the scene.
@@ -102,7 +105,7 @@ class NetworkConfig : public QDialog
   QLabel *_portLabel; //!< QLabel for ports.
   QLabel *_IPLabel; //!< QLabel for network adress.
 
-	std::map<std::string, MyDevice> _devices; //!< Handling all devices mapped by name.
+  std::map<std::string, MyDevice> _devices; //!< Handling all devices mapped by name.
 
   QComboBox *_devicesComboBox; //!< QComboBox handling various devices available.
   QComboBox *_pluginsComboBox; //!< QComboBox handling various plug-ins available.

@@ -163,6 +163,13 @@ void NetworkConfig::deviceSelected(int indexSelected) {
 	}
 }
 
+void
+NetworkConfig::setNetworkConfig(std::string IP, std::string port){
+    _devices["OSCDevice"].networkPort = atoi(port.c_str());
+    _devices["OSCDevice"].networkHost = IP;
+    updateNetworkConfiguration();
+}
+
 void NetworkConfig::updateNetworkConfiguration() {
   if (_changed) {
     QHostAddress hostAddress(_IPBox->text());
