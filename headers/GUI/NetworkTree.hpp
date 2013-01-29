@@ -58,7 +58,7 @@ using std::map;
 class QTreeView;
 
 enum {NodeNamespaceType = QTreeWidgetItem::UserType + 1, NodeNoNamespaceType = QTreeWidgetItem::UserType + 2 ,
-    LeaveType = QTreeWidgetItem::UserType + 3, AttributeType = QTreeWidgetItem::UserType + 4, OSCNamespace = QTreeWidgetItem::UserType + 5, OSCNode = QTreeWidgetItem::UserType + 6};
+    LeaveType = QTreeWidgetItem::UserType + 3, AttributeType = QTreeWidgetItem::UserType + 4, OSCNamespace = QTreeWidgetItem::UserType + 5, OSCNode = QTreeWidgetItem::UserType + 6,addOSCNode = QTreeWidgetItem::UserType + 7};
 
 
 
@@ -420,6 +420,7 @@ class NetworkTree : public QTreeWidget
         void valueChanged(QTreeWidgetItem* item,int column);
         void changeStartValue(QTreeWidgetItem* item,QString newValue);
         void changeEndValue(QTreeWidgetItem* item,QString newValue);
+        void changeNameValue(QTreeWidgetItem* item,QString newValue);
 };
 
 

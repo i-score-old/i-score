@@ -127,9 +127,10 @@ Maquette::init() {
                 _devices[maxDevice.name] = maxDevice;
                 stringstream port;
                 port << maxDevice.networkPort;
-                _engines->addNetworkDevice(maxDevice.name,maxDevice.plugin,maxDevice.networkHost,port.str());
+//                _engines->addNetworkDevice(maxDevice.name,maxDevice.plugin,maxDevice.networkHost,port.str());
             }
             deviceIt = _devices.find("MinuitDevice");
+
             if (deviceIt != _devices.end()) {
                 MyDevice minuitDevice = deviceIt->second;
                 minuitDevice.name = "MinuitDevice1";
@@ -143,42 +144,48 @@ Maquette::init() {
         }
     }
     else{
-		vector<string>::iterator it;
-		vector<unsigned int>::iterator it2;
-		for (it = pluginsLoaded.begin(), it2 = _listeningPorts.begin();
-			(it != pluginsLoaded.end()) && (it2 != _listeningPorts.end()) ;
-			it++,it2++) {
-			stringstream deviceName;
-			deviceName << *it << "Device";
-			MyDevice device(deviceName.str(),*it,*it2,NETWORK_LOCALHOST);
-			_devices[device.name] = device;
-			stringstream devicePort;
-			devicePort << device.networkPort;
-			_engines->addNetworkDevice(device.name,device.plugin,device.networkHost,devicePort.str());
-		}
-		map<string,MyDevice>::iterator deviceIt;
-		deviceIt = _devices.find("OSCDevice");
-		if (deviceIt != _devices.end()) {
-			MyDevice maxDevice = deviceIt->second;
-			maxDevice.name = "MaxDevice";
-			maxDevice.networkPort = 7000;
-			maxDevice.networkHost = "127.0.0.1";
-			_devices[maxDevice.name] = maxDevice;
-			stringstream port;
-			port << maxDevice.networkPort;
-			_engines->addNetworkDevice(maxDevice.name,maxDevice.plugin,maxDevice.networkHost,port.str());
-		}
-		deviceIt = _devices.find("MinuitDevice");
-		if (deviceIt != _devices.end()) {
-			MyDevice minuitDevice = deviceIt->second;
-			minuitDevice.name = "MinuitDevice1";
-			minuitDevice.networkPort = 9998;
-			minuitDevice.networkHost = "127.0.0.1";
-			_devices[minuitDevice.name] = minuitDevice;
-			stringstream port;
-			port << minuitDevice.networkPort;
-			_engines->addNetworkDevice(minuitDevice.name,minuitDevice.plugin,minuitDevice.networkHost,port.str());
-		}
+        vector<string>::iterator it;
+        vector<unsigned int>::iterator it2;
+        for (it = pluginsLoaded.begin(), it2 = _listeningPorts.begin();
+            (it != pluginsLoaded.end()) && (it2 != _listeningPorts.end()) ;
+            it++,it2++) {
+            stringstream deviceName;
+            deviceName << *it << "Device";
+            std::cout<<"names : "<<*it<<std::endl;
+            MyDevice device(deviceName.str(),*it,*it2,NETWORK_LOCALHOST);
+            _devices[device.name] = device;
+//            stringstream devicePort;
+//            devicePort << OSC_NETWORK_PORT;
+//            _engines->addNetworkDevice(device.name,device.plugin,device.networkHost,devicePort.str());
+        }
+
+        map<string,MyDevice>::iterator deviceIt;
+        deviceIt = _devices.find("MinuitDevice");
+        if (deviceIt != _devices.end()) {
+            MyDevice minuitDevice = deviceIt->second;
+            minuitDevice.name = "MinuitDevice1";
+            std::cout<<"adding : "<<minuitDevice.name<<std::endl;
+            minuitDevice.networkPort = 9998;
+            minuitDevice.networkHost = "127.0.0.1";
+            _devices[minuitDevice.name] = minuitDevice;
+            stringstream port;
+            port << minuitDevice.networkPort;
+            _engines->addNetworkDevice(minuitDevice.name,minuitDevice.plugin,minuitDevice.networkHost,port.str());
+        }
+
+        deviceIt = _devices.find("OSCDevice");
+        if (deviceIt != _devices.end()) {
+            MyDevice oscDevice = deviceIt->second;
+            oscDevice.name = "OSCDevice";
+            std::cout<<"adding : "<<oscDevice.name<<std::endl;
+            oscDevice.networkPort = OSC_NETWORK_PORT;
+            oscDevice.networkHost = "127.0.0.1";
+            _devices[oscDevice.name] = oscDevice;
+            stringstream port;
+            port << oscDevice.networkPort;
+            _engines->addNetworkDevice(oscDevice.name,oscDevice.plugin,oscDevice.networkHost,port.str());
+        }
+        _devices.erase("MinuitDevice");
     }
 
 	_engines->addCrossingCtrlPointCallback(&crossTransitionCallback);

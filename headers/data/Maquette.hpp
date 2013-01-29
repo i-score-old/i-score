@@ -65,6 +65,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #define NETWORK_LOCALHOST "127.0.0.1"
 //! Default network port.
 static const int NETWORK_PORT = 7000;
+static const int OSC_NETWORK_PORT = 9999;
 #define NETWORK_PORT_STR "7000"
 
 class PaletteActor;
