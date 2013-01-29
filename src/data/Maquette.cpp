@@ -2319,7 +2319,8 @@ Maquette::load(const string &fileName){
                 port = OSC.childNodes().at(i).toElement().attribute("Port");
             }
         }
-        _scene->changeNetworkDevice("OSCDevice","OSC",ip.toStdString(),port.toStdString());
+
+        _scene->setNetworDeviceConfig("OSCDevice","OSC",ip.toStdString(),port.toStdString());
         _scene->editor()->networkTree()->createItemsFromMessages(OSCMessagesList);
     }
 

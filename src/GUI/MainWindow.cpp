@@ -135,7 +135,7 @@ MainWindow::MainWindow()
 //  connect(_maquetteWidget,SIGNAL(beginPlaying()),this,SLOT(play()));
   connect(_maquetteWidget,SIGNAL(accelerationValueChanged(int)),this,SLOT(accelerationChanged(int)));
   connect(_view->verticalScrollBar(),SIGNAL(valueChanged(int)),_scene,SLOT(verticalScroll(int)));
-  connect(_scene,SIGNAL(networkConfigChanged(std::string,std::string)),this,SLOT(changeNetworkConfig(std::string,std::string)));
+  connect(_scene,SIGNAL(networkConfigChanged(std::string,std::string,std::string,std::string)),this,SLOT(changeNetworkConfig(std::string,std::string,std::string,std::string)));
 }
 
 MainWindow::~MainWindow()
@@ -635,7 +635,7 @@ MainWindow::selectMode(const InteractionMode &mode,const BoxCreationMode &boxMod
 }
 
 void MainWindow::networkConfig() {
-//  NetworkConfig network (_scene, this);
+//  _networkConfig = new NetworkConfig(_scene, this);
   _networkConfig->exec();
 }
 
@@ -1059,6 +1059,6 @@ MainWindow::strippedName(const QString &fullFileName)
 }
 
 void
-MainWindow::changeNetworkConfig(std::string IP, std::string port){
-    _networkConfig->setNetworkConfig(IP,port);
+MainWindow::changeNetworkConfig(std::string deviceName,std::string pluginName, std::string IP, std::string port){
+    _networkConfig->setNetworkConfig(deviceName,pluginName, IP,port);
 }

@@ -74,7 +74,7 @@ class NetworkConfig : public QDialog
   NetworkConfig(MainWindow *parent);
   NetworkConfig(MaquetteScene *scene, QWidget *parent);
 
-  void setNetworkConfig(std::string IP, std::string port);
+  void setNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, std::string port);
 
   private slots :
 

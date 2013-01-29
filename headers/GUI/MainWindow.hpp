@@ -224,7 +224,7 @@ class MainWindow : public QMainWindow
    * \brief Selects the whole set of boxes.
    */
   void selectAll();
-  void changeNetworkConfig(std::string IP, std::string port);
+  void changeNetworkConfig(std::string deviceName,std::string pluginName, std::string IP, std::string port);
 
  private :
   /*!
