@@ -213,7 +213,6 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
     if(!itemsName.empty()){
     //Boucle sur liste message
         for(it=itemsName.begin() ; it!=itemsName.end() ; ++it){
-            std::cout<<"getItems : "<<*it<<std::endl;
             curName = QString::fromStdString(*it);
             address = curName.split(" ");
 
@@ -307,7 +306,6 @@ NetworkTree::createItemsFromMessages(QList<QString> messageslist){
 
 void
 NetworkTree::createItemFromMessage(QString message){
-    std::cout<<"----- "<<message.toStdString()<<std::endl;
     QStringList splitMessage = message.split("/");
     QStringList name;
     QList<QTreeWidgetItem *>  itemsFound;
@@ -316,7 +314,6 @@ NetworkTree::createItemFromMessage(QString message){
     int nodeType = NodeNamespaceType;
 
     itemsFound = findItems(device,Qt::MatchRecursive);
-    std::cout<<itemsFound.size()<<std::endl;
     if(!itemsFound.isEmpty()){
         if(itemsFound.size()>1){
             std::cerr<<"NetworkTree::createItemFromMessage : device name conflict"<<std::endl;
@@ -357,14 +354,13 @@ NetworkTree::addOSCMessage(){
     newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
 
     QString message = "OSCDevice/"+name;
-    _OSCMessages.push_back(message);
+    _OSCMessages.push_back(newItem);
 
     _OSCNodeRoot->insertChild(_OSCMessageCount++,newItem);    
 }
 
 void
 NetworkTree::addOSCMessage(QString message){
-    std::cout<<"Add OSC MEssage"<<std::endl;
     _OSCNodeRoot->setCheckState(START_COLUMN,Qt::Unchecked);
     _OSCNodeRoot->setCheckState(END_COLUMN,Qt::Unchecked);
 
@@ -375,9 +371,29 @@ NetworkTree::addOSCMessage(QString message){
     newItem->setCheckState(REDUNDANCY_COLUMN,Qt::Unchecked);
     newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
 
-    _OSCMessages.push_back(message);
+    _OSCMessages.push_back(newItem);
 
     _OSCNodeRoot->insertChild(_OSCMessageCount++,newItem);
+}
+
+void
+NetworkTree::setOSCMessageName(QTreeWidgetItem *item, QString name){
+    int index = _OSCMessages.indexOf(item);
+    _OSCMessages.at(index)->setText(NAME_COLUMN,name);
+}
+
+QList<QString>
+NetworkTree::getOSCMessages(){
+    QList<QTreeWidgetItem*>::iterator it;
+    QList<QString> msgsList;
+    QTreeWidgetItem *curIt;
+    QString msg;
+    for(it=_OSCMessages.begin() ; it!=_OSCMessages.end() ; it++){
+        curIt = *it;
+        msg = "OSCDevice/"+ curIt->text(NAME_COLUMN);
+        msgsList<<msg;
+    }
+    return msgsList;
 }
 
 //void
@@ -1365,7 +1381,6 @@ void
 NetworkTree::mouseDoubleClickEvent(QMouseEvent *event){
 //    mouseDoubleClickEvent(event);
     if(currentItem()->type() == OSCNode){
-        std::cout<<"edit"<<std::endl;
         QTreeWidgetItem *item = currentItem();
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
 //        item->setSelected(true);
@@ -1392,7 +1407,6 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event){
         ;
     else{
         if(currentColumn() == START_COLUMN || currentColumn() == END_COLUMN || currentColumn() == SR_COLUMN){
-            std::cout<<"edit2"<<std::endl;
             QTreeWidgetItem *item = currentItem();
             item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
             editItem(item,currentColumn());
@@ -1426,10 +1440,8 @@ NetworkTree::keyPressEvent(QKeyEvent *event){
          setSelectionMode(QAbstractItemView::ContiguousSelection);
     }
    if(event->key()==Qt::Key_Backtab){
-        std::cout<<"tabPressed"<<std::endl;
         if(VALUE_MODIFIED){
             if(currentColumn() == START_COLUMN){
-                std::cout<<"start column"<<std::endl;
                 editItem(currentItem(),END_COLUMN);
             }
        }
@@ -1510,12 +1522,10 @@ NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
     }
     if (item->type()==OSCNode && column == NAME_COLUMN && NAME_MODIFIED){
         NAME_MODIFIED = FALSE;
-        std::cout<<"NAME MODIFIED"<<std::endl;
         changeNameValue(item,item->text(NAME_COLUMN));
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
     }
     if (item->type()==OSCNode && column == START_COLUMN && VALUE_MODIFIED){
-        std::cout<<"VALUE MODIFIED"<<std::endl;
         VALUE_MODIFIED = FALSE;
         assignItem(item,data);
         emit(startValueChanged(item,item->text(START_COLUMN)));
@@ -1617,7 +1627,6 @@ NetworkTree::changeEndValue(QTreeWidgetItem *item, QString newValue){
 
 void
 NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue){
-    std::cout<<"new value : "<<newValue.toStdString()<<std::endl;
     if(item->type()==OSCNode){
         if(newValue.isEmpty()){
             _startMessages->removeMessage(item);
@@ -1626,21 +1635,17 @@ NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue){
             _OSCStartMessages->removeMessage(item);
         }
         else{
+            setOSCMessageName(item,newValue);
             if (_endMessages->getMessages()->contains(item)){
-
-//                std::cout<<"Newname "<<item->text(0)<<std::endl;
                 _endMessages->removeMessage(item);
                 QString Qaddress = getAbsoluteAddressWithValue(item,END_COLUMN);
-                std::cout<<"New address end : "<<Qaddress.toStdString()<<std::endl;
                 _endMessages->addMessage(item,Qaddress);
                 addOSCEndMessage(item,Qaddress);
                 emit(endMessageValueChanged(item));
             }
             if (_startMessages->getMessages()->contains(item)){
-                std::cout<<"has startValue"<<std::endl;
                 _startMessages->removeMessage(item);
                 QString Qaddress = getAbsoluteAddressWithValue(item,START_COLUMN);
-                std::cout<<"New address start : "<<Qaddress.toStdString()<<std::endl;
                 _startMessages->addMessage(item,Qaddress);
                 addOSCStartMessage(item,Qaddress);
                 emit(startMessageValueChanged(item));
