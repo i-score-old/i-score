@@ -213,6 +213,7 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
     if(!itemsName.empty()){
     //Boucle sur liste message
         for(it=itemsName.begin() ; it!=itemsName.end() ; ++it){
+            std::cout<<"getItems : "<<*it<<std::endl;
             curName = QString::fromStdString(*it);
             address = curName.split(" ");
 
@@ -306,6 +307,7 @@ NetworkTree::createItemsFromMessages(QList<QString> messageslist){
 
 void
 NetworkTree::createItemFromMessage(QString message){
+    std::cout<<"----- "<<message.toStdString()<<std::endl;
     QStringList splitMessage = message.split("/");
     QStringList name;
     QList<QTreeWidgetItem *>  itemsFound;
@@ -314,16 +316,18 @@ NetworkTree::createItemFromMessage(QString message){
     int nodeType = NodeNamespaceType;
 
     itemsFound = findItems(device,Qt::MatchRecursive);
+    std::cout<<itemsFound.size()<<std::endl;
     if(!itemsFound.isEmpty()){
         if(itemsFound.size()>1){
             std::cerr<<"NetworkTree::createItemFromMessage : device name conflict"<<std::endl;
             return;
         }
-        else{
-            std::cerr<<"NetworkTree::createItemFromMessage : Unknown device"<<std::endl;
-            return;
-        }
     }
+    else{
+        std::cerr<<"NetworkTree::createItemFromMessage : Unknown device"<<std::endl;
+        return;
+    }
+
     if(device=="OSCDevice"){
         nodeType = OSCNode;
         addOSCMessage(*(++it));
@@ -360,6 +364,7 @@ NetworkTree::addOSCMessage(){
 
 void
 NetworkTree::addOSCMessage(QString message){
+    std::cout<<"Add OSC MEssage"<<std::endl;
     _OSCNodeRoot->setCheckState(START_COLUMN,Qt::Unchecked);
     _OSCNodeRoot->setCheckState(END_COLUMN,Qt::Unchecked);
 
@@ -1363,7 +1368,7 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event){
         std::cout<<"edit"<<std::endl;
         QTreeWidgetItem *item = currentItem();
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
-        item->setSelected(true);
+//        item->setSelected(true);
         editItem(currentItem(),currentColumn());
         if(currentColumn() == NAME_COLUMN){
             NAME_MODIFIED = true;
@@ -1378,7 +1383,7 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event){
             SR_MODIFIED = true;
         }
 
-        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
+//        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
 //        QFont font;
 //        font.setBold(true);
 //        item->setFont(NAME_COLUMN,font);
@@ -1507,23 +1512,27 @@ NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
         NAME_MODIFIED = FALSE;
         std::cout<<"NAME MODIFIED"<<std::endl;
         changeNameValue(item,item->text(NAME_COLUMN));
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
     }
     if (item->type()==OSCNode && column == START_COLUMN && VALUE_MODIFIED){
         std::cout<<"VALUE MODIFIED"<<std::endl;
         VALUE_MODIFIED = FALSE;
         assignItem(item,data);
         emit(startValueChanged(item,item->text(START_COLUMN)));
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
     }
 
     if (item->type()==OSCNode && column == END_COLUMN && VALUE_MODIFIED){
         VALUE_MODIFIED = FALSE;
         assignItem(item,data);
         emit(endValueChanged(item,item->text(END_COLUMN)));
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
     }
 
     if (item->type()==OSCNode && column == SR_COLUMN && SR_MODIFIED){
         SR_MODIFIED = FALSE;
         emit(curveSampleRateChanged(item,(item->text(SR_COLUMN)).toInt()));
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
     }
 }
 
