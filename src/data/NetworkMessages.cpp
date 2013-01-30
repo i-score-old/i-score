@@ -187,6 +187,11 @@ NetworkMessages::computeMessages() {
 }
 
 void
+NetworkMessages::changeName(QTreeWidgetItem *item, QString newName){
+    std::cout<<"TODO"<<std::endl;
+}
+
+void
 NetworkMessages::addMessage(QTreeWidgetItem *treeItem, const QString &device, const QString &message, const QString &value){   
     Message msg = {device, message, value};
     _messages->insert(treeItem,msg);
@@ -421,16 +426,5 @@ NetworkMessages::setValue(QTreeWidgetItem *item, QString newValue){
 #endif
         return false;
     }
-}
-
-void
-NetworkMessages::messageChanged(){
-}
-
-void
-NetworkMessages::valueChanged(){
-}
-
-void NetworkMessages::deviceChanged(){
 }
 

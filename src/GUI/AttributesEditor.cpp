@@ -804,6 +804,8 @@ AttributesEditor::connectSlots()
     connect(_networkTree,SIGNAL(curveActivationChanged(QTreeWidgetItem*,bool)),this,SLOT(curveActivationChanged(QTreeWidgetItem*,bool)));
     connect(_networkTree,SIGNAL(curveRedundancyChanged(QTreeWidgetItem*,bool)),this,SLOT(curveRedundancyChanged(QTreeWidgetItem*,bool)));
     connect(_networkTree,SIGNAL(curveSampleRateChanged(QTreeWidgetItem*,int)),this,SLOT(curveSampleRateChanged(QTreeWidgetItem*,int)));    
+    connect(_networkTree,SIGNAL(startMessageNameChanged(QTreeWidgetItem*,QString)),this,SLOT(deployStartMessageChanged(QTreeWidgetItem*,QString)));
+    connect(_networkTree,SIGNAL(endMessageNameChanged(QTreeWidgetItem*,QString)),this,SLOT(deployEndMessageChanged(QTreeWidgetItem*,QString)));
 
 	connect(_treeMapLoad, SIGNAL(clicked()), this, SLOT(reloadTreeMap()));
 	connect(_treeMapUp, SIGNAL(clicked()), this, SLOT(upTreeMap()));
@@ -867,7 +869,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
         if (_boxEdited != NO_ID) {
 
 			_startMsgsEditor->addMessages(abBox->firstMsgs());
-            _endMsgsEditor->addMessages(abBox->lastMsgs());
+            _endMsgsEditor->addMessages(abBox->lastMsgs());            
 
             if(abBox->networkTreeItems().isEmpty() && abBox->networkTreeExpandedItems().isEmpty()){
                 //LOAD FILE
@@ -1438,6 +1440,53 @@ void AttributesEditor::endMessageRemoved(const string &address) {
     }
     else
         _scene->displayMessage("No box selected",INDICATION_LEVEL);
+}
+
+void
+AttributesEditor::deployStartMessageChanged(QTreeWidgetItem *item, QString newName){
+    std::map<unsigned int,BasicBox *>::iterator it;
+    std::map<unsigned int,BasicBox *> boxesMap = Maquette::getInstance()->getBoxes();
+    QList<unsigned int> boxesID;
+    unsigned int boxID;
+
+    for(it = boxesMap.begin() ; it!= boxesMap.end() ; it++)
+        boxesID<<(*it).first;
+
+    for(QList<unsigned int>::iterator idIt = boxesID.begin() ; idIt != boxesID.end() ; idIt++){
+        boxID = *idIt;
+
+        NetworkMessages *messagesToSend = Maquette::getInstance()->startMessages(boxID);
+
+        std::cout<<"BOX s "<<boxID<<std::endl;
+        for (int i=0; i<messagesToSend->computeMessages().size();i++)
+            std::cout<<messagesToSend->computeMessages().at(i)<<std::endl;
+        messagesToSend->changeName(item,newName);
+        std::cout<<"add "<<item->text(0).toStdString()<<" "<<newName.toStdString()<<std::endl;
+        Maquette::getInstance()->setStartMessagesToSend(_boxEdited,messagesToSend);
+    }
+}
+
+void
+AttributesEditor::deployEndMessageChanged(QTreeWidgetItem *item, QString newName){
+    std::map<unsigned int,BasicBox *>::iterator it;
+    std::map<unsigned int,BasicBox *> boxesMap = Maquette::getInstance()->getBoxes();
+    QList<unsigned int> boxesID;
+    unsigned int boxID;
+
+    for(it = boxesMap.begin() ; it!= boxesMap.end() ; it++)
+        boxesID<<(*it).first;
+
+    for(QList<unsigned int>::iterator idIt = boxesID.begin() ; idIt != boxesID.end() ; idIt++){
+        boxID = *idIt;
+
+        NetworkMessages *messagesToSend = Maquette::getInstance()->endMessages(boxID);
+        std::cout<<"BOX e "<<boxID<<std::endl;
+        for (int i=0; i<messagesToSend->computeMessages().size();i++)
+            std::cout<<messagesToSend->computeMessages().at(i)<<std::endl;
+        messagesToSend->changeName(item,newName);
+        std::cout<<"add "<<item->text(0).toStdString()<<" "<<newName.toStdString()<<std::endl;
+        Maquette::getInstance()->setEndMessagesToSend(_boxEdited,messagesToSend);
+    }
 }
 
 void

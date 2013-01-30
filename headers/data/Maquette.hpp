@@ -350,6 +350,7 @@ class Maquette : public QObject
    * \return if messages could be set
    */
   bool setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages);
+  NetworkMessages *startMessages(unsigned int boxID);
   /*!
    * \brief Sets the set of treeItems to send for the beginning of a box.
    *
@@ -397,6 +398,7 @@ class Maquette : public QObject
    * \return if networkMessages could be set
    */
   bool setEndMessages(unsigned int boxID,  NetworkMessages* nm);
+  NetworkMessages *endMessages(unsigned int boxID);
   /*!
    * \brief Remove from treeItems expanded list.
    *
@@ -713,6 +715,8 @@ class Maquette : public QObject
    * Messages (final state of each boxes) are sended to the engine.
    */
   void initSceneState();
+  void setStartMessageToSend(unsigned int boxID,QTreeWidgetItem *item,QString address);
+  void setEndMessageToSend(unsigned int boxID,QTreeWidgetItem *item,QString address);
 
  private :
 

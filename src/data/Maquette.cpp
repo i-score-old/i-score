@@ -767,6 +767,14 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages){
     return false;
 }
 
+NetworkMessages *
+Maquette::startMessages(unsigned int boxID){
+    if (boxID != NO_ID && (getBox(boxID) != NULL))
+        return _boxes[boxID]->startMessages();
+    else
+        std::cerr<<"Maquette::startMessage : wrong boxID"<<std::endl;
+}
+
 bool
 Maquette::setSelectedItemsToSend(unsigned int boxID,  QMap<QTreeWidgetItem*,Data> itemsSelected){
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
@@ -829,6 +837,14 @@ Maquette::setEndMessages(unsigned int boxID,  NetworkMessages* nm){
         return true;
     }
     return false;
+}
+
+NetworkMessages *
+Maquette::endMessages(unsigned int boxID){
+    if (boxID != NO_ID && (getBox(boxID) != NULL))
+        return _boxes[boxID]->endMessages();
+    else
+        std::cerr<<"Maquette::startMessage : wrong boxID"<<std::endl;
 }
 
 bool
@@ -2401,4 +2417,14 @@ void
 executionFinishedCallback()
 {
 	Maquette::getInstance()->executionFinished();
+}
+
+void
+Maquette::setStartMessageToSend(unsigned int boxID,QTreeWidgetItem *item,QString address){
+    _boxes[boxID]->setStartMessage(item,address);
+}
+
+void
+Maquette::setEndMessageToSend(unsigned int boxID,QTreeWidgetItem *item,QString address){
+    _boxes[boxID]->setEndMessage(item,address);
 }

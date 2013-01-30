@@ -832,6 +832,25 @@ BasicBox::setEndMessages(NetworkMessages *messages) {
     _abstract->setEndMessages(messages);
 }
 
+NetworkMessages *
+BasicBox::endMessages(){
+    _abstract->endMessages();
+}
+
+void
+BasicBox::setStartMessage(QTreeWidgetItem *item, QString address) {
+    _abstract->setStartMessage(item,address);
+}
+
+NetworkMessages *
+BasicBox::startMessages(){
+    _abstract->startMessages();
+}
+
+void
+BasicBox::setEndMessage(QTreeWidgetItem *item, QString address) {
+    _abstract->setEndMessage(item,address);
+}
 vector<string>
 BasicBox::firstMessagesToSend() const {
     return _abstract->firstMsgs();

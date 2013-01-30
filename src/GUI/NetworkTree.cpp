@@ -1635,20 +1635,15 @@ NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue){
             _OSCStartMessages->removeMessage(item);
         }
         else{
+            QString Qaddress;
             setOSCMessageName(item,newValue);
             if (_endMessages->getMessages()->contains(item)){
-                _endMessages->removeMessage(item);
-                QString Qaddress = getAbsoluteAddressWithValue(item,END_COLUMN);
-                _endMessages->addMessage(item,Qaddress);
-                addOSCEndMessage(item,Qaddress);
-                emit(endMessageValueChanged(item));
+                Qaddress = getAbsoluteAddressWithValue(item,END_COLUMN);
+                emit(endMessageNameChanged(item,newValue));
             }
             if (_startMessages->getMessages()->contains(item)){
-                _startMessages->removeMessage(item);
-                QString Qaddress = getAbsoluteAddressWithValue(item,START_COLUMN);
-                _startMessages->addMessage(item,Qaddress);
-                addOSCStartMessage(item,Qaddress);
-                emit(startMessageValueChanged(item));
+                Qaddress = getAbsoluteAddressWithValue(item,START_COLUMN);
+                emit(startMessageNameChanged(item,newValue));
             }
         }
     }
@@ -1795,12 +1790,7 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID)
 
 void
 NetworkTree::addOSCStartMessage(QTreeWidgetItem *item, QString msg){
-    QFont font;/*
-    font.setBold(true);
-    item->setFont(NAME_COLUMN, font);*/
     _OSCStartMessages->addMessage(item,msg);
-    Data data;
-//    assignItem(item,data);
 }
 
 void

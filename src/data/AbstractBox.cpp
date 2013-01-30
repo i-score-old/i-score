@@ -60,6 +60,16 @@ AbstractBox::AbstractBox(const AbstractBox &other) :
     _endMessages = new NetworkMessages;
 }
 
+void
+AbstractBox::setStartMessage(QTreeWidgetItem *item,QString address){
+    _startMessages->addMessage(item,address);
+}
+
+void
+AbstractBox::setEndMessage(QTreeWidgetItem *item,QString address){
+    _endMessages->addMessage(item,address);
+}
+
 int
 AbstractBox::type() const
 {

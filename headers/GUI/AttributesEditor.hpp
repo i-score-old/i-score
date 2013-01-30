@@ -134,7 +134,7 @@ class AttributesEditor : public QDockWidget
    * \brief Updates values of widgets according to the editor current attributes
    **/
   void updateWidgets(bool boxModified);
-  inline NetworkTree *networkTree(){return _networkTree;}
+  inline NetworkTree *networkTree(){return _networkTree;}  
 
  protected:
   /*!
@@ -242,6 +242,8 @@ class AttributesEditor : public QDockWidget
   void curveActivationChanged(QTreeWidgetItem *item, bool activated);
   void curveRedundancyChanged(QTreeWidgetItem *item, bool activated);
   void curveSampleRateChanged(QTreeWidgetItem *item, int value);
+  void deployStartMessageChanged(QTreeWidgetItem *item, QString address);
+  void deployEndMessageChanged(QTreeWidgetItem *item, QString address);
 
   /*!
    * \brief Updates box start message

@@ -72,6 +72,7 @@ public :
      */
     void addMessage(QTreeWidgetItem *item, const QString &device, const QString &message, const QString &value);
     void addMessage(QTreeWidgetItem *item, QString address);
+    void changeName(QTreeWidgetItem *item, QString newName);
     /*!
      * \brief Adds a list of messages.
      */
@@ -101,7 +102,6 @@ public :
       */
     bool setValue(QTreeWidgetItem *item, QString newValue);
 
-
     inline QMap<QTreeWidgetItem *, Message> *getMessages(){return _messages;}
     inline QList<QTreeWidgetItem *> getItems(){return _messages->keys();}
     std::string computeMessage(const Message &msg);
@@ -110,9 +110,6 @@ public :
     QMap<QString, QString> toMapAddressValue();
 
 public slots :
-    void messageChanged();
-    void valueChanged();
-    void deviceChanged();
     void removeMessage(QTreeWidgetItem *item);
 
     /*!

@@ -284,6 +284,7 @@ class BasicBox : public QObject, public QGraphicsItem
   QRectF boxRect();
   QRectF boxBody();
   void curveActivationChanged(string address, bool activated);
+  void setMessage(QTreeWidgetItem *item, QString address);
 
   /*!
    * \brief Gets the top left of the box in the scene coordinates.
@@ -488,7 +489,8 @@ class BasicBox : public QObject, public QGraphicsItem
    * \param messages : the messages to send at box's start
    */
   void setStartMessages(NetworkMessages *messages);
-
+  NetworkMessages *startMessages();
+  void setStartMessage(QTreeWidgetItem *item, QString address);
   /*!
    * \brief Sets networkTreeItems to send when the start of the box is reached.
    *
@@ -529,6 +531,8 @@ class BasicBox : public QObject, public QGraphicsItem
    * \param messages : the messages to send at box's end
    */
   void setEndMessages(NetworkMessages *messages);
+  NetworkMessages *endMessages();
+  void setEndMessage(QTreeWidgetItem *item, QString address);
 
   void updateWidgets();
   //! \brief Handles line width.

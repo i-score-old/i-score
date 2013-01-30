@@ -268,6 +268,8 @@ class AbstractBox : public Abstract
     }
   inline bool hasFirstMsgs(){return !_startMessages->messages().empty();}
   inline bool hasLastMsgs(){return !_endMessages->messages().empty();}
+  void setStartMessage(QTreeWidgetItem *item,QString address);
+  void setEndMessage(QTreeWidgetItem *item,QString address);
 
  protected :
 
