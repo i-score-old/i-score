@@ -166,6 +166,7 @@ src/GUI/TimeBarWidget.cpp \
 RESOURCES += i-score.qrc
 
 DEFINES += __Types__
+DEFINES += TTDATA_NO_RAMPLIB
 
 ICON = images/acousmoscribe.icns
 
