@@ -1,0 +1,2522 @@
+<pkmkdoc spec="1.12"><properties><title>i-score</title><build>/Users/bltzr/Dropbox/Iscore/i-score0.1-a3.pkg</build><organization>org.i-score</organization><userSees ui="both"/><min-target os="3"/><domain anywhere="true"/></properties><distribution><versions min-spec="1.000000"/><scripts></scripts></distribution><contents><choice title="i-score" id="choice16" starts_selected="true" starts_enabled="true" starts_hidden="false"><pkgref id="org.i-score.iscore.i-score.pkg"/></choice><choice title="i-score plugins" id="choice17" starts_selected="true" starts_enabled="true" starts_hidden="false"><pkgref id="org.i-score.iscore.Iscore.pkg"/></choice><choice title="gecode" id="choice18" starts_selected="true" starts_enabled="true" starts_hidden="false"><pkgref id="org.i-score.iscore.gecode.pkg"/></choice><choice title="libxml" id="choice19" starts_selected="true" starts_enabled="true" starts_hidden="false"><pkgref id="org.i-score.iscore.libxml.pkg"/></choice><choice title="QtCore" id="choice20" starts_selected="true" starts_enabled="true" starts_hidden="false"><pkgref id="org.i-score.iscore.QtCore.pkg"/></choice><choice title="QtGui" id="choice21" starts_selected="true" starts_enabled="true" starts_hidden="false"><pkgref id="org.i-score.iscore.QtGui.pkg"/></choice><choice title="QtXml" id="choice22" starts_selected="true" starts_enabled="true" starts_hidden="false"><pkgref id="org.i-score.iscore.QtXml.pkg"/></choice><choice title="QtSvg" id="choice23" starts_selected="true" starts_enabled="true" starts_hidden="false"><pkgref id="org.i-score.iscore.QtSvg.pkg"/></choice><choice title="QtNetwork" id="choice24" starts_selected="true" starts_enabled="true" starts_hidden="false"><pkgref id="org.i-score.iscore.QtNetwork.pkg"/></choice><choice title="imageformats" id="choice45" starts_selected="true" starts_enabled="true" starts_hidden="false"><pkgref id="org.i-score.iscore.imageformats.pkg"/></choice></contents><resources bg-scale="none" bg-align="topleft"><locale lang="fr"><resource relative="true" mod="true" type="background">macDocs/i-score-Background.png</resource><resource mime-type="text/rtf" kind="embedded" type="license"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf340
+{\fonttbl\f0\fnil\fcharset0 LucidaGrande;\f1\froman\fcharset0 TimesNewRomanPSMT;}
+{\colortbl;\red255\green255\blue255;}
+\deftab709
+\pard\pardeftab709
+
+\f0\fs26 \cf0 CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL\
+\
+\pard\pardeftab709
+
+\f1\fs24 \cf0 \
+    
+\f0\fs26 Avertissement
+\f1\fs24 \
+\
+\pard\pardeftab709
+
+\f0\fs26 \cf0 Ce contrat est une licence de logiciel libre issue d'une concertation
+\f1\fs24 \
+
+\f0\fs26 entre ses auteurs afin que le respect de deux grands principes pr\'e9side \'e0
+\f1\fs24 \
+
+\f0\fs26 sa r\'e9daction:
+\f1\fs24 \
+\
+    
+\f0\fs26 * d'une part, le respect des principes de diffusion des logiciels
+\f1\fs24 \
+      
+\f0\fs26 libres: acc\'e8s au code source, droits \'e9tendus conf\'e9r\'e9s aux
+\f1\fs24 \
+      
+\f0\fs26 utilisateurs,
+\f1\fs24 \
+    
+\f0\fs26 * d'autre part, la d\'e9signation d'un droit applicable, le droit
+\f1\fs24 \
+      
+\f0\fs26 fran\'e7ais, auquel elle est conforme, tant au regard du droit de la
+\f1\fs24 \
+      
+\f0\fs26 responsabilit\'e9 civile que du droit de la propri\'e9t\'e9 intellectuelle
+\f1\fs24 \
+      
+\f0\fs26 et de la protection qu'il offre aux auteurs et titulaires des
+\f1\fs24 \
+      
+\f0\fs26 droits patrimoniaux sur un logiciel.
+\f1\fs24 \
+\
+
+\f0\fs26 Les auteurs de la licence CeCILL (pour Ce[a] C[nrs] I[nria] L[ogiciel]
+\f1\fs24 \
+
+\f0\fs26 L[ibre]) sont:
+\f1\fs24 \
+\
+
+\f0\fs26 Commissariat \'e0 l'Energie Atomique - CEA, \'e9tablissement public de
+\f1\fs24 \
+
+\f0\fs26 recherche \'e0 caract\'e8re scientifique, technique et industriel, dont le
+\f1\fs24 \
+
+\f0\fs26 si\'e8ge est situ\'e9 25 rue Leblanc, immeuble Le Ponant D, 75015 Paris.
+\f1\fs24 \
+\
+
+\f0\fs26 Centre National de la Recherche Scientifique - CNRS, \'e9tablissement
+\f1\fs24 \
+
+\f0\fs26 public \'e0 caract\'e8re scientifique et technologique, dont le si\'e8ge est
+\f1\fs24 \
+
+\f0\fs26 situ\'e9 3 rue Michel-Ange, 75794 Paris cedex 16.
+\f1\fs24 \
+\
+
+\f0\fs26 Institut National de Recherche en Informatique et en Automatique -
+\f1\fs24 \
+
+\f0\fs26 INRIA, \'e9tablissement public \'e0 caract\'e8re scientifique et technologique,
+\f1\fs24 \
+
+\f0\fs26 dont le si\'e8ge est situ\'e9 Domaine de Voluceau, Rocquencourt, BP 105, 78153
+\f1\fs24 \
+
+\f0\fs26 Le Chesnay cedex.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Pr\'e9ambule
+\f1\fs24 \
+\
+
+\f0\fs26 Ce contrat est une licence de logiciel libre dont l'objectif est de
+\f1\fs24 \
+
+\f0\fs26 conf\'e9rer aux utilisateurs la libert\'e9 de modification et de
+\f1\fs24 \
+
+\f0\fs26 redistribution du logiciel r\'e9gi par cette licence dans le cadre d'un
+\f1\fs24 \
+
+\f0\fs26 mod\'e8le de diffusion en logiciel libre.
+\f1\fs24 \
+\
+
+\f0\fs26 L'exercice de ces libert\'e9s est assorti de certains devoirs \'e0 la charge
+\f1\fs24 \
+
+\f0\fs26 des utilisateurs afin de pr\'e9server ce statut au cours des
+\f1\fs24 \
+
+\f0\fs26 redistributions ult\'e9rieures.
+\f1\fs24 \
+\
+
+\f0\fs26 L'accessibilit\'e9 au code source et les droits de copie, de modification
+\f1\fs24 \
+
+\f0\fs26 et de redistribution qui en d\'e9coulent ont pour contrepartie de n'offrir
+\f1\fs24 \
+
+\f0\fs26 aux utilisateurs qu'une garantie limit\'e9e et de ne faire peser sur
+\f1\fs24 \
+
+\f0\fs26 l'auteur du logiciel, le titulaire des droits patrimoniaux et les
+\f1\fs24 \
+
+\f0\fs26 conc\'e9dants successifs qu'une responsabilit\'e9 restreinte.
+\f1\fs24 \
+\
+
+\f0\fs26 A cet \'e9gard l'attention de l'utilisateur est attir\'e9e sur les risques
+\f1\fs24 \
+
+\f0\fs26 associ\'e9s au chargement, \'e0 l'utilisation, \'e0 la modification et/ou au
+\f1\fs24 \
+
+\f0\fs26 d\'e9veloppement et \'e0 la reproduction du logiciel par l'utilisateur \'e9tant
+\f1\fs24 \
+
+\f0\fs26 donn\'e9 sa sp\'e9cificit\'e9 de logiciel libre, qui peut le rendre complexe \'e0
+\f1\fs24 \
+
+\f0\fs26 manipuler et qui le r\'e9serve donc \'e0 des d\'e9veloppeurs ou des
+\f1\fs24 \
+
+\f0\fs26 professionnels avertis poss\'e9dant des connaissances informatiques
+\f1\fs24 \
+
+\f0\fs26 approfondies. Les utilisateurs sont donc invit\'e9s \'e0 charger et tester
+\f1\fs24 \
+
+\f0\fs26 l'ad\'e9quation du logiciel \'e0 leurs besoins dans des conditions permettant
+\f1\fs24 \
+
+\f0\fs26 d'assurer la s\'e9curit\'e9 de leurs syst\'e8mes et/ou de leurs donn\'e9es et, plus
+\f1\fs24 \
+
+\f0\fs26 g\'e9n\'e9ralement, \'e0 l'utiliser et l'exploiter dans les m\'eames conditions de
+\f1\fs24 \
+
+\f0\fs26 s\'e9curit\'e9. Ce contrat peut \'eatre reproduit et diffus\'e9 librement, sous
+\f1\fs24 \
+
+\f0\fs26 r\'e9serve de le conserver en l'\'e9tat, sans ajout ni suppression de clauses.
+\f1\fs24 \
+\
+
+\f0\fs26 Ce contrat est susceptible de s'appliquer \'e0 tout logiciel dont le
+\f1\fs24 \
+
+\f0\fs26 titulaire des droits patrimoniaux d\'e9cide de soumettre l'exploitation aux
+\f1\fs24 \
+
+\f0\fs26 dispositions qu'il contient.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 1 - DEFINITIONS
+\f1\fs24 \
+\
+
+\f0\fs26 Dans ce contrat, les termes suivants, lorsqu'ils seront \'e9crits avec une
+\f1\fs24 \
+
+\f0\fs26 lettre capitale, auront la signification suivante:
+\f1\fs24 \
+\
+
+\f0\fs26 Contrat: d\'e9signe le pr\'e9sent contrat de licence, ses \'e9ventuelles versions
+\f1\fs24 \
+
+\f0\fs26 post\'e9rieures et annexes.
+\f1\fs24 \
+\
+
+\f0\fs26 Logiciel: d\'e9signe le logiciel sous sa forme de Code Objet et/ou de Code
+\f1\fs24 \
+
+\f0\fs26 Source et le cas \'e9ch\'e9ant sa documentation, dans leur \'e9tat au moment de
+\f1\fs24 \
+
+\f0\fs26 l'acceptation du Contrat par le Licenci\'e9.
+\f1\fs24 \
+\
+
+\f0\fs26 Logiciel Initial: d\'e9signe le Logiciel sous sa forme de Code Source et
+\f1\fs24 \
+
+\f0\fs26 \'e9ventuellement de Code Objet et le cas \'e9ch\'e9ant sa documentation, dans
+\f1\fs24 \
+
+\f0\fs26 leur \'e9tat au moment de leur premi\'e8re diffusion sous les termes du Contrat.
+\f1\fs24 \
+\
+
+\f0\fs26 Logiciel Modifi\'e9: d\'e9signe le Logiciel modifi\'e9 par au moins une
+\f1\fs24 \
+
+\f0\fs26 Contribution.
+\f1\fs24 \
+\
+
+\f0\fs26 Code Source: d\'e9signe l'ensemble des instructions et des lignes de
+\f1\fs24 \
+
+\f0\fs26 programme du Logiciel et auquel l'acc\'e8s est n\'e9cessaire en vue de
+\f1\fs24 \
+
+\f0\fs26 modifier le Logiciel.
+\f1\fs24 \
+\
+
+\f0\fs26 Code Objet: d\'e9signe les fichiers binaires issus de la compilation du
+\f1\fs24 \
+
+\f0\fs26 Code Source.
+\f1\fs24 \
+\
+
+\f0\fs26 Titulaire: d\'e9signe le ou les d\'e9tenteurs des droits patrimoniaux d'auteur
+\f1\fs24 \
+
+\f0\fs26 sur le Logiciel Initial.
+\f1\fs24 \
+\
+
+\f0\fs26 Licenci\'e9: d\'e9signe le ou les utilisateurs du Logiciel ayant accept\'e9 le
+\f1\fs24 \
+
+\f0\fs26 Contrat.
+\f1\fs24 \
+\
+
+\f0\fs26 Contributeur: d\'e9signe le Licenci\'e9 auteur d'au moins une Contribution.
+\f1\fs24 \
+\
+
+\f0\fs26 Conc\'e9dant: d\'e9signe le Titulaire ou toute personne physique ou morale
+\f1\fs24 \
+
+\f0\fs26 distribuant le Logiciel sous le Contrat.
+\f1\fs24 \
+\
+
+\f0\fs26 Contribution: d\'e9signe l'ensemble des modifications, corrections,
+\f1\fs24 \
+
+\f0\fs26 traductions, adaptations et/ou nouvelles fonctionnalit\'e9s int\'e9gr\'e9es dans
+\f1\fs24 \
+
+\f0\fs26 le Logiciel par tout Contributeur, ainsi que tout Module Interne.
+\f1\fs24 \
+\
+
+\f0\fs26 Module: d\'e9signe un ensemble de fichiers sources y compris leur
+\f1\fs24 \
+
+\f0\fs26 documentation qui permet de r\'e9aliser des fonctionnalit\'e9s ou services
+\f1\fs24 \
+
+\f0\fs26 suppl\'e9mentaires \'e0 ceux fournis par le Logiciel.
+\f1\fs24 \
+\
+
+\f0\fs26 Module Externe: d\'e9signe tout Module, non d\'e9riv\'e9 du Logiciel, tel que ce
+\f1\fs24 \
+
+\f0\fs26 Module et le Logiciel s'ex\'e9cutent dans des espaces d'adressage
+\f1\fs24 \
+
+\f0\fs26 diff\'e9rents, l'un appelant l'autre au moment de leur ex\'e9cution.
+\f1\fs24 \
+\
+
+\f0\fs26 Module Interne: d\'e9signe tout Module li\'e9 au Logiciel de telle sorte
+\f1\fs24 \
+
+\f0\fs26 qu'ils s'ex\'e9cutent dans le m\'eame espace d'adressage.
+\f1\fs24 \
+\
+
+\f0\fs26 GNU GPL: d\'e9signe la GNU General Public License dans sa version 2 ou
+\f1\fs24 \
+
+\f0\fs26 toute version ult\'e9rieure, telle que publi\'e9e par Free Software Foundation
+\f1\fs24 \
+
+\f0\fs26 Inc.
+\f1\fs24 \
+\
+
+\f0\fs26 Parties: d\'e9signe collectivement le Licenci\'e9 et le Conc\'e9dant.
+\f1\fs24 \
+\
+
+\f0\fs26 Ces termes s'entendent au singulier comme au pluriel.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 2 - OBJET
+\f1\fs24 \
+\
+
+\f0\fs26 Le Contrat a pour objet la concession par le Conc\'e9dant au Licenci\'e9 d'une
+\f1\fs24 \
+
+\f0\fs26 licence non exclusive, cessible et mondiale du Logiciel telle que
+\f1\fs24 \
+
+\f0\fs26 d\'e9finie ci-apr\'e8s \'e0 l'article 5 pour toute la dur\'e9e de protection des droits
+\f1\fs24 \
+
+\f0\fs26 portant sur ce Logiciel.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 3 - ACCEPTATION
+\f1\fs24 \
+\
+
+\f0\fs26 3.1 L'acceptation par le Licenci\'e9 des termes du Contrat est r\'e9put\'e9e
+\f1\fs24 \
+
+\f0\fs26 acquise du fait du premier des faits suivants:
+\f1\fs24 \
+\
+    
+\f0\fs26 * (i) le chargement du Logiciel par tout moyen notamment par
+\f1\fs24 \
+      
+\f0\fs26 t\'e9l\'e9chargement \'e0 partir d'un serveur distant ou par chargement \'e0
+\f1\fs24 \
+      
+\f0\fs26 partir d'un support physique;
+\f1\fs24 \
+    
+\f0\fs26 * (ii) le premier exercice par le Licenci\'e9 de l'un quelconque des
+\f1\fs24 \
+      
+\f0\fs26 droits conc\'e9d\'e9s par le Contrat.
+\f1\fs24 \
+\
+
+\f0\fs26 3.2 Un exemplaire du Contrat, contenant notamment un avertissement
+\f1\fs24 \
+
+\f0\fs26 relatif aux sp\'e9cificit\'e9s du Logiciel, \'e0 la restriction de garantie et \'e0
+\f1\fs24 \
+
+\f0\fs26 la limitation \'e0 un usage par des utilisateurs exp\'e9riment\'e9s a \'e9t\'e9 mis \'e0
+\f1\fs24 \
+
+\f0\fs26 disposition du Licenci\'e9 pr\'e9alablement \'e0 son acceptation telle que
+\f1\fs24 \
+
+\f0\fs26 d\'e9finie \'e0 l'article 3.1 ci dessus et le Licenci\'e9 reconna\'eet en avoir pris
+\f1\fs24 \
+
+\f0\fs26 connaissance.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 4 - ENTREE EN VIGUEUR ET DUREE
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 4.1 ENTREE EN VIGUEUR
+\f1\fs24 \
+\
+
+\f0\fs26 Le Contrat entre en vigueur \'e0 la date de son acceptation par le Licenci\'e9
+\f1\fs24 \
+
+\f0\fs26 telle que d\'e9finie en 3.1.
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 4.2 DUREE
+\f1\fs24 \
+\
+
+\f0\fs26 Le Contrat produira ses effets pendant toute la dur\'e9e l\'e9gale de
+\f1\fs24 \
+
+\f0\fs26 protection des droits patrimoniaux portant sur le Logiciel.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 5 - ETENDUE DES DROITS CONCEDES
+\f1\fs24 \
+\
+
+\f0\fs26 Le Conc\'e9dant conc\'e8de au Licenci\'e9, qui accepte, les droits suivants sur
+\f1\fs24 \
+
+\f0\fs26 le Logiciel pour toutes destinations et pour la dur\'e9e du Contrat dans
+\f1\fs24 \
+
+\f0\fs26 les conditions ci-apr\'e8s d\'e9taill\'e9es.
+\f1\fs24 \
+\
+
+\f0\fs26 Par ailleurs, si le Conc\'e9dant d\'e9tient ou venait \'e0 d\'e9tenir un ou
+\f1\fs24 \
+
+\f0\fs26 plusieurs brevets d'invention prot\'e9geant tout ou partie des
+\f1\fs24 \
+
+\f0\fs26 fonctionnalit\'e9s du Logiciel ou de ses composants, il s'engage \'e0 ne pas
+\f1\fs24 \
+
+\f0\fs26 opposer les \'e9ventuels droits conf\'e9r\'e9s par ces brevets aux Licenci\'e9s
+\f1\fs24 \
+
+\f0\fs26 successifs qui utiliseraient, exploiteraient ou modifieraient le
+\f1\fs24 \
+
+\f0\fs26 Logiciel. En cas de cession de ces brevets, le Conc\'e9dant s'engage \'e0
+\f1\fs24 \
+
+\f0\fs26 faire reprendre les obligations du pr\'e9sent alin\'e9a aux cessionnaires.
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 5.1 DROIT D'UTILISATION
+\f1\fs24 \
+\
+
+\f0\fs26 Le Licenci\'e9 est autoris\'e9 \'e0 utiliser le Logiciel, sans restriction quant
+\f1\fs24 \
+
+\f0\fs26 aux domaines d'application, \'e9tant ci-apr\'e8s pr\'e9cis\'e9 que cela comporte:
+\f1\fs24 \
+\
+   
+\f0\fs26 1. la reproduction permanente ou provisoire du Logiciel en tout ou
+\f1\fs24 \
+      
+\f0\fs26 partie par tout moyen et sous toute forme.
+\f1\fs24 \
+\
+   
+\f0\fs26 2. le chargement, l'affichage, l'ex\'e9cution, ou le stockage du
+\f1\fs24 \
+      
+\f0\fs26 Logiciel sur tout support.
+\f1\fs24 \
+\
+   
+\f0\fs26 3. la possibilit\'e9 d'en observer, d'en \'e9tudier, ou d'en tester le
+\f1\fs24 \
+      
+\f0\fs26 fonctionnement afin de d\'e9terminer les id\'e9es et principes qui sont
+\f1\fs24 \
+      
+\f0\fs26 \'e0 la base de n'importe quel \'e9l\'e9ment de ce Logiciel; et ceci,
+\f1\fs24 \
+      
+\f0\fs26 lorsque le Licenci\'e9 effectue toute op\'e9ration de chargement,
+\f1\fs24 \
+      
+\f0\fs26 d'affichage, d'ex\'e9cution, de transmission ou de stockage du
+\f1\fs24 \
+      
+\f0\fs26 Logiciel qu'il est en droit d'effectuer en vertu du Contrat.
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 5.2 DROIT D'APPORTER DES CONTRIBUTIONS
+\f1\fs24 \
+\
+
+\f0\fs26 Le droit d'apporter des Contributions comporte le droit de traduire,
+\f1\fs24 \
+
+\f0\fs26 d'adapter, d'arranger ou d'apporter toute autre modification au Logiciel
+\f1\fs24 \
+
+\f0\fs26 et le droit de reproduire le logiciel en r\'e9sultant.
+\f1\fs24 \
+\
+
+\f0\fs26 Le Licenci\'e9 est autoris\'e9 \'e0 apporter toute Contribution au Logiciel sous
+\f1\fs24 \
+
+\f0\fs26 r\'e9serve de mentionner, de fa\'e7on explicite, son nom en tant qu'auteur de
+\f1\fs24 \
+
+\f0\fs26 cette Contribution et la date de cr\'e9ation de celle-ci.
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 5.3 DROIT DE DISTRIBUTION
+\f1\fs24 \
+\
+
+\f0\fs26 Le droit de distribution comporte notamment le droit de diffuser, de
+\f1\fs24 \
+
+\f0\fs26 transmettre et de communiquer le Logiciel au public sur tout support et
+\f1\fs24 \
+
+\f0\fs26 par tout moyen ainsi que le droit de mettre sur le march\'e9 \'e0 titre
+\f1\fs24 \
+
+\f0\fs26 on\'e9reux ou gratuit, un ou des exemplaires du Logiciel par tout proc\'e9d\'e9.
+\f1\fs24 \
+\
+
+\f0\fs26 Le Licenci\'e9 est autoris\'e9 \'e0 distribuer des copies du Logiciel, modifi\'e9 ou
+\f1\fs24 \
+
+\f0\fs26 non, \'e0 des tiers dans les conditions ci-apr\'e8s d\'e9taill\'e9es.
+\f1\fs24 \
+\
+\
+        
+\f0\fs26 5.3.1 DISTRIBUTION DU LOGICIEL SANS MODIFICATION
+\f1\fs24 \
+\
+
+\f0\fs26 Le Licenci\'e9 est autoris\'e9 \'e0 distribuer des copies conformes du Logiciel,
+\f1\fs24 \
+
+\f0\fs26 sous forme de Code Source ou de Code Objet, \'e0 condition que cette
+\f1\fs24 \
+
+\f0\fs26 distribution respecte les dispositions du Contrat dans leur totalit\'e9 et
+\f1\fs24 \
+
+\f0\fs26 soit accompagn\'e9e:
+\f1\fs24 \
+\
+   
+\f0\fs26 1. d'un exemplaire du Contrat,
+\f1\fs24 \
+\
+   
+\f0\fs26 2. d'un avertissement relatif \'e0 la restriction de garantie et de
+\f1\fs24 \
+      
+\f0\fs26 responsabilit\'e9 du Conc\'e9dant telle que pr\'e9vue aux articles 8
+\f1\fs24 \
+      
+\f0\fs26 et 9,
+\f1\fs24 \
+\
+
+\f0\fs26 et que, dans le cas o\'f9 seul le Code Objet du Logiciel est redistribu\'e9,
+\f1\fs24 \
+
+\f0\fs26 le Licenci\'e9 permette aux futurs Licenci\'e9s d'acc\'e9der facilement au Code
+\f1\fs24 \
+
+\f0\fs26 Source complet du Logiciel en indiquant les modalit\'e9s d'acc\'e8s, \'e9tant
+\f1\fs24 \
+
+\f0\fs26 entendu que le co\'fbt additionnel d'acquisition du Code Source ne devra
+\f1\fs24 \
+
+\f0\fs26 pas exc\'e9der le simple co\'fbt de transfert des donn\'e9es.
+\f1\fs24 \
+\
+\
+        
+\f0\fs26 5.3.2 DISTRIBUTION DU LOGICIEL MODIFIE
+\f1\fs24 \
+\
+
+\f0\fs26 Lorsque le Licenci\'e9 apporte une Contribution au Logiciel, les conditions
+\f1\fs24 \
+
+\f0\fs26 de distribution du Logiciel Modifi\'e9 en r\'e9sultant sont alors soumises \'e0
+\f1\fs24 \
+
+\f0\fs26 l'int\'e9gralit\'e9 des dispositions du Contrat.
+\f1\fs24 \
+\
+
+\f0\fs26 Le Licenci\'e9 est autoris\'e9 \'e0 distribuer le Logiciel Modifi\'e9, sous forme de
+\f1\fs24 \
+
+\f0\fs26 code source ou de code objet, \'e0 condition que cette distribution
+\f1\fs24 \
+
+\f0\fs26 respecte les dispositions du Contrat dans leur totalit\'e9 et soit
+\f1\fs24 \
+
+\f0\fs26 accompagn\'e9e:
+\f1\fs24 \
+\
+   
+\f0\fs26 1. d'un exemplaire du Contrat,
+\f1\fs24 \
+\
+   
+\f0\fs26 2. d'un avertissement relatif \'e0 la restriction de garantie et de
+\f1\fs24 \
+      
+\f0\fs26 responsabilit\'e9 du Conc\'e9dant telle que pr\'e9vue aux articles 8
+\f1\fs24 \
+      
+\f0\fs26 et 9,
+\f1\fs24 \
+\
+
+\f0\fs26 et que, dans le cas o\'f9 seul le code objet du Logiciel Modifi\'e9 est
+\f1\fs24 \
+
+\f0\fs26 redistribu\'e9, le Licenci\'e9 permette aux futurs Licenci\'e9s d'acc\'e9der
+\f1\fs24 \
+
+\f0\fs26 facilement au code source complet du Logiciel Modifi\'e9 en indiquant les
+\f1\fs24 \
+
+\f0\fs26 modalit\'e9s d'acc\'e8s, \'e9tant entendu que le co\'fbt additionnel d'acquisition
+\f1\fs24 \
+
+\f0\fs26 du code source ne devra pas exc\'e9der le simple co\'fbt de transfert des donn\'e9es.
+\f1\fs24 \
+\
+\
+        
+\f0\fs26 5.3.3 DISTRIBUTION DES MODULES EXTERNES
+\f1\fs24 \
+\
+
+\f0\fs26 Lorsque le Licenci\'e9 a d\'e9velopp\'e9 un Module Externe les conditions du
+\f1\fs24 \
+
+\f0\fs26 Contrat ne s'appliquent pas \'e0 ce Module Externe, qui peut \'eatre distribu\'e9
+\f1\fs24 \
+
+\f0\fs26 sous un contrat de licence diff\'e9rent.
+\f1\fs24 \
+\
+\
+        
+\f0\fs26 5.3.4 COMPATIBILITE AVEC LA LICENCE GNU GPL
+\f1\fs24 \
+\
+
+\f0\fs26 Le Licenci\'e9 peut inclure un code soumis aux dispositions d'une des
+\f1\fs24 \
+
+\f0\fs26 versions de la licence GNU GPL dans le Logiciel modifi\'e9 ou non et
+\f1\fs24 \
+
+\f0\fs26 distribuer l'ensemble sous les conditions de la m\'eame version de la
+\f1\fs24 \
+
+\f0\fs26 licence GNU GPL.
+\f1\fs24 \
+\
+
+\f0\fs26 Le Licenci\'e9 peut inclure le Logiciel modifi\'e9 ou non dans un code soumis
+\f1\fs24 \
+
+\f0\fs26 aux dispositions d'une des versions de la licence GNU GPL et distribuer
+\f1\fs24 \
+
+\f0\fs26 l'ensemble sous les conditions de la m\'eame version de la licence GNU GPL.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 6 - PROPRIETE INTELLECTUELLE
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 6.1 SUR LE LOGICIEL INITIAL
+\f1\fs24 \
+\
+
+\f0\fs26 Le Titulaire est d\'e9tenteur des droits patrimoniaux sur le Logiciel
+\f1\fs24 \
+
+\f0\fs26 Initial. Toute utilisation du Logiciel Initial est soumise au respect
+\f1\fs24 \
+
+\f0\fs26 des conditions dans lesquelles le Titulaire a choisi de diffuser son
+\f1\fs24 \
+
+\f0\fs26 oeuvre et nul autre n'a la facult\'e9 de modifier les conditions de
+\f1\fs24 \
+
+\f0\fs26 diffusion de ce Logiciel Initial.
+\f1\fs24 \
+\
+
+\f0\fs26 Le Titulaire s'engage \'e0 ce que le Logiciel Initial reste au moins r\'e9gi
+\f1\fs24 \
+
+\f0\fs26 par le Contrat et ce, pour la dur\'e9e vis\'e9e \'e0 l'article 4.2.
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 6.2 SUR LES CONTRIBUTIONS
+\f1\fs24 \
+\
+
+\f0\fs26 Le Licenci\'e9 qui a d\'e9velopp\'e9 une Contribution est titulaire sur celle-ci
+\f1\fs24 \
+
+\f0\fs26 des droits de propri\'e9t\'e9 intellectuelle dans les conditions d\'e9finies par
+\f1\fs24 \
+
+\f0\fs26 la l\'e9gislation applicable.
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 6.3 SUR LES MODULES EXTERNES
+\f1\fs24 \
+\
+
+\f0\fs26 Le Licenci\'e9 qui a d\'e9velopp\'e9 un Module Externe est titulaire sur celui-ci
+\f1\fs24 \
+
+\f0\fs26 des droits de propri\'e9t\'e9 intellectuelle dans les conditions d\'e9finies par
+\f1\fs24 \
+
+\f0\fs26 la l\'e9gislation applicable et reste libre du choix du contrat r\'e9gissant
+\f1\fs24 \
+
+\f0\fs26 sa diffusion.
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 6.4 DISPOSITIONS COMMUNES
+\f1\fs24 \
+\
+
+\f0\fs26 Le Licenci\'e9 s'engage express\'e9ment:
+\f1\fs24 \
+\
+   
+\f0\fs26 1. \'e0 ne pas supprimer ou modifier de quelque mani\'e8re que ce soit les
+\f1\fs24 \
+      
+\f0\fs26 mentions de propri\'e9t\'e9 intellectuelle appos\'e9es sur le Logiciel;
+\f1\fs24 \
+\
+   
+\f0\fs26 2. \'e0 reproduire \'e0 l'identique lesdites mentions de propri\'e9t\'e9
+\f1\fs24 \
+      
+\f0\fs26 intellectuelle sur les copies du Logiciel modifi\'e9 ou non.
+\f1\fs24 \
+\
+
+\f0\fs26 Le Licenci\'e9 s'engage \'e0 ne pas porter atteinte, directement ou
+\f1\fs24 \
+
+\f0\fs26 indirectement, aux droits de propri\'e9t\'e9 intellectuelle du Titulaire et/ou
+\f1\fs24 \
+
+\f0\fs26 des Contributeurs sur le Logiciel et \'e0 prendre, le cas \'e9ch\'e9ant, \'e0
+\f1\fs24 \
+
+\f0\fs26 l'\'e9gard de son personnel toutes les mesures n\'e9cessaires pour assurer le
+\f1\fs24 \
+
+\f0\fs26 respect des dits droits de propri\'e9t\'e9 intellectuelle du Titulaire et/ou
+\f1\fs24 \
+
+\f0\fs26 des Contributeurs.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 7 - SERVICES ASSOCIES
+\f1\fs24 \
+\
+
+\f0\fs26 7.1 Le Contrat n'oblige en aucun cas le Conc\'e9dant \'e0 la r\'e9alisation de
+\f1\fs24 \
+
+\f0\fs26 prestations d'assistance technique ou de maintenance du Logiciel.
+\f1\fs24 \
+\
+
+\f0\fs26 Cependant le Conc\'e9dant reste libre de proposer ce type de services. Les
+\f1\fs24 \
+
+\f0\fs26 termes et conditions d'une telle assistance technique et/ou d'une telle
+\f1\fs24 \
+
+\f0\fs26 maintenance seront alors d\'e9termin\'e9s dans un acte s\'e9par\'e9. Ces actes de
+\f1\fs24 \
+
+\f0\fs26 maintenance et/ou assistance technique n'engageront que la seule
+\f1\fs24 \
+
+\f0\fs26 responsabilit\'e9 du Conc\'e9dant qui les propose.
+\f1\fs24 \
+\
+
+\f0\fs26 7.2 De m\'eame, tout Conc\'e9dant est libre de proposer, sous sa seule
+\f1\fs24 \
+
+\f0\fs26 responsabilit\'e9, \'e0 ses licenci\'e9s une garantie, qui n'engagera que lui,
+\f1\fs24 \
+
+\f0\fs26 lors de la redistribution du Logiciel et/ou du Logiciel Modifi\'e9 et ce,
+\f1\fs24 \
+
+\f0\fs26 dans les conditions qu'il souhaite. Cette garantie et les modalit\'e9s
+\f1\fs24 \
+
+\f0\fs26 financi\'e8res de son application feront l'objet d'un acte s\'e9par\'e9 entre le
+\f1\fs24 \
+
+\f0\fs26 Conc\'e9dant et le Licenci\'e9.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 8 - RESPONSABILITE
+\f1\fs24 \
+\
+
+\f0\fs26 8.1 Sous r\'e9serve des dispositions de l'article 8.2, le Licenci\'e9 a la 
+\f1\fs24 \
+
+\f0\fs26 facult\'e9, sous r\'e9serve de prouver la faute du Conc\'e9dant concern\'e9, de
+\f1\fs24 \
+
+\f0\fs26 solliciter la r\'e9paration du pr\'e9judice direct qu'il subirait du fait du
+\f1\fs24 \
+
+\f0\fs26 Logiciel et dont il apportera la preuve.
+\f1\fs24 \
+\
+
+\f0\fs26 8.2 La responsabilit\'e9 du Conc\'e9dant est limit\'e9e aux engagements pris en
+\f1\fs24 \
+
+\f0\fs26 application du Contrat et ne saurait \'eatre engag\'e9e en raison notamment:
+\f1\fs24 \
+
+\f0\fs26 (i) des dommages dus \'e0 l'inex\'e9cution, totale ou partielle, de ses
+\f1\fs24 \
+
+\f0\fs26 obligations par le Licenci\'e9, (ii) des dommages directs ou indirects
+\f1\fs24 \
+
+\f0\fs26 d\'e9coulant de l'utilisation ou des performances du Logiciel subis par le
+\f1\fs24 \
+
+\f0\fs26 Licenci\'e9 et (iii) plus g\'e9n\'e9ralement d'un quelconque dommage indirect. En
+\f1\fs24 \
+
+\f0\fs26 particulier, les Parties conviennent express\'e9ment que tout pr\'e9judice
+\f1\fs24 \
+
+\f0\fs26 financier ou commercial (par exemple perte de donn\'e9es, perte de
+\f1\fs24 \
+
+\f0\fs26 b\'e9n\'e9fices, perte d'exploitation, perte de client\'e8le ou de commandes,
+\f1\fs24 \
+
+\f0\fs26 manque \'e0 gagner, trouble commercial quelconque) ou toute action dirig\'e9e
+\f1\fs24 \
+
+\f0\fs26 contre le Licenci\'e9 par un tiers, constitue un dommage indirect et
+\f1\fs24 \
+
+\f0\fs26 n'ouvre pas droit \'e0 r\'e9paration par le Conc\'e9dant.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 9 - GARANTIE
+\f1\fs24 \
+\
+
+\f0\fs26 9.1 Le Licenci\'e9 reconna\'eet que l'\'e9tat actuel des connaissances
+\f1\fs24 \
+
+\f0\fs26 scientifiques et techniques au moment de la mise en circulation du
+\f1\fs24 \
+
+\f0\fs26 Logiciel ne permet pas d'en tester et d'en v\'e9rifier toutes les
+\f1\fs24 \
+
+\f0\fs26 utilisations ni de d\'e9tecter l'existence d'\'e9ventuels d\'e9fauts. L'attention
+\f1\fs24 \
+
+\f0\fs26 du Licenci\'e9 a \'e9t\'e9 attir\'e9e sur ce point sur les risques associ\'e9s au
+\f1\fs24 \
+
+\f0\fs26 chargement, \'e0 l'utilisation, la modification et/ou au d\'e9veloppement et \'e0
+\f1\fs24 \
+
+\f0\fs26 la reproduction du Logiciel qui sont r\'e9serv\'e9s \'e0 des utilisateurs avertis.
+\f1\fs24 \
+\
+
+\f0\fs26 Il rel\'e8ve de la responsabilit\'e9 du Licenci\'e9 de contr\'f4ler, par tous
+\f1\fs24 \
+
+\f0\fs26 moyens, l'ad\'e9quation du produit \'e0 ses besoins, son bon fonctionnement et
+\f1\fs24 \
+
+\f0\fs26 de s'assurer qu'il ne causera pas de dommages aux personnes et aux biens.
+\f1\fs24 \
+\
+
+\f0\fs26 9.2 Le Conc\'e9dant d\'e9clare de bonne foi \'eatre en droit de conc\'e9der
+\f1\fs24 \
+
+\f0\fs26 l'ensemble des droits attach\'e9s au Logiciel (comprenant notamment les
+\f1\fs24 \
+
+\f0\fs26 droits vis\'e9s \'e0 l'article 5).
+\f1\fs24 \
+\
+
+\f0\fs26 9.3 Le Licenci\'e9 reconna\'eet que le Logiciel est fourni "en l'\'e9tat" par le
+\f1\fs24 \
+
+\f0\fs26 Conc\'e9dant sans autre garantie, expresse ou tacite, que celle pr\'e9vue \'e0
+\f1\fs24 \
+
+\f0\fs26 l'article 9.2 et notamment sans aucune garantie sur sa valeur commerciale, 
+\f1\fs24 \
+
+\f0\fs26 son caract\'e8re s\'e9curis\'e9, innovant ou pertinent.
+\f1\fs24 \
+\
+
+\f0\fs26 En particulier, le Conc\'e9dant ne garantit pas que le Logiciel est exempt
+\f1\fs24 \
+
+\f0\fs26 d'erreur, qu'il fonctionnera sans interruption, qu'il sera compatible
+\f1\fs24 \
+
+\f0\fs26 avec l'\'e9quipement du Licenci\'e9 et sa configuration logicielle ni qu'il
+\f1\fs24 \
+
+\f0\fs26 remplira les besoins du Licenci\'e9.
+\f1\fs24 \
+\
+
+\f0\fs26 9.4 Le Conc\'e9dant ne garantit pas, de mani\'e8re expresse ou tacite, que le
+\f1\fs24 \
+
+\f0\fs26 Logiciel ne porte pas atteinte \'e0 un quelconque droit de propri\'e9t\'e9
+\f1\fs24 \
+
+\f0\fs26 intellectuelle d'un tiers portant sur un brevet, un logiciel ou sur tout
+\f1\fs24 \
+
+\f0\fs26 autre droit de propri\'e9t\'e9. Ainsi, le Conc\'e9dant exclut toute garantie au
+\f1\fs24 \
+
+\f0\fs26 profit du Licenci\'e9 contre les actions en contrefa\'e7on qui pourraient \'eatre
+\f1\fs24 \
+
+\f0\fs26 diligent\'e9es au titre de l'utilisation, de la modification, et de la
+\f1\fs24 \
+
+\f0\fs26 redistribution du Logiciel. N\'e9anmoins, si de telles actions sont
+\f1\fs24 \
+
+\f0\fs26 exerc\'e9es contre le Licenci\'e9, le Conc\'e9dant lui apportera son aide
+\f1\fs24 \
+
+\f0\fs26 technique et juridique pour sa d\'e9fense. Cette aide technique et
+\f1\fs24 \
+
+\f0\fs26 juridique est d\'e9termin\'e9e au cas par cas entre le Conc\'e9dant concern\'e9 et
+\f1\fs24 \
+
+\f0\fs26 le Licenci\'e9 dans le cadre d'un protocole d'accord. Le Conc\'e9dant d\'e9gage
+\f1\fs24 \
+
+\f0\fs26 toute responsabilit\'e9 quant \'e0 l'utilisation de la d\'e9nomination du
+\f1\fs24 \
+
+\f0\fs26 Logiciel par le Licenci\'e9. Aucune garantie n'est apport\'e9e quant \'e0
+\f1\fs24 \
+
+\f0\fs26 l'existence de droits ant\'e9rieurs sur le nom du Logiciel et sur
+\f1\fs24 \
+
+\f0\fs26 l'existence d'une marque.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 10 - RESILIATION
+\f1\fs24 \
+\
+
+\f0\fs26 10.1 En cas de manquement par le Licenci\'e9 aux obligations mises \'e0 sa
+\f1\fs24 \
+
+\f0\fs26 charge par le Contrat, le Conc\'e9dant pourra r\'e9silier de plein droit le
+\f1\fs24 \
+
+\f0\fs26 Contrat trente (30) jours apr\'e8s notification adress\'e9e au Licenci\'e9 et
+\f1\fs24 \
+
+\f0\fs26 rest\'e9e sans effet.
+\f1\fs24 \
+\
+
+\f0\fs26 10.2 Le Licenci\'e9 dont le Contrat est r\'e9sili\'e9 n'est plus autoris\'e9 \'e0
+\f1\fs24 \
+
+\f0\fs26 utiliser, modifier ou distribuer le Logiciel. Cependant, toutes les
+\f1\fs24 \
+
+\f0\fs26 licences qu'il aura conc\'e9d\'e9es ant\'e9rieurement \'e0 la r\'e9siliation du Contrat
+\f1\fs24 \
+
+\f0\fs26 resteront valides sous r\'e9serve qu'elles aient \'e9t\'e9 effectu\'e9es en
+\f1\fs24 \
+
+\f0\fs26 conformit\'e9 avec le Contrat.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 11 - DISPOSITIONS DIVERSES
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 11.1 CAUSE EXTERIEURE
+\f1\fs24 \
+\
+
+\f0\fs26 Aucune des Parties ne sera responsable d'un retard ou d'une d\'e9faillance
+\f1\fs24 \
+
+\f0\fs26 d'ex\'e9cution du Contrat qui serait d\'fb \'e0 un cas de force majeure, un cas
+\f1\fs24 \
+
+\f0\fs26 fortuit ou une cause ext\'e9rieure, telle que, notamment, le mauvais
+\f1\fs24 \
+
+\f0\fs26 fonctionnement ou les interruptions du r\'e9seau \'e9lectrique ou de
+\f1\fs24 \
+
+\f0\fs26 t\'e9l\'e9communication, la paralysie du r\'e9seau li\'e9e \'e0 une attaque
+\f1\fs24 \
+
+\f0\fs26 informatique, l'intervention des autorit\'e9s gouvernementales, les
+\f1\fs24 \
+
+\f0\fs26 catastrophes naturelles, les d\'e9g\'e2ts des eaux, les tremblements de terre,
+\f1\fs24 \
+
+\f0\fs26 le feu, les explosions, les gr\'e8ves et les conflits sociaux, l'\'e9tat de
+\f1\fs24 \
+
+\f0\fs26 guerre...
+\f1\fs24 \
+\
+
+\f0\fs26 11.2 Le fait, par l'une ou l'autre des Parties, d'omettre en une ou
+\f1\fs24 \
+
+\f0\fs26 plusieurs occasions de se pr\'e9valoir d'une ou plusieurs dispositions du
+\f1\fs24 \
+
+\f0\fs26 Contrat, ne pourra en aucun cas impliquer renonciation par la Partie
+\f1\fs24 \
+
+\f0\fs26 int\'e9ress\'e9e \'e0 s'en pr\'e9valoir ult\'e9rieurement.
+\f1\fs24 \
+\
+
+\f0\fs26 11.3 Le Contrat annule et remplace toute convention ant\'e9rieure, \'e9crite
+\f1\fs24 \
+
+\f0\fs26 ou orale, entre les Parties sur le m\'eame objet et constitue l'accord
+\f1\fs24 \
+
+\f0\fs26 entier entre les Parties sur cet objet. Aucune addition ou modification
+\f1\fs24 \
+
+\f0\fs26 aux termes du Contrat n'aura d'effet \'e0 l'\'e9gard des Parties \'e0 moins
+\f1\fs24 \
+
+\f0\fs26 d'\'eatre faite par \'e9crit et sign\'e9e par leurs repr\'e9sentants d\'fbment habilit\'e9s.
+\f1\fs24 \
+\
+
+\f0\fs26 11.4 Dans l'hypoth\'e8se o\'f9 une ou plusieurs des dispositions du Contrat
+\f1\fs24 \
+
+\f0\fs26 s'av\'e8rerait contraire \'e0 une loi ou \'e0 un texte applicable, existants ou
+\f1\fs24 \
+
+\f0\fs26 futurs, cette loi ou ce texte pr\'e9vaudrait, et les Parties feraient les
+\f1\fs24 \
+
+\f0\fs26 amendements n\'e9cessaires pour se conformer \'e0 cette loi ou \'e0 ce texte.
+\f1\fs24 \
+
+\f0\fs26 Toutes les autres dispositions resteront en vigueur. De m\'eame, la
+\f1\fs24 \
+
+\f0\fs26 nullit\'e9, pour quelque raison que ce soit, d'une des dispositions du
+\f1\fs24 \
+
+\f0\fs26 Contrat ne saurait entra\'eener la nullit\'e9 de l'ensemble du Contrat.
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 11.5 LANGUE
+\f1\fs24 \
+\
+
+\f0\fs26 Le Contrat est r\'e9dig\'e9 en langue fran\'e7aise et en langue anglaise, ces
+\f1\fs24 \
+
+\f0\fs26 deux versions faisant \'e9galement foi.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 12 - NOUVELLES VERSIONS DU CONTRAT
+\f1\fs24 \
+\
+
+\f0\fs26 12.1 Toute personne est autoris\'e9e \'e0 copier et distribuer des copies de
+\f1\fs24 \
+
+\f0\fs26 ce Contrat.
+\f1\fs24 \
+\
+
+\f0\fs26 12.2 Afin d'en pr\'e9server la coh\'e9rence, le texte du Contrat est prot\'e9g\'e9
+\f1\fs24 \
+
+\f0\fs26 et ne peut \'eatre modifi\'e9 que par les auteurs de la licence, lesquels se
+\f1\fs24 \
+
+\f0\fs26 r\'e9servent le droit de publier p\'e9riodiquement des mises \'e0 jour ou de
+\f1\fs24 \
+
+\f0\fs26 nouvelles versions du Contrat, qui poss\'e9deront chacune un num\'e9ro
+\f1\fs24 \
+
+\f0\fs26 distinct. Ces versions ult\'e9rieures seront susceptibles de prendre en
+\f1\fs24 \
+
+\f0\fs26 compte de nouvelles probl\'e9matiques rencontr\'e9es par les logiciels libres.
+\f1\fs24 \
+\
+
+\f0\fs26 12.3 Tout Logiciel diffus\'e9 sous une version donn\'e9e du Contrat ne pourra
+\f1\fs24 \
+
+\f0\fs26 faire l'objet d'une diffusion ult\'e9rieure que sous la m\'eame version du
+\f1\fs24 \
+
+\f0\fs26 Contrat ou une version post\'e9rieure, sous r\'e9serve des dispositions de
+\f1\fs24 \
+
+\f0\fs26 l'article 5.3.4.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 13 - LOI APPLICABLE ET COMPETENCE TERRITORIALE
+\f1\fs24 \
+\
+
+\f0\fs26 13.1 Le Contrat est r\'e9gi par la loi fran\'e7aise. Les Parties conviennent
+\f1\fs24 \
+
+\f0\fs26 de tenter de r\'e9gler \'e0 l'amiable les diff\'e9rends ou litiges qui
+\f1\fs24 \
+
+\f0\fs26 viendraient \'e0 se produire par suite ou \'e0 l'occasion du Contrat.
+\f1\fs24 \
+\
+
+\f0\fs26 13.2 A d\'e9faut d'accord amiable dans un d\'e9lai de deux (2) mois \'e0 compter
+\f1\fs24 \
+
+\f0\fs26 de leur survenance et sauf situation relevant d'une proc\'e9dure d'urgence,
+\f1\fs24 \
+
+\f0\fs26 les diff\'e9rends ou litiges seront port\'e9s par la Partie la plus diligente
+\f1\fs24 \
+
+\f0\fs26 devant les Tribunaux comp\'e9tents de Paris.
+\f1\fs24 \
+\
+\
+
+\f0\fs26 Version 2.0 du 2006-09-05.
+\f1\fs24 \
+}]]></resource><resource mime-type="text/rtf" kind="embedded" type="welcome"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf340
+{\fonttbl\f0\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+\deftab709
+\pard\tx860\tx1160\pardeftab709\li1160\fi-1160\ri-620\sb80
+
+\f0\fs26 \cf0 Bienvenue !\
+\pard\tx-300\tx0\pardeftab709\ri-620\sb80
+\cf0 \
+\pard\tx860\tx1160\pardeftab709\li1160\fi-1160\ri-620\sb80
+
+\b \cf0 i-score
+\b0  est un s\'e9quenceur interactif intermedia\
+\
+Pour plus d'informations, rendez-vous sur {\field{\*\fldinst{HYPERLINK "http://i-score.org/"}}{\fldrslt i-score.org}}\
+\
+\pard\pardeftab709
+\cf0 Merci de l'utiliser ! \
+Notez toutefois que ceci est une version alpha, ce qui signifie que certains bugs sont encore pr\'e9sents et que les fonctionnalit\'e9s peuvent changer \'e0 tout moment.\
+\
+Appuyez sur "Continuez" pour proc\'e9der \'e0 l'installation.}]]></resource><resource mime-type="text/rtf" kind="embedded" type="conclusion"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf340
+{\fonttbl\f0\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+\deftab709
+\pard\pardeftab709
+
+\f0\fs26 \cf0 Thank you for installing i-score !\
+\
+We hope you'll enjoy it !\
+\
+Please report any bug to {\field{\*\fldinst{HYPERLINK "http://redmine.jamoma.org/projects/i-score/issues?query_id=8"}}{\fldrslt our bug tracker}}}]]></resource></locale><locale lang="en"><resource relative="true" mod="true" type="background">macDocs/i-score-Background.png</resource><resource mime-type="text/rtf" kind="embedded" type="license"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf340
+{\fonttbl\f0\fnil\fcharset0 LucidaGrande;\f1\froman\fcharset0 TimesNewRomanPSMT;}
+{\colortbl;\red255\green255\blue255;}
+\deftab709
+\pard\pardeftab709
+
+\f0\fs26 \cf0 CeCILL FREE SOFTWARE LICENSE AGREEMENT\
+\
+\pard\pardeftab709
+
+\f1\fs24 \cf0 \
+    
+\f0\fs26 Notice
+\f1\fs24 \
+\
+\pard\pardeftab709
+
+\f0\fs26 \cf0 This Agreement is a Free Software license agreement that is the result
+\f1\fs24 \
+
+\f0\fs26 of discussions between its authors in order to ensure compliance with
+\f1\fs24 \
+
+\f0\fs26 the two main principles guiding its drafting:
+\f1\fs24 \
+\
+    
+\f0\fs26 * firstly, compliance with the principles governing the distribution
+\f1\fs24 \
+      
+\f0\fs26 of Free Software: access to source code, broad rights granted to
+\f1\fs24 \
+      
+\f0\fs26 users,
+\f1\fs24 \
+    
+\f0\fs26 * secondly, the election of a governing law, French law, with which
+\f1\fs24 \
+      
+\f0\fs26 it is conformant, both as regards the law of torts and
+\f1\fs24 \
+      
+\f0\fs26 intellectual property law, and the protection that it offers to
+\f1\fs24 \
+      
+\f0\fs26 both authors and holders of the economic rights over software.
+\f1\fs24 \
+\
+
+\f0\fs26 The authors of the CeCILL (for Ce[a] C[nrs] I[nria] L[ogiciel] L[ibre])
+\f1\fs24 \
+
+\f0\fs26 license are:
+\f1\fs24 \
+\
+
+\f0\fs26 Commissariat \'e0 l'Energie Atomique - CEA, a public scientific, technical
+\f1\fs24 \
+
+\f0\fs26 and industrial research establishment, having its principal place of
+\f1\fs24 \
+
+\f0\fs26 business at 25 rue Leblanc, immeuble Le Ponant D, 75015 Paris, France.
+\f1\fs24 \
+\
+
+\f0\fs26 Centre National de la Recherche Scientifique - CNRS, a public scientific
+\f1\fs24 \
+
+\f0\fs26 and technological establishment, having its principal place of business
+\f1\fs24 \
+
+\f0\fs26 at 3 rue Michel-Ange, 75794 Paris cedex 16, France.
+\f1\fs24 \
+\
+
+\f0\fs26 Institut National de Recherche en Informatique et en Automatique -
+\f1\fs24 \
+
+\f0\fs26 INRIA, a public scientific and technological establishment, having its
+\f1\fs24 \
+
+\f0\fs26 principal place of business at Domaine de Voluceau, Rocquencourt, BP
+\f1\fs24 \
+
+\f0\fs26 105, 78153 Le Chesnay cedex, France.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Preamble
+\f1\fs24 \
+\
+
+\f0\fs26 The purpose of this Free Software license agreement is to grant users
+\f1\fs24 \
+
+\f0\fs26 the right to modify and redistribute the software governed by this
+\f1\fs24 \
+
+\f0\fs26 license within the framework of an open source distribution model.
+\f1\fs24 \
+\
+
+\f0\fs26 The exercising of these rights is conditional upon certain obligations
+\f1\fs24 \
+
+\f0\fs26 for users so as to preserve this status for all subsequent redistributions.
+\f1\fs24 \
+\
+
+\f0\fs26 In consideration of access to the source code and the rights to copy,
+\f1\fs24 \
+
+\f0\fs26 modify and redistribute granted by the license, users are provided only
+\f1\fs24 \
+
+\f0\fs26 with a limited warranty and the software's author, the holder of the
+\f1\fs24 \
+
+\f0\fs26 economic rights, and the successive licensors only have limited liability.
+\f1\fs24 \
+\
+
+\f0\fs26 In this respect, the risks associated with loading, using, modifying
+\f1\fs24 \
+
+\f0\fs26 and/or developing or reproducing the software by the user are brought to
+\f1\fs24 \
+
+\f0\fs26 the user's attention, given its Free Software status, which may make it
+\f1\fs24 \
+
+\f0\fs26 complicated to use, with the result that its use is reserved for
+\f1\fs24 \
+
+\f0\fs26 developers and experienced professionals having in-depth computer
+\f1\fs24 \
+
+\f0\fs26 knowledge. Users are therefore encouraged to load and test the
+\f1\fs24 \
+
+\f0\fs26 suitability of the software as regards their requirements in conditions
+\f1\fs24 \
+
+\f0\fs26 enabling the security of their systems and/or data to be ensured and,
+\f1\fs24 \
+
+\f0\fs26 more generally, to use and operate it in the same conditions of
+\f1\fs24 \
+
+\f0\fs26 security. This Agreement may be freely reproduced and published,
+\f1\fs24 \
+
+\f0\fs26 provided it is not altered, and that no provisions are either added or
+\f1\fs24 \
+
+\f0\fs26 removed herefrom.
+\f1\fs24 \
+\
+
+\f0\fs26 This Agreement may apply to any or all software for which the holder of
+\f1\fs24 \
+
+\f0\fs26 the economic rights decides to submit the use thereof to its provisions.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 1 - DEFINITIONS
+\f1\fs24 \
+\
+
+\f0\fs26 For the purpose of this Agreement, when the following expressions
+\f1\fs24 \
+
+\f0\fs26 commence with a capital letter, they shall have the following meaning:
+\f1\fs24 \
+\
+
+\f0\fs26 Agreement: means this license agreement, and its possible subsequent
+\f1\fs24 \
+
+\f0\fs26 versions and annexes.
+\f1\fs24 \
+\
+
+\f0\fs26 Software: means the software in its Object Code and/or Source Code form
+\f1\fs24 \
+
+\f0\fs26 and, where applicable, its documentation, "as is" when the Licensee
+\f1\fs24 \
+
+\f0\fs26 accepts the Agreement.
+\f1\fs24 \
+\
+
+\f0\fs26 Initial Software: means the Software in its Source Code and possibly its
+\f1\fs24 \
+
+\f0\fs26 Object Code form and, where applicable, its documentation, "as is" when
+\f1\fs24 \
+
+\f0\fs26 it is first distributed under the terms and conditions of the Agreement.
+\f1\fs24 \
+\
+
+\f0\fs26 Modified Software: means the Software modified by at least one
+\f1\fs24 \
+
+\f0\fs26 Contribution.
+\f1\fs24 \
+\
+
+\f0\fs26 Source Code: means all the Software's instructions and program lines to
+\f1\fs24 \
+
+\f0\fs26 which access is required so as to modify the Software.
+\f1\fs24 \
+\
+
+\f0\fs26 Object Code: means the binary files originating from the compilation of
+\f1\fs24 \
+
+\f0\fs26 the Source Code.
+\f1\fs24 \
+\
+
+\f0\fs26 Holder: means the holder(s) of the economic rights over the Initial
+\f1\fs24 \
+
+\f0\fs26 Software.
+\f1\fs24 \
+\
+
+\f0\fs26 Licensee: means the Software user(s) having accepted the Agreement.
+\f1\fs24 \
+\
+
+\f0\fs26 Contributor: means a Licensee having made at least one Contribution.
+\f1\fs24 \
+\
+
+\f0\fs26 Licensor: means the Holder, or any other individual or legal entity, who
+\f1\fs24 \
+
+\f0\fs26 distributes the Software under the Agreement.
+\f1\fs24 \
+\
+
+\f0\fs26 Contribution: means any or all modifications, corrections, translations,
+\f1\fs24 \
+
+\f0\fs26 adaptations and/or new functions integrated into the Software by any or
+\f1\fs24 \
+
+\f0\fs26 all Contributors, as well as any or all Internal Modules.
+\f1\fs24 \
+\
+
+\f0\fs26 Module: means a set of sources files including their documentation that
+\f1\fs24 \
+
+\f0\fs26 enables supplementary functions or services in addition to those offered
+\f1\fs24 \
+
+\f0\fs26 by the Software.
+\f1\fs24 \
+\
+
+\f0\fs26 External Module: means any or all Modules, not derived from the
+\f1\fs24 \
+
+\f0\fs26 Software, so that this Module and the Software run in separate address
+\f1\fs24 \
+
+\f0\fs26 spaces, with one calling the other when they are run.
+\f1\fs24 \
+\
+
+\f0\fs26 Internal Module: means any or all Module, connected to the Software so
+\f1\fs24 \
+
+\f0\fs26 that they both execute in the same address space.
+\f1\fs24 \
+\
+
+\f0\fs26 GNU GPL: means the GNU General Public License version 2 or any
+\f1\fs24 \
+
+\f0\fs26 subsequent version, as published by the Free Software Foundation Inc.
+\f1\fs24 \
+\
+
+\f0\fs26 Parties: mean both the Licensee and the Licensor.
+\f1\fs24 \
+\
+
+\f0\fs26 These expressions may be used both in singular and plural form.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 2 - PURPOSE
+\f1\fs24 \
+\
+
+\f0\fs26 The purpose of the Agreement is the grant by the Licensor to the
+\f1\fs24 \
+
+\f0\fs26 Licensee of a non-exclusive, transferable and worldwide license for the
+\f1\fs24 \
+
+\f0\fs26 Software as set forth in Article 5 hereinafter for the whole term of the
+\f1\fs24 \
+
+\f0\fs26 protection granted by the rights over said Software. 
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 3 - ACCEPTANCE
+\f1\fs24 \
+\
+
+\f0\fs26 3.1 The Licensee shall be deemed as having accepted the terms and
+\f1\fs24 \
+
+\f0\fs26 conditions of this Agreement upon the occurrence of the first of the
+\f1\fs24 \
+
+\f0\fs26 following events:
+\f1\fs24 \
+\
+    
+\f0\fs26 * (i) loading the Software by any or all means, notably, by
+\f1\fs24 \
+      
+\f0\fs26 downloading from a remote server, or by loading from a physical
+\f1\fs24 \
+      
+\f0\fs26 medium;
+\f1\fs24 \
+    
+\f0\fs26 * (ii) the first time the Licensee exercises any of the rights
+\f1\fs24 \
+      
+\f0\fs26 granted hereunder.
+\f1\fs24 \
+\
+
+\f0\fs26 3.2 One copy of the Agreement, containing a notice relating to the
+\f1\fs24 \
+
+\f0\fs26 characteristics of the Software, to the limited warranty, and to the
+\f1\fs24 \
+
+\f0\fs26 fact that its use is restricted to experienced users has been provided
+\f1\fs24 \
+
+\f0\fs26 to the Licensee prior to its acceptance as set forth in Article 3.1
+\f1\fs24 \
+
+\f0\fs26 hereinabove, and the Licensee hereby acknowledges that it has read and
+\f1\fs24 \
+
+\f0\fs26 understood it.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 4 - EFFECTIVE DATE AND TERM
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 4.1 EFFECTIVE DATE
+\f1\fs24 \
+\
+
+\f0\fs26 The Agreement shall become effective on the date when it is accepted by
+\f1\fs24 \
+
+\f0\fs26 the Licensee as set forth in Article 3.1.
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 4.2 TERM
+\f1\fs24 \
+\
+
+\f0\fs26 The Agreement shall remain in force for the entire legal term of
+\f1\fs24 \
+
+\f0\fs26 protection of the economic rights over the Software.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 5 - SCOPE OF RIGHTS GRANTED
+\f1\fs24 \
+\
+
+\f0\fs26 The Licensor hereby grants to the Licensee, who accepts, the following
+\f1\fs24 \
+
+\f0\fs26 rights over the Software for any or all use, and for the term of the
+\f1\fs24 \
+
+\f0\fs26 Agreement, on the basis of the terms and conditions set forth hereinafter.
+\f1\fs24 \
+\
+
+\f0\fs26 Besides, if the Licensor owns or comes to own one or more patents
+\f1\fs24 \
+
+\f0\fs26 protecting all or part of the functions of the Software or of its
+\f1\fs24 \
+
+\f0\fs26 components, the Licensor undertakes not to enforce the rights granted by
+\f1\fs24 \
+
+\f0\fs26 these patents against successive Licensees using, exploiting or
+\f1\fs24 \
+
+\f0\fs26 modifying the Software. If these patents are transferred, the Licensor
+\f1\fs24 \
+
+\f0\fs26 undertakes to have the transferees subscribe to the obligations set
+\f1\fs24 \
+
+\f0\fs26 forth in this paragraph.
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 5.1 RIGHT OF USE
+\f1\fs24 \
+\
+
+\f0\fs26 The Licensee is authorized to use the Software, without any limitation
+\f1\fs24 \
+
+\f0\fs26 as to its fields of application, with it being hereinafter specified
+\f1\fs24 \
+
+\f0\fs26 that this comprises:
+\f1\fs24 \
+\
+   
+\f0\fs26 1. permanent or temporary reproduction of all or part of the Software
+\f1\fs24 \
+      
+\f0\fs26 by any or all means and in any or all form.
+\f1\fs24 \
+\
+   
+\f0\fs26 2. loading, displaying, running, or storing the Software on any or
+\f1\fs24 \
+      
+\f0\fs26 all medium.
+\f1\fs24 \
+\
+   
+\f0\fs26 3. entitlement to observe, study or test its operation so as to
+\f1\fs24 \
+      
+\f0\fs26 determine the ideas and principles behind any or all constituent
+\f1\fs24 \
+      
+\f0\fs26 elements of said Software. This shall apply when the Licensee
+\f1\fs24 \
+      
+\f0\fs26 carries out any or all loading, displaying, running, transmission
+\f1\fs24 \
+      
+\f0\fs26 or storage operation as regards the Software, that it is entitled
+\f1\fs24 \
+      
+\f0\fs26 to carry out hereunder.
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 5.2 ENTITLEMENT TO MAKE CONTRIBUTIONS
+\f1\fs24 \
+\
+
+\f0\fs26 The right to make Contributions includes the right to translate, adapt,
+\f1\fs24 \
+
+\f0\fs26 arrange, or make any or all modifications to the Software, and the right
+\f1\fs24 \
+
+\f0\fs26 to reproduce the resulting software.
+\f1\fs24 \
+\
+
+\f0\fs26 The Licensee is authorized to make any or all Contributions to the
+\f1\fs24 \
+
+\f0\fs26 Software provided that it includes an explicit notice that it is the
+\f1\fs24 \
+
+\f0\fs26 author of said Contribution and indicates the date of the creation thereof.
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 5.3 RIGHT OF DISTRIBUTION
+\f1\fs24 \
+\
+
+\f0\fs26 In particular, the right of distribution includes the right to publish,
+\f1\fs24 \
+
+\f0\fs26 transmit and communicate the Software to the general public on any or
+\f1\fs24 \
+
+\f0\fs26 all medium, and by any or all means, and the right to market, either in
+\f1\fs24 \
+
+\f0\fs26 consideration of a fee, or free of charge, one or more copies of the
+\f1\fs24 \
+
+\f0\fs26 Software by any means.
+\f1\fs24 \
+\
+
+\f0\fs26 The Licensee is further authorized to distribute copies of the modified
+\f1\fs24 \
+
+\f0\fs26 or unmodified Software to third parties according to the terms and
+\f1\fs24 \
+
+\f0\fs26 conditions set forth hereinafter.
+\f1\fs24 \
+\
+\
+        
+\f0\fs26 5.3.1 DISTRIBUTION OF SOFTWARE WITHOUT MODIFICATION
+\f1\fs24 \
+\
+
+\f0\fs26 The Licensee is authorized to distribute true copies of the Software in
+\f1\fs24 \
+
+\f0\fs26 Source Code or Object Code form, provided that said distribution
+\f1\fs24 \
+
+\f0\fs26 complies with all the provisions of the Agreement and is accompanied by:
+\f1\fs24 \
+\
+   
+\f0\fs26 1. a copy of the Agreement,
+\f1\fs24 \
+\
+   
+\f0\fs26 2. a notice relating to the limitation of both the Licensor's
+\f1\fs24 \
+      
+\f0\fs26 warranty and liability as set forth in Articles 8 and 9,
+\f1\fs24 \
+\
+
+\f0\fs26 and that, in the event that only the Object Code of the Software is
+\f1\fs24 \
+
+\f0\fs26 redistributed, the Licensee allows future Licensees unhindered access to
+\f1\fs24 \
+
+\f0\fs26 the full Source Code of the Software by indicating how to access it, it
+\f1\fs24 \
+
+\f0\fs26 being understood that the additional cost of acquiring the Source Code
+\f1\fs24 \
+
+\f0\fs26 shall not exceed the cost of transferring the data.
+\f1\fs24 \
+\
+\
+        
+\f0\fs26 5.3.2 DISTRIBUTION OF MODIFIED SOFTWARE
+\f1\fs24 \
+\
+
+\f0\fs26 When the Licensee makes a Contribution to the Software, the terms and
+\f1\fs24 \
+
+\f0\fs26 conditions for the distribution of the resulting Modified Software
+\f1\fs24 \
+
+\f0\fs26 become subject to all the provisions of this Agreement.
+\f1\fs24 \
+\
+
+\f0\fs26 The Licensee is authorized to distribute the Modified Software, in
+\f1\fs24 \
+
+\f0\fs26 source code or object code form, provided that said distribution
+\f1\fs24 \
+
+\f0\fs26 complies with all the provisions of the Agreement and is accompanied by:
+\f1\fs24 \
+\
+   
+\f0\fs26 1. a copy of the Agreement,
+\f1\fs24 \
+\
+   
+\f0\fs26 2. a notice relating to the limitation of both the Licensor's
+\f1\fs24 \
+      
+\f0\fs26 warranty and liability as set forth in Articles 8 and 9,
+\f1\fs24 \
+\
+
+\f0\fs26 and that, in the event that only the object code of the Modified
+\f1\fs24 \
+
+\f0\fs26 Software is redistributed, the Licensee allows future Licensees
+\f1\fs24 \
+
+\f0\fs26 unhindered access to the full source code of the Modified Software by
+\f1\fs24 \
+
+\f0\fs26 indicating how to access it, it being understood that the additional
+\f1\fs24 \
+
+\f0\fs26 cost of acquiring the source code shall not exceed the cost of
+\f1\fs24 \
+
+\f0\fs26 transferring the data.
+\f1\fs24 \
+\
+\
+        
+\f0\fs26 5.3.3 DISTRIBUTION OF EXTERNAL MODULES
+\f1\fs24 \
+\
+
+\f0\fs26 When the Licensee has developed an External Module, the terms and
+\f1\fs24 \
+
+\f0\fs26 conditions of this Agreement do not apply to said External Module, that
+\f1\fs24 \
+
+\f0\fs26 may be distributed under a separate license agreement.
+\f1\fs24 \
+\
+\
+        
+\f0\fs26 5.3.4 COMPATIBILITY WITH THE GNU GPL
+\f1\fs24 \
+\
+
+\f0\fs26 The Licensee can include a code that is subject to the provisions of one
+\f1\fs24 \
+
+\f0\fs26 of the versions of the GNU GPL in the Modified or unmodified Software,
+\f1\fs24 \
+
+\f0\fs26 and distribute that entire code under the terms of the same version of
+\f1\fs24 \
+
+\f0\fs26 the GNU GPL.
+\f1\fs24 \
+\
+
+\f0\fs26 The Licensee can include the Modified or unmodified Software in a code
+\f1\fs24 \
+
+\f0\fs26 that is subject to the provisions of one of the versions of the GNU GPL,
+\f1\fs24 \
+
+\f0\fs26 and distribute that entire code under the terms of the same version of
+\f1\fs24 \
+
+\f0\fs26 the GNU GPL.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 6 - INTELLECTUAL PROPERTY
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 6.1 OVER THE INITIAL SOFTWARE
+\f1\fs24 \
+\
+
+\f0\fs26 The Holder owns the economic rights over the Initial Software. Any or
+\f1\fs24 \
+
+\f0\fs26 all use of the Initial Software is subject to compliance with the terms
+\f1\fs24 \
+
+\f0\fs26 and conditions under which the Holder has elected to distribute its work
+\f1\fs24 \
+
+\f0\fs26 and no one shall be entitled to modify the terms and conditions for the
+\f1\fs24 \
+
+\f0\fs26 distribution of said Initial Software.
+\f1\fs24 \
+\
+
+\f0\fs26 The Holder undertakes that the Initial Software will remain ruled at
+\f1\fs24 \
+
+\f0\fs26 least by this Agreement, for the duration set forth in Article 4.2.
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 6.2 OVER THE CONTRIBUTIONS
+\f1\fs24 \
+\
+
+\f0\fs26 The Licensee who develops a Contribution is the owner of the
+\f1\fs24 \
+
+\f0\fs26 intellectual property rights over this Contribution as defined by
+\f1\fs24 \
+
+\f0\fs26 applicable law.
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 6.3 OVER THE EXTERNAL MODULES
+\f1\fs24 \
+\
+
+\f0\fs26 The Licensee who develops an External Module is the owner of the
+\f1\fs24 \
+
+\f0\fs26 intellectual property rights over this External Module as defined by
+\f1\fs24 \
+
+\f0\fs26 applicable law and is free to choose the type of agreement that shall
+\f1\fs24 \
+
+\f0\fs26 govern its distribution.
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 6.4 JOINT PROVISIONS
+\f1\fs24 \
+\
+
+\f0\fs26 The Licensee expressly undertakes:
+\f1\fs24 \
+\
+   
+\f0\fs26 1. not to remove, or modify, in any manner, the intellectual property
+\f1\fs24 \
+      
+\f0\fs26 notices attached to the Software;
+\f1\fs24 \
+\
+   
+\f0\fs26 2. to reproduce said notices, in an identical manner, in the copies
+\f1\fs24 \
+      
+\f0\fs26 of the Software modified or not.
+\f1\fs24 \
+\
+
+\f0\fs26 The Licensee undertakes not to directly or indirectly infringe the
+\f1\fs24 \
+
+\f0\fs26 intellectual property rights of the Holder and/or Contributors on the
+\f1\fs24 \
+
+\f0\fs26 Software and to take, where applicable, vis-\'e0-vis its staff, any and all
+\f1\fs24 \
+
+\f0\fs26 measures required to ensure respect of said intellectual property rights
+\f1\fs24 \
+
+\f0\fs26 of the Holder and/or Contributors.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 7 - RELATED SERVICES
+\f1\fs24 \
+\
+
+\f0\fs26 7.1 Under no circumstances shall the Agreement oblige the Licensor to
+\f1\fs24 \
+
+\f0\fs26 provide technical assistance or maintenance services for the Software.
+\f1\fs24 \
+\
+
+\f0\fs26 However, the Licensor is entitled to offer this type of services. The
+\f1\fs24 \
+
+\f0\fs26 terms and conditions of such technical assistance, and/or such
+\f1\fs24 \
+
+\f0\fs26 maintenance, shall be set forth in a separate instrument. Only the
+\f1\fs24 \
+
+\f0\fs26 Licensor offering said maintenance and/or technical assistance services
+\f1\fs24 \
+
+\f0\fs26 shall incur liability therefor.
+\f1\fs24 \
+\
+
+\f0\fs26 7.2 Similarly, any Licensor is entitled to offer to its licensees, under
+\f1\fs24 \
+
+\f0\fs26 its sole responsibility, a warranty, that shall only be binding upon
+\f1\fs24 \
+
+\f0\fs26 itself, for the redistribution of the Software and/or the Modified
+\f1\fs24 \
+
+\f0\fs26 Software, under terms and conditions that it is free to decide. Said
+\f1\fs24 \
+
+\f0\fs26 warranty, and the financial terms and conditions of its application,
+\f1\fs24 \
+
+\f0\fs26 shall be subject of a separate instrument executed between the Licensor
+\f1\fs24 \
+
+\f0\fs26 and the Licensee.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 8 - LIABILITY
+\f1\fs24 \
+\
+
+\f0\fs26 8.1 Subject to the provisions of Article 8.2, the Licensee shall be
+\f1\fs24 \
+
+\f0\fs26 entitled to claim compensation for any direct loss it may have suffered
+\f1\fs24 \
+
+\f0\fs26 from the Software as a result of a fault on the part of the relevant
+\f1\fs24 \
+
+\f0\fs26 Licensor, subject to providing evidence thereof.
+\f1\fs24 \
+\
+
+\f0\fs26 8.2 The Licensor's liability is limited to the commitments made under
+\f1\fs24 \
+
+\f0\fs26 this Agreement and shall not be incurred as a result of in particular:
+\f1\fs24 \
+
+\f0\fs26 (i) loss due the Licensee's total or partial failure to fulfill its
+\f1\fs24 \
+
+\f0\fs26 obligations, (ii) direct or consequential loss that is suffered by the
+\f1\fs24 \
+
+\f0\fs26 Licensee due to the use or performance of the Software, and (iii) more
+\f1\fs24 \
+
+\f0\fs26 generally, any consequential loss. In particular the Parties expressly
+\f1\fs24 \
+
+\f0\fs26 agree that any or all pecuniary or business loss (i.e. loss of data,
+\f1\fs24 \
+
+\f0\fs26 loss of profits, operating loss, loss of customers or orders,
+\f1\fs24 \
+
+\f0\fs26 opportunity cost, any disturbance to business activities) or any or all
+\f1\fs24 \
+
+\f0\fs26 legal proceedings instituted against the Licensee by a third party,
+\f1\fs24 \
+
+\f0\fs26 shall constitute consequential loss and shall not provide entitlement to
+\f1\fs24 \
+
+\f0\fs26 any or all compensation from the Licensor.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 9 - WARRANTY
+\f1\fs24 \
+\
+
+\f0\fs26 9.1 The Licensee acknowledges that the scientific and technical
+\f1\fs24 \
+
+\f0\fs26 state-of-the-art when the Software was distributed did not enable all
+\f1\fs24 \
+
+\f0\fs26 possible uses to be tested and verified, nor for the presence of
+\f1\fs24 \
+
+\f0\fs26 possible defects to be detected. In this respect, the Licensee's
+\f1\fs24 \
+
+\f0\fs26 attention has been drawn to the risks associated with loading, using,
+\f1\fs24 \
+
+\f0\fs26 modifying and/or developing and reproducing the Software which are
+\f1\fs24 \
+
+\f0\fs26 reserved for experienced users.
+\f1\fs24 \
+\
+
+\f0\fs26 The Licensee shall be responsible for verifying, by any or all means,
+\f1\fs24 \
+
+\f0\fs26 the suitability of the product for its requirements, its good working
+\f1\fs24 \
+
+\f0\fs26 order, and for ensuring that it shall not cause damage to either persons
+\f1\fs24 \
+
+\f0\fs26 or properties.
+\f1\fs24 \
+\
+
+\f0\fs26 9.2 The Licensor hereby represents, in good faith, that it is entitled
+\f1\fs24 \
+
+\f0\fs26 to grant all the rights over the Software (including in particular the
+\f1\fs24 \
+
+\f0\fs26 rights set forth in Article 5).
+\f1\fs24 \
+\
+
+\f0\fs26 9.3 The Licensee acknowledges that the Software is supplied "as is" by
+\f1\fs24 \
+
+\f0\fs26 the Licensor without any other express or tacit warranty, other than
+\f1\fs24 \
+
+\f0\fs26 that provided for in Article 9.2 and, in particular, without any warranty 
+\f1\fs24 \
+
+\f0\fs26 as to its commercial value, its secured, safe, innovative or relevant
+\f1\fs24 \
+
+\f0\fs26 nature.
+\f1\fs24 \
+\
+
+\f0\fs26 Specifically, the Licensor does not warrant that the Software is free
+\f1\fs24 \
+
+\f0\fs26 from any error, that it will operate without interruption, that it will
+\f1\fs24 \
+
+\f0\fs26 be compatible with the Licensee's own equipment and software
+\f1\fs24 \
+
+\f0\fs26 configuration, nor that it will meet the Licensee's requirements.
+\f1\fs24 \
+\
+
+\f0\fs26 9.4 The Licensor does not either expressly or tacitly warrant that the
+\f1\fs24 \
+
+\f0\fs26 Software does not infringe any third party intellectual property right
+\f1\fs24 \
+
+\f0\fs26 relating to a patent, software or any other property right. Therefore,
+\f1\fs24 \
+
+\f0\fs26 the Licensor disclaims any and all liability towards the Licensee
+\f1\fs24 \
+
+\f0\fs26 arising out of any or all proceedings for infringement that may be
+\f1\fs24 \
+
+\f0\fs26 instituted in respect of the use, modification and redistribution of the
+\f1\fs24 \
+
+\f0\fs26 Software. Nevertheless, should such proceedings be instituted against
+\f1\fs24 \
+
+\f0\fs26 the Licensee, the Licensor shall provide it with technical and legal
+\f1\fs24 \
+
+\f0\fs26 assistance for its defense. Such technical and legal assistance shall be
+\f1\fs24 \
+
+\f0\fs26 decided on a case-by-case basis between the relevant Licensor and the
+\f1\fs24 \
+
+\f0\fs26 Licensee pursuant to a memorandum of understanding. The Licensor
+\f1\fs24 \
+
+\f0\fs26 disclaims any and all liability as regards the Licensee's use of the
+\f1\fs24 \
+
+\f0\fs26 name of the Software. No warranty is given as regards the existence of
+\f1\fs24 \
+
+\f0\fs26 prior rights over the name of the Software or as regards the existence
+\f1\fs24 \
+
+\f0\fs26 of a trademark.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 10 - TERMINATION
+\f1\fs24 \
+\
+
+\f0\fs26 10.1 In the event of a breach by the Licensee of its obligations
+\f1\fs24 \
+
+\f0\fs26 hereunder, the Licensor may automatically terminate this Agreement
+\f1\fs24 \
+
+\f0\fs26 thirty (30) days after notice has been sent to the Licensee and has
+\f1\fs24 \
+
+\f0\fs26 remained ineffective.
+\f1\fs24 \
+\
+
+\f0\fs26 10.2 A Licensee whose Agreement is terminated shall no longer be
+\f1\fs24 \
+
+\f0\fs26 authorized to use, modify or distribute the Software. However, any
+\f1\fs24 \
+
+\f0\fs26 licenses that it may have granted prior to termination of the Agreement
+\f1\fs24 \
+
+\f0\fs26 shall remain valid subject to their having been granted in compliance
+\f1\fs24 \
+
+\f0\fs26 with the terms and conditions hereof.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 11 - MISCELLANEOUS
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 11.1 EXCUSABLE EVENTS
+\f1\fs24 \
+\
+
+\f0\fs26 Neither Party shall be liable for any or all delay, or failure to
+\f1\fs24 \
+
+\f0\fs26 perform the Agreement, that may be attributable to an event of force
+\f1\fs24 \
+
+\f0\fs26 majeure, an act of God or an outside cause, such as defective
+\f1\fs24 \
+
+\f0\fs26 functioning or interruptions of the electricity or telecommunications
+\f1\fs24 \
+
+\f0\fs26 networks, network paralysis following a virus attack, intervention by
+\f1\fs24 \
+
+\f0\fs26 government authorities, natural disasters, water damage, earthquakes,
+\f1\fs24 \
+
+\f0\fs26 fire, explosions, strikes and labor unrest, war, etc.
+\f1\fs24 \
+\
+
+\f0\fs26 11.2 Any failure by either Party, on one or more occasions, to invoke
+\f1\fs24 \
+
+\f0\fs26 one or more of the provisions hereof, shall under no circumstances be
+\f1\fs24 \
+
+\f0\fs26 interpreted as being a waiver by the interested Party of its right to
+\f1\fs24 \
+
+\f0\fs26 invoke said provision(s) subsequently.
+\f1\fs24 \
+\
+
+\f0\fs26 11.3 The Agreement cancels and replaces any or all previous agreements,
+\f1\fs24 \
+
+\f0\fs26 whether written or oral, between the Parties and having the same
+\f1\fs24 \
+
+\f0\fs26 purpose, and constitutes the entirety of the agreement between said
+\f1\fs24 \
+
+\f0\fs26 Parties concerning said purpose. No supplement or modification to the
+\f1\fs24 \
+
+\f0\fs26 terms and conditions hereof shall be effective as between the Parties
+\f1\fs24 \
+
+\f0\fs26 unless it is made in writing and signed by their duly authorized
+\f1\fs24 \
+
+\f0\fs26 representatives.
+\f1\fs24 \
+\
+
+\f0\fs26 11.4 In the event that one or more of the provisions hereof were to
+\f1\fs24 \
+
+\f0\fs26 conflict with a current or future applicable act or legislative text,
+\f1\fs24 \
+
+\f0\fs26 said act or legislative text shall prevail, and the Parties shall make
+\f1\fs24 \
+
+\f0\fs26 the necessary amendments so as to comply with said act or legislative
+\f1\fs24 \
+
+\f0\fs26 text. All other provisions shall remain effective. Similarly, invalidity
+\f1\fs24 \
+
+\f0\fs26 of a provision of the Agreement, for any reason whatsoever, shall not
+\f1\fs24 \
+
+\f0\fs26 cause the Agreement as a whole to be invalid.
+\f1\fs24 \
+\
+\
+      
+\f0\fs26 11.5 LANGUAGE
+\f1\fs24 \
+\
+
+\f0\fs26 The Agreement is drafted in both French and English and both versions
+\f1\fs24 \
+
+\f0\fs26 are deemed authentic.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 12 - NEW VERSIONS OF THE AGREEMENT
+\f1\fs24 \
+\
+
+\f0\fs26 12.1 Any person is authorized to duplicate and distribute copies of this
+\f1\fs24 \
+
+\f0\fs26 Agreement.
+\f1\fs24 \
+\
+
+\f0\fs26 12.2 So as to ensure coherence, the wording of this Agreement is
+\f1\fs24 \
+
+\f0\fs26 protected and may only be modified by the authors of the License, who
+\f1\fs24 \
+
+\f0\fs26 reserve the right to periodically publish updates or new versions of the
+\f1\fs24 \
+
+\f0\fs26 Agreement, each with a separate number. These subsequent versions may
+\f1\fs24 \
+
+\f0\fs26 address new issues encountered by Free Software.
+\f1\fs24 \
+\
+
+\f0\fs26 12.3 Any Software distributed under a given version of the Agreement may
+\f1\fs24 \
+
+\f0\fs26 only be subsequently distributed under the same version of the Agreement
+\f1\fs24 \
+
+\f0\fs26 or a subsequent version, subject to the provisions of Article 5.3.4.
+\f1\fs24 \
+\
+\
+    
+\f0\fs26 Article 13 - GOVERNING LAW AND JURISDICTION
+\f1\fs24 \
+\
+
+\f0\fs26 13.1 The Agreement is governed by French law. The Parties agree to
+\f1\fs24 \
+
+\f0\fs26 endeavor to seek an amicable solution to any disagreements or disputes
+\f1\fs24 \
+
+\f0\fs26 that may arise during the performance of the Agreement.
+\f1\fs24 \
+\
+
+\f0\fs26 13.2 Failing an amicable solution within two (2) months as from their
+\f1\fs24 \
+
+\f0\fs26 occurrence, and unless emergency proceedings are necessary, the
+\f1\fs24 \
+
+\f0\fs26 disagreements or disputes shall be referred to the Paris Courts having
+\f1\fs24 \
+
+\f0\fs26 jurisdiction, by the more diligent Party.
+\f1\fs24 \
+\
+\
+
+\f0\fs26 Version 2.0 dated 2006-09-05.
+\f1\fs24 \
+}]]></resource><resource mime-type="text/rtf" kind="embedded" type="welcome"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf340
+{\fonttbl\f0\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+\deftab709
+\pard\tx860\tx1160\pardeftab709\li1160\fi-1160\ri-620\sb80
+
+\f0\fs26 \cf0 Welcome !\
+\
+\pard\tx860\tx1160\pardeftab709\li1160\fi-1160\ri-620\sb80
+
+\b \cf0 i-score
+\b0  is an interactive sequencer for the intermedia arts\
+\
+Read more about it at {\field{\*\fldinst{HYPERLINK "http://i-score.org/"}}{\fldrslt i-score.org}}\
+\
+\pard\pardeftab709
+\cf0 Thanks for using it ! \
+Please notice though that this is an alpha version, which means that there are still some bugs, and that features might change at any time.\
+\
+Click on \'93Continue" to proceed.}]]></resource><resource mime-type="text/rtf" kind="embedded" type="conclusion"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf340
+{\fonttbl\f0\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+\deftab709
+\pard\pardeftab709
+
+\f0\fs26 \cf0 Merci d'avoir install\'e9 i-score !\
+\
+En esp\'e9rant que vous appr\'e9cierez ce logiciel.\
+\
+Merci de nous {\field{\*\fldinst{HYPERLINK "http://redmine.jamoma.org/projects/i-score/issues?query_id=8"}}{\fldrslt signaler les bugs}} que vous rencontreriez.}]]></resource></locale></resources><flags/><item type="file">01i.xml</item><item type="file">02iscore.xml</item><item type="file">03gecode.xml</item><item type="file">04libxml.xml</item><item type="file">05qtcore.xml</item><item type="file">06qtgui.xml</item><item type="file">07qtxml.xml</item><item type="file">08qtsvg.xml</item><item type="file">09qtnetwork.xml</item><item type="file">10imageformats.xml</item><mod>properties.title</mod></pkmkdoc>

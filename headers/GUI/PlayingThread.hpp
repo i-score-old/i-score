@@ -58,7 +58,7 @@ class MaquetteScene;
  * \brief Thread handling playing.
  */
 class PlayingThread : public QThread
-{
+{    
 	public :
 		PlayingThread(MaquetteScene *scene);
 	protected :

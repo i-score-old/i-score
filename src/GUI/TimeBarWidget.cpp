@@ -84,7 +84,6 @@ void
 TimeBarWidget::mousePressEvent(QMouseEvent *event){
     int value = event->pos().x()* MaquetteScene::MS_PER_PIXEL;
     emit gotoValueEntered(value);
-
 }
 
 void
@@ -114,7 +113,6 @@ TimeBarWidget::drawBackground(QPainter *painter, QRect rect){
 
     float zoom = 16/MaquetteScene::MS_PER_PIXEL;
     float factor = ((float)1)/zoom;
-//    float textIndic = 0.;
 
     for (float i = 0; i <= (WIDTH * MaquetteScene::MS_PER_PIXEL) / S_TO_MS ; i+=factor) { // for each second
 
@@ -122,19 +120,7 @@ TimeBarWidget::drawBackground(QPainter *painter, QRect rect){
 
         painter->drawLine(QPointF(i_PXL, 3*HEIGHT/4), QPointF(i_PXL, HEIGHT));
         painter->drawText(QPointF(i_PXL, 2*HEIGHT/3),QString("%1").arg(i));
-        }
-
-
-//    for (float j = 0; j <= (WIDTH * MaquetteScene::MS_PER_PIXEL) / S_TO_MS ; j+=factor) { // for each second
-
-////        i_PXL = i * S_TO_MS / MaquetteScene::MS_PER_PIXEL + LEFT_MARGIN;
-//        j_PXL = j * S_TO_MS / MaquetteScene::MS_PER_PIXEL + LEFT_MARGIN;
-//        painter->drawLine(QPointF(j_PXL, 3*HEIGHT/4), QPointF(j_PXL, HEIGHT));
-//        if(j==textIndic){
-//        painter->drawText(QPointF(j_PXL, 2*HEIGHT/3),QString("%1").arg(j));
-//            textIndic++;
-//        }
-//    }
+    }
 
     painter->restore();
 }

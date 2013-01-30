@@ -47,6 +47,7 @@ knowledge of the CeCILL license and that you accept its terms.
  */
 #include<QGraphicsView>
 
+class TriggerPoint;
 class BasicBox;
 class MainWindow;
 class MaquetteScene;
@@ -72,10 +73,14 @@ class MaquetteView : public QGraphicsView
    * \param value : the goto value in ms
    */
   void setGotoValue(int value);
+  inline int gotoValue(){return _gotoValue;}
+  QList<TriggerPoint *> triggersQueueList();
   inline MainWindow *mainWindow(){return _mainWindow;}
+  void triggerShortcut(int shortcut);
 
   signals:
     void zoomChanged(float newValue);
+    void playModeChanged();
 
   public slots :
 
@@ -95,7 +100,19 @@ class MaquetteView : public QGraphicsView
    * \brief Performs zoom out of the entire scene.
    */
   void zoomOut();
-
+  /*!
+   * \brief Sets the zoom value. (used for loadFiles)
+   *
+   * \param value : the zoom factor value
+   */
+  void setZoom(float value);
+  inline float zoom(){return _zoom;}
+  /*!
+   * \brief Gets the coordinates of the center of the scene.
+   *
+   * \return the center, as a QPointF.
+   */
+  QPointF getCenterCoordinates();
  protected :
   /*!
    * \brief Redefinition of QGraphicsView::drawBackground().
@@ -117,12 +134,7 @@ class MaquetteView : public QGraphicsView
    * \param event : the information about the event
    */
   virtual void wheelEvent(QWheelEvent *event);
-  /*!
-   * \brief Gets the coordinates of the center of the scene.
-   *
-   * \return the center, as a QPointF.
-   */
-  QPointF getCenterCoordinates();
+
 
  private :
 

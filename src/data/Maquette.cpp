@@ -60,6 +60,7 @@ knowledge of the CeCILL license and that you accept its terms.
 
 #include <stdio.h>
 #include <assert.h>
+#include <QCoreApplication>
 
 using std::vector;
 using std::map;
@@ -398,7 +399,7 @@ Maquette::addParentBox(unsigned int ID, const QPointF & corner1, const QPointF &
 	_engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
 	_engines->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
 
-	ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
+    ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
 
 	if (ID != NO_ID) {
 		newBox->setName(QString::fromStdString(name));
@@ -427,46 +428,86 @@ Maquette::addParentBox(unsigned int ID, const QPointF & corner1, const QPointF &
 }
 
 unsigned int
+Maquette::addParentBox(unsigned int ID, const unsigned int date, const unsigned int topLeftY, const unsigned int sizeY, const unsigned int duration, const string & name, unsigned int mother, QColor color)
+{
+    QPointF corner1(date/MaquetteScene::MS_PER_PIXEL,topLeftY);
+    QPointF corner2((date+duration)/MaquetteScene::MS_PER_PIXEL,topLeftY+sizeY);
+
+    vector<string> firstMsgs;
+    vector<string> lastMsgs;
+    _engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
+    _engines->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
+
+    ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
+
+    if (ID != NO_ID) {
+        newBox->setName(QString::fromStdString(name));
+        newBox->setColor(color);
+        _boxes[ID] = newBox;
+        _parentBoxes[ID] = newBox;
+        newBox->setID(ID);
+        if (mother != NO_ID && mother != ROOT_BOX_ID) {
+            BoxesMap::iterator it;
+            if ((it = _boxes.find(mother)) != _boxes.end()) {
+                if (it->second->type() == PARENT_BOX_TYPE) {
+                    newBox->setMother(mother);
+                  static_cast<ParentBox*>(it->second)->addChild(ID);
+                }
+                else {
+                    newBox->setMother(ROOT_BOX_ID);
+                }
+            }
+        }
+
+        newBox->setFirstMessagesToSend(firstMsgs);
+        newBox->setLastMessagesToSend(lastMsgs);
+    }
+
+    return ID;
+
+}
+
+unsigned int
 Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
 {
-	QPointF firstCorner(std::min(corner1.x(),corner2.x()),std::min(corner1.y(),corner2.y()));
-	QPointF secondCorner(std::max(corner1.x(),corner2.x()),std::max(corner1.y(),corner2.y()));
+    QPointF firstCorner(std::min(corner1.x(),corner2.x()),std::min(corner1.y(),corner2.y()));
+        QPointF secondCorner(std::max(corner1.x(),corner2.x()),std::max(corner1.y(),corner2.y()));
 
-	ParentBox *newBox = new ParentBox(firstCorner, secondCorner, _scene);
+        ParentBox *newBox = new ParentBox(firstCorner, secondCorner, _scene);
 
-	ParentBox *motherBox = NULL;
-	int motherID = mother;
-	if (_boxes.find(mother) == _boxes.end()) {
-		motherID = ROOT_BOX_ID;
-	}
-	else {
-		BoxesMap::iterator it;
-		if ((it = _boxes.find(mother)) != _boxes.end()) {
-			if (it->second->type() == PARENT_BOX_TYPE) {
-				motherBox = static_cast<ParentBox*>(it->second);
-				firstCorner.rx() -= motherBox->beginPos();
-				secondCorner.rx() -= motherBox->beginPos();
-			}
-		}
-	}
-	unsigned int newBoxID = _engines->addBox(firstCorner.x() * MaquetteScene::MS_PER_PIXEL,
-			(secondCorner.x()-firstCorner.x()) * MaquetteScene::MS_PER_PIXEL , motherID);
+        ParentBox *motherBox = NULL;
+        int motherID = mother;
+        if (_boxes.find(mother) == _boxes.end()) {
+            motherID = ROOT_BOX_ID;
+        }
+        else {
+            BoxesMap::iterator it;
+            if ((it = _boxes.find(mother)) != _boxes.end()) {
+                if (it->second->type() == PARENT_BOX_TYPE) {
+                    motherBox = static_cast<ParentBox*>(it->second);
+                    firstCorner.rx() -= motherBox->beginPos();
+                    secondCorner.rx() -= motherBox->beginPos();
+                }
+            }
+        }
+        unsigned int newBoxID = _engines->addBox(firstCorner.x() * MaquetteScene::MS_PER_PIXEL,
+                (secondCorner.x()-firstCorner.x()) * MaquetteScene::MS_PER_PIXEL , motherID);
 
-	if (newBoxID != NO_ID) {
-		newBox->setName(QString::fromStdString(name));
+        if (newBoxID != NO_ID) {
+            newBox->setName(QString::fromStdString(name));
 
-		_boxes[newBoxID] = newBox;
-		_parentBoxes[newBoxID] = newBox;
-		newBox->setID(newBoxID);
-		if (motherBox != NULL) {
-			newBox->setMother(motherID);
-			motherBox->addChild(newBoxID);
-		}
-		_engines->setCtrlPointMessagesToSend(newBoxID,BEGIN_CONTROL_POINT_INDEX,newBox->firstMessagesToSend());
-		_engines->setCtrlPointMessagesToSend(newBoxID,END_CONTROL_POINT_INDEX,newBox->lastMessagesToSend());
-		}
+            _boxes[newBoxID] = newBox;
+            _parentBoxes[newBoxID] = newBox;
+            newBox->setID(newBoxID);
+            if (motherBox != NULL) {
+                newBox->setMother(motherID);
+                motherBox->addChild(newBoxID);
+            }
+            _engines->setCtrlPointMessagesToSend(newBoxID,BEGIN_CONTROL_POINT_INDEX,newBox->firstMessagesToSend());
+            _engines->setCtrlPointMessagesToSend(newBoxID,END_CONTROL_POINT_INDEX,newBox->lastMessagesToSend());
+            }
 
-	return newBoxID;
+        return newBoxID;
 }
 
 unsigned int
@@ -543,62 +584,6 @@ Maquette::lastMessagesToSend(unsigned int boxID)
 	return messages;
 }
 
-//void
-//Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, const vector<string> &endMsgs)
-//{
-
-//	vector<string> curvesAddresses = getCurvesAddresses(boxID);
-//	vector<string> startAddresses;
-//	vector<string>::const_iterator it;
-
-//	for (it = startMsgs.begin() ; it != startMsgs.end() ; ++it) {
-//		size_t blankPos;
-//		if ((blankPos = it->find_first_of(" ")) != string::npos) {
-//			startAddresses.push_back(it->substr(0,blankPos));
-//		}
-//	}
-//	vector<string> endAddresses;
-//	vector<string>::const_iterator it2;
-//	for (it2 = endMsgs.begin() ; it2 != endMsgs.end() ; ++it2) {
-//		size_t blankPos;
-//		if ((blankPos = it2->find_first_of(" ")) != string::npos) {
-//			endAddresses.push_back(it2->substr(0,blankPos));
-//		}
-//	}
-
-//	vector<string>::iterator startAddressIt;
-//	for(startAddressIt = startAddresses.begin() ; startAddressIt != startAddresses.end() ; ++startAddressIt) {
-//        string address = *startAddressIt;
-//		if (std::find(endAddresses.begin(),endAddresses.end(),address) != endAddresses.end()) {
-//			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end()) {
-//                std::cout<<" add1 > "<<address;
-//				_engines->addCurve(boxID,address);
-//			}
-//		}
-//		else {
-//			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) != curvesAddresses.end()) {
-//				_engines->removeCurve(boxID,address);
-//			}
-//		}
-//	}
-
-//	vector<string>::iterator endAddressIt;
-//	for(endAddressIt = endAddresses.begin() ; endAddressIt != endAddresses.end() ; ++endAddressIt) {
-//		string address = *endAddressIt;
-//		if (std::find(startAddresses.begin(),startAddresses.end(),address) != startAddresses.end()) {
-//			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end()) {
-//				_engines->addCurve(boxID,address);
-//                std::cout<<" add2 > "<<address;
-//			}
-//		}
-//		else {
-//			if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) != curvesAddresses.end()) {
-//				_engines->removeCurve(boxID,address);
-//			}
-//		}
-//	}
-//    std::cout<<" ;"<<std::endl;
-//}
 
 void
 Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, const vector<string> &endMsgs)
@@ -907,13 +892,13 @@ bool Maquette::updateBox(unsigned int boxID, const Coords &coord) {
 		BasicBox *box = _boxes[boxID];
 		if (moveAccepted = _engines->performBoxEditing(boxID, coord.topLeftX * MaquetteScene::MS_PER_PIXEL,
 				coord.topLeftX * MaquetteScene::MS_PER_PIXEL +
-				coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
+                coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
 			box->setRelativeTopLeft(QPoint(coord.topLeftX,coord.topLeftY));
 			box->setSize(QPoint(coord.sizeX,coord.sizeY));
 			box->setPos(box->getCenter());
 			box->update();
 		}
-		else {
+        else {
 			box->setRelativeTopLeft(QPoint(_engines->getBoxBeginTime(boxID)/MaquetteScene::MS_PER_PIXEL,
 					box->getTopLeft().y()));
 			box->setSize(QPoint((_engines->getBoxEndTime(boxID)/MaquetteScene::MS_PER_PIXEL -
@@ -933,8 +918,10 @@ bool Maquette::updateBox(unsigned int boxID, const Coords &coord) {
 #ifdef DEBUG
 			std::cerr << "Maquette::updateBoxes : box moved : " << *it << std::endl;
 #endif
-			if (_boxes[*it]->relativeBeginPos() != _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL ||
-					(_engines->getBoxEndTime(*it)/MaquetteScene::MS_PER_PIXEL - _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL) != _boxes[*it]->width()) {
+            if ((_boxes[*it]->relativeBeginPos() != _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL ||
+                 (_engines->getBoxEndTime(*it)/MaquetteScene::MS_PER_PIXEL - _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL) != _boxes[*it]->width())&& _engines->getBoxBeginTime(*it)) {
+
+
 				_boxes[*it]->setRelativeTopLeft(QPoint(_engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL,
 						_boxes[*it]->getTopLeft().y()));
 				_boxes[*it]->setSize(QPoint((_engines->getBoxEndTime(*it)/MaquetteScene::MS_PER_PIXEL -
@@ -1168,9 +1155,9 @@ Maquette::updateBoxesFromEngines(const vector<unsigned int> &movedBoxes)
 {
 	vector<unsigned int>::const_iterator it;
 	if (!movedBoxes.empty()) {
-		for (it = movedBoxes.begin() ; it != movedBoxes.end() ; it++) {
-			if (_boxes[*it]->relativeBeginPos() != _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL ||
-					(_engines->getBoxEndTime(*it)/MaquetteScene::MS_PER_PIXEL - _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL) != _boxes[*it]->width()) {
+        for (it = movedBoxes.begin() ; it != movedBoxes.end() ; it++) {
+            if ((_boxes[*it]->relativeBeginPos() != _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL ||
+                    (_engines->getBoxEndTime(*it)/MaquetteScene::MS_PER_PIXEL - _engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL) != _boxes[*it]->width())) {
 				_boxes[*it]->setRelativeTopLeft(QPoint(_engines->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL,
 						_boxes[*it]->getTopLeft().y()));
 				_boxes[*it]->setSize(QPoint((_engines->getBoxEndTime(*it)/MaquetteScene::MS_PER_PIXEL -
@@ -1307,11 +1294,11 @@ Maquette::changeRelationBounds(unsigned int relID, const float &minBound, const 
 	vector<unsigned int> movedBoxes;
 	int minBoundMS = NO_BOUND;
 	if (minBound != NO_BOUND) {
-		minBoundMS = minBound * MaquetteScene::MS_PER_PIXEL;
+        minBoundMS = minBound * (MaquetteScene::MS_PER_PIXEL*_scene->zoom());
 	}
 	int maxBoundMS = NO_BOUND;
 	if (maxBound != NO_BOUND) {
-		maxBoundMS = maxBound * MaquetteScene::MS_PER_PIXEL;
+        maxBoundMS = maxBound * (MaquetteScene::MS_PER_PIXEL*_scene->zoom());
 	}
 	_engines->changeTemporalRelationBounds(relID,minBoundMS,maxBoundMS,movedBoxes);
 	updateBoxesFromEngines(movedBoxes);
@@ -1344,12 +1331,25 @@ Maquette::getProgression(unsigned int boxID)
 
 void
 Maquette::setGotoValue(int gotoValue) {
-	_engines->setGotoValue(gotoValue);
+//    std::cout<<"GOTO "<<gotoValue<<std::endl;
+//    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
+//        unsigned int boxID = it->first;
+//        std::cout<<" "<<boxID<<" "<< _engines->getBoxBeginTime(boxID)<<" " <<_engines->getBoxEndTime(boxID)<<std::endl;
+//        if(_engines->getBoxBeginTime(boxID)<gotoValue){
+//            std::cout<<"MUTED "<<std::endl;
+//            _engines->setCtrlPointMutingState(boxID,1,true);
+//        }
+//        else{
+//            _engines->setCtrlPointMutingState(boxID,1,true);
+//        }
+//    }
+    _scene->view()->setGotoValue(gotoValue);
+    _engines->setGotoValue(gotoValue);
 }
 
 void
 Maquette::generateTriggerQueue(){
-    _scene->_triggersQueueList.clear();
+    _scene->triggersQueueList().clear();
     TrgPntMap::iterator it1;
     for(it1=_triggerPoints.begin() ; it1!=_triggerPoints.end() ; ++it1){
         _scene->addToTriggerQueue(it1->second);
@@ -1357,17 +1357,93 @@ Maquette::generateTriggerQueue(){
 }
 
 void
+Maquette::initSceneState(){
+    //Pour palier au bug du moteur (qui envoyait tous les messages début et fin de toutes les boîtes < Goto)
+
+    double gotoValue = (double)_engines->getGotoValue();
+    unsigned int boxID;
+    QMap<QString,QPair<QString,unsigned int> > msgs, boxMsgs;
+    QList<QString> boxAddresses;
+    BasicBox *currentBox;
+    std::vector<string> curvesList;
+
+    //Pour toutes les boîtes avant le goto, on récupère leur état final (on simule leur exécution)
+    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
+        boxID = it->first;
+        currentBox = (*it).second;
+
+        //réinit : On démute toutes les boîtes, elles ont potentiellement pu être mutées  à la fin de l'algo
+        _engines->setCtrlPointMutingState(boxID,1,false);
+        _engines->setCtrlPointMutingState(boxID,2,false);
+
+        if(currentBox->date() < gotoValue && (currentBox->date()+currentBox->duration()) < gotoValue ){
+
+            boxMsgs = currentBox->getFinalState();
+
+        }
+        else
+            //goto au milieu d'une boîte : On envoie la valeur du début de boîte
+            if(gotoValue > currentBox->date() && gotoValue < (currentBox->date()+currentBox->duration())){
+                boxMsgs = currentBox->getStartState();
+                curvesList = _engines->getCurvesAddress(boxID);
+            }
+
+        boxAddresses = boxMsgs.keys();
+
+            //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
+            for(QList<QString>::iterator it2 = boxAddresses.begin() ; it2!=boxAddresses.end() ; it2++){
+                if(msgs.contains(*it2)){
+                    if(msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second < gotoValue)
+                        msgs.insert(*it2,boxMsgs.value(*it2));
+                }
+                //sinon on ajoute dans la liste de messages
+                else
+                    if(boxMsgs.value(*it2).second < gotoValue)
+                        msgs.insert(*it2,boxMsgs.value(*it2));
+            }
+
+            //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
+            //    Start messages
+                _engines->setCtrlPointMutingState(boxID,1,true);
+            //    End messages
+            if(currentBox->date()+currentBox->duration()<gotoValue)
+                _engines->setCtrlPointMutingState(boxID,2,true);
+
+            //On supprime les messages si ils sont déjà associés à une courbe (le moteur les envoie automatiquement)
+            for (int i=0 ; i<curvesList.size() ; i++)
+                msgs.remove(QString::fromStdString(curvesList[i]));
+        }
+
+    //traduction en QMap<QString,QString>, on supprime le champs date des messages
+    QList<QString> addresses = msgs.keys();
+
+    QString message;
+    for(QList<QString>::iterator it = addresses.begin() ; it != addresses.end() ; it++){
+         message = *it+" "+msgs.value(*it).first;
+         sendMessage(message.toStdString());         
+    }
+
+
+}
+
+void
+Maquette::pause(){
+    _engines->pause(true);
+}
+
+void
 Maquette::startPlaying()
 {
+    _engines->pause(false);
     double gotoValue = (double)_engines->getGotoValue();
-
+    initSceneState();
     generateTriggerQueue();
-    int nbTrg = _scene->_triggersQueueList.size();
+    int nbTrg = _scene->triggersQueueList().size();
 
     try{
         for(int i=0 ; i<nbTrg ; i++){
-            if( gotoValue >= _scene->_triggersQueueList.first()->date() ){
-                _scene->_triggersQueueList.removeFirst();
+            if( gotoValue >= _scene->triggersQueueList().first()->date() ){
+                _scene->triggersQueueList().removeFirst();
             }
             else
                 break;
@@ -1377,342 +1453,389 @@ Maquette::startPlaying()
        std::cerr << e.what();
    }
 
-	for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
-		it->second->lock();
-		if (it->second->type() == SOUND_BOX_TYPE) {
-			if (it->second->date() >= _engines->getGotoValue()) {
+    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
+        it->second->lock();
+        if (it->second->type() == SOUND_BOX_TYPE) {
+            if (it->second->date() >= _engines->getGotoValue()) {
                 sendMessage(static_cast<SoundBox*>(it->second)->getPalette().toString());
-			}
-		}
-	}
-
+            }
+        }
+    }
     _engines->play();
 }
 
 void
-Maquette::stopPlaying()
+Maquette::stopPlayingGotoStart()
 {
-	for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
-		it->second->unlock();
-	}
+    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
+        it->second->unlock();
+    }
 
-	_engines->stop();
+    _engines->stop();
 
-	BoxesMap::iterator it;
-	for (it = _boxes.begin() ; it != _boxes.end() ; it++) {
-		int type = it->second->type();
-		if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+    BoxesMap::iterator it;
+    for (it = _boxes.begin() ; it != _boxes.end() ; it++) {
+        int type = it->second->type();
+        if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
             static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
-		}
-	}
-    _scene->getTriggersQueueList().clear();
+        }
+    }
+    _scene->triggersQueueList().clear();
+
+    setGotoValue(0);
+}
+
+void
+Maquette::stopPlaying(){
+    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
+        it->second->unlock();
+    }
+    _engines->stop();
+
+    BoxesMap::iterator it;
+    for (it = _boxes.begin() ; it != _boxes.end() ; it++) {
+        int type = it->second->type();
+        if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+            static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
+        }
+    }
+    _scene->triggersQueueList().clear();
+}
+
+void
+Maquette::stopPlayingWithGoto()
+{
+    unsigned int gotoValue = _scene->getCurrentTime();
+    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
+        it->second->unlock();
+    }
+    _engines->stop();
+
+    BoxesMap::iterator it;
+    for (it = _boxes.begin() ; it != _boxes.end() ; it++) {
+        int type = it->second->type();
+        if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+            static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
+        }
+    }
+    _scene->triggersQueueList().clear();
+    setGotoValue(gotoValue);
 }
 
 void
 Maquette::saveBox(unsigned int boxID)
 {
-	// TODO : handle others boxes further attributes during save
-	QString boxType = "unknown";
-	if (_boxes[boxID]->type() == SOUND_BOX_TYPE) {
-		boxType = QString("sound");
-	}
-	else if (_boxes[boxID]->type() == CONTROL_BOX_TYPE) {
-		boxType = QString("control");
-	}
-	else if (_boxes[boxID]->type() == PARENT_BOX_TYPE) {
-		boxType = QString("parent");
-	}
-	else {
-		boxType = QString("unknown");
-	}
+    // TODO : handle others boxes further attributes during save
+    QString boxType = "unknown";
+    if (_boxes[boxID]->type() == SOUND_BOX_TYPE) {
+        boxType = QString("sound");
+    }
+    else if (_boxes[boxID]->type() == CONTROL_BOX_TYPE) {
+        boxType = QString("control");
+    }
+    else if (_boxes[boxID]->type() == PARENT_BOX_TYPE) {
+        boxType = QString("parent");
+    }
+    else {
+        boxType = QString("unknown");
+    }
 
-	/* Provided for convenience */
-	BasicBox *box = _boxes[boxID];
-	QPointF topLeft = box->getTopLeft();
-	QPointF size = box->getSize();
-	QColor color = box->color();
-	QString name = box->name();
-	int mother = box->mother();
+    /* Provided for convenience */
+    BasicBox *box = _boxes[boxID];
+    unsigned int date = box->date();
+    unsigned int duration = box->duration();
+    unsigned int topLeftY = box->getTopLeft().y();
+    unsigned int sizeY = box->getSize().y();
+    QColor color = box->color();
+    QString name = box->name();
+    int mother = box->mother();
 
-	// root node
-	QDomElement root = _doc->documentElement();
-	QDomElement boxNode = _doc->createElement("box");
-	root.firstChild().appendChild(boxNode);
+    // root node
+    QDomElement root = _doc->documentElement();
+    QDomElement boxNode = _doc->createElement("box");
+    root.firstChild().appendChild(boxNode);
 
-	boxNode.setAttribute("type",boxType);
-	boxNode.setAttribute("ID",boxID);
-	boxNode.setAttribute("name",name);
-	boxNode.setAttribute("mother",mother);
+    boxNode.setAttribute("type",boxType);
+    boxNode.setAttribute("ID",boxID);
+    boxNode.setAttribute("name",name);
+    boxNode.setAttribute("mother",mother);
 
-	QDomElement positionNode = _doc->createElement("position");
+    QDomElement positionNode = _doc->createElement("position");
 
-	QDomElement topLeftNode = _doc->createElement("top-left");
-	topLeftNode.setAttribute("x",topLeft.x());
-	topLeftNode.setAttribute("y",topLeft.y());
+    QDomElement dateNode = _doc->createElement("date");
+    dateNode.setAttribute("begin",date);
+    dateNode.setAttribute("duration",duration);
 
-	QDomElement sizeNode = _doc->createElement("size");
-	sizeNode.setAttribute("x",size.x());
-	sizeNode.setAttribute("y",size.y());
+    QDomElement topLeftNode = _doc->createElement("top-left");
+    topLeftNode.setAttribute("y",topLeftY);
 
-	positionNode.appendChild(topLeftNode);
-	positionNode.appendChild(sizeNode);
+    QDomElement sizeNode = _doc->createElement("size");
+    sizeNode.setAttribute("y",sizeY);
 
-	boxNode.appendChild(positionNode);
+    positionNode.appendChild(dateNode);
+    positionNode.appendChild(topLeftNode);
+    positionNode.appendChild(sizeNode);
 
-	QDomElement colorNode = _doc->createElement("color");
-	colorNode.setAttribute("red",color.redF());
-	colorNode.setAttribute("green",color.greenF());
-	colorNode.setAttribute("blue",color.blueF());
+    boxNode.appendChild(positionNode);
 
-	boxNode.appendChild(colorNode);
+    QDomElement colorNode = _doc->createElement("color");
+    colorNode.setAttribute("red",color.red());
+    colorNode.setAttribute("green",color.green());
+    colorNode.setAttribute("blue",color.blue());
 
-	if (boxType == "sound") {
-		Palette pal = static_cast<SoundBox*>(box)->getPalette();
-		QString soundFile = static_cast<SoundBox*>(box)->soundSelected();
-		QDomElement attributesNode = _doc->createElement("attributes");
-		QDomElement dynamicNode = _doc->createElement("dynamic");
-		dynamicNode.setAttribute("shape",pal.shape());
-		attributesNode.appendChild(dynamicNode);
-		QDomElement rythmNode = _doc->createElement("rythm");
-		rythmNode.setAttribute("speed",pal.speed());
-		rythmNode.setAttribute("speed-variation",pal.speedVariation());
-		rythmNode.setAttribute("grain",pal.grain());
-		attributesNode.appendChild(rythmNode);
-		QDomElement melodicNode = _doc->createElement("melodic");
-		melodicNode.setAttribute("pitch-start",pal.pitchStart());
-		melodicNode.setAttribute("pitch-random",pal.pitchRandom());
-		melodicNode.setAttribute("pitch-vibrato",pal.pitchVibrato());
-		melodicNode.setAttribute("pitch-end",pal.pitchEnd());
-		melodicNode.setAttribute("pitch-amplitude",pal.pitchAmplitude());
-		melodicNode.setAttribute("pitch-grade",pal.pitchGrade());
-		attributesNode.appendChild(melodicNode);
-		QDomElement harmonicNode = _doc->createElement("harmonic");
-		harmonicNode.setAttribute("harmony",pal.harmo());
-		harmonicNode.setAttribute("harmony-variation",pal.harmoVariation());
-		attributesNode.appendChild(harmonicNode);
-		QDomElement impulsiveNode = _doc->createElement("impulsive");
-		impulsiveNode.setAttribute("state",pal.impulsive());
-		attributesNode.appendChild(impulsiveNode);
-		QDomElement soundNode = _doc->createElement("sound");
-		soundNode.setAttribute("mode",pal.playingMode());
-		soundNode.setAttribute("file",soundFile);
-		attributesNode.appendChild(soundNode);
-		boxNode.appendChild(attributesNode);
-	}
+    boxNode.appendChild(colorNode);
 
-	//return true;
+    if (boxType == "sound") {
+        Palette pal = static_cast<SoundBox*>(box)->getPalette();
+        QString soundFile = static_cast<SoundBox*>(box)->soundSelected();
+        QDomElement attributesNode = _doc->createElement("attributes");
+        QDomElement dynamicNode = _doc->createElement("dynamic");
+        dynamicNode.setAttribute("shape",pal.shape());
+        attributesNode.appendChild(dynamicNode);
+        QDomElement rythmNode = _doc->createElement("rythm");
+        rythmNode.setAttribute("speed",pal.speed());
+        rythmNode.setAttribute("speed-variation",pal.speedVariation());
+        rythmNode.setAttribute("grain",pal.grain());
+        attributesNode.appendChild(rythmNode);
+        QDomElement melodicNode = _doc->createElement("melodic");
+        melodicNode.setAttribute("pitch-start",pal.pitchStart());
+        melodicNode.setAttribute("pitch-random",pal.pitchRandom());
+        melodicNode.setAttribute("pitch-vibrato",pal.pitchVibrato());
+        melodicNode.setAttribute("pitch-end",pal.pitchEnd());
+        melodicNode.setAttribute("pitch-amplitude",pal.pitchAmplitude());
+        melodicNode.setAttribute("pitch-grade",pal.pitchGrade());
+        attributesNode.appendChild(melodicNode);
+        QDomElement harmonicNode = _doc->createElement("harmonic");
+        harmonicNode.setAttribute("harmony",pal.harmo());
+        harmonicNode.setAttribute("harmony-variation",pal.harmoVariation());
+        attributesNode.appendChild(harmonicNode);
+        QDomElement impulsiveNode = _doc->createElement("impulsive");
+        impulsiveNode.setAttribute("state",pal.impulsive());
+        attributesNode.appendChild(impulsiveNode);
+        QDomElement soundNode = _doc->createElement("sound");
+        soundNode.setAttribute("mode",pal.playingMode());
+        soundNode.setAttribute("file",soundFile);
+        attributesNode.appendChild(soundNode);
+        boxNode.appendChild(attributesNode);
+    }
+
+    //return true;
 }
 
 void
 Maquette::save(const string &fileName) {
-	_engines->store(fileName+".simone");
+    _engines->store(fileName+".simone");
 
-	QFile file(QString::fromStdString(fileName));
+    QFile file(QString::fromStdString(fileName));
 
-	if (!file.open(QFile::WriteOnly | QFile::Text)) {
-		_scene->displayMessage(((QString("Cannot write file %1:\n%2.")).arg(QString::fromStdString(fileName)).
-				arg(file.errorString())).toStdString(),WARNING_LEVEL);
-		//return false;
-	}
+    if (!file.open(QFile::WriteOnly | QFile::Text)) {
+        _scene->displayMessage(((QString("Cannot write file %1:\n%2.")).arg(QString::fromStdString(fileName)).
+                arg(file.errorString())).toStdString(),WARNING_LEVEL);
+        //return false;
+    }
 
-	QDomImplementation impl = QDomDocument().implementation();
+    QDomImplementation impl = QDomDocument().implementation();
 
-	QString publicId = "Acousmoscribe 2009";
-	QString systemId = "http://scrime.labri.fr";
-	QString typeId = "acousmoscribeSave";
-	_doc = new QDomDocument(impl.createDocumentType(typeId,publicId,systemId));
+    QString publicId = "i-score 2012";
+    QString systemId = "http://scrime.labri.fr";
+    QString typeId = "i-scoreSave";
+    _doc = new QDomDocument(impl.createDocumentType(typeId,publicId,systemId));
 
-	QDomElement root = _doc->createElement("GRAPHICS");
-	_doc->appendChild(root);
-	QDomElement boxesNode = _doc->createElement("boxes");
-	root.appendChild(boxesNode);
+    QDomElement root = _doc->createElement("GRAPHICS");
+    root.setAttribute("zoom",_scene->zoom());
+    root.setAttribute("centerX",_scene->view()->getCenterCoordinates().x());
+    root.setAttribute("centerY",_scene->view()->getCenterCoordinates().y());
+    _doc->appendChild(root);
+    QDomElement boxesNode = _doc->createElement("boxes");
+    root.appendChild(boxesNode);
 
-	QString boxType;
-	for(BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; ++it ) {
-		saveBox(it->first);
-	}
+    QString boxType;
+    for(BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; ++it ) {
+        saveBox(it->first);
+    }
 
-	QTextStream ts(&file);
-	ts << _doc->toString();
-	file.close();
+    QTextStream ts(&file);
+    ts << _doc->toString();
+    file.close();
 
-	delete _doc;
+    delete _doc;
 }
 
+
 void
-Maquette::load(const string &fileName){
-	_engines->load(fileName + ".simone");
+Maquette::loadOLD(const string &fileName){
+    _engines->load(fileName + ".simone");
     _engines->addCrossingCtrlPointCallback(&crossTransitionCallback);
-	_engines->addExecutionFinishedCallback(&executionFinishedCallback);
+    _engines->addExecutionFinishedCallback(&executionFinishedCallback);
 
-	QFile enginesFile(QString::fromStdString(fileName + ".simone"));
-	QFile file(QString::fromStdString(fileName));
+    QFile enginesFile(QString::fromStdString(fileName + ".simone"));
+    QFile file(QString::fromStdString(fileName));
 
-	_doc = new QDomDocument;
+    _doc = new QDomDocument;
 
-	if (enginesFile.open(QFile::ReadOnly)) {
-		if (!file.open(QFile::ReadOnly | QFile::Text)) {
-			_scene->displayMessage((tr("Cannot read file %1:\n%2.")
-					.arg(QString::fromStdString(fileName))
-					.arg(file.errorString())).toStdString(),
-					WARNING_LEVEL);
-			return;
-		}
-		else if (!_doc->setContent(&file)) {
-			_scene->displayMessage((tr("Cannot import xml document from %1:\n%2.")
-					.arg(QString::fromStdString(fileName))
-					.arg(file.errorString())).toStdString(),
-					WARNING_LEVEL);
-			file.close();
-			return;
-		}
-	}
-	else {
-		if (!file.open(QFile::ReadOnly | QFile::Text)) {
-			_scene->displayMessage((tr("Cannot read neither file %1 or %2 :\n%3.")
-					.arg(QString::fromStdString(fileName))
-					.arg(QString::fromStdString(fileName+".simone"))
-					.arg(file.errorString())).toStdString(),
-					WARNING_LEVEL);
-		}
-		else {
-			_scene->displayMessage((tr("Cannot read file %1 :\n%2.")
-					.arg(QString::fromStdString(fileName+".simone"))
-					.arg(file.errorString())).toStdString(),
-					WARNING_LEVEL);
-		}
-	}
+    if (enginesFile.open(QFile::ReadOnly)) {
+        if (!file.open(QFile::ReadOnly | QFile::Text)) {
+            _scene->displayMessage((tr("Cannot read file %1:\n%2.")
+                    .arg(QString::fromStdString(fileName))
+                    .arg(file.errorString())).toStdString(),
+                    WARNING_LEVEL);
+            return;
+        }
+        else if (!_doc->setContent(&file)) {
+            _scene->displayMessage((tr("Cannot import xml document from %1:\n%2.")
+                    .arg(QString::fromStdString(fileName))
+                    .arg(file.errorString())).toStdString(),
+                    WARNING_LEVEL);
+            file.close();
+            return;
+        }
+    }
+    else {
+        if (!file.open(QFile::ReadOnly | QFile::Text)) {
+            _scene->displayMessage((tr("Cannot read neither file %1 or %2 :\n%3.")
+                    .arg(QString::fromStdString(fileName))
+                    .arg(QString::fromStdString(fileName+".simone"))
+                    .arg(file.errorString())).toStdString(),
+                    WARNING_LEVEL);
+        }
+        else {
+            _scene->displayMessage((tr("Cannot read file %1 :\n%2.")
+                    .arg(QString::fromStdString(fileName+".simone"))
+                    .arg(file.errorString())).toStdString(),
+                    WARNING_LEVEL);
+        }
+    }
 
-	QDomElement root = _doc->documentElement();
-	if (root.tagName() != "GRAPHICS") {
-		_scene->displayMessage((tr("Unvailable xml document %1").
-				arg(QString::fromStdString(fileName))).toStdString(),
-				WARNING_LEVEL);
-		file.close();
-		return;
+    QDomElement root = _doc->documentElement();
+    if (root.tagName() != "GRAPHICS") {
+        _scene->displayMessage((tr("Unvailable xml document %1").
+                arg(QString::fromStdString(fileName))).toStdString(),
+                WARNING_LEVEL);
+        file.close();
+        return;
     }
 
     _scene->clear();
 
-	QPointF topLeft,size,bottomRight;
-	QString name,boxType,relType;
-	QColor color(1.,1.,1.);
-	Palette pal;
-	int boxID,motherID;
-	QMap<int,unsigned int> hashMap;
-	QDomNode mainNode = root.firstChild(); // Boxes
-	while (!mainNode.isNull()) {
-		QDomNode node1 = mainNode.firstChild(); // Box
-		while (!node1.isNull()) {
-			QDomElement elt1 = node1.toElement();
-			if (!elt1.isNull()) {
-				if (elt1.tagName() == "box") {
-					boxID = elt1.attribute("ID",QString("%1").arg(NO_ID)).toInt();
-					boxType = elt1.attribute("type","unknown");
-					name = elt1.attribute("name","unknown");
-					motherID = elt1.attribute("mother",QString("%1").arg(ROOT_BOX_ID)).toInt();
-				}
-				QDomNode node2 = node1.firstChild();
-				while (!node2.isNull()) {
-					QDomElement elt2 = node2.toElement();
-					if (!elt2.isNull()) {
-						if (elt2.tagName() == "color") {
-							color = QColor(elt2.attribute("red","1").toFloat() * 255,elt2.attribute("green","1").toFloat() * 255,
-									elt2.attribute("blue","1").toFloat() * 255);
-							pal.setColor(color);
-						}
-						QDomNode node3 = node2.firstChild();
-						while (!node3.isNull()) {
-							QDomElement elt3 = node3.toElement();
-							if (elt2.tagName() == "position") {
-								QPointF tmp(elt3.attribute("x","0").toInt(),elt3.attribute("y","0").toInt());
-								if (elt3.tagName() == "top-left") {
-									topLeft = tmp;
-								}
-								else if (elt3.tagName() == "size") {
-									size = tmp;
-								}
-							}
-							else if (elt2.tagName() == "attributes") {
-								if (elt3.tagName() == "dynamic")
-									pal.setShape(Shape(elt3.attribute("shape","0").toInt()));
-								else if (elt3.tagName() == "rythm") {
-									pal.setSpeed(Speed(elt3.attribute("speed","0").toInt()));
-									pal.setSpeedVariation(SpeedVariation(elt3.attribute("speed-variation","0").toInt()));
-									pal.setGrain(Grain(elt3.attribute("grain","0").toInt()));
-								}
-								else if (elt3.tagName() == "melodic") {
-									pal.setPitchStart(Pitch(elt3.attribute("pitch-start","0").toInt()));
-									pal.setPitchRandom(elt3.attribute("pitch-random","0").toInt() == 1);
-									pal.setPitchVibrato(elt3.attribute("pitch-vibrato","0").toInt() == 1);
-									pal.setPitchEnd(Pitch(elt3.attribute("pitch-end","0").toInt()));
-									pal.setPitchAmplitude(PitchVariation(elt3.attribute("pitch-amplitude","0").toInt()));
-									pal.setPitchGrade(PitchVariation(elt3.attribute("pitch-grade","0").toInt()));
-								}
-								else if (elt3.tagName() == "harmonic") {
-									pal.setHarmo(Harmo(elt3.attribute("harmony","0").toInt()));
-									pal.setHarmoVariation(HarmoVariation(elt3.attribute("harmony-variation","0").toInt()));
-								}
-								else if (elt3.tagName() == "impulsive") {
-									pal.setImpulsive(elt3.attribute("state","0").toInt() == 1);
-								}
-								else if (elt3.tagName() == "sound") {
-									pal.setPlayingMode((PlayingMode)(elt3.attribute("mode","0").toInt()));
-									QString file = elt3.attribute("file","");
-									if (pal.playingMode() == FileMode) {
-										if (QFile(file).exists()) {
-											pal.setSoundFile(file);
-										}
-										else {
-											pal.setSoundFile("");
-											_scene->displayMessage((QString("Unvalid sound directory \"%1\" in box \"%2\"").
-													arg(file).arg(name)).toStdString(),WARNING_LEVEL);
-										}
-									}
-								}
-								// TODO : handle other boxes' attributes
-							}
-							node3 = node3.nextSibling();
-						}
-					}
-					node2 = node2.nextSibling();
-				}
-			}
-			if (!elt1.isNull()) {
-				if (elt1.tagName() == "box") {
-					if (boxType != "unknown") {
-						bottomRight = topLeft + size;
-						unsigned int ID = NO_ID;
-						if (boxType == "sound") {
-							pal.setColor(color);
-							ID = addSoundBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),pal,motherID);
-							_scene->addSoundBox(ID);
-						}
+    QPointF topLeft,size,bottomRight;    
+    QString name,boxType,relType;
+    QColor color(1.,1.,1.);
+    Palette pal;
+    int boxID,motherID;
+    QMap<int,unsigned int> hashMap;
+    QDomNode mainNode = root.firstChild(); // Boxes
+    while (!mainNode.isNull()) {
+        QDomNode node1 = mainNode.firstChild(); // Box
+        while (!node1.isNull()) {
+            QDomElement elt1 = node1.toElement();
+            if (!elt1.isNull()) {
+                if (elt1.tagName() == "box") {
+                    boxID = elt1.attribute("ID",QString("%1").arg(NO_ID)).toInt();
+                    boxType = elt1.attribute("type","unknown");
+                    name = elt1.attribute("name","unknown");
+                    motherID = elt1.attribute("mother",QString("%1").arg(ROOT_BOX_ID)).toInt();
+                }
+                QDomNode node2 = node1.firstChild();
+                while (!node2.isNull()) {
+                    QDomElement elt2 = node2.toElement();
+                    if (!elt2.isNull()) {
+                        if (elt2.tagName() == "color") {
+                            color = QColor(elt2.attribute("red","1").toFloat() * 255,elt2.attribute("green","1").toFloat() * 255,
+                                    elt2.attribute("blue","1").toFloat() * 255);
+                            pal.setColor(color);
+                        }
+                        QDomNode node3 = node2.firstChild();
+                        while (!node3.isNull()) {
+                            QDomElement elt3 = node3.toElement();
+                            if (elt2.tagName() == "position") {
+                                QPointF tmp(elt3.attribute("x","0").toInt(),elt3.attribute("y","0").toInt());
+                                if (elt3.tagName() == "top-left") {
+                                    topLeft = tmp;
+                                }
+                                else if (elt3.tagName() == "size") {
+                                    size = tmp;
+                                }
+                            }
+                            else if (elt2.tagName() == "attributes") {
+                                if (elt3.tagName() == "dynamic")
+                                    pal.setShape(Shape(elt3.attribute("shape","0").toInt()));
+                                else if (elt3.tagName() == "rythm") {
+                                    pal.setSpeed(Speed(elt3.attribute("speed","0").toInt()));
+                                    pal.setSpeedVariation(SpeedVariation(elt3.attribute("speed-variation","0").toInt()));
+                                    pal.setGrain(Grain(elt3.attribute("grain","0").toInt()));
+                                }
+                                else if (elt3.tagName() == "melodic") {
+                                    pal.setPitchStart(Pitch(elt3.attribute("pitch-start","0").toInt()));
+                                    pal.setPitchRandom(elt3.attribute("pitch-random","0").toInt() == 1);
+                                    pal.setPitchVibrato(elt3.attribute("pitch-vibrato","0").toInt() == 1);
+                                    pal.setPitchEnd(Pitch(elt3.attribute("pitch-end","0").toInt()));
+                                    pal.setPitchAmplitude(PitchVariation(elt3.attribute("pitch-amplitude","0").toInt()));
+                                    pal.setPitchGrade(PitchVariation(elt3.attribute("pitch-grade","0").toInt()));
+                                }
+                                else if (elt3.tagName() == "harmonic") {
+                                    pal.setHarmo(Harmo(elt3.attribute("harmony","0").toInt()));
+                                    pal.setHarmoVariation(HarmoVariation(elt3.attribute("harmony-variation","0").toInt()));
+                                }
+                                else if (elt3.tagName() == "impulsive") {
+                                    pal.setImpulsive(elt3.attribute("state","0").toInt() == 1);
+                                }
+                                else if (elt3.tagName() == "sound") {
+                                    pal.setPlayingMode((PlayingMode)(elt3.attribute("mode","0").toInt()));
+                                    QString file = elt3.attribute("file","");
+                                    if (pal.playingMode() == FileMode) {
+                                        if (QFile(file).exists()) {
+                                            pal.setSoundFile(file);
+                                        }
+                                        else {
+                                            pal.setSoundFile("");
+                                            _scene->displayMessage((QString("Unvalid sound directory \"%1\" in box \"%2\"").
+                                                    arg(file).arg(name)).toStdString(),WARNING_LEVEL);
+                                        }
+                                    }
+                                }
+                                // TODO : handle other boxes' attributes
+                            }
+                            node3 = node3.nextSibling();
+                        }
+                    }
+                    node2 = node2.nextSibling();
+                }
+            }
+            if (!elt1.isNull()) {
+                if (elt1.tagName() == "box") {
+                    if (boxType != "unknown") {
+                        bottomRight = topLeft + size;
+                        unsigned int ID = NO_ID;
+                        if (boxType == "sound") {
+                            pal.setColor(color);
+                            ID = addSoundBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),pal,motherID);
+                            _scene->addSoundBox(ID);
+                        }
                         else if (boxType == "control") {
-							ID = addControlBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);
+                            ID = addControlBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);
                             _scene->addControlBox(ID);
                             _scene->getBox(ID)->updateWidgets();
                             //OPEN FILE
-						}
-						else if (boxType == "parent") {
-							ID = addParentBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);
-							_scene->addParentBox(ID);
-						}
-						else {
-							_scene->displayMessage((QString("Unavailable box type through loading %1")
-									.arg(QString::fromStdString(fileName))).toStdString(),
-									WARNING_LEVEL);
-						}
-					}
-				}
-			}
-			node1 = node1.nextSibling(); // next Box
-		}
-		mainNode = mainNode.nextSibling();
-	}
+                        }
+                        else if (boxType == "parent") {
+                            ID = addParentBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);
+                            _scene->addParentBox(ID);
+                        }
+                        else {
+                            _scene->displayMessage((QString("Unavailable box type through loading %1")
+                                    .arg(QString::fromStdString(fileName))).toStdString(),
+                                    WARNING_LEVEL);
+                        }
+                    }
+                }
+            }
+            node1 = node1.nextSibling(); // next Box
+        }
+        mainNode = mainNode.nextSibling();
+    }
 
-	vector<unsigned int> boxesID;
-	_engines->getBoxesId(boxesID);
+    vector<unsigned int> boxesID;
+    _engines->getBoxesId(boxesID);
     vector<unsigned int>::iterator it;
 
     /************************ TRIGGER ************************/
@@ -1764,58 +1887,357 @@ Maquette::load(const string &fileName){
     }
 
     /************************ RELATIONS ************************/
-	vector<unsigned int> relationsID;
-	_engines->getRelationsId(relationsID);
+    vector<unsigned int> relationsID;
+    _engines->getRelationsId(relationsID);
 
 
-	for (it = relationsID.begin() ; it != relationsID.end() ; it++) {
-		AbstractRelation abstractRel;
-		unsigned int firstBoxID = _engines->getRelationFirstBoxId(*it);
-		unsigned int secondBoxID = _engines->getRelationSecondBoxId(*it);
-		if (firstBoxID != NO_ID && firstBoxID != ROOT_BOX_ID && secondBoxID != NO_ID
-				&& secondBoxID != ROOT_BOX_ID && firstBoxID != secondBoxID) {
-			abstractRel.setFirstBox(firstBoxID);
-			abstractRel.setSecondBox(secondBoxID);
-			switch (_engines->getRelationFirstCtrlPointIndex(*it)) {
-			case BEGIN_CONTROL_POINT_INDEX :
-				abstractRel.setFirstExtremity(BOX_START);
-				break;
-			case END_CONTROL_POINT_INDEX :
-				abstractRel.setFirstExtremity(BOX_END);
-				break;
-			}
-			switch (_engines->getRelationSecondCtrlPointIndex(*it)) {
-			case BEGIN_CONTROL_POINT_INDEX :
-				abstractRel.setSecondExtremity(BOX_START);
-				break;
-			case END_CONTROL_POINT_INDEX :
-				abstractRel.setSecondExtremity(BOX_END);
-				break;
-			}
-			int minBoundMS = _engines->getRelationMinBound(*it);
-			float minBoundPXL = NO_BOUND;
-			if (minBoundMS != NO_BOUND) {
-				minBoundPXL = (float)minBoundMS/MaquetteScene::MS_PER_PIXEL;
-			}
-			int maxBoundMS = _engines->getRelationMaxBound(*it);
-			float maxBoundPXL = NO_BOUND;
-			if (maxBoundMS != NO_BOUND) {
-				maxBoundPXL = (float)maxBoundMS/MaquetteScene::MS_PER_PIXEL;
-			}
-			abstractRel.setMinBound(minBoundPXL);
-			abstractRel.setMaxBound(maxBoundPXL);
-			abstractRel.setID(*it);
+    for (it = relationsID.begin() ; it != relationsID.end() ; it++) {
+        AbstractRelation abstractRel;
+        unsigned int firstBoxID = _engines->getRelationFirstBoxId(*it);
+        unsigned int secondBoxID = _engines->getRelationSecondBoxId(*it);
+        if (firstBoxID != NO_ID && firstBoxID != ROOT_BOX_ID && secondBoxID != NO_ID
+                && secondBoxID != ROOT_BOX_ID && firstBoxID != secondBoxID) {
+            abstractRel.setFirstBox(firstBoxID);
+            abstractRel.setSecondBox(secondBoxID);
+            switch (_engines->getRelationFirstCtrlPointIndex(*it)) {
+            case BEGIN_CONTROL_POINT_INDEX :
+                abstractRel.setFirstExtremity(BOX_START);
+                break;
+            case END_CONTROL_POINT_INDEX :
+                abstractRel.setFirstExtremity(BOX_END);
+                break;
+            }
+            switch (_engines->getRelationSecondCtrlPointIndex(*it)) {
+            case BEGIN_CONTROL_POINT_INDEX :
+                abstractRel.setSecondExtremity(BOX_START);
+                break;
+            case END_CONTROL_POINT_INDEX :
+                abstractRel.setSecondExtremity(BOX_END);
+                break;
+            }
+            int minBoundMS = _engines->getRelationMinBound(*it);
+            float minBoundPXL = NO_BOUND;
+            if (minBoundMS != NO_BOUND) {
+                minBoundPXL = (float)minBoundMS/MaquetteScene::MS_PER_PIXEL;
+            }
+            int maxBoundMS = _engines->getRelationMaxBound(*it);
+            float maxBoundPXL = NO_BOUND;
+            if (maxBoundMS != NO_BOUND) {
+                maxBoundPXL = (float)maxBoundMS/MaquetteScene::MS_PER_PIXEL;
+            }
+            abstractRel.setMinBound(minBoundPXL);
+            abstractRel.setMaxBound(maxBoundPXL);
+            abstractRel.setID(*it);
             addRelation(abstractRel);
-		}
-	}
+        }
+    }
 
 
-	delete _doc;
+    delete _doc;
+}
+
+void
+Maquette::load(const string &fileName){
+    _engines->load(fileName + ".simone");
+    _engines->addCrossingCtrlPointCallback(&crossTransitionCallback);
+    _engines->addExecutionFinishedCallback(&executionFinishedCallback);
+
+    QFile enginesFile(QString::fromStdString(fileName + ".simone"));
+    QFile file(QString::fromStdString(fileName));
+
+    _doc = new QDomDocument;
+
+    if (enginesFile.open(QFile::ReadOnly)) {
+        if (!file.open(QFile::ReadOnly | QFile::Text)) {
+            _scene->displayMessage((tr("Cannot read file %1:\n%2.")
+                    .arg(QString::fromStdString(fileName))
+                    .arg(file.errorString())).toStdString(),
+                    WARNING_LEVEL);
+            return;
+        }
+        else if (!_doc->setContent(&file)) {
+            _scene->displayMessage((tr("Cannot import xml document from %1:\n%2.")
+                    .arg(QString::fromStdString(fileName))
+                    .arg(file.errorString())).toStdString(),
+                    WARNING_LEVEL);
+            file.close();
+            return;
+        }
+    }
+    else {
+        if (!file.open(QFile::ReadOnly | QFile::Text)) {
+            _scene->displayMessage((tr("Cannot read neither file %1 or %2 :\n%3.")
+                    .arg(QString::fromStdString(fileName))
+                    .arg(QString::fromStdString(fileName+".simone"))
+                    .arg(file.errorString())).toStdString(),
+                    WARNING_LEVEL);
+        }
+        else {
+            _scene->displayMessage((tr("Cannot read file %1 :\n%2.")
+                    .arg(QString::fromStdString(fileName+".simone"))
+                    .arg(file.errorString())).toStdString(),
+                    WARNING_LEVEL);
+        }
+    }
+
+    if(_doc->doctype().nodeName()!="i-scoreSave"){
+        loadOLD(fileName);
+        return;
+    }
+
+    QDomElement root = _doc->documentElement();
+    if (root.tagName() != "GRAPHICS") {
+        _scene->displayMessage((tr("Unvailable xml document %1").
+                arg(QString::fromStdString(fileName))).toStdString(),
+                WARNING_LEVEL);
+        file.close();
+        return;
+    }
+
+    _scene->clear();
+
+    QPointF topLeft,size,bottomRight;
+    unsigned int begin,duration,topLeftY,sizeY;
+    QString name,boxType,relType;
+    QColor color(1.,1.,1.);
+    Palette pal;
+    int boxID,motherID;
+    float zoom;
+    QPointF centerCoordinates;
+
+    zoom = root.attribute("zoom","1").toFloat();
+    centerCoordinates = QPointF(root.attribute("centerX","0.").toFloat(),root.attribute("centerY","0.").toFloat());
+
+    _scene->view()->setZoom(zoom);
+    _scene->view()->centerOn(centerCoordinates);
+
+    QMap<int,unsigned int> hashMap;
+    QDomNode mainNode = root.firstChild(); // Boxes
+    while (!mainNode.isNull()) {
+        QDomNode node1 = mainNode.firstChild(); // Box
+        while (!node1.isNull()) {
+            QDomElement elt1 = node1.toElement();
+            if (!elt1.isNull()) {
+                if (elt1.tagName() == "box") {
+                    boxID = elt1.attribute("ID",QString("%1").arg(NO_ID)).toInt();
+                    boxType = elt1.attribute("type","unknown");
+                    name = elt1.attribute("name","unknown");
+                    motherID = elt1.attribute("mother",QString("%1").arg(ROOT_BOX_ID)).toInt();
+                }
+                QDomNode node2 = node1.firstChild();
+                while (!node2.isNull()) {
+                    QDomElement elt2 = node2.toElement();
+                    if (!elt2.isNull()) {
+                        if (elt2.tagName() == "color") {
+                            color = QColor(elt2.attribute("red","1").toInt(),elt2.attribute("green","1").toInt(),
+                                    elt2.attribute("blue","1").toInt());
+                            pal.setColor(color);
+                        }
+                        QDomNode node3 = node2.firstChild();
+                        while (!node3.isNull()) {
+                            QDomElement elt3 = node3.toElement();
+                            if (elt2.tagName() == "position") {
+                                QPointF tmp(elt3.attribute("x","0").toInt(),elt3.attribute("y","0").toInt());
+                                if (elt3.tagName() == "date") {
+                                    begin = elt3.attribute("begin","0").toInt();
+                                    duration = elt3.attribute("duration","0").toInt();
+                                }
+                                else if (elt3.tagName() == "top-left") {
+                                    topLeftY = sizeY = elt3.attribute("y","0").toInt();
+                                }
+                                else if (elt3.tagName() == "size") {
+                                    sizeY = elt3.attribute("y","0").toInt();
+                                }
+                            }
+                            else if (elt2.tagName() == "attributes") {
+                                if (elt3.tagName() == "dynamic")
+                                    pal.setShape(Shape(elt3.attribute("shape","0").toInt()));
+                                else if (elt3.tagName() == "rythm") {
+                                    pal.setSpeed(Speed(elt3.attribute("speed","0").toInt()));
+                                    pal.setSpeedVariation(SpeedVariation(elt3.attribute("speed-variation","0").toInt()));
+                                    pal.setGrain(Grain(elt3.attribute("grain","0").toInt()));
+                                }
+                                else if (elt3.tagName() == "melodic") {
+                                    pal.setPitchStart(Pitch(elt3.attribute("pitch-start","0").toInt()));
+                                    pal.setPitchRandom(elt3.attribute("pitch-random","0").toInt() == 1);
+                                    pal.setPitchVibrato(elt3.attribute("pitch-vibrato","0").toInt() == 1);
+                                    pal.setPitchEnd(Pitch(elt3.attribute("pitch-end","0").toInt()));
+                                    pal.setPitchAmplitude(PitchVariation(elt3.attribute("pitch-amplitude","0").toInt()));
+                                    pal.setPitchGrade(PitchVariation(elt3.attribute("pitch-grade","0").toInt()));
+                                }
+                                else if (elt3.tagName() == "harmonic") {
+                                    pal.setHarmo(Harmo(elt3.attribute("harmony","0").toInt()));
+                                    pal.setHarmoVariation(HarmoVariation(elt3.attribute("harmony-variation","0").toInt()));
+                                }
+                                else if (elt3.tagName() == "impulsive") {
+                                    pal.setImpulsive(elt3.attribute("state","0").toInt() == 1);
+                                }
+                                else if (elt3.tagName() == "sound") {
+                                    pal.setPlayingMode((PlayingMode)(elt3.attribute("mode","0").toInt()));
+                                    QString file = elt3.attribute("file","");
+                                    if (pal.playingMode() == FileMode) {
+                                        if (QFile(file).exists()) {
+                                            pal.setSoundFile(file);
+                                        }
+                                        else {
+                                            pal.setSoundFile("");
+                                            _scene->displayMessage((QString("Unvalid sound directory \"%1\" in box \"%2\"").
+                                                    arg(file).arg(name)).toStdString(),WARNING_LEVEL);
+                                        }
+                                    }
+                                }
+                                // TODO : handle other boxes' attributes
+                            }
+                            node3 = node3.nextSibling();
+                        }
+                    }
+                    node2 = node2.nextSibling();
+                }
+            }
+            if (!elt1.isNull()) {
+                if (elt1.tagName() == "box") {
+                    if (boxType != "unknown") {
+                        bottomRight = topLeft + size;
+                        unsigned int ID = NO_ID;
+                        if (boxType == "sound") {
+                            pal.setColor(color);
+                            ID = addSoundBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),pal,motherID);
+                            _scene->addSoundBox(ID);
+                        }
+                        else if (boxType == "control") {
+                            ID = addControlBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);
+                            _scene->addControlBox(ID);
+                            _scene->getBox(ID)->updateWidgets();
+                            //OPEN FILE
+                        }
+                        else if (boxType == "parent") {
+//                            ID = addParentBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);
+                            ID = addParentBox((unsigned int)boxID,(unsigned int)begin,(unsigned int)topLeftY,(unsigned int)sizeY,(unsigned int)duration,name.toStdString(),motherID,color);
+                            _scene->addParentBox(ID);
+                        }
+                        else {
+                            _scene->displayMessage((QString("Unavailable box type through loading %1")
+                                    .arg(QString::fromStdString(fileName))).toStdString(),
+                                    WARNING_LEVEL);
+                        }
+                    }
+                }
+            }
+            node1 = node1.nextSibling(); // next Box
+        }
+        mainNode = mainNode.nextSibling();
+    }
+
+    vector<unsigned int> boxesID;
+    _engines->getBoxesId(boxesID);
+    vector<unsigned int>::iterator it;
+
+    /************************ TRIGGER ************************/
+    vector<unsigned int> triggersID;
+    _engines->getTriggersPointId(triggersID);
+
+    for (it = triggersID.begin() ; it != triggersID.end() ; it++){
+        AbstractTriggerPoint abstractTrgPnt;
+        abstractTrgPnt.setID(*it);
+        unsigned int tpBoxID = _engines->getTriggerPointRelatedBoxId(*it);
+        if (tpBoxID != NO_ID) {
+            BasicBox *tpBox = getBox(tpBoxID);
+            if (tpBox != NULL) {
+                abstractTrgPnt.setBoxID(tpBoxID);
+                switch(_engines->getTriggerPointRelatedCtrlPointIndex(*it)) {
+                case BEGIN_CONTROL_POINT_INDEX :
+                    abstractTrgPnt.setBoxExtremity(BOX_START);
+                    break;
+                case END_CONTROL_POINT_INDEX :
+                    abstractTrgPnt.setBoxExtremity(BOX_END);
+                    break;
+                default :
+                    std::cerr << "Maquette::load : unrecognized box extremity for Trigger Point " << *it << std::endl;
+                    abstractTrgPnt.setBoxExtremity(BOX_START);
+                    break;
+                }
+                std::string tpMsg = _engines->getTriggerPointMessage(*it);
+                if (tpMsg != "") {
+                    abstractTrgPnt.setMessage(tpMsg);
+                }
+                else {
+#ifdef DEBUG
+                    std::cerr << "Maquette::load : empty message found for Trigger Point " << *it << std::endl;
+#endif
+                }
+                addTriggerPoint(abstractTrgPnt);
+            }
+            else {
+#ifdef DEBUG
+                std::cerr << "Maquette::load : NULL box found for trigger point " << *it << std::endl;
+#endif
+            }
+        }
+        else {
+#ifdef DEBUG
+            std::cerr << "Maquette::load : box with NO_ID found for trigger point " << *it << std::endl;
+#endif
+        }
+    }
+
+    /************************ RELATIONS ************************/
+    vector<unsigned int> relationsID;
+    _engines->getRelationsId(relationsID);
+
+
+    for (it = relationsID.begin() ; it != relationsID.end() ; it++) {
+        AbstractRelation abstractRel;
+        unsigned int firstBoxID = _engines->getRelationFirstBoxId(*it);
+        unsigned int secondBoxID = _engines->getRelationSecondBoxId(*it);
+        if (firstBoxID != NO_ID && firstBoxID != ROOT_BOX_ID && secondBoxID != NO_ID
+                && secondBoxID != ROOT_BOX_ID && firstBoxID != secondBoxID) {
+            abstractRel.setFirstBox(firstBoxID);
+            abstractRel.setSecondBox(secondBoxID);
+            switch (_engines->getRelationFirstCtrlPointIndex(*it)) {
+            case BEGIN_CONTROL_POINT_INDEX :
+                abstractRel.setFirstExtremity(BOX_START);
+                break;
+            case END_CONTROL_POINT_INDEX :
+                abstractRel.setFirstExtremity(BOX_END);
+                break;
+            }
+            switch (_engines->getRelationSecondCtrlPointIndex(*it)) {
+            case BEGIN_CONTROL_POINT_INDEX :
+                abstractRel.setSecondExtremity(BOX_START);
+                break;
+            case END_CONTROL_POINT_INDEX :
+                abstractRel.setSecondExtremity(BOX_END);
+                break;
+            }
+            int minBoundMS = _engines->getRelationMinBound(*it);
+            float minBoundPXL = NO_BOUND;
+            if (minBoundMS != NO_BOUND) {
+                minBoundPXL = (float)minBoundMS/(MaquetteScene::MS_PER_PIXEL*zoom);
+            }
+            int maxBoundMS = _engines->getRelationMaxBound(*it);
+            float maxBoundPXL = NO_BOUND;
+            if (maxBoundMS != NO_BOUND) {
+                maxBoundPXL = (float)maxBoundMS/(MaquetteScene::MS_PER_PIXEL*zoom);
+            }
+            abstractRel.setMinBound(minBoundPXL);
+            abstractRel.setMaxBound(maxBoundPXL);
+            abstractRel.setID(*it);
+            addRelation(abstractRel);
+        }
+    }
+
+
+    delete _doc;
+}
+
+double
+Maquette::accelerationFactor(){
+    return _engines->getExecutionSpeedFactor();
 }
 
 void
 Maquette::setAccelerationFactor(const float &factor) {
-	_engines->setExecutionSpeedFactor(factor);
+    _engines->setExecutionSpeedFactor(factor);
 }
 
 void
@@ -1843,16 +2265,16 @@ Maquette::crossedTriggerPoint(bool waiting, unsigned int trgID)
      if (trgPnt != NULL) {
           if(waiting){
               trgPnt->setWaiting(waiting);
-              if (_scene->_triggersQueueList.isEmpty())
+              if (_scene->triggersQueueList().isEmpty())
                   generateTriggerQueue();
-                  _scene->setFocusItem(_scene->_triggersQueueList.first(),Qt::OtherFocusReason);
+                  _scene->setFocusItem(_scene->triggersQueueList().first(),Qt::OtherFocusReason);
               }
 
            else{
               trgPnt->setWaiting(waiting);
-              _scene->_triggersQueueList.removeAll(trgPnt);
-              if(!_scene->_triggersQueueList.isEmpty())
-                 _scene->setFocusItem(_scene->_triggersQueueList.first(),Qt::OtherFocusReason);
+              _scene->triggersQueueList().removeAll(trgPnt);
+              if(!_scene->triggersQueueList().isEmpty())
+                 _scene->setFocusItem(_scene->triggersQueueList().first(),Qt::OtherFocusReason);
            }
       }
 }

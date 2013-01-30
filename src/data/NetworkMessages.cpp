@@ -133,6 +133,19 @@ NetworkMessages::computeMessage(const Message &msg) {
     return completeMessage.toStdString();
 }
 
+QMap<QString, QString>
+NetworkMessages::toMapAddressValue(){
+    QString address;
+    QMap<QString, QString> messages;
+    QMap<QTreeWidgetItem *, Message>::iterator it;
+
+    for (it=_messages->begin() ; it!= _messages->end() ; it++){
+        address = QString::fromStdString(computeMessageWithoutValue(*it));
+        messages.insert(address,(*it).value);
+    }
+    return messages;
+}
+
 std::string
 NetworkMessages::computeMessageWithoutValue(const Message &msg) {
     //form : device/message/

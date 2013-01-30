@@ -265,10 +265,8 @@ MainWindow::newFile()
       break;
     }
   }
-
-  setCurrentFile("");
-
   _scene->clear();
+  setCurrentFile("");  
 }
 
 void
@@ -292,7 +290,6 @@ MainWindow::open()
       break;
     }
   }
-
   QString fileName = QFileDialog::getOpenFileName(this,tr("Open File"),"",tr("XML Files (*.xml)"));
   if (!fileName.isEmpty()) {
     loadFile(fileName);
@@ -995,7 +992,7 @@ void
 MainWindow::loadFile(const QString &fileName)
 {
   QApplication::setOverrideCursor(Qt::WaitCursor);
-
+  _scene->clear();
   _scene->load(fileName.toStdString());
 
   QApplication::restoreOverrideCursor();

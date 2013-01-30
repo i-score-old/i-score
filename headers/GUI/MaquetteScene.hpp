@@ -60,6 +60,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "AbstractParentBox.hpp"
 #include "BasicBox.hpp"
 #include "TimeBarWidget.hpp"
+#include "MaquetteView.hpp"
+#include <QTimeLine>
 
 #include <map>
 #include <vector>
@@ -105,10 +107,9 @@ class MaquetteScene : public QGraphicsScene
   Q_OBJECT
 
   public :
-  QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
   MaquetteScene(const QRectF & rect, AttributesEditor *palette);
   virtual ~MaquetteScene();
-
+  QTimeLine *_timeLine;
   /*!
    * \brief Initialises scene parameters.
    */
@@ -205,7 +206,7 @@ class MaquetteScene : public QGraphicsScene
 
    * \return the triggersQueueList.
    */
-  inline QList<TriggerPoint *> getTriggersQueueList(){return _triggersQueueList;}
+  inline QList<TriggerPoint *> triggersQueueList(){return _triggersQueueList;}
   /*!
    * \brief Adds a trigger to the queue list.
    *
@@ -422,7 +423,7 @@ class MaquetteScene : public QGraphicsScene
    *
    * \param message : the message to send for triggering
    */
-  void trigger(const std::string &message);
+  void trigger(TriggerPoint *triggerPoint);
   /*!
    * \brief Set trigger point 's message.
    *
@@ -574,6 +575,9 @@ class MaquetteScene : public QGraphicsScene
   bool subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent);
   void createMaquetteBarWidget();
   void setName(QString name);
+  inline float zoom(){return _view->zoom();}
+  void updateProgressBar();
+  void setAccelerationFactor(double value);
 
  protected :
   /*!
@@ -660,7 +664,7 @@ class MaquetteScene : public QGraphicsScene
 
 signals:
   void stopPlaying();
-
+  void accelerationValueChanged(double value);
 
 public slots :
   void verticalScroll(int value);
@@ -696,6 +700,8 @@ public slots :
    * \brief Stops playing the composition.
    */
   void stop();
+  void stopGotoStart();
+  void stopWithGoto();
   /*!
    * \brief Pauses playing the composition.
    */
@@ -806,7 +812,11 @@ public slots :
   PlayingThread *_playThread; //!< The thread handling playing.
 
   TimeBarWidget *_timeBar;
+  QGraphicsLineItem *_progressLine;
+  double _accelerationFactorSave;
+  double _accelerationFactor;
 
+  QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
 };
 
 #endif

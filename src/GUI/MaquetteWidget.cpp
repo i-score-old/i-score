@@ -56,7 +56,7 @@ using std::string;
 #include "MaquetteScene.hpp"
 #include "MainWindow.hpp"
 
-const float MaquetteWidget::HEADER_HEIGHT = 35.;
+const float MaquetteWidget::HEADER_HEIGHT = 42.;
 const float MaquetteWidget::NAME_POINT_SIZE = 20.;
 
 MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScene *scene)
@@ -88,9 +88,38 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
     _maquetteLayout->setVerticalSpacing(0);
     setLayout(_maquetteLayout);
 
-    connect(_scene,SIGNAL(stopPlaying()),this,SLOT(stop()));
+
+//    connect(_scene,SIGNAL(stopPlaying()),this,SLOT(stop()));
     connect(_view,SIGNAL(zoomChanged(float)),this,SLOT(changeZoom(float)));
+    connect(_view,SIGNAL(playModeChanged()),this,SLOT(updateHeader()));
 //    connect(_view,SIGNAL(zoomChanged(float)),_timeBar,SLOT(updateZoom(float)));
+}
+
+void
+MaquetteWidget::paintEvent(QPaintEvent *event){
+    QWidget::paintEvent(event);
+
+//    QPainterPath path;
+//    float line = 2;
+//    QPointF adjustX(0,0);
+//    QPointF adjustY(0,0);
+//    QRectF rect = this->rect();
+
+//    path.moveTo(rect.topLeft()+adjustX);
+
+////    path.lineTo(rect.bottomLeft()+adjustX+adjustY);
+////    path.lineTo(rect.bottomRight()+ adjustY);
+////    path.lineTo(rect.bottomRight()+ adjustY - QPointF(0,rect.height()/5.));
+////    path.quadTo(rect.topRight(),rect.topLeft()+adjustX);
+
+//    QPainter *painter=new QPainter();
+//    QPen pen(Qt::black);
+//    pen.setWidth(5);
+//    painter->setPen(pen);
+//    painter->drawRect(QRect(0,3,10,10));
+////    painter->drawPath(path);
+//    std::cout<<"PINA"<<std::endl;
+//    delete painter;
 }
 
 void
@@ -140,7 +169,7 @@ MaquetteWidget::createReadingSpeedWidget(){
     _accelerationSlider->setStatusTip(tr("Acceleration"));
     _accelerationSlider->setFixedWidth(200);
     _accelerationSlider->setSliderPosition(50);
-    _accelerationSlider->setSizePolicy(*ignoredPolicy);
+    _accelerationSlider->setSizePolicy(*ignoredPolicy);    
 
     _accelerationDisplay = new QDoubleSpinBox(this);
     _accelerationDisplay->setStatusTip(tr("Acceleration"));
@@ -155,21 +184,26 @@ MaquetteWidget::createReadingSpeedWidget(){
     _readingSpeedWidget->setLayout(layout);
 
     connect(_accelerationSlider,SIGNAL(valueChanged(int)),this,SLOT(accelerationValueModified(int)));
-    connect(_accelerationDisplay, SIGNAL(valueChanged(double)), this, SLOT(accelerationValueEntered(double)));
+    connect(_accelerationDisplay, SIGNAL(valueChanged(double)), this, SLOT(accelerationValueEntered(double)));    
+    connect(_scene, SIGNAL(accelerationValueChanged(double)), this, SLOT(accelerationValueEntered(double)));
 }
+
 
 void
 MaquetteWidget::createActions(){
 
+    QPixmap pix = QPixmap(35,35);
+    pix.fill(Qt::transparent);
+
     QIcon playIcon(":/images/playSimple.svg");
     _playAction = new QAction(playIcon, tr("Play"), this);
-    _playAction->setShortcut(QString("Space"));
-    _playAction->setStatusTip(tr("Play composition"));
+//    _playAction->setShortcut(QString("Space"));
+    _playAction->setStatusTip(tr("Play scenario"));
 
-    QIcon stopIcon(":/images/stopSimple.svg");
+     QIcon stopIcon(":/images/stopSimple.svg");
     _stopAction = new QAction(stopIcon, tr("Stop"), this);
-    _stopAction->setShortcut(QString("Enter"));
-    _stopAction->setStatusTip(tr("Stop composition"));
+//    _stopAction->setShortcut(QString("Enter"));
+    _stopAction->setStatusTip(tr("Stop scenario"));
 
     connect(_playAction,SIGNAL(triggered()), this, SLOT(play()));
     connect(_stopAction,SIGNAL(triggered()), this, SLOT(stop()));
@@ -189,12 +223,14 @@ MaquetteWidget::createToolBar(){
                             "}"
                             );
     _toolBar->addAction(_playAction);
+    _toolBar->raise();
 }
 
 void
 MaquetteWidget::createHeader(){
 
     _header->setGeometry(0,0,width(),HEADER_HEIGHT);
+    _header->setFixedHeight(HEADER_HEIGHT);
     _header->setPalette(QPalette(_color));
     _header->setAutoFillBackground(true);
 
@@ -224,6 +260,7 @@ MaquetteWidget::accelerationValueModified(int value){
         if (_accelerationDisplay->value() != newValue){
             _sliderMoved = true;
             _accelerationDisplay->setValue(newValue);
+
         }
     }
     _valueEntered = false;
@@ -237,7 +274,13 @@ MaquetteWidget::play(){
 
 void
 MaquetteWidget::stop(){
-    _scene->stop();
+    _scene->pause();
+    updateHeader();
+}
+
+void
+MaquetteWidget::pause(){
+    _scene->pause();
     updateHeader();
 }
 
@@ -266,7 +309,7 @@ void
 MaquetteWidget::accelerationValueEntered(double value){
     if(!_sliderMoved){
         int newValue = _accelerationSlider->valueForAcceleration(value);
-        Maquette::getInstance()->setAccelerationFactor(value);
+        _accelerationDisplay->setValue(value);
         if(newValue<LogarithmicSlider::MAXIMUM_VALUE)
             _accelerationSlider->setValue(newValue);
         else{
@@ -274,5 +317,6 @@ MaquetteWidget::accelerationValueEntered(double value){
             _accelerationSlider->setValue(_accelerationSlider->valueForAcceleration(LogarithmicSlider::MAXIMUM_VALUE));
         }
     }
+    _scene->setAccelerationFactor(value);
     _sliderMoved = false;
 }

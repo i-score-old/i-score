@@ -80,7 +80,7 @@ using std::map;
 #include "Interpolation.hpp"
 #include "NetworkTree.hpp"
 
-/* La palette hÃˆrite de QDockWidget, a pour parent la fenetre principale*/
+/* La palette hérite de QDockWidget, a pour parent la fenetre principale*/
 
 static const int ENGLISH = 0;
 static const int FRENCH = 1;
@@ -891,18 +891,22 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
             _networkTree->updateStartMsgsDisplay();
             _networkTree->updateEndMsgsDisplay();
             _networkTree->assignItems(_networkTree->assignedItems());
-            
-            //PRINT
-            //            QList<QTreeWidgetItem *> items = _networkTree->assignedItems().keys();
-            //            QList<QTreeWidgetItem *>::iterator i;
-            //            QTreeWidgetItem *curIt;
-            //            std::cout<<"\nAFFICHAGE START\n";
-            //            for(i=items.begin() ; i!=items.end() ; i++){
-            //                curIt=*i;
-            //                std::cout<<curIt->text(0).toStdString()<<" "<<_networkTree->getSampleRate(curIt)<<std::endl;
-            //            }
-            //            std::cout<<"--AFFICHAGE END\n\n";
-            //PRINT
+
+            //PRINT MESSAGES
+//            QList<QTreeWidgetItem *> items = _networkTree->assignedItems().keys();
+//            QList<QTreeWidgetItem *>::iterator i;
+//            QTreeWidgetItem *curIt;
+//            std::cout<<"\nAFFICHAGE START\n";
+//            vector<string> startMessages = _networkTree->startMessages()->computeMessages();
+//            for(int i=0; i<startMessages.size(); i++){
+//                std::cout<<startMessages[i]<<std::endl;
+//            }
+//            std::cout<<"--AFFICHAGE END\n";
+//            vector<string> endMessages = _networkTree->endMessages()->computeMessages();
+//            for(int i=0; i<endMessages.size(); i++){
+//                std::cout<<endMessages[i]<<std::endl;
+//            }
+            //END PRINT
         }
     }
 	//if (_boxEdited != NO_ID) {

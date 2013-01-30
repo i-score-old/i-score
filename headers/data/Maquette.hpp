@@ -84,6 +84,7 @@ class AbstractParentBox;
 class AbstractRelation;
 class Relation;
 class TriggerPoint;
+class QApplication;
 
 //! Enum containing various error messages.
 typedef enum {SUCCESS = 1, NO_MODIFICATION = 0, RETURN_ERROR = -1,
@@ -474,7 +475,7 @@ class Maquette : public QObject
    * \param mother : the mother of the box
    * \return the ID of created parent box
    */
-  unsigned int addParentBox(const QPointF & corner1, const QPointF & corner2, const std::string & name, unsigned int mother);
+  unsigned int addParentBox(const QPointF & corner1, const QPointF & corner2, const std::string & name, unsigned int mother);  
   /*!
    * \brief Adds a new parent box to the maquette with specific information.
    *
@@ -638,6 +639,7 @@ class Maquette : public QObject
    * \param fileName : the file to load composition from
    */
   void load(const std::string &fileName);
+  void loadOLD(const std::string &fileName);
   /*!
    * \brief Gets the current execution time in ms.
    *
@@ -667,7 +669,6 @@ class Maquette : public QObject
 	 */
 	void updateBoxesFromEngines();
 
-
   public slots :
 
   /*!
@@ -682,12 +683,16 @@ class Maquette : public QObject
    * \brief Stops the playing process.
    */
   void stopPlaying();
+  void stopPlayingGotoStart();
+  void stopPlayingWithGoto();
+  void pause();
   /*!
    * \brief Sets a new acceleration factor.
    *
    * \param factor : the new acceleration factor value between 0 and 1
    */
   void setAccelerationFactor(const float &factor);
+  double accelerationFactor();
   /*!
    * \brief Called by the callback when a transition is crossed.
    *
@@ -703,6 +708,12 @@ class Maquette : public QObject
    */
   void crossedTriggerPoint(bool  waiting, unsigned int trgID);  
   inline std::map<unsigned int,BasicBox*> getBoxes(){return _boxes;}
+
+  /*!
+   * \brief When a goto value is entered, the scenario before this value is simulated.
+   * Messages (final state of each boxes) are sended to the engine.
+   */
+  void initSceneState();
 
  private :
 
@@ -750,8 +761,12 @@ class Maquette : public QObject
    */
   unsigned int addParentBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const std::string &name,
 			   unsigned int mother);
+  unsigned int addParentBox(unsigned int ID, const unsigned int date, const unsigned int topLeftY, const unsigned int sizeY, const unsigned int duration, const std::string &name,
+                            unsigned int mother, QColor color);
+
   string extractAddress(string msg);
   string extractValue(string msg);
+
   /*!
    * \brief Saves a box into doc.
    *

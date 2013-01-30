@@ -42,9 +42,8 @@ public :
     ~MaquetteWidget();
 
     void init();
-    void setName(QString name);
-    void updateHeader();
-    inline TimeBarWidget *timeBar(){return _timeBar;}
+    void setName(QString name);    
+    inline TimeBarWidget *timeBar(){return _timeBar;}    
     static const float HEADER_HEIGHT;
     static const float NAME_POINT_SIZE;
 
@@ -57,9 +56,14 @@ signals:
 public slots:
     void play();
     void stop();
+    void pause();
     void accelerationValueModified(int value);
     void accelerationValueEntered(double value);
     void changeZoom(float value);
+    void updateHeader();
+
+protected :
+    virtual void paintEvent(QPaintEvent *event);
 
 private:
     void createActions();

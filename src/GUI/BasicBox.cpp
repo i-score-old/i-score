@@ -94,24 +94,24 @@ const QString BasicBox::SUB_SCENARIO_MODE_TEXT = tr("Scenario");
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
 : QGraphicsItem()
 {
-	_scene = parent;
+    _scene = parent;
 
-	int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
+    int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
 
-	xmin = (int)(std::min(press.x(),release.x()));
-	ymin = (int)(std::min(press.y(),release.y()));
-	xmax = (int)(std::max(press.x(),release.x()));
-	ymax = (int)(std::max(press.y(),release.y()));
+    xmin = (int)(std::min(press.x(),release.x()));
+    ymin = (int)(std::min(press.y(),release.y()));
+    xmax = (int)(std::max(press.x(),release.x()));
+    ymax = (int)(std::max(press.y(),release.y()));
 
-	_abstract = new AbstractBox();
+    _abstract = new AbstractBox();
 
-	_abstract->setTopLeft(QPointF(xmin,ymin));
-	_abstract->setWidth(xmax-xmin);
-	_abstract->setHeight(ymax-ymin);
+    _abstract->setTopLeft(QPointF(xmin,ymin));
+    _abstract->setWidth(xmax-xmin);
+    _abstract->setHeight(ymax-ymin);
 
     createWidget();
 
-	init();
+    init();
 
     update();
     connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),_curvesWidget, SLOT(updateDisplay(const QString&)));
@@ -169,7 +169,6 @@ BasicBox::createWidget(){
     _curveProxy->setAcceptedMouseButtons(Qt::LeftButton);
     _curveProxy->setFlag(QGraphicsItem::ItemIsMovable, false);
     _curveProxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
-    _curveProxy->setAttribute(Qt::WA_PaintOnScreen);
     _curveProxy->setVisible(true);
     _curveProxy->setAcceptsHoverEvents(true);
     _curveProxy->setWidget(_boxWidget);
@@ -188,27 +187,28 @@ BasicBox::createWidget(){
     _comboBoxProxy = new QGraphicsProxyWidget(this);
     _comboBoxProxy->setWidget(_comboBox);
     _comboBoxProxy->setPalette(palette);
-    _curvesWidget->setComboBox(_comboBox);
-
+    _curvesWidget->setComboBox(_comboBox);    
 }
 
 BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
 : QGraphicsItem()
 {
-	_scene = parent;
+    _scene = parent;
 
-	_abstract = new AbstractBox(*abstract);
+    _abstract = new AbstractBox(*abstract);
 
-	init();
+    init();
 
-	update();
+    update();
 }
 
 BasicBox::~BasicBox()
 {
-	if (_abstract) {
-		delete static_cast<AbstractBox*>(_abstract);
-	}
+    if (_abstract) {
+        removeRelations(BOX_START);
+        removeRelations(BOX_END);
+        delete static_cast<AbstractBox*>(_abstract);
+    }
 }
 
 QString
@@ -218,30 +218,31 @@ BasicBox::currentText(){
 
 void
 BasicBox::updateFlexibility(){
-    _flexible = hasTriggerPoint(BOX_END);    
+    _flexible = hasTriggerPoint(BOX_END);
 }
 
 void
 BasicBox::init()
 {
-	_hasContextMenu = false;
+    _hasContextMenu = false;
     _shift = false;
-	_playing = false;
+    _playing = false;
     _low = false;
     _triggerPoints = new QMap<BoxExtremity,TriggerPoint*>();
-	_comment = NULL;
+    _comment = NULL;
     _color = QColor(Qt::white);
     _colorUnselected = QColor(Qt::white);
+    _hover=false;
 
     updateBoxSize();
 
     setCacheMode(QGraphicsItem::ItemCoordinateCache);
     setFlag(QGraphicsItem::ItemIsMovable, true);
-	setFlag(QGraphicsItem::ItemIsSelectable, true);
-	setFlag(QGraphicsItem::ItemIsFocusable, true);
-	setFlag(ItemSendsGeometryChanges,true);
-	setVisible(true);
-	setAcceptsHoverEvents(true);
+    setFlag(QGraphicsItem::ItemIsSelectable, true);
+    setFlag(QGraphicsItem::ItemIsFocusable, true);
+    setFlag(ItemSendsGeometryChanges,true);
+    setVisible(true);
+    setAcceptsHoverEvents(true);
     _currentZvalue = 0;
     setZValue(_currentZvalue);
     updateFlexibility();
@@ -260,7 +261,7 @@ BasicBox::addToComboBox(QString address){
 }
 
 void
-BasicBox::updateCurves(){    
+BasicBox::updateCurves(){
     _curvesWidget->updateMessages(_abstract->ID(),true);
     update();
 }
@@ -268,13 +269,13 @@ BasicBox::updateCurves(){
 int
 BasicBox::type() const
 {
-	return BASIC_BOX_TYPE;
+    return BASIC_BOX_TYPE;
 }
 
 Abstract*
 BasicBox::abstract() const
 {
-	return _abstract;
+    return _abstract;
 }
 
 QPointF
@@ -292,19 +293,19 @@ BasicBox::getBottomRight() const
 QPointF
 BasicBox::getCenter() const
 {
-	return QPointF(_abstract->topLeft().x() + _abstract->width()/2., _abstract->topLeft().y() + _abstract->height()/2.);
+    return QPointF(_abstract->topLeft().x() + _abstract->width()/2., _abstract->topLeft().y() + _abstract->height()/2.);
 }
 
 QPointF
 BasicBox::getRelativeCenter() const
 {
-	return QPointF(relativeBeginPos() + _abstract->width()/2., _abstract->topLeft().y() + _abstract->height()/2.);
+    return QPointF(relativeBeginPos() + _abstract->width()/2., _abstract->topLeft().y() + _abstract->height()/2.);
 }
 
 QPointF
 BasicBox::getSize() const
 {
-	return QPointF(_abstract->width(),_abstract->height());
+    return QPointF(_abstract->width(),_abstract->height());
 }
 
 QPointF
@@ -327,24 +328,24 @@ BasicBox::getRightGripPoint()
 QPointF
 BasicBox::getMiddleRight() const
 {
-	return QPointF(_abstract->topLeft().x() + _abstract->width(), _abstract->topLeft().y() + _abstract->height()/2.);
+    return QPointF(_abstract->topLeft().x() + _abstract->width(), _abstract->topLeft().y() + _abstract->height()/2.);
 }
 
 QPointF
 BasicBox::getMiddleLeft() const
 {
-	return QPointF(_abstract->topLeft().x(), _abstract->topLeft().y() + _abstract->height()/2.);
+    return QPointF(_abstract->topLeft().x(), _abstract->topLeft().y() + _abstract->height()/2.);
 }
 
 QPointF
 BasicBox::getShapeTopLeft() const
-{ 
+{
     return _abstract->topLeft();
 }
 
 QPointF
 BasicBox::getShapeTopRight() const
-{   
+{
     return QPointF(_abstract->topLeft().x() + _abstract->width(),
             _abstract->topLeft().y());
 }
@@ -352,138 +353,182 @@ BasicBox::getShapeTopRight() const
 void
 BasicBox::setTopLeft(const QPointF & topLeft)
 {
-	_abstract->setTopLeft(topLeft);
+    _abstract->setTopLeft(topLeft);
 
-	updateStuff();
+    updateStuff();
 }
 
 void
 BasicBox::setRelativeTopLeft(const QPointF & rTopLeft)
 {
-	QPointF relTopLeft(rTopLeft);
-	int relBeginPos = relTopLeft.x();
-	if (_abstract->mother() != NO_ID && _abstract->mother() != ROOT_BOX_ID) {
-		BasicBox *motherBox = _scene->getBox(_abstract->mother());
-		if (motherBox != NULL) {
-			relBeginPos += motherBox->beginPos();
-			relTopLeft.setX(relBeginPos);
-		}
-		else {
-			_abstract->setMother(ROOT_BOX_ID);
-		}
-	}
-	else {
-		_abstract->setMother(ROOT_BOX_ID);
-	}
-	setTopLeft(relTopLeft);
+    QPointF relTopLeft(rTopLeft);
+    int relBeginPos = relTopLeft.x();
+    if (_abstract->mother() != NO_ID && _abstract->mother() != ROOT_BOX_ID) {
+        BasicBox *motherBox = _scene->getBox(_abstract->mother());
+        if (motherBox != NULL) {
+            relBeginPos += motherBox->beginPos();
+            relTopLeft.setX(relBeginPos);
+        }
+        else {
+            _abstract->setMother(ROOT_BOX_ID);
+        }
+    }
+    else {
+        _abstract->setMother(ROOT_BOX_ID);
+    }
+    setTopLeft(relTopLeft);
 }
 
 void
 BasicBox::setSize(const QPointF & size)
 {
-	_abstract->setWidth(std::max((float)size.x(),MaquetteScene::MS_PRECISION / MaquetteScene::MS_PER_PIXEL));
-	_abstract->setHeight(size.y());
+    _abstract->setWidth(std::max((float)size.x(),MaquetteScene::MS_PRECISION / MaquetteScene::MS_PER_PIXEL));
+    _abstract->setHeight(size.y());
 
-	updateStuff();
+    updateStuff();
 }
 
 float
 BasicBox::beginPos() const
 {
-	return _abstract->topLeft().x();
+    return _abstract->topLeft().x();
 }
 
 float
 BasicBox::relativeBeginPos() const
 {
-	float relBeginPos = _abstract->topLeft().x();
-	if (_abstract->mother() != NO_ID && _abstract->mother() != ROOT_BOX_ID) {
-		BasicBox *motherBox = _scene->getBox(_abstract->mother());
-		if (motherBox != NULL) {
-			relBeginPos -= _scene->getBox(_abstract->mother())->beginPos();
-		}
-		else {
-			_abstract->setMother(ROOT_BOX_ID);
-		}
-	}
-	else {
-		_abstract->setMother(ROOT_BOX_ID);
-	}
-	return relBeginPos;
+    float relBeginPos = _abstract->topLeft().x();
+    if (_abstract->mother() != NO_ID && _abstract->mother() != ROOT_BOX_ID) {
+        BasicBox *motherBox = _scene->getBox(_abstract->mother());
+        if (motherBox != NULL) {
+            relBeginPos -= _scene->getBox(_abstract->mother())->beginPos();
+        }
+        else {
+            _abstract->setMother(ROOT_BOX_ID);
+        }
+    }
+    else {
+        _abstract->setMother(ROOT_BOX_ID);
+    }
+    return relBeginPos;
 }
 
 float
 BasicBox::width() const
 {
-	return _abstract->width();
+    return _abstract->width();
 }
 
 float
 BasicBox::height() const
 {
-	return _abstract->height();
+    return _abstract->height();
 }
+
+QMap<QString,QPair<QString,unsigned int> >
+BasicBox::getFinalState(){
+    //QMap <Address, QPair<MessageValue, MessageDate> >
+
+    QMap<QString,QString> startMsgs, endMsgs;
+    QMap<QString,QPair<QString, unsigned int> > finalMessages;
+    startMsgs = _abstract->startMessages()->toMapAddressValue();
+    endMsgs = _abstract->endMessages()->toMapAddressValue();
+
+    //End values
+    QList<QString> endAddresses = endMsgs.keys();
+    for(QList<QString>::iterator it = endAddresses.begin() ; it!=endAddresses.end() ; it++)
+        finalMessages.insert(*it, QPair<QString,unsigned int>(endMsgs.value(*it),date()+duration()));
+
+    //Start values
+    QList<QString> startAddresses = startMsgs.keys();
+    for(QList<QString>::iterator it = startAddresses.begin() ; it!=startAddresses.end() ; it++){
+        if(!finalMessages.contains(*it))
+            finalMessages.insert(*it,QPair<QString,unsigned int>(startMsgs.value(*it),date()));
+    }
+
+    return finalMessages;
+}
+
+QMap<QString,QPair<QString,unsigned int> >
+BasicBox::getStartState(){
+    //QMap <Address, QPair<MessageValue, MessageDate> >
+
+    QMap<QString,QString> startMsgs;
+    QMap<QString,QPair<QString, unsigned int> > finalMessages;
+    startMsgs = _abstract->startMessages()->toMapAddressValue();
+
+    //Start values
+    QList<QString> startAddresses = startMsgs.keys();
+    for(QList<QString>::iterator it = startAddresses.begin() ; it!=startAddresses.end() ; it++)
+        finalMessages.insert(*it,QPair<QString,unsigned int>(startMsgs.value(*it),date()));
+
+    return finalMessages;
+}
+
 
 void
 BasicBox::resizeWidthEdition(float width)
 {
-	float newWidth = std::max(width,MaquetteScene::MS_PRECISION / MaquetteScene::MS_PER_PIXEL);
+    float newWidth = std::max(width,MaquetteScene::MS_PRECISION / MaquetteScene::MS_PER_PIXEL);
 
-	if (hasMother()) {
-		BasicBox *motherBox = _scene->getBox(_abstract->mother());
-		if (motherBox != NULL) {
-			if ((motherBox->getBottomRight().x() - width) <= _abstract->topLeft().x()) {
-				if (_scene->resizeMode() == HORIZONTAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE) { // Trying to escape by a resize to the right
-					newWidth = motherBox->getBottomRight().x() - _abstract->topLeft().x();
-				}
-			}
-		}
-	}
-	_abstract->setWidth(newWidth);
+    if (hasMother()) {
+        BasicBox *motherBox = _scene->getBox(_abstract->mother());
+        if (motherBox != NULL) {
+            if ((motherBox->getBottomRight().x() - width) <= _abstract->topLeft().x()) {
+                if (_scene->resizeMode() == HORIZONTAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE) { // Trying to escape by a resize to the right
+                    newWidth = motherBox->getBottomRight().x() - _abstract->topLeft().x();
+                }
+            }
+        }
+    }
+    _abstract->setWidth(newWidth);
     centerWidget();
 }
 
 void
 BasicBox::resizeHeightEdition(float height)
 {
-	_abstract->setHeight(height);
+    _abstract->setHeight(height);
 
-	if (_comment != NULL) {
-		_comment->updatePos();
-	}
+    if (_comment != NULL) {
+        _comment->updatePos();
+    }
     centerWidget();
 }
 
 void
 BasicBox::resizeAllEdition(float width,float height)
 {
-	resizeWidthEdition(width);
-	resizeHeightEdition(height);
+    resizeWidthEdition(width);
+    resizeHeightEdition(height);
 }
 
 QString
 BasicBox::name() const
 {
-	return QString::fromStdString(_abstract->name());
+    return QString::fromStdString(_abstract->name());
 }
 
 void
 BasicBox::setName(const QString & name)
 {
-	_abstract->setName(name.toStdString());
+    _abstract->setName(name.toStdString());
     update();
 }
 
 QColor
 BasicBox::color() const
 {
-	return QColor(_abstract->color());
+//    return _abstract->color();
+    return _color;
 }
 
 void
 BasicBox::setColor(const QColor & color)
 {
-	_abstract->setColor(color);
+    _abstract->setColor(color);
+    _colorUnselected = color;
+    _color = color;
 }
 
 void
@@ -509,17 +554,17 @@ void
 BasicBox::updateStuff()
 {
     updateBoxSize();
-	if (_comment != NULL) {
-		_comment->updatePos();
-	}
+    if (_comment != NULL) {
+        _comment->updatePos();
+    }
 
-	map<BoxExtremity,map<unsigned int,Relation*> >::iterator extIt;
-	map<unsigned int,Relation*>::iterator relIt;
-	for (extIt = _relations.begin() ; extIt != _relations.end() ; ++extIt) {
-		for (relIt = extIt->second.begin() ; relIt != extIt->second.end() ; ++relIt) {
-			relIt->second->updateCoordinates();
-		}
-	}
+    map<BoxExtremity,map<unsigned int,Relation*> >::iterator extIt;
+    map<unsigned int,Relation*>::iterator relIt;
+    for (extIt = _relations.begin() ; extIt != _relations.end() ; ++extIt) {
+        for (relIt = extIt->second.begin() ; relIt != extIt->second.end() ; ++relIt) {
+            relIt->second->updateCoordinates();
+        }
+    }
     QList<BoxExtremity> list = _triggerPoints->keys();
     QList<BoxExtremity>::iterator it2;
     for (it2 = list.begin() ; it2 != list.end() ; it2++) {
@@ -532,84 +577,84 @@ BasicBox::updateStuff()
 void
 BasicBox::addRelation(BoxExtremity extremity, Relation *rel)
 {
-	map<BoxExtremity,Relation*>::iterator it;
-	_relations[extremity][rel->ID()] = rel;
-	_relations[extremity][rel->ID()]->updateCoordinates();
+    map<BoxExtremity,Relation*>::iterator it;
+    _relations[extremity][rel->ID()] = rel;
+    _relations[extremity][rel->ID()]->updateCoordinates();
 }
 
 void
 BasicBox::removeRelation(BoxExtremity extremity, unsigned int relID) {
-	map<BoxExtremity,map<unsigned int,Relation*> >::iterator it;
-	if ((it = _relations.find(extremity)) != _relations.end()) {
-		map<unsigned int,Relation*>::iterator it2;
-		if ((it2 = it->second.find(relID)) != it->second.end()) {
-			it->second.erase(it2);
-			if (it->second.empty()) {
-				_relations.erase(it);
-			}
-		}
-	}
+    map<BoxExtremity,map<unsigned int,Relation*> >::iterator it;
+    if ((it = _relations.find(extremity)) != _relations.end()) {
+        map<unsigned int,Relation*>::iterator it2;
+        if ((it2 = it->second.find(relID)) != it->second.end()) {
+            it->second.erase(it2);
+            if (it->second.empty()) {
+                _relations.erase(it);
+            }
+        }
+    }
 }
 
 void
 BasicBox::removeRelations(BoxExtremity extremity) {
-	map<BoxExtremity,map<unsigned int,Relation*> >::iterator it;
-	if ((it = _relations.find(extremity)) != _relations.end()) {
-		it->second.clear();
-		_relations.erase(it);
-	}
+    map<BoxExtremity,map<unsigned int,Relation*> >::iterator it;
+    if ((it = _relations.find(extremity)) != _relations.end()) {
+        it->second.clear();
+        _relations.erase(it);
+    }
 }
 
 void
 BasicBox::addComment()
 {
-	addComment(AbstractComment(QObject::tr("Comment").toStdString(),_abstract->ID()));
+    addComment(AbstractComment(QObject::tr("Comment").toStdString(),_abstract->ID()));
 }
 
 void
 BasicBox::addComment(const AbstractComment &abstract)
 {
-	_comment = new Comment(abstract.text(),abstract.ID(),_scene);
-	_comment->updatePos();
+    _comment = new Comment(abstract.text(),abstract.ID(),_scene);
+    _comment->updatePos();
 }
 
 bool
 BasicBox::hasComment() const
 {
-	return (_comment != NULL);
+    return (_comment != NULL);
 }
 
 Comment*
 BasicBox::comment() const
 {
-	return _comment;
+    return _comment;
 }
 
 void
 BasicBox::removeComment()
 {
-	if (_comment != NULL) {
-		_comment = NULL;
-	}
+    if (_comment != NULL) {
+        _comment = NULL;
+    }
 }
 
 bool
 BasicBox::playing() const {
-	return _playing;
+    return _playing;
 }
 
 void
 BasicBox::setCrossedExtremity(BoxExtremity extremity)
 {
-	if (extremity == BOX_START) {
-		_playing = true;
-	}
-	else if (extremity == BOX_END) {
-		_playing = false;
-		setCrossedTriggerPoint(false,BOX_START);
-		setCrossedTriggerPoint(false,BOX_END);
-	}
-	_scene->setPlaying(_abstract->ID(),_playing);
+    if (extremity == BOX_START) {
+        _playing = true;
+    }
+    else if (extremity == BOX_END) {
+        _playing = false;
+        setCrossedTriggerPoint(false,BOX_START);
+        setCrossedTriggerPoint(false,BOX_END);
+    }
+    _scene->setPlaying(_abstract->ID(),_playing);
 }
 
 void
@@ -619,8 +664,8 @@ BasicBox::setCrossedTriggerPoint(bool waiting, BoxExtremity extremity)
 //	if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
     if(_triggerPoints->contains(extremity)){
         _triggerPoints->value(extremity)->setWaiting(waiting);
-	}
-	update();
+    }
+    update();
 }
 
 
@@ -645,15 +690,15 @@ BasicBox::addTriggerPoint(BoxExtremity extremity)
     switch (extremity) {
     case BOX_START :
         trgName = "/"+_abstract->name()+"/start";
-		break;
-	case BOX_END :
+        break;
+    case BOX_END :
         trgName = "/"+_abstract->name()+"/end";
-		break;
+        break;
 
-	default :
+    default :
         trgName = "/"+_abstract->name()+MaquetteScene::DEFAULT_TRIGGER_MSG;
-		break;
-	}
+        break;
+    }
 
     bool ret = false;
 //    if (_triggerPoints.find(extremity) == _triggerPoints.end()) {
@@ -672,22 +717,22 @@ BasicBox::addTriggerPoint(BoxExtremity extremity)
 
     unlock();
 
-	return ret;
+    return ret;
 }
 
 void
 BasicBox::addTriggerPoint(const AbstractTriggerPoint &abstractTP)
 {
     if(!_triggerPoints->contains(abstractTP.boxExtremity())){
-		int trgID = abstractTP.ID();
-		if (trgID == NO_ID) {
-			trgID = _scene->addTriggerPoint(_abstract->ID(),abstractTP.boxExtremity(),abstractTP.message());
-		}
-		if (trgID != NO_ID) {
+        int trgID = abstractTP.ID();
+        if (trgID == NO_ID) {
+            trgID = _scene->addTriggerPoint(_abstract->ID(),abstractTP.boxExtremity(),abstractTP.message());
+        }
+        if (trgID != NO_ID) {
             _triggerPoints->insert(abstractTP.boxExtremity(), _scene->getTriggerPoint(trgID));
             _triggerPoints->value(abstractTP.boxExtremity())->updatePosition();
             _scene->addItem(_triggerPoints->value(abstractTP.boxExtremity()));
-		}
+        }
         updateFlexibility();
     }
 
@@ -703,10 +748,10 @@ BasicBox::addTriggerPoint(BoxExtremity extremity, TriggerPoint *tp)
         _triggerPoints->value(extremity)->updatePosition();
         updateRelations(extremity);
         updateFlexibility();
-	}
-	else {
-		std::cerr << "BasicBox::addTriggerPoint : already existing" <<  std::endl;
-	}
+    }
+    else {
+        std::cerr << "BasicBox::addTriggerPoint : already existing" <<  std::endl;
+    }
 }
 
 void
@@ -726,7 +771,7 @@ BasicBox::setTriggerPointMessage(BoxExtremity extremity, const string &message)
 //	if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
     if(_triggerPoints->contains(extremity)){
         _triggerPoints->value(extremity)->setMessage(message);
-	}
+    }
 }
 
 string
@@ -737,14 +782,14 @@ BasicBox::triggerPointMessage(BoxExtremity extremity)
     if(_triggerPoints->contains(extremity))
         return _triggerPoints->value(extremity)->message();
 
-	else {
-		return "";
-	}
+    else {
+        return "";
+    }
 }
 
 void
-BasicBox::setFirstMessagesToSend(const vector<string> &messages) {    
-	_abstract->setFirstMsgs(messages);
+BasicBox::setFirstMessagesToSend(const vector<string> &messages) {
+    _abstract->setFirstMsgs(messages);
 }
 
 void
@@ -790,24 +835,24 @@ BasicBox::setEndMessages(NetworkMessages *messages) {
 
 vector<string>
 BasicBox::firstMessagesToSend() const {
-	return _abstract->firstMsgs();
+    return _abstract->firstMsgs();
 }
 
 vector<string>
 BasicBox::lastMessagesToSend() const {
-	return _abstract->lastMsgs();
+    return _abstract->lastMsgs();
 }
 
 AbstractCurve *
 BasicBox::getCurve(const std::string &address)
 {
-	AbstractCurve * curve = NULL;
-	map<string,AbstractCurve*>::iterator it;
-	if ((it = _abstractCurves.find(address)) != _abstractCurves.end()) {
-		curve = it->second;
-	}
+    AbstractCurve * curve = NULL;
+    map<string,AbstractCurve*>::iterator it;
+    if ((it = _abstractCurves.find(address)) != _abstractCurves.end()) {
+        curve = it->second;
+    }
 
-	return curve;
+    return curve;
 }
 
 void
@@ -818,18 +863,18 @@ BasicBox::curveActivationChanged(string address, bool activated){
     _curvesWidget->curveActivationChanged(QString::fromStdString(address),activated);
 
     if(!activated)
-        removeCurve(address);    
+        removeCurve(address);
 }
 
 void
 BasicBox::setCurve(const string &address, AbstractCurve *curve)
 {
-	if (curve != NULL) {
+    if (curve != NULL) {
         _abstractCurves[address] = curve;
-	}
-	else {
-		removeCurve(address);
-	}
+    }
+    else {
+        removeCurve(address);
+    }
 }
 
 void
@@ -848,138 +893,138 @@ BasicBox::addCurveAddress(const std::string &address){
 void
 BasicBox::removeCurve(const string &address)
 {
-	map<string,AbstractCurve*>::iterator it = _abstractCurves.find(address);
-	if (it != _abstractCurves.end()) {
-		_abstractCurves.erase(it);        
-	}
+    map<string,AbstractCurve*>::iterator it = _abstractCurves.find(address);
+    if (it != _abstractCurves.end()) {
+        _abstractCurves.erase(it);
+    }
     _curvesWidget->removeCurve(address);
 }
 
 void
 BasicBox::lock()
 {
-	setFlag(QGraphicsItem::ItemIsMovable, false);
+    setFlag(QGraphicsItem::ItemIsMovable, false);
 //    setFlag(QGraphicsItem::ItemIsSelectable, false);
-	setFlag(QGraphicsItem::ItemIsFocusable, false);
+    setFlag(QGraphicsItem::ItemIsFocusable, false);
 }
 
 void
 BasicBox::unlock()
 {
-	setFlag(QGraphicsItem::ItemIsMovable);
+    setFlag(QGraphicsItem::ItemIsMovable);
 //    setFlag(QGraphicsItem::ItemIsSelectable);
-	setFlag(QGraphicsItem::ItemIsFocusable);
+    setFlag(QGraphicsItem::ItemIsFocusable);
 }
 
 bool
 BasicBox::resizing() const
 {
-	return (cursor().shape() == Qt::SizeFDiagCursor)
-	|| (cursor().shape() == Qt::SizeHorCursor)
-	|| (cursor().shape() == Qt::SizeVerCursor);
+    return (cursor().shape() == Qt::SizeFDiagCursor)
+    || (cursor().shape() == Qt::SizeHorCursor)
+    || (cursor().shape() == Qt::SizeVerCursor);
 }
 
 bool
 BasicBox::operator<(BasicBox *box) const
 {
-	return beginPos() < box->beginPos() ;
+    return beginPos() < box->beginPos() ;
 }
 
 unsigned int
 BasicBox::date() const
 {
-	return beginPos() * MaquetteScene::MS_PER_PIXEL;
+    return beginPos() * MaquetteScene::MS_PER_PIXEL;
 }
 
 unsigned int
 BasicBox::duration() const
 {
-	return width() * MaquetteScene::MS_PER_PIXEL;
+    return width() * MaquetteScene::MS_PER_PIXEL;
 }
 
 unsigned int
 BasicBox::ID() const
 {
-	return _abstract->ID();
+    return _abstract->ID();
 }
 
 void
 BasicBox::setID(unsigned int ID)
 {
-	_abstract->setID(ID);
+    _abstract->setID(ID);
 }
 
 unsigned int
 BasicBox::mother() const
 {
-	return _abstract->mother();
+    return _abstract->mother();
 }
 
 void
 BasicBox::setMother(unsigned int motherID)
 {
-	_abstract->setMother(motherID);
+    _abstract->setMother(motherID);
 }
 
 bool BasicBox::hasMother()
-{ 
-	return (_abstract->mother() != NO_ID && _abstract->mother() != ROOT_BOX_ID);
+{
+    return (_abstract->mother() != NO_ID && _abstract->mother() != ROOT_BOX_ID);
 }
 
 QVariant
 BasicBox::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-	QVariant newValue = QGraphicsItem::itemChange(change,value);
-	//QVariant newValue(value);
-	if (change == ItemPositionChange) {
-		QPointF newPos = value.toPoint();
-		QPointF newnewPos(newPos);
-		if (hasMother()) {
-			BasicBox *motherBox = _scene->getBox(_abstract->mother());
-			if (motherBox != NULL) {
-				if ((motherBox->getTopLeft().y() + _abstract->height()/2.) >= newPos.y()) {
-					if (_scene->resizeMode() == NO_RESIZE) { // Trying to escape by a move to the top
-						newnewPos.setY(motherBox->getTopLeft().y() + _abstract->height()/2.);
-					}
-					else if (_scene->resizeMode() == VERTICAL_RESIZE
-							|| _scene->resizeMode() == DIAGONAL_RESIZE) { // Trying to escape by a resize to the top
-						// Not happening
-					}
-				}
-				if ((motherBox->getBottomRight().y() - _abstract->height()/2.) <= newPos.y()) {
-					if (_scene->resizeMode() == NO_RESIZE) { // Trying to escape by a move to the bottom
-						newnewPos.setY(motherBox->getBottomRight().y() - _abstract->height()/2);
-					}
-					else if (_scene->resizeMode() == VERTICAL_RESIZE
-							|| _scene->resizeMode() == DIAGONAL_RESIZE) { // Trying to escape by a resize to the bottom
-						_abstract->setHeight(motherBox->getBottomRight().y() - _abstract->topLeft().y());
-						newnewPos.setY(_abstract->topLeft().y() + _abstract->height()/2);
-					}
-				}
-				if ((motherBox->getTopLeft().x() + _abstract->width()/2.) >= newPos.x()) {
-					if (_scene->resizeMode() == NO_RESIZE) { // Trying to escape by a move to the left
-						newnewPos.setX(motherBox->getTopLeft().x() + _abstract->width()/2.);
-					}
-					else if (_scene->resizeMode() == HORIZONTAL_RESIZE
-							|| _scene->resizeMode() == DIAGONAL_RESIZE) { // Trying to escape by a resize to the left
-						// Not happening
-					}
-				}
-				if ((motherBox->getBottomRight().x() - _abstract->width()/2.) <= newPos.x()) {
-					if (_scene->resizeMode() == NO_RESIZE) { // Trying to escape by a move to the right
-						newnewPos.setX(motherBox->getBottomRight().x() - _abstract->width()/2);
-					}
-					else if (_scene->resizeMode() == HORIZONTAL_RESIZE
-							|| _scene->resizeMode() == DIAGONAL_RESIZE) { // Trying to escape by a resize to the right
-						// Handled by BasicBox::resizeWidthEdition()
-					}
-				}
-				newValue = QVariant(newnewPos);
-			}
-		}
-	}
+    QVariant newValue = QGraphicsItem::itemChange(change,value);
+    //QVariant newValue(value);
+    if (change == ItemPositionChange) {
+        QPointF newPos = value.toPoint();
+        QPointF newnewPos(newPos);
+        if (hasMother()) {
+            BasicBox *motherBox = _scene->getBox(_abstract->mother());
+            if (motherBox != NULL) {
+                if ((motherBox->getTopLeft().y() + _abstract->height()/2.) >= newPos.y()) {
+                    if (_scene->resizeMode() == NO_RESIZE) { // Trying to escape by a move to the top
+                        newnewPos.setY(motherBox->getTopLeft().y() + _abstract->height()/2.);
+                    }
+                    else if (_scene->resizeMode() == VERTICAL_RESIZE
+                            || _scene->resizeMode() == DIAGONAL_RESIZE) { // Trying to escape by a resize to the top
+                        // Not happening
+                    }
+                }
+                if ((motherBox->getBottomRight().y() - _abstract->height()/2.) <= newPos.y()) {
+                    if (_scene->resizeMode() == NO_RESIZE) { // Trying to escape by a move to the bottom
+                        newnewPos.setY(motherBox->getBottomRight().y() - _abstract->height()/2);
+                    }
+                    else if (_scene->resizeMode() == VERTICAL_RESIZE
+                            || _scene->resizeMode() == DIAGONAL_RESIZE) { // Trying to escape by a resize to the bottom
+                        _abstract->setHeight(motherBox->getBottomRight().y() - _abstract->topLeft().y());
+                        newnewPos.setY(_abstract->topLeft().y() + _abstract->height()/2);
+                    }
+                }
+                if ((motherBox->getTopLeft().x() + _abstract->width()/2.) >= newPos.x()) {
+                    if (_scene->resizeMode() == NO_RESIZE) { // Trying to escape by a move to the left
+                        newnewPos.setX(motherBox->getTopLeft().x() + _abstract->width()/2.);
+                    }
+                    else if (_scene->resizeMode() == HORIZONTAL_RESIZE
+                            || _scene->resizeMode() == DIAGONAL_RESIZE) { // Trying to escape by a resize to the left
+                        // Not happening
+                    }
+                }
+                if ((motherBox->getBottomRight().x() - _abstract->width()/2.) <= newPos.x()) {
+                    if (_scene->resizeMode() == NO_RESIZE) { // Trying to escape by a move to the right
+                        newnewPos.setX(motherBox->getBottomRight().x() - _abstract->width()/2);
+                    }
+                    else if (_scene->resizeMode() == HORIZONTAL_RESIZE
+                            || _scene->resizeMode() == DIAGONAL_RESIZE) { // Trying to escape by a resize to the right
+                        // Handled by BasicBox::resizeWidthEdition()
+                    }
+                }
+                newValue = QVariant(newnewPos);
+            }
+        }
+    }
 
-	return newValue;
+    return newValue;
 }
 
 QPainterPath
@@ -987,14 +1032,13 @@ BasicBox::shape() const
 {
     QPainterPath path;
 
-//    path.addRect(boundingRect());
     path.addRect(_boxRect);
     path.addRect(_leftEar);
     path.addRect(_rightEar);
     path.addRect(_startTriggerGrip);
     path.addRect(_endTriggerGrip);
 
-	return path;
+    return path;
 }
 
 void
@@ -1023,7 +1067,7 @@ BasicBox::boxBody()
 }
 void
 BasicBox::keyPressEvent(QKeyEvent *event){
-    QGraphicsItem::keyPressEvent(event);    
+    QGraphicsItem::keyPressEvent(event);
 }
 
 void
@@ -1097,11 +1141,11 @@ BasicBox::lower(bool state){
 void
 BasicBox::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
 {
-	QGraphicsItem::contextMenuEvent(event);
-	if (_hasContextMenu) {
-		setSelected(false);
-		_contextMenu->exec(event->screenPos());
-	}
+    QGraphicsItem::contextMenuEvent(event);
+    if (_hasContextMenu) {
+        setSelected(false);
+        _contextMenu->exec(event->screenPos());
+    }
 }
 
 QInputDialog *
@@ -1191,19 +1235,19 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void
 BasicBox::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-	QGraphicsItem::mouseReleaseEvent(event);
+    QGraphicsItem::mouseReleaseEvent(event);
 
     if (event->button() == Qt::LeftButton) {
         if(cursor().shape() == Qt::ClosedHandCursor)
             setCursor(Qt::OpenHandCursor);
         _scene->setAttributes(_abstract);
-	}
+    }
 
-	if (!playing()) {
-		unlock();
-	}
+    if (!playing()) {
+        unlock();
+    }
 
-	_scene->setResizeMode(NO_RESIZE);    
+    _scene->setResizeMode(NO_RESIZE);
 }
 
 void
@@ -1211,6 +1255,7 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 {
     QGraphicsItem::hoverEnterEvent(event);
 
+    _hover=true;
     const float RESIZE_ZONE_WIDTH = 3*LINE_WIDTH;
 
     QRectF textRect(_boxRect.topLeft(),_boxRect.topRight() + QPointF(0,RESIZE_TOLERANCE));
@@ -1274,7 +1319,7 @@ BasicBox::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
     //  Seulement si on passe trop vite dessus, il n'a pas le temps de l'affecter.
 
     QGraphicsItem::hoverEnterEvent(event);
-
+    _hover=true;
     const float RESIZE_ZONE_WIDTH = 3*LINE_WIDTH;
 
     QRectF textRect(_boxRect.topLeft(),_boxRect.topRight() + QPointF(0,3*RESIZE_TOLERANCE/4));
@@ -1331,6 +1376,7 @@ BasicBox::hoverLeaveEvent ( QGraphicsSceneHoverEvent * event )
 {
     QGraphicsItem::hoverLeaveEvent(event);
     setCursor(Qt::ArrowCursor);
+    _hover=false;
 }
 
 void
@@ -1490,17 +1536,21 @@ BasicBox::drawMsgsIndicators(QPainter *painter){
 void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-	Q_UNUSED(option);
-	Q_UNUSED(widget);  
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 //    QPen penR(Qt::lightGray,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
     QPen penR(isSelected() ? _color : _colorUnselected ,isSelected() ? 1.5 * LINE_WIDTH : LINE_WIDTH);
 
 
     //************* pour afficher la shape *************
-    QPen penG(Qt::green);
-    penG.setWidth(2);
-//    painter->setPen(penG);
-//    painter->drawRect(boundingRect());
+    QPen penG(Qt::blue);
+    penG.setWidth(4);
+//    if(_hover){
+//        painter->setPen(penG);
+//        painter->drawRect(boundingRect());
+//        QPainterPath path = shape();
+//        painter->drawPath(path);
+//    }
 //    painter->drawRect(_leftEar);
 //    painter->drawRect(_rightEar);
 //    painter->drawRect(_startTriggerGrip);
@@ -1521,22 +1571,22 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
     QBrush brush(Qt::lightGray,isSelected() ? Qt::SolidPattern : Qt::SolidPattern);
     QPen pen(color(),isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
-	painter->setPen(pen);
-	painter->setBrush(brush);
-	painter->setRenderHint(QPainter::Antialiasing, true);
+    painter->setPen(pen);
+    painter->setBrush(brush);
+    painter->setRenderHint(QPainter::Antialiasing, true);
 
-	QRectF textRect = QRectF(mapFromScene(getTopLeft()).x(),mapFromScene(getTopLeft()).y(), width(), RESIZE_TOLERANCE - LINE_WIDTH);
+    QRectF textRect = QRectF(mapFromScene(getTopLeft()).x(),mapFromScene(getTopLeft()).y(), width(), RESIZE_TOLERANCE - LINE_WIDTH);
 
-	QFont font;
-	font.setCapitalization(QFont::SmallCaps);
-	painter->setFont(font);
-	painter->translate(textRect.topLeft());
+    QFont font;
+    font.setCapitalization(QFont::SmallCaps);
+    painter->setFont(font);
+    painter->translate(textRect.topLeft());
 
-	if (_abstract->width() <= 3*RESIZE_TOLERANCE) {
-		painter->translate(QPointF(RESIZE_TOLERANCE - LINE_WIDTH,0));
-		painter->rotate(90);
-		textRect.setWidth(_abstract->height());
-	}
+    if (_abstract->width() <= 3*RESIZE_TOLERANCE) {
+        painter->translate(QPointF(RESIZE_TOLERANCE - LINE_WIDTH,0));
+        painter->rotate(90);
+        textRect.setWidth(_abstract->height());
+    }
 
     if (_abstract->width() <= 5*RESIZE_TOLERANCE) {
         _comboBoxProxy->setVisible(false);
@@ -1545,33 +1595,39 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
     painter->fillRect(0,0,textRect.width(),textRect.height(),isSelected() ? _color : _colorUnselected);
 
+    painter->save();
+    painter->setPen(QPen(Qt::black));
     painter->drawText(QRectF(10,0,textRect.width(),textRect.height()),Qt::AlignLeft,name());
+    painter->restore();
 
-	if (_abstract->width() <= 3*RESIZE_TOLERANCE) {
-		painter->rotate(-90);       
-		painter->translate(-QPointF(RESIZE_TOLERANCE - LINE_WIDTH,0));        
-	}
+    if (_abstract->width() <= 3*RESIZE_TOLERANCE) {
+        painter->rotate(-90);
+        painter->translate(-QPointF(RESIZE_TOLERANCE - LINE_WIDTH,0));
+    }
 
 
-	painter->translate(QPointF(0,0)-(textRect.topLeft()));
+    painter->translate(QPointF(0,0)-(textRect.topLeft()));
 
-	if (cursor().shape() == Qt::SizeHorCursor) {
+    if (cursor().shape() == Qt::SizeHorCursor) {
         static const float S_TO_MS = 1000.;
         painter->drawText(_boxRect.bottomRight() - QPoint(2*RESIZE_TOLERANCE,0),QString("%1s").arg((double)duration() / S_TO_MS));
-	}
+    }
 
     painter->translate(_boxRect.topLeft());
 
-	if (_playing) {
+    if (_playing) {
         QPen pen = painter->pen();
+        pen.setColor(Qt::black);
+        pen.setWidth(3);
         QBrush brush = painter->brush();
         brush.setStyle(Qt::NoBrush);
         painter->setPen(pen);
         brush.setColor(Qt::blue);
         painter->setBrush(brush);
-		const float progressPosX = _scene->getProgression(_abstract->ID())*(_abstract->width());
-		painter->fillRect(0,_abstract->height()-RESIZE_TOLERANCE/2.,progressPosX,RESIZE_TOLERANCE/2.,Qt::darkGreen);
-		painter->drawLine(QPointF(progressPosX,RESIZE_TOLERANCE),QPointF(progressPosX,_abstract->height()));       
+        const float progressPosX = _scene->getProgression(_abstract->ID())*(_abstract->width());
+        painter->fillRect(0,_abstract->height()-RESIZE_TOLERANCE/2.,progressPosX,RESIZE_TOLERANCE/2.,Qt::darkGreen);
+
+        painter->drawLine(QPointF(progressPosX,RESIZE_TOLERANCE),QPointF(progressPosX,_abstract->height()));
     }
     painter->translate(QPointF(0,0) - _boxRect.topLeft());
 

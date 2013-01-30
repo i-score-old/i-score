@@ -49,6 +49,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QGraphicsItem>
 #include <QGraphicsSvgItem>
 #include <map>
+#include <QMap>
 #include <vector>
 #include <string>
 #include <QInputDialog>
@@ -593,6 +594,13 @@ class BasicBox : public QObject, public QGraphicsItem
   void changeColor(QColor color);
   inline QColor currentColor(){return _color;}
 
+  /*!
+   * \brief Return the messages list, like if the box just ended its execution.
+   * \return QMap <message address, QPair<value, date> >
+   */
+  QMap<QString,QPair<QString,unsigned int> > getFinalState();
+  QMap<QString,QPair<QString,unsigned int> > getStartState();
+
  protected:
   /*!
    * \brief Create the QInputDialog, for asking new name.
@@ -697,6 +705,7 @@ class BasicBox : public QObject, public QGraphicsItem
   QColor _color;
   QColor _colorUnselected;
   bool _low;
+  bool _hover;
 };
 
 #endif

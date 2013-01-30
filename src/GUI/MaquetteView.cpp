@@ -46,6 +46,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "AttributesEditor.hpp"
 #include "TimeBarWidget.hpp"
 #include "Maquette.hpp"
+#include "math.h"
+#include "TriggerPoint.hpp"
 
 #include <QGraphicsSceneDragDropEvent>
 #include <QMimeData>
@@ -53,6 +55,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QKeyEvent>
 #include <QScrollBar>
 #include <QPushButton>
+
 
 using namespace SndBoxProp;
 
@@ -100,6 +103,7 @@ MaquetteView::wheelEvent(QWheelEvent *event){
 void
 MaquetteView::setGotoValue(int value) {
 	_gotoValue = value;
+    _scene->updateProgressBar();    
     updateSceneWithoutCenterOn();
 }
 
@@ -125,7 +129,6 @@ MaquetteView::updateScene(){
 
 void
 MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
-
   QGraphicsView::drawBackground(painter,rect);
 //  QPen pen(Qt::darkGreen);
   QPen pen(QColor(145,145,145));
@@ -138,11 +141,12 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
   const int HEIGHT = sceneRect().height();
   for (int i = 0 ; i <= (WIDTH * MaquetteScene::MS_PER_PIXEL) / S_TO_MS ; i++) { // for each second
   	int i_PXL = i * S_TO_MS / MaquetteScene::MS_PER_PIXEL;
-  	if (_zoom < 1 && ((i % (int)(1./_zoom)) != 0 )) {
-  		continue;
-  	}
+    if (_zoom < 1 && ((i % (int)(1./_zoom)) != 0 )) {
+        continue;
+    }
 // 	 painter->drawText(QPointF(i_PXL, 10),QString("%1").arg(i));
-     painter->drawLine(QPointF(i_PXL, 0), QPointF(i_PXL, HEIGHT));
+   painter->drawLine(QPointF(i_PXL, 0), QPointF(i_PXL, HEIGHT));
+
    if (_zoom > 1) {
          QPen pen = painter->pen();
 	 	 QPen savePen = pen;
@@ -160,20 +164,23 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
     }
   }
 
-  double progressBarPosX = _gotoValue/(float)MaquetteScene::MS_PER_PIXEL;
+//  if(!_scene->playing()){
+//      //drawGotoBar
+//      std::cout<<"not playing"<<std::endl;
+//      double gotoBarPosX = _gotoValue/(float)MaquetteScene::MS_PER_PIXEL;
+//      QPen reSavedPen = painter->pen();
+//      QPen pen3(Qt::black);
+//      pen3.setWidth(3);
+//      painter->setPen(pen3);
+//      painter->drawLine(QPointF(gotoBarPosX,0),QPointF(gotoBarPosX,HEIGHT));
 
-  QPen reSavedPen = painter->pen();
-  QPen pen3(Qt::black);
-  pen3.setWidth(3);
-  painter->setPen(pen3);
-  painter->drawLine(QPointF(progressBarPosX,0),QPointF(progressBarPosX,HEIGHT));
+//    //  pen3.setColor(Qt::white);
+//    //  pen3.setWidth(1);
+//    //  painter->setPen(pen3);
+//    //  painter->drawLine(QPointF(progressBarPosX,0),QPointF(progressBarPosX,HEIGHT));
 
-//  pen3.setColor(Qt::white);
-//  pen3.setWidth(1);
-//  painter->setPen(pen3);
-//  painter->drawLine(QPointF(progressBarPosX,0),QPointF(progressBarPosX,HEIGHT));
-
-  painter->setPen(reSavedPen);
+//      painter->setPen(reSavedPen);
+//  }
 
   if (_scene->tracksView()) {
     QPen pen2(Qt::darkGray);
@@ -182,9 +189,50 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
     painter->setPen(pen2);
 
     for (int i = 0 ; i <= MaquetteScene::MAX_SCENE_HEIGHT ; i=i+150) {
-    	painter->drawLine(QPointF(0,i), QPointF(MaquetteScene::MAX_SCENE_WIDTH, i));
+        painter->drawLine(QPointF(0,i), QPointF(MaquetteScene::MAX_SCENE_WIDTH, i));
     }
   }
+}
+
+void
+MaquetteView::triggerShortcut(int shorcut){
+    QList<TriggerPoint *>::iterator it = triggersQueueList().begin();
+    TriggerPoint *currentTrigger;
+    int waitingTriggers;
+
+    int triggerNumero;
+
+    switch (shorcut){
+        case Qt::Key_0 :
+            triggerNumero = 1;
+            break;
+
+        case Qt::Key_1 :
+            triggerNumero = 2;
+            break;
+
+        case Qt::Key_2 :
+            triggerNumero = 3;
+            break;
+
+        case Qt::Key_3 :
+            triggerNumero = 4;
+            break;
+    }
+
+    if(triggersQueueList().size() >= triggerNumero){
+        waitingTriggers = 0;
+
+        while(it!=triggersQueueList().end() && waitingTriggers<triggerNumero){
+            currentTrigger = *it;
+            if(currentTrigger->isWaiting())
+                waitingTriggers++;
+
+            it++;
+        }
+        if(triggerNumero==waitingTriggers)
+            _scene->trigger(currentTrigger);
+    }
 }
 
 void
@@ -211,14 +259,38 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
 		_scene->removeSelectedItems();
 		_scene->displayMessage(tr("Selection removed").toStdString(),INDICATION_LEVEL);
     }
-    else if (event->key()==Qt::Key_Space && !_scene->playing()) {
+    else if ((event->key()==Qt::Key_Space || event->key()==Qt::Key_Comma || event->key()==Qt::Key_Period) && !_scene->playing()) {
         _scene->play();
         _scene->displayMessage(tr("Start playing").toStdString(),INDICATION_LEVEL);
+        emit(playModeChanged());
+    }
+    else if ((event->key()==Qt::Key_Space || event->key()==Qt::Key_Comma || event->key()==Qt::Key_Period) && _scene->playing()) {
+        _scene->pause();
+        _scene->displayMessage(tr("Stop playing").toStdString(),INDICATION_LEVEL);
+        emit(playModeChanged());
     }
     else if (event->key()==Qt::Key_Enter || event->key()==Qt::Key_Return) {
-        _scene->stop();
-        _scene->displayMessage(tr("Stop playing").toStdString(),INDICATION_LEVEL);
+        _scene->stopGotoStart();
+        _scene->displayMessage(tr("Stop playing and go to start").toStdString(),INDICATION_LEVEL);
+        emit(playModeChanged());
     }
+    else if (event->key()==Qt::Key_0){
+        if(!_scene->playing()){
+            _scene->play();
+            _scene->displayMessage(tr("Start playing").toStdString(),INDICATION_LEVEL);
+            emit(playModeChanged());
+        }
+        else
+            triggerShortcut(Qt::Key_0);
+    }
+    else if (event->key()==Qt::Key_1 || event->key()==Qt::Key_2 || event->key()==Qt::Key_3)
+        triggerShortcut(event->key());
+
+}
+
+QList<TriggerPoint *>
+MaquetteView::triggersQueueList(){
+    return _scene->triggersQueueList();
 }
 
 /**
@@ -234,15 +306,46 @@ MaquetteView::zoomIn()
         resetCachedContent();
         _scene->update();
 
-		Maquette::getInstance()->updateBoxesFromEngines();
-        emit(zoomChanged(_zoom));
+        Maquette::getInstance()->updateBoxesFromEngines();
 	}
 }
 
 QPointF
 MaquetteView::getCenterCoordinates(){
-    QPointF centerCoordinates;
+    QPointF centerCoordinates =  mapToScene(viewport()->rect().center());
     return centerCoordinates;
+}
+
+void
+MaquetteView::setZoom(float value){
+    _zoom=value;
+    int nb_zoom ;
+
+    //zoom out
+    if(value>1){
+
+        nb_zoom = log2(value);
+        for(int i = 0; i<nb_zoom; i++)
+            MaquetteScene::MS_PER_PIXEL /= 2;
+    }
+
+    //zoom in
+    else if(value<1){
+        if (MaquetteScene::MS_PER_PIXEL > 0.125) {
+            int c=0;
+            while(value<1){
+                value*=2;
+                c++;
+            }
+            nb_zoom = c;
+            for(int i = 0; i<nb_zoom; i++)
+                MaquetteScene::MS_PER_PIXEL *= 2;
+        }
+    }
+    repaint();
+    resetCachedContent();
+    _scene->update();
+    Maquette::getInstance()->updateBoxesFromEngines();
 }
 
 /**
@@ -254,7 +357,6 @@ MaquetteView::zoomOut()
     MaquetteScene::MS_PER_PIXEL *= 2;
 
     _zoom /= 2.;
-    emit(zoomChanged(_zoom));
     resetCachedContent();
     _scene->update();
     Maquette::getInstance()->updateBoxesFromEngines();

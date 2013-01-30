@@ -224,10 +224,12 @@ class Relation : public QGraphicsItem
 
   QPointF _start; //!< The starting point of the relation.
   QPointF _end; //!< The ending point of the relation.
+  float _startBound;
+  float _endBound;
 
   QRectF _startBoundRect;
   QRectF _endBoundRect;
-  float _zoomFactor;
+  float _zoom;
 
   bool _leftHandleSelected; //!< Left handle selection state.
   bool _rightHandleSelected; //!< Right handle selection state.
@@ -236,6 +238,9 @@ class Relation : public QGraphicsItem
   bool _flexibleRelation;//!< The relation can be extended
   bool _elasticMode;//!< For rigid relations
   float _lastMaxBound;
+
+  bool _leftBoundModified;
+  bool _rightBoundModified;
 
   static const float ARROW_SIZE; //!< The size of the arrow.
   static const float HANDLE_HEIGHT; //!< The height of a handle.
