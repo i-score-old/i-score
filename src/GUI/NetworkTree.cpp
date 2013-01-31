@@ -499,74 +499,78 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
         TTList      returnedChildren;
         TTValue     v, attributeValue;
         TTSymbol    name;
+        TTErr       err;
 
         std::cout << "NetworkTree::treeRecursiveExploration : address = " << itemAddress.c_str() << std::endl;
 
         _addressMap.insert(curItem, itemAddress.c_str());
 
         // retrieve the node in the directory
-        getDirectoryFrom(itemAddress)->getTTNode(itemAddress, &itemNode);
+        err = getDirectoryFrom(itemAddress)->getTTNode(itemAddress, &itemNode);
 
-        // get all children
-        itemNode->getChildren(S_WILDCARD, S_WILDCARD, returnedChildren);
+        if (!err) {
 
-        for (returnedChildren.begin(); returnedChildren.end(); returnedChildren.next()) {
+            // get all children
+            itemNode->getChildren(S_WILDCARD, S_WILDCARD, returnedChildren);
 
-            // get a node from the TTList
-            aNode = TTNodePtr((TTPtr)returnedChildren.current()[0]);
+            for (returnedChildren.begin(); returnedChildren.end(); returnedChildren.next()) {
 
-            QStringList list;
-            list << aNode->getName().c_str();
+                // get a node from the TTList
+                aNode = TTNodePtr((TTPtr)returnedChildren.current()[0]);
 
-            QTreeWidgetItem *childItem = new QTreeWidgetItem(list, LeaveType);
+                QStringList list;
+                list << aNode->getName().c_str();
 
-            curItem->setCheckState(START_COLUMN,Qt::Unchecked);
-            curItem->setCheckState(END_COLUMN,Qt::Unchecked);
-            curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-            curItem->addChild(childItem);
+                QTreeWidgetItem *childItem = new QTreeWidgetItem(list, LeaveType);
 
-            list.clear();
-            treeRecursiveExploration(childItem);
-        }
+                curItem->setCheckState(START_COLUMN,Qt::Unchecked);
+                curItem->setCheckState(END_COLUMN,Qt::Unchecked);
+                curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+                curItem->addChild(childItem);
 
-        // if the node refer to an object : get attribute names and value
-        if (itemNode->getObject()) {
+                list.clear();
+                treeRecursiveExploration(childItem);
+            }
 
-            itemNode->getObject()->getAttributeNames(v);
+            // if the node refer to an object : get attribute names and value
+            if (itemNode->getObject()) {
 
-            for (TTUInt32 i = 0; i < v.size(); i++) {
+                itemNode->getObject()->getAttributeNames(v);
 
-                name = v[i];
+                for (TTUInt32 i = 0; i < v.size(); i++) {
 
-                itemNode->getObject()->getAttributeValue(name, attributeValue);
+                    name = v[i];
 
-                attributeValue.toString();
+                    itemNode->getObject()->getAttributeValue(name, attributeValue);
 
-                if (name == kTTSym_value) {
+                    attributeValue.toString();
 
-                    TTString leave_value = attributeValue[0];
-                    QFont font;
+                    if (name == kTTSym_value) {
 
-                    font.setCapitalization(QFont::SmallCaps);
+                        TTString leave_value = attributeValue[0];
+                        QFont font;
 
-                    curItem->setText(VALUE_COLUMN, leave_value.c_str());
-                    curItem->setFont(VALUE_COLUMN,font);
-                    curItem->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
-                    curItem->setCheckState(REDUNDANCY_COLUMN,Qt::Unchecked);
-                    curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
-                }
-                else {
+                        font.setCapitalization(QFont::SmallCaps);
 
-                    TTString nameAndValue = name.string();
-                    nameAndValue += " : ";
-                    nameAndValue += TTString(attributeValue[0]);
+                        curItem->setText(VALUE_COLUMN, leave_value.c_str());
+                        curItem->setFont(VALUE_COLUMN,font);
+                        curItem->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
+                        curItem->setCheckState(REDUNDANCY_COLUMN,Qt::Unchecked);
+                        curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
+                    }
+                    else {
 
-                    QStringList list;
-                    list << nameAndValue.c_str();
+                        TTString nameAndValue = name.string();
+                        nameAndValue += " : ";
+                        nameAndValue += TTString(attributeValue[0]);
 
-                    QTreeWidgetItem *childItem = new QTreeWidgetItem(list, AttributeType);
+                        QStringList list;
+                        list << nameAndValue.c_str();
 
-                    list.clear();
+                        QTreeWidgetItem *childItem = new QTreeWidgetItem(list, AttributeType);
+
+                        list.clear();
+                    }
                 }
             }
         }
