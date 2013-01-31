@@ -159,6 +159,13 @@ class Maquette : public QObject
 	 */
   void init();
 
+#ifdef USE_JAMOMA
+    /*!
+    * \brief Used to show how to deal with the TTNodeDirectory
+    */
+  void dumpAddressBelow(TTNodePtr aNode);
+#endif
+
 	/*!
 	 * \brief Sets a new scene.
 	 *

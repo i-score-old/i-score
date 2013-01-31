@@ -75,17 +75,24 @@ typedef map<unsigned int,TriggerPoint*> TrgPntMap;
 
 using namespace SndBoxProp;
 
+#ifndef USE_JAMOMA
+void
+Maquette::init() {
+
+    ;
+}
+
+#else
 void
 Maquette::init() {
 
     TTErr               err;
     TTValue             args, v;
     TTString            applicationName = "i-score";            // TODO : declare as global variable
-    TTApplicationPtr    iscore;                               // TODO : declare as global variable
+    TTObjectBasePtr     iscore;                                 // TODO : declare as global variable
     TTString            configFile = "/usr/local/include/IScore/i-scoreConfiguration.xml";
     TTString            pluginsDir = "/usr/local/lib/IScore";
-
-    vector<string>  pluginsLoaded;
+    TTHash              hashParameters;
 
     ///////////////////////////
     // Init the Modular library
@@ -97,15 +104,6 @@ Maquette::init() {
 
     // Get i-score
     iscore = getLocalApplication;
-
-    // Check if the configuration file have been loaded correctly
-    iscore->getAttributeValue(TTSymbol("allAppNames"), v);
-    if (!v.size()) {
-        string errorConfig;
-        errorConfig.append(tr("i-scoreConfiguration.xml can't be loaded. It is expected in ").toStdString());
-        errorConfig.append(configFile);
-        _scene->displayMessage(errorConfig,ERROR_LEVEL);
-    }
 
     ///////////////////////////
     // Init the Score library
@@ -124,23 +122,40 @@ Maquette::init() {
     }
 
     ////////////
-    // Example : Add a distant application and use the Minuit protocol to handle it
+    // Example : Create a distant application
     ////////////
-    TTApplicationPtr	anApplication = NULL;
+    TTObjectBasePtr	anApplication = NULL;
 
     // create an application
     args = TTValue(TTSymbol("myApplication"));
     TTObjectBaseInstantiate(kTTSym_Application, TTObjectBaseHandle(&anApplication), args);
 
+    ////////////
+    // Example : Register local and distant application to the Minuit protocol
+    ////////////
+
     // check if the Minuit protocol has been loaded
     if (getProtocol(TTSymbol("Minuit"))) {
+
+        // register the local application to the Minuit protocol
+        v = TTValue(TTSymbol(applicationName));
+        getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), v, kTTValNONE);
+
+        // set the Minuit parameters for the local application
+        hashParameters.clear();
+        hashParameters.append(TTSymbol("port"), 8002);
+        hashParameters.append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
+
+        v = TTValue(TTSymbol(applicationName));
+        v.append(TTPtr(&hashParameters));
+        getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
 
         // register this application to the Minuit protocol
         v = TTValue(TTSymbol("myApplication"));
         getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), v, kTTValNONE);
 
-        // set the Minuit parameters for this application
-        TTHash	hashParameters;
+        // set the Minuit parameters for the distant application
+        hashParameters.clear();
         hashParameters.append(TTSymbol("port"), 9998);
         hashParameters.append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
 
@@ -153,9 +168,60 @@ Maquette::init() {
     }
 
     ////////////
-    // Example : Fill the namespace of i-score
+    // Example : Read the namespace of myApplication from a namespace file
     ////////////
+
+    // create a TTXmlHandler class to parse a xml namespace file
+    TTXmlHandlerPtr myXmlHandler = NULL;
+    TTObjectBaseInstantiate(kTTSym_XmlHandler, TTObjectBaseHandle(&myXmlHandler), kTTValNONE);
+
+    // prepare the TTXmlHandler to pass the result of the parsing to myApplication
+    v = TTValue(anApplication);
+    myXmlHandler->setAttributeValue(TTSymbol("object"), v);
+
+    // read a namespace file
+    err = myXmlHandler->sendMessage(TTSymbol("Read"), TTSymbol("/Users/WALL-E/Documents/Jamoma/Modules/Modular/implementations/MaxMSP/jcom.modular/remoteApp-namespace.xml"), kTTValNONE);
+
+    if (!err) {
+
+        // get the root of the TNodeDirectory of myApplication
+        // note : the TTNodeDirectory is a tree structure used to registered and retrieve TTObjects using TTAddress
+        TTNodeDirectoryPtr anApplicationDirectory = getApplicationDirectory(TTSymbol("myApplication"));
+
+        // return all addresses of the TTNodeDirectory
+        std::cout <<"__ Dump myApplication directory __"<<std::endl;
+        dumpAddressBelow(anApplicationDirectory->getRoot());
+        std::cout <<"__________________________________"<<std::endl;
+    }
+
+    ////////////
+    // Example : Build the namespace of myApplication using discovery feature (if the protocol provides it)
+    ////////////
+
+    anApplication->sendMessage(TTSymbol("DirectoryBuild"));
+
+    // note : you can create an OSC receive on the 9998 port to see that a namespace is sent by i-score (using Pure Data for example)
 }
+
+void
+Maquette::dumpAddressBelow(TTNodePtr aNode) {
+
+    TTList      returnedChildren;
+    TTAddress   anAddress;
+
+    aNode->getChildren(S_WILDCARD, S_WILDCARD, returnedChildren);
+
+    for (returnedChildren.begin(); returnedChildren.end(); returnedChildren.next()) {
+
+        aNode = TTNodePtr((TTPtr)returnedChildren.current()[0]);
+        aNode->getAddress(anAddress);
+
+        std::cout <<"   "<< anAddress.string()<<std::endl;
+        dumpAddressBelow(aNode);
+    }
+}
+
+#endif  // USE_JAMOMA
 
 Maquette::Maquette():_engines(NULL) {
 	//init();
@@ -545,10 +611,46 @@ Maquette::changeNetworkDevice(const string &deviceName, const string &pluginName
 	_engines->addNetworkDevice(deviceName,pluginName,IP,port);
 }
 
+#ifndef USE_JAMOMA
 void
 Maquette::getNetworkDeviceNames(vector<string> &deviceName, vector<bool> &namespaceRequestable) {
-	_engines->getNetworkDevicesName(deviceName,namespaceRequestable);
+
+    _engines->getNetworkDevicesName(deviceName, namespaceRequestable);
 }
+
+#else
+
+void
+Maquette::getNetworkDeviceNames(vector<string> &deviceName, vector<bool> &namespaceRequestable) {
+
+    TTValue applicationNames, protocolNames;
+    TTSymbol name;
+
+    // get all application name
+    TTModularApplications->getAttributeValue(TTSymbol("applicationNames"), applicationNames);
+
+    for (TTUInt8 i = 0; i < applicationNames.size(); i++) {
+
+        // don't return the local application
+        name = applicationNames[i];
+        if (name == getLocalApplicationName)
+            continue;
+
+        deviceName.push_back(name.c_str());
+
+        // get all protocol names used by this application
+        protocolNames = getApplicationProtocols(name);
+
+        // if there is at least one protocol,
+        if (protocolNames.size()) {
+
+            // look if it provides namespace exploration
+            name = protocolNames[0];
+            namespaceRequestable.push_back(getProtocol(name)->mExploration);
+        }
+    }
+}
+#endif  // USE_JAMOMA
 
 vector<string> Maquette::requestNetworkSnapShot(const string &address) {
 	return _engines->requestNetworkSnapShot(address);

@@ -167,6 +167,7 @@ RESOURCES += i-score.qrc
 
 DEFINES += __Types__
 DEFINES += TTDATA_NO_RAMPLIB
+DEFINES += USE_JAMOMA
 
 ICON = images/acousmoscribe.icns
 
