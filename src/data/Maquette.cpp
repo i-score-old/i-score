@@ -75,34 +75,31 @@ typedef map<unsigned int,TriggerPoint*> TrgPntMap;
 
 using namespace SndBoxProp;
 
-#ifndef USE_JAMOMA
+#ifndef USE_JAMOMA_MODULAR
 void
 Maquette::init() {
 
-    string pluginsDir = "/usr/local/lib/IScore";
+    TTErr           err;
+    TTValue         args;
+    TTString        pluginsDir = "/usr/local/lib/IScore";
+    vector<string>  pluginsLoaded;
 
-    _engines = new Engines(SCENARIO_SIZE,pluginsDir);
+    TTScoreInit();
 
-    vector<string> pluginsLoaded;
+    args = TTValue(SCENARIO_SIZE);
+    args.append(pluginsDir);
+    err = TTObjectBaseInstantiate(TTSymbol("Engine"), TTObjectBaseHandle(&_engines), args);
 
-    _engines->getLoadedNetworkPlugins(pluginsLoaded,_listeningPorts);
+    if (!err) {
 
-    if(pluginsLoaded.empty()){
-        string pluginsDir =  (QCoreApplication::applicationDirPath()+"/../plugins/i-score").toStdString();
-        _engines = new Engines(SCENARIO_SIZE,pluginsDir);
         _engines->getLoadedNetworkPlugins(pluginsLoaded,_listeningPorts);
-        if(pluginsLoaded.empty()){
-            string error;
-            error.append(tr("No network plugins found in ").toStdString());
-            error.append(pluginsDir);
-            _scene->displayMessage(error,ERROR_LEVEL);
-        }
-        else{
+
+        if (!pluginsLoaded.empty()) {
             vector<string>::iterator it;
             vector<unsigned int>::iterator it2;
             for (it = pluginsLoaded.begin(), it2 = _listeningPorts.begin();
-                (it != pluginsLoaded.end()) && (it2 != _listeningPorts.end()) ;
-                it++,it2++) {
+                 (it != pluginsLoaded.end()) && (it2 != _listeningPorts.end()) ;
+                 it++,it2++) {
                 stringstream deviceName;
                 deviceName << *it << "Device";
                 MyDevice device(deviceName.str(),*it,*it2,NETWORK_LOCALHOST);
@@ -135,49 +132,17 @@ Maquette::init() {
                 _engines->addNetworkDevice(minuitDevice.name,minuitDevice.plugin,minuitDevice.networkHost,port.str());
             }
         }
-    }
-    else{
-        vector<string>::iterator it;
-        vector<unsigned int>::iterator it2;
-        for (it = pluginsLoaded.begin(), it2 = _listeningPorts.begin();
-            (it != pluginsLoaded.end()) && (it2 != _listeningPorts.end()) ;
-            it++,it2++) {
-            stringstream deviceName;
-            deviceName << *it << "Device";
-            MyDevice device(deviceName.str(),*it,*it2,NETWORK_LOCALHOST);
-            _devices[device.name] = device;
-            stringstream devicePort;
-            devicePort << device.networkPort;
-            _engines->addNetworkDevice(device.name,device.plugin,device.networkHost,devicePort.str());
+        else {
+            string error;
+            error.append(tr("No network plugins found in ").toStdString());
+            error.append(pluginsDir);
+            _scene->displayMessage(error,ERROR_LEVEL);
         }
-        map<string,MyDevice>::iterator deviceIt;
-        deviceIt = _devices.find("OSCDevice");
-        if (deviceIt != _devices.end()) {
-            MyDevice maxDevice = deviceIt->second;
-            maxDevice.name = "MaxDevice";
-            maxDevice.networkPort = 7000;
-            maxDevice.networkHost = "127.0.0.1";
-            _devices[maxDevice.name] = maxDevice;
-            stringstream port;
-            port << maxDevice.networkPort;
-            _engines->addNetworkDevice(maxDevice.name,maxDevice.plugin,maxDevice.networkHost,port.str());
-        }
-        deviceIt = _devices.find("MinuitDevice");
-        if (deviceIt != _devices.end()) {
-            MyDevice minuitDevice = deviceIt->second;
-            minuitDevice.name = "MinuitDevice1";
-            minuitDevice.networkPort = 9998;
-            minuitDevice.networkHost = "127.0.0.1";
-            _devices[minuitDevice.name] = minuitDevice;
-            stringstream port;
-            port << minuitDevice.networkPort;
-            _engines->addNetworkDevice(minuitDevice.name,minuitDevice.plugin,minuitDevice.networkHost,port.str());
-        }
-    }
 
-    _engines->addCrossingCtrlPointCallback(&crossTransitionCallback);
-    _engines->addCrossingTrgPointCallback(&crossTriggerPointCallback);
-    _engines->addExecutionFinishedCallback(&executionFinishedCallback);
+        _engines->addCrossingCtrlPointCallback(&crossTransitionCallback);
+        _engines->addCrossingTrgPointCallback(&crossTriggerPointCallback);
+        _engines->addExecutionFinishedCallback(&executionFinishedCallback);
+    }
 }
 
 #else
@@ -283,7 +248,7 @@ Maquette::init() {
     myXmlHandler->setAttributeValue(TTSymbol("object"), v);
 
     // read a namespace file
-    err = myXmlHandler->sendMessage(TTSymbol("Read"), TTSymbol("/Users/WALL-E/Documents/Jamoma/Modules/Modular/implementations/MaxMSP/jcom.modular/remoteApp-namespace.xml"), kTTValNONE);
+    err = myXmlHandler->sendMessage(TTSymbol("Read"), TTSymbol("/Users/WALL-E/Documents/Jamoma/Modules/Modular/implementations/MaxMSP/jcom.modular/remoteApp - namespace.xml"), kTTValNONE);
 
     if (!err) {
 
@@ -292,7 +257,7 @@ Maquette::init() {
         TTNodeDirectoryPtr anApplicationDirectory = getApplicationDirectory(TTSymbol("myApplication"));
 
         // return all addresses of the TTNodeDirectory
-        std::cout <<"__ Dump myApplication directory __"<<std::endl;
+        std::cout <<"__ Dump myApplication directory __"<< std::endl;
 
         // start to dump addresses recursilvely from the root of the directory
         dumpAddressBelow(anApplicationDirectory->getRoot());
@@ -332,7 +297,7 @@ Maquette::dumpAddressBelow(TTNodePtr aNode) {
         dumpAddressBelow(aNode);
     }
 }
-#endif  // USE_JAMOMA
+#endif  // USE_JAMOMA_MODULAR
 
 Maquette::Maquette():_engines(NULL) {
 	//init();

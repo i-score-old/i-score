@@ -305,7 +305,7 @@ NetworkTree::loadNetworkTree(AbstractBox *abBox){
     setEndMessages(endMsg);
 }
 
-#ifndef USE_JAMOMA
+#ifndef USE_JAMOMA_MODULAR
 QString
 NetworkTree::getAbsoluteAddress(QTreeWidgetItem *item) const {
     QString address;
@@ -427,7 +427,7 @@ NetworkTree::hasStartEndMsg(QTreeWidgetItem *item){
 //    QByteArray =
 //}
 
-#ifndef USE_JAMOMA
+#ifndef USE_JAMOMA_MODULAR
 void
 NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
 
@@ -576,7 +576,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
         }
     }
 }
-#endif  // USE_JAMOMA
+#endif  // USE_JAMOMA_MODULAR
 
 void
 NetworkTree::clearColumn(unsigned int column){

@@ -159,7 +159,7 @@ class Maquette : public QObject
 	 */
   void init();
 
-#ifdef USE_JAMOMA
+#ifdef USE_JAMOMA_MODULAR
     /*!
     * \brief Used to show how to deal with the TTNodeDirectory
     */
