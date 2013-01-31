@@ -79,7 +79,105 @@ using namespace SndBoxProp;
 void
 Maquette::init() {
 
-    ;
+    string pluginsDir = "/usr/local/lib/IScore";
+
+    _engines = new Engines(SCENARIO_SIZE,pluginsDir);
+
+    vector<string> pluginsLoaded;
+
+    _engines->getLoadedNetworkPlugins(pluginsLoaded,_listeningPorts);
+
+    if(pluginsLoaded.empty()){
+        string pluginsDir =  (QCoreApplication::applicationDirPath()+"/../plugins/i-score").toStdString();
+        _engines = new Engines(SCENARIO_SIZE,pluginsDir);
+        _engines->getLoadedNetworkPlugins(pluginsLoaded,_listeningPorts);
+        if(pluginsLoaded.empty()){
+            string error;
+            error.append(tr("No network plugins found in ").toStdString());
+            error.append(pluginsDir);
+            _scene->displayMessage(error,ERROR_LEVEL);
+        }
+        else{
+            vector<string>::iterator it;
+            vector<unsigned int>::iterator it2;
+            for (it = pluginsLoaded.begin(), it2 = _listeningPorts.begin();
+                (it != pluginsLoaded.end()) && (it2 != _listeningPorts.end()) ;
+                it++,it2++) {
+                stringstream deviceName;
+                deviceName << *it << "Device";
+                MyDevice device(deviceName.str(),*it,*it2,NETWORK_LOCALHOST);
+                _devices[device.name] = device;
+                stringstream devicePort;
+                devicePort << device.networkPort;
+                _engines->addNetworkDevice(device.name,device.plugin,device.networkHost,devicePort.str());
+            }
+            map<string,MyDevice>::iterator deviceIt;
+            deviceIt = _devices.find("OSCDevice");
+            if (deviceIt != _devices.end()) {
+                MyDevice maxDevice = deviceIt->second;
+                maxDevice.name = "MaxDevice";
+                maxDevice.networkPort = 7000;
+                maxDevice.networkHost = "127.0.0.1";
+                _devices[maxDevice.name] = maxDevice;
+                stringstream port;
+                port << maxDevice.networkPort;
+                _engines->addNetworkDevice(maxDevice.name,maxDevice.plugin,maxDevice.networkHost,port.str());
+            }
+            deviceIt = _devices.find("MinuitDevice");
+            if (deviceIt != _devices.end()) {
+                MyDevice minuitDevice = deviceIt->second;
+                minuitDevice.name = "MinuitDevice1";
+                minuitDevice.networkPort = 9998;
+                minuitDevice.networkHost = "127.0.0.1";
+                _devices[minuitDevice.name] = minuitDevice;
+                stringstream port;
+                port << minuitDevice.networkPort;
+                _engines->addNetworkDevice(minuitDevice.name,minuitDevice.plugin,minuitDevice.networkHost,port.str());
+            }
+        }
+    }
+    else{
+        vector<string>::iterator it;
+        vector<unsigned int>::iterator it2;
+        for (it = pluginsLoaded.begin(), it2 = _listeningPorts.begin();
+            (it != pluginsLoaded.end()) && (it2 != _listeningPorts.end()) ;
+            it++,it2++) {
+            stringstream deviceName;
+            deviceName << *it << "Device";
+            MyDevice device(deviceName.str(),*it,*it2,NETWORK_LOCALHOST);
+            _devices[device.name] = device;
+            stringstream devicePort;
+            devicePort << device.networkPort;
+            _engines->addNetworkDevice(device.name,device.plugin,device.networkHost,devicePort.str());
+        }
+        map<string,MyDevice>::iterator deviceIt;
+        deviceIt = _devices.find("OSCDevice");
+        if (deviceIt != _devices.end()) {
+            MyDevice maxDevice = deviceIt->second;
+            maxDevice.name = "MaxDevice";
+            maxDevice.networkPort = 7000;
+            maxDevice.networkHost = "127.0.0.1";
+            _devices[maxDevice.name] = maxDevice;
+            stringstream port;
+            port << maxDevice.networkPort;
+            _engines->addNetworkDevice(maxDevice.name,maxDevice.plugin,maxDevice.networkHost,port.str());
+        }
+        deviceIt = _devices.find("MinuitDevice");
+        if (deviceIt != _devices.end()) {
+            MyDevice minuitDevice = deviceIt->second;
+            minuitDevice.name = "MinuitDevice1";
+            minuitDevice.networkPort = 9998;
+            minuitDevice.networkHost = "127.0.0.1";
+            _devices[minuitDevice.name] = minuitDevice;
+            stringstream port;
+            port << minuitDevice.networkPort;
+            _engines->addNetworkDevice(minuitDevice.name,minuitDevice.plugin,minuitDevice.networkHost,port.str());
+        }
+    }
+
+    _engines->addCrossingCtrlPointCallback(&crossTransitionCallback);
+    _engines->addCrossingTrgPointCallback(&crossTriggerPointCallback);
+    _engines->addExecutionFinishedCallback(&executionFinishedCallback);
 }
 
 #else
@@ -97,24 +195,29 @@ Maquette::init() {
     ///////////////////////////
     // Init the Modular library
     ///////////////////////////
+
+    // this initializes the Modular framework and loads protocol plugins (in /usr/local/jamoma/extensions folder)
     TTModularInit();
 
-    // Create a local application named i-score and get it
+    // create a local application named i-score
     TTModularCreateLocalApplication(applicationName, configFile);
 
-    // Get i-score
+    // get i-score application
     iscore = getLocalApplication;
 
     ///////////////////////////
     // Init the Score library
     ///////////////////////////
+
+    // this initializes the Score framework
     TTScoreInit();
 
+    // create the main Engine class (!! this will change in the future !!)
     args = TTValue(SCENARIO_SIZE);
     args.append(pluginsDir);
-
     err = TTObjectBaseInstantiate(TTSymbol("Engine"), TTObjectBaseHandle(&_engines), args);
 
+    // set callbacks (!! this will change in the future !!)
     if (!err) {
         _engines->addCrossingCtrlPointCallback(&crossTransitionCallback);
         _engines->addCrossingTrgPointCallback(&crossTriggerPointCallback);
@@ -126,12 +229,12 @@ Maquette::init() {
     ////////////
     TTObjectBasePtr	anApplication = NULL;
 
-    // create an application
+    // create an application called myApplication
     args = TTValue(TTSymbol("myApplication"));
     TTObjectBaseInstantiate(kTTSym_Application, TTObjectBaseHandle(&anApplication), args);
 
     ////////////
-    // Example : Register local and distant application to the Minuit protocol
+    // Example : Register i-score and myApplication to the Minuit protocol
     ////////////
 
     // check if the Minuit protocol has been loaded
@@ -190,7 +293,10 @@ Maquette::init() {
 
         // return all addresses of the TTNodeDirectory
         std::cout <<"__ Dump myApplication directory __"<<std::endl;
+
+        // start to dump addresses recursilvely from the root of the directory
         dumpAddressBelow(anApplicationDirectory->getRoot());
+
         std::cout <<"__________________________________"<<std::endl;
     }
 
@@ -198,9 +304,8 @@ Maquette::init() {
     // Example : Build the namespace of myApplication using discovery feature (if the protocol provides it)
     ////////////
 
+    // you can create an OSC receive on the 9998 port to see that a namespace request is sent by i-score (using Pure Data for example)
     anApplication->sendMessage(TTSymbol("DirectoryBuild"));
-
-    // note : you can create an OSC receive on the 9998 port to see that a namespace is sent by i-score (using Pure Data for example)
 }
 
 void
@@ -209,18 +314,24 @@ Maquette::dumpAddressBelow(TTNodePtr aNode) {
     TTList      returnedChildren;
     TTAddress   anAddress;
 
+    // fill a TTList with all children (because we use * (wilcard) for the name and the instance)
     aNode->getChildren(S_WILDCARD, S_WILDCARD, returnedChildren);
 
+    // for each child
     for (returnedChildren.begin(); returnedChildren.end(); returnedChildren.next()) {
 
+        // get a node from the TTList
         aNode = TTNodePtr((TTPtr)returnedChildren.current()[0]);
+
+        // compute his absolute address
         aNode->getAddress(anAddress);
 
         std::cout <<"   "<< anAddress.string()<<std::endl;
+
+        // dump all addresses below this node (recursive call)
         dumpAddressBelow(aNode);
     }
 }
-
 #endif  // USE_JAMOMA
 
 Maquette::Maquette():_engines(NULL) {

@@ -305,6 +305,7 @@ NetworkTree::loadNetworkTree(AbstractBox *abBox){
     setEndMessages(endMsg);
 }
 
+#ifndef USE_JAMOMA
 QString
 NetworkTree::getAbsoluteAddress(QTreeWidgetItem *item) const {
     QString address;
@@ -320,6 +321,27 @@ NetworkTree::getAbsoluteAddress(QTreeWidgetItem *item) const {
     }
     return address;
 }
+
+#else
+
+QString
+NetworkTree::getAbsoluteAddress(QTreeWidgetItem *item) const {
+
+    // TODO : return something like myApplication:/address
+    QString address;
+    QTreeWidgetItem * curItem = item;
+    while (curItem != NULL) {
+        QString node;
+        if (curItem->parent() != NULL) {
+            node.append("/");
+        }
+        node.append(curItem->text(0));
+        address.insert(0,node);
+        curItem = curItem->parent();
+    }
+    return address;
+}
+#endif
 
 QTreeWidgetItem *
 NetworkTree::getItemFromAddress(string address) const{
@@ -405,6 +427,7 @@ NetworkTree::hasStartEndMsg(QTreeWidgetItem *item){
 //    QByteArray =
 //}
 
+#ifndef USE_JAMOMA
 void
 NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
 
@@ -462,6 +485,94 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
         }
     }    
 }
+
+#else
+
+void
+NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem){
+
+    if (!curItem->isDisabled()) {
+
+        TTString    address = TTString(getAbsoluteAddress(curItem).toStdString());
+        TTAddress   itemAddress(address);
+        TTNodePtr   itemNode, aNode;
+        TTList      returnedChildren;
+        TTValue     v, attributeValue;
+        TTSymbol    name;
+
+        std::cout << "NetworkTree::treeRecursiveExploration : address = " << itemAddress.c_str() << std::endl;
+
+        _addressMap.insert(curItem, itemAddress.c_str());
+
+        // retrieve the node in the directory
+        getDirectoryFrom(itemAddress)->getTTNode(itemAddress, &itemNode);
+
+        // get all children
+        itemNode->getChildren(S_WILDCARD, S_WILDCARD, returnedChildren);
+
+        for (returnedChildren.begin(); returnedChildren.end(); returnedChildren.next()) {
+
+            // get a node from the TTList
+            aNode = TTNodePtr((TTPtr)returnedChildren.current()[0]);
+
+            QStringList list;
+            list << aNode->getName().c_str();
+
+            QTreeWidgetItem *childItem = new QTreeWidgetItem(list, LeaveType);
+
+            curItem->setCheckState(START_COLUMN,Qt::Unchecked);
+            curItem->setCheckState(END_COLUMN,Qt::Unchecked);
+            curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+            curItem->addChild(childItem);
+
+            list.clear();
+            treeRecursiveExploration(childItem);
+        }
+
+        // if the node refer to an object : get attribute names and value
+        if (itemNode->getObject()) {
+
+            itemNode->getObject()->getAttributeNames(v);
+
+            for (TTUInt32 i = 0; i < v.size(); i++) {
+
+                name = v[i];
+
+                itemNode->getObject()->getAttributeValue(name, attributeValue);
+
+                attributeValue.toString();
+
+                if (name == kTTSym_value) {
+
+                    TTString leave_value = attributeValue[0];
+                    QFont font;
+
+                    font.setCapitalization(QFont::SmallCaps);
+
+                    curItem->setText(VALUE_COLUMN, leave_value.c_str());
+                    curItem->setFont(VALUE_COLUMN,font);
+                    curItem->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
+                    curItem->setCheckState(REDUNDANCY_COLUMN,Qt::Unchecked);
+                    curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
+                }
+                else {
+
+                    TTString nameAndValue = name.string();
+                    nameAndValue += " : ";
+                    nameAndValue += TTString(attributeValue[0]);
+
+                    QStringList list;
+                    list << nameAndValue.c_str();
+
+                    QTreeWidgetItem *childItem = new QTreeWidgetItem(list, AttributeType);
+
+                    list.clear();
+                }
+            }
+        }
+    }
+}
+#endif  // USE_JAMOMA
 
 void
 NetworkTree::clearColumn(unsigned int column){
