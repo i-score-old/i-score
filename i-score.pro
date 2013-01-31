@@ -166,6 +166,7 @@ src/GUI/TimeBarWidget.cpp \
 RESOURCES += i-score.qrc
 
 DEFINES += __Types__
+DEFINES += TT_NO_DSP
 DEFINES += TTDATA_NO_RAMPLIB
 DEFINES += USE_JAMOMA
 
