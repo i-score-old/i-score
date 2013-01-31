@@ -748,14 +748,7 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages){
     vector<string> firstMsgs = messages->computeMessages();
 
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
-        //PRINT
-//            std::cout<<"---- Maquette::SETSTARTMESSAGETOSEND ----"<<std::endl;
-//            for(int i=0 ; i<firstMsgs.size(); i++ )
-//                std::cout<< firstMsgs[i]<<std::endl;
-//            std::cout<<std::endl<<std::endl;
-        //PRINT
         _engines->setCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
-//        _boxes[boxID]->setFirstMessagesToSend(firstMsgs);
         _boxes[boxID]->setStartMessages(messages);
 
         vector<string> lastMsgs;
@@ -864,10 +857,11 @@ Maquette::setLastMessagesToSend(unsigned int boxID, const vector<string> &lastMs
 
 bool
 Maquette::setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages) {
+
     vector<string> lastMsgs = messages->computeMessages();
+
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
         _engines->setCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
-//        _boxes[boxID]->setLastMessagesToSend(lastMsgs);
         _boxes[boxID]->setEndMessages(messages);
 
         vector<string> firstMsgs;

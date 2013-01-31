@@ -210,7 +210,7 @@ class AbstractBox : public Abstract
    */
   inline void setStartMessages(NetworkMessages *startMsgs){
     _startMessages->clear();
-    _startMessages = new NetworkMessages(startMsgs->getMessages());
+    _startMessages = new NetworkMessages(startMsgs->getMessages());    
     }
   /*!
    * \brief Sets the items to send at box start.

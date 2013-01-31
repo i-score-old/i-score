@@ -135,6 +135,7 @@ class AttributesEditor : public QDockWidget
    **/
   void updateWidgets(bool boxModified);
   inline NetworkTree *networkTree(){return _networkTree;}  
+  virtual void clear();
 
  protected:
   /*!

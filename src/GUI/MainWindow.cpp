@@ -270,6 +270,7 @@ MainWindow::newFile()
     }
   }
   _scene->clear();
+  _editor->clear();
   setCurrentFile("");  
 }
 

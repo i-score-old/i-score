@@ -584,13 +584,6 @@ NetworkTree::hasStartEndMsg(QTreeWidgetItem *item){
  *                          General display tools
  ****************************************************************************/
 
-//QString
-//NetworkTree::parse(string value){
-//    QString valueParsed = QString::fromStdString(value);
-
-//    QByteArray =
-//}
-
 void
 NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict){
 
@@ -691,6 +684,12 @@ NetworkTree::clearEndMsgs(){
 
 void
 NetworkTree::displayBoxContent(AbstractBox *abBox){
+    vector<string> startMessages = abBox->startMessages()->computeMessages();
+    std::cout<<"Networktree::displayBoxContent"<<std::endl;
+    for(int i=0; i<startMessages.size(); i++){
+        std::cout<<startMessages[i]<<std::endl;
+    }
+
     setStartMessages(abBox->startMessages());
     setEndMessages(abBox->endMessages());
     updateStartMsgsDisplay();
@@ -903,7 +902,6 @@ NetworkTree::resetNetworkTree(){
     resetAssignedItems();
     resetAssignedNodes();
 
-//    clearOSCMessages();
 }
 
 
@@ -1458,7 +1456,7 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item,int column){
             recursiveFatherSelection(item,true);
         }
 
-        if(!item->isSelected()){
+        if(!item->isSelected() && item->type()!=OSCNode){
             unselectPartially(item);
             recursiveChildrenSelection(item, false);
             recursiveFatherSelection(item,false);
@@ -1633,10 +1631,12 @@ NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue){
             _endMessages->removeMessage(item);
             _OSCEndMessages->removeMessage(item);
             _OSCStartMessages->removeMessage(item);
+            removeAssignItem(item);
         }
         else{
             QString Qaddress;
             setOSCMessageName(item,newValue);
+
             if (_endMessages->getMessages()->contains(item)){
                 Qaddress = getAbsoluteAddressWithValue(item,END_COLUMN);
                 emit(endMessageNameChanged(item,newValue));
@@ -1644,6 +1644,12 @@ NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue){
             if (_startMessages->getMessages()->contains(item)){
                 Qaddress = getAbsoluteAddressWithValue(item,START_COLUMN);
                 emit(startMessageNameChanged(item,newValue));
+            }
+            QMap<QTreeWidgetItem *, Data>::iterator it = _assignedItems.find(item);
+            if (it!=_assignedItems.end()){
+                Data data = it.value();
+                removeAssignItem(item);
+                assignItem(item,data);
             }
         }
     }
@@ -1743,8 +1749,6 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID)
     {
         if(box->hasCurve(address)){
             if (_assignedItems.value(item).hasCurve){
-                AbstractCurve *abCurve = box->getCurve(address);
-
                 unsigned int sampleRate;
                 bool redundancy,interpolate;
                 vector<float> values,xPercents,yValues,coeff;
@@ -1755,31 +1759,6 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID)
                 if (getCurveSuccess)
                     updateLine(item,interpolate,sampleRate,redundancy);
             }
-//            if (abCurve != NULL) // Abstract Curve found
-//            {
-//                bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
-//                if (getCurveSuccess) {
-//                    if (xPercents.empty() && yValues.empty() && values.size() >= 2) {
-//                        if (values.front() == values.back())
-//                            interpolate = false;
-//                    }
-//                    updateLine(item,interpolate,sampleRate,redundancy);
-//                }
-//            }
-
-//            else // Abstract Curve not found
-//            {
-//                interpolate = true;
-//                bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
-//                if (getCurveSuccess){
-//                    if (xPercents.empty() && yValues.empty() && values.size() >= 2) {
-//                        if (values.front() == values.back())
-//                            interpolate = false;
-//                    }
-//                    updateLine(item,interpolate,sampleRate,redundancy);
-//                }
-
-//            }
         }
     }
     else // Box Not Found
@@ -1795,12 +1774,7 @@ NetworkTree::addOSCStartMessage(QTreeWidgetItem *item, QString msg){
 
 void
 NetworkTree::addOSCEndMessage(QTreeWidgetItem *item, QString msg){
-    QFont font;
-//    font.setBold(true);
-//    item->setFont(NAME_COLUMN, font);
     _OSCEndMessages->addMessage(item,msg);
-    Data data;
-//    assignItem(item,data);
 }
 
 void
