@@ -320,7 +320,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
                     else if (it->second.first > mousePosY){ // mouse above : pow between 1 and 6
                         pow = 1 + std::min(it->second.first - mousePosY,(float)50.) / 10.;
                     }
-                    it->second = std::make_pair<float,float>(it->second.first,pow);
+                    it->second = std::make_pair(it->second.first,pow);
                     _movingBreakpointY = -1;
                     curveChanged();
                 }
