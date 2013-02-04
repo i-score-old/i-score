@@ -75,3 +75,16 @@ AbstractBox::type() const
 {
   return ABSTRACT_BOX_TYPE;
 }
+
+void
+AbstractBox::setStartMessages(NetworkMessages *startMsgs){
+
+    QMap<QTreeWidgetItem *, Message> *map = startMsgs->getMessages();
+    NetworkMessages *newMessages = new NetworkMessages(map);
+    _startMessages = newMessages;
+}
+
+void
+AbstractBox::setEndMessages(NetworkMessages *endMsgs){
+  _endMessages = new NetworkMessages(endMsgs->getMessages());
+ }

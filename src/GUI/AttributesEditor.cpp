@@ -164,7 +164,8 @@ void AttributesEditor::noBoxEdited() {
 
 void
 AttributesEditor::nameWidgets(int language)
-{
+{    
+
 	// QComboBoxes containments names
 	QStringList shapeList, speedHeldList, speedVariationList, grainList,
 	pitchList, pitchVariationList, harmoHeldList, harmoVariationList,devicesList;
@@ -889,21 +890,21 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
              _networkTree->displayBoxContent(abBox);
 
             //PRINT MESSAGES
-            QList<QTreeWidgetItem *> items = _networkTree->assignedItems().keys();
-            QList<QTreeWidgetItem *>::iterator i;
-            QTreeWidgetItem *curIt;
-            std::cout<<"\nsetattribute::AFFICHAGE START\n";
-            vector<string> startMessages = _scene->getBox(_boxEdited)->startMessages()->computeMessages();
-//            vector<string> startMessages = _networkTree->startMessages()->computeMessages();
-            for(int i=0; i<startMessages.size(); i++){
-                std::cout<<startMessages[i]<<std::endl;
-            }
-            std::cout<<"setattribute::AFFICHAGE END\n";
-            vector<string> endMessages = _scene->getBox(_boxEdited)->endMessages()->computeMessages();
-//            vector<string> endMessages = _networkTree->endMessages()->computeMessages();
-            for(int i=0; i<endMessages.size(); i++){
-                std::cout<<endMessages[i]<<std::endl;
-            }
+//            QList<QTreeWidgetItem *> items = _networkTree->assignedItems().keys();
+//            QList<QTreeWidgetItem *>::iterator i;
+//            QTreeWidgetItem *curIt;
+//            std::cout<<"\nsetattribute::AFFICHAGE START\n";
+//            vector<string> startMessages = _scene->getBox(_boxEdited)->startMessages()->computeMessages();
+////            vector<string> startMessages = _networkTree->startMessages()->computeMessages();
+//            for(int i=0; i<startMessages.size(); i++){
+//                std::cout<<startMessages[i]<<std::endl;
+//            }
+//            std::cout<<"setattribute::AFFICHAGE END\n";
+//            vector<string> endMessages = _scene->getBox(_boxEdited)->endMessages()->computeMessages();
+////            vector<string> endMessages = _networkTree->endMessages()->computeMessages();
+//            for(int i=0; i<endMessages.size(); i++){
+//                std::cout<<endMessages[i]<<std::endl;
+//            }
             //END PRINT
         }
     }
@@ -1330,6 +1331,7 @@ AttributesEditor::changeColor() {
 void
 AttributesEditor::startMessagesChanged()
 {
+    std::cout<<"<<<<StartMessageChanged>>>>"<<std::endl;
     BasicBox * box = _scene->getBox(_boxEdited);
     if(_boxEdited!=NO_ID){
         if(box->type()==SOUND_BOX_TYPE)
@@ -1377,8 +1379,8 @@ AttributesEditor::endMessagesChanged()
 }
 
 void AttributesEditor::startMessageChanged(QTreeWidgetItem *item) {
+    std::cout<<"<<<StartMessageChanged>>>>"<<std::endl;
     if(_boxEdited!=NO_ID){
-        std::cout<<"StartMessageChanged"<<std::endl;
         //PAS OPTIMAL, NE DEVRAIT MODIFIER QU'UN SEUL ITEM
         QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
         Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
@@ -1420,6 +1422,7 @@ void AttributesEditor::endMessageChanged(QTreeWidgetItem *item) {
 }
 
 void AttributesEditor::startMessageRemoved(const string &address) {
+    std::cout<<"<<<StartMessageRemoved>>>>"<<std::endl;
     if(_boxEdited!=NO_ID){
     //    QList<QTreeWidgetItem*> items = _networkTree->assignedItems();
         QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
@@ -1449,19 +1452,17 @@ void AttributesEditor::endMessageRemoved(const string &address) {
 
 void
 AttributesEditor::deployStartMessageChanged(QTreeWidgetItem *item, QString newName){
+
+    std::cout<<"<<<DeployStartMessage>>>>"<<std::endl;
     std::map<unsigned int,BasicBox *>::iterator it;
-    std::map<unsigned int,BasicBox *> boxesMap = Maquette::getInstance()->getBoxes();
-    QList<unsigned int> boxesID;
+    std::map<unsigned int,BasicBox *> boxesMap = Maquette::getInstance()->getBoxes();    
     unsigned int boxID;
 
-    for(it = boxesMap.begin() ; it!= boxesMap.end() ; it++)
-        boxesID<<(*it).first;
+    for(it = boxesMap.begin() ; it!= boxesMap.end() ; it++){
+        boxID = (*it).first;
 
-    for(QList<unsigned int>::iterator idIt = boxesID.begin() ; idIt != boxesID.end() ; idIt++){
-        boxID = *idIt;
-        NetworkMessages *messagesToSend = Maquette::getInstance()->startMessages(boxID);        
+        NetworkMessages *messagesToSend = Maquette::getInstance()->startMessages(boxID);
         messagesToSend->changeName(item,newName);
-//        Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
         Maquette::getInstance()->setStartMessagesToSend(boxID,messagesToSend);
     }
 }
@@ -1483,6 +1484,7 @@ AttributesEditor::deployEndMessageChanged(QTreeWidgetItem *item, QString newName
         messagesToSend->changeName(item,newName);
         Maquette::getInstance()->setEndMessagesToSend(boxID,messagesToSend);
     }
+    //setAttributes(static_cast<AbstractBox *>(Maquette::getInstance()->getBox(_boxEdited)->abstract()));
 }
 
 void

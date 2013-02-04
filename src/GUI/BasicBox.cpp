@@ -137,7 +137,7 @@ BasicBox::updateWidgets(){
 
 void
 BasicBox::updateDisplay(QString displayMode){
-
+    Q_UNUSED(displayMode)
 }
 
 void
@@ -670,16 +670,9 @@ BasicBox::setCrossedTriggerPoint(bool waiting, BoxExtremity extremity)
 
 
 bool
-BasicBox::hasTriggerPoint(BoxExtremity extremity)
-{
-//    if(!_triggerPoints != NULL){
-//        std::cout<<"bug"<<std::endl;
-        bool result = _triggerPoints->contains(extremity);
-//        std::cout<<"ah non "<<std::endl;
-        return result;
-//    }
-//    else
-//        return false;
+BasicBox::hasTriggerPoint(BoxExtremity extremity){
+    bool result = _triggerPoints->contains(extremity);
+    return result;
 }
 
 bool
@@ -701,7 +694,6 @@ BasicBox::addTriggerPoint(BoxExtremity extremity)
     }
 
     bool ret = false;
-//    if (_triggerPoints.find(extremity) == _triggerPoints.end()) {
     if(!_triggerPoints->contains(extremity)){
 
         int trgID = _scene->addTriggerPoint(_abstract->ID(),extremity,trgName);

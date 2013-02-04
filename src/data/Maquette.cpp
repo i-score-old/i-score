@@ -93,6 +93,7 @@ Maquette::init() {
 
     _engines->getLoadedNetworkPlugins(pluginsLoaded,_listeningPorts);
 
+    //pour maintenir le fonctionnement pendant le developpement : l'appli n'est pas auto portée.
     if(pluginsLoaded.empty()){
         string pluginsDir =  (QCoreApplication::applicationDirPath()+"/../plugins/i-score").toStdString();
         _engines = new Engines(SCENARIO_SIZE,pluginsDir);
@@ -127,7 +128,6 @@ Maquette::init() {
                 _devices[maxDevice.name] = maxDevice;
                 stringstream port;
                 port << maxDevice.networkPort;
-//                _engines->addNetworkDevice(maxDevice.name,maxDevice.plugin,maxDevice.networkHost,port.str());
             }
             deviceIt = _devices.find("MinuitDevice");
 
@@ -151,12 +151,8 @@ Maquette::init() {
             it++,it2++) {
             stringstream deviceName;
             deviceName << *it << "Device";
-            std::cout<<"names : "<<*it<<std::endl;
             MyDevice device(deviceName.str(),*it,*it2,NETWORK_LOCALHOST);
             _devices[device.name] = device;
-//            stringstream devicePort;
-//            devicePort << OSC_NETWORK_PORT;
-//            _engines->addNetworkDevice(device.name,device.plugin,device.networkHost,devicePort.str());
         }
 
         map<string,MyDevice>::iterator deviceIt;
@@ -1383,18 +1379,6 @@ Maquette::getProgression(unsigned int boxID)
 
 void
 Maquette::setGotoValue(int gotoValue) {
-//    std::cout<<"GOTO "<<gotoValue<<std::endl;
-//    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
-//        unsigned int boxID = it->first;
-//        std::cout<<" "<<boxID<<" "<< _engines->getBoxBeginTime(boxID)<<" " <<_engines->getBoxEndTime(boxID)<<std::endl;
-//        if(_engines->getBoxBeginTime(boxID)<gotoValue){
-//            std::cout<<"MUTED "<<std::endl;
-//            _engines->setCtrlPointMutingState(boxID,1,true);
-//        }
-//        else{
-//            _engines->setCtrlPointMutingState(boxID,1,true);
-//        }
-//    }
     _scene->view()->setGotoValue(gotoValue);
     _engines->setGotoValue(gotoValue);
 }

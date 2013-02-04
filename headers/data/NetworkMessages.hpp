@@ -89,6 +89,7 @@ public :
      * \brief Sets the list of messages.
      */
     inline void setMessages(QMap<QTreeWidgetItem *, Message> *messages){
+        _messages->clear();
         _messages=messages;
      ;}
     /*!
@@ -102,7 +103,8 @@ public :
       */
     bool setValue(QTreeWidgetItem *item, QString newValue);
 
-    inline QMap<QTreeWidgetItem *, Message> *getMessages(){return _messages;}
+    QMap<QTreeWidgetItem *, Message> *getMessages();
+
     inline QList<QTreeWidgetItem *> getItems(){return _messages->keys();}
     std::string computeMessage(const Message &msg);
     std::string computeMessageWithoutValue(const Message &msg);

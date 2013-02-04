@@ -101,7 +101,6 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
  ****************************************************************************/
 void
 NetworkTree::init(){
-
     _startMessages = new NetworkMessages;
     _endMessages = new NetworkMessages;
     _OSCMessageCount = 0;
@@ -684,22 +683,11 @@ NetworkTree::clearEndMsgs(){
 
 void
 NetworkTree::displayBoxContent(AbstractBox *abBox){
-    vector<string> startMessages = abBox->startMessages()->computeMessages();
-    std::cout<<"Networktree::displayBoxContent"<<std::endl;
-    for(int i=0; i<startMessages.size(); i++){
-        std::cout<<startMessages[i]<<std::endl;
-    }
-
     setStartMessages(abBox->startMessages());
     setEndMessages(abBox->endMessages());
     updateStartMsgsDisplay();
     updateEndMsgsDisplay();
     assignItems(assignedItems());
-
-//    setStartOSCMessages(abBox->startOSCMsgs());
-//    setEndOSCMessages(abBox->endOSCMsgs());
-//    updateStartOSCMsgsDisplay();
-//    updateEndOSCMsgsDisplay();
 }
 
 void
@@ -1788,13 +1776,6 @@ NetworkTree::updateCurves(unsigned int boxID) {
             item = *it;
             updateCurve(item,boxID);
         }
-        //PRINT
-//        QTreeWidgetItem *item;
-//        for (curveAddressIt = curvesAddresses.begin() ; curveAddressIt != curvesAddresses.end() ; ++curveAddressIt) {
-//            item = getItemFromAddress(*curveAddressIt);
-//             std::cout<<"ITem : " <<item->text(0).toStdString()<<std::endl;
-//            updateCurve(item,boxID);
-//        }
     }
 }
 

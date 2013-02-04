@@ -77,6 +77,12 @@ NetworkMessages::clear(){
     emit(messagesChanged());
 }
 
+
+QMap<QTreeWidgetItem *, Message> *
+NetworkMessages::getMessages(){
+     return _messages;
+}
+
 bool
 NetworkMessages::messageToString(const Message &msg, string &device, string &message, string &value){
 
@@ -191,19 +197,19 @@ NetworkMessages::changeName(QTreeWidgetItem *item, QString newName){
     QMap<QTreeWidgetItem *, Message>::iterator it = _messages->find(item);
     Message msg;
 
-    //print
-//    std::vector<std::string> list = computeMessages();
-//    std::cout<<"change name in : "<<std::endl;
-//    for(int i = 0 ; i<list.size() ; i++)
-//        std::cout<<list[i]<<std::endl;
-    //endPrint
-
     if(it!=_messages->end()){
         msg = it.value();
         newName.push_front("/");
         msg.message = newName;
         _messages->remove(item);
         _messages->insert(item,msg);
+
+        //print
+//        std::vector<std::string> list = computeMessages();
+//        std::cout<<"change name in : "<<std::endl;
+//        for(int i = 0 ; i<list.size() ; i++)
+//            std::cout<<list[i]<<std::endl;
+        //endPrint
     }
     else
         std::cerr<<"NetworkMessages::changeName : item not found"<<std::endl;
