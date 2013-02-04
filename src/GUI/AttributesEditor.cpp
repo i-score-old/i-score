@@ -808,8 +808,7 @@ AttributesEditor::connectSlots()
     connect(_networkTree,SIGNAL(curveActivationChanged(QTreeWidgetItem*,bool)),this,SLOT(curveActivationChanged(QTreeWidgetItem*,bool)));
     connect(_networkTree,SIGNAL(curveRedundancyChanged(QTreeWidgetItem*,bool)),this,SLOT(curveRedundancyChanged(QTreeWidgetItem*,bool)));
     connect(_networkTree,SIGNAL(curveSampleRateChanged(QTreeWidgetItem*,int)),this,SLOT(curveSampleRateChanged(QTreeWidgetItem*,int)));    
-    connect(_networkTree,SIGNAL(startMessageNameChanged(QTreeWidgetItem*,QString)),this,SLOT(deployStartMessageChanged(QTreeWidgetItem*,QString)));
-    connect(_networkTree,SIGNAL(endMessageNameChanged(QTreeWidgetItem*,QString)),this,SLOT(deployEndMessageChanged(QTreeWidgetItem*,QString)));
+    connect(_networkTree,SIGNAL(nameChanged(QTreeWidgetItem*,QString)),this,SLOT(deployNameChanged(QTreeWidgetItem*,QString)));
 
 	connect(_treeMapLoad, SIGNAL(clicked()), this, SLOT(reloadTreeMap()));
 	connect(_treeMapUp, SIGNAL(clicked()), this, SLOT(upTreeMap()));
@@ -1379,7 +1378,6 @@ AttributesEditor::endMessagesChanged()
 }
 
 void AttributesEditor::startMessageChanged(QTreeWidgetItem *item) {
-    std::cout<<"<<<StartMessageChanged>>>>"<<std::endl;
     if(_boxEdited!=NO_ID){
         //PAS OPTIMAL, NE DEVRAIT MODIFIER QU'UN SEUL ITEM
         QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
@@ -1451,7 +1449,7 @@ void AttributesEditor::endMessageRemoved(const string &address) {
 }
 
 void
-AttributesEditor::deployStartMessageChanged(QTreeWidgetItem *item, QString newName){
+AttributesEditor::deployNameChanged(QTreeWidgetItem *item, QString newName){
 
     std::cout<<"<<<DeployStartMessage>>>>"<<std::endl;
     std::map<unsigned int,BasicBox *>::iterator it;
@@ -1461,30 +1459,20 @@ AttributesEditor::deployStartMessageChanged(QTreeWidgetItem *item, QString newNa
     for(it = boxesMap.begin() ; it!= boxesMap.end() ; it++){
         boxID = (*it).first;
 
+        //start messages
         NetworkMessages *messagesToSend = Maquette::getInstance()->startMessages(boxID);
-        messagesToSend->changeName(item,newName);
-        Maquette::getInstance()->setStartMessagesToSend(boxID,messagesToSend);
+        if(messagesToSend->getItems().contains(item)){
+            messagesToSend->changeName(item,newName);
+            Maquette::getInstance()->setStartMessagesToSend(boxID,messagesToSend);
+        }
+
+        //end messages
+        messagesToSend = Maquette::getInstance()->endMessages(boxID);
+        if(messagesToSend->getItems().contains(item)){
+            messagesToSend->changeName(item,newName);
+            Maquette::getInstance()->setEndMessagesToSend(boxID,messagesToSend);
+        }
     }
-}
-
-void
-AttributesEditor::deployEndMessageChanged(QTreeWidgetItem *item, QString newName){
-    std::map<unsigned int,BasicBox *>::iterator it;
-    std::map<unsigned int,BasicBox *> boxesMap = Maquette::getInstance()->getBoxes();
-    QList<unsigned int> boxesID;
-    unsigned int boxID;
-
-    for(it = boxesMap.begin() ; it!= boxesMap.end() ; it++)
-        boxesID<<(*it).first;
-
-    for(QList<unsigned int>::iterator idIt = boxesID.begin() ; idIt != boxesID.end() ; idIt++){
-        boxID = *idIt;
-
-        NetworkMessages *messagesToSend = Maquette::getInstance()->endMessages(boxID);
-        messagesToSend->changeName(item,newName);
-        Maquette::getInstance()->setEndMessagesToSend(boxID,messagesToSend);
-    }
-    //setAttributes(static_cast<AbstractBox *>(Maquette::getInstance()->getBox(_boxEdited)->abstract()));
 }
 
 void

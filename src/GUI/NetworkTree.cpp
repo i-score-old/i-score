@@ -889,7 +889,6 @@ NetworkTree::resetNetworkTree(){
     resetSelectedItems();
     resetAssignedItems();
     resetAssignedNodes();
-
 }
 
 
@@ -1622,24 +1621,16 @@ NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue){
             removeAssignItem(item);
         }
         else{
-            QString Qaddress;
             setOSCMessageName(item,newValue);
-
-            if (_endMessages->getMessages()->contains(item)){
-                Qaddress = getAbsoluteAddressWithValue(item,END_COLUMN);
-                emit(endMessageNameChanged(item,newValue));
-            }
-            if (_startMessages->getMessages()->contains(item)){
-                Qaddress = getAbsoluteAddressWithValue(item,START_COLUMN);
-                emit(startMessageNameChanged(item,newValue));
-            }
-            QMap<QTreeWidgetItem *, Data>::iterator it = _assignedItems.find(item);
-            if (it!=_assignedItems.end()){
-                Data data = it.value();
-                removeAssignItem(item);
-                assignItem(item,data);
-            }
+            emit(nameChanged(item,newValue));
         }
+        QMap<QTreeWidgetItem *, Data>::iterator it = _assignedItems.find(item);
+        if (it!=_assignedItems.end()){
+            Data data = it.value();
+            removeAssignItem(item);
+            assignItem(item,data);
+        }
+
     }
 }
 
