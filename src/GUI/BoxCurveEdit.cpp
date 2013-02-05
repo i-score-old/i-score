@@ -21,7 +21,6 @@ BoxCurveEdit::init(){
 
     setWindowModality(Qt::ApplicationModal);
     setGeometry(_scene->sceneRect().toRect());
-    QGridLayout *layout = new QGridLayout;
     setLayout(_stackedLayout);
 }
 

@@ -162,6 +162,8 @@ void NetworkConfig::deviceSelected(int indexSelected) {
 
 void
 NetworkConfig::setNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, std::string port){
+    Q_UNUSED(deviceName); Q_UNUSED(pluginName);
+
     _devices["OSCDevice"].networkPort = atoi(port.c_str());
     _devices["OSCDevice"].networkHost = IP;
     updateNetworkConfiguration();

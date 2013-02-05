@@ -760,8 +760,10 @@ NetworkMessages *
 Maquette::startMessages(unsigned int boxID){
     if (boxID != NO_ID && (getBox(boxID) != NULL))
         return _boxes[boxID]->startMessages();
-    else
+    else{
         std::cerr<<"Maquette::startMessage : wrong boxID"<<std::endl;
+        return NULL;
+    }
 }
 
 bool
@@ -832,8 +834,10 @@ NetworkMessages *
 Maquette::endMessages(unsigned int boxID){
     if (boxID != NO_ID && (getBox(boxID) != NULL))
         return _boxes[boxID]->endMessages();
-    else
+    else{
         std::cerr<<"Maquette::startMessage : wrong boxID"<<std::endl;
+        return NULL;
+    }
 }
 
 bool
@@ -1449,7 +1453,7 @@ Maquette::initSceneState(){
             _engines->setCtrlPointMutingState(boxID,2,true);
 
         //On supprime les messages si ils sont déjà associés à une courbe (le moteur les envoie automatiquement)
-        for (int i=0 ; i<curvesList.size() ; i++)
+        for (unsigned int i=0 ; i<curvesList.size() ; i++)
             msgs.remove(QString::fromStdString(curvesList[i]));
     }
 

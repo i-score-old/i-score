@@ -72,23 +72,15 @@ QStringList NetworkMessagesEditor::_devicesList = QStringList();
 NetworkMessagesEditor::NetworkMessagesEditor(QWidget *parent)
 : QTableWidget(0,3,parent)
 {
-	_parent = parent;
-	//_layout = new QVBoxLayout(this);
-	//_layout->setSpacing(0);
-	//_layout->setAlignment(Qt::AlignTop);
-	//_table = new QTableWidget(0,3,this);
+    _parent = parent;
 	QStringList labels;
 	labels << tr("Device") << tr("Message") << tr("Values");
 	setContentsMargins(0,0,0,0);
 	setHorizontalHeaderLabels(labels);
 	setSelectionBehavior(QAbstractItemView::SelectRows);
-	setEditTriggers(QAbstractItemView::DoubleClicked);
-	//_table->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setEditTriggers(QAbstractItemView::DoubleClicked);
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	_currentLine = 0;
-	//setMinimumWidth(WIDTH);
-	static const int TABLE_WIDTH = WIDTH - 40;
- 	//_layout->addWidget(_table);
+    _currentLine = 0;
 
 	_clipboard = QApplication::clipboard();
 }

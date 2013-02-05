@@ -250,11 +250,8 @@ void
 Relation::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 {
   QGraphicsItem::hoverEnterEvent(event);
-  double startX = mapFromScene(_start).x()+BasicBox::EAR_WIDTH/2 , startY = mapFromScene(_start).y();
+  double startX = mapFromScene(_start).x()+BasicBox::EAR_WIDTH/2;
   double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
-  double sizeY = endY - startY;
-  double centerY = startY + sizeY/2.;
-
 
   double endBound = NO_BOUND, startBound = NO_BOUND;
   if (_abstract->maxBound() != NO_BOUND) {
@@ -301,9 +298,8 @@ Relation::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 {
   QGraphicsItem::hoverMoveEvent(event);
 
-  double startX = mapFromScene(_start).x()/*+BasicBox::EAR_WIDTH/2*/, startY = mapFromScene(_start).y();
+  double startX = mapFromScene(_start).x();
   double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
-  double sizeY = endY - startY;
 
   double endBound = NO_BOUND, startBound = NO_BOUND;
   if (_abstract->maxBound() != NO_BOUND) {
@@ -390,7 +386,7 @@ Relation::mousePressEvent (QGraphicsSceneMouseEvent * event) {
 
     if (!_scene->playing()) {
         if (cursor().shape() == Qt::SplitHCursor) {
-          double startX = mapFromScene(_start).x(), startY = mapFromScene(_start).y();
+          double startX = mapFromScene(_start).x();
           double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
 
           double startBound = startX;
@@ -519,8 +515,6 @@ Relation::updateFlexibility(){
         _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,NO_BOUND,NO_BOUND);
     else if (!_flexibleRelation){
         _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,(endX-startX)/_scene->zoom(),(endX-startX)/_scene->zoom()+RIGID_TOLERANCE);
-//        changeBounds(endX-startX,endX-startX);
-//        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
     }
     else{
         changeBounds(0,NO_BOUND);
@@ -533,8 +527,8 @@ void
 Relation::drawRail(QPainter *painter, double startBound, double endBound){
     painter->save();
 
-    double startX = mapFromScene(_start).x(), startY = mapFromScene(_start).y() ;
-    double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
+    double startY = mapFromScene(_start).y() ;
+    double endY = mapFromScene(_end).y();
 
     QPen solidLine = QPen(Qt::SolidLine);
     solidLine.setWidth(LINE_WIDTH);

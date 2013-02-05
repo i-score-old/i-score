@@ -124,9 +124,23 @@ void CurveWidget::curveRepresentationOutdated() {
 }
 
 void
-CurveWidget::setAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition, const vector<float> &values, unsigned int sampleRate,
-		bool redundancy, bool show, bool interpolate, const vector<string> &/*argType*/, const vector<float> &xPercents , const vector<float> &yValues, const vector<short> &sectionType,
-        const vector<float> &coeff) {
+CurveWidget::setAttributes(unsigned int boxID,
+                           const std::string &address,
+                           unsigned int argPosition,
+                           const vector<float> &values,
+                           unsigned int sampleRate,
+                           bool redundancy,
+                           bool show,
+                           bool interpolate,
+                           const vector<string> &,
+                           const vector<float> &xPercents ,
+                           const vector<float> &yValues,
+                           const vector<short> &sectionType,
+                            const vector<float> &coeff) {
+
+    Q_UNUSED(argPosition);
+    Q_UNUSED(sectionType);
+
 	_abstract->_boxID = boxID;
 	_abstract->_curve.clear();
 	_abstract->_breakpoints.clear();
@@ -457,8 +471,6 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
     painter->setRenderHint(QPainter::Antialiasing, true);
     static const QColor BASE_COLOR(Qt::black);
     static const QColor AXE_COLOR(Qt::black);
-    static const QColor X_SUBDIV_COLOR(Qt::gray);
-    static const QColor X_DIV_COLOR(Qt::black);
     static const QColor EXTREMITY_COLOR(Qt::red);
     static const QColor CURVE_COLOR(Qt::darkRed);
     static const QColor BREAKPOINT_COLOR(Qt::blue);
@@ -477,28 +489,10 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
     QPointF precPoint(-1,-1);
 
     unsigned int i = 0;
-    unsigned int Xdiv = _abstract->_curve.size() / 10;
-    unsigned int XsubDiv = std::max((unsigned int)1,Xdiv) / 10;
 
     for (it = _abstract->_curve.begin() ; it != _abstract->_curve.end() ; ++it) {
         curPoint = absoluteCoordinates(QPointF(1,*it));
         curPoint.setX(i * _interspace * _scaleX);
-
-//        if (XsubDiv != 0) {
-//            if ((i % XsubDiv) == 0) {
-//                painter->setPen(X_SUBDIV_COLOR);
-//                painter->drawLine(QPointF(curPoint.x(),height()/2.-5),QPointF(curPoint.x(),height()/2.+5));
-//                painter->setPen(BASE_COLOR);
-//            }
-//        }
-
-//        if (Xdiv != 0) {
-//            if ((i % Xdiv) == 0) {
-//                painter->setPen(X_DIV_COLOR);
-//                painter->drawLine(QPointF(curPoint.x(),height()/2.-10),QPointF(curPoint.x(),height()/2.+10));
-//                painter->setPen(BASE_COLOR);
-//            }
-//        }
 
         if (it == _abstract->_curve.begin()) { // First point is represented by a specific color
             painter->fillRect(QRectF(curPoint - QPointF(pointSizeX/2.,pointSizeY/2.),QSizeF(pointSizeX,pointSizeY)),EXTREMITY_COLOR);
@@ -508,7 +502,6 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
             QPen pen(_unactive ? UNACTIVE_COLOR : CURVE_COLOR);
             pen.setWidth(_unactive ? 1 : 2);
             painter->setPen(pen);
-//            painter->setPen(_abstract->_interpolate ? CURVE_COLOR : UNACTIVE_COLOR);
             painter->drawLine(precPoint,curPoint); // Draw lines between values
 
             painter->setPen(BASE_COLOR);
@@ -541,7 +534,6 @@ void
 CurveWidget::setLowerStyle(bool state){
 
    _unactive = state;
-//   setGraphicsEffect(effect);
    repaint();
 }
 

@@ -49,7 +49,6 @@ public :
 
     bool contains(const std::string &address);
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
-    virtual void paintEngine();
 
     void curveActivationChanged(const QString &address,bool state);
     void curveRedundancyChanged(const QString &address,bool state);

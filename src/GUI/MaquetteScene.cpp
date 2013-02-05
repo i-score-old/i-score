@@ -311,28 +311,21 @@ MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[]
 
 void
 MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
+    Q_UNUSED(rect);
+
     if (_playing) {
         QPen pen(Qt::black);
         pen.setWidth(3);
         painter->setPen(pen);        
-//        painter->drawLine(QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL, _view->sceneRect().top()), QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL,_view->sceneRect().height()));
     }
 
     else{
 
         //drawGotoBar
-        double gotoBarPosX = _view->gotoValue()/(float)MS_PER_PIXEL;
         QPen reSavedPen = painter->pen();
         QPen pen3(Qt::black);
         pen3.setWidth(3);
         painter->setPen(pen3);
-//        painter->drawLine(QPointF(gotoBarPosX,0),QPointF(gotoBarPosX,sceneRect().height()));
-
-      //  pen3.setColor(Qt::white);
-      //  pen3.setWidth(1);
-      //  painter->setPen(pen3);
-      //  painter->drawLine(QPointF(progressBarPosX,0),QPointF(progressBarPosX,HEIGHT));
-
         painter->setPen(reSavedPen);
 
         if (_currentInteractionMode == RELATION_MODE) {
@@ -342,11 +335,9 @@ MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
                 QPointF start;
                 switch (_relation->firstExtremity()) {
                 case BOX_START :
-//					start = box->getMiddleLeft();
                     start = box->getLeftGripPoint();
                     break;
                 case BOX_END :
-//					start = box->getMiddleRight();
                     start = box->getRightGripPoint();
                     break;
                 case NO_EXTREMITY :
@@ -367,15 +358,11 @@ MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
                             box = static_cast<BasicBox*>(itemAt(_mousePos));
                             if (_mousePos.x() < (box->mapToScene(box->boundingRect().topLeft()).x()
                                     + BasicBox::RESIZE_TOLERANCE)) {
-//								endX = box->getMiddleLeft().x();
-//								endY = box->getMiddleLeft().y();
                                 endX = box->getLeftGripPoint().x();
                                 endY = box->getLeftGripPoint().y();
                             }
                             else if (_mousePos.x() > (box->mapToScene(box->boundingRect().bottomRight()).x()
                                     - BasicBox::RESIZE_TOLERANCE)) {
-//								endX = box->getMiddleRight().x();
-//								endY = box->getMiddleRight().y();
                                 endX = box->getRightGripPoint().x();
                                 endY = box->getRightGripPoint().y();
                             }

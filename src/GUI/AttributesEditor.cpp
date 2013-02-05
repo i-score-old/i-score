@@ -165,6 +165,7 @@ void AttributesEditor::noBoxEdited() {
 void
 AttributesEditor::nameWidgets(int language)
 {    
+    Q_UNUSED(language);
 
 	// QComboBoxes containments names
 	QStringList shapeList, speedHeldList, speedVariationList, grainList,
@@ -541,7 +542,6 @@ AttributesEditor::createWidgets()
 void
 AttributesEditor::addWidgetsToLayout()
 {
-	static const unsigned int LABEL_WIDTH = 1;
 	static const unsigned int LABEL_HEIGHT = 1;
 	static const unsigned int PREVIEW_AREA_WIDTH = 3;
 	static const unsigned int PREVIEW_AREA_HEIGHT = 3;

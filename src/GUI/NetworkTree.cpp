@@ -50,13 +50,13 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QAbstractItemView>
 #include <QTreeView>
 
-unsigned int NetworkTree::NAME_COLUMN = 0;
-unsigned int NetworkTree::VALUE_COLUMN = 1;
-unsigned int NetworkTree::START_COLUMN = 2;
-unsigned int NetworkTree::END_COLUMN = 4;
-unsigned int NetworkTree::INTERPOLATION_COLUMN = 3;
-unsigned int NetworkTree::REDUNDANCY_COLUMN = 5;
-unsigned int NetworkTree::SR_COLUMN = 6;
+int NetworkTree::NAME_COLUMN = 0;
+int NetworkTree::VALUE_COLUMN = 1;
+int NetworkTree::START_COLUMN = 2;
+int NetworkTree::END_COLUMN = 4;
+int NetworkTree::INTERPOLATION_COLUMN = 3;
+int NetworkTree::REDUNDANCY_COLUMN = 5;
+int NetworkTree::SR_COLUMN = 6;
 QString NetworkTree::OSC_ADD_NODE_TEXT = QString("Add a node");
 
 unsigned int NetworkTree::TEXT_POINT_SIZE = 10;
@@ -87,6 +87,11 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     SR_MODIFIED = false;
     NAME_MODIFIED = false;
     hideColumn(VALUE_COLUMN);
+
+    setDropIndicatorShown(true);
+    setDragEnabled(true);
+    setDragDropMode(InternalMove);
+    setDragDropOverwriteMode(true);
 
     connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(itemCollapsed()));
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(clickInNetworkTree(QTreeWidgetItem *,int)));
@@ -153,16 +158,6 @@ NetworkTree::load() {
     for (nameIt = deviceNames.begin(), requestableIt = deviceRequestable.begin() ; nameIt != deviceNames.end(), requestableIt != deviceRequestable.end() ;	++nameIt,++requestableIt) {
         QStringList deviceName;
 
-        //delete MaxDevice and MinuitDevice nodes
-//        if(QString::fromStdString(*nameIt) == tr("MaxDevice")){
-//            deviceNames.erase(nameIt);
-//            deviceRequestable.erase(requestableIt);
-//        }
-//        if(QString::fromStdString(*nameIt) == tr("MinuitDevice")){
-//            deviceNames.erase(nameIt);
-//            deviceRequestable.erase(requestableIt);
-//        }
-
         deviceName << QString::fromStdString(*nameIt);
 
         QTreeWidgetItem *curItem = NULL;
@@ -172,14 +167,9 @@ NetworkTree::load() {
             _OSCNodeRoot = curItem;
             curItem->setFlags(Qt::ItemIsEnabled);
             createOCSBranch(curItem);
-//            curItem->setCheckState(0,Qt::Unchecked);
-//            curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
         }
         else {            
             curItem = new QTreeWidgetItem(deviceName,NodeNamespaceType);
-//            curItem->setCheckState(0,Qt::Unchecked);
-//            curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-
             try{
                 treeRecursiveExploration(curItem,true);
             }catch (const std::exception & e){
@@ -350,7 +340,7 @@ NetworkTree::addOSCMessage(){
     QTreeWidgetItem *newItem = new QTreeWidgetItem(OSCname,OSCNode);
     newItem->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
     newItem->setCheckState(REDUNDANCY_COLUMN,Qt::Unchecked);
-    newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled);
 
     QString message = "OSCDevice/"+name;
     _OSCMessages.push_back(newItem);
@@ -514,6 +504,7 @@ NetworkTree::getItemFromAddress(string address) const{
 
 QMap <QTreeWidgetItem *, Data>
 NetworkTree::treeSnapshot(unsigned int boxID) {
+    Q_UNUSED(boxID);
 
     QMap<QTreeWidgetItem *, Data> snapshots;
     QList<QTreeWidgetItem*> selection = selectedItems();
@@ -764,10 +755,8 @@ NetworkTree::updateEndMsgsDisplay(){
     QList<QTreeWidgetItem *> items = _endMessages->getItems();
     QList<QTreeWidgetItem *>::iterator it;
     QTreeWidgetItem *curItem;
-    Message currentMsg;
-    QTreeWidgetItem *father;
+    Message currentMsg;    
 
-//    clearColumn(END_COLUMN);
     for(it=items.begin() ; it!=items.end() ; it++){
         curItem = *it;
         currentMsg = _endMessages->getMessages()->value(curItem);
@@ -1317,17 +1306,8 @@ NetworkTree::resetSelectedItems(){
 QList<QTreeWidgetItem*>
 NetworkTree::getSelectedItems(){
 
-    QList<QTreeWidgetItem*> items  = selectedItems(), allSelectedItems, *children = new QList<QTreeWidgetItem*>();
-    QList<QTreeWidgetItem*>::iterator it;
-
+    QList<QTreeWidgetItem*> items  = selectedItems(), allSelectedItems;
     allSelectedItems << items;
-
-
-//    for(it=items.begin() ; it!=items.end() ; ++it){
-//        if (!children->empty())
-//            allSelectedItems << *children;
-//    }
-
 
     return allSelectedItems;
 }
@@ -1361,14 +1341,13 @@ NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select){
  ************************************************************************/
 
 
-
 void
 NetworkTree::mouseDoubleClickEvent(QMouseEvent *event){
-//    mouseDoubleClickEvent(event);
+    Q_UNUSED(event);
+
     if(currentItem()->type() == OSCNode){
         QTreeWidgetItem *item = currentItem();
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
-//        item->setSelected(true);
         editItem(currentItem(),currentColumn());
         if(currentColumn() == NAME_COLUMN){
             NAME_MODIFIED = true;
@@ -1382,11 +1361,6 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event){
         if(currentColumn() == SR_COLUMN){
             SR_MODIFIED = true;
         }
-
-//        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
-//        QFont font;
-//        font.setBold(true);
-//        item->setFont(NAME_COLUMN,font);
     }
     else if(currentItem()->type()==addOSCNode)
         ;
@@ -1435,7 +1409,6 @@ NetworkTree::keyPressEvent(QKeyEvent *event){
 
 void
 NetworkTree::clickInNetworkTree(QTreeWidgetItem *item,int column){
-//    QTreeWidgetItem *item = currentItem();
 
     if(item!=NULL){
         if(item->isSelected()){
@@ -1482,7 +1455,6 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item,int column){
         addOSCMessage();
 }
 
-
 void
 NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
     Data data;
@@ -1508,26 +1480,26 @@ NetworkTree::valueChanged(QTreeWidgetItem* item,int column){
     if (item->type()==OSCNode && column == NAME_COLUMN && NAME_MODIFIED){
         NAME_MODIFIED = FALSE;
         changeNameValue(item,item->text(NAME_COLUMN));
-        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable);
     }
     if (item->type()==OSCNode && column == START_COLUMN && VALUE_MODIFIED){
         VALUE_MODIFIED = FALSE;
         assignItem(item,data);
         emit(startValueChanged(item,item->text(START_COLUMN)));
-        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable);
     }
 
     if (item->type()==OSCNode && column == END_COLUMN && VALUE_MODIFIED){
         VALUE_MODIFIED = FALSE;
         assignItem(item,data);
         emit(endValueChanged(item,item->text(END_COLUMN)));
-        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable);
     }
 
     if (item->type()==OSCNode && column == SR_COLUMN && SR_MODIFIED){
         SR_MODIFIED = FALSE;
         emit(curveSampleRateChanged(item,(item->text(SR_COLUMN)).toInt()));
-        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable);
     }
 }
 
@@ -1706,15 +1678,13 @@ NetworkTree::getSampleRate(QTreeWidgetItem *item){
             return _assignedItems.value(item).sampleRate;
         }
         else{
-#ifdef DEBUG
-            std::cerr<<"NetworkTree::getSampleRate : Impossible to get item's sample rate, item has no curve."<<std::endl;
-#endif
+            std::cerr<<"NetworkTree::getSampleRate : Impossible to get item's sample rate, item has no curve."<<std::endl;        
+            exit(-1);
         }
     }
     else{
-#ifdef DEBUG
-        std::cerr<<"NetworkTree::getSampleRate : Impossible to get item's sample rate, item is not assigned."<<std::endl;
-#endif
+        std::cerr<<"NetworkTree::getSampleRate : Impossible to get item's sample rate, item is not assigned."<<std::endl;    
+        exit(-1);
     }
 }
 

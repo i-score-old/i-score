@@ -299,6 +299,7 @@ MaquetteWidget::setName(QString name){
 
 void
 MaquetteWidget::setAvailableMenu(QWidget *widget){
+    Q_UNUSED(widget);
     //TODO
 }
 

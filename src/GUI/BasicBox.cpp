@@ -826,7 +826,7 @@ BasicBox::setEndMessages(NetworkMessages *messages) {
 
 NetworkMessages *
 BasicBox::endMessages(){
-    _abstract->endMessages();
+    return _abstract->endMessages();
 }
 
 void
@@ -836,7 +836,7 @@ BasicBox::setStartMessage(QTreeWidgetItem *item, QString address) {
 
 NetworkMessages *
 BasicBox::startMessages(){
-    _abstract->startMessages();
+    return _abstract->startMessages();
 }
 
 void
@@ -1505,12 +1505,6 @@ BasicBox::drawInteractionGrips(QPainter *painter){
     painter->rotate(-180);
     painter->drawChord(rect,startAngle,spanAngle);
     painter->rotate(90);
-}
-
-void
-BasicBox::drawBox(QPainter *painter){
-
-
 }
 
 void
