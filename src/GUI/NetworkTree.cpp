@@ -385,48 +385,6 @@ NetworkTree::getOSCMessages(){
     return msgsList;
 }
 
-//void
-//NetworkTree::loadNetworkTree(AbstractBox *abBox){
-//    std::cout<<"load NT"<<std::endl;
-//    QList< QPair<QTreeWidgetItem *, Message> > startItemsAndMsgs = getItemsFromMsg(abBox->firstMsgs());
-//    QList< QPair<QTreeWidgetItem *, Message> > endItemsAndMsgs = getItemsFromMsg(abBox->lastMsgs());
-//    QList< QPair<QTreeWidgetItem *, Message> >::iterator it0;
-//    QPair<QTreeWidgetItem *, Message> curPair;
-
-////    QList<QTreeWidgetItem *>itemsFromMsg;
-//    QMap<QTreeWidgetItem *,Data>itemsFromMsg;
-//    Data currentData;
-//    for(it0 = startItemsAndMsgs.begin() ; it0 != startItemsAndMsgs.end() ; it0++){
-//        curPair = *it0;
-////        itemsFromMsg << curPair.first;
-//        itemsFromMsg.insert(curPair.first,currentData);
-//    }
-
-//    QList<QTreeWidgetItem *>itemsFromEndMsg;
-//    for(it0 = endItemsAndMsgs.begin() ; it0 != endItemsAndMsgs.end() ; it0++){
-//        curPair = *it0;
-////        itemsFromEndMsg << curPair.first;
-//        itemsFromMsg.insert(curPair.first,currentData);
-//    }
-
-//    QList<QTreeWidgetItem *>::iterator it;
-//    QTreeWidgetItem *curItem;
-//    for(it = itemsFromEndMsg.begin() ; it != itemsFromEndMsg.end() ; it++){
-//        curItem = *it;
-//        if(!itemsFromMsg.contains(curItem)){
-////            itemsFromMsg.append(curItem);
-//            itemsFromMsg.insert(curItem,currentData);
-//        }
-//    }
-//    setAssignedItems(itemsFromMsg);
-//    NetworkMessages *startMsg = new NetworkMessages();
-//    NetworkMessages *endMsg = new NetworkMessages();
-//    startMsg->setMessages(startItemsAndMsgs);
-//    endMsg->setMessages(endItemsAndMsgs);
-//    setStartMessages(startMsg);
-//    setEndMessages(endMsg);
-//}
-
 void
 NetworkTree::loadNetworkTree(AbstractBox *abBox){
 
@@ -435,19 +393,16 @@ NetworkTree::loadNetworkTree(AbstractBox *abBox){
     QList< QPair<QTreeWidgetItem *, Message> >::iterator it0;
     QPair<QTreeWidgetItem *, Message> curPair;
 
-//    QList<QTreeWidgetItem *>itemsFromMsg;
     QMap<QTreeWidgetItem *,Data>itemsFromMsg;
     Data currentData;
     for(it0 = startItemsAndMsgs.begin() ; it0 != startItemsAndMsgs.end() ; it0++){
         curPair = *it0;
-//        itemsFromMsg << curPair.first;
         itemsFromMsg.insert(curPair.first,currentData);
     }
 
     QList<QTreeWidgetItem *>itemsFromEndMsg;
     for(it0 = endItemsAndMsgs.begin() ; it0 != endItemsAndMsgs.end() ; it0++){
         curPair = *it0;
-//        itemsFromEndMsg << curPair.first;
         itemsFromMsg.insert(curPair.first,currentData);
     }
 
@@ -456,7 +411,6 @@ NetworkTree::loadNetworkTree(AbstractBox *abBox){
     for(it = itemsFromEndMsg.begin() ; it != itemsFromEndMsg.end() ; it++){
         curItem = *it;
         if(!itemsFromMsg.contains(curItem)){
-//            itemsFromMsg.append(curItem);
             itemsFromMsg.insert(curItem,currentData);
         }
     }
@@ -1609,60 +1563,11 @@ NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue){
 void
 NetworkTree::itemCollapsed() {
     currentItem()->setExpanded(!currentItem()->isExpanded());
-//    editValue();
-/*
-	QTreeWidgetItem *selectedItem = currentItem();
-	if (!selectedItem->isDisabled()) {
-		if (selectedItem->type() == NodeNamespaceType || selectedItem->type() == LeaveType) {
-			QString address = getAbsoluteAddress(selectedItem);
-
-			vector<string> nodes,leaves,attributes,attributesValues;
-
-			Maquette::getInstance()->requestNetworkNamespace(address.toStdString(), nodes, leaves, attributes, attributesValues);
-
-			QList<QTreeWidgetItem *> selectedItemChildren = selectedItem->takeChildren();
-			QList<QTreeWidgetItem *>::iterator childIt;
-			for (childIt = selectedItemChildren.begin() ; childIt != selectedItemChildren.end() ; ++childIt) {
-				delete *childIt;
-			}
-			vector<string>::iterator it;
-            vector<string>::iterator it2;
-			for (it = nodes.begin() ; it != nodes.end() ; ++it) {
-				QStringList list;
-				list << QString::fromStdString(*it);
-				QTreeWidgetItem *childItem = new QTreeWidgetItem(list,NodeNamespaceType);
-                //childItem->setBackground(0,QBrush(Qt::darkCyan));
-				selectedItem->addChild(childItem);
-				list.clear();                
-			}
-			for (it = leaves.begin() ; it != leaves.end() ; ++it) {
-				QStringList list;
-				list << QString::fromStdString(*it);
-				QTreeWidgetItem *childItem = new QTreeWidgetItem(list,LeaveType);
-                //childItem->setBackground(0,QBrush(Qt::darkGreen));
-				selectedItem->addChild(childItem);
-				list.clear();                
-			}
-			for (it = attributes.begin(),it2 = attributesValues.begin() ; it != attributes.end(), it2 != attributesValues.end() ; ++it , ++it2) {
-				QStringList list;
-				list << QString::fromStdString(*it + " : " + *it2);
-				QTreeWidgetItem *childItem = new QTreeWidgetItem(list,AttributeType);
-                //childItem->setBackground(0,QBrush(Qt::green));
-				selectedItem->addChild(childItem);
-				list.clear();
-			}
-		}
-    }*/
 }
 
 /***********************************************************************
  *                              Curves
  ***********************************************************************/
-
-//void
-//NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID){
-//    updateCurve(getAbsoluteAddress(item),boxID);
-//}
 
 void
 NetworkTree::assignOCSMsg(QTreeWidgetItem *item){
