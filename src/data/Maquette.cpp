@@ -121,7 +121,6 @@ Maquette::init() {
             if (deviceIt != _devices.end()) {
                 MyDevice minuitDevice = deviceIt->second;
                 minuitDevice.name = "MinuitDevice1";
-                std::cout<<"adding : "<<minuitDevice.name<<std::endl;
                 minuitDevice.networkPort = 9998;
                 minuitDevice.networkHost = "127.0.0.1";
                 _devices[minuitDevice.name] = minuitDevice;
@@ -134,7 +133,6 @@ Maquette::init() {
             if (deviceIt != _devices.end()) {
                 MyDevice oscDevice = deviceIt->second;
                 oscDevice.name = "OSCDevice";
-                std::cout<<"adding : "<<oscDevice.name<<std::endl;
                 oscDevice.networkPort = OSC_NETWORK_PORT;
                 oscDevice.networkHost = "127.0.0.1";
                 _devices[oscDevice.name] = oscDevice;
@@ -162,7 +160,6 @@ Maquette::init() {
         if (deviceIt != _devices.end()) {
             MyDevice minuitDevice = deviceIt->second;
             minuitDevice.name = "MinuitDevice1";
-            std::cout<<"adding : "<<minuitDevice.name<<std::endl;
             minuitDevice.networkPort = 9998;
             minuitDevice.networkHost = "127.0.0.1";
             _devices[minuitDevice.name] = minuitDevice;
@@ -175,7 +172,6 @@ Maquette::init() {
         if (deviceIt != _devices.end()) {
             MyDevice oscDevice = deviceIt->second;
             oscDevice.name = "OSCDevice";
-            std::cout<<"adding : "<<oscDevice.name<<std::endl;
             oscDevice.networkPort = OSC_NETWORK_PORT;
             oscDevice.networkHost = "127.0.0.1";
             _devices[oscDevice.name] = oscDevice;
