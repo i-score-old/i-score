@@ -108,6 +108,7 @@ Relation::init()
   _color = QColor(Qt::blue);
   _lastMaxBound = -1;
   _elasticMode = false;
+  _mouseClickPosSave = mapToScene(_start);
   updateFlexibility();
 
 }
@@ -168,44 +169,41 @@ void
 Relation::updateCoordinates()
 {
   BasicBox *box = _scene->getBox(_abstract->firstBox());
-
-  switch (_abstract->firstExtremity()) {
-  case BOX_START :
-//    _start = box->getMiddleLeft();
-      _start = box->getLeftGripPoint();
-
-    break;
-  case BOX_END :
-//    _start = box->getMiddleRight();
-      _start = box->getRightGripPoint();
-    break;
-  case NO_EXTREMITY :
-    _start = box->getCenter();
-    break;
+  if(box != NULL){
+      switch (_abstract->firstExtremity()) {
+          case BOX_START :
+              _start = box->getLeftGripPoint();
+            break;
+          case BOX_END :
+              _start = box->getRightGripPoint();
+            break;
+          case NO_EXTREMITY :
+            _start = box->getCenter();
+            break;
+      }
   }
 
   box = _scene->getBox(_abstract->secondBox());
-  switch (_abstract->secondExtremity()) {
-  case BOX_START :
-      if(box!=NULL){
-//        _end = box->getMiddleLeft();
-        _end = box->getLeftGripPoint();
-      }
-    break;
-  case BOX_END :
-      if(box!=NULL){
-//        _end = box->getMiddleRight();
-          _end = box->getRightGripPoint();
-      }
-    break;
-  case NO_EXTREMITY :
-      if(box!=NULL)
-        _end = box->getCenter();
-    break;
+  if(box != NULL){
+      switch (_abstract->secondExtremity()) {
+          case BOX_START :
+              if(box!=NULL){
+                _end = box->getLeftGripPoint();
+              }
+            break;
+          case BOX_END :
+              if(box!=NULL){
+                  _end = box->getRightGripPoint();
+              }
+            break;
+          case NO_EXTREMITY :
+              if(box!=NULL)
+                _end = box->getCenter();
+            break;
+        }
   }
   _abstract->_length = _end.x() - _start.x();
   setPos(getCenter());
-
 }
 
 void
@@ -401,6 +399,7 @@ Relation::mousePressEvent (QGraphicsSceneMouseEvent * event) {
 
           if(QRectF(startX+(endX - startX)/2-HANDLE_WIDTH/2,endY-HANDLE_HEIGHT/2,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
               _middleHandleSelected = true;
+              _mouseClickPosSave = event->pos();
           }
           else if (QRectF(startBound - HANDLE_WIDTH/2 ,endY - HANDLE_HEIGHT/2.,HANDLE_WIDTH,HANDLE_HEIGHT).contains(event->pos())) {
             _leftHandleSelected = true;
@@ -429,13 +428,26 @@ Relation::mouseMoveEvent (QGraphicsSceneMouseEvent * event) {
     update();
     }
     else if (_middleHandleSelected){
-      _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,std::max(2*(eventPosX - startX),0.),std::max(2*(eventPosX - startX),0.));
+        BasicBox *rightBox = _scene->getBox(_abstract->secondBox());
+        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,NO_BOUND,NO_BOUND);
+        qreal factorX =  2*(eventPosX - _mouseClickPosSave.x());
+        rightBox->moveBy(factorX,0.);
+        rightBox->setTopLeft(rightBox->getTopLeft()+QPointF(factorX,0.));
+        rightBox->updateStuff();
+        _scene->boxMoved(rightBox->ID());
     }
 }
 
 void
 Relation::mouseReleaseEvent (QGraphicsSceneMouseEvent * event) {
     QGraphicsItem::mouseReleaseEvent(event);
+
+    if(_middleHandleSelected){
+        double startX = mapFromScene(_start).x();
+        double endX = mapFromScene(_end).x();
+        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,endX-startX,endX-startX);
+        _middleHandleSelected = false;
+    }
     _leftHandleSelected = false;
     _rightHandleSelected = false;
 }

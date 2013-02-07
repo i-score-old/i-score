@@ -238,6 +238,7 @@ class Relation : public QGraphicsItem
   bool _flexibleRelation;//!< The relation can be extended
   bool _elasticMode;//!< For rigid relations
   float _lastMaxBound;
+  QPointF _mouseClickPosSave;
 
   bool _leftBoundModified;
   bool _rightBoundModified;

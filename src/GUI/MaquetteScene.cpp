@@ -622,8 +622,9 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     else if (noBoxSelected() || subScenarioMode(mouseEvent)){
         setCurrentMode(CREATION_MODE);
     }
-    else
+    else{
         setCurrentMode(SELECTION_MODE);
+    }
 
     if (itemAt(mouseEvent->scenePos()) != 0) {
         if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::PointingHandCursor && _currentInteractionMode != TRIGGER_MODE) {
@@ -675,7 +676,6 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         case BOX_EDIT_MODE :
             break;
         }
-
 }
 
 void
@@ -1668,6 +1668,7 @@ MaquetteScene::boxResized() {
 
 void
 MaquetteScene::selectionMoved() {
+
 	for (int i = 0 ; i < selectedItems().size() ; i++) {
 		QGraphicsItem *curItem = selectedItems().at(i);
 		int type = curItem->type();
