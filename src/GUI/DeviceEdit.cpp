@@ -83,7 +83,19 @@ DeviceEdit::init(){
 
 void
 DeviceEdit::edit(QString name){
-    _nameEdit->setText(name);
+    std::map<string,MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
+    std::map<string,MyDevice>::iterator it;
+
+    if ((it = devices.find(name.toStdString())) != devices.end())
+        _currentDevice = it->second;
+    else {
+      QMessageBox::warning(this,"",tr("Device not found"));
+      return;
+    }
+    _portBox->setValue(_currentDevice.networkPort);
+    _IPBox->setText(QString::fromStdString(_currentDevice.networkHost));
+
+    _nameEdit->setText(QString::fromStdString(_currentDevice.name));
     _nameEdit->selectAll();
     exec();
 }

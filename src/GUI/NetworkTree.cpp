@@ -106,7 +106,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
  ****************************************************************************/
 void
 NetworkTree::init(){
-    _deviceEdit = new DeviceEdit(parentWidget());
+    _deviceEdit = new DeviceEdit(topLevelWidget());
 
     _startMessages = new NetworkMessages;
     _endMessages = new NetworkMessages;

@@ -2,6 +2,7 @@
 #define DEVICEEDIT_HPP
 
 #include <QDialog>
+#include <QMessageBox>
 #include <QLabel>
 #include <QGridLayout>
 #include <map>
@@ -32,6 +33,7 @@ class DeviceEdit : public QDialog
     void init();
 
     bool _changed;
+    MyDevice _currentDevice;
 
     QGridLayout *_layout;
     QLabel *_deviceNameLabel;
