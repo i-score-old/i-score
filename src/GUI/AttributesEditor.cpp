@@ -138,7 +138,7 @@ AttributesEditor::~AttributesEditor()
 }
 
 void AttributesEditor::clear() {
-    //TODO
+    _networkTree->clear();
 }
 void AttributesEditor::setScene(MaquetteScene * scene) {
 	_scene = scene;

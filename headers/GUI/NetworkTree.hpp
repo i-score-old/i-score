@@ -424,6 +424,7 @@ class NetworkTree : public QTreeWidget
         void changeStartValue(QTreeWidgetItem* item,QString newValue);
         void changeEndValue(QTreeWidgetItem* item,QString newValue);
         void changeNameValue(QTreeWidgetItem* item,QString newValue);
+        virtual void clear();
 };
 
 

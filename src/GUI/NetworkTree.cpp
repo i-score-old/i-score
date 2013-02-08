@@ -146,6 +146,16 @@ NetworkTree::init(){
 }
 
 void
+NetworkTree::clear(){
+    QList<QTreeWidgetItem*>::iterator it;
+    for(it = _OSCMessages.begin() ; it !=  _OSCMessages.end() ; it++)
+        _OSCNodeRoot->removeChild(*it);
+
+    _OSCMessages.clear();
+    _OSCMessageCount = 0;
+}
+
+void
 NetworkTree::load() {
     vector<string> deviceNames;
     vector<bool> deviceRequestable;
@@ -333,7 +343,7 @@ NetworkTree::addOSCMessage(){
     _OSCNodeRoot->setCheckState(START_COLUMN,Qt::Unchecked);
     _OSCNodeRoot->setCheckState(END_COLUMN,Qt::Unchecked);
 
-    QString number = QString("%1").arg(_OSCMessageCount);
+    QString number = QString("%1").arg(_OSCMessageCount++);
     QString name = QString("OSCMessage"+number);
     QStringList OSCname = QStringList(name);
 
@@ -342,10 +352,8 @@ NetworkTree::addOSCMessage(){
     newItem->setCheckState(REDUNDANCY_COLUMN,Qt::Unchecked);
     newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled);
 
-    QString message = "OSCDevice/"+name;
+    _OSCNodeRoot->insertChild(_OSCMessages.size(),newItem);
     _OSCMessages.push_back(newItem);
-
-    _OSCNodeRoot->insertChild(_OSCMessageCount++,newItem);    
 }
 
 void
@@ -1544,6 +1552,8 @@ NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue){
             _endMessages->removeMessage(item);
             _OSCEndMessages->removeMessage(item);
             _OSCStartMessages->removeMessage(item);
+            _OSCNodeRoot->removeChild(item);
+            _OSCMessages.removeAll(item);
             removeAssignItem(item);
         }
         else{

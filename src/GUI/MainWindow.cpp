@@ -998,6 +998,7 @@ MainWindow::loadFile(const QString &fileName)
 {
   QApplication::setOverrideCursor(Qt::WaitCursor);
   _scene->clear();
+  _editor->clear();
   _scene->load(fileName.toStdString());
 
   QApplication::restoreOverrideCursor();
