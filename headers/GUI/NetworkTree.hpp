@@ -49,13 +49,14 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <iostream>
 #include "NetworkMessages.hpp"
 #include "AbstractBox.hpp"
+#include "DeviceEdit.hpp"
 #include <QPair>
 #include <QMap>
 
 using std::vector;
 using std::string;
 using std::map;
-class QTreeView;
+
 
 enum {NodeNamespaceType = QTreeWidgetItem::UserType + 1, NodeNoNamespaceType = QTreeWidgetItem::UserType + 2 ,
     LeaveType = QTreeWidgetItem::UserType + 3, AttributeType = QTreeWidgetItem::UserType + 4, OSCNamespace = QTreeWidgetItem::UserType + 5, OSCNode = QTreeWidgetItem::UserType + 6,addOSCNode = QTreeWidgetItem::UserType + 7};
@@ -416,6 +417,8 @@ class NetworkTree : public QTreeWidget
 
         QTreeWidgetItem *_OSCNodeRoot;
         int _OSCMessageCount;
+
+        DeviceEdit *_deviceEdit;
 
 	public slots:
         void itemCollapsed();

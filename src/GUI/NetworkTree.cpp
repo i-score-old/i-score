@@ -106,6 +106,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
  ****************************************************************************/
 void
 NetworkTree::init(){
+    _deviceEdit = new DeviceEdit(this);
     _startMessages = new NetworkMessages;
     _endMessages = new NetworkMessages;
     _OSCMessageCount = 0;
@@ -160,6 +161,7 @@ NetworkTree::load() {
     vector<string> deviceNames;
     vector<bool> deviceRequestable;
     Maquette::getInstance()->getNetworkDeviceNames(deviceNames, deviceRequestable);    
+
     vector<string>::iterator nameIt;
     vector<bool>::iterator requestableIt;
 
@@ -1326,6 +1328,11 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event){
     }
     else if(currentItem()->type()==addOSCNode)
         ;
+    else if(currentItem()->type()==NodeNamespaceType){
+        QString deviceName = currentItem()->text(NAME_COLUMN);
+        std::cout<<"edit : "<<deviceName.toStdString()<<std::endl;
+        _deviceEdit->edit(deviceName);
+    }
     else{
         if(currentColumn() == START_COLUMN || currentColumn() == END_COLUMN || currentColumn() == SR_COLUMN){
             QTreeWidgetItem *item = currentItem();
