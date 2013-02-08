@@ -52,14 +52,38 @@ DeviceEdit::init(){
     setLayout(_layout);
 
     _deviceNameLabel = new QLabel(tr("DeviceName"));
+    _pluginsLabel = new QLabel(tr("Plugins"));
+    _portLabel = new QLabel(tr("Port"));
+    _IPLabel = new QLabel(tr("IP"));
+
+
+    _portBox = new QSpinBox;
+    _portBox->setRange(0,10000);
+
+    _IPBox = new QLineEdit;
     _nameEdit = new QLineEdit;
+
+    _pluginsComboBox = new QComboBox;
 
     _layout->addWidget(_deviceNameLabel, 0, 0, 1, 1);
     _layout->addWidget(_nameEdit, 0, 1, 1, 1);
+    _layout->addWidget(_pluginsLabel, 1, 0, 1, 1);
+    _layout->addWidget(_pluginsComboBox, 1, 1, 1, 1);
+    _layout->addWidget(_portLabel, 2, 0, 1, 1);
+    _layout->addWidget(_portBox, 2, 1, 1, 1);
+    _layout->addWidget(_IPLabel, 3, 0, 1, 1);
+    _layout->addWidget(_IPBox, 3, 1, 1, 1);
+
+    _okButton = new QPushButton(tr("OK"), this);
+    _layout->addWidget(_okButton, 3, 2, 1, 1);
+    _cancelButton = new QPushButton(tr("Cancel"), this);
+    _layout->addWidget(_cancelButton, 3, 3, 1, 1);
+
 }
 
 void
 DeviceEdit::edit(QString name){
     _nameEdit->setText(name);
+    _nameEdit->selectAll();
     exec();
 }

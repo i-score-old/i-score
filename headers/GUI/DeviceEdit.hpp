@@ -7,6 +7,8 @@
 #include <map>
 #include <string>
 #include "Maquette.hpp"
+#include <QSpinBox>
+#include <QPushButton>
 
 class MaquetteScene;
 
@@ -34,6 +36,19 @@ class DeviceEdit : public QDialog
     QGridLayout *_layout;
     QLabel *_deviceNameLabel;
     QLineEdit *_nameEdit;
+
+    QLabel *_devicesLabel; //!< QLabel for devices.
+    QLabel *_pluginsLabel; //!< QLabel for plugins.
+    QLabel *_portLabel; //!< QLabel for ports.
+    QLabel *_IPLabel; //!< QLabel for network adress.
+
+    QComboBox *_pluginsComboBox; //!< QComboBox handling various plug-ins available.
+    QSpinBox *_portBox; //!< QSpinBox managing port value.
+    QLineEdit *_IPBox; //!< QLineEdit
+
+    QPushButton *_okButton; //!< Button used to confirme.
+    QPushButton *_cancelButton; //!< Button used to cancel.
+
 
 };
 
