@@ -365,7 +365,8 @@ class NetworkTree : public QTreeWidget
         void endOSCMessageChanged(QTreeWidgetItem *item, QString message);
         void endOSCMessageAdded(QTreeWidgetItem *item, QString message);
         void endOSCMessageRemoved(QTreeWidgetItem *item);
-        void nameChanged(QTreeWidgetItem *item, QString address);
+        void messageChanged(QTreeWidgetItem *item, QString address);
+        void deviceChanged(QString address);
 
     private :
         void treeRecursiveExploration(QTreeWidgetItem *curItem, bool onflict);
@@ -427,6 +428,7 @@ class NetworkTree : public QTreeWidget
         void changeStartValue(QTreeWidgetItem* item,QString newValue);
         void changeEndValue(QTreeWidgetItem* item,QString newValue);
         void changeNameValue(QTreeWidgetItem* item,QString newValue);
+        void changeDeviceName(QString newName);
         virtual void clear();
 };
 

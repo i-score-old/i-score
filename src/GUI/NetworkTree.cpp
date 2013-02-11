@@ -98,6 +98,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     connect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this,SLOT(valueChanged(QTreeWidgetItem*,int)));
     connect(this, SIGNAL(startValueChanged(QTreeWidgetItem*,QString)),this,SLOT(changeStartValue(QTreeWidgetItem*,QString)));
     connect(this, SIGNAL(endValueChanged(QTreeWidgetItem*,QString)),this,SLOT(changeEndValue(QTreeWidgetItem*,QString)));
+    connect(_deviceEdit, SIGNAL(deviceNameChanged(QString)),this,SLOT(changeDeviceName(QString)));
 }
 
 
@@ -1331,7 +1332,6 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event){
         ;
     else if(currentItem()->type()==NodeNamespaceType){
         QString deviceName = currentItem()->text(NAME_COLUMN);
-        std::cout<<"edit : "<<deviceName.toStdString()<<std::endl;
         _deviceEdit->edit(deviceName);
     }
     else{
@@ -1566,7 +1566,7 @@ NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue){
         }
         else{
             setOSCMessageName(item,newValue);
-            emit(nameChanged(item,newValue));
+            emit(messageChanged(item,newValue));
         }
         QMap<QTreeWidgetItem *, Data>::iterator it = _assignedItems.find(item);
         if (it!=_assignedItems.end()){
@@ -1718,3 +1718,8 @@ NetworkTree::updateLine(QTreeWidgetItem *item, bool interpolationState, int samp
         item->setCheckState(REDUNDANCY_COLUMN,Qt::Unchecked);
 }
 
+void
+NetworkTree::changeDeviceName(QString newName){
+    currentItem()->setText(NAME_COLUMN,newName);
+    emit(deviceChanged(newName));
+}

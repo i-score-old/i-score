@@ -72,7 +72,8 @@ public :
      */
     void addMessage(QTreeWidgetItem *item, const QString &device, const QString &message, const QString &value);
     void addMessage(QTreeWidgetItem *item, QString address);
-    void changeName(QTreeWidgetItem *item, QString newName);
+    void changeMessage(QTreeWidgetItem *item, QString newName);
+    void changeDevice(QString newName);
     /*!
      * \brief Adds a list of messages.
      */
@@ -110,6 +111,7 @@ public :
     std::string computeMessageWithoutValue(const Message &msg);
     inline QList<Message> messages(){return _messages->values();}
     QMap<QString, QString> toMapAddressValue();
+    inline bool isEmpty(){return _messages->isEmpty();}
 
 public slots :
     void removeMessage(QTreeWidgetItem *item);

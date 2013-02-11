@@ -47,6 +47,7 @@ DeviceEdit::DeviceEdit(QWidget *parent)
 void
 DeviceEdit::init(){
     _changed = false;
+    _nameChanged = false;
 
     _layout = new QGridLayout(this);
     setLayout(_layout);
@@ -79,7 +80,7 @@ DeviceEdit::init(){
     _cancelButton = new QPushButton(tr("Cancel"), this);
     _layout->addWidget(_cancelButton, 3, 3, 1, 1);
 
-//    connect(_nameEdit,SIGNAL(editingFinished()),this,SLOT(setChanged()));
+    connect(_nameEdit,SIGNAL(editingFinished()),this,SLOT(deviceNameChanged()));
     connect(_pluginsComboBox,SIGNAL(activated(int)),this,SLOT(setChanged()));
     connect(_portBox, SIGNAL(valueChanged(int)), this, SLOT(setChanged()));
     connect(_IPBox, SIGNAL(textChanged(const QString &)), this, SLOT(setChanged()));
@@ -131,15 +132,35 @@ DeviceEdit::edit(QString name){
 
 void
 DeviceEdit::setChanged() {
-    std::cout<<"<<<< set changed >>>>"<<std::endl;
     _changed = true;
 }
 
 void
 DeviceEdit::updateNetworkConfiguration(){
+    std::cout<<"<<<< updateNetworkConfig >>>>"<<std::endl;
+    if (_changed) {
+        QHostAddress hostAddress(_IPBox->text());
+        if (!hostAddress.isNull()) {
+            Maquette::getInstance()->changeNetworkDevice(_nameEdit->text().toStdString(),_pluginsComboBox->currentText().toStdString(),
+                                        _IPBox->text().toStdString(),_portBox->text().toStdString());
+            if(_nameChanged)
+                emit(deviceNameChanged(_nameEdit->text()));
 
+            accept();
+      }
+      else {
+        QMessageBox::warning(this,"",tr("Unvalid IP address"));
+      }
+    }
+    else {
+      accept();
+    }
+    _changed = false;
+    _nameChanged = false;
 }
-void
-DeviceEdit::reject(){
 
+void
+DeviceEdit::deviceNameChanged(){
+    _nameChanged = true;
+    setChanged();
 }

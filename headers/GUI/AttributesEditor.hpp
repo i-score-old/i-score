@@ -243,7 +243,8 @@ class AttributesEditor : public QDockWidget
   void curveActivationChanged(QTreeWidgetItem *item, bool activated);
   void curveRedundancyChanged(QTreeWidgetItem *item, bool activated);
   void curveSampleRateChanged(QTreeWidgetItem *item, int value);
-  void deployNameChanged(QTreeWidgetItem *item, QString address);
+  void deployMessageChanged(QTreeWidgetItem *item, QString address);
+  void deployDeviceChanged(QString address);
 
   /*!
    * \brief Updates box start message

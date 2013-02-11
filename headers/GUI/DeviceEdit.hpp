@@ -10,6 +10,7 @@
 #include "Maquette.hpp"
 #include <QSpinBox>
 #include <QPushButton>
+#include <QHostAddress>
 
 class MaquetteScene;
 
@@ -30,12 +31,17 @@ class DeviceEdit : public QDialog
     void edit(QString name);
     void setChanged();
     void updateNetworkConfiguration();
-    void reject();
+    void deviceNameChanged();
+
+ signals:
+    void deviceNameChanged(QString);
 
  private :
     void init();
 
     bool _changed;
+    bool _nameChanged;
+
     MyDevice _currentDevice;
 
     QGridLayout *_layout;
@@ -53,7 +59,6 @@ class DeviceEdit : public QDialog
 
     QPushButton *_okButton; //!< Button used to confirme.
     QPushButton *_cancelButton; //!< Button used to cancel.
-
 
 };
 
