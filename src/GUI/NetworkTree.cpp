@@ -1306,6 +1306,12 @@ NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select){
  *                         SLOTS - Virtual methods
  ************************************************************************/
 
+void
+NetworkTree::contextMenuEvent(QContextMenuEvent *event){
+    Q_UNUSED(event);
+    if(currentItem()->type() == NodeNamespaceType)
+        std::cout<<"OK CONTEXT MENU"<<std::endl;
+}
 
 void
 NetworkTree::mouseDoubleClickEvent(QMouseEvent *event){

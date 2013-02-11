@@ -336,6 +336,7 @@ class NetworkTree : public QTreeWidget
         virtual void keyPressEvent(QKeyEvent *event);
         virtual void keyReleaseEvent(QKeyEvent *event);
         virtual void mouseDoubleClickEvent(QMouseEvent *event);
+        virtual void contextMenuEvent(QContextMenuEvent *event);
 
         static int NAME_COLUMN ;
         static int VALUE_COLUMN ;
