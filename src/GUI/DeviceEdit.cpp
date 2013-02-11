@@ -79,11 +79,20 @@ DeviceEdit::init(){
     _cancelButton = new QPushButton(tr("Cancel"), this);
     _layout->addWidget(_cancelButton, 3, 3, 1, 1);
 
+//    connect(_nameEdit,SIGNAL(editingFinished()),this,SLOT(setChanged()));
+    connect(_pluginsComboBox,SIGNAL(activated(int)),this,SLOT(setChanged()));
+    connect(_portBox, SIGNAL(valueChanged(int)), this, SLOT(setChanged()));
+    connect(_IPBox, SIGNAL(textChanged(const QString &)), this, SLOT(setChanged()));
+
+    connect(_okButton, SIGNAL(clicked()), this, SLOT(updateNetworkConfiguration()));
+    connect(_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
 void
 DeviceEdit::edit(QString name){
     std::map<string,MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
+    std::vector<std::string> plugins = Maquette::getInstance()->getPlugins();
+
     std::map<string,MyDevice>::iterator it;
 
     if ((it = devices.find(name.toStdString())) != devices.end())
@@ -92,10 +101,45 @@ DeviceEdit::edit(QString name){
       QMessageBox::warning(this,"",tr("Device not found"));
       return;
     }
+
     _portBox->setValue(_currentDevice.networkPort);
     _IPBox->setText(QString::fromStdString(_currentDevice.networkHost));
 
     _nameEdit->setText(QString::fromStdString(_currentDevice.name));
     _nameEdit->selectAll();
+
+    /***************************   Plugins *****************************/
+    for(unsigned int i=0 ; i<plugins.size() ; i++){
+        if (_pluginsComboBox->findText(QString::fromStdString(plugins[i])) == -1)
+            _pluginsComboBox->addItem(QString::fromStdString(plugins[i]));
+    }
+    if (_pluginsComboBox->findText(QString::fromStdString(_currentDevice.plugin)) == -1)
+        _pluginsComboBox->addItem(QString::fromStdString(_currentDevice.plugin));
+
+    int found = -1;
+    if ((found = _pluginsComboBox->findText(QString::fromStdString(_currentDevice.plugin))) != -1) {
+      _pluginsComboBox->setCurrentIndex(found);
+    }
+    else {
+      QMessageBox::warning(this,"",QString::fromStdString(_currentDevice.plugin) + tr(" plugin not found : default selected"));
+      _pluginsComboBox->setCurrentIndex(0);
+    }
+    /*******************************************************************/
+
     exec();
+}
+
+void
+DeviceEdit::setChanged() {
+    std::cout<<"<<<< set changed >>>>"<<std::endl;
+    _changed = true;
+}
+
+void
+DeviceEdit::updateNetworkConfiguration(){
+
+}
+void
+DeviceEdit::reject(){
+
 }

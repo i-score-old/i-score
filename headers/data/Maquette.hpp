@@ -717,6 +717,7 @@ class Maquette : public QObject
   void initSceneState();
   void setStartMessageToSend(unsigned int boxID,QTreeWidgetItem *item,QString address);
   void setEndMessageToSend(unsigned int boxID,QTreeWidgetItem *item,QString address);
+  std::vector<std::string> getPlugins();
 
  private :
 
@@ -814,6 +815,7 @@ class Maquette : public QObject
   std::map<std::string,MyDevice> _devices;
   //! The set of available Engines listening ports.
   std::vector<unsigned int> _listeningPorts;
+  std::vector<std::string> _plugins;
 
   //Device _defaultDevice; //!< The default network device used.
 

@@ -28,6 +28,9 @@ class DeviceEdit : public QDialog
 
  public slots:
     void edit(QString name);
+    void setChanged();
+    void updateNetworkConfiguration();
+    void reject();
 
  private :
     void init();

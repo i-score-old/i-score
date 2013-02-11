@@ -89,16 +89,16 @@ Maquette::init() {
 
 	_engines = new Engines(SCENARIO_SIZE,pluginsDir);
 
-	vector<string> pluginsLoaded;
+    vector<string> pluginsLoaded;
 
-    _engines->getLoadedNetworkPlugins(pluginsLoaded,_listeningPorts);
+    _engines->getLoadedNetworkPlugins(_plugins,_listeningPorts);
 
     //pour maintenir le fonctionnement pendant le developpement : l'appli n'est pas auto portée.
-    if(pluginsLoaded.empty()){
+    if(_plugins.empty()){
         string pluginsDir =  (QCoreApplication::applicationDirPath()+"/../plugins/i-score").toStdString();
         _engines = new Engines(SCENARIO_SIZE,pluginsDir);
-        _engines->getLoadedNetworkPlugins(pluginsLoaded,_listeningPorts);
-        if(pluginsLoaded.empty()){
+        _engines->getLoadedNetworkPlugins(_plugins,_listeningPorts);
+        if(_plugins.empty()){
             string error;
             error.append(tr("No network plugins found in ").toStdString());
             error.append(pluginsDir);
@@ -107,8 +107,8 @@ Maquette::init() {
         else{
             vector<string>::iterator it;
             vector<unsigned int>::iterator it2;
-            for (it = pluginsLoaded.begin(), it2 = _listeningPorts.begin();
-                (it != pluginsLoaded.end()) && (it2 != _listeningPorts.end()) ;
+            for (it = _plugins.begin(), it2 = _listeningPorts.begin();
+                (it != _plugins.end()) && (it2 != _listeningPorts.end()) ;
                 it++,it2++) {
                 stringstream deviceName;
                 deviceName << *it << "Device";
@@ -146,8 +146,8 @@ Maquette::init() {
     else{
         vector<string>::iterator it;
         vector<unsigned int>::iterator it2;
-        for (it = pluginsLoaded.begin(), it2 = _listeningPorts.begin();
-            (it != pluginsLoaded.end()) && (it2 != _listeningPorts.end()) ;
+        for (it = _plugins.begin(), it2 = _listeningPorts.begin();
+            (it != _plugins.end()) && (it2 != _listeningPorts.end()) ;
             it++,it2++) {
             stringstream deviceName;
             deviceName << *it << "Device";
@@ -177,7 +177,7 @@ Maquette::init() {
             _devices[oscDevice.name] = oscDevice;
             stringstream port;
             port << oscDevice.networkPort;
-            _engines->addNetworkDevice(oscDevice.name,oscDevice.plugin,oscDevice.networkHost,port.str());
+            _engines->addNetworkDevice(oscDevice.name,oscDevice.plugin,oscDevice.networkHost,port.str());            
         }
         _devices.erase("MinuitDevice");
     }
@@ -201,6 +201,11 @@ Maquette::~Maquette()
 void
 Maquette::setScene(MaquetteScene *scene) {
 	_scene = scene;
+}
+
+vector<string>
+Maquette::getPlugins(){
+    return _plugins;
 }
 
 vector<unsigned int>
