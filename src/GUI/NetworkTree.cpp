@@ -163,16 +163,9 @@ NetworkTree::clear(){
 void
 NetworkTree::load() {
 
-    std::cout<<"LOAD"<<std::endl;
     vector<string> deviceNames;
     vector<bool> deviceRequestable;
     Maquette::getInstance()->getNetworkDeviceNames(deviceNames, deviceRequestable);    
-
-    std::cout<<"--- NetworkTree::load ---"<<std::endl;
-    for(unsigned int i=0 ; i<deviceNames.size() ; i++){
-        std::cout<<deviceNames[i]<<std::endl;
-    }
-    std::cout<<"------------------------"<<std::endl;
 
     vector<string>::iterator nameIt;
     vector<bool>::iterator requestableIt;
@@ -199,10 +192,12 @@ NetworkTree::load() {
             }catch (const std::exception & e){
                 std::cerr << *nameIt << " : " << e.what();
             }
+            itemsList << curItem;
         }
-        itemsList << curItem;
+
     }
     addTopLevelItems(itemsList);
+    addTopLevelItem(_OSCNodeRoot);
 }
 
 /*
@@ -1736,8 +1731,8 @@ NetworkTree::updateLine(QTreeWidgetItem *item, bool interpolationState, int samp
 void
 NetworkTree::changeDeviceName(QString newName){
     std::string deviceName = currentItem()->text(NAME_COLUMN).toStdString();
-    std::cout<<"NetworkTree::removing "<<deviceName<<std::endl;
     Maquette::getInstance()->removeNetworkDevice(deviceName);
-    currentItem()->setText(NAME_COLUMN,newName);
+    currentItem()->setText(NAME_COLUMN,newName);    
+
     emit(deviceChanged(newName));
 }

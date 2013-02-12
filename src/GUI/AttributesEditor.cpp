@@ -456,8 +456,8 @@ AttributesEditor::createWidgets()
 	_endMsgLabel = new QLabel;
 	_startMsgScrollArea = new QScrollArea;
 	_endMsgScrollArea = new QScrollArea;
-	_startMsgsEditor = new NetworkMessagesEditor(_startMsgScrollArea);
-	_endMsgsEditor = new NetworkMessagesEditor(_endMsgScrollArea);
+//	_startMsgsEditor = new NetworkMessagesEditor(_startMsgScrollArea);
+//	_endMsgsEditor = new NetworkMessagesEditor(_endMsgScrollArea);
 	_startMsgsAddButton = new QPushButton("+",this);
 	_endMsgsAddButton = new QPushButton("+",this);
 	_startMsgClearButton = new QPushButton("Clear", this);
@@ -668,7 +668,7 @@ AttributesEditor::addWidgetsToLayout()
 	_msgStartTopLayout->addWidget(_startMsgClearButton, 0, 4, 1, 1, Qt::AlignRight);
 	_msgStartLayout->addLayout(_msgStartTopLayout);
 	offsetY += LABEL_HEIGHT;
-	_msgStartLayout->addWidget(_startMsgsEditor);
+//	_msgStartLayout->addWidget(_startMsgsEditor);
 
 	QWidget * startMsgsWidget = new QWidget(this);
 	startMsgsWidget->setLayout(_msgStartLayout);
@@ -681,7 +681,7 @@ AttributesEditor::addWidgetsToLayout()
 	_msgEndTopLayout->addWidget(_endMsgClearButton, 0, 4, 1, 1, Qt::AlignRight);
 	_msgEndLayout->addLayout(_msgEndTopLayout);
 	offsetY += LABEL_HEIGHT;
-	_msgEndLayout->addWidget(_endMsgsEditor);
+//	_msgEndLayout->addWidget(_endMsgsEditor);
 
 	QWidget * endMsgsWidget = new QWidget(this);
 	endMsgsWidget->setLayout(_msgEndLayout);
@@ -781,24 +781,24 @@ AttributesEditor::connectSlots()
 	connect(_harmoHeldComboBox, SIGNAL(activated(int)), this, SLOT(harmoHeldChanged()));
 	connect(_harmoVariationComboBox, SIGNAL(activated(int)), this, SLOT(harmoVariationChanged()));
 
-	connect(_startMsgsAddButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(addLine()));
-	connect(_startMsgDeleteButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(removeLines()));
-	connect(_startMsgCopyButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(exportMessages()));
-	connect(_startMsgPasteButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(importMessages()));
-	connect(_startMsgClearButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(clear()));
-	connect(_endMsgsAddButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(addLine()));
-	connect(_endMsgDeleteButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(removeLines()));
-	connect(_endMsgCopyButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(exportMessages()));
-	connect(_endMsgPasteButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(importMessages()));
-	connect(_endMsgClearButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(clear()));
+//	connect(_startMsgsAddButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(addLine()));
+//	connect(_startMsgDeleteButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(removeLines()));
+//	connect(_startMsgCopyButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(exportMessages()));
+//	connect(_startMsgPasteButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(importMessages()));
+//	connect(_startMsgClearButton, SIGNAL(clicked()), _startMsgsEditor, SLOT(clear()));
+//	connect(_endMsgsAddButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(addLine()));
+//	connect(_endMsgDeleteButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(removeLines()));
+//	connect(_endMsgCopyButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(exportMessages()));
+//	connect(_endMsgPasteButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(importMessages()));
+//	connect(_endMsgClearButton, SIGNAL(clicked()), _endMsgsEditor, SLOT(clear()));
 
-	connect(_startMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(startMessagesChanged()));
+//	connect(_startMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(startMessagesChanged()));
 
     connect(_networkTree,SIGNAL(startMessageValueChanged(QTreeWidgetItem *)),this,SLOT(startMessageChanged(QTreeWidgetItem *)));
     connect(_networkTree,SIGNAL(endMessageValueChanged(QTreeWidgetItem *)),this,SLOT(endMessageChanged(QTreeWidgetItem *)));
-	connect(_startMsgsEditor,SIGNAL(messageRemoved(const std::string &)),this,SLOT(startMessageRemoved(const std::string &)));
-	connect(_endMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(endMessagesChanged()));
-	connect(_endMsgsEditor,SIGNAL(messageRemoved(const std::string &)),this,SLOT(endMessageRemoved(const std::string &)));
+//	connect(_startMsgsEditor,SIGNAL(messageRemoved(const std::string &)),this,SLOT(startMessageRemoved(const std::string &)));
+//	connect(_endMsgsEditor,SIGNAL(messagesChanged()),this,SLOT(endMessagesChanged()));
+//	connect(_endMsgsEditor,SIGNAL(messageRemoved(const std::string &)),this,SLOT(endMessageRemoved(const std::string &)));
 
 	connect(_snapshotAssignStart, SIGNAL(clicked()),this,SLOT(snapshotStartAssignment()));
 	connect(_snapshotAssignEnd, SIGNAL(clicked()),this,SLOT(snapshotEndAssignment()));
@@ -866,14 +866,14 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 	_boxEdited = abBox->ID();
 
     if (boxModified || (_boxEdited == NO_ID)) {
-		_startMsgsEditor->reset();
-        _endMsgsEditor->reset();
+//		_startMsgsEditor->reset();
+//        _endMsgsEditor->reset();
         _networkTree->resetNetworkTree();
 
         if (_boxEdited != NO_ID) {
 
-			_startMsgsEditor->addMessages(abBox->firstMsgs());
-            _endMsgsEditor->addMessages(abBox->lastMsgs());            
+//			_startMsgsEditor->addMessages(abBox->firstMsgs());
+//            _endMsgsEditor->addMessages(abBox->lastMsgs());
 
             if(abBox->networkTreeItems().isEmpty() && abBox->networkTreeExpandedItems().isEmpty()){
                 //LOAD FILE
@@ -1350,7 +1350,7 @@ AttributesEditor::endMessagesChanged()
         BasicBox * box = _scene->getBox(_boxEdited);
 
         if(box->type()==SOUND_BOX_TYPE){
-            vector<string> msgs = _endMsgsEditor->computeMessages();
+//            vector<string> msgs = _endMsgsEditor->computeMessages();
     //        Maquette::getInstance()->setLastMessagesToSend(_boxEdited,msgs);
             Maquette::getInstance()->setEndMessagesToSend(_boxEdited,_networkTree->endMessages());
         }
@@ -1537,7 +1537,7 @@ AttributesEditor::treeMapStartAssignment()
 
 	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 		if (!snapshot.empty()) {
-			_startMsgsEditor->addMessages(snapshot);
+//			_startMsgsEditor->addMessages(snapshot);
 			startMessagesChanged();
 			_scene->displayMessage("Snapshot successfully captured and applied to box start",INDICATION_LEVEL);
 		}
@@ -1557,7 +1557,7 @@ void AttributesEditor::treeMapEndAssignment()
 
 	if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 		if (!snapshot.empty()) {
-			_endMsgsEditor->addMessages(snapshot);
+//			_endMsgsEditor->addMessages(snapshot);
 			endMessagesChanged();
 			_scene->displayMessage("Snapshot successfully captured and applied to box end",INDICATION_LEVEL);
 		}

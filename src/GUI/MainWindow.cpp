@@ -997,14 +997,14 @@ MainWindow::loadFile(const QString &fileName)
 {
   QApplication::setOverrideCursor(Qt::WaitCursor);
   _scene->clear();
-  _editor->clear();
+  _editor->clear();  
+
   _scene->load(fileName.toStdString());    
 
   QApplication::restoreOverrideCursor();
 
   setCurrentFile(fileName);
   statusBar()->showMessage(tr("File loaded"), 2000);
-
   update();
 }
 

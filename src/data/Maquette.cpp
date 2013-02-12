@@ -1722,8 +1722,7 @@ Maquette::save(const string &fileName) {
     string plugin;
     MyDevice curDevice;
 
-    it = _devices.begin();
-    for( ; it!=_devices.end(); it++){
+    for( it = _devices.begin(); it!=_devices.end(); it++){
         curDevice = it->second;
 
         deviceName = curDevice.name;
@@ -2336,10 +2335,9 @@ Maquette::load(const string &fileName){
     vector<string> deviceNames;
     vector<bool> deviceRequestable;
     _engines->getNetworkDevicesName(deviceNames,deviceRequestable);
-    for(unsigned int i=0; i<deviceNames.size(); i++){
+    for(unsigned int i=0; i<deviceNames.size(); i++)
         _engines->removeNetworkDevice(deviceNames[i]);
 
-    }
 
     //read from xml
     if(root.childNodes().size()>=2){ //Devices
