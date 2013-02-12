@@ -89,8 +89,6 @@ Maquette::init() {
 
 	_engines = new Engines(SCENARIO_SIZE,pluginsDir);
 
-    vector<string> pluginsLoaded;
-
     _engines->getLoadedNetworkPlugins(_plugins,_listeningPorts);
 
     //pour maintenir le fonctionnement pendant le developpement : l'appli n'est pas auto portée.
@@ -1677,10 +1675,7 @@ Maquette::getNetworkHost(){
 
 void
 Maquette::save(const string &fileName) {
-    _engines->store(fileName+".simone");
-
-    unsigned int networkOSCPort = _devices["OSCDevice"].networkPort;
-    std::string IP = _devices["OSCDevice"].networkHost;
+    _engines->store(fileName+".simone");    
 
     QFile file(QString::fromStdString(fileName));
 
@@ -1711,21 +1706,31 @@ Maquette::save(const string &fileName) {
     }
 
     //OSC Messages
-    QDomElement OSCMessagesNode = _doc->createElement("OSCMessages");
-    QList<QString> OSCMessages = _scene->editor()->networkTree()->getOSCMessages();
-    QDomElement OSCMessageNode;
+    std::map<std::string,MyDevice>::iterator it;
+    string OSCDeviceName = "OSCDevice";
+    it = _devices.find(OSCDeviceName);
 
-    OSCMessageNode = _doc->createElement("Network");
-    OSCMessageNode.setAttribute("IP",QString::fromStdString(IP));
-    OSCMessageNode.setAttribute("Port",networkOSCPort);
-    OSCMessagesNode.appendChild(OSCMessageNode);
+    if(it != _devices.end()){
 
-    for(QList<QString>::iterator it=OSCMessages.begin() ; it!=OSCMessages.end() ; it++){
-        OSCMessageNode = _doc->createElement("OSC");
-        OSCMessageNode.setAttribute("message",*it);
+        unsigned int networkOSCPort = _devices["OSCDevice"].networkPort;
+        std::string IP = _devices["OSCDevice"].networkHost;
+
+        QDomElement OSCMessagesNode = _doc->createElement("OSCMessages");
+        QList<QString> OSCMessages = _scene->editor()->networkTree()->getOSCMessages();
+        QDomElement OSCMessageNode;
+
+        OSCMessageNode = _doc->createElement("Network");
+        OSCMessageNode.setAttribute("IP",QString::fromStdString(IP));
+        OSCMessageNode.setAttribute("Port",networkOSCPort);
         OSCMessagesNode.appendChild(OSCMessageNode);
+
+        for(QList<QString>::iterator it=OSCMessages.begin() ; it!=OSCMessages.end() ; it++){
+            OSCMessageNode = _doc->createElement("OSC");
+            OSCMessageNode.setAttribute("message",*it);
+            OSCMessagesNode.appendChild(OSCMessageNode);
+        }
+        root.appendChild(OSCMessagesNode);
     }
-    root.appendChild(OSCMessagesNode);
 
     QTextStream ts(&file);
     ts << _doc->toString();
@@ -2323,6 +2328,31 @@ Maquette::load(const string &fileName){
         _scene->setNetworDeviceConfig("OSCDevice","OSC",ip.toStdString(),port.toStdString());
         _scene->editor()->networkTree()->createItemsFromMessages(OSCMessagesList);
     }
+
+
+    /************************ Devices ************************/
+    //clean
+    vector<string> deviceNames;
+    vector<bool> deviceRequestable;
+    _engines->getNetworkDevicesName(deviceNames,deviceRequestable);
+    for(unsigned int i=0; i<deviceNames.size(); i++){
+        _engines->removeNetworkDevice(deviceNames[i]);
+
+    }
+    deviceNames[0] = "azurDevice";
+    QString ip1 = tr("192.168.1.1");
+    QString port1 = tr("67");
+
+    deviceNames[1] = "MinuitDevice1";
+    QString ip2 = tr("192.168.1.2");
+    QString port2 = tr("68");
+
+    _engines->addNetworkDevice(deviceNames[0],"OSC",ip1.toStdString(),port1.toStdString());
+    _engines->addNetworkDevice(deviceNames[1],"Minuit",ip2.toStdString(),port2.toStdString());
+    _scene->editor()->networkTree()->load();
+
+    //read from xml
+//    deviceNames
 
     delete _doc;
 }

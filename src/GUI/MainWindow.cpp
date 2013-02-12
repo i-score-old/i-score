@@ -116,23 +116,17 @@ MainWindow::MainWindow()
 
   // Central Widget
   _maquetteWidget = new MaquetteWidget(this,_view,_scene);
-
   _networkConfig = new NetworkConfig(_scene,this);
-
-//  createMaquetteWidget();
   setCentralWidget(_maquetteWidget);
-//  setCentralWidget(_view);
 
   // Creating widgets
   createActions();
   createMenus();
-//  createToolBars();
   createStatusBar();
 
   setCurrentFile("");
-
   setAcceptDrops(false);
-//  connect(_maquetteWidget,SIGNAL(beginPlaying()),this,SLOT(play()));
+
   connect(_maquetteWidget,SIGNAL(accelerationValueChanged(int)),this,SLOT(accelerationChanged(int)));
   connect(_view->verticalScrollBar(),SIGNAL(valueChanged(int)),_scene,SLOT(verticalScroll(int)));
   connect(_scene,SIGNAL(networkConfigChanged(std::string,std::string,std::string,std::string)),this,SLOT(changeNetworkConfig(std::string,std::string,std::string,std::string)));
@@ -271,6 +265,9 @@ MainWindow::newFile()
   }
   _scene->clear();
   _editor->clear();
+
+  _editor->init();
+
   setCurrentFile("");  
 }
 

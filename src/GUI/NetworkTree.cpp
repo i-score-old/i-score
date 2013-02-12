@@ -156,13 +156,23 @@ NetworkTree::clear(){
 
     _OSCMessages.clear();
     _OSCMessageCount = 0;
+
+    QTreeWidget::clear();
 }
 
 void
 NetworkTree::load() {
+
+    std::cout<<"LOAD"<<std::endl;
     vector<string> deviceNames;
     vector<bool> deviceRequestable;
     Maquette::getInstance()->getNetworkDeviceNames(deviceNames, deviceRequestable);    
+
+    std::cout<<"--- NetworkTree::load ---"<<std::endl;
+    for(unsigned int i=0 ; i<deviceNames.size() ; i++){
+        std::cout<<deviceNames[i]<<std::endl;
+    }
+    std::cout<<"------------------------"<<std::endl;
 
     vector<string>::iterator nameIt;
     vector<bool>::iterator requestableIt;
@@ -193,7 +203,6 @@ NetworkTree::load() {
         itemsList << curItem;
     }
     addTopLevelItems(itemsList);
-
 }
 
 /*
