@@ -718,6 +718,7 @@ class Maquette : public QObject
   void setStartMessageToSend(unsigned int boxID,QTreeWidgetItem *item,QString address);
   void setEndMessageToSend(unsigned int boxID,QTreeWidgetItem *item,QString address);
   std::vector<std::string> getPlugins();
+  void removeNetworkDevice(string deviceName);
 
  private :
 

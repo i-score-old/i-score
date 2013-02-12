@@ -1460,9 +1460,9 @@ AttributesEditor::deployMessageChanged(QTreeWidgetItem *item, QString newName){
 
 void
 AttributesEditor::deployDeviceChanged(QString newName){
-    std::cout<<"--- deployDeviceChanged"<<std::endl;
     std::map<unsigned int,BasicBox *>::iterator it;
     std::map<unsigned int,BasicBox *> boxesMap = Maquette::getInstance()->getBoxes();
+
     unsigned int boxID;
 
     for(it = boxesMap.begin() ; it!= boxesMap.end() ; it++){

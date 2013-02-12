@@ -1735,6 +1735,9 @@ NetworkTree::updateLine(QTreeWidgetItem *item, bool interpolationState, int samp
 
 void
 NetworkTree::changeDeviceName(QString newName){
+    std::string deviceName = currentItem()->text(NAME_COLUMN).toStdString();
+    std::cout<<"NetworkTree::removing "<<deviceName<<std::endl;
+    Maquette::getInstance()->removeNetworkDevice(deviceName);
     currentItem()->setText(NAME_COLUMN,newName);
     emit(deviceChanged(newName));
 }

@@ -585,6 +585,12 @@ Maquette::getNetworkDevice(){
 }
 
 void
+Maquette::removeNetworkDevice(string deviceName){
+    _devices.erase(deviceName);
+    _engines->removeNetworkDevice(deviceName);
+}
+
+void
 Maquette::getNetworkDeviceNames(vector<string> &deviceName, vector<bool> &namespaceRequestable) {
 	_engines->getNetworkDevicesName(deviceName,namespaceRequestable);
 }
@@ -1705,13 +1711,12 @@ Maquette::save(const string &fileName) {
         saveBox(it->first);
     }
 
-    //OSC Messages
+    //OSC Messages    
     std::map<std::string,MyDevice>::iterator it;
     string OSCDeviceName = "OSCDevice";
     it = _devices.find(OSCDeviceName);
 
     if(it != _devices.end()){
-
         unsigned int networkOSCPort = _devices["OSCDevice"].networkPort;
         std::string IP = _devices["OSCDevice"].networkHost;
 
@@ -1732,13 +1737,21 @@ Maquette::save(const string &fileName) {
         root.appendChild(OSCMessagesNode);
     }
 
+    //Devices
+    std::cout<<"--- Maquette::save ---"<<std::endl;
+    it = _devices.begin();
+    for( ; it!=_devices.end(); it++){
+        std::cout<<it->first<<std::endl;
+    }
+    std::cout<<"------------------------"<<std::endl;
+
+
     QTextStream ts(&file);
     ts << _doc->toString();
     file.close();
 
     delete _doc;
 }
-
 
 void
 Maquette::loadOLD(const string &fileName){
