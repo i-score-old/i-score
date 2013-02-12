@@ -1726,7 +1726,6 @@ Maquette::save(const string &fileName) {
     it = _devices.begin();
     for( ; it!=_devices.end(); it++){
         curDevice = it->second;
-        std::cout<<it->first<<std::endl;
 
         deviceName = curDevice.name;
         networkPort = curDevice.networkPort;
@@ -1734,7 +1733,6 @@ Maquette::save(const string &fileName) {
         plugin = curDevice.plugin;
 
         deviceNode = _doc->createElement("Device");
-
         deviceNode.setAttribute("IP",QString::fromStdString(networkHost));
         deviceNode.setAttribute("port",networkPort);
         deviceNode.setAttribute("plugin",QString::fromStdString(plugin));
@@ -1745,24 +1743,20 @@ Maquette::save(const string &fileName) {
 
     root.appendChild(devicesNode);
 
-    std::cout<<"------------------------"<<std::endl;
-
     //OSC Messages
-    string OSCDeviceName="OSCDevice";
-    it = _devices.find(OSCDeviceName);
+    QList<QString> OSCMessages = _scene->editor()->networkTree()->getOSCMessages();
+    QDomElement OSCMessagesNode = _doc->createElement("OSCMessages");
+    QDomElement OSCMessageNode;
 
-    if(it != _devices.end()){
-        QList<QString> OSCMessages = _scene->editor()->networkTree()->getOSCMessages();
-        QDomElement OSCMessagesNode = _doc->createElement("OSCMessages");
-        QDomElement OSCMessageNode;
-
-        for(QList<QString>::iterator it=OSCMessages.begin() ; it!=OSCMessages.end() ; it++){
-            OSCMessageNode = _doc->createElement("OSC");
-            OSCMessageNode.setAttribute("message",*it);
-            OSCMessagesNode.appendChild(OSCMessageNode);
-        }
-        root.appendChild(OSCMessagesNode);
+    for(QList<QString>::iterator it=OSCMessages.begin() ; it!=OSCMessages.end() ; it++){
+        OSCMessageNode = _doc->createElement("OSC");
+        OSCMessageNode.setAttribute("message",*it);
+        OSCMessagesNode.appendChild(OSCMessageNode);
     }
+    root.appendChild(OSCMessagesNode);
+
+    //***************************************************************
+
 
     QTextStream ts(&file);
     ts << _doc->toString();

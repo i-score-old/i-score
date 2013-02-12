@@ -1471,7 +1471,6 @@ AttributesEditor::deployDeviceChanged(QString newName){
         //start messages
         NetworkMessages *messagesToSend = Maquette::getInstance()->startMessages(boxID);
         if(!messagesToSend->isEmpty()){
-            std::cout<<"du"<<std::endl;
             messagesToSend->changeDevice(newName);
             Maquette::getInstance()->setStartMessagesToSend(boxID,messagesToSend);
         }
@@ -1479,7 +1478,6 @@ AttributesEditor::deployDeviceChanged(QString newName){
         //end messages
         messagesToSend = Maquette::getInstance()->endMessages(boxID);
         if(!messagesToSend->isEmpty()){
-            std::cout<<"paté"<<std::endl;
             messagesToSend->changeDevice(newName);
             Maquette::getInstance()->setEndMessagesToSend(boxID,messagesToSend);
         }
