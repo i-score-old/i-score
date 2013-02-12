@@ -1467,7 +1467,7 @@ AttributesEditor::deployDeviceChanged(QString newName){
 
     for(it = boxesMap.begin() ; it!= boxesMap.end() ; it++){
         boxID = (*it).first;
-        std::cout<<"ya"<<std::endl;
+
         //start messages
         NetworkMessages *messagesToSend = Maquette::getInstance()->startMessages(boxID);
         if(!messagesToSend->isEmpty()){

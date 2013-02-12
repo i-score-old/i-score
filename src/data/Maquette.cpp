@@ -1711,23 +1711,50 @@ Maquette::save(const string &fileName) {
         saveBox(it->first);
     }
 
-    //OSC Messages    
+    //****************************  Devices ****************************
+    QDomElement devicesNode = _doc->createElement("Devices");
+    QDomElement deviceNode;
+
     std::map<std::string,MyDevice>::iterator it;
-    string OSCDeviceName = "OSCDevice";
+    string deviceName;
+    unsigned int networkPort;
+    string networkHost;
+    string plugin;
+    MyDevice curDevice;
+
+    std::cout<<"--- Maquette::save ---"<<std::endl;
+    it = _devices.begin();
+    for( ; it!=_devices.end(); it++){
+        curDevice = it->second;
+        std::cout<<it->first<<std::endl;
+
+        deviceName = curDevice.name;
+        networkPort = curDevice.networkPort;
+        networkHost = curDevice.networkHost;
+        plugin = curDevice.plugin;
+
+        deviceNode = _doc->createElement("Device");
+
+        deviceNode.setAttribute("IP",QString::fromStdString(networkHost));
+        deviceNode.setAttribute("port",networkPort);
+        deviceNode.setAttribute("plugin",QString::fromStdString(plugin));
+        deviceNode.setAttribute("name",QString::fromStdString(deviceName));
+
+        devicesNode.appendChild(deviceNode);
+    }
+
+    root.appendChild(devicesNode);
+
+    std::cout<<"------------------------"<<std::endl;
+
+    //OSC Messages
+    string OSCDeviceName="OSCDevice";
     it = _devices.find(OSCDeviceName);
 
     if(it != _devices.end()){
-        unsigned int networkOSCPort = _devices["OSCDevice"].networkPort;
-        std::string IP = _devices["OSCDevice"].networkHost;
-
-        QDomElement OSCMessagesNode = _doc->createElement("OSCMessages");
         QList<QString> OSCMessages = _scene->editor()->networkTree()->getOSCMessages();
+        QDomElement OSCMessagesNode = _doc->createElement("OSCMessages");
         QDomElement OSCMessageNode;
-
-        OSCMessageNode = _doc->createElement("Network");
-        OSCMessageNode.setAttribute("IP",QString::fromStdString(IP));
-        OSCMessageNode.setAttribute("Port",networkOSCPort);
-        OSCMessagesNode.appendChild(OSCMessageNode);
 
         for(QList<QString>::iterator it=OSCMessages.begin() ; it!=OSCMessages.end() ; it++){
             OSCMessageNode = _doc->createElement("OSC");
@@ -1736,15 +1763,6 @@ Maquette::save(const string &fileName) {
         }
         root.appendChild(OSCMessagesNode);
     }
-
-    //Devices
-    std::cout<<"--- Maquette::save ---"<<std::endl;
-    it = _devices.begin();
-    for( ; it!=_devices.end(); it++){
-        std::cout<<it->first<<std::endl;
-    }
-    std::cout<<"------------------------"<<std::endl;
-
 
     QTextStream ts(&file);
     ts << _doc->toString();
