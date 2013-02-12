@@ -1722,7 +1722,6 @@ Maquette::save(const string &fileName) {
     string plugin;
     MyDevice curDevice;
 
-    std::cout<<"--- Maquette::save ---"<<std::endl;
     it = _devices.begin();
     for( ; it!=_devices.end(); it++){
         curDevice = it->second;
@@ -2102,7 +2101,7 @@ Maquette::load(const string &fileName){
 
     QPointF topLeft,size,bottomRight;
     unsigned int begin,duration,topLeftY,sizeY;
-    QString name,boxType,relType;
+    QString name,boxType;
     QColor color(1.,1.,1.);
     Palette pal;
     int boxID,motherID;
@@ -2328,34 +2327,11 @@ Maquette::load(const string &fileName){
         }
     }
 
-    /************************ OSC ************************/
-    if(root.childNodes().size()>=2){
-        QDomElement OSC = root.childNodes().at(1).toElement();
-
-        if (OSC.tagName() != "OSCMessages") {
-            _scene->displayMessage((tr("Unvailable xml document %1 - OSC Messages problem").
-                    arg(QString::fromStdString(fileName))).toStdString(),
-                    WARNING_LEVEL);
-            file.close();
-            return;
-        }
-        QString ip;
-        QString port;
-        QList<QString> OSCMessagesList;
-        for(int i=0 ; i<OSC.childNodes().size() ; i++){
-            if(OSC.childNodes().at(i).toElement().tagName()=="OSC")
-                OSCMessagesList<<OSC.childNodes().at(i).toElement().attribute("message");
-            else if(OSC.childNodes().at(i).toElement().tagName()=="Network"){
-                ip = OSC.childNodes().at(i).toElement().attribute("IP");
-                port = OSC.childNodes().at(i).toElement().attribute("Port");
-            }
-        }
-        _scene->setNetworDeviceConfig("OSCDevice","OSC",ip.toStdString(),port.toStdString());
-        _scene->editor()->networkTree()->createItemsFromMessages(OSCMessagesList);
-    }
-
 
     /************************ Devices ************************/
+    MyDevice OSCDevice;
+    string OSCDevicePort;
+
     //clean
     vector<string> deviceNames;
     vector<bool> deviceRequestable;
@@ -2364,20 +2340,70 @@ Maquette::load(const string &fileName){
         _engines->removeNetworkDevice(deviceNames[i]);
 
     }
-    deviceNames[0] = "azurDevice";
-    QString ip1 = tr("192.168.1.1");
-    QString port1 = tr("67");
-
-    deviceNames[1] = "MinuitDevice1";
-    QString ip2 = tr("192.168.1.2");
-    QString port2 = tr("68");
-
-    _engines->addNetworkDevice(deviceNames[0],"OSC",ip1.toStdString(),port1.toStdString());
-    _engines->addNetworkDevice(deviceNames[1],"Minuit",ip2.toStdString(),port2.toStdString());
-    _scene->editor()->networkTree()->load();
 
     //read from xml
-//    deviceNames
+    if(root.childNodes().size()>=2){ //Devices
+        QDomElement devices = root.childNodes().at(1).toElement();
+        if (devices.tagName() != "Devices") {
+            _scene->displayMessage((tr("Unvailable xml document %1 - Devices problem").
+                    arg(QString::fromStdString(fileName))).toStdString(),
+                    WARNING_LEVEL);
+            file.close();
+            return;
+        }
+        else{ //get device infos
+            QString deviceName;
+            QString ip;
+            QString port;
+            QString plugin;
+
+            for(int i=0 ; i<devices.childNodes().size() ; i++){ //Device
+                if(devices.childNodes().at(i).toElement().tagName()=="Device"){
+                    deviceName = devices.childNodes().at(i).toElement().attribute("name");
+                    ip = devices.childNodes().at(i).toElement().attribute("IP");
+                    port = devices.childNodes().at(i).toElement().attribute("port");
+                    plugin = devices.childNodes().at(i).toElement().attribute("plugin");
+
+                    //send to engine
+                    _engines->addNetworkDevice(deviceName.toStdString(),plugin.toStdString(),ip.toStdString(),port.toStdString());
+
+                    //save OSC device (for OSCMessages)
+                    if(plugin == "OSC"){
+                        OSCDevice.name = deviceName.toStdString();
+                        OSCDevice.networkHost = ip.toStdString();
+                        OSCDevicePort = port.toStdString();
+                        OSCDevice.plugin = plugin.toStdString();
+                    }
+                }
+            }
+        }
+    }
+
+    //reload networkTree
+    _scene->editor()->networkTree()->load();
+
+
+    /************************ OSC ************************/
+    if(root.childNodes().size()>=2){
+        QDomElement OSC = root.childNodes().at(2).toElement();
+
+        if (OSC.tagName() != "OSCMessages") {
+            _scene->displayMessage((tr("Unvailable xml document %1 - OSC Messages problem").
+                    arg(QString::fromStdString(fileName))).toStdString(),
+                    WARNING_LEVEL);
+            file.close();
+            return;
+        }
+
+        QList<QString> OSCMessagesList;
+        for(int i=0 ; i<OSC.childNodes().size() ; i++){
+            if(OSC.childNodes().at(i).toElement().tagName()=="OSC")
+                OSCMessagesList<<OSC.childNodes().at(i).toElement().attribute("message");
+        }
+
+        _scene->setNetworDeviceConfig(OSCDevice.name,OSCDevice.plugin,OSCDevice.networkHost,OSCDevicePort);
+        _scene->editor()->networkTree()->createItemsFromMessages(OSCMessagesList);
+    }
 
     delete _doc;
 }

@@ -49,6 +49,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "SoundBox.hpp"
 #include "ViewRelations.hpp"
 #include "MaquetteWidget.hpp"
+#include "NetworkTree.hpp"
 
 #include <QResource>
 #include <QString>
@@ -266,6 +267,7 @@ MainWindow::newFile()
   _scene->clear();
   _editor->clear();
 
+  _scene->init();
   _editor->init();
 
   setCurrentFile("");  
@@ -996,7 +998,7 @@ MainWindow::loadFile(const QString &fileName)
   QApplication::setOverrideCursor(Qt::WaitCursor);
   _scene->clear();
   _editor->clear();
-  _scene->load(fileName.toStdString());
+  _scene->load(fileName.toStdString());    
 
   QApplication::restoreOverrideCursor();
 
