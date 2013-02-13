@@ -217,7 +217,6 @@ NetworkMessages::changeMessage(QTreeWidgetItem *item, QString newName){
 
 void
 NetworkMessages::changeDevice(QString newName){
-    std::cout<<"NetworkMsg::changeDevice\n";
     QMap<QTreeWidgetItem *, Message>::iterator it;
     QTreeWidgetItem *curItem;
     Message msg;

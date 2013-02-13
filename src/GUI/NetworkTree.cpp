@@ -178,7 +178,10 @@ NetworkTree::load() {
         deviceName << QString::fromStdString(*nameIt);
 
         QTreeWidgetItem *curItem = NULL;
-        if (!(*requestableIt)) {
+        map<string,MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
+        map<string,MyDevice>::iterator it = devices.find(*nameIt);
+
+        if (!(*requestableIt)){
             //OSCDevice
             curItem = new QTreeWidgetItem(deviceName,OSCNamespace);
             _OSCNodeRoot = curItem;
@@ -292,9 +295,7 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
                     itemsMatchedList<<newPair;
                 }
                 else{//No item in tree
-                    if(msg.device == "OSCDevice"){
-                        std::cout<<"OSC > "<<msg.message.toStdString()<<std::endl;
-                    }
+                    ;
                 }
             }
         }
@@ -316,10 +317,9 @@ NetworkTree::createItemFromMessage(QString message){
     QStringList splitMessage = message.split("/");
     QStringList name;
     QList<QTreeWidgetItem *>  itemsFound;
-    QStringList::iterator it=splitMessage.begin();
+    QStringList::iterator it = splitMessage.begin();
     QString device = *it;
     int nodeType = NodeNamespaceType;
-
     itemsFound = findItems(device,Qt::MatchRecursive);
     if(!itemsFound.isEmpty()){
         if(itemsFound.size()>1){
@@ -332,7 +332,9 @@ NetworkTree::createItemFromMessage(QString message){
         return;
     }
 
-    if(device=="OSCDevice"){
+    map<string,MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
+    map<string,MyDevice>::iterator it2 = devices.find(device.toStdString());
+    if(it2!=devices.end() && it2->second.plugin == "OSC"){
         nodeType = OSCNode;
         addOSCMessage(*(++it));
     }
@@ -395,7 +397,7 @@ NetworkTree::getOSCMessages(){
     QString msg;
     for(it=_OSCMessages.begin() ; it!=_OSCMessages.end() ; it++){
         curIt = *it;
-        msg = "OSCDevice/"+ curIt->text(NAME_COLUMN);
+        msg = _OSCNodeRoot->text(NAME_COLUMN) + "/" + curIt->text(NAME_COLUMN);
         msgsList<<msg;
     }
     return msgsList;
@@ -1340,7 +1342,7 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event){
     }
     else if(currentItem()->type()==addOSCNode)
         ;
-    else if(currentItem()->type()==NodeNamespaceType){
+    else if(currentItem()->type()==NodeNamespaceType || currentItem()->type()==OSCNamespace){
         QString deviceName = currentItem()->text(NAME_COLUMN);
         _deviceEdit->edit(deviceName);
     }
@@ -1734,5 +1736,5 @@ NetworkTree::changeDeviceName(QString newName){
     Maquette::getInstance()->removeNetworkDevice(deviceName);
     currentItem()->setText(NAME_COLUMN,newName);    
 
-    emit(deviceChanged(newName));
+    emit(deviceChanged(newName));    
 }
