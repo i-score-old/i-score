@@ -178,9 +178,6 @@ NetworkTree::load() {
         deviceName << QString::fromStdString(*nameIt);
 
         QTreeWidgetItem *curItem = NULL;
-        map<string,MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
-        map<string,MyDevice>::iterator it = devices.find(*nameIt);
-
         if (!(*requestableIt)){
             //OSCDevice
             curItem = new QTreeWidgetItem(deviceName,OSCNamespace);

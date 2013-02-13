@@ -264,7 +264,7 @@ MainWindow::newFile()
       break;
     }
   }
-  _scene->clear();
+  _scene->clear();  
   _editor->clear();
 
   _scene->init();
