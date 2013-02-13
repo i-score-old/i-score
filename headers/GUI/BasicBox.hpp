@@ -60,6 +60,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QComboBox>
 #include <QGraphicsProxyWidget>
 #include <QObject>
+#include <QMenuBar>
 
 class MaquetteScene;
 class QGraphicsTextItem;
@@ -285,6 +286,8 @@ class BasicBox : public QObject, public QGraphicsItem
   QRectF boxBody();
   void curveActivationChanged(string address, bool activated);
   void setMessage(QTreeWidgetItem *item, QString address);
+  void createActions();
+  void createMenus();
 
   /*!
    * \brief Gets the top left of the box in the scene coordinates.
@@ -576,11 +579,11 @@ class BasicBox : public QObject, public QGraphicsItem
   void updateBoxSize();
   inline QRectF leftEar(){return _leftEar;}
   inline QRectF rightEar(){return _rightEar;}
-  inline BoxWidget *curvesWidget(){return _curvesWidget;}
+  inline BoxWidget *boxContentWidget(){return _boxContentWidget;}
   inline QWidget *boxWidget(){return _boxWidget;}
   inline MaquetteScene *maquetteScene(){return _scene;}
-  inline void setComboBox(QComboBox *cbox){curvesWidget()->setComboBox(cbox);}
-  inline void setStackedLayout(QStackedLayout *slayout){curvesWidget()->setStackedLayout(slayout);}
+  inline void setComboBox(QComboBox *cbox){boxContentWidget()->setComboBox(cbox);}
+  inline void setStackedLayout(QStackedLayout *slayout){boxContentWidget()->setStackedLayout(slayout);}
   inline bool hasCurve(string address){return _curvesAddresses.contains(address);}
   void refresh();
 
@@ -689,7 +692,7 @@ class BasicBox : public QObject, public QGraphicsItem
   QMap<BoxExtremity,TriggerPoint*> *_triggerPoints; //!< The trigger points.
   std::map < BoxExtremity,std::map < unsigned int, Relation* > > _relations; //!< The relations.
   std::map<std::string,AbstractCurve*> _abstractCurves; //!< The Curves
-  BoxWidget *_curvesWidget;
+  BoxWidget *_boxContentWidget;
 
   QRectF _boxRect;
   QRectF _leftEar;
@@ -710,6 +713,15 @@ class BasicBox : public QObject, public QGraphicsItem
   QColor _colorUnselected;
   bool _low;
   bool _hover;
+
+  QAction *_jumpToStartCue;
+  QAction *_jumpToEndCue;
+
+  QMenu *_startMenu;
+  QMenu *_endMenu;
+
+  QMenuBar *_startMenuBar;
+  QMenuBar *_endMenuBar;
 };
 
 #endif

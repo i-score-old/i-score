@@ -109,14 +109,14 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
     _abstract->setWidth(xmax-xmin);
     _abstract->setHeight(ymax-ymin);
 
-    createWidget();
-
     init();
 
-    update();
-    connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),_curvesWidget, SLOT(updateDisplay(const QString&)));
-//    connect(_comboBox,SIGNAL(activated(const QString&)),_curvesWidget, SLOT(displayCurve(const QString&)));
+    createActions();
+    createMenus();
+    createWidget();        
 
+    update();
+    connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),_boxContentWidget, SLOT(updateDisplay(const QString&)));
 }
 
 void
@@ -127,8 +127,30 @@ BasicBox::centerWidget(){
 
     _comboBox->move(0,-(height()/2+LINE_WIDTH));
     _comboBox->resize((width() - 2*LINE_WIDTH)/2,COMBOBOX_HEIGHT);
+
+    _startMenuBar->move(-(width())/2+LINE_WIDTH,-(height())/2 + (1.2*RESIZE_TOLERANCE));
+    _endMenuBar->move((width())/2+LINE_WIDTH,-(height())/2 + (1.2*RESIZE_TOLERANCE));
 }
 
+void
+BasicBox::createActions(){
+    _jumpToStartCue = new QAction("Jump to cue",this);
+    _jumpToEndCue = new QAction("Jump to cue",this);
+
+    connect(_jumpToStartCue,SIGNAL(triggered()),_boxContentWidget,SLOT(jumpToStartCue()));
+    connect(_jumpToEndCue,SIGNAL(triggered()),_boxContentWidget,SLOT(jumpToEndCue()));
+}
+
+void
+BasicBox::createMenus(){
+    _startMenuBar = new QMenuBar();
+    _startMenu = _startMenuBar->addMenu(tr("&StartMenu"));
+    _startMenu->addAction(_jumpToStartCue);
+
+    _endMenuBar = new QMenuBar();
+    _endMenu = _endMenuBar->addMenu(tr("&EndMenu"));
+    _endMenu->addAction(_jumpToEndCue);
+}
 
 void
 BasicBox::updateWidgets(){
@@ -153,15 +175,13 @@ BasicBox::createWidget(){
 
     //---------------------- Curve widget ----------------------//
 
-    _boxWidget = new QWidget();
-    _curvesWidget = new BoxWidget(_boxWidget,this);
     QGridLayout *layout = new QGridLayout;
-    layout->addWidget(_curvesWidget);
+    layout->addWidget(_boxContentWidget);
     layout->setMargin(0);
     layout->setContentsMargins(0,0,0,0);
     layout->setAlignment(_boxWidget,Qt::AlignLeft);
     _boxWidget->setLayout(layout);
-    _curvesWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    _boxContentWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
     _curveProxy = new QGraphicsProxyWidget(this);
 
@@ -187,7 +207,15 @@ BasicBox::createWidget(){
     _comboBoxProxy = new QGraphicsProxyWidget(this);
     _comboBoxProxy->setWidget(_comboBox);
     _comboBoxProxy->setPalette(palette);
-    _curvesWidget->setComboBox(_comboBox);    
+    _boxContentWidget->setComboBox(_comboBox);
+
+
+    //---------------- Start/End menus ------------------//
+    QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
+    startMenuProxy->setWidget(_startMenuBar);
+
+    QGraphicsProxyWidget *endMenuProxy =  new QGraphicsProxyWidget(this);
+    endMenuProxy->setWidget(_endMenuBar);
 }
 
 BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
@@ -224,6 +252,8 @@ BasicBox::updateFlexibility(){
 void
 BasicBox::init()
 {
+    _boxWidget = new QWidget();
+    _boxContentWidget = new BoxWidget(_boxWidget,this);
     _hasContextMenu = false;
     _shift = false;
     _playing = false;
@@ -257,12 +287,12 @@ BasicBox::changeColor(QColor color){
 
 void
 BasicBox::addToComboBox(QString address){
-    _curvesWidget->addToComboBox(address);
+    _boxContentWidget->addToComboBox(address);
 }
 
 void
 BasicBox::updateCurves(){
-    _curvesWidget->updateMessages(_abstract->ID(),true);
+    _boxContentWidget->updateMessages(_abstract->ID(),true);
     update();
 }
 
@@ -870,7 +900,7 @@ BasicBox::curveActivationChanged(string address, bool activated){
     if(!hasCurve(address))
         addCurve(address);
 
-    _curvesWidget->curveActivationChanged(QString::fromStdString(address),activated);
+    _boxContentWidget->curveActivationChanged(QString::fromStdString(address),activated);
 
     if(!activated)
         removeCurve(address);
@@ -907,7 +937,7 @@ BasicBox::removeCurve(const string &address)
     if (it != _abstractCurves.end()) {
         _abstractCurves.erase(it);
     }
-    _curvesWidget->removeCurve(address);
+    _boxContentWidget->removeCurve(address);
 }
 
 void
@@ -1211,7 +1241,7 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
     QGraphicsItem::mouseMoveEvent(event);
     // Draw cursor coordinates as a tooltip
-//    CurveWidget *curve = (static_cast<CurveWidget *>(_curvesWidget->_stackedLayout->currentWidget()));
+//    CurveWidget *curve = (static_cast<CurveWidget *>(_boxContentWidget->_stackedLayout->currentWidget()));
 //    QPointF mousePos = curve->relativeCoordinates(event->pos());
 //    QRect rect;
 //    QString posStr = QString("%1 ; %2").arg(mousePos.x(),0,'f',2).arg(mousePos.y(),0,'f',2);
@@ -1641,7 +1671,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
 void
 BasicBox::curveShowChanged(const QString &address,bool state){
-    _curvesWidget->curveShowChanged(address,state);
+    _boxContentWidget->curveShowChanged(address,state);
 }
 
 void

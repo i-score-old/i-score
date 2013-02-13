@@ -65,7 +65,8 @@ public :
 
 public slots :
     void updateDisplay(const QString &address);
-
+    void jumpToStartCue();
+    void jumpToEndCue();
 
 signals :
     void currentIndexChanged(QString address);

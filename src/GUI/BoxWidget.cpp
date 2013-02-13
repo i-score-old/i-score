@@ -103,7 +103,7 @@ BoxWidget::~BoxWidget(){
 
 void
 BoxWidget::mousePressEvent(QMouseEvent *event){
-    Q_UNUSED(event);
+    Q_UNUSED(event);    
     if(_box->isSelected()){
         hide();
         setWindowModality(Qt::WindowModal);
@@ -342,11 +342,22 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
 void
 BoxWidget::mouseDoubleClickEvent(QMouseEvent *event){
     Q_UNUSED(event);
-    //TODO
+    jumpToStartCue();
 }
-
 
 void
 BoxWidget::setComboBox(QComboBox *cbox){
     _comboBox = cbox;
+}
+
+void
+BoxWidget::jumpToStartCue(){
+    unsigned int gotoValue = _box->date();
+    _box->maquetteScene()->gotoChanged(gotoValue);
+}
+
+void
+BoxWidget::jumpToEndCue(){
+    unsigned int gotoValue = _box->date() + _box->duration();
+    _box->maquetteScene()->gotoChanged(gotoValue);
 }
