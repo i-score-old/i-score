@@ -1730,7 +1730,7 @@ NetworkTree::updateLine(QTreeWidgetItem *item, bool interpolationState, int samp
 void
 NetworkTree::updateDeviceName(QString newName){
 
-    QString oldName = currentItem()->text(NAME_COLUMN); //attention, peut-être mieux vaut récupérer l'ancien nom par le signal de _deviceEdit
+    QString oldName = currentItem()->text(NAME_COLUMN);
 
     currentItem()->setText(NAME_COLUMN,newName);    
 
@@ -1739,5 +1739,15 @@ NetworkTree::updateDeviceName(QString newName){
 
 void
 NetworkTree::updateDevicePlugin(QString newPlugin){
-    std::cout<<"TODO : update Device plugin"<<std::endl;
+    QString deviceName = currentItem()->text(NAME_COLUMN);
+    QTreeWidgetItem *item = currentItem();
+    if(newPlugin=="OSC"){
+//        createOCSBranch(item);
+    }
+    else if(newPlugin=="Minuit"){
+//        item->takeChildren();
+        //networkRequest
+    }
+    emit(pluginChanged(deviceName));
+    //Va supprimer les message de cette device
 }

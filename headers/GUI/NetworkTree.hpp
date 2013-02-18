@@ -368,6 +368,7 @@ class NetworkTree : public QTreeWidget
         void endOSCMessageRemoved(QTreeWidgetItem *item);
         void messageChanged(QTreeWidgetItem *item, QString address);
         void deviceChanged(QString oldName, QString newName);
+        void pluginChanged(QString deviceName);
 
     private :
         void treeRecursiveExploration(QTreeWidgetItem *curItem, bool onflict);
