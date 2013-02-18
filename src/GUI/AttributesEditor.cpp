@@ -809,7 +809,7 @@ AttributesEditor::connectSlots()
     connect(_networkTree,SIGNAL(curveRedundancyChanged(QTreeWidgetItem*,bool)),this,SLOT(curveRedundancyChanged(QTreeWidgetItem*,bool)));
     connect(_networkTree,SIGNAL(curveSampleRateChanged(QTreeWidgetItem*,int)),this,SLOT(curveSampleRateChanged(QTreeWidgetItem*,int)));    
     connect(_networkTree,SIGNAL(messageChanged(QTreeWidgetItem*,QString)),this,SLOT(deployMessageChanged(QTreeWidgetItem*,QString)));
-    connect(_networkTree,SIGNAL(deviceChanged(QString)),this,SLOT(deployDeviceChanged(QString)));
+    connect(_networkTree,SIGNAL(deviceChanged(QString,QString)),this,SLOT(deployDeviceChanged(QString,QString)));
 
 	connect(_treeMapLoad, SIGNAL(clicked()), this, SLOT(reloadTreeMap()));
 	connect(_treeMapUp, SIGNAL(clicked()), this, SLOT(upTreeMap()));
@@ -1459,7 +1459,7 @@ AttributesEditor::deployMessageChanged(QTreeWidgetItem *item, QString newName){
 }
 
 void
-AttributesEditor::deployDeviceChanged(QString newName){
+AttributesEditor::deployDeviceChanged(QString oldName, QString newName){
     std::map<unsigned int,BasicBox *>::iterator it;
     std::map<unsigned int,BasicBox *> boxesMap = Maquette::getInstance()->getBoxes();
 
@@ -1471,14 +1471,14 @@ AttributesEditor::deployDeviceChanged(QString newName){
         //start messages
         NetworkMessages *messagesToSend = Maquette::getInstance()->startMessages(boxID);
         if(!messagesToSend->isEmpty()){
-            messagesToSend->changeDevice(newName);
+            messagesToSend->changeDevice(oldName,newName);
             Maquette::getInstance()->setStartMessagesToSend(boxID,messagesToSend);
         }
 
         //end messages
         messagesToSend = Maquette::getInstance()->endMessages(boxID);
         if(!messagesToSend->isEmpty()){
-            messagesToSend->changeDevice(newName);
+            messagesToSend->changeDevice(oldName,newName);
             Maquette::getInstance()->setEndMessagesToSend(boxID,messagesToSend);
         }
     }

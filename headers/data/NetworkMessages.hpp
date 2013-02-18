@@ -73,7 +73,7 @@ public :
     void addMessage(QTreeWidgetItem *item, const QString &device, const QString &message, const QString &value);
     void addMessage(QTreeWidgetItem *item, QString address);
     void changeMessage(QTreeWidgetItem *item, QString newName);
-    void changeDevice(QString newName);
+    void changeDevice(QString oldName, QString newName);
     /*!
      * \brief Adds a list of messages.
      */

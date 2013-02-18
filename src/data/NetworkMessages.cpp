@@ -216,7 +216,8 @@ NetworkMessages::changeMessage(QTreeWidgetItem *item, QString newName){
 }
 
 void
-NetworkMessages::changeDevice(QString newName){
+NetworkMessages::changeDevice(QString oldName, QString newName){
+
     QMap<QTreeWidgetItem *, Message>::iterator it;
     QTreeWidgetItem *curItem;
     Message msg;
@@ -224,9 +225,11 @@ NetworkMessages::changeDevice(QString newName){
     for(it=_messages->begin() ; it!=_messages->end() ; it++){
         curItem = it.key();
         msg = it.value();
-        msg.device = newName;
-        _messages->remove(curItem);
-        _messages->insert(curItem,msg);
+        if(msg.device == oldName){
+            msg.device = newName;
+            _messages->remove(curItem);
+            _messages->insert(curItem,msg);
+        }
     }
 //        print
 //        std::vector<std::string> list = computeMessages();
