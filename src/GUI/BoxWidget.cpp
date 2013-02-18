@@ -163,7 +163,7 @@ void BoxWidget::displayCurve(const QString &address){
 
     CurveWidget *cur;
 
-    for(int i ; i<count ; i++){
+    for(int i=0 ; i<count ; i++){
         cur = values.at(i);
         cur->setLowerStyle(true);
         cur->repaint();
