@@ -111,8 +111,8 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 
     init();
 
-    createActions();
-    createMenus();
+//    createActions();
+//    createMenus();
     createWidget();        
 
     update();
@@ -128,8 +128,8 @@ BasicBox::centerWidget(){
     _comboBox->move(0,-(height()/2+LINE_WIDTH));
     _comboBox->resize((width() - 2*LINE_WIDTH)/2,COMBOBOX_HEIGHT);
 
-    _startMenuBar->move(-(width())/2+LINE_WIDTH,-(height())/2 + (1.2*RESIZE_TOLERANCE));
-    _endMenuBar->move((width())/2+LINE_WIDTH,-(height())/2 + (1.2*RESIZE_TOLERANCE));
+//    _startMenuBar->move(-(width())/2+LINE_WIDTH,-(height())/2 + (1.2*RESIZE_TOLERANCE));
+//    _endMenuBar->move((width())/2+LINE_WIDTH,-(height())/2 + (1.2*RESIZE_TOLERANCE));
 }
 
 void
@@ -174,7 +174,8 @@ BasicBox::createWidget(){
 
 
     //---------------------- Curve widget ----------------------//
-
+    _boxWidget = new QWidget();
+    _boxContentWidget = new BoxWidget(_boxWidget,this);
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(_boxContentWidget);
     layout->setMargin(0);
@@ -211,11 +212,11 @@ BasicBox::createWidget(){
 
 
     //---------------- Start/End menus ------------------//
-    QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
-    startMenuProxy->setWidget(_startMenuBar);
+//    QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
+//    startMenuProxy->setWidget(_startMenuBar);
 
-    QGraphicsProxyWidget *endMenuProxy =  new QGraphicsProxyWidget(this);
-    endMenuProxy->setWidget(_endMenuBar);
+//    QGraphicsProxyWidget *endMenuProxy =  new QGraphicsProxyWidget(this);
+//    endMenuProxy->setWidget(_endMenuBar);
 }
 
 BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
@@ -251,9 +252,7 @@ BasicBox::updateFlexibility(){
 
 void
 BasicBox::init()
-{
-    _boxWidget = new QWidget();
-    _boxContentWidget = new BoxWidget(_boxWidget,this);
+{    
     _hasContextMenu = false;
     _shift = false;
     _playing = false;

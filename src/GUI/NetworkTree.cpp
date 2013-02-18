@@ -487,6 +487,7 @@ NetworkTree::treeSnapshot(unsigned int boxID) {
             curItem = *it;
             if(!curItem->text(VALUE_COLUMN).isEmpty()){// >type() != NodeNamespaceType && curItem->type() != NodeNoNamespaceType){
                 QString address = getAbsoluteAddress(*it);
+                QPair<QTreeWidgetItem *, Data> curPair;
 
                 if (!address.isEmpty()) {
                     vector<string> snapshot = Maquette::getInstance()->requestNetworkSnapShot(address.toStdString());
@@ -619,12 +620,11 @@ NetworkTree::clearColumn(unsigned int column){
         for (it=assignedItems.begin(); it!=assignedItems.end(); it++){
             curIt=*it;
 
-            if(curIt->type() != OSCNamespace && curIt->type() != OSCNode){
-                if (curIt->checkState(column)){
-                    curIt->setCheckState(column,Qt::Unchecked);
-                }
-                curIt->setText(column,emptyString);
+            if (curIt->checkState(column)){
+                curIt->setCheckState(column,Qt::Unchecked);
             }
+            curIt->setText(column,emptyString);
+
         }
     }
 }
