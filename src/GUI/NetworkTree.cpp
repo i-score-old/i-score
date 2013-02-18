@@ -98,7 +98,8 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     connect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this,SLOT(valueChanged(QTreeWidgetItem*,int)));
     connect(this, SIGNAL(startValueChanged(QTreeWidgetItem*,QString)),this,SLOT(changeStartValue(QTreeWidgetItem*,QString)));
     connect(this, SIGNAL(endValueChanged(QTreeWidgetItem*,QString)),this,SLOT(changeEndValue(QTreeWidgetItem*,QString)));
-    connect(_deviceEdit, SIGNAL(deviceNameChanged(QString)),this,SLOT(changeDeviceName(QString)));
+    connect(_deviceEdit, SIGNAL(deviceNameChanged(QString)),this,SLOT(updateDeviceName(QString)));
+    connect(_deviceEdit, SIGNAL(devicePluginChanged(QString)),this,SLOT(updateDevicePlugin(QString)));
 }
 
 
@@ -487,8 +488,6 @@ NetworkTree::treeSnapshot(unsigned int boxID) {
             if(!curItem->text(VALUE_COLUMN).isEmpty()){// >type() != NodeNamespaceType && curItem->type() != NodeNoNamespaceType){
                 QString address = getAbsoluteAddress(*it);
 
-                QPair<QTreeWidgetItem *, Data> curPair;
-
                 if (!address.isEmpty()) {
                     vector<string> snapshot = Maquette::getInstance()->requestNetworkSnapShot(address.toStdString());
 
@@ -618,13 +617,14 @@ NetworkTree::clearColumn(unsigned int column){
         emptyString.clear();
 
         for (it=assignedItems.begin(); it!=assignedItems.end(); it++){
+            curIt=*it;
 
-              curIt=*it;
-              if (curIt->checkState(column)){
-
-                  curIt->setCheckState(column,Qt::Unchecked);
-              }
-              curIt->setText(column,emptyString);
+            if(curIt->type() != OSCNamespace && curIt->type() != OSCNode){
+                if (curIt->checkState(column)){
+                    curIt->setCheckState(column,Qt::Unchecked);
+                }
+                curIt->setText(column,emptyString);
+            }
         }
     }
 }
@@ -1728,10 +1728,16 @@ NetworkTree::updateLine(QTreeWidgetItem *item, bool interpolationState, int samp
 }
 
 void
-NetworkTree::changeDeviceName(QString newName){
-    QString oldName = currentItem()->text(NAME_COLUMN);
-    Maquette::getInstance()->removeNetworkDevice(oldName.toStdString());
+NetworkTree::updateDeviceName(QString newName){
+
+    QString oldName = currentItem()->text(NAME_COLUMN); //attention, peut-être mieux vaut récupérer l'ancien nom par le signal de _deviceEdit
+
     currentItem()->setText(NAME_COLUMN,newName);    
 
     emit(deviceChanged(oldName,newName));
+}
+
+void
+NetworkTree::updateDevicePlugin(QString newPlugin){
+    std::cout<<"TODO : update Device plugin"<<std::endl;
 }

@@ -231,13 +231,6 @@ NetworkMessages::changeDevice(QString oldName, QString newName){
             _messages->insert(curItem,msg);
         }
     }
-//        print
-//        std::vector<std::string> list = computeMessages();
-//        std::cout<<"change name in : "<<std::endl;
-//        for(unsigned int i = 0 ; i<list.size() ; i++)
-//            std::cout<<list[i]<<std::endl;
-//        endPrint
-
 }
 
 void

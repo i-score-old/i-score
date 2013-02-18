@@ -30,17 +30,20 @@ class DeviceEdit : public QDialog
  public slots:
     void edit(QString name);
     void setChanged();
+    void setPluginChanged();
     void updateNetworkConfiguration();
     void deviceNameChanged();
 
  signals:
     void deviceNameChanged(QString);
+    void devicePluginChanged(QString);
 
  private :
     void init();
 
     bool _changed;
     bool _nameChanged;
+    bool _pluginChanged;
 
     MyDevice _currentDevice;
 

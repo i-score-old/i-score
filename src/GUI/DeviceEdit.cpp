@@ -81,7 +81,7 @@ DeviceEdit::init(){
     _layout->addWidget(_cancelButton, 3, 3, 1, 1);
 
     connect(_nameEdit,SIGNAL(editingFinished()),this,SLOT(deviceNameChanged()));
-    connect(_pluginsComboBox,SIGNAL(activated(int)),this,SLOT(setChanged()));
+    connect(_pluginsComboBox,SIGNAL(activated(int)),this,SLOT(setPluginChanged()));
     connect(_portBox, SIGNAL(valueChanged(int)), this, SLOT(setChanged()));
     connect(_IPBox, SIGNAL(textChanged(const QString &)), this, SLOT(setChanged()));
 
@@ -131,18 +131,27 @@ DeviceEdit::edit(QString name){
 }
 
 void
+DeviceEdit::setPluginChanged() {
+    _pluginChanged = true;
+    setChanged();
+}
+
+void
 DeviceEdit::setChanged() {
     _changed = true;
 }
 
 void
 DeviceEdit::updateNetworkConfiguration(){
-    std::cout<<"<<<< updateNetworkConfig >>>>"<<std::endl;
     if (_changed) {
         QHostAddress hostAddress(_IPBox->text());
         if (!hostAddress.isNull()) {
+
             Maquette::getInstance()->changeNetworkDevice(_nameEdit->text().toStdString(),_pluginsComboBox->currentText().toStdString(),
                                         _IPBox->text().toStdString(),_portBox->text().toStdString());
+            if(_pluginChanged){
+                emit(devicePluginChanged(_pluginsComboBox->currentText()));
+            }
             if(_nameChanged)
                 emit(deviceNameChanged(_nameEdit->text()));
 
