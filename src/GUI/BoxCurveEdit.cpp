@@ -14,8 +14,8 @@ BoxCurveEdit::BoxCurveEdit(QWidget *parent,BasicBox *box):QWidget(parent){
 void
 BoxCurveEdit::init(){
 
-    _stackedLayout = _basicBox->curvesWidget()->stackedLayout();
-    _comboBox = _basicBox->curvesWidget()->comboBox();
+    _stackedLayout = _basicBox->boxContentWidget()->stackedLayout();
+    _comboBox = _basicBox->boxContentWidget()->comboBox();
     _scene = _basicBox->maquetteScene();
 
 
