@@ -1493,9 +1493,18 @@ AttributesEditor::snapshotStartAssignment()
 
     if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 
+        //--- Pour réassigner les items des autres devices (qui n'ont pas été supprimés) ---
+        QList<QTreeWidgetItem *> itemsNotModified = _networkTree->startMessages()->getItems();
+
         if (!treeSnapshot.first.empty()) {
             _networkTree->startMessages()->setMessages(treeSnapshot.first);
+
+            //clear tous les messages assignés et set les nouveaux
             _networkTree->assignItems(treeSnapshot.first);
+
+            //ajoute les messages sauvegardés dans les assignés
+            _networkTree->assignItems(itemsNotModified);
+
             startMessagesChanged();
             _scene->displayMessage("treeSnapshot successfully captured and applied to box start",INDICATION_LEVEL);
         }
@@ -1515,9 +1524,17 @@ void AttributesEditor::snapshotEndAssignment()
 
     if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 
+        //--- Pour réassigner les items des autres devices (qui n'ont pas été supprimés) ---
+        QList<QTreeWidgetItem *> itemsNotModified = _networkTree->endMessages()->getItems();
+
         if (!treeSnapshot.first.empty()) {
+
             _networkTree->endMessages()->setMessages(treeSnapshot.first);
+
             _networkTree->assignItems(treeSnapshot.first);
+            //ajoute les messages sauvegardés dans les assignés
+            _networkTree->assignItems(itemsNotModified);
+
             endMessagesChanged();
             _scene->displayMessage("treeSnapshot successfully captured and applied to box start",INDICATION_LEVEL);
         }

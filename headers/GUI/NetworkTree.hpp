@@ -240,7 +240,7 @@ class NetworkTree : public QTreeWidget
          *
          * \param selectedItems : items assigned to the box
          */
-//        void assignItems(QList<QTreeWidgetItem*> selectedItems);
+         void assignItems(QList<QTreeWidgetItem*> selectedItems);
          void assignItems(QMap<QTreeWidgetItem*,Data> selectedItems);
         /*!
          * \brief True if all items' brothers have a value in their column.

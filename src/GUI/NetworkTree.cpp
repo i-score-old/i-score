@@ -908,29 +908,20 @@ NetworkTree::assignItem(QTreeWidgetItem *item, Data data){
     fathersAssignation(item);
 }
 
-//void
-//NetworkTree::assignItems(QList<QTreeWidgetItem*> selectedItems){
-//    QList<QTreeWidgetItem *>::iterator it;
-//    QTreeWidgetItem *curItem;
-//    QMap<QTreeWidgetItem*, Data> itemsToAssign;
-//    //TMP
-//    Data data;
-//    for (it =  selectedItems.begin() ; it !=  selectedItems.end() ; ++it){
-//        curItem = *it;
-//        itemsToAssign.insert(curItem,data);
-//     }
-//    //TMP
-
-//    resetAssignedItems();
-////    setAssignedItems(selectedItems);
-//    setAssignedItems(itemsToAssign);
+void
+NetworkTree::assignItems(QList<QTreeWidgetItem*> selectedItems){
+    QList<QTreeWidgetItem *>::iterator it;
+    QTreeWidgetItem *curItem;
+    Data data;
+    data.hasCurve = false;
 
 
-//    for (it =  selectedItems.begin() ; it !=  selectedItems.end() ; ++it){
-//        curItem = *it;
-//        assignItem(curItem);
-//     }
-//}
+    for (it =  selectedItems.begin() ; it !=  selectedItems.end() ; ++it){
+        curItem = *it;
+        data.address = getAbsoluteAddress(curItem);
+        assignItem(curItem,data);
+     }
+}
 
 void
 NetworkTree::assignItems(QMap<QTreeWidgetItem*,Data> selectedItems){
@@ -1102,7 +1093,7 @@ NetworkTree::resetAssignedItems(){
     QList<QTreeWidgetItem *>  assignedLeaves = assignedItems().keys();
 
     for(it = assignedLeaves.begin(); it!= assignedLeaves.end() ; it++){
-        curItem = *it;
+        curItem = *it;        
         unassignItem(curItem);
     }
 
