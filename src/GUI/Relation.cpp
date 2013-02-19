@@ -353,7 +353,7 @@ Relation::mouseDoubleClickEvent (QGraphicsSceneMouseEvent * event) {
             _elasticMode=!_elasticMode;            
             updateFlexibility();
         }
-        else if(_abstract->maxBound()==NO_BOUND || _lastMaxBound!=-1){
+        else if(_abstract->maxBound()==NO_BOUND || _lastMaxBound!=-1){            
             if(_lastMaxBound != -1)
                 maxBound = std::max(_lastMaxBound*_scene->zoom(), (float)(mapFromScene(_end).x()-mapFromScene(_start).x()+LINE_WIDTH));
             else
@@ -363,7 +363,7 @@ Relation::mouseDoubleClickEvent (QGraphicsSceneMouseEvent * event) {
             _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),maxBound/_scene->zoom());
             _lastMaxBound = -1;
         }
-        else{
+        else{            
             _lastMaxBound = _abstract->maxBound();
             changeBounds(_abstract->minBound(),NO_BOUND);
             _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),NO_BOUND);

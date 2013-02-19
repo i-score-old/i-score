@@ -313,8 +313,8 @@ class NetworkTree : public QTreeWidget
          * \brief Reset the display of assigned fathers (full and partial nodes) and clear lists.
          */
         void resetAssignedNodes();        
-        void addOSCMessage();
-        void addOSCMessage(QString message);
+        void addOSCMessage(QTreeWidgetItem *rootNode);
+        void addOSCMessage(QTreeWidgetItem *rootNode, QString message);
         void setOSCMessageName(QTreeWidgetItem *item, QString name);
         void assignOCSMsg(QTreeWidgetItem *item);
         inline QList<QTreeWidgetItem *> OSCMessages(){return _OSCMessages;}
