@@ -577,6 +577,10 @@ Maquette::changeNetworkDevice(const string &deviceName, const string &pluginName
 
 	_engines->addNetworkDevice(deviceName,pluginName,IP,port);
     _currentDevice=deviceName;
+
+    for(std::map<std::string,MyDevice>::iterator it=_devices.begin() ; it!=_devices.end() ; it++){
+        std::cout<<"DEVICES "<<(*it).first<<std::endl;
+    }
 }
 
 std::string

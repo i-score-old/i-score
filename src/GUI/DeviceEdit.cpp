@@ -152,8 +152,10 @@ DeviceEdit::updateNetworkConfiguration(){
             if(_pluginChanged){
                 emit(devicePluginChanged(_pluginsComboBox->currentText()));
             }
-            if(_nameChanged)
-                emit(deviceNameChanged(_nameEdit->text()));
+            if(_nameChanged){
+                Maquette::getInstance()->removeNetworkDevice(_currentDevice.name);
+                emit(deviceNameChanged(_nameEdit->text(),_pluginsComboBox->currentText()));
+            }
 
             accept();
       }

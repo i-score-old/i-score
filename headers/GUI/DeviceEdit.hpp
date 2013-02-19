@@ -35,7 +35,7 @@ class DeviceEdit : public QDialog
     void deviceNameChanged();
 
  signals:
-    void deviceNameChanged(QString);
+    void deviceNameChanged(QString,QString);
     void devicePluginChanged(QString);
 
  private :

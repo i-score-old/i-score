@@ -98,7 +98,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     connect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this,SLOT(valueChanged(QTreeWidgetItem*,int)));
     connect(this, SIGNAL(startValueChanged(QTreeWidgetItem*,QString)),this,SLOT(changeStartValue(QTreeWidgetItem*,QString)));
     connect(this, SIGNAL(endValueChanged(QTreeWidgetItem*,QString)),this,SLOT(changeEndValue(QTreeWidgetItem*,QString)));
-    connect(_deviceEdit, SIGNAL(deviceNameChanged(QString)),this,SLOT(updateDeviceName(QString)));
+    connect(_deviceEdit, SIGNAL(deviceNameChanged(QString,QString)),this,SLOT(updateDeviceName(QString,QString)));
     connect(_deviceEdit, SIGNAL(devicePluginChanged(QString)),this,SLOT(updateDevicePlugin(QString)));
 }
 
@@ -112,8 +112,7 @@ NetworkTree::init(){
 
     _startMessages = new NetworkMessages;
     _endMessages = new NetworkMessages;
-    _OSCMessageCount = 0;
-    _OSCNodeRoot = NULL;
+    _OSCMessageCount = 0;    
     _OSCStartMessages = new NetworkMessages;
     _OSCEndMessages = new NetworkMessages;
 
@@ -145,15 +144,15 @@ NetworkTree::init(){
                      "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6b9be8, stop: 1 #577fbf);"
                 "}"
                 );
-
-
 }
 
 void
 NetworkTree::clear(){
     QList<QTreeWidgetItem*>::iterator it;
-    for(it = _OSCMessages.begin() ; it !=  _OSCMessages.end() ; it++)
-        _OSCNodeRoot->removeChild(*it);
+
+
+//    for(it = _OSCMessages.begin() ; it !=  _OSCMessages.end() ; it++)
+//        _OSCNodeRoot->removeChild(*it);
 
     _OSCMessages.clear();
     _OSCMessageCount = 0;
@@ -171,6 +170,7 @@ NetworkTree::load() {
     vector<bool>::iterator requestableIt;
 
     QList<QTreeWidgetItem*> itemsList;
+    QTreeWidgetItem *OSCRootNode;
 
     for (nameIt = deviceNames.begin(), requestableIt = deviceRequestable.begin() ; nameIt != deviceNames.end(), requestableIt != deviceRequestable.end() ;	++nameIt,++requestableIt) {
         QStringList deviceName;
@@ -181,7 +181,7 @@ NetworkTree::load() {
         if (!(*requestableIt)){
             //OSCDevice
             curItem = new QTreeWidgetItem(deviceName,NodeNamespaceType);
-            _OSCNodeRoot = curItem;
+            OSCRootNode = curItem;
 
             createOCSBranch(curItem);
         }
@@ -197,7 +197,7 @@ NetworkTree::load() {
 
     }
     addTopLevelItems(itemsList);
-    addTopLevelItem(_OSCNodeRoot);
+    addTopLevelItem(OSCRootNode);
 }
 
 /*
@@ -312,10 +312,11 @@ NetworkTree::createItemsFromMessages(QList<QString> messageslist){
 void
 NetworkTree::createItemFromMessage(QString message){
     QStringList splitMessage = message.split("/");
-    QStringList name;
+    QStringList name;    
     QList<QTreeWidgetItem *>  itemsFound;
     QStringList::iterator it = splitMessage.begin();
     QString device = *it;
+
     int nodeType = NodeNamespaceType;
     itemsFound = findItems(device,Qt::MatchRecursive);
     if(!itemsFound.isEmpty()){
@@ -333,12 +334,12 @@ NetworkTree::createItemFromMessage(QString message){
 
     map<string,MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
     map<string,MyDevice>::iterator it2 = devices.find(device.toStdString());
-    if(it2!=devices.end() && it2->second.plugin == "OSC"){
+    if(it2!=devices.end() && it2->second.plugin == "OSC"){        
         nodeType = OSCNode;
         addOSCMessage(father,*(++it));
     }
     else{        
-        for(++it ; it!=splitMessage.end() ; it++){
+        for(++it ; it!=splitMessage.end() ; it++){            
             name<<*it;
             QTreeWidgetItem *newItem = new QTreeWidgetItem(father,name,nodeType);
             father=newItem;
@@ -360,8 +361,9 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode){
     newItem->setCheckState(REDUNDANCY_COLUMN,Qt::Unchecked);
     newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled);
 
-    rootNode->insertChild(_OSCMessages.size(),newItem);
-    _OSCMessages.push_back(newItem);
+    rootNode->insertChild(rootNode->childCount()-1,newItem);
+    QString address = getAbsoluteAddress(newItem);
+    _OSCMessages.insert(newItem,address);
 }
 
 void
@@ -376,29 +378,34 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode, QString message){
     newItem->setCheckState(REDUNDANCY_COLUMN,Qt::Unchecked);
     newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
 
-    _OSCMessages.push_back(newItem);
+    _OSCMessages.insert(newItem,getAbsoluteAddress(newItem));
 
-    rootNode->insertChild(_OSCMessageCount++,newItem);
+    rootNode->insertChild(rootNode->childCount()-1,newItem);
 }
 
 void
 NetworkTree::setOSCMessageName(QTreeWidgetItem *item, QString name){
-    int index = _OSCMessages.indexOf(item);
-    _OSCMessages.at(index)->setText(NAME_COLUMN,name);
+    QMap<QTreeWidgetItem *, QString> ::iterator it = _OSCMessages.find(item);
+    item->setText(NAME_COLUMN,name);
+    if(it!=_OSCMessages.end()){
+        _OSCMessages.erase(it);
+        _OSCMessages.insert(item,getAbsoluteAddress(item));
+    }
 }
 
 QList<QString>
-NetworkTree::getOSCMessages(){
-    QList<QTreeWidgetItem*>::iterator it;
-    QList<QString> msgsList;
-    QTreeWidgetItem *curIt;
-    QString msg;
-    for(it=_OSCMessages.begin() ; it!=_OSCMessages.end() ; it++){
-        curIt = *it;
-        msg = _OSCNodeRoot->text(NAME_COLUMN) + "/" + curIt->text(NAME_COLUMN);
-        msgsList<<msg;
-    }
-    return msgsList;
+NetworkTree::getOSCMessages(){    
+    return _OSCMessages.values();
+//    QList<QTreeWidgetItem*>::iterator it;
+//    QList<QString> msgsList;
+//    QTreeWidgetItem *curIt;
+//    QString msg;
+//    for(it=_OSCMessages.begin() ; it!=_OSCMessages.end() ; it++){
+//        curIt = *it;
+//        msg = _OSCNodeRoot->text(NAME_COLUMN) + "/" + curIt->text(NAME_COLUMN);
+//        msgsList<<msg;
+//    }
+//    return msgsList;
 }
 
 void
@@ -1591,9 +1598,9 @@ NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue){
             _startMessages->removeMessage(item);
             _endMessages->removeMessage(item);
             _OSCEndMessages->removeMessage(item);
-            _OSCStartMessages->removeMessage(item);
-            _OSCNodeRoot->removeChild(item);
-            _OSCMessages.removeAll(item);
+            _OSCStartMessages->removeMessage(item);            
+            item->parent()->removeChild(item);
+            _OSCMessages.remove(item);
             removeAssignItem(item);
         }
         else{
@@ -1751,11 +1758,27 @@ NetworkTree::updateLine(QTreeWidgetItem *item, bool interpolationState, int samp
 }
 
 void
-NetworkTree::updateDeviceName(QString newName){
+NetworkTree::updateOSCAddresses(){
+    QMap<QTreeWidgetItem *, QString>::iterator it;
+    QTreeWidgetItem *curItem;
+    for(it=_OSCMessages.begin() ; it!=_OSCMessages.end() ;it++){
+        curItem=it.key();
+        _OSCMessages.insert(curItem,getAbsoluteAddress(curItem));
+    }
+}
+
+void
+NetworkTree::updateDeviceName(QString newName, QString plugin){
 
     QString oldName = currentItem()->text(NAME_COLUMN);
 
     currentItem()->setText(NAME_COLUMN,newName);    
+
+    //OSC
+    if(plugin == "OSC"){
+//        std::cout<<"OUAIS OSC"<<std::endl;
+        updateOSCAddresses();
+    }
 
     emit(deviceChanged(oldName,newName));
 }

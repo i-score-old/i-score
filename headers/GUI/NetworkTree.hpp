@@ -317,7 +317,7 @@ class NetworkTree : public QTreeWidget
         void addOSCMessage(QTreeWidgetItem *rootNode, QString message);
         void setOSCMessageName(QTreeWidgetItem *item, QString name);
         void assignOCSMsg(QTreeWidgetItem *item);
-        inline QList<QTreeWidgetItem *> OSCMessages(){return _OSCMessages;}
+        inline QMap<QTreeWidgetItem *,QString> OSCMessages(){return _OSCMessages;}
         QList<QString> getOSCMessages();
 
         /***********************************************************************
@@ -408,6 +408,7 @@ class NetworkTree : public QTreeWidget
         void assignTotally(QTreeWidgetItem *item);
         void unassignTotally(QTreeWidgetItem *item);
         void assignItem(QTreeWidgetItem *item,Data data);
+        void updateOSCAddresses();
 
         QMap<QTreeWidgetItem *,string> _addressMap;
         QList<QTreeWidgetItem*> _nodesWithSelectedChildren;
@@ -419,9 +420,8 @@ class NetworkTree : public QTreeWidget
         NetworkMessages *_endMessages;
         NetworkMessages *_OSCStartMessages;
         NetworkMessages *_OSCEndMessages;
-        QList<QTreeWidgetItem*> _OSCMessages;
+        QMap<QTreeWidgetItem *, QString> _OSCMessages;
 
-        QTreeWidgetItem *_OSCNodeRoot;
         int _OSCMessageCount;
 
         DeviceEdit *_deviceEdit;
@@ -433,7 +433,7 @@ class NetworkTree : public QTreeWidget
         void changeStartValue(QTreeWidgetItem* item,QString newValue);
         void changeEndValue(QTreeWidgetItem* item,QString newValue);
         void changeNameValue(QTreeWidgetItem* item,QString newValue);
-        void updateDeviceName(QString newName);
+        void updateDeviceName(QString newName, QString plugin);
         void updateDevicePlugin(QString newName);
 
         virtual void clear();
