@@ -94,6 +94,10 @@ public :
         _messages=messages;
      ;}
     /*!
+     * \brief Sets the list of messages just for one device. Filter the list and clear/reset only message starting with deviceName.
+     */
+    void setDeviceMessages(QString deviceName, QMap<QTreeWidgetItem *, Message> *messages);
+    /*!
      * \brief Set the list of messages.
      */
     void setMessages(const QMap<QTreeWidgetItem *, Data> messagesList);
@@ -120,6 +124,7 @@ public slots :
      * \brief Clears messages list and set as modified.
      */
     void clear();
+    void clearDevicesMsgs(QList<QString> devices);
 
 signals :
     void messageChanged(const std::string &address);

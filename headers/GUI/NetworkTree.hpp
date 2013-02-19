@@ -80,7 +80,7 @@ class NetworkTree : public QTreeWidget
          ***********************************************************************/
 
 
-        QMap<QTreeWidgetItem *, Data> treeSnapshot(unsigned int boxID);
+        QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot(unsigned int boxID);
 
 		std::vector<std::string> snapshot();
 		 /*!
@@ -89,6 +89,7 @@ class NetworkTree : public QTreeWidget
 		  * \param item : the item to get address for
 		  */
 		QString getAbsoluteAddress(QTreeWidgetItem *item) const;
+        QString getDeviceName(QTreeWidgetItem *item) const;
         QString getAbsoluteAddressWithValue(QTreeWidgetItem *item, int column) const;
         /*!
          * \brief Gets the absolute address of an item in the snapshot tree.
@@ -148,10 +149,12 @@ class NetworkTree : public QTreeWidget
          * \brief Clear start messages list.
          */
         void clearStartMsgs();
+        void clearDevicesStartMsgs(QList<QString> devices);
         /*!
          * \brief Clear end messages list.
          */
         void clearEndMsgs();
+        void clearDevicesEndMsgs(QList<QString> devices);
         /*!
          * \brief Checks item's messages, to knows if start and end messages are set.
          * \param The item we want to check.

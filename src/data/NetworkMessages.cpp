@@ -77,6 +77,20 @@ NetworkMessages::clear(){
     emit(messagesChanged());
 }
 
+void
+NetworkMessages::clearDevicesMsgs(QList<QString> devices){
+    QList<QTreeWidgetItem *> messagesList = _messages->keys();
+    QList<QTreeWidgetItem *>::iterator it;
+    QTreeWidgetItem *curItem;
+    Message curMsg;
+
+    for(it=messagesList.begin() ; it!=messagesList.end() ; it++){
+        curItem = *it;
+        curMsg = _messages->value(curItem);
+        if(devices.contains(curMsg.device))
+            _messages->remove(curItem);
+    }
+}
 
 QMap<QTreeWidgetItem *, Message> *
 NetworkMessages::getMessages(){
@@ -469,4 +483,18 @@ NetworkMessages::setValue(QTreeWidgetItem *item, QString newValue){
         return false;
     }
 }
+
+void
+NetworkMessages::setDeviceMessages(QString deviceName, QMap<QTreeWidgetItem *, Message> *messages){
+    QMap<QTreeWidgetItem *, Message>::iterator it;
+    Message curMsg;
+
+    for (it=_messages->begin() ; it!= _messages->end() ; it++){
+        curMsg = *it;
+        if(curMsg.device == deviceName){
+            _messages->erase(it);
+        }
+    }
+}
+
 

@@ -1487,14 +1487,15 @@ AttributesEditor::deployDeviceChanged(QString oldName, QString newName){
 void
 AttributesEditor::snapshotStartAssignment()
 {
-    QMap<QTreeWidgetItem *, Data> treeSnapshot = _networkTree->treeSnapshot(_boxEdited);
-    _networkTree->clearStartMsgs();
+    QPair< QMap <QTreeWidgetItem *, Data> , QList<QString> > treeSnapshot = _networkTree->treeSnapshot(_boxEdited);
+
+    _networkTree->clearDevicesStartMsgs(treeSnapshot.second);
 
     if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 
-        if (!treeSnapshot.empty()) {
-            _networkTree->startMessages()->setMessages(treeSnapshot);
-            _networkTree->assignItems(treeSnapshot);
+        if (!treeSnapshot.first.empty()) {
+            _networkTree->startMessages()->setMessages(treeSnapshot.first);
+            _networkTree->assignItems(treeSnapshot.first);
             startMessagesChanged();
             _scene->displayMessage("treeSnapshot successfully captured and applied to box start",INDICATION_LEVEL);
         }
@@ -1509,14 +1510,14 @@ AttributesEditor::snapshotStartAssignment()
 
 void AttributesEditor::snapshotEndAssignment()
 {
-    QMap<QTreeWidgetItem *, Data> treeSnapshot = _networkTree->treeSnapshot(_boxEdited);
-    _networkTree->clearEndMsgs();
+    QPair< QMap <QTreeWidgetItem *, Data> , QList<QString> > treeSnapshot = _networkTree->treeSnapshot(_boxEdited);
+    _networkTree->clearDevicesEndMsgs(treeSnapshot.second);
 
     if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 
-        if (!treeSnapshot.empty()) {
-            _networkTree->endMessages()->setMessages(treeSnapshot);
-            _networkTree->assignItems(treeSnapshot);
+        if (!treeSnapshot.first.empty()) {
+            _networkTree->endMessages()->setMessages(treeSnapshot.first);
+            _networkTree->assignItems(treeSnapshot.first);
             endMessagesChanged();
             _scene->displayMessage("treeSnapshot successfully captured and applied to box start",INDICATION_LEVEL);
         }

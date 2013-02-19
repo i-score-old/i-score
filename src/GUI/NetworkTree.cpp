@@ -466,17 +466,31 @@ NetworkTree::getAbsoluteAddress(QTreeWidgetItem *item) const {
     return address;
 }
 
+QString
+NetworkTree::getDeviceName(QTreeWidgetItem *item) const {
+    QString deviceName;
+
+    QTreeWidgetItem * curItem = item;
+    while (curItem->parent() != NULL)
+        curItem = curItem->parent();
+
+    deviceName = curItem->text(NAME_COLUMN);
+    return deviceName;
+}
+
 QTreeWidgetItem *
 NetworkTree::getItemFromAddress(string address) const{
 
     return _addressMap.key(address);
 }
 
-QMap <QTreeWidgetItem *, Data>
+QPair< QMap <QTreeWidgetItem *, Data> , QList<QString> >
 NetworkTree::treeSnapshot(unsigned int boxID) {
     Q_UNUSED(boxID);
 
     QMap<QTreeWidgetItem *, Data> snapshots;
+    QList<QString> devicesConcerned;
+
     QList<QTreeWidgetItem*> selection = selectedItems();
     if (!selection.empty()) {
         QList<QTreeWidgetItem*>::iterator it;
@@ -487,6 +501,12 @@ NetworkTree::treeSnapshot(unsigned int boxID) {
             curItem = *it;
             if(!curItem->text(VALUE_COLUMN).isEmpty()){// >type() != NodeNamespaceType && curItem->type() != NodeNoNamespaceType){
                 QString address = getAbsoluteAddress(*it);
+
+                //get device concerned
+                QString deviceName = getDeviceName(*it);
+                if(!devicesConcerned.contains(deviceName))
+                    devicesConcerned.append(deviceName);
+
                 QPair<QTreeWidgetItem *, Data> curPair;
 
                 if (!address.isEmpty()) {
@@ -503,9 +523,9 @@ NetworkTree::treeSnapshot(unsigned int boxID) {
                 }
             }
         }
-    }
+    }    
 
-    return snapshots;
+    return qMakePair(snapshots,devicesConcerned);
 }
 
 //Obsolete
@@ -624,7 +644,6 @@ NetworkTree::clearColumn(unsigned int column){
                 curIt->setCheckState(column,Qt::Unchecked);
             }
             curIt->setText(column,emptyString);
-
         }
     }
 }
@@ -636,9 +655,21 @@ NetworkTree::clearStartMsgs(){
 }
 
 void
+NetworkTree::clearDevicesStartMsgs(QList<QString> devices){
+    clearColumn(START_COLUMN);
+    _startMessages->clearDevicesMsgs(devices);
+}
+
+void
 NetworkTree::clearEndMsgs(){
     clearColumn(END_COLUMN);
     _endMessages->clear();
+}
+
+void
+NetworkTree::clearDevicesEndMsgs(QList<QString> devices){
+    clearColumn(END_COLUMN);
+    _endMessages->clearDevicesMsgs(devices);
 }
 
 void
@@ -1512,11 +1543,13 @@ NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue){
         if (!_startMessages->getMessages()->contains(item)){
             QString Qaddress = getAbsoluteAddressWithValue(item,START_COLUMN);
             _startMessages->addMessage(item,Qaddress);
+            Data data;
+            assignItem(item,data);
             if(item->type()==OSCNode)
                 addOSCStartMessage(item,Qaddress);
             emit(startMessageValueChanged(item));
         }
-        else{
+        else{            
             if (_startMessages->setValue(item,newValue)){
                 if(item->type()==OSCNode)
                     _OSCStartMessages->setValue(item,newValue);
