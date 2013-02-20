@@ -183,6 +183,7 @@ class Maquette : public QObject
    * \return the current network device used
    */
   std::string getNetworkDevice();
+  void addNetworkDevice(string deviceName,string plugin,string ip,string port);
   /*!
    * \brief Gets a set of the available network devices.
    *

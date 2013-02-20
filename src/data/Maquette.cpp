@@ -577,10 +577,6 @@ Maquette::changeNetworkDevice(const string &deviceName, const string &pluginName
 
 	_engines->addNetworkDevice(deviceName,pluginName,IP,port);
     _currentDevice=deviceName;
-
-    for(std::map<std::string,MyDevice>::iterator it=_devices.begin() ; it!=_devices.end() ; it++){
-        std::cout<<"DEVICES "<<(*it).first<<std::endl;
-    }
 }
 
 std::string
@@ -2341,7 +2337,7 @@ Maquette::load(const string &fileName){
     _engines->getNetworkDevicesName(deviceNames,deviceRequestable);
     for(unsigned int i=0; i<deviceNames.size(); i++)
         _engines->removeNetworkDevice(deviceNames[i]);
-
+    _devices.clear();
 
     //read from xml
     if(root.childNodes().size()>=2){ //Devices
@@ -2366,8 +2362,7 @@ Maquette::load(const string &fileName){
                     port = devices.childNodes().at(i).toElement().attribute("port");
                     plugin = devices.childNodes().at(i).toElement().attribute("plugin");
 
-                    //send to engine
-                    _engines->addNetworkDevice(deviceName.toStdString(),plugin.toStdString(),ip.toStdString(),port.toStdString());
+                    addNetworkDevice(deviceName.toStdString(),plugin.toStdString(),ip.toStdString(),port.toStdString());
 
                     //save OSC device (for OSCMessages)
                     if(plugin == "OSC"){
@@ -2408,6 +2403,18 @@ Maquette::load(const string &fileName){
     }
 
     delete _doc;
+}
+
+void
+Maquette::addNetworkDevice(string deviceName,string plugin,string ip,string port){
+    std::istringstream iss(port);
+    unsigned int portInt;
+    iss >> portInt;
+
+    MyDevice newDevice(deviceName,plugin,portInt,ip);
+    _devices[deviceName]=newDevice;
+
+    _engines->addNetworkDevice(deviceName,plugin,ip,port);
 }
 
 double

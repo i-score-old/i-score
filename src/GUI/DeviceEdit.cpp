@@ -53,7 +53,7 @@ DeviceEdit::init(){
     setLayout(_layout);
 
     _deviceNameLabel = new QLabel(tr("DeviceName"));
-    _pluginsLabel = new QLabel(tr("Plugins"));
+    _pluginsLabel = new QLabel(tr("Plugins"));    
     _portLabel = new QLabel(tr("Port"));
     _IPLabel = new QLabel(tr("IP"));
 
@@ -65,6 +65,7 @@ DeviceEdit::init(){
     _nameEdit = new QLineEdit;
 
     _pluginsComboBox = new QComboBox;
+    _pluginsComboBox->setEnabled(false);
 
     _layout->addWidget(_deviceNameLabel, 0, 0, 1, 1);
     _layout->addWidget(_nameEdit, 0, 1, 1, 1);

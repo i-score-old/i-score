@@ -334,6 +334,7 @@ NetworkTree::createItemFromMessage(QString message){
 
     map<string,MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
     map<string,MyDevice>::iterator it2 = devices.find(device.toStdString());
+
     if(it2!=devices.end() && it2->second.plugin == "OSC"){        
         nodeType = OSCNode;
         addOSCMessage(father,*(++it));
@@ -1776,7 +1777,6 @@ NetworkTree::updateDeviceName(QString newName, QString plugin){
 
     //OSC
     if(plugin == "OSC"){
-//        std::cout<<"OUAIS OSC"<<std::endl;
         updateOSCAddresses();
     }
 
@@ -1788,12 +1788,12 @@ NetworkTree::updateDevicePlugin(QString newPlugin){
     QString deviceName = currentItem()->text(NAME_COLUMN);
     QTreeWidgetItem *item = currentItem();
     if(newPlugin=="OSC"){
-        std::cout<<"OSC"<<std::endl;
+        std::cout<<"NetworkTree:: updatdevicePlugin(OSC)"<<std::endl;
         item->takeChildren();
         createOCSBranch(item);
     }
     else if(newPlugin=="Minuit"){
-        std::cout<<"Minuit"<<std::endl;
+        std::cout<<"NetworkTree:: updatdevicePlugin(Minuit)"<<std::endl;
         item->takeChildren();
         //networkRequest
     }
