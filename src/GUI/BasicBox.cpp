@@ -89,6 +89,7 @@ const float BasicBox::MSGS_INDICATOR_WIDTH = 50;
 const float BasicBox::EAR_WIDTH = 9;
 const float BasicBox::EAR_HEIGHT = 30;
 const float BasicBox::GRIP_CIRCLE_SIZE = 5;
+unsigned int BasicBox::BOX_MARGIN = 25;
 const QString BasicBox::SUB_SCENARIO_MODE_TEXT = tr("Scenario");
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
@@ -111,9 +112,9 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 
     init();
 
-//    createActions();
-//    createMenus();
-    createWidget();        
+    createWidget();
+    createActions();
+    createMenus();
 
     update();
     connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),_boxContentWidget, SLOT(updateDisplay(const QString&)));
@@ -126,30 +127,58 @@ BasicBox::centerWidget(){
     _boxWidget->resize(width()-2*LINE_WIDTH,height()-1.5*RESIZE_TOLERANCE);
 
     _comboBox->move(0,-(height()/2+LINE_WIDTH));
-    _comboBox->resize((width() - 2*LINE_WIDTH)/2,COMBOBOX_HEIGHT);
+    _comboBox->resize((width() - 4*LINE_WIDTH - BOX_MARGIN)/2,COMBOBOX_HEIGHT);
 
-//    _startMenuBar->move(-(width())/2+LINE_WIDTH,-(height())/2 + (1.2*RESIZE_TOLERANCE));
-//    _endMenuBar->move((width())/2+LINE_WIDTH,-(height())/2 + (1.2*RESIZE_TOLERANCE));
+    _startMenuButton->move(-(width())/2+LINE_WIDTH,-(height())/2);
+    _endMenuButton->move((width())/2+2*LINE_WIDTH-BOX_MARGIN,-(height())/2+LINE_WIDTH);
 }
 
 void
 BasicBox::createActions(){
     _jumpToStartCue = new QAction("Jump to cue",this);
-    _jumpToEndCue = new QAction("Jump to cue",this);
+    _jumpToEndCue = new QAction("Jump to cue",this);        
 
     connect(_jumpToStartCue,SIGNAL(triggered()),_boxContentWidget,SLOT(jumpToStartCue()));
     connect(_jumpToEndCue,SIGNAL(triggered()),_boxContentWidget,SLOT(jumpToEndCue()));
+
 }
 
 void
 BasicBox::createMenus(){
-    _startMenuBar = new QMenuBar();
-    _startMenu = _startMenuBar->addMenu(tr("&StartMenu"));
+
+    _startMenu = new QMenu(tr("&StartMenu"));
     _startMenu->addAction(_jumpToStartCue);
 
-    _endMenuBar = new QMenuBar();
-    _endMenu = _endMenuBar->addMenu(tr("&EndMenu"));
-    _endMenu->addAction(_jumpToEndCue);
+    //---------------- Start/End buttons ------------------//
+    QIcon startMenuIcon(":/images/boxStartMenu.svg");
+    _startMenuButton = new QPushButton();
+    _startMenuButton->setIcon(startMenuIcon);
+    _startMenuButton->setStyleSheet(
+                "QPushButton {"
+                "border: none;"
+                "border-radius: none;"
+                "background-color: transparent;"
+                "}"
+                );
+
+    QIcon endMenuIcon(":/images/boxEndMenu.svg");
+    _endMenuButton = new QPushButton();
+    _endMenuButton->setIcon(endMenuIcon);
+    _endMenuButton->setStyleSheet(
+                "QPushButton {"
+                "border: none;"
+                "border-radius: none;"
+                "background-color: transparent;"
+                "}"
+                );
+
+    QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
+    startMenuProxy->setWidget(_startMenuButton);
+    QGraphicsProxyWidget *endMenuProxy =  new QGraphicsProxyWidget(this);
+    endMenuProxy->setWidget(_endMenuButton);
+
+    connect(_startMenuButton,SIGNAL(clicked()),_jumpToStartCue,SLOT(trigger()));
+    connect(_endMenuButton,SIGNAL(clicked()),_jumpToEndCue,SLOT(trigger()));
 }
 
 void
@@ -171,7 +200,6 @@ BasicBox::createWidget(){
     brush.setTexture(pix);
     QPalette palette;
     palette.setBrush(QPalette::Background,brush);
-
 
     //---------------------- Curve widget ----------------------//
     _boxWidget = new QWidget();
@@ -195,7 +223,6 @@ BasicBox::createWidget(){
     _curveProxy->setWidget(_boxWidget);
     _curveProxy->setPalette(palette);
 
-
     //---------------- ComboBox (curves list) ------------------//
     _comboBox = new QComboBox;
     _comboBox->view()->setTextElideMode(Qt::ElideMiddle);
@@ -210,13 +237,6 @@ BasicBox::createWidget(){
     _comboBoxProxy->setPalette(palette);
     _boxContentWidget->setComboBox(_comboBox);
 
-
-    //---------------- Start/End menus ------------------//
-//    QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
-//    startMenuProxy->setWidget(_startMenuBar);
-
-//    QGraphicsProxyWidget *endMenuProxy =  new QGraphicsProxyWidget(this);
-//    endMenuProxy->setWidget(_endMenuBar);
 }
 
 BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
@@ -1120,6 +1140,7 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mousePressEvent(event);
     if (event->button() == Qt::LeftButton) {
         setSelected(true);
+
         if(cursor().shape() == Qt::OpenHandCursor)
             setCursor(Qt::ClosedHandCursor);
         if (cursor().shape() == Qt::ArrowCursor) {
@@ -1630,7 +1651,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
     painter->save();
     painter->setPen(QPen(Qt::black));
-    painter->drawText(QRectF(10,0,textRect.width(),textRect.height()),Qt::AlignLeft,name());
+    painter->drawText(QRectF(BOX_MARGIN,0,textRect.width(),textRect.height()),Qt::AlignLeft,name());
     painter->restore();
 
     if (_abstract->width() <= 3*RESIZE_TOLERANCE) {

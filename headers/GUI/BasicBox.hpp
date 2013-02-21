@@ -60,7 +60,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QComboBox>
 #include <QGraphicsProxyWidget>
 #include <QObject>
-#include <QMenuBar>
+#include <QPushButton>
 
 class MaquetteScene;
 class QGraphicsTextItem;
@@ -542,7 +542,7 @@ class BasicBox : public QObject, public QGraphicsItem
   static const unsigned int LINE_WIDTH = 2;
   //! \brief Handles resizing tolerance.
   static const unsigned int RESIZE_TOLERANCE = 25;
-  static const unsigned int BOX_MARGIN = 10;
+  static unsigned int BOX_MARGIN;
   static const float TRIGGER_ZONE_WIDTH;
   static const float TRIGGER_ZONE_HEIGHT;
   static const float TRIGGER_EXPANSION_FACTOR;
@@ -720,8 +720,8 @@ class BasicBox : public QObject, public QGraphicsItem
   QMenu *_startMenu;
   QMenu *_endMenu;
 
-  QMenuBar *_startMenuBar;
-  QMenuBar *_endMenuBar;
+  QPushButton *_startMenuButton;
+  QPushButton *_endMenuButton;
 };
 
 #endif
