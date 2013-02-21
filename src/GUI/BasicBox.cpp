@@ -137,10 +137,13 @@ void
 BasicBox::createActions(){
     _jumpToStartCue = new QAction("Jump to cue",this);
     _jumpToEndCue = new QAction("Jump to cue",this);        
+    _updateStartCue = new QAction("Update cue",this);
+    _updateEndCue = new QAction("Update cue",this);
 
     connect(_jumpToStartCue,SIGNAL(triggered()),_boxContentWidget,SLOT(jumpToStartCue()));
     connect(_jumpToEndCue,SIGNAL(triggered()),_boxContentWidget,SLOT(jumpToEndCue()));
-
+    connect(_updateStartCue,SIGNAL(triggered()),_boxContentWidget,SLOT(updateStartCue()));
+    connect(_updateEndCue,SIGNAL(triggered()),_boxContentWidget,SLOT(updateEndCue()));
 }
 
 void
@@ -148,6 +151,7 @@ BasicBox::createMenus(){
 
     _startMenu = new QMenu(tr("&StartMenu"));
     _startMenu->addAction(_jumpToStartCue);
+    _startMenu->addAction(_updateStartCue);
 
     //---------------- Start/End buttons ------------------//
     QIcon startMenuIcon(":/images/boxStartMenu.svg");
@@ -179,6 +183,8 @@ BasicBox::createMenus(){
 
     connect(_startMenuButton,SIGNAL(clicked()),_jumpToStartCue,SLOT(trigger()));
     connect(_endMenuButton,SIGNAL(clicked()),_jumpToEndCue,SLOT(trigger()));
+//    connect(_startMenuButton,SIGNAL(clicked()),_updateStartCue,SLOT(trigger()));
+//    connect(_endMenuButton,SIGNAL(clicked()),_updateEndCue,SLOT(trigger()));
 }
 
 void
@@ -1136,7 +1142,7 @@ BasicBox::keyReleaseEvent(QKeyEvent *event){
 
 void
 BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
+{    
     QGraphicsItem::mousePressEvent(event);
     if (event->button() == Qt::LeftButton) {
         setSelected(true);

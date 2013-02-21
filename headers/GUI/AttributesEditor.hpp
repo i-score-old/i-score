@@ -134,6 +134,14 @@ class AttributesEditor : public QDockWidget
    * \brief Updates values of widgets according to the editor current attributes
    **/
   void updateWidgets(bool boxModified);
+  /*!
+   * \brief Assigns the snapshot to the start of the box.
+   */
+  void snapshotStartAssignment();
+  /*!
+   * \brief Assigns the snapshot to the end of the box.
+   */
+  void snapshotEndAssignment();
   inline NetworkTree *networkTree(){return _networkTree;}  
   virtual void clear();
 
@@ -274,14 +282,7 @@ class AttributesEditor : public QDockWidget
    * \brief Called when the name of the box is changed.
    */
   void nameChanged();
-  /*!
-   * \brief Assigns the snapshot to the start of the box.
-   */
-  void snapshotStartAssignment();
-  /*!
-   * \brief Assigns the snapshot to the end of the box.
-   */
-  void snapshotEndAssignment();
+
 
   void treeMapStartAssignment();
   void treeMapEndAssignment();

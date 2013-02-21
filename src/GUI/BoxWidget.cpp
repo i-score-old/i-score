@@ -63,6 +63,7 @@ using std::string;
 #include "Maquette.hpp"
 #include "MaquetteScene.hpp"
 #include "ParentBox.hpp"
+#include "AttributesEditor.hpp"
 
 #define COMBOBOX_WIDTH 500
 
@@ -351,12 +352,30 @@ BoxWidget::setComboBox(QComboBox *cbox){
 
 void
 BoxWidget::jumpToStartCue(){
+    _box->setSelected(true);
+    _box->update();
     unsigned int gotoValue = _box->date();
     _box->maquetteScene()->gotoChanged(gotoValue);
 }
 
 void
 BoxWidget::jumpToEndCue(){
+    _box->setSelected(true);
+    _box->update();
     unsigned int gotoValue = _box->date() + _box->duration();
     _box->maquetteScene()->gotoChanged(gotoValue);
+}
+
+void
+BoxWidget::updateStartCue(){
+    _box->setSelected(true);
+    _box->update();
+    _box->maquetteScene()->editor()->snapshotStartAssignment();
+}
+
+void
+BoxWidget::updateEndCue(){
+    _box->setSelected(true);
+    _box->update();
+    _box->maquetteScene()->editor()->snapshotEndAssignment();
 }
