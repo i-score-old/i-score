@@ -738,6 +738,21 @@
 					);
 			};
 		};
+		07D829721851FA908EE8737E = {
+			isa = PBXFileReference;
+			name = "DeviceEdit.cpp";
+			path = "src/GUI/DeviceEdit.cpp";
+			refType = 4;
+			lastKnownFileType = "sourcecode.cpp.cpp";
+		};
+		F6F1F8996A4F093F521CA194 = {
+			fileRef = "07D829721851FA908EE8737E";
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					);
+			};
+		};
 		B95006AEFE6773908F66D1C6 = {
 			isa = PBXFileReference;
 			name = "acousmoscribe.icns";
@@ -1172,6 +1187,21 @@
 					);
 			};
 		};
+		65CACA49A290408AE9AB82F6 = {
+			isa = PBXFileReference;
+			name = "moc_DeviceEdit.cpp";
+			path = "moc/moc_DeviceEdit.cpp";
+			refType = 4;
+			lastKnownFileType = "sourcecode.cpp.cpp";
+		};
+		C99A8FB6E40ADE861FF56DC2 = {
+			fileRef = "65CACA49A290408AE9AB82F6";
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					);
+			};
+		};
 		5A224ABC9D6D75C7D981C029 = {
 			isa = PBXFileReference;
 			name = "qrc_i-score.cpp";
@@ -1487,6 +1517,12 @@
 			path = "headers/GUI/TimeBarWidget.hpp";
 			refType = 4;
 		};
+		6A526CA82AF2E47E10846DB7 = {
+			isa = PBXFileReference;
+			name = "DeviceEdit.hpp";
+			path = "headers/GUI/DeviceEdit.hpp";
+			refType = 4;
+		};
 		71078BD4296B16D83E12B053 = {
 			isa = PBXFileReference;
 			name = "i-score.pro";
@@ -1561,7 +1597,8 @@
 				"7D9FFD201504D7783386B2D5",
 				"F46982B2688387B52E8ED692",
 				"FB5D4873C9FF5F7BB38886E5",
-				"A9EE3D73828716AB26E22349");
+				"A9EE3D73828716AB26E22349",
+				"6A526CA82AF2E47E10846DB7");
 			name = "GUI";
 			refType = 4;
 		};
@@ -1636,7 +1673,8 @@
 				"D6D855C345DCC3C8D811C1B5",
 				"A25A3876BE4ED864C7D3A6F5",
 				"BA8D814134C12D0523477057",
-				"173EB5EE74998E45E257A7BA");
+				"173EB5EE74998E45E257A7BA",
+				"07D829721851FA908EE8737E");
 			name = "GUI";
 			refType = 4;
 		};
@@ -1688,7 +1726,8 @@
 				"58185FD17225028C3967CC8D",
 				"FE9B7CC0D91F8891075F5E1E",
 				"9CDE5B52CBCFDAA86606AFA7",
-				"A7A44BD6F49C7F74B9AF3AFC");
+				"A7A44BD6F49C7F74B9AF3AFC",
+				"65CACA49A290408AE9AB82F6");
 			name = "moc";
 			refType = 4;
 		};
@@ -1776,6 +1815,7 @@
 				"5D3015BF4027605BCE0456D6",
 				"A47C3E4E0F07119890974EDE",
 				"3EEEFD562F282A4C7920667E",
+				"F6F1F8996A4F093F521CA194",
 				"0B2292BC85745A06F653071B",
 				"FD3B07BA4A94B84DBFB464E8",
 				"86EB7F55602050556A3549AE",
@@ -1804,6 +1844,7 @@
 				"98FC9815077E79F2F65C77EB",
 				"DCE00115E769ABE2329459C1",
 				"2E94610D0FF6EBB39B408BF1",
+				"C99A8FB6E40ADE861FF56DC2",
 				"7F3E602466E431ABBC2C3ACC");
 			isa = PBXShellScriptBuildPhase;
 			name = "Qt Preprocessors";
@@ -1856,6 +1897,7 @@
 				"5D3015BF4027605BCE0456D6",
 				"A47C3E4E0F07119890974EDE",
 				"3EEEFD562F282A4C7920667E",
+				"F6F1F8996A4F093F521CA194",
 				"0B2292BC85745A06F653071B",
 				"FD3B07BA4A94B84DBFB464E8",
 				"86EB7F55602050556A3549AE",
@@ -1884,6 +1926,7 @@
 				"98FC9815077E79F2F65C77EB",
 				"DCE00115E769ABE2329459C1",
 				"2E94610D0FF6EBB39B408BF1",
+				"C99A8FB6E40ADE861FF56DC2",
 				"7F3E602466E431ABBC2C3ACC");
 			shellPath = "/bin/sh";
 			shellScript = "make\ -C\ /Users/nicolashincker/Documents/workspace/acousmoscribe\ -f\ \'i-score.xcodeproj/qt_preprocess.mak\'";
@@ -1939,6 +1982,7 @@
 				"5D3015BF4027605BCE0456D6",
 				"A47C3E4E0F07119890974EDE",
 				"3EEEFD562F282A4C7920667E",
+				"F6F1F8996A4F093F521CA194",
 				"0B2292BC85745A06F653071B",
 				"FD3B07BA4A94B84DBFB464E8",
 				"86EB7F55602050556A3549AE",
@@ -1967,21 +2011,10 @@
 				"98FC9815077E79F2F65C77EB",
 				"DCE00115E769ABE2329459C1",
 				"2E94610D0FF6EBB39B408BF1",
+				"C99A8FB6E40ADE861FF56DC2",
 				"7F3E602466E431ABBC2C3ACC");
 			isa = PBXSourcesBuildPhase;
 			name = "Build Sources";
-		};
-		DA138F75C9F545CDAE7FB264 = {
-			isa = PBXFrameworkReference;
-			name = "Carbon.framework";
-			path = "/System/Library/Frameworks/Carbon.framework";
-			refType = 0;
-		};
-		C8FD4A1AAA37CF2CA2824CCF = {
-			fileRef = "DA138F75C9F545CDAE7FB264";
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		2D7FF9EBB69BCF2C19DC629B = {
 			isa = PBXFrameworkReference;
@@ -2045,7 +2078,6 @@
 		};
 		ED1E82605DD74B483AF3C982 = {
 			children = (
-				"DA138F75C9F545CDAE7FB264",
 				"2D7FF9EBB69BCF2C19DC629B",
 				"9B36DA7E32F0304E780E7972",
 				"7BC2E65A5E699A5E5D834CA2",
@@ -2059,7 +2091,6 @@
 		2A1043669E6E5A7426EA502A = {
 			buildActionMask = 2147483647;
 			files = (
-				"C8FD4A1AAA37CF2CA2824CCF",
 				"08D8EC4D0C273BC5E194E43D",
 				"501667F26B3C1FF6767A7C12",
 				"069D05B0128AE5DC7EE31738",
@@ -2124,14 +2155,11 @@
 				OTHER_LDFLAGS = (
 						"-headerpad_max_install_names",
 						"-L/Library/Frameworks",
-						"-F/Library/Frameworks",
-						"$(QTDIR)/lib/libqt.a",
-						"-lz");
+						"-F/Library/Frameworks");
 				DYLIB_CURRENT_VERSION = "1.0.0";
 				DYLIB_COMPATIBILITY_VERSION = "1.0";
 				MACOSX_DEPLOYMENT_TARGET = "10.4";
 				PRODUCT_NAME = "i-score";
-				QTDIR = "";
 			};
 			conditionalBuildSettings = {
 			};
@@ -2191,8 +2219,7 @@
 					"/System/Library/Frameworks/CarbonCore.framework/Headers",
 					"/usr/local/Qt4.8/mkspecs/macx-xcode");
 				LIBRARY_SEARCH_PATHS = (
-					"/Library/Frameworks",
-					"/System/Library/Frameworks/");
+					"/Library/Frameworks");
 				FRAMEWORK_SEARCH_PATHS = (
 					"/Library/Frameworks",
 					"/Library/Frameworks");
@@ -2224,9 +2251,7 @@
 				OTHER_LDFLAGS = (
 						"-headerpad_max_install_names",
 						"-L/Library/Frameworks",
-						"-F/Library/Frameworks",
-						"$(QTDIR)/lib/libqt.a",
-						"-lz");
+						"-F/Library/Frameworks");
 				ARCHS = "x86_64";
 			};
 			name = "Debug";
@@ -2277,8 +2302,7 @@
 					"/System/Library/Frameworks/CarbonCore.framework/Headers",
 					"/usr/local/Qt4.8/mkspecs/macx-xcode");
 				LIBRARY_SEARCH_PATHS = (
-					"/Library/Frameworks",
-					"/System/Library/Frameworks/");
+					"/Library/Frameworks");
 				FRAMEWORK_SEARCH_PATHS = (
 					"/Library/Frameworks",
 					"/Library/Frameworks");
@@ -2310,9 +2334,7 @@
 				OTHER_LDFLAGS = (
 						"-headerpad_max_install_names",
 						"-L/Library/Frameworks",
-						"-F/Library/Frameworks",
-						"$(QTDIR)/lib/libqt.a",
-						"-lz");
+						"-F/Library/Frameworks");
 				ARCHS = "x86_64";
 			};
 			name = "Release";

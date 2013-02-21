@@ -342,7 +342,6 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
 void
 BoxWidget::mouseDoubleClickEvent(QMouseEvent *event){
     Q_UNUSED(event);
-    jumpToStartCue();
 }
 
 void
