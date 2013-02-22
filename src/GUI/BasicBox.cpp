@@ -157,6 +157,7 @@ BasicBox::createMenus(){
     QIcon startMenuIcon(":/images/boxStartMenu.svg");
     _startMenuButton = new QPushButton();
     _startMenuButton->setIcon(startMenuIcon);
+
     _startMenuButton->setStyleSheet(
                 "QPushButton {"
                 "border: none;"
@@ -168,6 +169,7 @@ BasicBox::createMenus(){
     QIcon endMenuIcon(":/images/boxEndMenu.svg");
     _endMenuButton = new QPushButton();
     _endMenuButton->setIcon(endMenuIcon);
+    _endMenuButton->setShortcutEnabled(1,false);
     _endMenuButton->setStyleSheet(
                 "QPushButton {"
                 "border: none;"
@@ -181,10 +183,13 @@ BasicBox::createMenus(){
     QGraphicsProxyWidget *endMenuProxy =  new QGraphicsProxyWidget(this);
     endMenuProxy->setWidget(_endMenuButton);
 
-    connect(_startMenuButton,SIGNAL(clicked()),_jumpToStartCue,SLOT(trigger()));
-    connect(_endMenuButton,SIGNAL(clicked()),_jumpToEndCue,SLOT(trigger()));
+//    connect(_startMenuButton,SIGNAL(clicked()),_jumpToStartCue,SLOT(trigger()));
+//    connect(_endMenuButton,SIGNAL(clicked()),_jumpToEndCue,SLOT(trigger()));
 //    connect(_startMenuButton,SIGNAL(clicked()),_updateStartCue,SLOT(trigger()));
 //    connect(_endMenuButton,SIGNAL(clicked()),_updateEndCue,SLOT(trigger()));
+
+    connect(_startMenuButton,SIGNAL(clicked()),_boxContentWidget,SLOT(execStartAction()));
+    connect(_endMenuButton,SIGNAL(clicked()),_boxContentWidget,SLOT(execEndAction()));
 }
 
 void
@@ -514,8 +519,9 @@ BasicBox::getStartState(){
 
     //Start values
     QList<QString> startAddresses = startMsgs.keys();
-    for(QList<QString>::iterator it = startAddresses.begin() ; it!=startAddresses.end() ; it++)
-        finalMessages.insert(*it,QPair<QString,unsigned int>(startMsgs.value(*it),date()));
+    for(QList<QString>::iterator it = startAddresses.begin() ; it!=startAddresses.end() ; it++){
+        finalMessages.insert(*it,QPair<QString,unsigned int>(startMsgs.value(*it),date()));        
+    }
 
     return finalMessages;
 }
@@ -1132,7 +1138,7 @@ BasicBox::boxBody()
 }
 void
 BasicBox::keyPressEvent(QKeyEvent *event){
-    QGraphicsItem::keyPressEvent(event);
+    QGraphicsItem::keyPressEvent(event);    
 }
 
 void
@@ -1142,7 +1148,7 @@ BasicBox::keyReleaseEvent(QKeyEvent *event){
 
 void
 BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{    
+{
     QGraphicsItem::mousePressEvent(event);
     if (event->button() == Qt::LeftButton) {
         setSelected(true);

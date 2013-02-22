@@ -75,6 +75,7 @@ MaquetteView::MaquetteView(MainWindow *mw)
   centerOn(0,0);
   _zoom = 1;
   _gotoValue = 0;
+  _command = false;
 }
 
 MaquetteView::~MaquetteView(){
@@ -239,6 +240,10 @@ void
 MaquetteView::keyPressEvent(QKeyEvent *event)
 {
     QGraphicsView::keyPressEvent(event);
+    if(event->key()==Qt::Key_Control){
+        _command = true;
+    }
+
 	if (event->matches(QKeySequence::Copy)) {
 		_scene->copyBoxes();
 		_scene->displayMessage(tr("Selection copied").toStdString(),INDICATION_LEVEL);
@@ -286,6 +291,12 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
     else if (event->key()==Qt::Key_1 || event->key()==Qt::Key_2 || event->key()==Qt::Key_3)
         triggerShortcut(event->key());
 
+}
+
+void
+MaquetteView::keyReleaseEvent(QKeyEvent *event){
+    QGraphicsView::keyReleaseEvent(event);
+    _command = false;
 }
 
 QList<TriggerPoint *>

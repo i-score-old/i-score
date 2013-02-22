@@ -1836,7 +1836,7 @@ MaquetteScene:: play() {
         _maquette->setAccelerationFactor(_accelerationFactor);
         _maquette->startPlaying();
         _playThread->start();        
-        _paused = false;
+        _paused = false;        
 	}
     else {
         _playing = true;

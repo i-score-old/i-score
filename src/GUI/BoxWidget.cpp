@@ -62,6 +62,7 @@ using std::string;
 #include "Interpolation.hpp"
 #include "Maquette.hpp"
 #include "MaquetteScene.hpp"
+#include "MaquetteView.hpp"
 #include "ParentBox.hpp"
 #include "AttributesEditor.hpp"
 
@@ -351,11 +352,30 @@ BoxWidget::setComboBox(QComboBox *cbox){
 }
 
 void
+BoxWidget::execStartAction(){
+    std::cout<<"EXEC START"<<std::endl;
+    if(_box->maquetteScene()->view()->command())
+        updateStartCue();
+    else
+        jumpToStartCue();
+}
+
+void
+BoxWidget::execEndAction(){
+    if(_box->maquetteScene()->view()->command())
+        updateEndCue();
+    else
+        jumpToEndCue();
+}
+
+void
 BoxWidget::jumpToStartCue(){
+    std::cout<<"JUMP TO START CUE"<<std::endl;
     _box->setSelected(true);
     _box->update();
     unsigned int gotoValue = _box->date();
     _box->maquetteScene()->gotoChanged(gotoValue);
+    Maquette::getInstance()->initSceneState(); //reload scene (reset the remote application state)
 }
 
 void
@@ -364,6 +384,7 @@ BoxWidget::jumpToEndCue(){
     _box->update();
     unsigned int gotoValue = _box->date() + _box->duration();
     _box->maquetteScene()->gotoChanged(gotoValue);
+    Maquette::getInstance()->initSceneState(); //reload scene (reset the remote application state)
 }
 
 void

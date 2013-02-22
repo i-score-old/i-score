@@ -69,6 +69,8 @@ public slots :
     void jumpToEndCue();
     void updateStartCue();
     void updateEndCue();
+    void execStartAction();
+    void execEndAction();
 
 signals :
     void currentIndexChanged(QString address);

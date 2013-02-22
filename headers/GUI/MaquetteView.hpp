@@ -113,6 +113,12 @@ class MaquetteView : public QGraphicsView
    * \return the center, as a QPointF.
    */
   QPointF getCenterCoordinates();
+  /*!
+   * \brief Get the Command Key state.
+   *
+   * \return True if pressed, false if not.
+   */
+  inline bool command(){return _command;}
  protected :
   /*!
    * \brief Redefinition of QGraphicsView::drawBackground().
@@ -128,6 +134,7 @@ class MaquetteView : public QGraphicsView
    * \param event : the information about the event
    */
   virtual void keyPressEvent(QKeyEvent *event);
+  virtual void keyReleaseEvent(QKeyEvent *event);
   /*!
    * \brief Redefinition of QGraphicsView::wheelEvent().
    *
@@ -142,6 +149,7 @@ class MaquetteView : public QGraphicsView
   MainWindow *_mainWindow;
   float _zoom; //!< The zoom factor value.
   int _gotoValue; //!< The goto value in pixels.
+  bool _command; //!< State of Command Key state.
 };
 
 #endif
