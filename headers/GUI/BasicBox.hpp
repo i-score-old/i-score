@@ -61,6 +61,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QGraphicsProxyWidget>
 #include <QObject>
 #include <QPushButton>
+#include <QMenu>
 
 class MaquetteScene;
 class QGraphicsTextItem;
@@ -724,6 +725,9 @@ class BasicBox : public QObject, public QGraphicsItem
 
   QPushButton *_startMenuButton;
   QPushButton *_endMenuButton;
+
 };
+
+
 
 #endif

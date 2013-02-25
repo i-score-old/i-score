@@ -96,6 +96,10 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 : QGraphicsItem()
 {
     _scene = parent;
+    _startMenu = NULL;
+    _endMenu = NULL;
+    _startMenuButton = NULL;
+    _endMenuButton = NULL;
 
     int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
 
@@ -122,7 +126,6 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 
 void
 BasicBox::centerWidget(){
-
     _boxWidget->move(-(width())/2+LINE_WIDTH,-(height())/2 + (1.2*RESIZE_TOLERANCE));
     _boxWidget->resize(width()-2*LINE_WIDTH,height()-1.5*RESIZE_TOLERANCE);
 
@@ -150,13 +153,17 @@ void
 BasicBox::createMenus(){
 
     _startMenu = new QMenu(tr("&StartMenu"));
+    _startMenu->setParent(_boxWidget);
+    _startMenu->setWindowModality(Qt::ApplicationModal);
     _startMenu->addAction(_jumpToStartCue);
     _startMenu->addAction(_updateStartCue);
 
-    //---------------- Start/End buttons ------------------//
+
+    //--- start button ---
     QIcon startMenuIcon(":/images/boxStartMenu.svg");
     _startMenuButton = new QPushButton();
     _startMenuButton->setIcon(startMenuIcon);
+    _startMenuButton->setContextMenuPolicy(Qt::CustomContextMenu);
     _startMenuButton->setStyleSheet(
                 "QPushButton {"
                 "border: none;"
@@ -164,7 +171,15 @@ BasicBox::createMenus(){
                 "background-color: transparent;"
                 "}"
                 );
+    _boxContentWidget->setStartMenu(_startMenu);
 
+
+    //--- end button ---
+    _endMenu = new QMenu(tr("&EndMenu"));
+    _endMenu->setParent(_boxWidget);
+    _endMenu->setWindowModality(Qt::ApplicationModal);
+    _endMenu->addAction(_jumpToEndCue);
+    _endMenu->addAction(_updateEndCue);
     QIcon endMenuIcon(":/images/boxEndMenu.svg");
     _endMenuButton = new QPushButton();
     _endMenuButton->setIcon(endMenuIcon);
@@ -176,19 +191,17 @@ BasicBox::createMenus(){
                 "background-color: transparent;"
                 "}"
                 );
+    _boxContentWidget->setEndMenu(_endMenu);
 
     QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
     startMenuProxy->setWidget(_startMenuButton);
     QGraphicsProxyWidget *endMenuProxy =  new QGraphicsProxyWidget(this);
     endMenuProxy->setWidget(_endMenuButton);
 
-//    connect(_startMenuButton,SIGNAL(clicked()),_jumpToStartCue,SLOT(trigger()));
-//    connect(_endMenuButton,SIGNAL(clicked()),_jumpToEndCue,SLOT(trigger()));
-//    connect(_startMenuButton,SIGNAL(clicked()),_updateStartCue,SLOT(trigger()));
-//    connect(_endMenuButton,SIGNAL(clicked()),_updateEndCue,SLOT(trigger()));
-
     connect(_startMenuButton,SIGNAL(clicked()),_boxContentWidget,SLOT(execStartAction()));
-    connect(_endMenuButton,SIGNAL(clicked()),_boxContentWidget,SLOT(execEndAction()));
+    connect(_endMenuButton,SIGNAL(clicked()),_boxContentWidget,SLOT(execEndAction()));    
+    connect(_startMenuButton,SIGNAL(customContextMenuRequested(QPoint)),_boxContentWidget,SLOT(displayStartMenu(QPoint)));
+    connect(_endMenuButton,SIGNAL(customContextMenuRequested(QPoint)),_boxContentWidget,SLOT(displayEndMenu(QPoint)));
 }
 
 void
@@ -1149,6 +1162,11 @@ void
 BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsItem::mousePressEvent(event);
+    if(_startMenu != NULL)
+        _startMenu->close();
+    if(_endMenu != NULL)
+        _endMenu->close();
+
     if (event->button() == Qt::LeftButton) {
         setSelected(true);
 
@@ -1210,13 +1228,15 @@ BasicBox::lower(bool state){
 }
 
 void
-BasicBox::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
+BasicBox::contextMenuEvent(QGraphicsSceneContextMenuEvent * event )
 {
     QGraphicsItem::contextMenuEvent(event);
+
     if (_hasContextMenu) {
         setSelected(false);
         _contextMenu->exec(event->screenPos());
     }
+
 }
 
 QInputDialog *

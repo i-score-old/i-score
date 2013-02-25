@@ -93,7 +93,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
     setDragDropMode(InternalMove);
     setDragDropOverwriteMode(true);
 
-    connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(itemCollapsed()));
+//    connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),this,SLOT(itemCollapsed()));
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem *,int)),this,SLOT(clickInNetworkTree(QTreeWidgetItem *,int)));
     connect(this, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this,SLOT(valueChanged(QTreeWidgetItem*,int)));
     connect(this, SIGNAL(startValueChanged(QTreeWidgetItem*,QString)),this,SLOT(changeStartValue(QTreeWidgetItem*,QString)));
@@ -1368,7 +1368,7 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event){
     }
     else if(currentItem()->type()==addOSCNode)
         ;
-    else if(currentItem()->type()==NodeNamespaceType){
+    else if(currentItem()->type()==NodeNamespaceType && currentColumn()==NAME_COLUMN){
         QString deviceName = currentItem()->text(NAME_COLUMN);
         _deviceEdit->edit(deviceName);
     }

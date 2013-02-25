@@ -96,6 +96,9 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
 
     _parentWidget = parent;
     _curveWidgetList = new QList<CurveWidget *>;
+
+    _startMenu = NULL;
+    _endMenu = NULL;
 }
 
 BoxWidget::~BoxWidget(){
@@ -109,11 +112,10 @@ BoxWidget::mousePressEvent(QMouseEvent *event){
         hide();
         setWindowModality(Qt::WindowModal);
         show();
-    }
+    }    
 }
 
 void BoxWidget::curveActivationChanged(const QString &address, bool state) {
-//    std::cout<<"BoxWidget::CurveActivation Changed"<<std::endl;
     if (_boxID != NO_ID) {
         Maquette::getInstance()->setCurveMuteState(_boxID,address.toStdString(),!state);
         updateCurve(address.toStdString(),true);
@@ -374,6 +376,8 @@ BoxWidget::execEndAction(){
 
 void
 BoxWidget::jumpToStartCue(){
+    if(_startMenu!=NULL)
+        _startMenu->close();
     _box->setSelected(true);
     _box->update();
     unsigned int gotoValue = _box->date();
@@ -383,6 +387,8 @@ BoxWidget::jumpToStartCue(){
 
 void
 BoxWidget::jumpToEndCue(){
+    if(_endMenu!=NULL)
+        _endMenu->close();
     _box->setSelected(true);
     _box->update();
     unsigned int gotoValue = _box->date() + _box->duration();
@@ -392,6 +398,8 @@ BoxWidget::jumpToEndCue(){
 
 void
 BoxWidget::updateStartCue(){
+    if(_startMenu!=NULL)
+        _startMenu->close();
     _box->setSelected(true);
     _box->update();
     _box->maquetteScene()->editor()->snapshotStartAssignment();
@@ -399,7 +407,21 @@ BoxWidget::updateStartCue(){
 
 void
 BoxWidget::updateEndCue(){
+    if(_endMenu!=NULL)
+        _endMenu->close();
     _box->setSelected(true);
     _box->update();
     _box->maquetteScene()->editor()->snapshotEndAssignment();
+}
+
+void
+BoxWidget::displayStartMenu(QPoint pos){
+    if(_startMenu != NULL)
+        _startMenu->exec(pos);
+}
+
+void
+BoxWidget::displayEndMenu(QPoint pos){
+    if(_endMenu != NULL)
+        _endMenu->exec(pos);
 }

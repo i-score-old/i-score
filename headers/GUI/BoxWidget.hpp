@@ -15,6 +15,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <QMenu>
 
 class QGridLayout;
 class CurveWidget;
@@ -62,6 +63,8 @@ public :
     inline void setStackedLayout(QStackedLayout *slayout){_stackedLayout = slayout;setLayout(_stackedLayout);}    
     void addToComboBox(const QString address);
     void displayCurve(const QString &address);
+    inline void setStartMenu(QMenu *menu){_startMenu = menu;}
+    inline void setEndMenu(QMenu *menu){_endMenu = menu;}
 
 public slots :
     void updateDisplay(const QString &address);
@@ -71,6 +74,8 @@ public slots :
     void updateEndCue();
     void execStartAction();
     void execEndAction();
+    void displayStartMenu(QPoint pos);
+    void displayEndMenu(QPoint pos);
 
 signals :
     void currentIndexChanged(QString address);
@@ -98,6 +103,8 @@ private :
     CurveWidget *_curveWidget;
     QStackedLayout *_stackedLayout;
     BasicBox *_box;
+    QMenu *_startMenu;
+    QMenu *_endMenu;
 };
 
 #endif // BOXWIDGET_H
