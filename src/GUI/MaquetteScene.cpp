@@ -111,6 +111,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
     addWidget(_timeBar);
 
     connect(_timeBar,SIGNAL(gotoValueEntered(double)),this,SLOT(gotoChanged(double)));
+    connect(this,SIGNAL(stopPlaying()),this,SLOT(stop()));
 }
 
 MaquetteScene::~MaquetteScene() {
@@ -1929,8 +1930,7 @@ void
 MaquetteScene::timeEndReached()
 {
     static_cast<MaquetteView*>(views().first())->mainWindow()->timeEndReached();
-	_playing = false;
-
+    _playing = false;
     emit(stopPlaying());
 	update();
 }
