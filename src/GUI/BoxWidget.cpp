@@ -96,7 +96,6 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
 
     _parentWidget = parent;
     _curveWidgetList = new QList<CurveWidget *>;
-
 }
 
 BoxWidget::~BoxWidget(){
@@ -353,11 +352,13 @@ BoxWidget::setComboBox(QComboBox *cbox){
 
 void
 BoxWidget::execStartAction(){
-    std::cout<<"EXEC START"<<std::endl;
     if(_box->maquetteScene()->view()->command())
         updateStartCue();
     else
         jumpToStartCue();
+
+    //unactive button focus
+    _box->setFocus();
 }
 
 void
@@ -366,11 +367,13 @@ BoxWidget::execEndAction(){
         updateEndCue();
     else
         jumpToEndCue();
+
+    //unactive button focus
+    _box->setFocus();
 }
 
 void
 BoxWidget::jumpToStartCue(){
-    std::cout<<"JUMP TO START CUE"<<std::endl;
     _box->setSelected(true);
     _box->update();
     unsigned int gotoValue = _box->date();

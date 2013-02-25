@@ -1408,7 +1408,6 @@ Maquette::initSceneState(){
     //Pour palier au bug du moteur (qui envoyait tous les messages début et fin de toutes les boîtes < Goto)
 
     double gotoValue = (double)_engines->getGotoValue();
-    std::cout<<"init scene : "<<gotoValue<<std::endl;
 
     unsigned int boxID;
     QMap<QString,QPair<QString,unsigned int> > msgs, boxMsgs;

@@ -157,7 +157,6 @@ BasicBox::createMenus(){
     QIcon startMenuIcon(":/images/boxStartMenu.svg");
     _startMenuButton = new QPushButton();
     _startMenuButton->setIcon(startMenuIcon);
-
     _startMenuButton->setStyleSheet(
                 "QPushButton {"
                 "border: none;"
