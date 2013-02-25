@@ -1931,7 +1931,7 @@ MaquetteScene::timeEndReached()
 {
     static_cast<MaquetteView*>(views().first())->mainWindow()->timeEndReached();
     _playing = false;
-    emit(stopPlaying());
+    emit(playModeChanged());
 	update();
 }
 

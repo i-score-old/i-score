@@ -1326,6 +1326,8 @@ AttributesEditor::changeColor() {
 void
 AttributesEditor::startMessagesChanged()
 {
+    if(_scene->paused())
+        _scene->stopWithGoto();
     BasicBox * box = _scene->getBox(_boxEdited);
     if(_boxEdited!=NO_ID){
         if(box->type()==SOUND_BOX_TYPE)
@@ -1346,6 +1348,8 @@ AttributesEditor::startMessagesChanged()
 void
 AttributesEditor::endMessagesChanged()
 {
+    if(_scene->paused())
+        _scene->stopWithGoto();
     if(_boxEdited!=NO_ID){
         BasicBox * box = _scene->getBox(_boxEdited);
 
@@ -1373,6 +1377,8 @@ AttributesEditor::endMessagesChanged()
 }
 
 void AttributesEditor::startMessageChanged(QTreeWidgetItem *item) {
+    if(_scene->paused())
+        _scene->stopWithGoto();
     if(_boxEdited!=NO_ID){
         //PAS OPTIMAL, NE DEVRAIT MODIFIER QU'UN SEUL ITEM
         QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
@@ -1394,6 +1400,9 @@ void AttributesEditor::startMessageChanged(QTreeWidgetItem *item) {
 
 void AttributesEditor::endMessageChanged(QTreeWidgetItem *item) {
 
+    if(_scene->paused())
+        _scene->stopWithGoto();
+
     if(_boxEdited!=NO_ID){
         QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
         Maquette::getInstance()->setSelectedItemsToSend(_boxEdited,items);
@@ -1412,6 +1421,8 @@ void AttributesEditor::endMessageChanged(QTreeWidgetItem *item) {
 }
 
 void AttributesEditor::startMessageRemoved(const string &address) {
+    if(_scene->paused())
+        _scene->stopWithGoto();
 
     if(_boxEdited!=NO_ID){
         QMap<QTreeWidgetItem*,Data> items = _networkTree->assignedItems();
@@ -1424,6 +1435,8 @@ void AttributesEditor::startMessageRemoved(const string &address) {
 }
 
 void AttributesEditor::endMessageRemoved(const string &address) {
+    if(_scene->paused())
+        _scene->stopWithGoto();
     if(_boxEdited!=NO_ID){
         Maquette::getInstance()->setEndMessagesToSend(_boxEdited,_networkTree->endMessages());
         Maquette::getInstance()->removeCurve(_boxEdited,address);
@@ -1434,7 +1447,8 @@ void AttributesEditor::endMessageRemoved(const string &address) {
 
 void
 AttributesEditor::deployMessageChanged(QTreeWidgetItem *item, QString newName){
-
+    if(_scene->paused())
+        _scene->stopWithGoto();
     std::map<unsigned int,BasicBox *>::iterator it;
     std::map<unsigned int,BasicBox *> boxesMap = Maquette::getInstance()->getBoxes();    
     unsigned int boxID;
@@ -1460,6 +1474,9 @@ AttributesEditor::deployMessageChanged(QTreeWidgetItem *item, QString newName){
 
 void
 AttributesEditor::deployDeviceChanged(QString oldName, QString newName){
+    if(_scene->paused())
+        _scene->stopWithGoto();
+
     std::map<unsigned int,BasicBox *>::iterator it;
     std::map<unsigned int,BasicBox *> boxesMap = Maquette::getInstance()->getBoxes();
 

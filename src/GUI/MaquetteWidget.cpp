@@ -92,6 +92,7 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
     connect(_scene,SIGNAL(stopPlaying()),this,SLOT(stop()));
     connect(_view,SIGNAL(zoomChanged(float)),this,SLOT(changeZoom(float)));
     connect(_view,SIGNAL(playModeChanged()),this,SLOT(updateHeader()));
+    connect(_scene,SIGNAL(playModeChanged()),this,SLOT(updateHeader()));
 //    connect(_view,SIGNAL(zoomChanged(float)),_timeBar,SLOT(updateZoom(float)));
 }
 

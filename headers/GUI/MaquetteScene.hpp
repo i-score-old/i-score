@@ -669,6 +669,7 @@ signals:
   void stopPlaying();
   void accelerationValueChanged(double value);
   void networkConfigChanged(std::string deviceName, std::string pluginName, std::string IP, std::string port);
+  void playModeChanged();
 
 public slots :
   void verticalScroll(int value);
