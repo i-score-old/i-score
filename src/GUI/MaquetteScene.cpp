@@ -1873,7 +1873,6 @@ void
 MaquetteScene::stopWithGoto() {
     displayMessage(tr("Stopped").toStdString(),INDICATION_LEVEL);
     _playing = false;
-    _paused = false;
     _maquette->stopPlayingWithGoto();
     _playThread->quit();
     _playingBoxes.clear();

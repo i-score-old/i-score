@@ -1328,6 +1328,7 @@ AttributesEditor::startMessagesChanged()
 {
     if(_scene->paused())
         _scene->stopWithGoto();
+
     BasicBox * box = _scene->getBox(_boxEdited);
     if(_boxEdited!=NO_ID){
         if(box->type()==SOUND_BOX_TYPE)
