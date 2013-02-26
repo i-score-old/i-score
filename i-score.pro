@@ -58,7 +58,7 @@ macx-g++ {
 LIBS += -lIscore -lDeviceManager -framework gecode -lxml2
 }
 macx-clang {
-LIBS += /usr/local/jamoma/lib/JamomaFoundation.dylib /usr/local/jamoma/lib/JamomaScore.dylib /usr/local/jamoma/lib/JamomaModular.dylib -lDeviceManager -framework gecode -lxml2
+LIBS += /usr/local/jamoma/lib/JamomaFoundation.dylib /usr/local/jamoma/lib/JamomaDSP.dylib /usr/local/jamoma/lib/JamomaScore.dylib /usr/local/jamoma/lib/JamomaModular.dylib -lDeviceManager -framework gecode -lxml2
 }
 
 # Input
