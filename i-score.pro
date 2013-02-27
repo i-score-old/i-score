@@ -65,6 +65,7 @@ LIBS += /usr/local/jamoma/lib/JamomaFoundation.dylib /usr/local/jamoma/lib/Jamom
 HEADERS += /usr/local/jamoma/includes/TTScore.h \
 /usr/local/jamoma/includes/CSPTypes.hpp \
 /usr/local/jamoma/includes/TTModular.h \
+/usr/local/jamoma/includes/TTDSP.h \
 headers/data/Abstract.hpp \
 headers/data/AbstractBox.hpp \
 headers/data/AbstractComment.hpp \
