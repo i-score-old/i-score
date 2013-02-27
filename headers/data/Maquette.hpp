@@ -834,6 +834,7 @@ class Maquette : public QObject
  * \param CPIndex : index of the box's control point crossed
  */
 void crossTransitionCallback(unsigned int boxID, unsigned int CPIndex, std::vector<unsigned int> processesToStop);
+void enginesNetworkUpdateCallback(unsigned int boxID, string m1, string m2);
 /*!
  * \brief Callback called when a Trigger Point is triggered is crossed.
  *

@@ -1830,7 +1830,7 @@ void MaquetteScene::updatePlayingBoxes() {
 }
 
 void
-MaquetteScene:: play() {
+MaquetteScene::play() {
     displayMessage(tr("Playing ...").toStdString(),INDICATION_LEVEL);
     if (_paused) {
         _playing = true;

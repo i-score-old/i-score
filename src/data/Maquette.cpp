@@ -182,7 +182,8 @@ Maquette::init() {
 
 	_engines->addCrossingCtrlPointCallback(&crossTransitionCallback);
     _engines->addCrossingTrgPointCallback(&crossTriggerPointCallback);
-	_engines->addExecutionFinishedCallback(&executionFinishedCallback);
+	_engines->addExecutionFinishedCallback(&executionFinishedCallback);    
+    _engines->addEnginesNetworkUpdateCallback(&enginesNetworkUpdateCallback);
 }
 
 Maquette::Maquette() {
@@ -1051,7 +1052,7 @@ Maquette::updateBoxes(const map<unsigned int,Coords> &boxes) {
 void
 Maquette::simulateTriggeringMessage(const string &message)
 {
-	_engines->simulateNetworkMessageReception(message);
+    _engines->simulateNetworkMessageReception(message);
 }
 
 int
@@ -2482,6 +2483,11 @@ crossTransitionCallback(unsigned int boxID, unsigned int CPIndex, vector<unsigne
 	for (vector<unsigned int>::iterator it = processesToStop.begin() ; it != processesToStop.end() ; ++it) {
 		Maquette::getInstance()->crossedTransition(*it,END_CONTROL_POINT_INDEX);
 	}
+}
+
+void
+enginesNetworkUpdateCallback(unsigned int boxID, string m1, string m2){
+    std::cout<<m1<<" - "<<m2<<std::endl;
 }
 
 void

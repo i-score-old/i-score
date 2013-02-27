@@ -606,6 +606,7 @@ BasicBox::setColor(const QColor & color)
 
 void
 BasicBox::updateRelations(BoxExtremity extremity){
+
     std::map< BoxExtremity,std::map < unsigned int, Relation* > >::iterator it;
     std::map< unsigned int, Relation* >::iterator it2;
     std::map< unsigned int, Relation* >cur;

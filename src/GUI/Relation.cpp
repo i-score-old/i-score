@@ -350,6 +350,7 @@ Relation::mouseDoubleClickEvent (QGraphicsSceneMouseEvent * event) {
     float maxBound;
     if (!_scene->playing()) {
         if(!_flexibleRelation){
+            _middleHandleSelected = false;
             _elasticMode=!_elasticMode;            
             updateFlexibility();
         }
@@ -523,15 +524,16 @@ Relation::updateFlexibility(){
     double startX = mapFromScene(_start).x();
     double endX = mapFromScene(_end).x();
 
-    if(_elasticMode)
-        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,NO_BOUND,NO_BOUND);
+    if(_elasticMode){
+        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,NO_BOUND,NO_BOUND);        
+    }
     else if (!_flexibleRelation){
         _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,(endX-startX)/_scene->zoom(),(endX-startX)/_scene->zoom()+RIGID_TOLERANCE);
+
     }
     else{
         changeBounds(0,NO_BOUND);
         _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
-
     }
 }
 
