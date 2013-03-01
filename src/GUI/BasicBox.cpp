@@ -1163,6 +1163,7 @@ void
 BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsItem::mousePressEvent(event);
+
     if(_startMenu != NULL)
         _startMenu->close();
     if(_endMenu != NULL)

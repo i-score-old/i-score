@@ -208,7 +208,7 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
 {
 	QWidget::mousePressEvent(event);
 	_clicked = true;
-	QPointF relativePoint = relativeCoordinates(event->pos());
+	QPointF relativePoint = relativeCoordinates(event->pos());    
 
 	switch(event->modifiers()) {
 	case Qt::ShiftModifier :

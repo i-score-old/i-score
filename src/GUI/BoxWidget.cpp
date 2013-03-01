@@ -107,7 +107,10 @@ BoxWidget::~BoxWidget(){
 
 void
 BoxWidget::mousePressEvent(QMouseEvent *event){
-    Q_UNUSED(event);    
+    Q_UNUSED(event);
+    if(_box->maquetteScene()->paused())
+        _box->maquetteScene()->stopWithGoto();
+
     if(_box->isSelected()){
         hide();
         setWindowModality(Qt::WindowModal);
