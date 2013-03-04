@@ -303,7 +303,6 @@ class NetworkTree : public QTreeWidget
          * \brief Removes an item in the assigned items list.
          * \param The item to remove.
          */
-//        inline void removeAssignItem(QTreeWidgetItem* item){ _assignedItems.removeAll(item);}
          inline void removeAssignItem(QTreeWidgetItem* item){ _assignedItems.remove(item);}
         /*!
          * \brief Reset the display of assigned items (leaves) and clear the assigned items list.

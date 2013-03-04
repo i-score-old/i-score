@@ -943,6 +943,7 @@ NetworkTree::assignItems(QMap<QTreeWidgetItem*,Data> selectedItems){
         curItem = *it;
         assignItem(curItem,selectedItems.value(curItem));
      }
+    recursiveFatherSelection(curItem,true);
 }
 
 void
@@ -1174,7 +1175,6 @@ NetworkTree::unselectPartially(QTreeWidgetItem *item){
 void
 NetworkTree::recursiveFatherSelection(QTreeWidgetItem *item, bool select)
 {
-
     if(item->parent()!=NULL){
         QTreeWidgetItem *father;
         father=item->parent();
