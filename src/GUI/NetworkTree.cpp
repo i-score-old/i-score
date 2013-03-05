@@ -934,7 +934,7 @@ void
 NetworkTree::assignItems(QMap<QTreeWidgetItem*,Data> selectedItems){
     QList<QTreeWidgetItem *>::iterator it;
     QList<QTreeWidgetItem *> items = selectedItems.keys();
-    QTreeWidgetItem *curItem;
+    QTreeWidgetItem *curItem = NULL;
 
     resetAssignedItems();
     setAssignedItems(selectedItems);
@@ -943,7 +943,8 @@ NetworkTree::assignItems(QMap<QTreeWidgetItem*,Data> selectedItems){
         curItem = *it;
         assignItem(curItem,selectedItems.value(curItem));
      }
-    recursiveFatherSelection(curItem,true);
+    if(curItem!=NULL)
+        recursiveFatherSelection(curItem,true);
 }
 
 void
