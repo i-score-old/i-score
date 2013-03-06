@@ -564,20 +564,20 @@ Maquette::requestNetworkNamespace(const string &address, vector<string>& nodes, 
 
 void
 Maquette::changeNetworkDevice(const string &deviceName, const string &pluginName, const string &IP, const string &port) {
-	if (_devices.find(deviceName) != _devices.end()) {
-		_engines->removeNetworkDevice(deviceName);
-	}
-  std::istringstream iss(port);
+    if (_devices.find(deviceName) != _devices.end())
+        removeNetworkDevice(deviceName);
 
-  unsigned int portInt;
+    addNetworkDevice(deviceName,pluginName,IP,port);
 
-  iss >> portInt;
+    std::istringstream iss(port);
+    unsigned int portInt;
+    iss >> portInt;
 
-	MyDevice newDevice(deviceName,pluginName,portInt,IP);
-	_devices[deviceName] = newDevice;
+//    MyDevice newDevice(deviceName,pluginName,portInt,IP);
+//    _devices[deviceName] = newDevice;
 
-	_engines->addNetworkDevice(deviceName,pluginName,IP,port);
-    _currentDevice=deviceName;
+//    _engines->addNetworkDevice(deviceName,pluginName,IP,port);
+    _currentDevice = deviceName;
 }
 
 std::string
@@ -2418,7 +2418,6 @@ Maquette::addNetworkDevice(string deviceName,string plugin,string ip,string port
 
     MyDevice newDevice(deviceName,plugin,portInt,ip);
     _devices[deviceName]=newDevice;
-
     _engines->addNetworkDevice(deviceName,plugin,ip,port);
 }
 

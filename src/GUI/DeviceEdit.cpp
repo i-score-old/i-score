@@ -94,12 +94,11 @@ void
 DeviceEdit::edit(QString name){
     std::map<string,MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
     std::vector<std::string> plugins = Maquette::getInstance()->getPlugins();
-
     std::map<string,MyDevice>::iterator it;
 
     if ((it = devices.find(name.toStdString())) != devices.end())
         _currentDevice = it->second;
-    else {
+    else {        
       QMessageBox::warning(this,"",tr("Device not found"));
       return;
     }
@@ -147,14 +146,12 @@ DeviceEdit::updateNetworkConfiguration(){
     if (_changed) {
         QHostAddress hostAddress(_IPBox->text());
         if (!hostAddress.isNull()) {
-
             Maquette::getInstance()->changeNetworkDevice(_nameEdit->text().toStdString(),_pluginsComboBox->currentText().toStdString(),
                                         _IPBox->text().toStdString(),_portBox->text().toStdString());
             if(_pluginChanged){
                 emit(devicePluginChanged(_pluginsComboBox->currentText()));
             }
             if(_nameChanged){
-                Maquette::getInstance()->removeNetworkDevice(_currentDevice.name);
                 emit(deviceNameChanged(_nameEdit->text(),_pluginsComboBox->currentText()));
             }
 
