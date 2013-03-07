@@ -2471,8 +2471,7 @@ Maquette::crossedTriggerPoint(bool waiting, unsigned int trgID)
 }
 
 void
-Maquette::executionFinished()
-{
+Maquette::executionFinished(){
 	_scene->timeEndReached();
 }
 
@@ -2521,8 +2520,6 @@ enginesNetworkUpdateCallback(unsigned int boxID, string m1, string m2){
     else
         std::cerr << "Maquette::enginesNetworkCallback : attribute _scene == NULL" << std::endl;
 #endif
-
-
 }
 
 void
@@ -2534,8 +2531,7 @@ crossTriggerPointCallback(bool waiting, unsigned int trgID, unsigned int boxID, 
 }
 
 void
-executionFinishedCallback()
-{
+executionFinishedCallback(){
 	Maquette::getInstance()->executionFinished();
 }
 

@@ -1623,6 +1623,7 @@ BasicBox::drawMsgsIndicators(QPainter *painter){
 
 void
 BasicBox::drawHoverShape(QPainter *painter){
+
     float interspace = 2.;
     int width = 2;
 
@@ -1655,8 +1656,11 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     //************* pour afficher la shape *************
     QPen penG(Qt::blue);
     penG.setWidth(4);
-    if(_hover)
+    if(isSelected())
         drawHoverShape(painter);
+    else if(_hover)
+        drawHoverShape(painter);
+
 
 //    painter->drawRect(_leftEar);
 //    painter->drawRect(_rightEar);

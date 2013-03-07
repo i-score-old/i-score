@@ -521,15 +521,13 @@ MainWindow::escapeKeyPressed() {
 
 void
 MainWindow::timeEndReached() {
-
   _accelerationSlider->setEnabled(true);
   _accelerationDisplay->setEnabled(true);
   _playAct->setChecked(false);
 }
 
 void
-MainWindow::play()
-{
+MainWindow::play(){
   //_accelerationSlider->setDisabled(true);
   _playAct->setChecked(true);
   _scene->play();
