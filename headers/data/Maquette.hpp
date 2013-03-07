@@ -66,6 +66,14 @@ knowledge of the CeCILL license and that you accept its terms.
 //! Default network port.
 static const int NETWORK_PORT = 7000;
 static const int OSC_NETWORK_PORT = 9999;
+
+static const std::string PLAY_ENGINES_MESSAGE = "/Transport/Play";
+static const std::string STOP_ENGINES_MESSAGE  = "/Transport/Stop";
+static const std::string PAUSE_ENGINES_MESSAGE = "/Transport/Pause";
+static const std::string REWIND_ENGINES_MESSAGE = "/Transport/Rewind";
+static const std::string STARTPOINT_ENGINES_MESSAGE = "/Transport/StartPoint";
+static const std::string SPEED_ENGINES_MESSAGE = "/Transport/Speed";
+
 #define NETWORK_PORT_STR "7000"
 
 class PaletteActor;
@@ -125,7 +133,7 @@ public :
 	std::string name; //!< Name of the device.
 	std::string plugin; //!< plugin used by the device.
 	unsigned int networkPort; //!< Network port used by device.
-	std::string networkHost; //!< Network host used by device.
+	std::string networkHost; //!< Network host used by device.    
 };
 
 /*!
@@ -670,6 +678,7 @@ class Maquette : public QObject
 	 * \brief Update boxes from Engines.
 	 */
 	void updateBoxesFromEngines();
+    inline MaquetteScene *scene(){return _scene;}
 
   public slots :
 

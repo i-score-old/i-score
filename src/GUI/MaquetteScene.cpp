@@ -1841,7 +1841,7 @@ MaquetteScene::play() {
 	}
     else {
         _playing = true;
-		_maquette->startPlaying();
+        _maquette->startPlaying();
         _playThread->start();
         _startingValue = _view->gotoValue();
 	}
@@ -1883,6 +1883,12 @@ void
 MaquetteScene::setAccelerationFactor(double value){
     _maquette->setAccelerationFactor(value);
     _accelerationFactor = value;
+}
+
+void
+MaquetteScene::speedChanged(double value){
+    setAccelerationFactor(value);
+    emit(accelerationValueChanged(value));
 }
 
 void

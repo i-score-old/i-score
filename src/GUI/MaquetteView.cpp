@@ -265,24 +265,20 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
 		_scene->displayMessage(tr("Selection removed").toStdString(),INDICATION_LEVEL);
     }
     else if ((event->key()==Qt::Key_Space || event->key()==Qt::Key_Comma || event->key()==Qt::Key_Period) && !_scene->playing()) {
-        _scene->play();
-        _scene->displayMessage(tr("Start playing").toStdString(),INDICATION_LEVEL);
+        _scene->play();        
         emit(playModeChanged());
     }
     else if ((event->key()==Qt::Key_Space || event->key()==Qt::Key_Comma || event->key()==Qt::Key_Period) && _scene->playing()) {
-        _scene->pause();
-        _scene->displayMessage(tr("Stop playing").toStdString(),INDICATION_LEVEL);
+        _scene->pause();        
         emit(playModeChanged());
     }
     else if (event->key()==Qt::Key_Enter || event->key()==Qt::Key_Return) {
-        _scene->stopGotoStart();
-        _scene->displayMessage(tr("Stop playing and go to start").toStdString(),INDICATION_LEVEL);
+        _scene->stopGotoStart();        
         emit(playModeChanged());
     }
     else if (event->key()==Qt::Key_0){
         if(!_scene->playing()){
-            _scene->play();
-            _scene->displayMessage(tr("Start playing").toStdString(),INDICATION_LEVEL);
+            _scene->play();            
             emit(playModeChanged());
         }
         else
@@ -290,7 +286,11 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
     }
     else if (event->key()==Qt::Key_1 || event->key()==Qt::Key_2 || event->key()==Qt::Key_3)
         triggerShortcut(event->key());
+}
 
+void
+MaquetteView::emitPlayModeChanged(){
+    emit(playModeChanged());
 }
 
 void

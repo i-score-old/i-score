@@ -182,7 +182,7 @@ Maquette::init() {
 
 	_engines->addCrossingCtrlPointCallback(&crossTransitionCallback);
     _engines->addCrossingTrgPointCallback(&crossTriggerPointCallback);
-	_engines->addExecutionFinishedCallback(&executionFinishedCallback);    
+    _engines->addExecutionFinishedCallback(&executionFinishedCallback);
     _engines->addEnginesNetworkUpdateCallback(&enginesNetworkUpdateCallback);
 }
 
@@ -1485,8 +1485,8 @@ Maquette::pause(){
 }
 
 void
-Maquette::startPlaying()
-{
+Maquette::startPlaying(){
+
     _engines->pause(false);
     double gotoValue = (double)_engines->getGotoValue();
     initSceneState();
@@ -2486,7 +2486,43 @@ crossTransitionCallback(unsigned int boxID, unsigned int CPIndex, vector<unsigne
 
 void
 enginesNetworkUpdateCallback(unsigned int boxID, string m1, string m2){
-    std::cout<<m1<<" - "<<m2<<std::endl;
+    Q_UNUSED(boxID);
+    MaquetteScene *scene = Maquette::getInstance()->scene();
+
+    if(scene != NULL){
+        if(m1 == PLAY_ENGINES_MESSAGE){
+            scene->play();
+        }
+        else if(m1 == STOP_ENGINES_MESSAGE){
+            scene->stopWithGoto();
+        }
+        else if(m1 == STARTPOINT_ENGINES_MESSAGE){
+            if(!m2.empty()){
+                std::istringstream iss(m2);
+                unsigned int value;
+                iss >> value;
+                scene->gotoChanged(value);
+            }
+        }
+        else if(m1 == REWIND_ENGINES_MESSAGE){
+            scene->stopGotoStart();
+        }
+        else if(m1 == SPEED_ENGINES_MESSAGE){
+            if(!m2.empty()){
+                std::istringstream iss(m2);
+                double value;
+                iss >> value;
+                scene->speedChanged(value);
+            }
+        }
+        scene->view()->emitPlayModeChanged();
+    }
+#ifdef DEBUG
+    else
+        std::cerr << "Maquette::enginesNetworkCallback : attribute _scene == NULL" << std::endl;
+#endif
+
+
 }
 
 void

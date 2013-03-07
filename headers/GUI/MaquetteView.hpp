@@ -77,6 +77,7 @@ class MaquetteView : public QGraphicsView
   QList<TriggerPoint *> triggersQueueList();
   inline MainWindow *mainWindow(){return _mainWindow;}
   void triggerShortcut(int shortcut);
+  void emitPlayModeChanged();
 
   signals:
     void zoomChanged(float newValue);

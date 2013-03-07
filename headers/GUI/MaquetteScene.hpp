@@ -674,7 +674,7 @@ signals:
 public slots :
   void verticalScroll(int value);
   void gotoChanged(double value);
-
+  void speedChanged(double value);
 
   /*!
    * \brief Cuts selected boxes.

@@ -1348,7 +1348,8 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 {
     QGraphicsItem::hoverEnterEvent(event);
 
-    _hover=true;
+    _hover=true;        
+
     const float RESIZE_ZONE_WIDTH = 3*LINE_WIDTH;
 
     QRectF textRect(_boxRect.topLeft(),_boxRect.topRight() + QPointF(0,RESIZE_TOLERANCE));
@@ -1621,6 +1622,28 @@ BasicBox::drawMsgsIndicators(QPainter *painter){
 }
 
 void
+BasicBox::drawHoverShape(QPainter *painter){
+    float interspace = 2.;
+    int width = 2;
+
+    painter->save();
+
+    QPen penBlue(Qt::blue);
+    penBlue.setWidth(width);
+    painter->setPen(penBlue);
+
+    QPainterPath path;
+    path.addRect(_boxRect);
+    QRect hoverRect(QPoint(_boxRect.topLeft().x()-interspace,_boxRect.topLeft().y()-interspace) ,
+                    QPoint(_boxRect.bottomRight().x()+interspace,_boxRect.bottomRight().y()+interspace));
+
+    path.addRect(hoverRect);
+    painter->drawPath(path);
+
+    painter->restore();
+}
+
+void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
@@ -1632,12 +1655,9 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     //************* pour afficher la shape *************
     QPen penG(Qt::blue);
     penG.setWidth(4);
-//    if(_hover){
-//        painter->setPen(penG);
-//        painter->drawRect(boundingRect());
-//        QPainterPath path = shape();
-//        painter->drawPath(path);
-//    }
+    if(_hover)
+        drawHoverShape(painter);
+
 //    painter->drawRect(_leftEar);
 //    painter->drawRect(_rightEar);
 //    painter->drawRect(_startTriggerGrip);

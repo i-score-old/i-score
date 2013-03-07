@@ -577,6 +577,8 @@ class BasicBox : public QObject, public QGraphicsItem
   void createWidget();
   void drawInteractionGrips(QPainter *painter);
   void drawTriggerGrips(QPainter *painter);
+  void drawHoverShape(QPainter *painter);
+
   void updateBoxSize();
   inline QRectF leftEar(){return _leftEar;}
   inline QRectF rightEar(){return _rightEar;}
