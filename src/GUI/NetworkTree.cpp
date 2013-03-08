@@ -1399,11 +1399,16 @@ NetworkTree::keyReleaseEvent(QKeyEvent *event){
     if ( event->key()==Qt::Key_Shift) {
         setSelectionMode(QAbstractItemView::MultiSelection);
     }
+    if (event->key()==Qt::Key_Control) {
+        emit(cmdKeyStateChanged(false));
+    }
 }
 
 void
 NetworkTree::keyPressEvent(QKeyEvent *event){
-
+   if ( event->key()==Qt::Key_Control) {
+       emit(cmdKeyStateChanged(true));
+   }
    if ( event->key()==Qt::Key_Shift) {
          setSelectionMode(QAbstractItemView::ContiguousSelection);
     }

@@ -115,6 +115,8 @@ MainWindow::MainWindow()
   _editor->init();
   _editor->show();
 
+  _commandKey = false;
+
   // Central Widget
   _maquetteWidget = new MaquetteWidget(this,_view,_scene);
   _networkConfig = new NetworkConfig(_scene,this);
@@ -128,11 +130,10 @@ MainWindow::MainWindow()
   setCurrentFile("");
   setAcceptDrops(false);
 
-  _commandKey = false;
-
   connect(_maquetteWidget,SIGNAL(accelerationValueChanged(int)),this,SLOT(accelerationChanged(int)));
   connect(_view->verticalScrollBar(),SIGNAL(valueChanged(int)),_scene,SLOT(verticalScroll(int)));
   connect(_scene,SIGNAL(networkConfigChanged(std::string,std::string,std::string,std::string)),this,SLOT(changeNetworkConfig(std::string,std::string,std::string,std::string)));
+  connect(_editor->networkTree(),SIGNAL(cmdKeyStateChanged(bool)),this,SLOT(updateCmdKeyState(bool)));
 }
 
 MainWindow::~MainWindow()
@@ -524,15 +525,20 @@ MainWindow::escapeKeyPressed() {
 void
 MainWindow::keyPressEvent(QKeyEvent *event){
     QMainWindow::keyPressEvent(event);
-
-    if(event->key()==Qt::Key_Control)
+    if(event->key()==Qt::Key_Control){
         _commandKey = true;
+    }
 }
 
 void
 MainWindow::keyReleaseEvent(QKeyEvent *event){
-    QMainWindow::keyPressEvent(event);
+    QMainWindow::keyReleaseEvent(event);
     _commandKey = false;
+}
+
+bool
+MainWindow::commandKey(){
+    return _commandKey;
 }
 
 void
@@ -1076,4 +1082,9 @@ MainWindow::strippedName(const QString &fullFileName)
 void
 MainWindow::changeNetworkConfig(std::string deviceName,std::string pluginName, std::string IP, std::string port){
     _networkConfig->setNetworkConfig(deviceName,pluginName, IP,port);
+}
+
+void
+MainWindow::updateCmdKeyState(bool state){
+    _commandKey = state;
 }

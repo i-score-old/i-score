@@ -165,7 +165,8 @@ class AttributesEditor : public QDockWidget
    * \brief Associates slots with QWidgets' signals.
    **/
   void connectSlots();
-
+  void keyPressEvent(QKeyEvent *event);
+  void keyReleaseEvent(QKeyEvent *event);
 
   private slots:
 

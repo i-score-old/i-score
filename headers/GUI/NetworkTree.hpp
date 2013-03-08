@@ -371,6 +371,7 @@ class NetworkTree : public QTreeWidget
         void messageChanged(QTreeWidgetItem *item, QString address);
         void deviceChanged(QString oldName, QString newName);
         void pluginChanged(QString deviceName);
+        void cmdKeyStateChanged(bool);
 
     private :
         void treeRecursiveExploration(QTreeWidgetItem *curItem, bool onflict);

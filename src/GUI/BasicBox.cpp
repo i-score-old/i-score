@@ -161,18 +161,18 @@ BasicBox::createMenus(){
 
     //--- start button ---
     QIcon startMenuIcon(":/images/boxStartMenu.svg");
-    _startMenuButton = new QPushButton();
+    _startMenuButton = new QPushButton();    
     _startMenuButton->setIcon(startMenuIcon);
     _startMenuButton->setContextMenuPolicy(Qt::CustomContextMenu);
-    _startMenuButton->setStyleSheet(
-                "QPushButton {"
-                "border: none;"
-                "border-radius: none;"
-                "background-color: transparent;"
-                "}"
-                );
-    _boxContentWidget->setStartMenu(_startMenu);
 
+    _startMenuButton->setStyleSheet(
+            "QPushButton {"
+            "border: none;"
+            "border-radius: none;"
+            "background-color: transparent;"
+            "};"
+            );
+    _boxContentWidget->setStartMenu(_startMenu);
 
     //--- end button ---
     _endMenu = new QMenu(tr("&EndMenu"));

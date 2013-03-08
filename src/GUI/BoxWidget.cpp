@@ -80,6 +80,7 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
     QPalette palette;
     palette.setColor(QPalette::Background,QColor(255, 0, 0, 127));
     setPalette(palette);
+    setWindowFlags(Qt::Widget);
 
     update(); 
 
@@ -353,14 +354,25 @@ BoxWidget::mouseDoubleClickEvent(QMouseEvent *event){
 }
 
 void
+BoxWidget::keyPressEvent(QKeyEvent *event){
+    QWidget::keyPressEvent(event);
+}
+
+void
+BoxWidget::keyReleaseEvent(QKeyEvent *event){
+    QWidget::keyReleaseEvent(event);
+}
+
+void
 BoxWidget::setComboBox(QComboBox *cbox){
     _comboBox = cbox;
 }
 
 void
 BoxWidget::execStartAction(){
+    MainWindow *ui = _box->maquetteScene()->view()->mainWindow();
 
-    if(((MainWindow *)(this->parentWidget()))->commandKey())
+    if(ui->commandKey())
         updateStartCue();
     else
         jumpToStartCue();
@@ -371,8 +383,9 @@ BoxWidget::execStartAction(){
 
 void
 BoxWidget::execEndAction(){
+    MainWindow *ui = _box->maquetteScene()->view()->mainWindow();
 
-    if(((MainWindow *)(this->parentWidget()))->commandKey())
+    if(ui->commandKey())
         updateEndCue();
     else
         jumpToEndCue();

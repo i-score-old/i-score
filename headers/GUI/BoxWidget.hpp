@@ -82,6 +82,8 @@ signals :
 
 protected :
     virtual void mousePressEvent(QMouseEvent *event);
+    virtual void keyPressEvent(QKeyEvent *event);
+    virtual void keyReleaseEvent(QKeyEvent *event);
 
 private :
     bool updateCurve(const std::string &address, bool forceUpdate);
@@ -105,6 +107,7 @@ private :
     BasicBox *_box;
     QMenu *_startMenu;
     QMenu *_endMenu;
+
 };
 
 #endif // BOXWIDGET_H

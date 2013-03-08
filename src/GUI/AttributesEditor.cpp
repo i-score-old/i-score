@@ -943,6 +943,16 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 }
 
 void
+AttributesEditor::keyPressEvent(QKeyEvent *event){
+    QDockWidget::keyPressEvent(event);
+}
+
+void
+AttributesEditor::keyReleaseEvent(QKeyEvent *event){
+    QDockWidget::keyReleaseEvent(event);
+}
+
+void
 AttributesEditor::updateWidgets(bool boxModified)
 {
     Q_UNUSED(boxModified);

@@ -124,7 +124,7 @@ class MainWindow : public QMainWindow
    *
    * \return True if pressed, false if not.
    */
-  inline bool commandKey(){return _commandKey;}
+  bool commandKey();
   void setMaquetteSceneTitle(QString name);
   inline MaquetteWidget *maquetteWidget(){return _maquetteWidget;}  
 
@@ -233,6 +233,7 @@ class MainWindow : public QMainWindow
    */
   void selectAll();
   void changeNetworkConfig(std::string deviceName,std::string pluginName, std::string IP, std::string port);
+  void updateCmdKeyState(bool state);
 
  private :
   /*!
