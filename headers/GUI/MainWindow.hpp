@@ -117,10 +117,16 @@ class MainWindow : public QMainWindow
   void timeEndReached();
   /*!
    * \brief Returns goto value in ms.
-   */
+   */  
   int gotoValue();
+  /*!
+   * \brief Get the Command Key state.
+   *
+   * \return True if pressed, false if not.
+   */
+  inline bool commandKey(){return _commandKey;}
   void setMaquetteSceneTitle(QString name);
-  inline MaquetteWidget *maquetteWidget(){return _maquetteWidget;}
+  inline MaquetteWidget *maquetteWidget(){return _maquetteWidget;}  
 
  protected:
 
@@ -131,6 +137,8 @@ class MainWindow : public QMainWindow
    * \param event : the QT closing event
    */
   virtual void closeEvent(QCloseEvent *event);
+  virtual void keyPressEvent(QKeyEvent *event);
+  virtual void keyReleaseEvent(QKeyEvent *event);
 
   private slots:
 
@@ -335,6 +343,8 @@ class MainWindow : public QMainWindow
 
   MaquetteWidget *_maquetteWidget;
   NetworkConfig *_networkConfig;
+
+  bool _commandKey; //!< State of Command Key state.
 };
 
 #endif

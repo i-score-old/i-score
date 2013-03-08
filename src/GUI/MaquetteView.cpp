@@ -74,8 +74,7 @@ MaquetteView::MaquetteView(MainWindow *mw)
   setAlignment(Qt::AlignLeft | Qt::AlignTop);
   centerOn(0,0);
   _zoom = 1;
-  _gotoValue = 0;
-  _command = false;
+  _gotoValue = 0;  
 }
 
 MaquetteView::~MaquetteView(){
@@ -239,10 +238,7 @@ MaquetteView::triggerShortcut(int shorcut){
 void
 MaquetteView::keyPressEvent(QKeyEvent *event)
 {
-    QGraphicsView::keyPressEvent(event);
-    if(event->key()==Qt::Key_Control){
-        _command = true;
-    }
+    QGraphicsView::keyPressEvent(event);    
 
 	if (event->matches(QKeySequence::Copy)) {
 		_scene->copyBoxes();
@@ -295,8 +291,7 @@ MaquetteView::emitPlayModeChanged(){
 
 void
 MaquetteView::keyReleaseEvent(QKeyEvent *event){
-    QGraphicsView::keyReleaseEvent(event);
-    _command = false;
+    QGraphicsView::keyReleaseEvent(event);    
 }
 
 QList<TriggerPoint *>

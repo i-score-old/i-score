@@ -113,13 +113,7 @@ class MaquetteView : public QGraphicsView
    *
    * \return the center, as a QPointF.
    */
-  QPointF getCenterCoordinates();
-  /*!
-   * \brief Get the Command Key state.
-   *
-   * \return True if pressed, false if not.
-   */
-  inline bool command(){return _command;}
+  QPointF getCenterCoordinates();  
  protected :
   /*!
    * \brief Redefinition of QGraphicsView::drawBackground().
@@ -150,7 +144,7 @@ class MaquetteView : public QGraphicsView
   MainWindow *_mainWindow;
   float _zoom; //!< The zoom factor value.
   int _gotoValue; //!< The goto value in pixels.
-  bool _command; //!< State of Command Key state.
+
 };
 
 #endif

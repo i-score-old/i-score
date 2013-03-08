@@ -128,6 +128,8 @@ MainWindow::MainWindow()
   setCurrentFile("");
   setAcceptDrops(false);
 
+  _commandKey = false;
+
   connect(_maquetteWidget,SIGNAL(accelerationValueChanged(int)),this,SLOT(accelerationChanged(int)));
   connect(_view->verticalScrollBar(),SIGNAL(valueChanged(int)),_scene,SLOT(verticalScroll(int)));
   connect(_scene,SIGNAL(networkConfigChanged(std::string,std::string,std::string,std::string)),this,SLOT(changeNetworkConfig(std::string,std::string,std::string,std::string)));
@@ -518,6 +520,20 @@ MainWindow::escapeKeyPressed() {
   }
 }
 */
+
+void
+MainWindow::keyPressEvent(QKeyEvent *event){
+    QMainWindow::keyPressEvent(event);
+
+    if(event->key()==Qt::Key_Control)
+        _commandKey = true;
+}
+
+void
+MainWindow::keyReleaseEvent(QKeyEvent *event){
+    QMainWindow::keyPressEvent(event);
+    _commandKey = false;
+}
 
 void
 MainWindow::timeEndReached() {

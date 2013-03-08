@@ -65,6 +65,7 @@ using std::string;
 #include "MaquetteView.hpp"
 #include "ParentBox.hpp"
 #include "AttributesEditor.hpp"
+#include "MainWindow.hpp"
 
 #define COMBOBOX_WIDTH 500
 
@@ -358,18 +359,20 @@ BoxWidget::setComboBox(QComboBox *cbox){
 
 void
 BoxWidget::execStartAction(){
-    if(_box->maquetteScene()->view()->command())
+
+    if(((MainWindow *)(this->parentWidget()))->commandKey())
         updateStartCue();
     else
         jumpToStartCue();
 
-    //unactive button focus
+    //set button focus off
     _box->setFocus();
 }
 
 void
 BoxWidget::execEndAction(){
-    if(_box->maquetteScene()->view()->command())
+
+    if(((MainWindow *)(this->parentWidget()))->commandKey())
         updateEndCue();
     else
         jumpToEndCue();
