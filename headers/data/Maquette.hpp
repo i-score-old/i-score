@@ -91,7 +91,6 @@ typedef enum {SUCCESS = 1, NO_MODIFICATION = 0, RETURN_ERROR = -1,
 	      ARGS_ERROR = -2} ErrorMessage;
 
 //! Enum containing various warning levels.
-
 typedef enum {INDICATION_LEVEL,WARNING_LEVEL,ERROR_LEVEL} ErrorLevel;
 
 /*!
