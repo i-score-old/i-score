@@ -526,13 +526,14 @@ void
 MainWindow::keyPressEvent(QKeyEvent *event){
     QMainWindow::keyPressEvent(event);
     if(event->key()==Qt::Key_Control){
-        _commandKey = true;
+        updateCmdKeyState(true);
     }
 }
 
 void
 MainWindow::keyReleaseEvent(QKeyEvent *event){
     QMainWindow::keyReleaseEvent(event);
+    updateCmdKeyState(false);
     _commandKey = false;
 }
 
@@ -1085,6 +1086,7 @@ MainWindow::changeNetworkConfig(std::string deviceName,std::string pluginName, s
 }
 
 void
-MainWindow::updateCmdKeyState(bool state){
+MainWindow::updateCmdKeyState(bool state){    
+    displayMessage(state ? tr("command key pressed") : tr(""),INDICATION_LEVEL);
     _commandKey = state;
 }

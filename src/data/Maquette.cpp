@@ -634,7 +634,6 @@ Maquette::lastMessagesToSend(unsigned int boxID)
 void
 Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, const vector<string> &endMsgs)
 {    
-
     //QMap<address,value>
     QMap<string,string> startMessages;
     QMap<string,string> endMessages;
@@ -644,7 +643,6 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
     string currentMsg;
     string currentAddress;
     string currentValue;
-
 
     /************  init start messages (QMap)  ************/
     for (it = startMsgs.begin() ; it != startMsgs.end() ; ++it) {
@@ -657,7 +655,6 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
         }
         startMessages.insert(currentAddress,currentValue);
     }
-
 
     /************  init end messages (QMap)  ************/
     for (it = endMsgs.begin() ; it != endMsgs.end() ; ++it) {

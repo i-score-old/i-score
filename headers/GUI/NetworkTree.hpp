@@ -79,7 +79,6 @@ class NetworkTree : public QTreeWidget
          *                          General tools
          ***********************************************************************/
 
-
         QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot(unsigned int boxID);
 
 		std::vector<std::string> snapshot();
