@@ -338,6 +338,12 @@ BasicBox::updateCurves(){
     update();
 }
 
+void
+BasicBox::updateCurve(string address, bool forceUpdate){
+    _boxContentWidget->updateCurve(address,forceUpdate);
+    update();
+}
+
 int
 BasicBox::type() const
 {

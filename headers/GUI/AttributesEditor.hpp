@@ -258,11 +258,11 @@ class AttributesEditor : public QDockWidget
   /*!
    * \brief Updates box start message
    */
-  void startMessagesChanged();
+  void startMessagesChanged(bool forceUpdate=false);
   /*!
    * \brief Updates box end message
    */
-  void endMessagesChanged();
+  void endMessagesChanged(bool forceUpdate=false);
   /*!
    * \brief Called when profiles are modified.
    */

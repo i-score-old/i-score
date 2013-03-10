@@ -76,6 +76,7 @@ public slots :
     void execEndAction();
     void displayStartMenu(QPoint pos);
     void displayEndMenu(QPoint pos);
+    bool updateCurve(const std::string &address, bool forceUpdate);
 
 signals :
     void currentIndexChanged(QString address);
@@ -86,7 +87,6 @@ protected :
     virtual void keyReleaseEvent(QKeyEvent *event);
 
 private :
-    bool updateCurve(const std::string &address, bool forceUpdate);
     void addCurve(QString address,CurveWidget *curveWidget);
     void clearCurves();
     QComboBox *_comboBox;

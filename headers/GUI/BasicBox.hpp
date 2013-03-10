@@ -573,6 +573,7 @@ class BasicBox : public QObject, public QGraphicsItem
    */
   bool operator<(BasicBox *box) const;
   void updateCurves();
+  void updateCurve(string address, bool forceUpdate);
   void centerWidget();
   void createWidget();
   void drawInteractionGrips(QPainter *painter);

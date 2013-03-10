@@ -322,8 +322,8 @@ class NetworkTree : public QTreeWidget
          *                              Curves
          ***********************************************************************/
 
-        bool updateCurve(QTreeWidgetItem *item, unsigned int boxID);
-        void updateCurves(unsigned int boxID);
+        bool updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUpdate=false);
+        void updateCurves(unsigned int boxID,bool forceUpdate=false);
         unsigned int getSampleRate(QTreeWidgetItem *item);
         bool hasCurve(QTreeWidgetItem *item);
         void setSampleRate(QTreeWidgetItem *item, unsigned int sampleRate);

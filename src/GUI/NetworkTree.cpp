@@ -1659,7 +1659,7 @@ NetworkTree::getSampleRate(QTreeWidgetItem *item){
 
 
 bool
-NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID)
+NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUpdate)
 {
     string address = getAbsoluteAddress(item).toStdString();
     BasicBox *box = Maquette::getInstance()->getBox(boxID);
@@ -1673,9 +1673,17 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID)
                 vector<string> argTypes;
                 vector<short> sectionType;
 
-                bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
-                if (getCurveSuccess){
-                    std::cout<<sampleRate<<std::endl;
+                bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);                
+                if (getCurveSuccess){                    
+                    if(forceUpdate){
+                        interpolate = !(values.front()==values.back());
+                        Maquette::getInstance()->setCurveMuteState(boxID,address,!interpolate);
+                        if(interpolate){
+                            std::cout<<"networkTree -> interpolate devient true"<<std::endl;
+                        }
+                        else
+                            std::cout<<"networkTree -> interpolate devient false"<<std::endl;
+                    }
                     updateLine(item,interpolate,sampleRate,redundancy);
                 }
             }
@@ -1698,7 +1706,7 @@ NetworkTree::addOSCEndMessage(QTreeWidgetItem *item, QString msg){
 }
 
 void
-NetworkTree::updateCurves(unsigned int boxID) {
+NetworkTree::updateCurves(unsigned int boxID,bool forceUpdate) {
 
     if (boxID != NO_ID) {
         QTreeWidgetItem *item;
@@ -1706,7 +1714,7 @@ NetworkTree::updateCurves(unsigned int boxID) {
         QList<QTreeWidgetItem *>::iterator it;
         for(it=list.begin() ; it!=list.end() ; it++){
             item = *it;
-            updateCurve(item,boxID);
+            updateCurve(item,boxID,forceUpdate);
         }
     }
 }
