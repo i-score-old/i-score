@@ -1427,8 +1427,7 @@ Maquette::initSceneState(){
 
         }
         else if(gotoValue > currentBox->date() && gotoValue < (currentBox->date()+currentBox->duration())){
-            //goto au milieu d'une boîte : On envoie la valeur du début de boîte
-            std::cout<<"> milieu de boîte"<<std::endl;
+            //goto au milieu d'une boîte : On envoie la valeur du début de boîte            
             boxMsgs = currentBox->getStartState();            
             curvesList = _engines->getCurvesAddress(boxID);
 
@@ -1441,14 +1440,8 @@ Maquette::initSceneState(){
             }
             std::cout<<std::endl;
         }
-        else if(gotoValue == currentBox->date()){
-            std::cout<<"> Début de boîte "<<boxID<<std::endl;
-            boxMsgs = currentBox->getStartState();
-
-            QList<QPair<QString,unsigned int> > values = boxMsgs.values();
-            QList<QString> messagess = boxMsgs.keys();
-            for(int j=0 ; j<values.size() ; j++)
-                std::cout<<"   "<< messagess.at(j).toStdString()<<" "<<values.at(j).first.toStdString()<<" - "<<values.at(j).second<<std::endl;
+        else if(gotoValue == currentBox->date()){            
+            boxMsgs = currentBox->getStartState();            
         }
 
 
@@ -1456,18 +1449,14 @@ Maquette::initSceneState(){
 
         //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
         for(QList<QString>::iterator it2 = boxAddresses.begin() ; it2!=boxAddresses.end() ; it2++){
-            if(msgs.contains(*it2)){
-                std::cout<<"contains"<<std::endl;
-                std::cout<<"  "<<msgs.value(*it2).second<<std::endl;
+            if(msgs.contains(*it2)){                
                 if(msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second <= gotoValue){
-                    msgs.insert(*it2,boxMsgs.value(*it2));
-                    std::cout<<"INSERT"<<std::endl;
+                    msgs.insert(*it2,boxMsgs.value(*it2));                    
                 }
             }
             //sinon on ajoute dans la liste de messages
             else
                 if(boxMsgs.value(*it2).second <= gotoValue){
-                    std::cout<<"<="<<std::endl;
                     msgs.insert(*it2,boxMsgs.value(*it2));
                 }
         }
@@ -1475,17 +1464,12 @@ Maquette::initSceneState(){
         //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
         //    Start messages
         if(currentBox->date() < gotoValue){
-            std::cout<<"> muting start box"<<boxID<<std::endl;
             _engines->setCtrlPointMutingState(boxID,1,true);
         }
         //    End messages
-        if(currentBox->date()+currentBox->duration()<gotoValue){
-            std::cout<<"> muting end box"<<boxID<<std::endl;
+        if(currentBox->date()+currentBox->duration()<gotoValue){            
             _engines->setCtrlPointMutingState(boxID,2,true);
         }
-
-
-
     }
 
     //traduction en QMap<QString,QString>, on supprime le champs date des messages
