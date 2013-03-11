@@ -1428,10 +1428,22 @@ Maquette::initSceneState(){
         }
         else if(gotoValue > currentBox->date() && gotoValue < (currentBox->date()+currentBox->duration())){
             //goto au milieu d'une boîte : On envoie la valeur du début de boîte
-            boxMsgs = currentBox->getStartState();
+            std::cout<<"> milieu de boîte"<<std::endl;
+            boxMsgs = currentBox->getStartState();            
             curvesList = _engines->getCurvesAddress(boxID);
+
+            //On supprime les messages si ils sont déjà associés à une courbe (le moteur les envoie automatiquement)
+            for (unsigned int i=0 ; i<curvesList.size() ; i++){
+                //sauf si la courbe a été désactivée manuellement
+                if(!getCurveMuteState(boxID,curvesList[i])){
+                    msgs.remove(QString::fromStdString(curvesList[i]));
+
+                }
+            }
+            std::cout<<std::endl;
         }
         else if(gotoValue == currentBox->date()){
+            std::cout<<"> Début de boîte"<<std::endl;
             boxMsgs = currentBox->getStartState();
         }
 
@@ -1453,16 +1465,16 @@ Maquette::initSceneState(){
         //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
         //    Start messages
         if(currentBox->date() < gotoValue){
+            std::cout<<"> muting start box"<<boxID<<std::endl;
             _engines->setCtrlPointMutingState(boxID,1,true);
         }
         //    End messages
         if(currentBox->date()+currentBox->duration()<gotoValue){
+            std::cout<<"> muting end box"<<boxID<<std::endl;
             _engines->setCtrlPointMutingState(boxID,2,true);
         }
 
-        //On supprime les messages si ils sont déjà associés à une courbe (le moteur les envoie automatiquement)
-        for (unsigned int i=0 ; i<curvesList.size() ; i++)
-            msgs.remove(QString::fromStdString(curvesList[i]));
+
 
     }
 
