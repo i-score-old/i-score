@@ -1437,14 +1437,18 @@ Maquette::initSceneState(){
                 //sauf si la courbe a été désactivée manuellement
                 if(!getCurveMuteState(boxID,curvesList[i])){
                     msgs.remove(QString::fromStdString(curvesList[i]));
-
                 }
             }
             std::cout<<std::endl;
         }
         else if(gotoValue == currentBox->date()){
-            std::cout<<"> Début de boîte"<<std::endl;
+            std::cout<<"> Début de boîte "<<boxID<<std::endl;
             boxMsgs = currentBox->getStartState();
+
+            QList<QPair<QString,unsigned int> > values = boxMsgs.values();
+            QList<QString> messagess = boxMsgs.keys();
+            for(int j=0 ; j<values.size() ; j++)
+                std::cout<<"   "<< messagess.at(j).toStdString()<<" "<<values.at(j).first.toStdString()<<" - "<<values.at(j).second<<std::endl;
         }
 
 
@@ -1453,13 +1457,19 @@ Maquette::initSceneState(){
         //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
         for(QList<QString>::iterator it2 = boxAddresses.begin() ; it2!=boxAddresses.end() ; it2++){
             if(msgs.contains(*it2)){
-                if(msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second < gotoValue)
+                std::cout<<"contains"<<std::endl;
+                std::cout<<"  "<<msgs.value(*it2).second<<std::endl;
+                if(msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second <= gotoValue){
                     msgs.insert(*it2,boxMsgs.value(*it2));
+                    std::cout<<"INSERT"<<std::endl;
+                }
             }
             //sinon on ajoute dans la liste de messages
             else
-                if(boxMsgs.value(*it2).second <= gotoValue)
+                if(boxMsgs.value(*it2).second <= gotoValue){
+                    std::cout<<"<="<<std::endl;
                     msgs.insert(*it2,boxMsgs.value(*it2));
+                }
         }
 
         //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
