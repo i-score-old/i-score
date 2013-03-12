@@ -4,6 +4,7 @@ QMAKE_LFLAGS += -std=c++11 -stdlib=libc++ -O0 -fPIC -msse3
 CONFIG += debug
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
 TARGET = i-score
+
 DEPENDPATH += . \
 include \
 headers/data \
@@ -11,53 +12,46 @@ headers/GUI \
 src/data \
 src/GUI \
 
-linux-g++ {
-INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2
-}
-linux-g++-64 {
-INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2
-}
-macx-g++ {
-INCLUDEPATH += . headers/GUI headers/data /Library/Frameworks/ /usr/local/include/libxml2
-}
-macx-clang {
-INCLUDEPATH += . headers/GUI headers/data /Library/Frameworks/ /usr/local/jamoma/includes /usr/local/include/libxml2
-}
-
 QT += network xml svg
-
-linux-g++ {
-QMAKE_LFLAGS += -L/usr/local/lib/
-}
-linux-g++-64 {
-QMAKE_LFLAGS += -L/usr/local/lib/
-}
-macx-g++ {
-QMAKE_LFLAGS += -L/usr/local/lib/ -L/System/Library/Frameworks/ -L/Library/Frameworks/
-QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=10.7
-QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
-}
-macx-clang {
-QMAKE_LFLAGS += -L/usr/local/lib/ -L/usr/local/jamoma/lib -L/System/Library/Frameworks/ -L/Library/Frameworks/
-QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=10.7
-QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
-}
 
 # Dossier des sources temporaires de Qt
 MOC_DIR = moc 
 # Dossier des binaires
 OBJECTS_DIR = bin
 
+RESOURCES += i-score.qrc
+
+DEFINES += __Types__
+DEFINES += USE_JAMOMA_MODULAR
+
+ICON = images/acousmoscribe.icns
+
+TRANSLATIONS = acousmoscribe_en.ts \
+acousmoscribe_fr.ts
+
+# Support for conditional structures is made available via these scopes
 linux-g++ {
+INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2
+QMAKE_LFLAGS += -L/usr/local/lib/
 LIBS += -lIscore -lDeviceManager -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodescheduling -lgecodeset -lgecodesupport -lgecodegraph
 }
 linux-g++-64 {
+INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2
+QMAKE_LFLAGS += -L/usr/local/lib/
 LIBS += -lIscore -lDeviceManager -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodescheduling -lgecodeset -lgecodesupport -lgecodegraph
 }
 macx-g++ {
+INCLUDEPATH += . headers/GUI headers/data /Library/Frameworks/ /usr/local/include/libxml2
+QMAKE_LFLAGS += -L/usr/local/lib/ -L/System/Library/Frameworks/ -L/Library/Frameworks/
+QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=10.7
+QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
 LIBS += -lIscore -lDeviceManager -framework gecode -lxml2
 }
 macx-clang {
+INCLUDEPATH += . headers/GUI headers/data /Library/Frameworks/ /usr/local/jamoma/includes /usr/local/include/libxml2
+QMAKE_LFLAGS += -L/usr/local/lib/ -L/usr/local/jamoma/lib -L/System/Library/Frameworks/ -L/Library/Frameworks/
+QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=10.7
+QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
 LIBS += /usr/local/jamoma/lib/JamomaFoundation.dylib /usr/local/jamoma/lib/JamomaDSP.dylib /usr/local/jamoma/lib/JamomaScore.dylib /usr/local/jamoma/lib/JamomaModular.dylib -lDeviceManager -framework gecode -lxml2
 }
 
@@ -163,14 +157,4 @@ src/GUI/BoxCurveEdit.cpp \
 src/GUI/MaquetteWidget.cpp \
 src/GUI/TimeBarWidget.cpp \
     src/GUI/AttributeEditor.cpp
-
-RESOURCES += i-score.qrc
-
-DEFINES += __Types__
-DEFINES += USE_JAMOMA_MODULAR
-
-ICON = images/acousmoscribe.icns
-
-TRANSLATIONS = acousmoscribe_en.ts \
-               acousmoscribe_fr.ts
 
