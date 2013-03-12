@@ -109,7 +109,7 @@ headers/GUI/BoxCurveEdit.hpp \
 headers/GUI/MaquetteWidget.hpp \
 headers/GUI/TimeBarWidget.hpp
 
-SOURCES += main.cpp \
+SOURCES += src/main.cpp \
 src/data/Abstract.cpp \
 src/data/AbstractBox.cpp \
 src/data/AbstractComment.cpp \
