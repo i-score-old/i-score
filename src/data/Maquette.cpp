@@ -2387,7 +2387,6 @@ Maquette::load(const string &fileName){
     //reload networkTree
     _scene->editor()->networkTree()->load();
 
-
     /************************ OSC ************************/
     if(root.childNodes().size()>=2){
         QDomElement OSC = root.childNodes().at(2).toElement();

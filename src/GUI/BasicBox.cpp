@@ -158,6 +158,11 @@ BasicBox::createMenus(){
     _startMenu->addAction(_jumpToStartCue);
     _startMenu->addAction(_updateStartCue);
 
+    _endMenu = new QMenu(tr("&EndMenu"));
+    _endMenu->setParent(_boxWidget);
+    _endMenu->setWindowModality(Qt::ApplicationModal);
+    _endMenu->addAction(_jumpToEndCue);
+    _endMenu->addAction(_updateEndCue);
 
     //--- start button ---
     QIcon startMenuIcon(":/images/boxStartMenu.svg");
@@ -175,11 +180,6 @@ BasicBox::createMenus(){
     _boxContentWidget->setStartMenu(_startMenu);
 
     //--- end button ---
-    _endMenu = new QMenu(tr("&EndMenu"));
-    _endMenu->setParent(_boxWidget);
-    _endMenu->setWindowModality(Qt::ApplicationModal);
-    _endMenu->addAction(_jumpToEndCue);
-    _endMenu->addAction(_updateEndCue);
     QIcon endMenuIcon(":/images/boxEndMenu.svg");
     _endMenuButton = new QPushButton();
     _endMenuButton->setIcon(endMenuIcon);

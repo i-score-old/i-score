@@ -309,7 +309,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 		case Qt::ShiftModifier : // POW
 		{
             if (_lastPointSelected) {
-
+                std::cout<<"lastPointSelected"<<std::endl;
 				float mousePosY = event->pos().y();
 				float pow = 1.;
 				QPointF lastPoint = absoluteCoordinates(QPointF(1,_abstract->_curve.back()));
@@ -325,14 +325,19 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
             }
             else if (_movingBreakpointX != -1) {
                 map<float,pair<float,float> >::iterator it;
+
                 if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
                     float mousePosY = relativePoint.y();
                     float pow = 1.;
                     if (mousePosY > it->second.first) { // mouse under : pow between 0 and 1
-                        pow = 1 - std::min(mousePosY - it->second.first,(float)50.) / 50.;
+                        pow = std::max(1 - std::min(mousePosY - it->second.first,(float)50.) / 10., 0.1);
+                        std::cout<<"under pow = "<<pow<<std::endl;
+                        std::cout<<mousePosY<<" - "<<it->second.first<<std::endl;
                     }
                     else if (it->second.first > mousePosY){ // mouse above : pow between 1 and 6
-                        pow = 1 + std::min(it->second.first - mousePosY,(float)50.) / 10.;
+                        pow = 1 + std::min(it->second.first - mousePosY,(float)50.) / 7.;
+                        std::cout<<"above pow = "<<pow<<std::endl;
+                        std::cout<<it->second.first<<" - "<<mousePosY<<std::endl<<std::endl;
                     }
                     it->second = std::make_pair<float,float>(it->second.first,pow);
                     _movingBreakpointY = -1;

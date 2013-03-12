@@ -163,8 +163,7 @@ BoxWidget::updateDisplay(const QString &address){
     displayCurve(address);
 }
 
-void BoxWidget::displayCurve(const QString &address){
-
+void BoxWidget::displayCurve(const QString &address){    
     std::string add = address.toStdString();
     QMap<string,CurveWidget *>::iterator curveIt;
     CurveWidget *curveWidget;
@@ -334,7 +333,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
                         bool muteState = Maquette::getInstance()->getCurveMuteState(_boxID,address);
                         if(!muteState){
                             std::cout<<"FORCE interpolate = true"<<std::endl;
-                            addCurve(curveAddressStr,curveTab);
+                            addCurve(curveAddressStr,curveTab);                            
                         }
                         else{
                             std::cout<<"FORCE interpolate = false"<<std::endl;
