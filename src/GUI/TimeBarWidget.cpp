@@ -49,7 +49,6 @@ knowledge of the CeCILL license and that you accept its terms.
 
 class MaquetteScene;
 
-
 const float TimeBarWidget::TIME_BAR_HEIGHT =  15.;
 const float TimeBarWidget::LEFT_MARGIN =  0.5;
 const float TimeBarWidget::NUMBERS_POINT_SIZE =  10.;

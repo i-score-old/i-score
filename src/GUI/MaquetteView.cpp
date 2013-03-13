@@ -129,7 +129,7 @@ MaquetteView::updateScene(){
 
 void
 MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
-  QGraphicsView::drawBackground(painter,rect);
+  QGraphicsView::drawBackground(painter,rect);  
 //  QPen pen(Qt::darkGreen);
   QPen pen(QColor(145,145,145));
 

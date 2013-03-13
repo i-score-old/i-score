@@ -78,6 +78,8 @@ typedef map<unsigned int,TriggerPoint*> TrgPntMap;
 
 using namespace SndBoxProp;
 
+#define SCENARIO_DURATION 1800000
+
 void
 Maquette::init() {
 /*	char buf[256];
@@ -85,10 +87,9 @@ Maquette::init() {
 	string pluginsDir;
 	pluginsDir.append(buf);
 	pluginsDir.append("/plugins");*/
-	string pluginsDir = "/usr/local/lib/IScore";
+	string pluginsDir = "/usr/local/lib/IScore";    
 
-	_engines = new Engines(SCENARIO_SIZE,pluginsDir);
-
+    _engines = new Engines(SCENARIO_DURATION,pluginsDir);
     _engines->getLoadedNetworkPlugins(_plugins,_listeningPorts);
 
     //pour maintenir le fonctionnement pendant le developpement : l'appli n'est pas auto portée.
