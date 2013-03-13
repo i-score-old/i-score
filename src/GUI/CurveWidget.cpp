@@ -118,7 +118,10 @@ void CurveWidget::curveRepresentationOutdated() {
 	_maxY = *(std::max_element(_abstract->_curve.begin(),_abstract->_curve.end()));
 	float halfSizeY = std::max(fabs(_maxY),fabs(_minY));
 
-	_scaleY = height() / (2*halfSizeY);
+    std::cout<<"_maxY = "<<fabs(_maxY)<<" _minY = "<<fabs(_minY);
+    std::cout<<"height = "<<height()<<" >> _scaleY = "<<height() / (2*halfSizeY)<<std::endl;
+
+    _scaleY = height() / (2*halfSizeY);
 
     update();
 }
@@ -180,9 +183,9 @@ CurveWidget::relativeCoordinates(const QPointF &point) {
 	float finalX = std::max((float)0.,std::min((float)1.,translatedX / width() ));
 
 	float pointY = point.y();
-	float translatedY = pointY - height()/2.;
+    float translatedY = pointY - height()/2.;
 	float symetricalY = - translatedY;
-	float finalY = symetricalY / (float)_scaleY;
+	float finalY = symetricalY / (float)_scaleY;    
 
 	return QPointF(finalX,finalY);
 }
@@ -314,14 +317,13 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 				float pow = 1.;
 				QPointF lastPoint = absoluteCoordinates(QPointF(1,_abstract->_curve.back()));
                 if (mousePosY > lastPoint.y()) { // mouse under : pow between 0 and 1
-					pow = 1 - std::min((float)(mousePosY - lastPoint.y()),(float)50.) / 50.;                    
+                    pow = 1 - std::min((float)(mousePosY - lastPoint.y()),(float)50.) / 10.;
 				}
                 else if (lastPoint.y() > mousePosY){ // mouse above : pow between 1 and 6
 					pow = 1 + std::min((float)(lastPoint.y() - mousePosY),(float)50.) / 10.;
                 }
                 _abstract->_lastPointCoeff = pow;
                 curveChanged();
-
             }
             else if (_movingBreakpointX != -1) {
                 map<float,pair<float,float> >::iterator it;
@@ -329,15 +331,23 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
                 if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
                     float mousePosY = relativePoint.y();
                     float pow = 1.;
+                    float div;
                     if (mousePosY > it->second.first) { // mouse under : pow between 0 and 1
-                        pow = std::max(1 - std::min(mousePosY - it->second.first,(float)50.) / 10., 0.1);
-                        std::cout<<"under pow = "<<pow<<std::endl;
-                        std::cout<<mousePosY<<" - "<<it->second.first<<std::endl;
+                        div = std::min(50.,(double)std::max(fabs(_maxY),fabs(_minY)));
+
+                        pow = std::max(1 - std::min(mousePosY - it->second.first,(float)50.) / (double)div, 0.1);
+                        std::cout<<"mouseY "<<event->pos().y()<<std::endl;
+                        std::cout << "under pow = "  << pow << std::endl;
+                        std::cout<<"LE DIV "<<div<<" ("<<fabs(_maxY)<<" , "<<fabs(_minY)<<")"<<std::endl;
+                        std::cout << mousePosY<<" - "<< it->second.first<<" = " <<mousePosY - it->second.first<< std::endl<<std::endl;
                     }
                     else if (it->second.first > mousePosY){ // mouse above : pow between 1 and 6
-                        pow = 1 + std::min(it->second.first - mousePosY,(float)50.) / 7.;
+                        div = std::min(50.,std::max(fabs(_maxY),fabs(_minY)))/5;
+                        pow = 1 + std::min(it->second.first - mousePosY,(float)50.) / div;
                         std::cout<<"above pow = "<<pow<<std::endl;
+                        std::cout<<"LE DIV "<<div<<" , "<<fabs(_minY)<<")"<<std::endl;
                         std::cout<<it->second.first<<" - "<<mousePosY<<std::endl<<std::endl;
+
                     }
                     it->second = std::make_pair<float,float>(it->second.first,pow);
                     _movingBreakpointY = -1;
