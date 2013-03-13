@@ -220,14 +220,22 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
     if(!itemsName.empty()){
     //Boucle sur liste message
         for(it=itemsName.begin() ; it!=itemsName.end() ; ++it){
+
             curName = QString::fromStdString(*it);
             address = curName.split(" ");
 
             splitAddress = address.first().split("/");
+            int nbMembers = address.size();
             int nbSection = splitAddress.size();
-            if (nbSection>=2){
+            if (nbSection>=2){                
                 curName = address.first();
                 msg.value = address.at(1);//second value
+                if(nbMembers>1){//pour les listes
+                    for(int i=2;i<nbMembers;i++){
+                        msg.value +=QString(tr(" ")+address.at(i));
+                    }
+                }
+                std::cout<<msg.value.toStdString()<<std::endl;
                 msg.device = curName.section('/',0,0);
                 msg.message= tr("/");
                 msg.message += curName.section('/',1,nbSection);
