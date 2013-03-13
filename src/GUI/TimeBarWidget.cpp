@@ -120,7 +120,14 @@ TimeBarWidget::drawBackground(QPainter *painter, QRect rect){
         i_PXL = i * S_TO_MS / MaquetteScene::MS_PER_PIXEL + LEFT_MARGIN;
 
         painter->drawLine(QPointF(i_PXL, 3*HEIGHT/4), QPointF(i_PXL, HEIGHT));
-        painter->drawText(QPointF(i_PXL, 2*HEIGHT/3),QString("%1").arg(i));
+
+        if(factor>=1){
+            int m = (int)i / 60;
+            int s = i-(m*60);
+            painter->drawText(QPointF(i_PXL, 2*HEIGHT/3),QString("%1'%2").arg(m).arg(s));
+        }
+        else
+            painter->drawText(QPointF(i_PXL, 2*HEIGHT/3),QString("%1").arg(i));
     }
 
     painter->restore();
