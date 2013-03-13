@@ -162,7 +162,7 @@ src/GUI/BoxWidget.cpp \
 src/GUI/BoxCurveEdit.cpp \
 src/GUI/MaquetteWidget.cpp \
 src/GUI/TimeBarWidget.cpp \
-    src/GUI/AttributeEditor.cpp
+src/GUI/AttributeEditor.cpp
 
 RESOURCES += i-score.qrc
 
