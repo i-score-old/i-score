@@ -1690,6 +1690,7 @@ Maquette::getNetworkHost(){
 
 void
 Maquette::save(const string &fileName) {
+    std::cout<<"fileName "<<fileName<<std::endl;
     _engines->store(fileName+".simone");    
 
     QFile file(QString::fromStdString(fileName));
@@ -1763,7 +1764,6 @@ Maquette::save(const string &fileName) {
     root.appendChild(OSCMessagesNode);
 
     //***************************************************************
-
 
     QTextStream ts(&file);
     ts << _doc->toString();
