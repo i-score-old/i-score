@@ -128,7 +128,8 @@ MaquetteView::updateScene(){
 }
 
 void
-MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
+MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){  
+
   QGraphicsView::drawBackground(painter,rect);  
 //  QPen pen(Qt::darkGreen);
   QPen pen(QColor(145,145,145));
@@ -182,7 +183,7 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
 //      painter->setPen(reSavedPen);
 //  }
 
-  if (_scene->tracksView()) {
+  if (_scene->tracksView()) {      
     QPen pen2(Qt::darkGray);
     pen2.setStyle(Qt::SolidLine);
     pen2.setWidth(4);
@@ -350,7 +351,8 @@ MaquetteView::setZoom(float value){
     }
     repaint();
     resetCachedContent();
-    _scene->update();
+// TODO check if can be comment
+//    _scene->update();
     Maquette::getInstance()->updateBoxesFromEngines();
 }
 

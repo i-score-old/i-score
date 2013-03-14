@@ -459,7 +459,6 @@ CurveWidget::paintEngine(){
 }
 
 void CurveWidget::paintEvent(QPaintEvent * /* event */) {
-
     QPainter *painter = new QPainter(this);
 
     QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect;

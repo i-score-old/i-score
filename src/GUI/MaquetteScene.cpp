@@ -1274,8 +1274,11 @@ MaquetteScene::addBox(BoxCreationMode mode) {
 			update();
 			break;
 		default :
-			std::cerr << "MaquetteScene :: Unknown Box Creation Mode" << std::endl;
-			break;
+            std::cerr << "MaquetteScene :: Unknown Box Creation Mode" << std::endl;
+            //TODO check this :
+            boxID = addParentBox();
+            update();
+            break;
 		}
 	}
 	if (boxID != NO_ID) {
