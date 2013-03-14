@@ -1444,8 +1444,6 @@ Maquette::initSceneState(){
         else if(gotoValue == currentBox->date()){            
             boxMsgs = currentBox->getStartState();            
         }
-
-
         boxAddresses = boxMsgs.keys();
 
         //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
@@ -1689,8 +1687,7 @@ Maquette::getNetworkHost(){
 }
 
 void
-Maquette::save(const string &fileName) {
-    std::cout<<"fileName "<<fileName<<std::endl;
+Maquette::save(const string &fileName) {    
     _engines->store(fileName+".simone");    
 
     QFile file(QString::fromStdString(fileName));

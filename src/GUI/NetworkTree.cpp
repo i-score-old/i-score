@@ -234,8 +234,7 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
                     for(int i=2;i<nbMembers;i++){
                         msg.value +=QString(tr(" ")+address.at(i));
                     }
-                }
-                std::cout<<msg.value.toStdString()<<std::endl;
+                }                
                 msg.device = curName.section('/',0,0);
                 msg.message= tr("/");
                 msg.message += curName.section('/',1,nbSection);

@@ -1036,8 +1036,9 @@ MainWindow::saveFile(const QString &fileName)
     QDate date = QDate::currentDate();
     QTime time = QTime::currentTime();
     QString timeString = time.toString();
+    std::cout<<"NICO"<<fileName.toStdString()<<std::endl;
+    QString concat(tr("(")+QString("%1-%2-%3").arg(date.day()).arg(date.month()).arg(date.year())+tr("-")+timeString+tr(")"));
 
-    QString concat(tr("(")+QString("%1-%2").arg(date.dayOfWeek()).arg(date.month())+tr("-")+timeString+tr("("));
 
     QString backupName = fileName;
     int i = fileName.indexOf(".xml");
@@ -1052,10 +1053,7 @@ MainWindow::saveFile(const QString &fileName)
     SIMONEargs<< QString(fileName+tr(".simone"));
     SIMONEargs<< QString(backupName+tr(".simone"));
 
-    std::cout<<fileName.toStdString()<<"    "<<(backupName+tr(".simone")).toStdString()<<std::endl;
-
     process.start("cp", XMLargs);
-
     process.execute("cp", SIMONEargs);
     process.close();
     /*******************************************/
