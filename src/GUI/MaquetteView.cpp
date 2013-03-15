@@ -305,7 +305,7 @@ MaquetteView::triggersQueueList(){
  */
 void
 MaquetteView::zoomIn()
-{
+{    
 	if (MaquetteScene::MS_PER_PIXEL > 0.125) {
 		MaquetteScene::MS_PER_PIXEL /= 2;
 		_zoom *= 2;
@@ -314,12 +314,16 @@ MaquetteView::zoomIn()
         _scene->update();
 
         Maquette::getInstance()->updateBoxesFromEngines();
+
+        QPointF newCenter(2*getCenterCoordinates().x(),2*getCenterCoordinates().y());
+//        std::cout<<"new center ("<<newCenter.x()<<";"<<newCenter.y()<<") zoom > "<<_zoom<<std::endl;
+        centerOn(newCenter);
 	}
 }
 
 QPointF
 MaquetteView::getCenterCoordinates(){
-    QPointF centerCoordinates =  mapToScene(viewport()->rect().center());
+    QPointF centerCoordinates =  mapToScene(viewport()->rect().center()-=QPoint(viewport()->rect().center().y()/2,viewport()->rect().center().y()/2));
     return centerCoordinates;
 }
 
@@ -351,8 +355,10 @@ MaquetteView::setZoom(float value){
     }
     repaint();
     resetCachedContent();
+
 // TODO check if can be comment
-//    _scene->update();
+    _scene->update();
+
     Maquette::getInstance()->updateBoxesFromEngines();
 }
 
@@ -361,11 +367,15 @@ MaquetteView::setZoom(float value){
  */
 void
 MaquetteView::zoomOut()
-{
+{    
     MaquetteScene::MS_PER_PIXEL *= 2;
 
     _zoom /= 2.;
     resetCachedContent();
     _scene->update();
-    Maquette::getInstance()->updateBoxesFromEngines();
+    Maquette::getInstance()->updateBoxesFromEngines();    
+
+    QPointF newCenter(getCenterCoordinates().x()/2,getCenterCoordinates().y()/2);
+//    std::cout<<"new center ("<<newCenter.x()<<";"<<newCenter.y()<<") zoom > "<<_zoom<<std::endl;
+    centerOn(newCenter);
 }
