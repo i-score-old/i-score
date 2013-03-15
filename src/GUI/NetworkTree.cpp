@@ -653,12 +653,23 @@ NetworkTree::clearColumn(unsigned int column){
 
         for (it=assignedItems.begin(); it!=assignedItems.end(); it++){
             curIt=*it;
-
+            std::cout<<"clear "<<curIt->text(0).toStdString()<<std::endl;
             if (curIt->checkState(column)){
+                std::cout<<"UNCHECK"<<std::endl;
                 curIt->setCheckState(column,Qt::Unchecked);
             }
             curIt->setText(column,emptyString);
         }
+
+        //clear ça :
+//        std::cout<<"AllChihldren : "<<std::endl;
+//        for(int i=0; i<_nodesWithAllChildrenAssigned.size(); i++){
+//            std::cout<<_nodesWithAllChildrenAssigned.at(i)->text(0).toStdString()<<std::endl;
+//        }
+//        std::cout<<"SomeChihldren : "<<std::endl;
+//        for(int i=0; i<_nodesWithSomeChildrenAssigned.size(); i++){
+//            std::cout<<_nodesWithSomeChildrenAssigned.at(i)->text(0).toStdString()<<std::endl;
+//        }
     }
 }
 
@@ -669,7 +680,7 @@ NetworkTree::clearStartMsgs(){
 }
 
 void
-NetworkTree::clearDevicesStartMsgs(QList<QString> devices){
+NetworkTree::clearDevicesStartMsgs(QList<QString> devices){    
     clearColumn(START_COLUMN);
     _startMessages->clearDevicesMsgs(devices);
 }
@@ -1040,7 +1051,7 @@ NetworkTree::fathersAssignation(QTreeWidgetItem *item){
         father=item->parent();
 
         if(!allBrothersAssigned(item)){
-//            std::cout<<getAbsoluteAddress(father).toStdString()<<" assignPartially"<<std::endl<<std::endl;
+            std::cout<<getAbsoluteAddress(father).toStdString()<<" assignPartially"<<std::endl<<std::endl;
             assignPartially(father);
         }
         else
@@ -1701,15 +1712,18 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
 
                 bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);                
                 if (getCurveSuccess){                    
-                    if(forceUpdate){
-                        interpolate = !(values.front()==values.back());
-                        Maquette::getInstance()->setCurveMuteState(boxID,address,!interpolate);
+                    if(forceUpdate){                        
+
                         if(interpolate){
-                            std::cout<<"networkTree -> interpolate devient true"<<std::endl;
+                            interpolate = !(values.front()==values.back());
+                            Maquette::getInstance()->setCurveMuteState(boxID,address,!interpolate);
+                            if(interpolate){
+                                std::cout<<"networkTree -> interpolate devient true"<<std::endl;
+                            }
+                            else
+                                std::cout<<"networkTree -> interpolate devient false"<<std::endl;
+                            }
                         }
-                        else
-                            std::cout<<"networkTree -> interpolate devient false"<<std::endl;
-                    }
                     updateLine(item,interpolate,sampleRate,redundancy);
                 }
             }
