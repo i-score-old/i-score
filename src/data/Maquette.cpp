@@ -1288,7 +1288,10 @@ Maquette::addRelation(unsigned int ID1, BoxExtremity firstExtremum, unsigned int
         _boxes[ID2]->addRelation(secondExtremum,newRel);
 		_scene->addItem(newRel);
 		updateBoxesFromEngines(movedBoxes);
-        _scene->boxesMoved(movedBoxes);
+
+        //TODO : Check if can be comment
+//        _scene->boxesMoved(movedBoxes);
+
 		return (int)relationID;
 	}
 
@@ -1308,7 +1311,7 @@ Maquette::addRelation(const AbstractRelation &abstract) {
 		_relations[abstract.ID()] = newRel;
 		_scene->addItem(newRel);
 		_boxes[abstract.firstBox()]->addRelation(abstract.firstExtremity(),newRel);
-        _boxes[abstract.secondBox()]->addRelation(abstract.secondExtremity(),newRel);
+        _boxes[abstract.secondBox()]->addRelation(abstract.secondExtremity(),newRel);        
 		newRel->updateCoordinates();        
 		return (int)abstract.ID();
 	}
@@ -1438,8 +1441,7 @@ Maquette::initSceneState(){
                 if(!getCurveMuteState(boxID,curvesList[i])){
                     msgs.remove(QString::fromStdString(curvesList[i]));
                 }
-            }
-            std::cout<<std::endl;
+            }            
         }
         else if(gotoValue == currentBox->date()){            
             boxMsgs = currentBox->getStartState();            
