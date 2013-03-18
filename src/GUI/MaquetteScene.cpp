@@ -149,17 +149,15 @@ MaquetteScene::init()
 void
 MaquetteScene::updateProgressBar(){
 //    update(QRectF(QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL-4, 0), QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL+4, height())));
+
     if(_playing){
         _progressLine->setPos(_maquette->getCurrentTime()/MS_PER_PIXEL,sceneRect().topLeft().y());
-        invalidate(sceneRect(),ItemLayer);
+        invalidate(QRectF(),ItemLayer);
     }
     else{
         _progressLine->setPos(_view->gotoValue()/MS_PER_PIXEL,sceneRect().topLeft().y());
-        invalidate(sceneRect(),ItemLayer);
+        invalidate(QRectF(),ItemLayer);
     }
-
-//    _progressLine->moveBy(_maquette->getCurrentTime()/MS_PER_PIXEL - _progressLine->pos().x(),0);
-
 }
 
 void
@@ -276,9 +274,8 @@ MaquetteScene::getProgression(unsigned int boxID)
 
 void
 MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[], const QStyleOptionGraphicsItem options[], QWidget *widget)
-{
-	QGraphicsScene::drawItems(painter,numItems,items,options,widget);
-
+{    
+	QGraphicsScene::drawItems(painter,numItems,items,options,widget);    
 	qreal xmax = width(), ymax = height();
 
 /*	static int NUM_ITEMS = -1;
@@ -305,24 +302,15 @@ MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[]
         if (ymax < items[i]->mapToScene(items[i]->boundingRect().bottomRight()).y()) {
             ymax = items[i]->mapToScene(items[i]->boundingRect().bottomRight()).y();
 		}
-	}
-	std::cerr << "MaquetteScene::drawItems" << std::endl;
+	}	
 	//_view->setSceneRect(QRectF(0, 0, xmax, ymax));
 }
 
 void
-MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
-    Q_UNUSED(rect);
-
-    if (_playing) {
-        QPen pen(Qt::black);
-        pen.setWidth(3);
-        painter->setPen(pen);        
-    }
-
-    else{
-
-        //drawGotoBar
+MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {    
+    Q_UNUSED(rect);    
+    if (!_playing) {
+        //drawGotoBar        
         QPen reSavedPen = painter->pen();
         QPen pen3(Qt::black);
         pen3.setWidth(3);
@@ -331,7 +319,7 @@ MaquetteScene::drawForeground ( QPainter * painter, const QRectF & rect ) {
 
         if (_currentInteractionMode == RELATION_MODE) {
         if (_clicked) {
-            if (_relation->firstBox() != NO_ID) {
+            if (_relation->firstBox() != NO_ID) {                
                 BasicBox *box = getBox(_relation->firstBox());
                 QPointF start;
                 switch (_relation->firstExtremity()) {
@@ -609,6 +597,8 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     QGraphicsScene::mousePressEvent(mouseEvent);
     _clicked = true;
 
+//    std::cout<<"mouse "<<_view->mapToScene(mouseEvent->pos().toPoint()).x()<<" "<< _view->mapToScene(mouseEvent->pos().toPoint()).y()<<std::endl;
+//    std::cout<<"CenterCoordinates "<<_view->getCenterCoordinates().x()<<" "<< _view->getCenterCoordinates().y()<<std::endl;
 
     if (_tempBox) {
         removeItem(_tempBox);
@@ -768,11 +758,12 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent) {
 
                 BasicBox *firstBox = getBox(_relation->firstBox());
                 if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE)) {
+
                     setRelationSecondBox(secondBox->ID(),BOX_START);
                     addPendingRelation();
                     firstBox->setSelected(true);
 				}
-                else if (mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
+                else if (mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {                   
 					setRelationSecondBox(secondBox->ID(),BOX_END);
                     addPendingRelation();                    
                     firstBox->setSelected(true);
@@ -1537,7 +1528,7 @@ MaquetteScene::addRelation(const AbstractRelation &abstractRel) {
 //			addItem(newRel);
 			BasicBox *box = NULL;
             if ((box = getBox(abstractRel.firstBox())) != NULL) {
-				box->addRelation(abstractRel.firstExtremity(),newRel);
+				box->addRelation(abstractRel.firstExtremity(),newRel);                
 			}
             if ((box = getBox(abstractRel.secondBox())) != NULL) {
 				box->addRelation(abstractRel.secondExtremity(),newRel);
@@ -1588,7 +1579,7 @@ MaquetteScene::addPendingRelation()
 
 void
 MaquetteScene::changeRelationBounds(unsigned int relID, const float &length, const float &minBound, const float &maxBound)
-{
+{   
     Relation *rel = getRelation(relID);
     if (rel != NULL) {
         _maquette->changeRelationBounds(relID,minBound,maxBound);
@@ -1671,8 +1662,7 @@ MaquetteScene::boxResized() {
 }
 
 void
-MaquetteScene::selectionMoved() {
-
+MaquetteScene::selectionMoved() {        
 	for (int i = 0 ; i < selectedItems().size() ; i++) {
 		QGraphicsItem *curItem = selectedItems().at(i);
 		int type = curItem->type();
@@ -1698,8 +1688,7 @@ MaquetteScene::boxMoved(unsigned int boxID) {
         coord.topLeftY = box->mapToScene(box->boxRect().topLeft()).y();
         coord.sizeX = box->boxRect().size().width();
         coord.sizeY = box->boxRect().size().height();
-	}
-
+	}    
 	bool ret = 	_maquette->updateBox(boxID,coord);
 
 	if (ret) {
@@ -1716,7 +1705,7 @@ MaquetteScene::boxMoved(unsigned int boxID) {
 }
 
 void
-MaquetteScene::boxesMoved(const vector<unsigned int> &moved) {
+MaquetteScene::boxesMoved(const vector<unsigned int> &moved) {    
 	for (unsigned int i = 0 ; i < moved.size() ; i++) {
 		boxMoved(moved[i]);
 	}
