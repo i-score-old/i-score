@@ -1088,7 +1088,7 @@ void
 AttributesEditor::startChanged()
 {
 	BasicBox * box = _scene->getBox(_boxEdited);
-	if (box != NULL) {
+	if (box != NULL) {        
 		box->moveBy(_boxStartValue->value() * S_TO_MS / MaquetteScene::MS_PER_PIXEL - box->getTopLeft().x(),0);
 		_scene->boxMoved(_boxEdited);
 	}

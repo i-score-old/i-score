@@ -182,6 +182,7 @@ private :
 	float _interspace; //!< Horizontal interspace.
 	float _scaleX; //!< Value for horizontal scaling.
 	float _scaleY; //!< Value for vertical scaling.
+    float _scaleMaxY; //!< Value for maximum vertical scaling.
 	float _minY;
 	float _maxY;
 

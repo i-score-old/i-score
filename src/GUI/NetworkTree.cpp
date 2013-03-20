@@ -1713,7 +1713,6 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
                 bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);                
                 if (getCurveSuccess){                    
                     if(forceUpdate){                        
-
                         if(interpolate){
                             interpolate = !(values.front()==values.back());
                             Maquette::getInstance()->setCurveMuteState(boxID,address,!interpolate);

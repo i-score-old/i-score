@@ -128,15 +128,13 @@ MaquetteView::updateScene(){
 }
 
 void
-MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){  
+MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){          
 
-  QGraphicsView::drawBackground(painter,rect);  
-//  QPen pen(Qt::darkGreen);
+  QGraphicsView::drawBackground(painter,rect);
   QPen pen(QColor(145,145,145));
 
   painter->setPen(pen);
 
-  QPointF upperPoint,downPoint;
   static const int S_TO_MS = 1000;
   const int WIDTH = sceneRect().width();
   const int HEIGHT = sceneRect().height();
@@ -145,7 +143,6 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
     if (_zoom < 1 && ((i % (int)(1./_zoom)) != 0 )) {
         continue;
     }
-// 	 painter->drawText(QPointF(i_PXL, 10),QString("%1").arg(i));
    painter->drawLine(QPointF(i_PXL, 0), QPointF(i_PXL, HEIGHT));
 
    if (_zoom > 1) {
@@ -164,24 +161,6 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
 			painter->setPen(savePen);
     }
   }
-
-//  if(!_scene->playing()){
-//      //drawGotoBar
-//      std::cout<<"not playing"<<std::endl;
-//      double gotoBarPosX = _gotoValue/(float)MaquetteScene::MS_PER_PIXEL;
-//      QPen reSavedPen = painter->pen();
-//      QPen pen3(Qt::black);
-//      pen3.setWidth(3);
-//      painter->setPen(pen3);
-//      painter->drawLine(QPointF(gotoBarPosX,0),QPointF(gotoBarPosX,HEIGHT));
-
-//    //  pen3.setColor(Qt::white);
-//    //  pen3.setWidth(1);
-//    //  painter->setPen(pen3);
-//    //  painter->drawLine(QPointF(progressBarPosX,0),QPointF(progressBarPosX,HEIGHT));
-
-//      painter->setPen(reSavedPen);
-//  }
 
   if (_scene->tracksView()) {      
     QPen pen2(Qt::darkGray);

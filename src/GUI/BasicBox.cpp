@@ -388,7 +388,7 @@ BasicBox::getSize() const
 
 QPointF
 BasicBox::getLeftGripPoint()
-{
+{    
     return QPointF(_abstract->topLeft().x(), _abstract->topLeft().y() + _abstract->height()/2.);
 }
 
@@ -461,8 +461,7 @@ void
 BasicBox::setSize(const QPointF & size)
 {
     _abstract->setWidth(std::max((float)size.x(),MaquetteScene::MS_PRECISION / MaquetteScene::MS_PER_PIXEL));
-    _abstract->setHeight(size.y());
-
+    _abstract->setHeight(size.y());    
     updateStuff();
 }
 
@@ -632,7 +631,7 @@ BasicBox::updateRelations(BoxExtremity extremity){
 
 void
 BasicBox::updateStuff()
-{
+{    
     updateBoxSize();
     if (_comment != NULL) {
         _comment->updatePos();
@@ -656,7 +655,7 @@ BasicBox::updateStuff()
 
 void
 BasicBox::addRelation(BoxExtremity extremity, Relation *rel)
-{
+{    
     map<BoxExtremity,Relation*>::iterator it;
     _relations[extremity][rel->ID()] = rel;
     _relations[extremity][rel->ID()]->updateCoordinates();

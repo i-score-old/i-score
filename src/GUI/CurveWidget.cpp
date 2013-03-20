@@ -115,9 +115,16 @@ AbstractCurve * CurveWidget::abstractCurve() {
 void CurveWidget::curveRepresentationOutdated() {
 	_interspace = width() / (float)(std::max((unsigned int)2,(unsigned int)(_abstract->_curve.size())) - 1);
 	_minY = *(std::min_element(_abstract->_curve.begin(),_abstract->_curve.end()));
-	_maxY = *(std::max_element(_abstract->_curve.begin(),_abstract->_curve.end()));
-	float halfSizeY = std::max(fabs(_maxY),fabs(_minY));
+    _maxY =  *(std::max_element(_abstract->_curve.begin(),_abstract->_curve.end()));
+
+    float maxY = std::max(float(1.),*(std::max_element(_abstract->_curve.begin(),_abstract->_curve.end())));
+    std::cout<<"curveRepresentationOutDated _maxY "<<_maxY<<" - maxY "<<maxY<<" maxEl : "<<*(std::max_element(_abstract->_curve.begin(),_abstract->_curve.end()))<<std::endl;
+
+    float halfSizeY = std::max(fabs(_maxY),fabs(_minY));
+    float halfSizeMaxY = std::max(fabs(maxY),fabs(_minY));
+
     _scaleY = height() / (2*halfSizeY);
+//    _scaleMaxY = height() / (2*halfSizeMaxY);
 
     update();
 }
@@ -173,6 +180,7 @@ void CurveWidget::setAttributes(AbstractCurve *abCurve) {
 
 QPointF
 CurveWidget::relativeCoordinates(const QPointF &point) {
+    std::cout<<"relativeCoord"<<std::endl;
 	float pointX = point.x();
 	float scaledX = pointX / (float)_scaleX;
 	float translatedX = scaledX;
@@ -181,22 +189,22 @@ CurveWidget::relativeCoordinates(const QPointF &point) {
 	float pointY = point.y();
     float translatedY = pointY - height()/2.;
 	float symetricalY = - translatedY;
-	float finalY = symetricalY / (float)_scaleY;    
+    float finalY = symetricalY / (float)_scaleY;
 
 	return QPointF(finalX,finalY);
 }
 
 QPointF
 CurveWidget::absoluteCoordinates(const QPointF &point)
-{
+{ 
 	float pointX = point.x();
 	float unpercentX = pointX * width();
 	float scaledX = unpercentX * (float)_scaleX;
 	float finalX = scaledX;
 
 	float pointY = point.y();
-	float scaledY = pointY * (float)_scaleY;
-	float symetricalY = -scaledY;
+    float scaledY = pointY * (float)_scaleY;
+    float symetricalY = -scaledY;
     float finalY = symetricalY + height()/2.;
 
     return QPointF(finalX,finalY);
