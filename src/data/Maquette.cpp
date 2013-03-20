@@ -1195,8 +1195,8 @@ bool Maquette::getCurveAttributes(unsigned int boxID, const std::string &address
 	unsigned int &sampleRate, bool &redundancy, bool &interpolate, vector<float>& values, vector<string> &argTypes,
 	vector<float> &xPercents, vector<float> &yValues, vector<short> &sectionType, vector<float> &coeff) {
 
-	if (_engines->getCurveValues(boxID,address,argPosition,values)) {
-        if (_engines->getCurveSections(boxID,address,argPosition,xPercents,yValues,sectionType,coeff)) {
+	if (_engines->getCurveValues(boxID,address,argPosition,values)) {        
+        if (_engines->getCurveSections(boxID,address,argPosition,xPercents,yValues,sectionType,coeff)) {            
 			sampleRate = _engines->getCurveSampleRate(boxID,address);
 			redundancy = _engines->getCurveRedundancy(boxID,address);
 			interpolate = !_engines->getCurveMuteState(boxID,address);

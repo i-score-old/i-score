@@ -653,9 +653,9 @@ NetworkTree::clearColumn(unsigned int column){
 
         for (it=assignedItems.begin(); it!=assignedItems.end(); it++){
             curIt=*it;
-            std::cout<<"clear "<<curIt->text(0).toStdString()<<std::endl;
+//            std::cout<<"clear "<<curIt->text(0).toStdString()<<std::endl;
             if (curIt->checkState(column)){
-                std::cout<<"UNCHECK"<<std::endl;
+//                std::cout<<"UNCHECK"<<std::endl;
                 curIt->setCheckState(column,Qt::Unchecked);
             }
             curIt->setText(column,emptyString);
@@ -1051,7 +1051,7 @@ NetworkTree::fathersAssignation(QTreeWidgetItem *item){
         father=item->parent();
 
         if(!allBrothersAssigned(item)){
-            std::cout<<getAbsoluteAddress(father).toStdString()<<" assignPartially"<<std::endl<<std::endl;
+//            std::cout<<getAbsoluteAddress(father).toStdString()<<" assignPartially"<<std::endl<<std::endl;
             assignPartially(father);
         }
         else
@@ -1717,10 +1717,11 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
                             interpolate = !(values.front()==values.back());
                             Maquette::getInstance()->setCurveMuteState(boxID,address,!interpolate);
                             if(interpolate){
-                                std::cout<<"networkTree -> interpolate devient true"<<std::endl;
+//                                std::cout<<"networkTree -> interpolate devient true"<<std::endl;
                             }
                             else
-                                std::cout<<"networkTree -> interpolate devient false"<<std::endl;
+                                ;
+//                                std::cout<<"networkTree -> interpolate devient false"<<std::endl;
                             }
                         }
                     updateLine(item,interpolate,sampleRate,redundancy);
