@@ -62,11 +62,11 @@ using std::make_pair;
 #include "Engines.hpp"
 #include "Maquette.hpp"
 
-#define XAXIS_WIDTH 1.
+#define BORDER_WIDTH 2.
 
 CurveWidget::CurveWidget(QWidget *parent) : QWidget(parent)
 {
-    init();    
+    init();        
 }
 
 CurveWidget::CurveWidget(QWidget *parent, AbstractCurve *abCurve) : QWidget(parent)
@@ -96,7 +96,7 @@ void CurveWidget::init()
     _scaleX = 1;
     _scaleY = 1;
 
-    _interspace = width();
+    _interspace = width()-BORDER_WIDTH;
 
     _clicked = false;
     _unactive = false;
@@ -120,11 +120,11 @@ void CurveWidget::curveRepresentationOutdated() {
 
     //abscissa at the box middle only if the curve contains negative elements
     if(minCurveElement>=0.)
-        _xAxisPos = height()-1.;
+        _xAxisPos = height()-BORDER_WIDTH;
     else
-        _xAxisPos = height()/2.;
+        _xAxisPos = (height()-BORDER_WIDTH) /2.;
 
-    _interspace = width() / (float)(std::max((unsigned int)2,(unsigned int)(_abstract->_curve.size())) - 1);
+    _interspace = (width()-BORDER_WIDTH) / (float)(std::max((unsigned int)2,(unsigned int)(_abstract->_curve.size())) - 1);
     _minY = minCurveElement;
 
 //    _maxY =  *(std::max_element(_abstract->_curve.begin(),_abstract->_curve.end()));
@@ -132,7 +132,7 @@ void CurveWidget::curveRepresentationOutdated() {
     _maxY = std::max((float)1.,maxCurveElement);
 
     float halfSizeY = std::max(fabs(_maxY),fabs(_minY));    
-    _scaleY = 2*_xAxisPos / (2*halfSizeY);
+    _scaleY = 2*(_xAxisPos - BORDER_WIDTH) / (2*halfSizeY);
 
     update();
 }
@@ -327,8 +327,8 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
                 float mousePosY = event->pos().y();
                 float pow = 1.;
                 QPointF lastPoint = absoluteCoordinates(QPointF(1,_abstract->_curve.back()));
-                if (mousePosY > lastPoint.y()) { // mouse under : pow between 0 and 1
-                    pow = 1 - std::min((float)(mousePosY - lastPoint.y()),(float)50.) / 10.;
+                if (mousePosY > lastPoint.y()) { // mouse under : pow between 0 and 1                    
+                    pow = std::max( 1 - std::min((float)(mousePosY - lastPoint.y()),(float)50.) / 50., 0.1);
                 }
                 else if (lastPoint.y() > mousePosY){ // mouse above : pow between 1 and 6
                     pow = 1 + std::min((float)(lastPoint.y() - mousePosY),(float)50.) / 10.;
@@ -345,11 +345,11 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
                     float div;
                     if (mousePosY > it->second.first) { // mouse under : pow between 0 and 1
                         div = std::min(50.,(double)std::max(fabs(_maxY),fabs(_minY)));
-                        pow = std::max(1 - std::min(mousePosY - it->second.first,(float)50.) / (double)div, 0.1);
+                        pow = std::max(1 - std::min(mousePosY - it->second.first,(float)50.) / (double)div, 0.1);                        
                     }
                     else if (it->second.first > mousePosY){ // mouse above : pow between 1 and 6
                         div = std::min(50.,std::max(fabs(_maxY),fabs(_minY)))/5;
-                        pow = 1 + std::min(it->second.first - mousePosY,(float)50.) / div;
+                        pow = 1 + std::min(it->second.first - mousePosY,(float)50.) / div;                        
                     }
                     it->second = std::make_pair<float,float>(it->second.first,pow);
                     _movingBreakpointY = -1;
