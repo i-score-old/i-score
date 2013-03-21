@@ -62,10 +62,11 @@ using std::make_pair;
 #include "Engines.hpp"
 #include "Maquette.hpp"
 
+#define XAXIS_WIDTH 1.
 
 CurveWidget::CurveWidget(QWidget *parent) : QWidget(parent)
 {
-    init();
+    init();    
 }
 
 CurveWidget::CurveWidget(QWidget *parent, AbstractCurve *abCurve) : QWidget(parent)
@@ -103,9 +104,10 @@ void CurveWidget::init()
     _movingBreakpointX = -1;
     _movingBreakpointY = -1;
     _minY = -100;
-    _maxY = 100;
+    _maxY = 100;    
     _lastPointSelected = false;
     setLayout(_layout);
+    _xAxisPos = height()/2.;
 }
 
 AbstractCurve * CurveWidget::abstractCurve() {
@@ -113,14 +115,24 @@ AbstractCurve * CurveWidget::abstractCurve() {
 }
 
 void CurveWidget::curveRepresentationOutdated() {
+    float maxCurveElement = *(std::max_element(_abstract->_curve.begin(),_abstract->_curve.end()));
+    float minCurveElement = *(std::min_element(_abstract->_curve.begin(),_abstract->_curve.end()));
+
+    //abscissa at the box middle only if the curve contains negative elements
+    if(minCurveElement>=0.)
+        _xAxisPos = height()-1.;
+    else
+        _xAxisPos = height()/2.;
+
     _interspace = width() / (float)(std::max((unsigned int)2,(unsigned int)(_abstract->_curve.size())) - 1);
-    _minY = *(std::min_element(_abstract->_curve.begin(),_abstract->_curve.end()));
+    _minY = minCurveElement;
 
 //    _maxY =  *(std::max_element(_abstract->_curve.begin(),_abstract->_curve.end()));
-    _maxY = std::max(float(1.),*(std::max_element(_abstract->_curve.begin(),_abstract->_curve.end())));
+
+    _maxY = std::max((float)1.,maxCurveElement);
 
     float halfSizeY = std::max(fabs(_maxY),fabs(_minY));    
-    _scaleY = height() / (2*halfSizeY);    
+    _scaleY = 2*_xAxisPos / (2*halfSizeY);
 
     update();
 }
@@ -183,7 +195,7 @@ CurveWidget::relativeCoordinates(const QPointF &point) {
     float finalX = std::max((float)0.,std::min((float)1.,translatedX / width() ));
 
     float pointY = point.y();
-    float translatedY = pointY - height()/2.;
+    float translatedY = pointY - _xAxisPos;
     float symetricalY = - translatedY;
     float finalY = symetricalY / (float)_scaleY;
 
@@ -201,7 +213,7 @@ CurveWidget::absoluteCoordinates(const QPointF &point)
     float pointY = point.y();
     float scaledY = pointY * (float)_scaleY;
     float symetricalY = -scaledY;
-    float finalY = symetricalY + height()/2.;
+    float finalY = symetricalY + _xAxisPos;
 
     return QPointF(finalX,finalY);
 }
@@ -482,8 +494,11 @@ void CurveWidget::paintEvent(QPaintEvent * /* event */) {
     static const QColor MOVING_BREAKPOINT_COLOR(Qt::darkBlue);
     static const QColor UNACTIVE_COLOR(Qt::darkGray);
 
-    painter->setPen(AXE_COLOR);
-    painter->drawLine(0,height()/2.,width(),height()/2.); // Abcisses line
+    // Abcisses line
+    QPen penXAxis(_unactive ? UNACTIVE_COLOR : AXE_COLOR);
+    painter->setPen(penXAxis);
+    painter->drawLine(0,_xAxisPos,width(),_xAxisPos);
+
     painter->setPen(BASE_COLOR);
 
     vector<float>::iterator it;
