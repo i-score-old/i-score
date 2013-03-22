@@ -16,16 +16,16 @@ OS=$1
 if [ "$OS" = "LINUX" ] || [ "$OS" = "LINUX64" ]
 then
 {
-DEVICE_MANAGER_PATH='/Users/WALL-E/Documents/Iscore/Device-Manager'
-LIB_ISCORE_PATH='/Users/WALL-E/Documents/Iscore/libIscore'
-I-SCORE_PATH='/Users/WALL-E/Documents/Iscore/i-score'
+DEVICE_MANAGER_PATH='$CURRENT_PATH/../Device-Manager'
+LIB_ISCORE_PATH='$CURRENT_PATH/../libIscore'
+ISCORE_PATH='$CURRENT_PATH'
 }
 elif [ "$OS" = "MACOS" ] || [ "$OS" = "MACOS64" ]
 then
 {
-DEVICE_MANAGER_PATH='/Users/josephlarralde/Documents/workspace/DeviceManager'
-LIB_ISCORE_PATH='/Users/josephlarralde/Documents/workspace/libIscore'
-I-SCORE_PATH='/Users/josephlarralde/Documents/workspace/DeviceManager/i-score'
+DEVICE_MANAGER_PATH='$CURRENT_PATH/../Device-Manager'
+LIB_ISCORE_PATH='$CURRENT_PATH/../libIscore'
+ISCORE_PATH='$CURRENT_PATH'
 }
 fi
 
@@ -43,7 +43,7 @@ echo '-=[START]=-'
 
 echo 'Device-Manager changes tranfert'
 
-cp -r $I-SCORE_PATH/devManChanges/* $DEVICE_MANAGER_PATH
+cp -r $ISCORE_PATH/devManChanges/* $DEVICE_MANAGER_PATH
 
 ## Device-Manager Compilation
 
@@ -159,7 +159,7 @@ chmod u+x install.sh
 ./install.sh
 
 ## i-score Compilation
-cd $I-SCORE_PATH
+cd $ISCORE_PATH
 echo '-=[i-score]=- Cleaning ...'
 $MAKE_CLEAN
 if [ "$OS" = "LINUX" ]

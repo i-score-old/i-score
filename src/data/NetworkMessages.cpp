@@ -38,7 +38,7 @@ knowledge of the CeCILL license and that you accept its terms.
 */
 #include "NetworkMessages.hpp"
 #include "Maquette.hpp"
-#include <Qmap>
+#include <QMap>
 #include <set>
 #include <sstream>
 #include <limits>
