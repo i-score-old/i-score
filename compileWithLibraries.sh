@@ -16,9 +16,9 @@ OS=$1
 if [ "$OS" = "LINUX" ] || [ "$OS" = "LINUX64" ]
 then
 {
-DEVICE_MANAGER_PATH='$CURRENT_PATH/../Device-Manager'
-LIB_ISCORE_PATH='$CURRENT_PATH/../libIscore'
-ISCORE_PATH='$CURRENT_PATH'
+DEVICE_MANAGER_PATH="$CURRENT_PATH/../Device-Manager"
+LIB_ISCORE_PATH="$CURRENT_PATH/../libIscore"
+ISCORE_PATH="$CURRENT_PATH"
 }
 elif [ "$OS" = "MACOS" ] || [ "$OS" = "MACOS64" ]
 then
