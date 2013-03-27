@@ -597,9 +597,6 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     QGraphicsScene::mousePressEvent(mouseEvent);
     _clicked = true;
 
-//    std::cout<<"mouse "<<_view->mapToScene(mouseEvent->pos().toPoint()).x()<<" "<< _view->mapToScene(mouseEvent->pos().toPoint()).y()<<std::endl;
-//    std::cout<<"CenterCoordinates "<<_view->getCenterCoordinates().x()<<" "<< _view->getCenterCoordinates().y()<<std::endl;
-
     if (_tempBox) {
         removeItem(_tempBox);
         _tempBox = NULL;

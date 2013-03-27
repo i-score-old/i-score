@@ -1381,7 +1381,7 @@ void
 NetworkTree::contextMenuEvent(QContextMenuEvent *event){
     Q_UNUSED(event);
     if(currentItem()->type() == NodeNamespaceType)
-        std::cout<<"OK CONTEXT MENU"<<std::endl;
+        ;//TODO : context event for device editing
 }
 
 void

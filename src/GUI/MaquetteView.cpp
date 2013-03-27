@@ -299,7 +299,6 @@ MaquetteView::zoomIn()
         Maquette::getInstance()->updateBoxesFromEngines();
 
         QPointF newCenter(2*getCenterCoordinates().x(),2*getCenterCoordinates().y());
-//        std::cout<<"new center ("<<newCenter.x()<<";"<<newCenter.y()<<") zoom > "<<_zoom<<std::endl;
         centerOn(newCenter);
         _scene->updateProgressBar();
 	}
@@ -360,7 +359,6 @@ MaquetteView::zoomOut()
     Maquette::getInstance()->updateBoxesFromEngines();    
 
     QPointF newCenter(getCenterCoordinates().x()/2,getCenterCoordinates().y()/2);
-//    std::cout<<"new center ("<<newCenter.x()<<";"<<newCenter.y()<<") zoom > "<<_zoom<<std::endl;
     centerOn(newCenter);
     _scene->updateProgressBar();
 }
