@@ -1752,10 +1752,12 @@ Maquette::save(const string &fileName) {
 
     //OSC Messages
     QList<QString> OSCMessages = _scene->editor()->networkTree()->getOSCMessages();
+
     QDomElement OSCMessagesNode = _doc->createElement("OSCMessages");
     QDomElement OSCMessageNode;
 
     for(QList<QString>::iterator it=OSCMessages.begin() ; it!=OSCMessages.end() ; it++){
+
         OSCMessageNode = _doc->createElement("OSC");
         OSCMessageNode.setAttribute("message",*it);
         OSCMessagesNode.appendChild(OSCMessageNode);
