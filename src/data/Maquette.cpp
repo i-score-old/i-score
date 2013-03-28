@@ -78,6 +78,8 @@ typedef map<unsigned int,TriggerPoint*> TrgPntMap;
 
 using namespace SndBoxProp;
 
+#define SCENARIO_DURATION 1800000
+
 void
 Maquette::init() {
 /*	char buf[256];
@@ -85,10 +87,9 @@ Maquette::init() {
 	string pluginsDir;
 	pluginsDir.append(buf);
 	pluginsDir.append("/plugins");*/
-	string pluginsDir = "/usr/local/lib/IScore";
+	string pluginsDir = "/usr/local/lib/IScore";    
 
-	_engines = new Engines(SCENARIO_SIZE,pluginsDir);
-
+    _engines = new Engines(SCENARIO_DURATION,pluginsDir);
     _engines->getLoadedNetworkPlugins(_plugins,_listeningPorts);
 
     //pour maintenir le fonctionnement pendant le developpement : l'appli n'est pas auto portée.
@@ -1194,8 +1195,8 @@ bool Maquette::getCurveAttributes(unsigned int boxID, const std::string &address
 	unsigned int &sampleRate, bool &redundancy, bool &interpolate, vector<float>& values, vector<string> &argTypes,
 	vector<float> &xPercents, vector<float> &yValues, vector<short> &sectionType, vector<float> &coeff) {
 
-	if (_engines->getCurveValues(boxID,address,argPosition,values)) {
-        if (_engines->getCurveSections(boxID,address,argPosition,xPercents,yValues,sectionType,coeff)) {
+	if (_engines->getCurveValues(boxID,address,argPosition,values)) {        
+        if (_engines->getCurveSections(boxID,address,argPosition,xPercents,yValues,sectionType,coeff)) {            
 			sampleRate = _engines->getCurveSampleRate(boxID,address);
 			redundancy = _engines->getCurveRedundancy(boxID,address);
 			interpolate = !_engines->getCurveMuteState(boxID,address);
@@ -1287,7 +1288,10 @@ Maquette::addRelation(unsigned int ID1, BoxExtremity firstExtremum, unsigned int
         _boxes[ID2]->addRelation(secondExtremum,newRel);
 		_scene->addItem(newRel);
 		updateBoxesFromEngines(movedBoxes);
-        _scene->boxesMoved(movedBoxes);
+
+        //TODO : Check if can be comment
+//        _scene->boxesMoved(movedBoxes);
+
 		return (int)relationID;
 	}
 
@@ -1307,7 +1311,7 @@ Maquette::addRelation(const AbstractRelation &abstract) {
 		_relations[abstract.ID()] = newRel;
 		_scene->addItem(newRel);
 		_boxes[abstract.firstBox()]->addRelation(abstract.firstExtremity(),newRel);
-        _boxes[abstract.secondBox()]->addRelation(abstract.secondExtremity(),newRel);
+        _boxes[abstract.secondBox()]->addRelation(abstract.secondExtremity(),newRel);        
 		newRel->updateCoordinates();        
 		return (int)abstract.ID();
 	}
@@ -1427,27 +1431,35 @@ Maquette::initSceneState(){
 
         }
         else if(gotoValue > currentBox->date() && gotoValue < (currentBox->date()+currentBox->duration())){
-            //goto au milieu d'une boîte : On envoie la valeur du début de boîte
-            boxMsgs = currentBox->getStartState();
+            //goto au milieu d'une boîte : On envoie la valeur du début de boîte            
+            boxMsgs = currentBox->getStartState();            
             curvesList = _engines->getCurvesAddress(boxID);
-        }
-        else if(gotoValue == currentBox->date()){
-            boxMsgs = currentBox->getStartState();
-        }
 
-
+            //On supprime les messages si ils sont déjà associés à une courbe (le moteur les envoie automatiquement)
+            for (unsigned int i=0 ; i<curvesList.size() ; i++){
+                //sauf si la courbe a été désactivée manuellement
+                if(!getCurveMuteState(boxID,curvesList[i])){
+                    msgs.remove(QString::fromStdString(curvesList[i]));
+                }
+            }            
+        }
+        else if(gotoValue == currentBox->date()){            
+            boxMsgs = currentBox->getStartState();            
+        }
         boxAddresses = boxMsgs.keys();
 
         //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
         for(QList<QString>::iterator it2 = boxAddresses.begin() ; it2!=boxAddresses.end() ; it2++){
-            if(msgs.contains(*it2)){
-                if(msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second < gotoValue)
-                    msgs.insert(*it2,boxMsgs.value(*it2));
+            if(msgs.contains(*it2)){                
+                if(msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second <= gotoValue){
+                    msgs.insert(*it2,boxMsgs.value(*it2));                    
+                }
             }
             //sinon on ajoute dans la liste de messages
             else
-                if(boxMsgs.value(*it2).second <= gotoValue)
+                if(boxMsgs.value(*it2).second <= gotoValue){
                     msgs.insert(*it2,boxMsgs.value(*it2));
+                }
         }
 
         //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
@@ -1456,14 +1468,9 @@ Maquette::initSceneState(){
             _engines->setCtrlPointMutingState(boxID,1,true);
         }
         //    End messages
-        if(currentBox->date()+currentBox->duration()<gotoValue){
+        if(currentBox->date()+currentBox->duration()<gotoValue){            
             _engines->setCtrlPointMutingState(boxID,2,true);
         }
-
-        //On supprime les messages si ils sont déjà associés à une courbe (le moteur les envoie automatiquement)
-        for (unsigned int i=0 ; i<curvesList.size() ; i++)
-            msgs.remove(QString::fromStdString(curvesList[i]));
-
     }
 
     //traduction en QMap<QString,QString>, on supprime le champs date des messages
@@ -1682,7 +1689,7 @@ Maquette::getNetworkHost(){
 }
 
 void
-Maquette::save(const string &fileName) {
+Maquette::save(const string &fileName) {    
     _engines->store(fileName+".simone");    
 
     QFile file(QString::fromStdString(fileName));
@@ -1745,10 +1752,12 @@ Maquette::save(const string &fileName) {
 
     //OSC Messages
     QList<QString> OSCMessages = _scene->editor()->networkTree()->getOSCMessages();
+
     QDomElement OSCMessagesNode = _doc->createElement("OSCMessages");
     QDomElement OSCMessageNode;
 
     for(QList<QString>::iterator it=OSCMessages.begin() ; it!=OSCMessages.end() ; it++){
+
         OSCMessageNode = _doc->createElement("OSC");
         OSCMessageNode.setAttribute("message",*it);
         OSCMessagesNode.appendChild(OSCMessageNode);
@@ -1756,7 +1765,6 @@ Maquette::save(const string &fileName) {
     root.appendChild(OSCMessagesNode);
 
     //***************************************************************
-
 
     QTextStream ts(&file);
     ts << _doc->toString();
@@ -2380,7 +2388,6 @@ Maquette::load(const string &fileName){
 
     //reload networkTree
     _scene->editor()->networkTree()->load();
-
 
     /************************ OSC ************************/
     if(root.childNodes().size()>=2){

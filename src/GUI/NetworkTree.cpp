@@ -220,14 +220,21 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
     if(!itemsName.empty()){
     //Boucle sur liste message
         for(it=itemsName.begin() ; it!=itemsName.end() ; ++it){
+
             curName = QString::fromStdString(*it);
             address = curName.split(" ");
 
             splitAddress = address.first().split("/");
+            int nbMembers = address.size();
             int nbSection = splitAddress.size();
-            if (nbSection>=2){
+            if (nbSection>=2){                
                 curName = address.first();
                 msg.value = address.at(1);//second value
+                if(nbMembers>1){//pour les listes
+                    for(int i=2;i<nbMembers;i++){
+                        msg.value +=QString(tr(" ")+address.at(i));
+                    }
+                }                
                 msg.device = curName.section('/',0,0);
                 msg.message= tr("/");
                 msg.message += curName.section('/',1,nbSection);
@@ -395,8 +402,9 @@ NetworkTree::setOSCMessageName(QTreeWidgetItem *item, QString name){
 }
 
 QList<QString>
-NetworkTree::getOSCMessages(){    
+NetworkTree::getOSCMessages(){
     return _OSCMessages.values();
+
 //    QList<QTreeWidgetItem*>::iterator it;
 //    QList<QString> msgsList;
 //    QTreeWidgetItem *curIt;
@@ -646,12 +654,23 @@ NetworkTree::clearColumn(unsigned int column){
 
         for (it=assignedItems.begin(); it!=assignedItems.end(); it++){
             curIt=*it;
-
+//            std::cout<<"clear "<<curIt->text(0).toStdString()<<std::endl;
             if (curIt->checkState(column)){
+//                std::cout<<"UNCHECK"<<std::endl;
                 curIt->setCheckState(column,Qt::Unchecked);
             }
             curIt->setText(column,emptyString);
         }
+
+        //clear ça :
+//        std::cout<<"AllChihldren : "<<std::endl;
+//        for(int i=0; i<_nodesWithAllChildrenAssigned.size(); i++){
+//            std::cout<<_nodesWithAllChildrenAssigned.at(i)->text(0).toStdString()<<std::endl;
+//        }
+//        std::cout<<"SomeChihldren : "<<std::endl;
+//        for(int i=0; i<_nodesWithSomeChildrenAssigned.size(); i++){
+//            std::cout<<_nodesWithSomeChildrenAssigned.at(i)->text(0).toStdString()<<std::endl;
+//        }
     }
 }
 
@@ -662,7 +681,7 @@ NetworkTree::clearStartMsgs(){
 }
 
 void
-NetworkTree::clearDevicesStartMsgs(QList<QString> devices){
+NetworkTree::clearDevicesStartMsgs(QList<QString> devices){    
     clearColumn(START_COLUMN);
     _startMessages->clearDevicesMsgs(devices);
 }
@@ -744,14 +763,24 @@ NetworkTree::fatherColumnCheck(QTreeWidgetItem *item, int column){
     if (item->parent()!=NULL){
         QTreeWidgetItem *father = item->parent();
 
-        if(allBrothersChecked(item,column))
+        if(allBrothersChecked(item,column)){
+//            std::cout<<getAbsoluteAddress(item).toStdString()<<" > allbothers"<<std::endl;
+//            std::cout<<"check "<< getAbsoluteAddress(father).toStdString()<<std::endl;
             father->setCheckState(column,Qt::Checked);//Check box OK
-        else{
-            if(brothersPartiallyChecked(item,column))//PartialCheck
-                father->setCheckState(column,Qt::PartiallyChecked);
-            else//No check
-                father->setCheckState(column,Qt::Unchecked);
         }
+        else{
+            if(brothersPartiallyChecked(item,column)){//PartialCheck
+//                std::cout<<getAbsoluteAddress(item).toStdString()<<"> partial"<<std::endl;
+                father->setCheckState(column,Qt::PartiallyChecked);
+//                std::cout<<"partialcheck "<< getAbsoluteAddress(father).toStdString()<<std::endl;
+            }
+            else{//No check
+//                std::cout<<getAbsoluteAddress(item).toStdString()<<"> nobothers"<<std::endl;
+                father->setCheckState(column,Qt::Unchecked);                
+//                std::cout<<"uncheck "<< getAbsoluteAddress(father).toStdString()<<std::endl;
+            }
+        }
+//        std::cout<<std::endl;
         fatherColumnCheck(father,column);
     }
 }
@@ -1023,21 +1052,23 @@ NetworkTree::fathersAssignation(QTreeWidgetItem *item){
         father=item->parent();
 
         if(!allBrothersAssigned(item)){
+//            std::cout<<getAbsoluteAddress(father).toStdString()<<" assignPartially"<<std::endl<<std::endl;
             assignPartially(father);
         }
         else
             if(allBrothersAssigned(item)){
                 QTreeWidgetItem *father;
                 father=item->parent();
+//                std::cout<<getAbsoluteAddress(father).toStdString()<<" assignTotally"<<std::endl<<std::endl;
                 assignTotally(father);
-                }
+            }
         fathersAssignation(father);
     }
 }
 
 bool
 NetworkTree::allBrothersAssigned(QTreeWidgetItem *item){
-
+//    std::cout<<"<-- NetworkTree::allBrothersAssigned("<<item->text(0).toStdString()<<")-->"<<std::endl;
     QTreeWidgetItem *father, *child;
 
     if(item->parent()!=NULL){
@@ -1046,18 +1077,25 @@ NetworkTree::allBrothersAssigned(QTreeWidgetItem *item){
         for(int i=0 ; i<childrenCount ; i++){
             child=father->child(i);
             if(child->type() == NodeNamespaceType){
-                if(!_nodesWithSomeChildrenAssigned.contains(child))
+//                std::cout<<child->text(0).toStdString()<<" > NodeNameSpace"<<std::endl;
+                if(!_nodesWithSomeChildrenAssigned.contains(child)){
+//                    std::cout<<"----------------------> false1 "<<std::endl;
                     return false;
+                }
             }
             else
                 if(!isAssigned(child)){
+//                    std::cout<<"----------------------> false2 "<<std::endl;
                     return false;
-            }
+                }
         }
+//        std::cout<<"----------------------> true1"<<std::endl;
         return true;
     }
-    else
+    else{
+//        std::cout<<"----------------------> true2"<<std::endl;
         return true;
+    }
 }
 
 bool
@@ -1343,7 +1381,7 @@ void
 NetworkTree::contextMenuEvent(QContextMenuEvent *event){
     Q_UNUSED(event);
     if(currentItem()->type() == NodeNamespaceType)
-        std::cout<<"OK CONTEXT MENU"<<std::endl;
+        ;//TODO : context event for device editing
 }
 
 void
@@ -1549,14 +1587,16 @@ NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue){
             _startMessages->addMessage(item,Qaddress);
             Data data;
             assignItem(item,data);
-            if(item->type()==OSCNode)
+            if(item->type()==OSCNode){
                 addOSCStartMessage(item,Qaddress);
+            }
             emit(startMessageValueChanged(item));
         }
         else{            
             if (_startMessages->setValue(item,newValue)){
-                if(item->type()==OSCNode)
+                if(item->type()==OSCNode){
                     _OSCStartMessages->setValue(item,newValue);
+                }
                 emit(startMessageValueChanged(item));
             }
             else
@@ -1675,15 +1715,18 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
 
                 bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);                
                 if (getCurveSuccess){                    
-                    if(forceUpdate){
-                        interpolate = !(values.front()==values.back());
-                        Maquette::getInstance()->setCurveMuteState(boxID,address,!interpolate);
+                    if(forceUpdate){                        
                         if(interpolate){
-                            std::cout<<"networkTree -> interpolate devient true"<<std::endl;
+                            interpolate = !(values.front()==values.back());
+                            Maquette::getInstance()->setCurveMuteState(boxID,address,!interpolate);
+                            if(interpolate){
+//                                std::cout<<"networkTree -> interpolate devient true"<<std::endl;
+                            }
+                            else
+                                ;
+//                                std::cout<<"networkTree -> interpolate devient false"<<std::endl;
+                            }
                         }
-                        else
-                            std::cout<<"networkTree -> interpolate devient false"<<std::endl;
-                    }
                     updateLine(item,interpolate,sampleRate,redundancy);
                 }
             }

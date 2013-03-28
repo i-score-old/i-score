@@ -880,7 +880,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
                _networkTree->loadNetworkTree(abBox);
                 startMessagesChanged();
                 endMessagesChanged();
-                _networkTree->expandNodes(_networkTree->assignedItems().keys());
+//                _networkTree->expandNodes(_networkTree->assignedItems().keys());
             }
             else{
                 _networkTree->setAssignedItems(abBox->networkTreeItems());
@@ -1088,7 +1088,7 @@ void
 AttributesEditor::startChanged()
 {
 	BasicBox * box = _scene->getBox(_boxEdited);
-	if (box != NULL) {
+	if (box != NULL) {        
 		box->moveBy(_boxStartValue->value() * S_TO_MS / MaquetteScene::MS_PER_PIXEL - box->getTopLeft().x(),0);
 		_scene->boxMoved(_boxEdited);
 	}
@@ -1330,7 +1330,6 @@ AttributesEditor::changeColor() {
     else{
         _scene->displayMessage("No box selected",INDICATION_LEVEL);
     }
-
 }
 
 void

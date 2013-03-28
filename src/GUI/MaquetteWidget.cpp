@@ -119,7 +119,6 @@ MaquetteWidget::paintEvent(QPaintEvent *event){
 //    painter->setPen(pen);
 //    painter->drawRect(QRect(0,3,10,10));
 ////    painter->drawPath(path);
-//    std::cout<<"PINA"<<std::endl;
 //    delete painter;
 }
 

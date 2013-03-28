@@ -310,7 +310,7 @@ MainWindow::save()
     return saveAs();
   }
   else {
-    return saveFile(_curFile);
+    return saveFile(_curFile);    
   }
 }
 
@@ -1032,6 +1032,31 @@ MainWindow::loadFile(const QString &fileName)
 bool
 MainWindow::saveFile(const QString &fileName)
 {
+    /**** Backup automatique Résidence Albi ****/
+//    QDate date = QDate::currentDate();
+//    QTime time = QTime::currentTime();
+//    QString timeString = time.toString();
+
+//    QString concat(tr("(")+QString("%1-%2-%3").arg(date.day()).arg(date.month()).arg(date.year())+tr("-")+timeString+tr(")"));
+
+//    QString backupName = fileName;
+//    int i = fileName.indexOf(".xml");
+//    backupName.insert(i,concat);
+
+//    QProcess process;
+//    QStringList XMLargs, SIMONEargs;
+
+//    XMLargs<< fileName;
+//    XMLargs<< backupName;
+
+//    SIMONEargs<< QString(fileName+tr(".simone"));
+//    SIMONEargs<< QString(backupName+tr(".simone"));
+
+//    process.start("cp", XMLargs);
+//    process.execute("cp", SIMONEargs);
+//    process.close();
+    /*******************************************/
+
   QString fileN;
   if (!fileName.endsWith(".xml")) {
     fileN = fileName + ".xml";

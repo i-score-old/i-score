@@ -158,6 +158,11 @@ BasicBox::createMenus(){
     _startMenu->addAction(_jumpToStartCue);
     _startMenu->addAction(_updateStartCue);
 
+    _endMenu = new QMenu(tr("&EndMenu"));
+    _endMenu->setParent(_boxWidget);
+    _endMenu->setWindowModality(Qt::ApplicationModal);
+    _endMenu->addAction(_jumpToEndCue);
+    _endMenu->addAction(_updateEndCue);
 
     //--- start button ---
     QIcon startMenuIcon(":/images/boxStartMenu.svg");
@@ -175,11 +180,6 @@ BasicBox::createMenus(){
     _boxContentWidget->setStartMenu(_startMenu);
 
     //--- end button ---
-    _endMenu = new QMenu(tr("&EndMenu"));
-    _endMenu->setParent(_boxWidget);
-    _endMenu->setWindowModality(Qt::ApplicationModal);
-    _endMenu->addAction(_jumpToEndCue);
-    _endMenu->addAction(_updateEndCue);
     QIcon endMenuIcon(":/images/boxEndMenu.svg");
     _endMenuButton = new QPushButton();
     _endMenuButton->setIcon(endMenuIcon);
@@ -388,7 +388,7 @@ BasicBox::getSize() const
 
 QPointF
 BasicBox::getLeftGripPoint()
-{
+{    
     return QPointF(_abstract->topLeft().x(), _abstract->topLeft().y() + _abstract->height()/2.);
 }
 
@@ -461,8 +461,7 @@ void
 BasicBox::setSize(const QPointF & size)
 {
     _abstract->setWidth(std::max((float)size.x(),MaquetteScene::MS_PRECISION / MaquetteScene::MS_PER_PIXEL));
-    _abstract->setHeight(size.y());
-
+    _abstract->setHeight(size.y());    
     updateStuff();
 }
 
@@ -632,7 +631,7 @@ BasicBox::updateRelations(BoxExtremity extremity){
 
 void
 BasicBox::updateStuff()
-{
+{    
     updateBoxSize();
     if (_comment != NULL) {
         _comment->updatePos();
@@ -656,7 +655,7 @@ BasicBox::updateStuff()
 
 void
 BasicBox::addRelation(BoxExtremity extremity, Relation *rel)
-{
+{    
     map<BoxExtremity,Relation*>::iterator it;
     _relations[extremity][rel->ID()] = rel;
     _relations[extremity][rel->ID()]->updateCoordinates();
@@ -1178,6 +1177,14 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         setSelected(true);
 
+//        if(_startMenuButton->is){
+//            std::cout<<"<<<<<CHECKED>>>>>"<<std::endl;
+//            if(event->modifiers()==Qt::ControlModifier){
+//                std::cout<<"<<<<<STARTMENU>>>>>"<<std::endl;
+//                _updateStartCue->trigger();
+//            }
+//        }
+
         if(cursor().shape() == Qt::OpenHandCursor)
             setCursor(Qt::ClosedHandCursor);
         if (cursor().shape() == Qt::ArrowCursor) {
@@ -1652,7 +1659,7 @@ BasicBox::drawHoverShape(QPainter *painter){
 
 void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
+{    
     Q_UNUSED(option);
     Q_UNUSED(widget);
 //    QPen penR(Qt::lightGray,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);

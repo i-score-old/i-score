@@ -67,6 +67,7 @@ knowledge of the CeCILL license and that you accept its terms.
 static const int NETWORK_PORT = 7000;
 static const int OSC_NETWORK_PORT = 9999;
 
+
 static const std::string PLAY_ENGINES_MESSAGE = "/Transport/Play";
 static const std::string STOP_ENGINES_MESSAGE  = "/Transport/Stop";
 static const std::string PAUSE_ENGINES_MESSAGE = "/Transport/Pause";
@@ -679,6 +680,7 @@ class Maquette : public QObject
 	 */
 	void updateBoxesFromEngines();
     inline MaquetteScene *scene(){return _scene;}
+    static const unsigned int SIZE;
 
   public slots :
 
@@ -728,7 +730,7 @@ class Maquette : public QObject
   void setStartMessageToSend(unsigned int boxID,QTreeWidgetItem *item,QString address);
   void setEndMessageToSend(unsigned int boxID,QTreeWidgetItem *item,QString address);
   std::vector<std::string> getPlugins();
-  void removeNetworkDevice(string deviceName);
+  void removeNetworkDevice(string deviceName);    
 
  private :
 

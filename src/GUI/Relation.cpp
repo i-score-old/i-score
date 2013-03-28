@@ -167,7 +167,7 @@ Relation::toString() {
 
 void
 Relation::updateCoordinates()
-{
+{        
   BasicBox *box = _scene->getBox(_abstract->firstBox());
   if(box != NULL){
       switch (_abstract->firstExtremity()) {
@@ -434,16 +434,15 @@ Relation::mouseMoveEvent (QGraphicsSceneMouseEvent * event) {
         qreal factorX =  2*(eventPosX - _mouseClickPosSave.x());
         rightBox->moveBy(factorX,0.);
         rightBox->setTopLeft(rightBox->getTopLeft()+QPointF(factorX,0.));
-        rightBox->updateStuff();
+        rightBox->updateStuff();        
         _scene->boxMoved(rightBox->ID());
     }
 }
 
 void
 Relation::mouseReleaseEvent (QGraphicsSceneMouseEvent * event) {
-    QGraphicsItem::mouseReleaseEvent(event);
-
-    if(_middleHandleSelected){
+    QGraphicsItem::mouseReleaseEvent(event);    
+    if(_middleHandleSelected){       
         double startX = mapFromScene(_start).x();
         double endX = mapFromScene(_end).x();
         _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,(endX-startX)/_scene->zoom(),(endX-startX)/_scene->zoom());
@@ -506,8 +505,7 @@ Relation::shape() const
 }
 
 void
-Relation::updateFlexibility(){
-
+Relation::updateFlexibility(){    
     if(_scene->getBox(_abstract->secondBox())!=NULL){
         if(_abstract->secondExtremity() == BOX_START && _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START))
             _flexibleRelation = true;
@@ -524,14 +522,13 @@ Relation::updateFlexibility(){
     double startX = mapFromScene(_start).x();
     double endX = mapFromScene(_end).x();
 
-    if(_elasticMode){
+    if(_elasticMode){        
         _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,NO_BOUND,NO_BOUND);        
     }
-    else if (!_flexibleRelation){
-        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,(endX-startX)/_scene->zoom(),(endX-startX)/_scene->zoom()+RIGID_TOLERANCE);
-
+    else if (!_flexibleRelation){        
+        _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,(endX-startX)/_scene->zoom(),(endX-startX)/_scene->zoom()+RIGID_TOLERANCE);        
     }
-    else{
+    else{        
         changeBounds(0,NO_BOUND);
         _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,_abstract->minBound(),_abstract->maxBound());
     }

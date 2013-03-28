@@ -37,7 +37,7 @@ QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
 # Dossier des sources temporaires de Qt
 MOC_DIR = moc 
 # Dossier des binaires
-OBJETCS_DIR = bin
+OBJECTS_DIR = bin
 
 linux-g++ {
 LIBS += -lIscore -lDeviceManager -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodescheduling -lgecodeset -lgecodesupport -lgecodegraph
