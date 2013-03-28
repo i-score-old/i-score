@@ -16,7 +16,7 @@
 			neededFileNames = (
 				);
 			shellPath = "/bin/sh";
-			shellScript = "make\ -C\ /Users/nicolashincker/Documents/workspace/acousmoscribe\ -f\ \'i-score.xcodeproj/qt_makeqmake.mak\'";
+			shellScript = "make\ -C\ /Users/WALL-E/Documents/Iscore/i-score\ -f\ \'i-score.xcodeproj/qt_makeqmake.mak\'";
 		};
 		118FCBAABA162BA17933C789 = {
 			isa = PBXFileReference;
@@ -1929,7 +1929,7 @@
 				"C99A8FB6E40ADE861FF56DC2",
 				"7F3E602466E431ABBC2C3ACC");
 			shellPath = "/bin/sh";
-			shellScript = "make\ -C\ /Users/nicolashincker/Documents/workspace/acousmoscribe\ -f\ \'i-score.xcodeproj/qt_preprocess.mak\'";
+			shellScript = "make\ -C\ /Users/WALL-E/Documents/Iscore/i-score\ -f\ \'i-score.xcodeproj/qt_preprocess.mak\'";
 		};
 		C29B8785722055ED95EF7B57 = {
 			buildActionMask = 2147483647;
@@ -2120,7 +2120,7 @@
 			path = "";
 			refType = 4;
 		};
-		A4219A1AAFF00763FF569FFA = {
+		C5F16EC410D8D88129BB3788 = {
 			isa = PBXFileReference;
 			explicitFileType = "wrapper.application";
 			path = "i-score.app";
@@ -2129,12 +2129,12 @@
 		};
 		068F80C7519D0528FB08E821 = {
 			children = (
-				"A4219A1AAFF00763FF569FFA");
+				"C5F16EC410D8D88129BB3788");
 			isa = PBXGroup;
 			name = "Products";
 			refType = 4;
 		};
-		3149615A3D7AD6BDF230035A = {
+		C8963DE6094A958D6DDE6F7F = {
 			buildPhases = (
 				"D7BA7D76DAB5DD13389D6332",
 				"A0A52A2ADF7A1E2A99738674",
@@ -2151,7 +2151,7 @@
 				WARNING_CFLAGS = "";
 				PREBINDING = NO;
 				INFOPLIST_FILE = "Info.plist";
-				BUILD_ROOT = "/Users/nicolashincker/Documents/workspace/acousmoscribe";
+				BUILD_ROOT = "/Users/WALL-E/Documents/Iscore/i-score";
 				OTHER_LDFLAGS = (
 						"-headerpad_max_install_names",
 						"-L/Library/Frameworks",
@@ -2166,7 +2166,7 @@
 			};
 			dependencies = (
 				);
-			productReference = "A4219A1AAFF00763FF569FFA";
+			productReference = "C5F16EC410D8D88129BB3788";
 			shouldUseHeadermap = 1;
 			buildConfigurationList = 17B3380A4D6A7D415E7F2E1E;
 			isa = PBXNativeTarget;
@@ -2179,7 +2179,7 @@
 	<string>acousmoscribe.icns</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-    <key>CFBundleGetInfoString</key>
+ 	<key>CFBundleGetInfoString</key>
 	<string>Created by Qt/QMake</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
@@ -2387,7 +2387,7 @@
 			buildConfigurationList = "CC82A9286117DFED018F418F";
 			projectDirPath = "";
 			targets = (
-				"3149615A3D7AD6BDF230035A");
+				"C8963DE6094A958D6DDE6F7F");
 		};
 	};
 	rootObject = "91B15E841AA80083484172DE";
