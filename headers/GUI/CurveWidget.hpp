@@ -185,6 +185,7 @@ private :
     float _scaleMaxY; //!< Value for maximum vertical scaling.
 	float _minY;
 	float _maxY;
+    float _xAxisPos;
 
 	bool _lastPointSelected; //!< Last point selected.
 };

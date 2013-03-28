@@ -125,7 +125,6 @@ ParentBox::updateDisplay(QString displayMode){
     }
     else{
         for (it = _children.begin() ; it != _children.end() ; ++it) {
-            std::cout<<"curve\n";
             curBox = it->second;
             curBox->lower(true);
             curBox->setEnabled(false);

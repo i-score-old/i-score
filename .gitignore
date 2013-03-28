@@ -1,15 +1,17 @@
 *svn*
-*.o
+
+#Ignore i-score build files
 moc_*
 acousmoscribe.app   
 i-score.app     
 i-score.pro.user
 acousmoscribe.xcodeproj
 qrc_acousmoscribe.cpp
-.DS_Store
 compiler_*
 *~
 \#*
+Info.plist
+qrc_i-score.cpp
 org.eclipse*
 Doxyfile
 installation/acousmoscribe_MacOS_10_6*
@@ -20,3 +22,37 @@ installation/acousmoscribe_ubuntu64*
 /i-score.app/Contents/MacOS/i-score
 /acousmoscribe.app/
 /i-score.app/
+
+#Ignore DS_Store files
+.DS_Store
+
+logs
+build
+Debug
+Release
+Makefile
+
+# XCode files to be ignored
+xcuserdata
+*.mode1v3
+*.pbxuser
+*.perspectivev3
+project.xcworkspace
+*.mak
+
+*.layout
+*.depends
+#*.map
+*.ncb
+*.suo
+*.user
+*.tm_build_errors
+*.a
+*.lib
+
+# Files generated from templates by the build script
+JamomaModular.xcconfig
+
+# Git conflict files
+*.orig
+*.o

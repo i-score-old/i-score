@@ -19,6 +19,9 @@ INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /usr/local/i
 macx-g++ {
 INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /Library/Frameworks/ /usr/local/include/libxml2
 }
+macx-clang {
+INCLUDEPATH += . headers/GUI headers/data /usr/local/include/IScore /Library/Frameworks/ /usr/local/include/libxml2
+}
 
 QT += network xml svg
 
@@ -29,6 +32,11 @@ linux-g++-64 {
 QMAKE_LFLAGS += -L/usr/local/lib/
 }
 macx-g++ {
+QMAKE_LFLAGS += -L/usr/local/lib/ -L/System/Library/Frameworks/ -L/Library/Frameworks/
+QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=10.7
+QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
+}
+macx-clang {
 QMAKE_LFLAGS += -L/usr/local/lib/ -L/System/Library/Frameworks/ -L/Library/Frameworks/
 QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=10.7
 QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
@@ -48,6 +56,10 @@ LIBS += -lIscore -lDeviceManager -lxml2 -lgecodeint -lgecodesearch -lgecodedrive
 macx-g++ {
 LIBS += -lIscore -lDeviceManager -framework gecode -lxml2
 }
+macx-clang {
+LIBS += -lIscore -lDeviceManager -framework gecode -lxml2
+}
+
 # Input
 HEADERS += /usr/local/include/IScore/Engines.hpp \
 /usr/local/include/IScore/CSPTypes.hpp \

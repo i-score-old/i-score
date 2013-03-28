@@ -127,20 +127,14 @@ void CurvesWidget::curveSampleRateChanged(const QString &address,int value) {
 }
 
 void CurvesWidget::displayCurve(const QString &address){
-    std::cout<<"diplay()";
     std::string add = address.toStdString();
     map<string,CurveWidget *>::iterator curveIt = _curveMap.find(add);
-std::cout<<" 2 ";
     bool curveFound = (curveIt != _curveMap.end());
-std::cout<<" 3 ";
     if (curveFound) {
-        std::cout<<" 4 ";
         CurveWidget *curveWidget = curveIt->second;
         _tabWidget->clear();
-        std::cout<<" 5 ";
         _tabWidget->addTab(curveWidget,address);
     }
-    std::cout<<"END"<<std::endl;
 }
 
 bool
@@ -214,7 +208,6 @@ CurvesWidget::addToComboBox(const QString address){
 bool
 CurvesWidget::updateCurve(const string &address, bool forceUpdate)
 {
-    std::cout<<"CurvesWidget::UPDATECURVE"<<std::endl;
     BasicBox *box = Maquette::getInstance()->getBox(_boxID);
     if (box != NULL) // Box Found
     {
@@ -238,16 +231,12 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
 
         if (abCurve != NULL) // Abstract Curve found
         {
-            std::cout<<"CP1 -> ";
             if (abCurve->_show) // Abstract curve showing
             {
-                std::cout<<"abCurve->_show"<<std::endl;
                 if (curveFound) // Curve tab existing
                 {
-                     std::cout<<"curveFound"<<std::endl;
                     if (forceUpdate) // Force updating through engines
                     {
-                        std::cout<<"forceUpdate"<<std::endl;
                         bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                         if (getCurveSuccess) {
                             curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
@@ -259,7 +248,6 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                     }
                     else // No forcing : updating through abstract curve
                     {
-                        std::cout<<"!forceUpdate"<<std::endl;
                         curveTab->setAttributes(abCurve);
                         if (!_interpolation->updateLine(address,abCurve->_interpolate,abCurve->_sampleRate,abCurve->_redundancy,abCurve->_show)) {
                             _interpolation->addLine(address,abCurve->_interpolate,abCurve->_sampleRate,abCurve->_redundancy,abCurve->_show);
@@ -268,10 +256,8 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                 }
                 else // Curve tab not existing
                 {
-                    std::cout<<"!curveFound"<<std::endl;
                     if (forceUpdate) // Force creating through engines
                     {
-                        std::cout<<"force update"<<std::endl;
                         bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                         if (getCurveSuccess) {
                             // Create and set
@@ -296,7 +282,6 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
 
                     else // No forcing : create through abstract curve
                     {
-                        std::cout<<"!force update"<<std::endl;
                         // Create and set
                         curveTab = new CurveWidget(NULL);
                         curveTab->setAttributes(abCurve);
@@ -318,36 +303,27 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
             }
             else // Abstract curve hiding
             {
-                std::cout<<"!abst->show"<<std::endl;
-
-                //NICO
-
                 if (curveFound) // Curve tab existing
                 {
-                    std::cout<<"curveFound"<<std::endl;
 
                     if (forceUpdate) // Force updating through engines
                     {
-                        std::cout<<"force update"<<std::endl;
                         bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                         if (getCurveSuccess) {
                             if (values.front() != values.back()) {
                                 curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
                             }
                             else{
-                            // Set and assign new abstract curve to box                            
-                                std::cout<<"CurvesWidget getCurveSuccess"<<std::endl;
+                            // Set and assign new abstract curve to box
                                 curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
                             }
                         box->setCurve(address,curveTab->abstractCurve());
                         }
-
-                     //NICO
                     }
 
-                    else // No forcing : updating through abstract curve
+                    else
                     {
-                        std::cout<<"Noforcing"<<std::endl;
+                        // No forcing : updating through abstract curve
                     }
 
                     // Remove curve tab anyway
@@ -362,13 +338,10 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                 }
                 else // Curve tab not existing
                 {
-                    std::cout<<"!curveFound"<<std::endl;
                     if (forceUpdate) // Force updating through engines
                     {
-                        std::cout<<"forceUpdate"<<std::endl;
                         bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
                         if (getCurveSuccess) {
-                            std::cout<<"getCurveSuccess"<<std::endl;
                             // Create, set and assign new abstract curve to box
                             curveTab = new CurveWidget(NULL);
                             curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
@@ -381,7 +354,6 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                     }
                     else // No forcing : updating through abstract curve
                     {
-                        std::cout<<"!forceUpdate"<<std::endl;
                         if (!_interpolation->updateLine(address,abCurve->_interpolate,abCurve->_sampleRate,abCurve->_redundancy,abCurve->_show)) {
                             _interpolation->addLine(address,abCurve->_interpolate,abCurve->_sampleRate,abCurve->_redundancy,abCurve->_show);
                         }
@@ -391,31 +363,22 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
         }
         else // Abstract Curve not found
         {
-            std::cout<<"CP2 -> ";
             // Get attributes and determine if shown
             bool show = true;
-
-            /* *** AJOUT NICO***  */
             interpolate = true;
-            /**********************/
 
             bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
             if (getCurveSuccess) {
                 if (xPercents.empty() && yValues.empty() && values.size() >= 2) {
                     if (values.front() == values.back()) {
                         show = false;
-
-                        /* *** AJOUT NICO***  */
                         interpolate = false;
-                        /**********************/
                     }
                 }
                 if (show) // Curve showing
                 {
-                    std::cout<<"curve show"<<std::endl;
                     if (!curveFound) // Curve tab not existing
                     {
-                        std::cout<<"!curveFound"<<std::endl;
                         // Creating curve tab from engines anyway (no abstract curve)
                         // Create and set
                         curveTab = new CurveWidget(NULL);
@@ -424,14 +387,11 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                         // Add tab and store
                         addCurve(curveAddressStr,curveTab);
                         addToComboBox(curveAddressStr);
-                        std::cout<<"ATTENTION BUG"<<std::endl;
-                        std::cout<<"WE WANT TO DISPLAY " <<_comboBox->currentText().toStdString()<<std::endl;
                         displayCurve(_comboBox->currentText());
                     }
                     else // Curve tab existing
                     {
                         // Updating curve tab from engines anyway (no abstract curve)
-                        std::cout<<"curveFound"<<std::endl;
                     }
 
                     curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
@@ -443,10 +403,8 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                 }
                 else // Curve hiding
                 {
-                    std::cout<<"SHOW==FALSE"<<std::endl;
                     if (curveFound) // Curve tab existing
                     {
-                        std::cout<<"curveFound"<<std::endl;
                         // Creating curve tab from engines anyway (no abstract curve)
                         // Set and assign new abstract curve to box
                         curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
@@ -458,7 +416,6 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
 
                     else // Curve tab not existing
                     {
-                        std::cout<<"!curveFound"<<std::endl;
                         // Creating curve tab from engines anyway (no abstract curve)
                         curveTab = new CurveWidget(NULL);
                         curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
@@ -475,10 +432,8 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
     }
     else // Box Not Found
     {
-        std::cout<<"CurvesWidget curve==NULL"<<std::endl;
         return false;
     }
-    std::cout<<std::endl;
     return false;
 }
 

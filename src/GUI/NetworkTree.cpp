@@ -402,8 +402,9 @@ NetworkTree::setOSCMessageName(QTreeWidgetItem *item, QString name){
 }
 
 QList<QString>
-NetworkTree::getOSCMessages(){    
+NetworkTree::getOSCMessages(){
     return _OSCMessages.values();
+
 //    QList<QTreeWidgetItem*>::iterator it;
 //    QList<QString> msgsList;
 //    QTreeWidgetItem *curIt;
@@ -1380,7 +1381,7 @@ void
 NetworkTree::contextMenuEvent(QContextMenuEvent *event){
     Q_UNUSED(event);
     if(currentItem()->type() == NodeNamespaceType)
-        std::cout<<"OK CONTEXT MENU"<<std::endl;
+        ;//TODO : context event for device editing
 }
 
 void
@@ -1586,14 +1587,16 @@ NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue){
             _startMessages->addMessage(item,Qaddress);
             Data data;
             assignItem(item,data);
-            if(item->type()==OSCNode)
+            if(item->type()==OSCNode){
                 addOSCStartMessage(item,Qaddress);
+            }
             emit(startMessageValueChanged(item));
         }
         else{            
             if (_startMessages->setValue(item,newValue)){
-                if(item->type()==OSCNode)
+                if(item->type()==OSCNode){
                     _OSCStartMessages->setValue(item,newValue);
+                }
                 emit(startMessageValueChanged(item));
             }
             else
