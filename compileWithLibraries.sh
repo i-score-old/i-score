@@ -156,7 +156,7 @@ echo '-=[LibIScore]=- Compiling  ...'
 $MAKE
 echo '-=[LibIScore]=- Installing ...'
 chmod u+x install.sh
-./install.sh
+sudo ./install.sh
 
 ## i-score Compilation
 cd $I-SCORE_PATH
