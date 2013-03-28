@@ -96,6 +96,7 @@ typedef enum InteractionMode {SELECTION_MODE = 0, CREATION_MODE = 1,
  * \brief Enum handling various box creation modes.
  */
 typedef enum {NB_MODE = -1,CB_MODE = 0,SB_MODE = 1, PB_MODE = 2} BoxCreationMode;
+
 /*!
  * \brief Enum handling various resize modes.
  */
@@ -111,20 +112,24 @@ class MaquetteScene : public QGraphicsScene
   MaquetteScene(const QRectF & rect, AttributesEditor *palette);
   virtual ~MaquetteScene();
   QTimeLine *_timeLine;
+
   /*!
    * \brief Initialises scene parameters.
    */
   void init();
+
   /*!
    * \brief Updates current view.
    */
   void updateView();
+
   /*!
    * \brief Returns the current interaction mode.
    *
    * \return the current interaction mode
    */
   int currentMode();
+
   /*!
    * \brief Defines a new interaction mode with an eventual box creation mode if needed.
    *
@@ -132,24 +137,28 @@ class MaquetteScene : public QGraphicsScene
    * \param box : the new box creation mode
    */
   void setCurrentMode(int interactionMode, BoxCreationMode box = NB_MODE);
+
   /*!
    * \brief Gets the current resizing mode.
    *
    * \return the current resizing mode
    */
   int resizeMode() const;
+
   /*!
    * \brief Sets the current resizing mode.
    *
    * \param resizeMode the new resizing mode
    */
   void setResizeMode(int resizeMode);
+
   /*!
    * \brief Sets the current main resizing box.
    *
    * \param rb the box
    */
   void setResizeBox(unsigned int rb);
+
   /*!
    * \brief Requests the maquette for the box identified by ID.
    *
@@ -157,6 +166,7 @@ class MaquetteScene : public QGraphicsScene
    * \return the box identified
    */
   BasicBox *getBox(unsigned int box);
+
   /*!
    * \brief Requests the maquette for the relation identified by ID.
    *
@@ -164,6 +174,7 @@ class MaquetteScene : public QGraphicsScene
    * \return the relation identified
    */
   Relation *getRelation(unsigned int rel);
+
   /*!
    * \brief Adds a new comment to the maquette with a specific position.
    *
@@ -172,12 +183,14 @@ class MaquetteScene : public QGraphicsScene
    * \param boxID : the ID of the eventual box
    */
   Comment *addComment(const std::string &comment,const QPointF &position, unsigned int boxID);
+
   /*!
    * \brief Removes a specific comment.
    *
    * \param comment : the comment to remove
    */
   void removeComment(Comment *comment);
+
   /*!
    * \brief Adds a new trigger point to a box.
    *
@@ -188,12 +201,14 @@ class MaquetteScene : public QGraphicsScene
    * \return the ID of the trigger added
    */
   int addTriggerPoint(unsigned int boxID, BoxExtremity extremity, const std::string &message);
+
   /*!
    * \brief Removes a trigger point.
    *
    * \param trgID : trigger point ID to remove
    */
   void removeTriggerPoint(unsigned int trgID);
+
   /*!
    * \brief Gets a specific trigger point.
    *
@@ -202,24 +217,28 @@ class MaquetteScene : public QGraphicsScene
    * \return the trigger point
    */
   TriggerPoint *getTriggerPoint(unsigned int trgID);
+
   /*!
    * \brief Gets the triggersQueueList.
 
    * \return the triggersQueueList.
    */
   inline QList<TriggerPoint *> triggersQueueList(){return _triggersQueueList;}
+
   /*!
    * \brief Adds a trigger to the queue list.
    *
    * \param trgID : trigger point to add.
    */
   void addToTriggerQueue(TriggerPoint *trigger);  
+
   /*!
    * \brief Removes a trigger from the queue list.
    *
    * \param trgID : trigger point to remove.
    */
   inline void removeFromTriggerQueue(TriggerPoint *trigger){_triggersQueueList.removeAll(trigger);}
+
   /*!
    * \brief Adds a new sound box to the maquette with specific coordinates.
    *
