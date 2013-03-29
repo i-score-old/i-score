@@ -73,6 +73,7 @@ class MaquetteView : public QGraphicsView
    * \param value : the goto value in ms
    */
   void setGotoValue(int value);
+
   inline int gotoValue(){return _gotoValue;}
   QList<TriggerPoint *> triggersQueueList();
   inline MainWindow *mainWindow(){return _mainWindow;}
@@ -89,32 +90,40 @@ class MaquetteView : public QGraphicsView
    * \brief Raised to notify the scene from changes.
    */
   void updateScene();
+
   /*!
    * \brief Raised to notify the scene from changes without centering on the scene.
    */
   void updateSceneWithoutCenterOn();
+
   /*!
    * \brief Performs zoom in of the entire scene.
    */
   void zoomIn();
+
   /*!
    * \brief Performs zoom out of the entire scene.
    */
   void zoomOut();
+
   /*!
    * \brief Sets the zoom value. (used for loadFiles)
    *
    * \param value : the zoom factor value
    */
   void setZoom(float value);
+
   inline float zoom(){return _zoom;}
+
   /*!
    * \brief Gets the coordinates of the center of the scene.
    *
    * \return the center, as a QPointF.
    */
   QPointF getCenterCoordinates();  
+
  protected :
+
   /*!
    * \brief Redefinition of QGraphicsView::drawBackground().
    * This method is automatically called by QGraphicsView::render().
@@ -123,13 +132,16 @@ class MaquetteView : public QGraphicsView
    * \param rect : the bounding rectangle
    */
   virtual void drawBackground(QPainter *painter, const QRectF &rect);
+
   /*!
    * \brief Redefinition of QGraphicsView::keyPressEvent().
    *
    * \param event : the information about the event
    */
   virtual void keyPressEvent(QKeyEvent *event);
+
   virtual void keyReleaseEvent(QKeyEvent *event);
+
   /*!
    * \brief Redefinition of QGraphicsView::wheelEvent().
    *
@@ -144,7 +156,6 @@ class MaquetteView : public QGraphicsView
   MainWindow *_mainWindow;
   float _zoom; //!< The zoom factor value.
   int _gotoValue; //!< The goto value in pixels.
-
 };
 
 #endif

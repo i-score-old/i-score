@@ -74,12 +74,14 @@ class TextEdit : public QDialog
    * \param indication : the text indication
    */
   void setIndication(const std::string &indication);
+
   /*!
    * \brief Sets the default text.
    *
    * \param value : the default text value
    */
   void setDefaultValue(const std::string &value);
+
   /*!
    * \brief Gets the text contained.
    *

@@ -92,6 +92,7 @@ class MainWindow : public QMainWindow
    * \param warningLevel : the level of the message
    */
   void displayMessage(const QString &message, unsigned int warningLevel);
+
   /*!
    * \brief Selects interaction mode
    *
@@ -99,32 +100,38 @@ class MainWindow : public QMainWindow
    * \param boxMode : the new box creation mode
    */
   void selectMode(const InteractionMode &mode,const BoxCreationMode &boxMode = NB_MODE);
+
   /*!
    * \brief Shows/Hides the editor.
    *
    * \param state : the editor active state
    */
   void showEditor(bool state);
+
   /*!
    * \brief Determines if a modification occured since the last save.
    *
    * \return true if a modification occured since document was saved.
    */
   bool documentModified() const;
+
   /*!
    * \brief Called when the end of the composition is reached.
    */
   void timeEndReached();
+
   /*!
    * \brief Returns goto value in ms.
    */  
   int gotoValue();
+
   /*!
    * \brief Get the Command Key state.
    *
    * \return True if pressed, false if not.
    */
   bool commandKey();
+
   void setMaquetteSceneTitle(QString name);
   inline MaquetteWidget *maquetteWidget(){return _maquetteWidget;}  
 
@@ -146,62 +153,77 @@ class MainWindow : public QMainWindow
    * \brief Opens a network configuration window.
    */
   void networkConfig();
+
   /*!
    * \brief Resets current composition and prepares to write into a new file.
    */
   void newFile();
+
   /*!
    * \brief Opens an existing file.
    */
   void open();
+
   /*!
    * \brief Saves current file.
    */
   bool save();
+
   /*!
    * \brief Saves the current file into a new one.
    */
   bool saveAs();
+
   /*!
    * \brief Creates a picture from the current composition.
    */
   void exporting();
+
   /*!
    * \brief Prints the current composition.
    */
   void print();
+
   /*!
    * \brief Opens "About" dialog box.
    */
   void about();
+
   /*!
    * \brief Opens "Help" dialog box.
    */
   void help();
+
   /*!
    * \brief Updates the palette view state.
    */
   void updateEditor();
+
   /*!
    * \brief Updates the tracks view.
    */
   void viewTrack();
+
   /*!
    * \brief Cut the current selection of boxes.
    */
   void cutSelection();
+
   /*!
    * \brief Copies the current selection of boxes.
    */
   void copySelection();
+
   /*!
    * \brief Pastes the current selection of boxes.
    */
   void pasteSelection();
+
   /*!
    * \brief Starts playing the composition.
    */
   void play();
+
   /*!
    * \brief Pauses playing the composition.
    */

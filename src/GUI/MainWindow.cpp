@@ -190,60 +190,59 @@ MainWindow::~MainWindow()
 void
 MainWindow::displayMessage(const QString &mess, unsigned int warningLevel) {
   switch (warningLevel) {
-  case INDICATION_LEVEL :
-    statusBar()->showMessage(mess,2000);
-    break;
-  case WARNING_LEVEL :
-    QMessageBox::warning(this,"",mess);
-    break;
-  case ERROR_LEVEL :
-    {
-      QErrorMessage errorBox(this);
-      errorBox.showMessage(mess);
-      errorBox.setModal(true);
-      errorBox.exec();
+    case INDICATION_LEVEL :
+      statusBar()->showMessage(mess,2000);
+      break;
+    case WARNING_LEVEL :
+      QMessageBox::warning(this,"",mess);
+      break;
+    case ERROR_LEVEL :
+      {
+        QErrorMessage errorBox(this);
+        errorBox.showMessage(mess);
+        errorBox.setModal(true);
+        errorBox.exec();
+      }
+      break;
+    default :
+      std::cerr << "MainWindow::displayMessage : Unknown warning level type for displaying : "
+                << std::endl << mess.toStdString() << std::endl;
+      break;
     }
-    break;
-  default :
-    std::cerr << "MainWindow::displayMessage : Unknown warning level type for displaying : "
-              << std::endl << mess.toStdString() << std::endl;
-    break;
-  }
 }
 
 void
-MainWindow::closeEvent(QCloseEvent *event)
-{
+MainWindow::closeEvent(QCloseEvent *event) {
   writeSettings();
-  if (_scene->documentModified()) {
-
-    int ret = QMessageBox::question(_view, tr("Document modified"),
-                    tr("The document was modified.\n\nDo you want to save before leaving ?"),
-                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                    QMessageBox::Cancel);
-    switch (ret) {
-    case QMessageBox::Yes :
-      if (saveAs()) {
-    event->accept();
-    QWidget::close();
-      }
-      else {
-    event->ignore();
-      }
-      break;
-    case QMessageBox::No :
-      event->accept();
-      QWidget::close();
-      break;
-    case QMessageBox::Cancel :
-      event->ignore();
-      return;
-      break;
+  if (_scene->documentModified())
+    {
+      int ret = QMessageBox::question(_view, tr("Document modified"),
+                                      tr("The document was modified.\n\nDo you want to save before leaving ?"),
+                                      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                                      QMessageBox::Cancel);
+      switch (ret) {
+        case QMessageBox::Yes :
+          if (saveAs()) {
+              event->accept();
+              QWidget::close();
+            }
+          else {
+              event->ignore();
+            }
+          break;
+        case QMessageBox::No :
+          event->accept();
+          QWidget::close();
+          break;
+        case QMessageBox::Cancel :
+          event->ignore();
+          return;
+          break;
+        }
     }
-  }
   else {
-    event->accept();
-  }
+      event->accept();
+    }
 }
 
 void

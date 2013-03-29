@@ -8,7 +8,11 @@
 int main(int argc, char *argv[])
 {
 
+  Q_INIT_RESOURCE(application);
   QApplication app(argc, argv);
+
+  app.setOrganizationName("SCRIME");
+  app.setApplicationName("i-score");
 
 //  app.setLibraryPaths(QStringList(app.applicationDirPath() + "/../plugins"));
   QTranslator translator;

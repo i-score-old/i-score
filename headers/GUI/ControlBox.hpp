@@ -73,16 +73,19 @@ class ControlBox : public BasicBox
   ControlBox(AbstractControlBox *abstract, MaquetteScene *scene);
 
   virtual ~ControlBox();
+
   /*!
    * \brief Redefinition of QGraphicsItem::type(). Used for Item casting.
    *
    * \return the item's type of the box
    */
   virtual int type() const;
+
   /*!
    * \brief Initialises item's properties.
    */
   virtual void init();
+
   /*!
    * \brief Gets the abstract of the item.
    */

@@ -52,7 +52,6 @@ signals:
     void stopSignal();
     void accelerationValueChanged(int);
 
-
 public slots:
     void play();
     void stop();
