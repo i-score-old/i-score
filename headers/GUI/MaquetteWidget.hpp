@@ -56,13 +56,11 @@ public slots:
     void play();
     void stop();
     void pause();
+    void rewind();
     void accelerationValueModified(int value);
     void accelerationValueEntered(double value);
     void changeZoom(float value);
     void updateHeader();
-
-protected :
-    virtual void paintEvent(QPaintEvent *event);
 
 private:
     void createActions();
@@ -70,11 +68,7 @@ private:
     void createNameLabel();
     void createHeader();    
     void createMenuWidget();
-    void createReadingSpeedWidget();
-
-    void setAvailableAction(QAction *action);
-    void setAvailableMenu(QWidget *widget);
-
+    void createReadingSpeedWidget();    
 
     MaquetteView *_view;
     MaquetteScene *_scene;
@@ -86,6 +80,7 @@ private:
 
     QAction *_playAction;
     QAction *_stopAction;
+    QAction *_rewindAction;
 
     QColor _color;
     QGridLayout *_maquetteLayout;
