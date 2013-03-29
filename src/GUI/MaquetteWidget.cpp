@@ -81,51 +81,16 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
     createHeader();
 
     _maquetteLayout->addWidget(_header);
-//    _maquetteLayout->addWidget(_timeLine);
     _maquetteLayout->addWidget(_view);
 
     _maquetteLayout->setContentsMargins(0,0,0,0);
     _maquetteLayout->setVerticalSpacing(0);
     setLayout(_maquetteLayout);
 
-
     connect(_scene,SIGNAL(stopPlaying()),this,SLOT(stop()));
     connect(_view,SIGNAL(zoomChanged(float)),this,SLOT(changeZoom(float)));
     connect(_view,SIGNAL(playModeChanged()),this,SLOT(updateHeader()));
     connect(_scene,SIGNAL(playModeChanged()),this,SLOT(updateHeader()));
-//    connect(_view,SIGNAL(zoomChanged(float)),_timeBar,SLOT(updateZoom(float)));
-}
-
-void
-MaquetteWidget::paintEvent(QPaintEvent *event){
-    QWidget::paintEvent(event);
-
-//    QPainterPath path;
-//    float line = 2;
-//    QPointF adjustX(0,0);
-//    QPointF adjustY(0,0);
-//    QRectF rect = this->rect();
-
-//    path.moveTo(rect.topLeft()+adjustX);
-
-////    path.lineTo(rect.bottomLeft()+adjustX+adjustY);
-////    path.lineTo(rect.bottomRight()+ adjustY);
-////    path.lineTo(rect.bottomRight()+ adjustY - QPointF(0,rect.height()/5.));
-////    path.quadTo(rect.topRight(),rect.topLeft()+adjustX);
-
-//    QPainter *painter=new QPainter();
-//    QPen pen(Qt::black);
-//    pen.setWidth(5);
-//    painter->setPen(pen);
-//    painter->drawRect(QRect(0,3,10,10));
-////    painter->drawPath(path);
-//    std::cout<<"PINA"<<std::endl;
-//    delete painter;
-}
-
-void
-MaquetteWidget::init(){
-
 }
 
 void
@@ -145,6 +110,7 @@ MaquetteWidget::~MaquetteWidget(){
 
     delete _playAction;
     delete _stopAction;
+    delete _rewindAction;
 
     delete _maquetteLayout;
     delete _accelerationSlider;
@@ -198,16 +164,19 @@ MaquetteWidget::createActions(){
 
     QIcon playIcon(":/images/playSimple.svg");
     _playAction = new QAction(playIcon, tr("Play"), this);
-//    _playAction->setShortcut(QString("Space"));
     _playAction->setStatusTip(tr("Play scenario"));
 
      QIcon stopIcon(":/images/stopSimple.svg");
     _stopAction = new QAction(stopIcon, tr("Stop"), this);
-//    _stopAction->setShortcut(QString("Enter"));
     _stopAction->setStatusTip(tr("Stop scenario"));
+
+    QIcon rewindIcon(":/images/rewind.svg");
+    _rewindAction = new QAction(rewindIcon, tr("Rewind"), this);
+    _rewindAction->setStatusTip(tr("Rewind scenario"));
 
     connect(_playAction,SIGNAL(triggered()), this, SLOT(play()));
     connect(_stopAction,SIGNAL(triggered()), this, SLOT(stop()));
+    connect(_rewindAction,SIGNAL(triggered()), this, SLOT(rewind()));
 }
 
 void
@@ -223,7 +192,11 @@ MaquetteWidget::createToolBar(){
                             "border :none;background :white;"
                             "}"
                             );
+
     _toolBar->addAction(_playAction);
+    _toolBar->addAction(_stopAction);
+    _stopAction->setVisible(false);
+    _toolBar->addAction(_rewindAction);
     _toolBar->raise();
 }
 
@@ -289,25 +262,22 @@ MaquetteWidget::pause(){
 }
 
 void
+MaquetteWidget::rewind(){
+    _scene->stopGotoStart();
+    updateHeader();
+}
+
+void
 MaquetteWidget::updateHeader(){
-    setAvailableAction(_scene->playing() ? _stopAction : _playAction);
+    bool playing = _scene ->playing();
+
+    _stopAction->setVisible(playing);
+    _playAction->setVisible(!playing);
 }
 
 void
 MaquetteWidget::setName(QString name){
     _nameLabel->setText(name);
-}
-
-void
-MaquetteWidget::setAvailableMenu(QWidget *widget){
-    Q_UNUSED(widget);
-    //TODO
-}
-
-void
-MaquetteWidget::setAvailableAction(QAction *action){
-    _toolBar->clear();
-    _toolBar->addAction(action);
 }
 
 void
