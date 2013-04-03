@@ -53,5 +53,6 @@
         <file>images/error-icon.png</file>
         <file>images/boxStartMenu.svg</file>
         <file>images/boxEndMenu.svg</file>
+        <file>images/rewind.svg</file>
     </qresource>
 </RCC>
