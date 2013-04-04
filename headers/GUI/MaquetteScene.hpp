@@ -78,6 +78,7 @@ class Comment;
 class TriggerPoint;
 class PlayingThread;
 class TimeBarWidget;
+class NetworkTree;
 
 /*!
  * \class MaquetteScene
@@ -392,7 +393,8 @@ class MaquetteScene : public QGraphicsScene
    * \param IP : the new IP for device
    * \param port : the new port for device
    */
-  void changeNetworkDevice(const std::string &deviceName, const std::string &pluginName, const std::string &IP, const std::string &port);
+  void changeNetworkDevice(string deviceName, string pluginName, string IP, string port);
+  void setNetworDeviceConfig(string deviceName, string pluginName, string IP, string port);
   /*!
    * \brief Updates messages to send for a specific box.
    *
@@ -578,6 +580,7 @@ class MaquetteScene : public QGraphicsScene
   inline float zoom(){return _view->zoom();}
   void updateProgressBar();
   void setAccelerationFactor(double value);
+  inline NetworkTree *networkTreeAssociated(){return _networkTreeAssociated;}
 
  protected :
   /*!
@@ -665,10 +668,13 @@ class MaquetteScene : public QGraphicsScene
 signals:
   void stopPlaying();
   void accelerationValueChanged(double value);
+  void networkConfigChanged(std::string deviceName, std::string pluginName, std::string IP, std::string port);
+  void playModeChanged();
 
 public slots :
   void verticalScroll(int value);
   void gotoChanged(double value);
+  void speedChanged(double value);
 
   /*!
    * \brief Cuts selected boxes.
@@ -817,6 +823,7 @@ public slots :
   double _accelerationFactor;
 
   QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
+  NetworkTree *_networkTreeAssociated;
 };
 
 #endif

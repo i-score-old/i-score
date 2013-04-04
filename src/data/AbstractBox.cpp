@@ -60,8 +60,31 @@ AbstractBox::AbstractBox(const AbstractBox &other) :
     _endMessages = new NetworkMessages;
 }
 
+void
+AbstractBox::setStartMessage(QTreeWidgetItem *item,QString address){
+    _startMessages->addMessage(item,address);
+}
+
+void
+AbstractBox::setEndMessage(QTreeWidgetItem *item,QString address){
+    _endMessages->addMessage(item,address);
+}
+
 int
 AbstractBox::type() const
 {
   return ABSTRACT_BOX_TYPE;
 }
+
+void
+AbstractBox::setStartMessages(NetworkMessages *startMsgs){
+
+    QMap<QTreeWidgetItem *, Message> *map = startMsgs->getMessages();
+    NetworkMessages *newMessages = new NetworkMessages(map);
+    _startMessages = newMessages;
+}
+
+void
+AbstractBox::setEndMessages(NetworkMessages *endMsgs){
+  _endMessages = new NetworkMessages(endMsgs->getMessages());
+ }

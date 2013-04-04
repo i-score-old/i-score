@@ -67,6 +67,16 @@ knowledge of the CeCILL license and that you accept its terms.
 #define NETWORK_LOCALHOST "127.0.0.1"
 //! Default network port.
 static const int NETWORK_PORT = 7000;
+static const int OSC_NETWORK_PORT = 9999;
+
+
+static const std::string PLAY_ENGINES_MESSAGE = "/Transport/Play";
+static const std::string STOP_ENGINES_MESSAGE  = "/Transport/Stop";
+static const std::string PAUSE_ENGINES_MESSAGE = "/Transport/Pause";
+static const std::string REWIND_ENGINES_MESSAGE = "/Transport/Rewind";
+static const std::string STARTPOINT_ENGINES_MESSAGE = "/Transport/StartPoint";
+static const std::string SPEED_ENGINES_MESSAGE = "/Transport/Speed";
+
 #define NETWORK_PORT_STR "7000"
 
 class PaletteActor;
@@ -126,7 +136,7 @@ public :
 	std::string name; //!< Name of the device.
 	std::string plugin; //!< plugin used by the device.
 	unsigned int networkPort; //!< Network port used by device.
-	std::string networkHost; //!< Network host used by device.
+	std::string networkHost; //!< Network host used by device.    
 };
 
 /*!
@@ -191,6 +201,7 @@ class Maquette : public QObject
    * \return the current network device used
    */
   std::string getNetworkDevice();
+  void addNetworkDevice(string deviceName,string plugin,string ip,string port);
   /*!
    * \brief Gets a set of the available network devices.
    *
@@ -358,6 +369,7 @@ class Maquette : public QObject
    * \return if messages could be set
    */
   bool setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages);
+  NetworkMessages *startMessages(unsigned int boxID);
   /*!
    * \brief Sets the set of treeItems to send for the beginning of a box.
    *
@@ -405,6 +417,7 @@ class Maquette : public QObject
    * \return if networkMessages could be set
    */
   bool setEndMessages(unsigned int boxID,  NetworkMessages* nm);
+  NetworkMessages *endMessages(unsigned int boxID);
   /*!
    * \brief Remove from treeItems expanded list.
    *
@@ -675,6 +688,8 @@ class Maquette : public QObject
 	 * \brief Update boxes from Engines.
 	 */
 	void updateBoxesFromEngines();
+    inline MaquetteScene *scene(){return _scene;}
+    static const unsigned int SIZE;
 
   public slots :
 
@@ -721,6 +736,10 @@ class Maquette : public QObject
    * Messages (final state of each boxes) are sended to the engine.
    */
   void initSceneState();
+  void setStartMessageToSend(unsigned int boxID,QTreeWidgetItem *item,QString address);
+  void setEndMessageToSend(unsigned int boxID,QTreeWidgetItem *item,QString address);
+  std::vector<std::string> getPlugins();
+  void removeNetworkDevice(string deviceName);    
 
  private :
 
@@ -811,12 +830,14 @@ class Maquette : public QObject
   std::map<unsigned int,TriggerPoint*> _triggerPoints;
 
   //! The next ID to be used for sequential name purpose
-  //unsigned int _currentID;
+//  unsigned int _currentID;
+  std::string _currentDevice;
 
   //! The set of handled devices.
   std::map<std::string,MyDevice> _devices;
   //! The set of available Engines listening ports.
   std::vector<unsigned int> _listeningPorts;
+  std::vector<std::string> _plugins;
 
   //Device _defaultDevice; //!< The default network device used.
 
@@ -833,6 +854,7 @@ class Maquette : public QObject
  * \param CPIndex : index of the box's control point crossed
  */
 void crossTransitionCallback(unsigned int boxID, unsigned int CPIndex, std::vector<unsigned int> processesToStop);
+void enginesNetworkUpdateCallback(unsigned int boxID, string m1, string m2);
 /*!
  * \brief Callback called when a Trigger Point is triggered is crossed.
  *

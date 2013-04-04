@@ -73,7 +73,6 @@ Interpolation::Interpolation(QWidget *parent)
 
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	_currentLine = 0;
-
 }
 
 Interpolation::~Interpolation(){}

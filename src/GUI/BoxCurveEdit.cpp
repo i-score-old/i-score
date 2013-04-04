@@ -14,14 +14,13 @@ BoxCurveEdit::BoxCurveEdit(QWidget *parent,BasicBox *box):QWidget(parent){
 void
 BoxCurveEdit::init(){
 
-    _stackedLayout = _basicBox->curvesWidget()->stackedLayout();
-    _comboBox = _basicBox->curvesWidget()->comboBox();
+    _stackedLayout = _basicBox->boxContentWidget()->stackedLayout();
+    _comboBox = _basicBox->boxContentWidget()->comboBox();
     _scene = _basicBox->maquetteScene();
 
 
     setWindowModality(Qt::ApplicationModal);
     setGeometry(_scene->sceneRect().toRect());
-    QGridLayout *layout = new QGridLayout;
     setLayout(_stackedLayout);
 }
 
@@ -36,7 +35,6 @@ BoxCurveEdit::closeEvent(QCloseEvent *){
 
 void
 BoxCurveEdit::resetBox(){
-    std::cout<<">>>>>>reset box widget<<<<<"<<std::endl;
     _basicBox->setComboBox(_comboBox);
     _basicBox->setStackedLayout(_stackedLayout);
     _basicBox->update();

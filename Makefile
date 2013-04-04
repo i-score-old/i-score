@@ -40,7 +40,7 @@ export MACOSX_DEPLOYMENT_TARGET = 10.7
 
 ####### Output directory
 
-OBJECTS_DIR   = ./
+OBJECTS_DIR   = bin/
 
 ####### Files
 
@@ -91,7 +91,7 @@ SOURCES       = main.cpp \
 		src/GUI/BoxCurveEdit.cpp \
 		src/GUI/MaquetteWidget.cpp \
 		src/GUI/TimeBarWidget.cpp \
-		src/GUI/AttributeEditor.cpp moc/moc_Maquette.cpp \
+		src/GUI/DeviceEdit.cpp moc/moc_Maquette.cpp \
 		moc/moc_AttributesEditor.cpp \
 		moc/moc_BoxContextMenu.cpp \
 		moc/moc_ChooseTemporalRelation.cpp \
@@ -119,84 +119,87 @@ SOURCES       = main.cpp \
 		moc/moc_BoxCurveEdit.cpp \
 		moc/moc_MaquetteWidget.cpp \
 		moc/moc_TimeBarWidget.cpp \
+		moc/moc_DeviceEdit.cpp \
 		qrc_i-score.cpp
-OBJECTS       = main.o \
-		Abstract.o \
-		AbstractBox.o \
-		AbstractComment.o \
-		AbstractControlBox.o \
-		AbstractCurve.o \
-		AbstractParentBox.o \
-		AbstractRelation.o \
-		AbstractSoundBox.o \
-		AbstractTriggerPoint.o \
-		Maquette.o \
-		Palette.o \
-		BasicBox.o \
-		BoxContextMenu.o \
-		ChooseTemporalRelation.o \
-		Comment.o \
-		ControlBox.o \
-		ControlBoxContextMenu.o \
-		CurveWidget.o \
-		CurvesWidget.o \
-		Help.o \
-		Interpolation.o \
-		LogarithmicSlider.o \
-		MainWindow.o \
-		MaquetteScene.o \
-		MaquetteView.o \
-		NetworkConfig.o \
-		NetworkMessagesEditor.o \
-		NetworkTree.o \
-		ParentBox.o \
-		ParentBoxContextMenu.o \
-		PlayingThread.o \
-		PreviewArea.o \
-		Relation.o \
-		RelationEdit.o \
-		SoundBox.o \
-		SoundBoxContextMenu.o \
-		TextEdit.o \
-		TriggerPoint.o \
-		TreeMap.o \
-		TreeMapElement.o \
-		ViewRelations.o \
-		NetworkMessages.o \
-		BoxWidget.o \
-		BoxCurveEdit.o \
-		MaquetteWidget.o \
-		TimeBarWidget.o \
-		AttributeEditor.o \
-		moc_Maquette.o \
-		moc_AttributesEditor.o \
-		moc_BoxContextMenu.o \
-		moc_ChooseTemporalRelation.o \
-		moc_ControlBoxContextMenu.o \
-		moc_CurveWidget.o \
-		moc_CurvesWidget.o \
-		moc_Help.o \
-		moc_Interpolation.o \
-		moc_MainWindow.o \
-		moc_MaquetteScene.o \
-		moc_MaquetteView.o \
-		moc_NetworkConfig.o \
-		moc_NetworkMessagesEditor.o \
-		moc_NetworkTree.o \
-		moc_ParentBoxContextMenu.o \
-		moc_PreviewArea.o \
-		moc_RelationEdit.o \
-		moc_SoundBoxContextMenu.o \
-		moc_TextEdit.o \
-		moc_TreeMap.o \
-		moc_TreeMapElement.o \
-		moc_ViewRelations.o \
-		moc_NetworkMessages.o \
-		moc_BoxWidget.o \
-		moc_BoxCurveEdit.o \
-		moc_MaquetteWidget.o \
-		moc_TimeBarWidget.o \
-		qrc_i-score.o
+OBJECTS       = bin/main.o \
+		bin/Abstract.o \
+		bin/AbstractBox.o \
+		bin/AbstractComment.o \
+		bin/AbstractControlBox.o \
+		bin/AbstractCurve.o \
+		bin/AbstractParentBox.o \
+		bin/AbstractRelation.o \
+		bin/AbstractSoundBox.o \
+		bin/AbstractTriggerPoint.o \
+		bin/Maquette.o \
+		bin/Palette.o \
+		bin/AttributesEditor.o \
+		bin/BasicBox.o \
+		bin/BoxContextMenu.o \
+		bin/ChooseTemporalRelation.o \
+		bin/Comment.o \
+		bin/ControlBox.o \
+		bin/ControlBoxContextMenu.o \
+		bin/CurveWidget.o \
+		bin/CurvesWidget.o \
+		bin/Help.o \
+		bin/Interpolation.o \
+		bin/LogarithmicSlider.o \
+		bin/MainWindow.o \
+		bin/MaquetteScene.o \
+		bin/MaquetteView.o \
+		bin/NetworkConfig.o \
+		bin/NetworkMessagesEditor.o \
+		bin/NetworkTree.o \
+		bin/ParentBox.o \
+		bin/ParentBoxContextMenu.o \
+		bin/PlayingThread.o \
+		bin/PreviewArea.o \
+		bin/Relation.o \
+		bin/RelationEdit.o \
+		bin/SoundBox.o \
+		bin/SoundBoxContextMenu.o \
+		bin/TextEdit.o \
+		bin/TriggerPoint.o \
+		bin/TreeMap.o \
+		bin/TreeMapElement.o \
+		bin/ViewRelations.o \
+		bin/NetworkMessages.o \
+		bin/BoxWidget.o \
+		bin/BoxCurveEdit.o \
+		bin/MaquetteWidget.o \
+		bin/TimeBarWidget.o \
+		bin/DeviceEdit.o \
+		bin/moc_Maquette.o \
+		bin/moc_AttributesEditor.o \
+		bin/moc_BoxContextMenu.o \
+		bin/moc_ChooseTemporalRelation.o \
+		bin/moc_ControlBoxContextMenu.o \
+		bin/moc_CurveWidget.o \
+		bin/moc_CurvesWidget.o \
+		bin/moc_Help.o \
+		bin/moc_Interpolation.o \
+		bin/moc_MainWindow.o \
+		bin/moc_MaquetteScene.o \
+		bin/moc_MaquetteView.o \
+		bin/moc_NetworkConfig.o \
+		bin/moc_NetworkMessagesEditor.o \
+		bin/moc_NetworkTree.o \
+		bin/moc_ParentBoxContextMenu.o \
+		bin/moc_PreviewArea.o \
+		bin/moc_RelationEdit.o \
+		bin/moc_SoundBoxContextMenu.o \
+		bin/moc_TextEdit.o \
+		bin/moc_TreeMap.o \
+		bin/moc_TreeMapElement.o \
+		bin/moc_ViewRelations.o \
+		bin/moc_NetworkMessages.o \
+		bin/moc_BoxWidget.o \
+		bin/moc_BoxCurveEdit.o \
+		bin/moc_MaquetteWidget.o \
+		bin/moc_TimeBarWidget.o \
+		bin/moc_DeviceEdit.o \
+		bin/qrc_i-score.o
 DIST          = /usr/local/Qt4.8/mkspecs/common/unix.conf \
 		/usr/local/Qt4.8/mkspecs/common/mac.conf \
 		/usr/local/Qt4.8/mkspecs/common/gcc-base.conf \
@@ -357,8 +360,8 @@ i-score.app/Contents/Resources/acousmoscribe.icns: images/acousmoscribe.icns
 	@$(DEL_FILE) i-score.app/Contents/Resources/acousmoscribe.icns
 	@$(COPY_FILE) images/acousmoscribe.icns i-score.app/Contents/Resources/acousmoscribe.icns
 dist: 
-	@$(CHK_DIR_EXISTS) .tmp/i-score1.0.0 || $(MKDIR) .tmp/i-score1.0.0 
-	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/i-score1.0.0/ && $(COPY_FILE) --parents /usr/local/jamoma/includes/TTScore.h /usr/local/jamoma/includes/CSPTypes.hpp /usr/local/jamoma/includes/TTModular.h headers/data/Abstract.hpp headers/data/AbstractBox.hpp headers/data/AbstractComment.hpp headers/data/AbstractCurve.hpp headers/data/AbstractRelation.hpp headers/data/AbstractSoundBox.hpp headers/data/AbstractControlBox.hpp headers/data/AbstractParentBox.hpp headers/data/AbstractTriggerPoint.hpp headers/data/EnumPalette.hpp headers/data/Maquette.hpp headers/data/Palette.hpp headers/GUI/AttributesEditor.hpp headers/GUI/BasicBox.hpp headers/GUI/BoxContextMenu.hpp headers/GUI/ChooseTemporalRelation.hpp headers/GUI/Comment.hpp headers/GUI/ControlBox.hpp headers/GUI/ControlBoxContextMenu.hpp headers/GUI/CurveWidget.hpp headers/GUI/CurvesWidget.hpp headers/GUI/Help.hpp headers/GUI/Interpolation.hpp headers/GUI/LogarithmicSlider.hpp headers/GUI/MainWindow.hpp headers/GUI/MaquetteScene.hpp headers/GUI/MaquetteView.hpp headers/GUI/NetworkConfig.hpp headers/GUI/NetworkMessagesEditor.hpp headers/GUI/NetworkTree.hpp headers/GUI/ParentBox.hpp headers/GUI/ParentBoxContextMenu.hpp headers/GUI/PlayingThread.hpp headers/GUI/PreviewArea.hpp headers/GUI/Relation.hpp headers/GUI/RelationEdit.hpp headers/GUI/SoundBox.hpp headers/GUI/SoundBoxContextMenu.hpp headers/GUI/TextEdit.hpp headers/GUI/TriggerPoint.hpp headers/GUI/TreeMap.hpp headers/GUI/TreeMapElement.hpp headers/GUI/ViewRelations.hpp headers/data/NetworkMessages.hpp headers/GUI/BoxWidget.hpp headers/GUI/BoxCurveEdit.hpp headers/GUI/MaquetteWidget.hpp headers/GUI/TimeBarWidget.hpp .tmp/i-score1.0.0/ && $(COPY_FILE) --parents i-score.qrc .tmp/i-score1.0.0/ && $(COPY_FILE) --parents main.cpp src/data/Abstract.cpp src/data/AbstractBox.cpp src/data/AbstractComment.cpp src/data/AbstractControlBox.cpp src/data/AbstractCurve.cpp src/data/AbstractParentBox.cpp src/data/AbstractRelation.cpp src/data/AbstractSoundBox.cpp src/data/AbstractTriggerPoint.cpp src/data/Maquette.cpp src/data/Palette.cpp src/GUI/BasicBox.cpp src/GUI/BoxContextMenu.cpp src/GUI/ChooseTemporalRelation.cpp src/GUI/Comment.cpp src/GUI/ControlBox.cpp src/GUI/ControlBoxContextMenu.cpp src/GUI/CurveWidget.cpp src/GUI/CurvesWidget.cpp src/GUI/Help.cpp src/GUI/Interpolation.cpp src/GUI/LogarithmicSlider.cpp src/GUI/MainWindow.cpp src/GUI/MaquetteScene.cpp src/GUI/MaquetteView.cpp src/GUI/NetworkConfig.cpp src/GUI/NetworkMessagesEditor.cpp src/GUI/NetworkTree.cpp src/GUI/ParentBox.cpp src/GUI/ParentBoxContextMenu.cpp src/GUI/PlayingThread.cpp src/GUI/PreviewArea.cpp src/GUI/Relation.cpp src/GUI/RelationEdit.cpp src/GUI/SoundBox.cpp src/GUI/SoundBoxContextMenu.cpp src/GUI/TextEdit.cpp src/GUI/TriggerPoint.cpp src/GUI/TreeMap.cpp src/GUI/TreeMapElement.cpp src/GUI/ViewRelations.cpp src/data/NetworkMessages.cpp src/GUI/BoxWidget.cpp src/GUI/BoxCurveEdit.cpp src/GUI/MaquetteWidget.cpp src/GUI/TimeBarWidget.cpp src/GUI/AttributeEditor.cpp .tmp/i-score1.0.0/ && $(COPY_FILE) --parents acousmoscribe_en.ts acousmoscribe_fr.ts .tmp/i-score1.0.0/ && (cd `dirname .tmp/i-score1.0.0` && $(TAR) i-score1.0.0.tar i-score1.0.0 && $(COMPRESS) i-score1.0.0.tar) && $(MOVE) `dirname .tmp/i-score1.0.0`/i-score1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/i-score1.0.0
+	@$(CHK_DIR_EXISTS) bin/i-score1.0.0 || $(MKDIR) bin/i-score1.0.0 
+	$(COPY_FILE) --parents $(SOURCES) $(DIST) bin/i-score1.0.0/ && $(COPY_FILE) --parents /usr/local/include/IScore/Engines.hpp /usr/local/include/IScore/CSPTypes.hpp headers/data/Abstract.hpp headers/data/AbstractBox.hpp headers/data/AbstractComment.hpp headers/data/AbstractCurve.hpp headers/data/AbstractRelation.hpp headers/data/AbstractSoundBox.hpp headers/data/AbstractControlBox.hpp headers/data/AbstractParentBox.hpp headers/data/AbstractTriggerPoint.hpp headers/data/EnumPalette.hpp headers/data/Maquette.hpp headers/data/Palette.hpp headers/GUI/AttributesEditor.hpp headers/GUI/BasicBox.hpp headers/GUI/BoxContextMenu.hpp headers/GUI/ChooseTemporalRelation.hpp headers/GUI/Comment.hpp headers/GUI/ControlBox.hpp headers/GUI/ControlBoxContextMenu.hpp headers/GUI/CurveWidget.hpp headers/GUI/CurvesWidget.hpp headers/GUI/Help.hpp headers/GUI/Interpolation.hpp headers/GUI/LogarithmicSlider.hpp headers/GUI/MainWindow.hpp headers/GUI/MaquetteScene.hpp headers/GUI/MaquetteView.hpp headers/GUI/NetworkConfig.hpp headers/GUI/NetworkMessagesEditor.hpp headers/GUI/NetworkTree.hpp headers/GUI/ParentBox.hpp headers/GUI/ParentBoxContextMenu.hpp headers/GUI/PlayingThread.hpp headers/GUI/PreviewArea.hpp headers/GUI/Relation.hpp headers/GUI/RelationEdit.hpp headers/GUI/SoundBox.hpp headers/GUI/SoundBoxContextMenu.hpp headers/GUI/TextEdit.hpp headers/GUI/TriggerPoint.hpp headers/GUI/TreeMap.hpp headers/GUI/TreeMapElement.hpp headers/GUI/ViewRelations.hpp headers/data/NetworkMessages.hpp headers/GUI/BoxWidget.hpp headers/GUI/BoxCurveEdit.hpp headers/GUI/MaquetteWidget.hpp headers/GUI/TimeBarWidget.hpp headers/GUI/DeviceEdit.hpp bin/i-score1.0.0/ && $(COPY_FILE) --parents i-score.qrc bin/i-score1.0.0/ && $(COPY_FILE) --parents main.cpp src/data/Abstract.cpp src/data/AbstractBox.cpp src/data/AbstractComment.cpp src/data/AbstractControlBox.cpp src/data/AbstractCurve.cpp src/data/AbstractParentBox.cpp src/data/AbstractRelation.cpp src/data/AbstractSoundBox.cpp src/data/AbstractTriggerPoint.cpp src/data/Maquette.cpp src/data/Palette.cpp src/GUI/AttributesEditor.cpp src/GUI/BasicBox.cpp src/GUI/BoxContextMenu.cpp src/GUI/ChooseTemporalRelation.cpp src/GUI/Comment.cpp src/GUI/ControlBox.cpp src/GUI/ControlBoxContextMenu.cpp src/GUI/CurveWidget.cpp src/GUI/CurvesWidget.cpp src/GUI/Help.cpp src/GUI/Interpolation.cpp src/GUI/LogarithmicSlider.cpp src/GUI/MainWindow.cpp src/GUI/MaquetteScene.cpp src/GUI/MaquetteView.cpp src/GUI/NetworkConfig.cpp src/GUI/NetworkMessagesEditor.cpp src/GUI/NetworkTree.cpp src/GUI/ParentBox.cpp src/GUI/ParentBoxContextMenu.cpp src/GUI/PlayingThread.cpp src/GUI/PreviewArea.cpp src/GUI/Relation.cpp src/GUI/RelationEdit.cpp src/GUI/SoundBox.cpp src/GUI/SoundBoxContextMenu.cpp src/GUI/TextEdit.cpp src/GUI/TriggerPoint.cpp src/GUI/TreeMap.cpp src/GUI/TreeMapElement.cpp src/GUI/ViewRelations.cpp src/data/NetworkMessages.cpp src/GUI/BoxWidget.cpp src/GUI/BoxCurveEdit.cpp src/GUI/MaquetteWidget.cpp src/GUI/TimeBarWidget.cpp src/GUI/DeviceEdit.cpp bin/i-score1.0.0/ && $(COPY_FILE) --parents acousmoscribe_en.ts acousmoscribe_fr.ts bin/i-score1.0.0/ && (cd `dirname bin/i-score1.0.0` && $(TAR) i-score1.0.0.tar i-score1.0.0 && $(COMPRESS) i-score1.0.0.tar) && $(MOVE) `dirname bin/i-score1.0.0`/i-score1.0.0.tar.gz . && $(DEL_FILE) -r bin/i-score1.0.0
 
 
 clean:compiler_clean 
@@ -381,9 +384,9 @@ mocables: compiler_moc_header_make_all compiler_moc_source_make_all
 
 compiler_objective_c_make_all:
 compiler_objective_c_clean:
-compiler_moc_header_make_all: moc/moc_Maquette.cpp moc/moc_AttributesEditor.cpp moc/moc_BoxContextMenu.cpp moc/moc_ChooseTemporalRelation.cpp moc/moc_ControlBoxContextMenu.cpp moc/moc_CurveWidget.cpp moc/moc_CurvesWidget.cpp moc/moc_Help.cpp moc/moc_Interpolation.cpp moc/moc_MainWindow.cpp moc/moc_MaquetteScene.cpp moc/moc_MaquetteView.cpp moc/moc_NetworkConfig.cpp moc/moc_NetworkMessagesEditor.cpp moc/moc_NetworkTree.cpp moc/moc_ParentBoxContextMenu.cpp moc/moc_PreviewArea.cpp moc/moc_RelationEdit.cpp moc/moc_SoundBoxContextMenu.cpp moc/moc_TextEdit.cpp moc/moc_TreeMap.cpp moc/moc_TreeMapElement.cpp moc/moc_ViewRelations.cpp moc/moc_NetworkMessages.cpp moc/moc_BoxWidget.cpp moc/moc_BoxCurveEdit.cpp moc/moc_MaquetteWidget.cpp moc/moc_TimeBarWidget.cpp
+compiler_moc_header_make_all: moc/moc_Maquette.cpp moc/moc_AttributesEditor.cpp moc/moc_BoxContextMenu.cpp moc/moc_ChooseTemporalRelation.cpp moc/moc_ControlBoxContextMenu.cpp moc/moc_CurveWidget.cpp moc/moc_CurvesWidget.cpp moc/moc_Help.cpp moc/moc_Interpolation.cpp moc/moc_MainWindow.cpp moc/moc_MaquetteScene.cpp moc/moc_MaquetteView.cpp moc/moc_NetworkConfig.cpp moc/moc_NetworkMessagesEditor.cpp moc/moc_NetworkTree.cpp moc/moc_ParentBoxContextMenu.cpp moc/moc_PreviewArea.cpp moc/moc_RelationEdit.cpp moc/moc_SoundBoxContextMenu.cpp moc/moc_TextEdit.cpp moc/moc_TreeMap.cpp moc/moc_TreeMapElement.cpp moc/moc_ViewRelations.cpp moc/moc_NetworkMessages.cpp moc/moc_BoxWidget.cpp moc/moc_BoxCurveEdit.cpp moc/moc_MaquetteWidget.cpp moc/moc_TimeBarWidget.cpp moc/moc_DeviceEdit.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc/moc_Maquette.cpp moc/moc_AttributesEditor.cpp moc/moc_BoxContextMenu.cpp moc/moc_ChooseTemporalRelation.cpp moc/moc_ControlBoxContextMenu.cpp moc/moc_CurveWidget.cpp moc/moc_CurvesWidget.cpp moc/moc_Help.cpp moc/moc_Interpolation.cpp moc/moc_MainWindow.cpp moc/moc_MaquetteScene.cpp moc/moc_MaquetteView.cpp moc/moc_NetworkConfig.cpp moc/moc_NetworkMessagesEditor.cpp moc/moc_NetworkTree.cpp moc/moc_ParentBoxContextMenu.cpp moc/moc_PreviewArea.cpp moc/moc_RelationEdit.cpp moc/moc_SoundBoxContextMenu.cpp moc/moc_TextEdit.cpp moc/moc_TreeMap.cpp moc/moc_TreeMapElement.cpp moc/moc_ViewRelations.cpp moc/moc_NetworkMessages.cpp moc/moc_BoxWidget.cpp moc/moc_BoxCurveEdit.cpp moc/moc_MaquetteWidget.cpp moc/moc_TimeBarWidget.cpp
+	-$(DEL_FILE) moc/moc_Maquette.cpp moc/moc_AttributesEditor.cpp moc/moc_BoxContextMenu.cpp moc/moc_ChooseTemporalRelation.cpp moc/moc_ControlBoxContextMenu.cpp moc/moc_CurveWidget.cpp moc/moc_CurvesWidget.cpp moc/moc_Help.cpp moc/moc_Interpolation.cpp moc/moc_MainWindow.cpp moc/moc_MaquetteScene.cpp moc/moc_MaquetteView.cpp moc/moc_NetworkConfig.cpp moc/moc_NetworkMessagesEditor.cpp moc/moc_NetworkTree.cpp moc/moc_ParentBoxContextMenu.cpp moc/moc_PreviewArea.cpp moc/moc_RelationEdit.cpp moc/moc_SoundBoxContextMenu.cpp moc/moc_TextEdit.cpp moc/moc_TreeMap.cpp moc/moc_TreeMapElement.cpp moc/moc_ViewRelations.cpp moc/moc_NetworkMessages.cpp moc/moc_BoxWidget.cpp moc/moc_BoxCurveEdit.cpp moc/moc_MaquetteWidget.cpp moc/moc_TimeBarWidget.cpp moc/moc_DeviceEdit.cpp
 moc/moc_Maquette.cpp: headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp \
 		headers/data/NetworkMessages.hpp \
@@ -482,6 +485,13 @@ moc/moc_NetworkMessagesEditor.cpp: headers/GUI/NetworkMessagesEditor.hpp
 moc/moc_NetworkTree.cpp: headers/data/NetworkMessages.hpp \
 		headers/data/AbstractBox.hpp \
 		headers/data/Abstract.hpp \
+		headers/GUI/DeviceEdit.hpp \
+		headers/data/Maquette.hpp \
+		headers/data/Palette.hpp \
+		headers/data/EnumPalette.hpp \
+		headers/GUI/BasicBox.hpp \
+		headers/GUI/CurvesWidget.hpp \
+		headers/GUI/BoxWidget.hpp \
 		headers/GUI/NetworkTree.hpp
 	/Developer/Tools/Qt/moc $(DEFINES) $(INCPATH) -D__APPLE__ -D__GNUC__ headers/GUI/NetworkTree.hpp -o moc/moc_NetworkTree.cpp
 
@@ -587,6 +597,18 @@ moc/moc_TimeBarWidget.cpp: headers/GUI/MaquetteScene.hpp \
 		headers/GUI/TimeBarWidget.hpp
 	/Developer/Tools/Qt/moc $(DEFINES) $(INCPATH) -D__APPLE__ -D__GNUC__ headers/GUI/TimeBarWidget.hpp -o moc/moc_TimeBarWidget.cpp
 
+moc/moc_DeviceEdit.cpp: headers/data/Maquette.hpp \
+		headers/data/Palette.hpp \
+		headers/data/EnumPalette.hpp \
+		headers/data/NetworkMessages.hpp \
+		headers/GUI/BasicBox.hpp \
+		headers/data/AbstractBox.hpp \
+		headers/data/Abstract.hpp \
+		headers/GUI/CurvesWidget.hpp \
+		headers/GUI/BoxWidget.hpp \
+		headers/GUI/DeviceEdit.hpp
+	/Developer/Tools/Qt/moc $(DEFINES) $(INCPATH) -D__APPLE__ -D__GNUC__ headers/GUI/DeviceEdit.hpp -o moc/moc_DeviceEdit.cpp
+
 compiler_rcc_make_all: qrc_i-score.cpp
 compiler_rcc_clean:
 	-$(DEL_FILE) qrc_i-score.cpp
@@ -604,42 +626,46 @@ qrc_i-score.cpp: i-score.qrc \
 		documentation/editorProfiles.htm \
 		translations/acousmoscribe_fr.qm \
 		translations/acousmoscribe_en.qm \
-		images/cut.svg \
-		images/relation.svg \
-		images/controlBox.svg \
-		images/Relation.png \
+		images/Goto.png \
+		images/network.svg \
+		images/zoomout.svg \
+		images/BoxInteraction.png \
+		images/soundBox.svg \
+		images/stopSimple.svg \
+		images/boxStartMenu.svg \
+		images/copy.svg \
+		images/edit.svg \
+		images/zoomin.svg \
+		images/paste.svg \
+		images/trigger.svg \
+		images/comment.svg \
+		images/Curves.png \
 		images/ProfilesRythm.png \
 		images/i-score.icns \
-		images/parentBox.svg \
-		images/paste.svg \
-		images/edit.svg \
-		images/soundBox.svg \
-		images/about.svg \
-		images/freePlay.svg \
 		images/ProfilesDynamics.png \
-		images/network.svg \
-		images/Curves.png \
 		images/SnapshotTab.png \
-		images/synth.svg \
-		images/copy.svg \
+		images/Relation.png \
 		images/Messages.png \
-		images/select.svg \
-		images/zoomout.svg \
-		images/ProfilesMelody.png \
-		images/stopSimple.svg \
-		images/filePlay.svg \
-		images/GeneralTab.png \
-		images/playSimple.svg \
-		images/ProfilesHarmony.png \
+		images/freePlay.svg \
+		images/controlBox.svg \
 		images/help.svg \
-		images/comment.svg \
-		images/stop.svg \
-		images/play.svg \
-		images/zoomin.svg \
-		images/BoxInteraction.png \
-		images/trigger.svg \
+		images/ProfilesMelody.png \
+		images/ProfilesHarmony.png \
 		images/Acceleration.png \
-		images/Goto.png
+		images/error-icon.png \
+		images/about.svg \
+		images/addANode.png \
+		images/relation.svg \
+		images/synth.svg \
+		images/boxEndMenu.svg \
+		images/cut.svg \
+		images/filePlay.svg \
+		images/playSimple.svg \
+		images/select.svg \
+		images/play.svg \
+		images/stop.svg \
+		images/parentBox.svg \
+		images/GeneralTab.png
 	/Developer/Tools/Qt/rcc -name i-score i-score.qrc -o qrc_i-score.cpp
 
 compiler_image_collection_make_all: qmake_image_collection.cpp
@@ -661,7 +687,7 @@ compiler_clean: compiler_moc_header_clean compiler_rcc_clean
 
 ####### Compile
 
-main.o: main.cpp headers/GUI/MainWindow.hpp \
+bin/main.o: main.cpp headers/GUI/MainWindow.hpp \
 		headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp \
 		headers/GUI/MaquetteScene.hpp \
@@ -680,58 +706,58 @@ main.o: main.cpp headers/GUI/MainWindow.hpp \
 		headers/GUI/MaquetteView.hpp \
 		headers/GUI/MaquetteWidget.hpp \
 		headers/GUI/LogarithmicSlider.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/main.o main.cpp
 
-Abstract.o: src/data/Abstract.cpp headers/data/Abstract.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Abstract.o src/data/Abstract.cpp
+bin/Abstract.o: src/data/Abstract.cpp headers/data/Abstract.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/Abstract.o src/data/Abstract.cpp
 
-AbstractBox.o: src/data/AbstractBox.cpp headers/data/AbstractBox.hpp \
+bin/AbstractBox.o: src/data/AbstractBox.cpp headers/data/AbstractBox.hpp \
 		headers/data/Abstract.hpp \
 		headers/data/NetworkMessages.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o AbstractBox.o src/data/AbstractBox.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/AbstractBox.o src/data/AbstractBox.cpp
 
-AbstractComment.o: src/data/AbstractComment.cpp headers/data/AbstractComment.hpp \
+bin/AbstractComment.o: src/data/AbstractComment.cpp headers/data/AbstractComment.hpp \
 		headers/data/Abstract.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o AbstractComment.o src/data/AbstractComment.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/AbstractComment.o src/data/AbstractComment.cpp
 
-AbstractControlBox.o: src/data/AbstractControlBox.cpp headers/data/AbstractControlBox.hpp \
+bin/AbstractControlBox.o: src/data/AbstractControlBox.cpp headers/data/AbstractControlBox.hpp \
 		headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp \
 		headers/data/AbstractBox.hpp \
 		headers/data/Abstract.hpp \
 		headers/data/NetworkMessages.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o AbstractControlBox.o src/data/AbstractControlBox.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/AbstractControlBox.o src/data/AbstractControlBox.cpp
 
-AbstractCurve.o: src/data/AbstractCurve.cpp headers/data/AbstractCurve.hpp \
+bin/AbstractCurve.o: src/data/AbstractCurve.cpp headers/data/AbstractCurve.hpp \
 		headers/data/Abstract.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o AbstractCurve.o src/data/AbstractCurve.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/AbstractCurve.o src/data/AbstractCurve.cpp
 
-AbstractParentBox.o: src/data/AbstractParentBox.cpp headers/data/AbstractParentBox.hpp \
+bin/AbstractParentBox.o: src/data/AbstractParentBox.cpp headers/data/AbstractParentBox.hpp \
 		headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp \
 		headers/data/AbstractBox.hpp \
 		headers/data/Abstract.hpp \
 		headers/data/NetworkMessages.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o AbstractParentBox.o src/data/AbstractParentBox.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/AbstractParentBox.o src/data/AbstractParentBox.cpp
 
-AbstractRelation.o: src/data/AbstractRelation.cpp headers/data/AbstractRelation.hpp \
+bin/AbstractRelation.o: src/data/AbstractRelation.cpp headers/data/AbstractRelation.hpp \
 		headers/GUI/BasicBox.hpp \
 		headers/data/AbstractBox.hpp \
 		headers/data/Abstract.hpp \
 		headers/data/NetworkMessages.hpp \
 		headers/GUI/CurvesWidget.hpp \
 		headers/GUI/BoxWidget.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o AbstractRelation.o src/data/AbstractRelation.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/AbstractRelation.o src/data/AbstractRelation.cpp
 
-AbstractSoundBox.o: src/data/AbstractSoundBox.cpp headers/data/AbstractSoundBox.hpp \
+bin/AbstractSoundBox.o: src/data/AbstractSoundBox.cpp headers/data/AbstractSoundBox.hpp \
 		headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp \
 		headers/data/AbstractBox.hpp \
 		headers/data/Abstract.hpp \
 		headers/data/NetworkMessages.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o AbstractSoundBox.o src/data/AbstractSoundBox.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/AbstractSoundBox.o src/data/AbstractSoundBox.cpp
 
-AbstractTriggerPoint.o: src/data/AbstractTriggerPoint.cpp headers/data/AbstractTriggerPoint.hpp \
+bin/AbstractTriggerPoint.o: src/data/AbstractTriggerPoint.cpp headers/data/AbstractTriggerPoint.hpp \
 		headers/data/Abstract.hpp \
 		headers/GUI/BasicBox.hpp \
 		headers/data/AbstractBox.hpp \
@@ -748,9 +774,9 @@ AbstractTriggerPoint.o: src/data/AbstractTriggerPoint.cpp headers/data/AbstractT
 		headers/data/AbstractParentBox.hpp \
 		headers/GUI/TimeBarWidget.hpp \
 		headers/GUI/MaquetteView.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o AbstractTriggerPoint.o src/data/AbstractTriggerPoint.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/AbstractTriggerPoint.o src/data/AbstractTriggerPoint.cpp
 
-Maquette.o: src/data/Maquette.cpp headers/data/Maquette.hpp \
+bin/Maquette.o: src/data/Maquette.cpp headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp \
 		headers/data/NetworkMessages.hpp \
@@ -774,10 +800,13 @@ Maquette.o: src/data/Maquette.cpp headers/data/Maquette.hpp \
 		headers/GUI/ParentBox.hpp \
 		headers/GUI/Relation.hpp \
 		headers/GUI/TriggerPoint.hpp \
-		headers/data/AbstractTriggerPoint.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Maquette.o src/data/Maquette.cpp
+		headers/data/AbstractTriggerPoint.hpp \
+		headers/GUI/AttributesEditor.hpp \
+		headers/GUI/NetworkTree.hpp \
+		headers/GUI/DeviceEdit.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/Maquette.o src/data/Maquette.cpp
 
-Palette.o: src/data/Palette.cpp headers/data/Palette.hpp \
+bin/Palette.o: src/data/Palette.cpp headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp \
 		headers/GUI/MaquetteScene.hpp \
 		headers/data/Maquette.hpp \
@@ -795,9 +824,36 @@ Palette.o: src/data/Palette.cpp headers/data/Palette.hpp \
 		headers/GUI/MaquetteView.hpp \
 		headers/GUI/PreviewArea.hpp \
 		headers/GUI/SoundBox.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Palette.o src/data/Palette.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/Palette.o src/data/Palette.cpp
 
-BasicBox.o: src/GUI/BasicBox.cpp headers/GUI/BasicBox.hpp \
+bin/AttributesEditor.o: src/GUI/AttributesEditor.cpp headers/GUI/SoundBox.hpp \
+		headers/data/EnumPalette.hpp \
+		headers/data/Palette.hpp \
+		headers/GUI/BasicBox.hpp \
+		headers/data/AbstractBox.hpp \
+		headers/data/Abstract.hpp \
+		headers/data/NetworkMessages.hpp \
+		headers/GUI/CurvesWidget.hpp \
+		headers/GUI/BoxWidget.hpp \
+		headers/GUI/MaquetteScene.hpp \
+		headers/data/Maquette.hpp \
+		headers/data/AbstractRelation.hpp \
+		headers/data/AbstractSoundBox.hpp \
+		headers/data/AbstractControlBox.hpp \
+		headers/data/AbstractParentBox.hpp \
+		headers/GUI/TimeBarWidget.hpp \
+		headers/GUI/MaquetteView.hpp \
+		headers/GUI/AttributesEditor.hpp \
+		headers/GUI/PreviewArea.hpp \
+		headers/GUI/TreeMap.hpp \
+		headers/GUI/TreeMapElement.hpp \
+		headers/GUI/NetworkMessagesEditor.hpp \
+		headers/GUI/Interpolation.hpp \
+		headers/GUI/NetworkTree.hpp \
+		headers/GUI/DeviceEdit.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/AttributesEditor.o src/GUI/AttributesEditor.cpp
+
+bin/BasicBox.o: src/GUI/BasicBox.cpp headers/GUI/BasicBox.hpp \
 		headers/data/AbstractBox.hpp \
 		headers/data/Abstract.hpp \
 		headers/data/NetworkMessages.hpp \
@@ -825,9 +881,9 @@ BasicBox.o: src/GUI/BasicBox.cpp headers/GUI/BasicBox.hpp \
 		headers/GUI/Relation.hpp \
 		headers/GUI/CurveWidget.hpp \
 		headers/GUI/BoxCurveEdit.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o BasicBox.o src/GUI/BasicBox.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/BasicBox.o src/GUI/BasicBox.cpp
 
-BoxContextMenu.o: src/GUI/BoxContextMenu.cpp headers/GUI/BoxContextMenu.hpp \
+bin/BoxContextMenu.o: src/GUI/BoxContextMenu.cpp headers/GUI/BoxContextMenu.hpp \
 		headers/GUI/MaquetteScene.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
@@ -845,9 +901,9 @@ BoxContextMenu.o: src/GUI/BoxContextMenu.cpp headers/GUI/BoxContextMenu.hpp \
 		headers/GUI/TimeBarWidget.hpp \
 		headers/GUI/MaquetteView.hpp \
 		headers/GUI/ViewRelations.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o BoxContextMenu.o src/GUI/BoxContextMenu.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/BoxContextMenu.o src/GUI/BoxContextMenu.cpp
 
-ChooseTemporalRelation.o: src/GUI/ChooseTemporalRelation.cpp headers/GUI/ChooseTemporalRelation.hpp \
+bin/ChooseTemporalRelation.o: src/GUI/ChooseTemporalRelation.cpp headers/GUI/ChooseTemporalRelation.hpp \
 		headers/GUI/MainWindow.hpp \
 		headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp \
@@ -867,9 +923,9 @@ ChooseTemporalRelation.o: src/GUI/ChooseTemporalRelation.cpp headers/GUI/ChooseT
 		headers/GUI/MaquetteView.hpp \
 		headers/GUI/MaquetteWidget.hpp \
 		headers/GUI/LogarithmicSlider.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ChooseTemporalRelation.o src/GUI/ChooseTemporalRelation.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/ChooseTemporalRelation.o src/GUI/ChooseTemporalRelation.cpp
 
-Comment.o: src/GUI/Comment.cpp headers/GUI/Comment.hpp \
+bin/Comment.o: src/GUI/Comment.cpp headers/GUI/Comment.hpp \
 		headers/GUI/MaquetteScene.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
@@ -887,9 +943,9 @@ Comment.o: src/GUI/Comment.cpp headers/GUI/Comment.hpp \
 		headers/GUI/TimeBarWidget.hpp \
 		headers/GUI/MaquetteView.hpp \
 		headers/data/AbstractComment.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Comment.o src/GUI/Comment.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/Comment.o src/GUI/Comment.cpp
 
-ControlBox.o: src/GUI/ControlBox.cpp headers/GUI/BasicBox.hpp \
+bin/ControlBox.o: src/GUI/ControlBox.cpp headers/GUI/BasicBox.hpp \
 		headers/data/AbstractBox.hpp \
 		headers/data/Abstract.hpp \
 		headers/data/NetworkMessages.hpp \
@@ -912,9 +968,9 @@ ControlBox.o: src/GUI/ControlBox.cpp headers/GUI/BasicBox.hpp \
 		headers/data/AbstractTriggerPoint.hpp \
 		headers/GUI/Relation.hpp \
 		headers/GUI/TextEdit.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ControlBox.o src/GUI/ControlBox.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/ControlBox.o src/GUI/ControlBox.cpp
 
-ControlBoxContextMenu.o: src/GUI/ControlBoxContextMenu.cpp headers/GUI/ControlBoxContextMenu.hpp \
+bin/ControlBoxContextMenu.o: src/GUI/ControlBoxContextMenu.cpp headers/GUI/ControlBoxContextMenu.hpp \
 		headers/GUI/BoxContextMenu.hpp \
 		headers/GUI/ControlBox.hpp \
 		headers/GUI/BasicBox.hpp \
@@ -933,9 +989,9 @@ ControlBoxContextMenu.o: src/GUI/ControlBoxContextMenu.cpp headers/GUI/ControlBo
 		headers/data/AbstractParentBox.hpp \
 		headers/GUI/TimeBarWidget.hpp \
 		headers/GUI/MaquetteView.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ControlBoxContextMenu.o src/GUI/ControlBoxContextMenu.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/ControlBoxContextMenu.o src/GUI/ControlBoxContextMenu.cpp
 
-CurveWidget.o: src/GUI/CurveWidget.cpp headers/GUI/BasicBox.hpp \
+bin/CurveWidget.o: src/GUI/CurveWidget.cpp headers/GUI/BasicBox.hpp \
 		headers/data/AbstractBox.hpp \
 		headers/data/Abstract.hpp \
 		headers/data/NetworkMessages.hpp \
@@ -946,9 +1002,9 @@ CurveWidget.o: src/GUI/CurveWidget.cpp headers/GUI/BasicBox.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CurveWidget.o src/GUI/CurveWidget.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/CurveWidget.o src/GUI/CurveWidget.cpp
 
-CurvesWidget.o: src/GUI/CurvesWidget.cpp headers/data/AbstractCurve.hpp \
+bin/CurvesWidget.o: src/GUI/CurvesWidget.cpp headers/data/AbstractCurve.hpp \
 		headers/data/Abstract.hpp \
 		headers/GUI/BasicBox.hpp \
 		headers/data/AbstractBox.hpp \
@@ -960,12 +1016,12 @@ CurvesWidget.o: src/GUI/CurvesWidget.cpp headers/data/AbstractCurve.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CurvesWidget.o src/GUI/CurvesWidget.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/CurvesWidget.o src/GUI/CurvesWidget.cpp
 
-Help.o: src/GUI/Help.cpp headers/GUI/Help.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Help.o src/GUI/Help.cpp
+bin/Help.o: src/GUI/Help.cpp headers/GUI/Help.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/Help.o src/GUI/Help.cpp
 
-Interpolation.o: src/GUI/Interpolation.cpp headers/GUI/Interpolation.hpp \
+bin/Interpolation.o: src/GUI/Interpolation.cpp headers/GUI/Interpolation.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp \
@@ -975,12 +1031,12 @@ Interpolation.o: src/GUI/Interpolation.cpp headers/GUI/Interpolation.hpp \
 		headers/data/Abstract.hpp \
 		headers/GUI/CurvesWidget.hpp \
 		headers/GUI/BoxWidget.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Interpolation.o src/GUI/Interpolation.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/Interpolation.o src/GUI/Interpolation.cpp
 
-LogarithmicSlider.o: src/GUI/LogarithmicSlider.cpp headers/GUI/LogarithmicSlider.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o LogarithmicSlider.o src/GUI/LogarithmicSlider.cpp
+bin/LogarithmicSlider.o: src/GUI/LogarithmicSlider.cpp headers/GUI/LogarithmicSlider.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/LogarithmicSlider.o src/GUI/LogarithmicSlider.cpp
 
-MainWindow.o: src/GUI/MainWindow.cpp headers/GUI/AttributesEditor.hpp \
+bin/MainWindow.o: src/GUI/MainWindow.cpp headers/GUI/AttributesEditor.hpp \
 		headers/data/EnumPalette.hpp \
 		headers/GUI/BasicBox.hpp \
 		headers/data/AbstractBox.hpp \
@@ -1004,10 +1060,12 @@ MainWindow.o: src/GUI/MainWindow.cpp headers/GUI/AttributesEditor.hpp \
 		headers/GUI/MaquetteWidget.hpp \
 		headers/GUI/NetworkConfig.hpp \
 		headers/GUI/SoundBox.hpp \
-		headers/GUI/ViewRelations.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MainWindow.o src/GUI/MainWindow.cpp
+		headers/GUI/ViewRelations.hpp \
+		headers/GUI/NetworkTree.hpp \
+		headers/GUI/DeviceEdit.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/MainWindow.o src/GUI/MainWindow.cpp
 
-MaquetteScene.o: src/GUI/MaquetteScene.cpp headers/GUI/MaquetteScene.hpp \
+bin/MaquetteScene.o: src/GUI/MaquetteScene.cpp headers/GUI/MaquetteScene.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp \
@@ -1040,9 +1098,9 @@ MaquetteScene.o: src/GUI/MaquetteScene.cpp headers/GUI/MaquetteScene.hpp \
 		headers/GUI/TextEdit.hpp \
 		headers/GUI/PreviewArea.hpp \
 		headers/GUI/PlayingThread.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MaquetteScene.o src/GUI/MaquetteScene.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/MaquetteScene.o src/GUI/MaquetteScene.cpp
 
-MaquetteView.o: src/GUI/MaquetteView.cpp headers/GUI/MaquetteView.hpp \
+bin/MaquetteView.o: src/GUI/MaquetteView.cpp headers/GUI/MaquetteView.hpp \
 		headers/GUI/BasicBox.hpp \
 		headers/data/AbstractBox.hpp \
 		headers/data/Abstract.hpp \
@@ -1064,9 +1122,9 @@ MaquetteView.o: src/GUI/MaquetteView.cpp headers/GUI/MaquetteView.hpp \
 		headers/GUI/AttributesEditor.hpp \
 		headers/GUI/TriggerPoint.hpp \
 		headers/data/AbstractTriggerPoint.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MaquetteView.o src/GUI/MaquetteView.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/MaquetteView.o src/GUI/MaquetteView.cpp
 
-NetworkConfig.o: src/GUI/NetworkConfig.cpp headers/GUI/NetworkConfig.hpp \
+bin/NetworkConfig.o: src/GUI/NetworkConfig.cpp headers/GUI/NetworkConfig.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp \
@@ -1086,9 +1144,9 @@ NetworkConfig.o: src/GUI/NetworkConfig.cpp headers/GUI/NetworkConfig.hpp \
 		headers/GUI/MaquetteView.hpp \
 		headers/GUI/MaquetteWidget.hpp \
 		headers/GUI/LogarithmicSlider.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o NetworkConfig.o src/GUI/NetworkConfig.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/NetworkConfig.o src/GUI/NetworkConfig.cpp
 
-NetworkMessagesEditor.o: src/GUI/NetworkMessagesEditor.cpp headers/GUI/NetworkMessagesEditor.hpp \
+bin/NetworkMessagesEditor.o: src/GUI/NetworkMessagesEditor.cpp headers/GUI/NetworkMessagesEditor.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp \
@@ -1098,21 +1156,22 @@ NetworkMessagesEditor.o: src/GUI/NetworkMessagesEditor.cpp headers/GUI/NetworkMe
 		headers/data/Abstract.hpp \
 		headers/GUI/CurvesWidget.hpp \
 		headers/GUI/BoxWidget.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o NetworkMessagesEditor.o src/GUI/NetworkMessagesEditor.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/NetworkMessagesEditor.o src/GUI/NetworkMessagesEditor.cpp
 
-NetworkTree.o: src/GUI/NetworkTree.cpp headers/GUI/NetworkTree.hpp \
+bin/NetworkTree.o: src/GUI/NetworkTree.cpp headers/GUI/NetworkTree.hpp \
 		headers/data/NetworkMessages.hpp \
 		headers/data/AbstractBox.hpp \
 		headers/data/Abstract.hpp \
+		headers/GUI/DeviceEdit.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp \
 		headers/GUI/BasicBox.hpp \
 		headers/GUI/CurvesWidget.hpp \
 		headers/GUI/BoxWidget.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o NetworkTree.o src/GUI/NetworkTree.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/NetworkTree.o src/GUI/NetworkTree.cpp
 
-ParentBox.o: src/GUI/ParentBox.cpp headers/GUI/BasicBox.hpp \
+bin/ParentBox.o: src/GUI/ParentBox.cpp headers/GUI/BasicBox.hpp \
 		headers/data/AbstractBox.hpp \
 		headers/data/Abstract.hpp \
 		headers/data/NetworkMessages.hpp \
@@ -1135,9 +1194,9 @@ ParentBox.o: src/GUI/ParentBox.cpp headers/GUI/BasicBox.hpp \
 		headers/data/AbstractTriggerPoint.hpp \
 		headers/GUI/Relation.hpp \
 		headers/GUI/TextEdit.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ParentBox.o src/GUI/ParentBox.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/ParentBox.o src/GUI/ParentBox.cpp
 
-ParentBoxContextMenu.o: src/GUI/ParentBoxContextMenu.cpp headers/GUI/ParentBoxContextMenu.hpp \
+bin/ParentBoxContextMenu.o: src/GUI/ParentBoxContextMenu.cpp headers/GUI/ParentBoxContextMenu.hpp \
 		headers/GUI/BoxContextMenu.hpp \
 		headers/GUI/ParentBox.hpp \
 		headers/GUI/BasicBox.hpp \
@@ -1156,9 +1215,9 @@ ParentBoxContextMenu.o: src/GUI/ParentBoxContextMenu.cpp headers/GUI/ParentBoxCo
 		headers/data/AbstractParentBox.hpp \
 		headers/GUI/TimeBarWidget.hpp \
 		headers/GUI/MaquetteView.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ParentBoxContextMenu.o src/GUI/ParentBoxContextMenu.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/ParentBoxContextMenu.o src/GUI/ParentBoxContextMenu.cpp
 
-PlayingThread.o: src/GUI/PlayingThread.cpp headers/GUI/PlayingThread.hpp \
+bin/PlayingThread.o: src/GUI/PlayingThread.cpp headers/GUI/PlayingThread.hpp \
 		headers/GUI/MaquetteScene.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
@@ -1175,9 +1234,9 @@ PlayingThread.o: src/GUI/PlayingThread.cpp headers/GUI/PlayingThread.hpp \
 		headers/data/AbstractParentBox.hpp \
 		headers/GUI/TimeBarWidget.hpp \
 		headers/GUI/MaquetteView.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o PlayingThread.o src/GUI/PlayingThread.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/PlayingThread.o src/GUI/PlayingThread.cpp
 
-PreviewArea.o: src/GUI/PreviewArea.cpp headers/GUI/PreviewArea.hpp \
+bin/PreviewArea.o: src/GUI/PreviewArea.cpp headers/GUI/PreviewArea.hpp \
 		headers/data/EnumPalette.hpp \
 		headers/data/Palette.hpp \
 		headers/GUI/BasicBox.hpp \
@@ -1186,9 +1245,9 @@ PreviewArea.o: src/GUI/PreviewArea.cpp headers/GUI/PreviewArea.hpp \
 		headers/data/NetworkMessages.hpp \
 		headers/GUI/CurvesWidget.hpp \
 		headers/GUI/BoxWidget.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o PreviewArea.o src/GUI/PreviewArea.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/PreviewArea.o src/GUI/PreviewArea.cpp
 
-Relation.o: src/GUI/Relation.cpp headers/GUI/Relation.hpp \
+bin/Relation.o: src/GUI/Relation.cpp headers/GUI/Relation.hpp \
 		headers/GUI/BasicBox.hpp \
 		headers/data/AbstractBox.hpp \
 		headers/data/Abstract.hpp \
@@ -1206,9 +1265,9 @@ Relation.o: src/GUI/Relation.cpp headers/GUI/Relation.hpp \
 		headers/data/AbstractParentBox.hpp \
 		headers/GUI/TimeBarWidget.hpp \
 		headers/GUI/MaquetteView.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Relation.o src/GUI/Relation.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/Relation.o src/GUI/Relation.cpp
 
-RelationEdit.o: src/GUI/RelationEdit.cpp headers/GUI/RelationEdit.hpp \
+bin/RelationEdit.o: src/GUI/RelationEdit.cpp headers/GUI/RelationEdit.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp \
@@ -1229,9 +1288,9 @@ RelationEdit.o: src/GUI/RelationEdit.cpp headers/GUI/RelationEdit.hpp \
 		headers/GUI/MaquetteWidget.hpp \
 		headers/GUI/LogarithmicSlider.hpp \
 		headers/GUI/Relation.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o RelationEdit.o src/GUI/RelationEdit.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/RelationEdit.o src/GUI/RelationEdit.cpp
 
-SoundBox.o: src/GUI/SoundBox.cpp headers/GUI/BasicBox.hpp \
+bin/SoundBox.o: src/GUI/SoundBox.cpp headers/GUI/BasicBox.hpp \
 		headers/data/AbstractBox.hpp \
 		headers/data/Abstract.hpp \
 		headers/data/NetworkMessages.hpp \
@@ -1254,9 +1313,9 @@ SoundBox.o: src/GUI/SoundBox.cpp headers/GUI/BasicBox.hpp \
 		headers/data/AbstractTriggerPoint.hpp \
 		headers/GUI/Relation.hpp \
 		headers/GUI/TextEdit.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o SoundBox.o src/GUI/SoundBox.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/SoundBox.o src/GUI/SoundBox.cpp
 
-SoundBoxContextMenu.o: src/GUI/SoundBoxContextMenu.cpp headers/GUI/SoundBoxContextMenu.hpp \
+bin/SoundBoxContextMenu.o: src/GUI/SoundBoxContextMenu.cpp headers/GUI/SoundBoxContextMenu.hpp \
 		headers/GUI/BoxContextMenu.hpp \
 		headers/GUI/SoundBox.hpp \
 		headers/data/EnumPalette.hpp \
@@ -1275,12 +1334,12 @@ SoundBoxContextMenu.o: src/GUI/SoundBoxContextMenu.cpp headers/GUI/SoundBoxConte
 		headers/data/AbstractParentBox.hpp \
 		headers/GUI/TimeBarWidget.hpp \
 		headers/GUI/MaquetteView.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o SoundBoxContextMenu.o src/GUI/SoundBoxContextMenu.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/SoundBoxContextMenu.o src/GUI/SoundBoxContextMenu.cpp
 
-TextEdit.o: src/GUI/TextEdit.cpp headers/GUI/TextEdit.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TextEdit.o src/GUI/TextEdit.cpp
+bin/TextEdit.o: src/GUI/TextEdit.cpp headers/GUI/TextEdit.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/TextEdit.o src/GUI/TextEdit.cpp
 
-TriggerPoint.o: src/GUI/TriggerPoint.cpp headers/GUI/TriggerPoint.hpp \
+bin/TriggerPoint.o: src/GUI/TriggerPoint.cpp headers/GUI/TriggerPoint.hpp \
 		headers/GUI/BasicBox.hpp \
 		headers/data/AbstractBox.hpp \
 		headers/data/Abstract.hpp \
@@ -1300,9 +1359,9 @@ TriggerPoint.o: src/GUI/TriggerPoint.cpp headers/GUI/TriggerPoint.hpp \
 		headers/GUI/MaquetteView.hpp \
 		headers/GUI/Comment.hpp \
 		headers/GUI/TextEdit.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TriggerPoint.o src/GUI/TriggerPoint.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/TriggerPoint.o src/GUI/TriggerPoint.cpp
 
-TreeMap.o: src/GUI/TreeMap.cpp headers/GUI/TreeMap.hpp \
+bin/TreeMap.o: src/GUI/TreeMap.cpp headers/GUI/TreeMap.hpp \
 		headers/GUI/TreeMapElement.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
@@ -1313,9 +1372,9 @@ TreeMap.o: src/GUI/TreeMap.cpp headers/GUI/TreeMap.hpp \
 		headers/data/Abstract.hpp \
 		headers/GUI/CurvesWidget.hpp \
 		headers/GUI/BoxWidget.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TreeMap.o src/GUI/TreeMap.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/TreeMap.o src/GUI/TreeMap.cpp
 
-TreeMapElement.o: src/GUI/TreeMapElement.cpp headers/GUI/TreeMapElement.hpp \
+bin/TreeMapElement.o: src/GUI/TreeMapElement.cpp headers/GUI/TreeMapElement.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp \
@@ -1326,9 +1385,9 @@ TreeMapElement.o: src/GUI/TreeMapElement.cpp headers/GUI/TreeMapElement.hpp \
 		headers/GUI/CurvesWidget.hpp \
 		headers/GUI/BoxWidget.hpp \
 		headers/GUI/TreeMap.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TreeMapElement.o src/GUI/TreeMapElement.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/TreeMapElement.o src/GUI/TreeMapElement.cpp
 
-ViewRelations.o: src/GUI/ViewRelations.cpp headers/GUI/ViewRelations.hpp \
+bin/ViewRelations.o: src/GUI/ViewRelations.cpp headers/GUI/ViewRelations.hpp \
 		headers/GUI/MaquetteScene.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
@@ -1345,9 +1404,9 @@ ViewRelations.o: src/GUI/ViewRelations.cpp headers/GUI/ViewRelations.hpp \
 		headers/data/AbstractParentBox.hpp \
 		headers/GUI/TimeBarWidget.hpp \
 		headers/GUI/MaquetteView.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ViewRelations.o src/GUI/ViewRelations.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/ViewRelations.o src/GUI/ViewRelations.cpp
 
-NetworkMessages.o: src/data/NetworkMessages.cpp headers/data/NetworkMessages.hpp \
+bin/NetworkMessages.o: src/data/NetworkMessages.cpp headers/data/NetworkMessages.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
 		headers/data/EnumPalette.hpp \
@@ -1356,9 +1415,9 @@ NetworkMessages.o: src/data/NetworkMessages.cpp headers/data/NetworkMessages.hpp
 		headers/data/Abstract.hpp \
 		headers/GUI/CurvesWidget.hpp \
 		headers/GUI/BoxWidget.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o NetworkMessages.o src/data/NetworkMessages.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/NetworkMessages.o src/data/NetworkMessages.cpp
 
-BoxWidget.o: src/GUI/BoxWidget.cpp headers/data/AbstractCurve.hpp \
+bin/BoxWidget.o: src/GUI/BoxWidget.cpp headers/data/AbstractCurve.hpp \
 		headers/data/Abstract.hpp \
 		headers/GUI/BasicBox.hpp \
 		headers/data/AbstractBox.hpp \
@@ -1377,10 +1436,14 @@ BoxWidget.o: src/GUI/BoxWidget.cpp headers/data/AbstractCurve.hpp \
 		headers/data/AbstractParentBox.hpp \
 		headers/GUI/TimeBarWidget.hpp \
 		headers/GUI/MaquetteView.hpp \
-		headers/GUI/ParentBox.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o BoxWidget.o src/GUI/BoxWidget.cpp
+		headers/GUI/ParentBox.hpp \
+		headers/GUI/AttributesEditor.hpp \
+		headers/GUI/MainWindow.hpp \
+		headers/GUI/MaquetteWidget.hpp \
+		headers/GUI/LogarithmicSlider.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/BoxWidget.o src/GUI/BoxWidget.cpp
 
-BoxCurveEdit.o: src/GUI/BoxCurveEdit.cpp headers/GUI/BoxCurveEdit.hpp \
+bin/BoxCurveEdit.o: src/GUI/BoxCurveEdit.cpp headers/GUI/BoxCurveEdit.hpp \
 		headers/GUI/MaquetteScene.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
@@ -1397,9 +1460,9 @@ BoxCurveEdit.o: src/GUI/BoxCurveEdit.cpp headers/GUI/BoxCurveEdit.hpp \
 		headers/data/AbstractParentBox.hpp \
 		headers/GUI/TimeBarWidget.hpp \
 		headers/GUI/MaquetteView.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o BoxCurveEdit.o src/GUI/BoxCurveEdit.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/BoxCurveEdit.o src/GUI/BoxCurveEdit.cpp
 
-MaquetteWidget.o: src/GUI/MaquetteWidget.cpp headers/GUI/MaquetteWidget.hpp \
+bin/MaquetteWidget.o: src/GUI/MaquetteWidget.cpp headers/GUI/MaquetteWidget.hpp \
 		headers/GUI/MaquetteView.hpp \
 		headers/GUI/LogarithmicSlider.hpp \
 		headers/GUI/TimeBarWidget.hpp \
@@ -1418,9 +1481,9 @@ MaquetteWidget.o: src/GUI/MaquetteWidget.cpp headers/GUI/MaquetteWidget.hpp \
 		headers/data/AbstractControlBox.hpp \
 		headers/data/AbstractParentBox.hpp \
 		headers/GUI/MainWindow.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MaquetteWidget.o src/GUI/MaquetteWidget.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/MaquetteWidget.o src/GUI/MaquetteWidget.cpp
 
-TimeBarWidget.o: src/GUI/TimeBarWidget.cpp headers/GUI/TimeBarWidget.hpp \
+bin/TimeBarWidget.o: src/GUI/TimeBarWidget.cpp headers/GUI/TimeBarWidget.hpp \
 		headers/GUI/MaquetteScene.hpp \
 		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
@@ -1436,120 +1499,109 @@ TimeBarWidget.o: src/GUI/TimeBarWidget.cpp headers/GUI/TimeBarWidget.hpp \
 		headers/data/AbstractControlBox.hpp \
 		headers/data/AbstractParentBox.hpp \
 		headers/GUI/MaquetteView.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TimeBarWidget.o src/GUI/TimeBarWidget.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/TimeBarWidget.o src/GUI/TimeBarWidget.cpp
 
-AttributeEditor.o: src/GUI/AttributeEditor.cpp headers/GUI/SoundBox.hpp \
-		headers/data/EnumPalette.hpp \
+bin/DeviceEdit.o: src/GUI/DeviceEdit.cpp headers/GUI/DeviceEdit.hpp \
+		headers/data/Maquette.hpp \
 		headers/data/Palette.hpp \
+		headers/data/EnumPalette.hpp \
+		headers/data/NetworkMessages.hpp \
 		headers/GUI/BasicBox.hpp \
 		headers/data/AbstractBox.hpp \
 		headers/data/Abstract.hpp \
-		headers/data/NetworkMessages.hpp \
 		headers/GUI/CurvesWidget.hpp \
-		headers/GUI/BoxWidget.hpp \
-		headers/GUI/MaquetteScene.hpp \
-		headers/data/Maquette.hpp \
-		headers/data/AbstractRelation.hpp \
-		headers/data/AbstractSoundBox.hpp \
-		headers/data/AbstractControlBox.hpp \
-		headers/data/AbstractParentBox.hpp \
-		headers/GUI/TimeBarWidget.hpp \
-		headers/GUI/MaquetteView.hpp \
-		headers/GUI/AttributesEditor.hpp \
-		headers/GUI/PreviewArea.hpp \
-		headers/GUI/TreeMap.hpp \
-		headers/GUI/TreeMapElement.hpp \
-		headers/GUI/NetworkMessagesEditor.hpp \
-		headers/GUI/Interpolation.hpp \
-		headers/GUI/NetworkTree.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o AttributeEditor.o src/GUI/AttributeEditor.cpp
+		headers/GUI/BoxWidget.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/DeviceEdit.o src/GUI/DeviceEdit.cpp
 
-moc_Maquette.o: moc/moc_Maquette.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_Maquette.o moc/moc_Maquette.cpp
+bin/moc_Maquette.o: moc/moc_Maquette.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_Maquette.o moc/moc_Maquette.cpp
 
-moc_AttributesEditor.o: moc/moc_AttributesEditor.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_AttributesEditor.o moc/moc_AttributesEditor.cpp
+bin/moc_AttributesEditor.o: moc/moc_AttributesEditor.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_AttributesEditor.o moc/moc_AttributesEditor.cpp
 
-moc_BoxContextMenu.o: moc/moc_BoxContextMenu.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_BoxContextMenu.o moc/moc_BoxContextMenu.cpp
+bin/moc_BoxContextMenu.o: moc/moc_BoxContextMenu.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_BoxContextMenu.o moc/moc_BoxContextMenu.cpp
 
-moc_ChooseTemporalRelation.o: moc/moc_ChooseTemporalRelation.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_ChooseTemporalRelation.o moc/moc_ChooseTemporalRelation.cpp
+bin/moc_ChooseTemporalRelation.o: moc/moc_ChooseTemporalRelation.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_ChooseTemporalRelation.o moc/moc_ChooseTemporalRelation.cpp
 
-moc_ControlBoxContextMenu.o: moc/moc_ControlBoxContextMenu.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_ControlBoxContextMenu.o moc/moc_ControlBoxContextMenu.cpp
+bin/moc_ControlBoxContextMenu.o: moc/moc_ControlBoxContextMenu.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_ControlBoxContextMenu.o moc/moc_ControlBoxContextMenu.cpp
 
-moc_CurveWidget.o: moc/moc_CurveWidget.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_CurveWidget.o moc/moc_CurveWidget.cpp
+bin/moc_CurveWidget.o: moc/moc_CurveWidget.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_CurveWidget.o moc/moc_CurveWidget.cpp
 
-moc_CurvesWidget.o: moc/moc_CurvesWidget.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_CurvesWidget.o moc/moc_CurvesWidget.cpp
+bin/moc_CurvesWidget.o: moc/moc_CurvesWidget.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_CurvesWidget.o moc/moc_CurvesWidget.cpp
 
-moc_Help.o: moc/moc_Help.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_Help.o moc/moc_Help.cpp
+bin/moc_Help.o: moc/moc_Help.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_Help.o moc/moc_Help.cpp
 
-moc_Interpolation.o: moc/moc_Interpolation.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_Interpolation.o moc/moc_Interpolation.cpp
+bin/moc_Interpolation.o: moc/moc_Interpolation.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_Interpolation.o moc/moc_Interpolation.cpp
 
-moc_MainWindow.o: moc/moc_MainWindow.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_MainWindow.o moc/moc_MainWindow.cpp
+bin/moc_MainWindow.o: moc/moc_MainWindow.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_MainWindow.o moc/moc_MainWindow.cpp
 
-moc_MaquetteScene.o: moc/moc_MaquetteScene.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_MaquetteScene.o moc/moc_MaquetteScene.cpp
+bin/moc_MaquetteScene.o: moc/moc_MaquetteScene.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_MaquetteScene.o moc/moc_MaquetteScene.cpp
 
-moc_MaquetteView.o: moc/moc_MaquetteView.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_MaquetteView.o moc/moc_MaquetteView.cpp
+bin/moc_MaquetteView.o: moc/moc_MaquetteView.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_MaquetteView.o moc/moc_MaquetteView.cpp
 
-moc_NetworkConfig.o: moc/moc_NetworkConfig.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_NetworkConfig.o moc/moc_NetworkConfig.cpp
+bin/moc_NetworkConfig.o: moc/moc_NetworkConfig.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_NetworkConfig.o moc/moc_NetworkConfig.cpp
 
-moc_NetworkMessagesEditor.o: moc/moc_NetworkMessagesEditor.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_NetworkMessagesEditor.o moc/moc_NetworkMessagesEditor.cpp
+bin/moc_NetworkMessagesEditor.o: moc/moc_NetworkMessagesEditor.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_NetworkMessagesEditor.o moc/moc_NetworkMessagesEditor.cpp
 
-moc_NetworkTree.o: moc/moc_NetworkTree.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_NetworkTree.o moc/moc_NetworkTree.cpp
+bin/moc_NetworkTree.o: moc/moc_NetworkTree.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_NetworkTree.o moc/moc_NetworkTree.cpp
 
-moc_ParentBoxContextMenu.o: moc/moc_ParentBoxContextMenu.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_ParentBoxContextMenu.o moc/moc_ParentBoxContextMenu.cpp
+bin/moc_ParentBoxContextMenu.o: moc/moc_ParentBoxContextMenu.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_ParentBoxContextMenu.o moc/moc_ParentBoxContextMenu.cpp
 
-moc_PreviewArea.o: moc/moc_PreviewArea.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_PreviewArea.o moc/moc_PreviewArea.cpp
+bin/moc_PreviewArea.o: moc/moc_PreviewArea.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_PreviewArea.o moc/moc_PreviewArea.cpp
 
-moc_RelationEdit.o: moc/moc_RelationEdit.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_RelationEdit.o moc/moc_RelationEdit.cpp
+bin/moc_RelationEdit.o: moc/moc_RelationEdit.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_RelationEdit.o moc/moc_RelationEdit.cpp
 
-moc_SoundBoxContextMenu.o: moc/moc_SoundBoxContextMenu.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_SoundBoxContextMenu.o moc/moc_SoundBoxContextMenu.cpp
+bin/moc_SoundBoxContextMenu.o: moc/moc_SoundBoxContextMenu.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_SoundBoxContextMenu.o moc/moc_SoundBoxContextMenu.cpp
 
-moc_TextEdit.o: moc/moc_TextEdit.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_TextEdit.o moc/moc_TextEdit.cpp
+bin/moc_TextEdit.o: moc/moc_TextEdit.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_TextEdit.o moc/moc_TextEdit.cpp
 
-moc_TreeMap.o: moc/moc_TreeMap.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_TreeMap.o moc/moc_TreeMap.cpp
+bin/moc_TreeMap.o: moc/moc_TreeMap.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_TreeMap.o moc/moc_TreeMap.cpp
 
-moc_TreeMapElement.o: moc/moc_TreeMapElement.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_TreeMapElement.o moc/moc_TreeMapElement.cpp
+bin/moc_TreeMapElement.o: moc/moc_TreeMapElement.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_TreeMapElement.o moc/moc_TreeMapElement.cpp
 
-moc_ViewRelations.o: moc/moc_ViewRelations.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_ViewRelations.o moc/moc_ViewRelations.cpp
+bin/moc_ViewRelations.o: moc/moc_ViewRelations.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_ViewRelations.o moc/moc_ViewRelations.cpp
 
-moc_NetworkMessages.o: moc/moc_NetworkMessages.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_NetworkMessages.o moc/moc_NetworkMessages.cpp
+bin/moc_NetworkMessages.o: moc/moc_NetworkMessages.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_NetworkMessages.o moc/moc_NetworkMessages.cpp
 
-moc_BoxWidget.o: moc/moc_BoxWidget.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_BoxWidget.o moc/moc_BoxWidget.cpp
+bin/moc_BoxWidget.o: moc/moc_BoxWidget.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_BoxWidget.o moc/moc_BoxWidget.cpp
 
-moc_BoxCurveEdit.o: moc/moc_BoxCurveEdit.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_BoxCurveEdit.o moc/moc_BoxCurveEdit.cpp
+bin/moc_BoxCurveEdit.o: moc/moc_BoxCurveEdit.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_BoxCurveEdit.o moc/moc_BoxCurveEdit.cpp
 
-moc_MaquetteWidget.o: moc/moc_MaquetteWidget.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_MaquetteWidget.o moc/moc_MaquetteWidget.cpp
+bin/moc_MaquetteWidget.o: moc/moc_MaquetteWidget.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_MaquetteWidget.o moc/moc_MaquetteWidget.cpp
 
-moc_TimeBarWidget.o: moc/moc_TimeBarWidget.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_TimeBarWidget.o moc/moc_TimeBarWidget.cpp
+bin/moc_TimeBarWidget.o: moc/moc_TimeBarWidget.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_TimeBarWidget.o moc/moc_TimeBarWidget.cpp
 
-qrc_i-score.o: qrc_i-score.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_i-score.o qrc_i-score.cpp
+bin/moc_DeviceEdit.o: moc/moc_DeviceEdit.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/moc_DeviceEdit.o moc/moc_DeviceEdit.cpp
+
+bin/qrc_i-score.o: qrc_i-score.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bin/qrc_i-score.o qrc_i-score.cpp
 
 ####### Install
 

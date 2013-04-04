@@ -315,6 +315,11 @@ Maquette::setScene(MaquetteScene *scene) {
 	_scene = scene;
 }
 
+vector<string>
+Maquette::getPlugins(){
+    return _plugins;
+}
+
 vector<unsigned int>
 Maquette::getRelationsIDs(unsigned int boxID)
 {
@@ -672,19 +677,20 @@ Maquette::requestNetworkNamespace(const string &address, vector<string>& nodes, 
 
 void
 Maquette::changeNetworkDevice(const string &deviceName, const string &pluginName, const string &IP, const string &port) {
-	if (_devices.find(deviceName) != _devices.end()) {
-		_engines->removeNetworkDevice(deviceName);
-	}
-  std::istringstream iss(port);
+    if (_devices.find(deviceName) != _devices.end())
+        removeNetworkDevice(deviceName);
 
-  unsigned int portInt;
+    addNetworkDevice(deviceName,pluginName,IP,port);
 
-  iss >> portInt;
+    std::istringstream iss(port);
+    unsigned int portInt;
+    iss >> portInt;
 
-	MyDevice newDevice(deviceName,pluginName,portInt,IP);
-	_devices[deviceName] = newDevice;
+//    MyDevice newDevice(deviceName,pluginName,portInt,IP);
+//    _devices[deviceName] = newDevice;
 
-	_engines->addNetworkDevice(deviceName,pluginName,IP,port);
+//    _engines->addNetworkDevice(deviceName,pluginName,IP,port);
+    _currentDevice = deviceName;
 }
 
 #ifndef USE_JAMOMA
@@ -766,7 +772,6 @@ Maquette::lastMessagesToSend(unsigned int boxID)
 void
 Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, const vector<string> &endMsgs)
 {    
-
     //QMap<address,value>
     QMap<string,string> startMessages;
     QMap<string,string> endMessages;
@@ -776,7 +781,6 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
     string currentMsg;
     string currentAddress;
     string currentValue;
-
 
     /************  init start messages (QMap)  ************/
     for (it = startMsgs.begin() ; it != startMsgs.end() ; ++it) {
@@ -789,7 +793,6 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
         }
         startMessages.insert(currentAddress,currentValue);
     }
-
 
     /************  init end messages (QMap)  ************/
     for (it = endMsgs.begin() ; it != endMsgs.end() ; ++it) {
@@ -884,14 +887,7 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages){
     vector<string> firstMsgs = messages->computeMessages();
 
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
-        //PRINT
-//            std::cout<<"---- Maquette::SETSTARTMESSAGETOSEND ----"<<std::endl;
-//            for(int i=0 ; i<firstMsgs.size(); i++ )
-//                std::cout<< firstMsgs[i]<<std::endl;
-//            std::cout<<std::endl<<std::endl;
-        //PRINT
         _engines->setCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
-//        _boxes[boxID]->setFirstMessagesToSend(firstMsgs);
         _boxes[boxID]->setStartMessages(messages);
 
         vector<string> lastMsgs;
@@ -901,6 +897,16 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages){
         return true;
     }
     return false;
+}
+
+NetworkMessages *
+Maquette::startMessages(unsigned int boxID){
+    if (boxID != NO_ID && (getBox(boxID) != NULL))
+        return _boxes[boxID]->startMessages();
+    else{
+        std::cerr<<"Maquette::startMessage : wrong boxID"<<std::endl;
+        return NULL;
+    }
 }
 
 bool
@@ -967,6 +973,16 @@ Maquette::setEndMessages(unsigned int boxID,  NetworkMessages* nm){
     return false;
 }
 
+NetworkMessages *
+Maquette::endMessages(unsigned int boxID){
+    if (boxID != NO_ID && (getBox(boxID) != NULL))
+        return _boxes[boxID]->endMessages();
+    else{
+        std::cerr<<"Maquette::startMessage : wrong boxID"<<std::endl;
+        return NULL;
+    }
+}
+
 bool
 Maquette::setLastMessagesToSend(unsigned int boxID, const vector<string> &lastMsgs) {
 	if (boxID != NO_ID && (getBox(boxID) != NULL)) {
@@ -984,10 +1000,11 @@ Maquette::setLastMessagesToSend(unsigned int boxID, const vector<string> &lastMs
 
 bool
 Maquette::setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages) {
+
     vector<string> lastMsgs = messages->computeMessages();
+
     if (boxID != NO_ID && (getBox(boxID) != NULL)) {
         _engines->setCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
-//        _boxes[boxID]->setLastMessagesToSend(lastMsgs);
         _boxes[boxID]->setEndMessages(messages);
 
         vector<string> firstMsgs;
@@ -1170,7 +1187,7 @@ Maquette::updateBoxes(const map<unsigned int,Coords> &boxes) {
 void
 Maquette::simulateTriggeringMessage(const string &message)
 {
-	_engines->simulateNetworkMessageReception(message);
+    _engines->simulateNetworkMessageReception(message);
 }
 
 int
@@ -1315,8 +1332,8 @@ bool Maquette::getCurveAttributes(unsigned int boxID, const std::string &address
 	unsigned int &sampleRate, bool &redundancy, bool &interpolate, vector<float>& values, vector<string> &argTypes,
 	vector<float> &xPercents, vector<float> &yValues, vector<short> &sectionType, vector<float> &coeff) {
 
-	if (_engines->getCurveValues(boxID,address,argPosition,values)) {
-        if (_engines->getCurveSections(boxID,address,argPosition,xPercents,yValues,sectionType,coeff)) {
+	if (_engines->getCurveValues(boxID,address,argPosition,values)) {        
+        if (_engines->getCurveSections(boxID,address,argPosition,xPercents,yValues,sectionType,coeff)) {            
 			sampleRate = _engines->getCurveSampleRate(boxID,address);
 			redundancy = _engines->getCurveRedundancy(boxID,address);
 			interpolate = !_engines->getCurveMuteState(boxID,address);
@@ -1408,7 +1425,10 @@ Maquette::addRelation(unsigned int ID1, BoxExtremity firstExtremum, unsigned int
         _boxes[ID2]->addRelation(secondExtremum,newRel);
 		_scene->addItem(newRel);
 		updateBoxesFromEngines(movedBoxes);
-        _scene->boxesMoved(movedBoxes);
+
+        //TODO : Check if can be comment
+//        _scene->boxesMoved(movedBoxes);
+
 		return (int)relationID;
 	}
 
@@ -1428,7 +1448,7 @@ Maquette::addRelation(const AbstractRelation &abstract) {
 		_relations[abstract.ID()] = newRel;
 		_scene->addItem(newRel);
 		_boxes[abstract.firstBox()]->addRelation(abstract.firstExtremity(),newRel);
-        _boxes[abstract.secondBox()]->addRelation(abstract.secondExtremity(),newRel);
+        _boxes[abstract.secondBox()]->addRelation(abstract.secondExtremity(),newRel);        
 		newRel->updateCoordinates();        
 		return (int)abstract.ID();
 	}
@@ -1478,8 +1498,8 @@ Maquette::changeRelationBounds(unsigned int relID, const float &minBound, const 
 	if (maxBound != NO_BOUND) {
         maxBoundMS = maxBound * (MaquetteScene::MS_PER_PIXEL*_scene->zoom());
 	}
-	_engines->changeTemporalRelationBounds(relID,minBoundMS,maxBoundMS,movedBoxes);
-	updateBoxesFromEngines(movedBoxes);
+    _engines->changeTemporalRelationBounds(relID,minBoundMS,maxBoundMS,movedBoxes);
+    updateBoxesFromEngines(movedBoxes);
 }
 
 int
@@ -1509,18 +1529,6 @@ Maquette::getProgression(unsigned int boxID)
 
 void
 Maquette::setGotoValue(int gotoValue) {
-//    std::cout<<"GOTO "<<gotoValue<<std::endl;
-//    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
-//        unsigned int boxID = it->first;
-//        std::cout<<" "<<boxID<<" "<< _engines->getBoxBeginTime(boxID)<<" " <<_engines->getBoxEndTime(boxID)<<std::endl;
-//        if(_engines->getBoxBeginTime(boxID)<gotoValue){
-//            std::cout<<"MUTED "<<std::endl;
-//            _engines->setCtrlPointMutingState(boxID,1,true);
-//        }
-//        else{
-//            _engines->setCtrlPointMutingState(boxID,1,true);
-//        }
-//    }
     _scene->view()->setGotoValue(gotoValue);
     _engines->setGotoValue(gotoValue);
 }
@@ -1539,6 +1547,7 @@ Maquette::initSceneState(){
     //Pour palier au bug du moteur (qui envoyait tous les messages début et fin de toutes les boîtes < Goto)
 
     double gotoValue = (double)_engines->getGotoValue();
+
     unsigned int boxID;
     QMap<QString,QPair<QString,unsigned int> > msgs, boxMsgs;
     QList<QString> boxAddresses;
@@ -1550,58 +1559,65 @@ Maquette::initSceneState(){
         boxID = it->first;
         currentBox = (*it).second;
 
-        //réinit : On démute toutes les boîtes, elles ont potentiellement pu être mutées  à la fin de l'algo
+        //réinit : On démute toutes les boîtes, elles ont potentiellement pu être mutées à la fin de l'algo
         _engines->setCtrlPointMutingState(boxID,1,false);
         _engines->setCtrlPointMutingState(boxID,2,false);
 
-        if(currentBox->date() < gotoValue && (currentBox->date()+currentBox->duration()) < gotoValue ){
-
+        if(currentBox->date() < gotoValue && (currentBox->date()+currentBox->duration()) <= gotoValue ){
             boxMsgs = currentBox->getFinalState();
 
         }
-        else
-            //goto au milieu d'une boîte : On envoie la valeur du début de boîte
-            if(gotoValue > currentBox->date() && gotoValue < (currentBox->date()+currentBox->duration())){
-                boxMsgs = currentBox->getStartState();
-                curvesList = _engines->getCurvesAddress(boxID);
-            }
-
-        boxAddresses = boxMsgs.keys();
-
-            //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
-            for(QList<QString>::iterator it2 = boxAddresses.begin() ; it2!=boxAddresses.end() ; it2++){
-                if(msgs.contains(*it2)){
-                    if(msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second < gotoValue)
-                        msgs.insert(*it2,boxMsgs.value(*it2));
-                }
-                //sinon on ajoute dans la liste de messages
-                else
-                    if(boxMsgs.value(*it2).second < gotoValue)
-                        msgs.insert(*it2,boxMsgs.value(*it2));
-            }
-
-            //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
-            //    Start messages
-                _engines->setCtrlPointMutingState(boxID,1,true);
-            //    End messages
-            if(currentBox->date()+currentBox->duration()<gotoValue)
-                _engines->setCtrlPointMutingState(boxID,2,true);
+        else if(gotoValue > currentBox->date() && gotoValue < (currentBox->date()+currentBox->duration())){
+            //goto au milieu d'une boîte : On envoie la valeur du début de boîte            
+            boxMsgs = currentBox->getStartState();            
+            curvesList = _engines->getCurvesAddress(boxID);
 
             //On supprime les messages si ils sont déjà associés à une courbe (le moteur les envoie automatiquement)
-            for (int i=0 ; i<curvesList.size() ; i++)
-                msgs.remove(QString::fromStdString(curvesList[i]));
+            for (unsigned int i=0 ; i<curvesList.size() ; i++){
+                //sauf si la courbe a été désactivée manuellement
+                if(!getCurveMuteState(boxID,curvesList[i])){
+                    msgs.remove(QString::fromStdString(curvesList[i]));
+                }
+            }            
         }
+        else if(gotoValue == currentBox->date()){            
+            boxMsgs = currentBox->getStartState();            
+        }
+        boxAddresses = boxMsgs.keys();
+
+        //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
+        for(QList<QString>::iterator it2 = boxAddresses.begin() ; it2!=boxAddresses.end() ; it2++){
+            if(msgs.contains(*it2)){                
+                if(msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second <= gotoValue){
+                    msgs.insert(*it2,boxMsgs.value(*it2));                    
+                }
+            }
+            //sinon on ajoute dans la liste de messages
+            else
+                if(boxMsgs.value(*it2).second <= gotoValue){
+                    msgs.insert(*it2,boxMsgs.value(*it2));
+                }
+        }
+
+        //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
+        //    Start messages
+        if(currentBox->date() < gotoValue){
+            _engines->setCtrlPointMutingState(boxID,1,true);
+        }
+        //    End messages
+        if(currentBox->date()+currentBox->duration()<gotoValue){            
+            _engines->setCtrlPointMutingState(boxID,2,true);
+        }
+    }
 
     //traduction en QMap<QString,QString>, on supprime le champs date des messages
     QList<QString> addresses = msgs.keys();
 
     QString message;
-    for(QList<QString>::iterator it = addresses.begin() ; it != addresses.end() ; it++){
+    for(QList<QString>::iterator it = addresses.begin() ; it != addresses.end() ; it++){         
          message = *it+" "+msgs.value(*it).first;
-         sendMessage(message.toStdString());         
+         sendMessage(message.toStdString());
     }
-
-
 }
 
 void
@@ -1610,8 +1626,8 @@ Maquette::pause(){
 }
 
 void
-Maquette::startPlaying()
-{
+Maquette::startPlaying(){
+
     _engines->pause(false);
     double gotoValue = (double)_engines->getGotoValue();
     initSceneState();
@@ -1763,6 +1779,10 @@ Maquette::saveBox(unsigned int boxID)
 
     boxNode.appendChild(colorNode);
 
+    colorNode.setAttribute("red",color.red());
+    colorNode.setAttribute("green",color.green());
+    colorNode.setAttribute("blue",color.blue());
+
     if (boxType == "sound") {
         Palette pal = static_cast<SoundBox*>(box)->getPalette();
         QString soundFile = static_cast<SoundBox*>(box)->soundSelected();
@@ -1800,9 +1820,14 @@ Maquette::saveBox(unsigned int boxID)
     //return true;
 }
 
+std::string
+Maquette::getNetworkHost(){
+    return _devices.at(_currentDevice).networkHost;
+}
+
 void
-Maquette::save(const string &fileName) {
-    _engines->store(fileName+".simone");
+Maquette::save(const string &fileName) {    
+    _engines->store(fileName+".simone");    
 
     QFile file(QString::fromStdString(fileName));
 
@@ -1824,13 +1849,59 @@ Maquette::save(const string &fileName) {
     root.setAttribute("centerX",_scene->view()->getCenterCoordinates().x());
     root.setAttribute("centerY",_scene->view()->getCenterCoordinates().y());
     _doc->appendChild(root);
+
     QDomElement boxesNode = _doc->createElement("boxes");
     root.appendChild(boxesNode);
 
-    QString boxType;
     for(BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; ++it ) {
         saveBox(it->first);
     }
+
+    //****************************  Devices ****************************
+    QDomElement devicesNode = _doc->createElement("Devices");
+    QDomElement deviceNode;
+
+    std::map<std::string,MyDevice>::iterator it;
+    string deviceName;
+    unsigned int networkPort;
+    string networkHost;
+    string plugin;
+    MyDevice curDevice;
+
+    for( it = _devices.begin(); it!=_devices.end(); it++){
+        curDevice = it->second;
+
+        deviceName = curDevice.name;
+        networkPort = curDevice.networkPort;
+        networkHost = curDevice.networkHost;
+        plugin = curDevice.plugin;
+
+        deviceNode = _doc->createElement("Device");
+        deviceNode.setAttribute("IP",QString::fromStdString(networkHost));
+        deviceNode.setAttribute("port",networkPort);
+        deviceNode.setAttribute("plugin",QString::fromStdString(plugin));
+        deviceNode.setAttribute("name",QString::fromStdString(deviceName));
+
+        devicesNode.appendChild(deviceNode);
+    }
+
+    root.appendChild(devicesNode);
+
+    //OSC Messages
+    QList<QString> OSCMessages = _scene->editor()->networkTree()->getOSCMessages();
+
+    QDomElement OSCMessagesNode = _doc->createElement("OSCMessages");
+    QDomElement OSCMessageNode;
+
+    for(QList<QString>::iterator it=OSCMessages.begin() ; it!=OSCMessages.end() ; it++){
+
+        OSCMessageNode = _doc->createElement("OSC");
+        OSCMessageNode.setAttribute("message",*it);
+        OSCMessagesNode.appendChild(OSCMessageNode);
+    }
+    root.appendChild(OSCMessagesNode);
+
+    //***************************************************************
 
     QTextStream ts(&file);
     ts << _doc->toString();
@@ -1838,7 +1909,6 @@ Maquette::save(const string &fileName) {
 
     delete _doc;
 }
-
 
 void
 Maquette::loadOLD(const string &fileName){
@@ -2164,6 +2234,7 @@ Maquette::load(const string &fileName){
     }
 
     QDomElement root = _doc->documentElement();
+
     if (root.tagName() != "GRAPHICS") {
         _scene->displayMessage((tr("Unvailable xml document %1").
                 arg(QString::fromStdString(fileName))).toStdString(),
@@ -2176,7 +2247,7 @@ Maquette::load(const string &fileName){
 
     QPointF topLeft,size,bottomRight;
     unsigned int begin,duration,topLeftY,sizeY;
-    QString name,boxType,relType;
+    QString name,boxType;
     QColor color(1.,1.,1.);
     Palette pal;
     int boxID,motherID;
@@ -2189,7 +2260,6 @@ Maquette::load(const string &fileName){
     _scene->view()->setZoom(zoom);
     _scene->view()->centerOn(centerCoordinates);
 
-    QMap<int,unsigned int> hashMap;
     QDomNode mainNode = root.firstChild(); // Boxes
     while (!mainNode.isNull()) {
         QDomNode node1 = mainNode.firstChild(); // Box
@@ -2215,7 +2285,6 @@ Maquette::load(const string &fileName){
                         while (!node3.isNull()) {
                             QDomElement elt3 = node3.toElement();
                             if (elt2.tagName() == "position") {
-                                QPointF tmp(elt3.attribute("x","0").toInt(),elt3.attribute("y","0").toInt());
                                 if (elt3.tagName() == "date") {
                                     begin = elt3.attribute("begin","0").toInt();
                                     duration = elt3.attribute("duration","0").toInt();
@@ -2405,7 +2474,92 @@ Maquette::load(const string &fileName){
     }
 
 
+    /************************ Devices ************************/
+    MyDevice OSCDevice;
+    string OSCDevicePort;
+
+    //clean
+    vector<string> deviceNames;
+    vector<bool> deviceRequestable;
+    _engines->getNetworkDevicesName(deviceNames,deviceRequestable);
+    for(unsigned int i=0; i<deviceNames.size(); i++)
+        _engines->removeNetworkDevice(deviceNames[i]);
+    _devices.clear();
+
+    //read from xml
+    if(root.childNodes().size()>=2){ //Devices
+        QDomElement devices = root.childNodes().at(1).toElement();
+        if (devices.tagName() != "Devices") {
+            _scene->displayMessage((tr("Unvailable xml document %1 - Devices problem").
+                    arg(QString::fromStdString(fileName))).toStdString(),
+                    WARNING_LEVEL);
+            file.close();
+            return;
+        }
+        else{ //get device infos
+            QString deviceName;
+            QString ip;
+            QString port;
+            QString plugin;
+
+            for(int i=0 ; i<devices.childNodes().size() ; i++){ //Device
+                if(devices.childNodes().at(i).toElement().tagName()=="Device"){
+                    deviceName = devices.childNodes().at(i).toElement().attribute("name");
+                    ip = devices.childNodes().at(i).toElement().attribute("IP");
+                    port = devices.childNodes().at(i).toElement().attribute("port");
+                    plugin = devices.childNodes().at(i).toElement().attribute("plugin");
+
+                    addNetworkDevice(deviceName.toStdString(),plugin.toStdString(),ip.toStdString(),port.toStdString());
+
+                    //save OSC device (for OSCMessages)
+                    if(plugin == "OSC"){
+                        OSCDevice.name = deviceName.toStdString();
+                        OSCDevice.networkHost = ip.toStdString();
+                        OSCDevicePort = port.toStdString();
+                        OSCDevice.plugin = plugin.toStdString();
+                    }
+                }
+            }
+        }
+    }
+
+    //reload networkTree
+    _scene->editor()->networkTree()->load();
+
+    /************************ OSC ************************/
+    if(root.childNodes().size()>=2){
+        QDomElement OSC = root.childNodes().at(2).toElement();
+
+        if (OSC.tagName() != "OSCMessages") {
+            _scene->displayMessage((tr("Unvailable xml document %1 - OSC Messages problem").
+                    arg(QString::fromStdString(fileName))).toStdString(),
+                    WARNING_LEVEL);
+            file.close();
+            return;
+        }
+
+        QList<QString> OSCMessagesList;
+        for(int i=0 ; i<OSC.childNodes().size() ; i++){
+            if(OSC.childNodes().at(i).toElement().tagName()=="OSC")
+                OSCMessagesList<<OSC.childNodes().at(i).toElement().attribute("message");
+        }
+
+        _scene->setNetworDeviceConfig(OSCDevice.name,OSCDevice.plugin,OSCDevice.networkHost,OSCDevicePort);
+        _scene->editor()->networkTree()->createItemsFromMessages(OSCMessagesList);
+    }
+
     delete _doc;
+}
+
+void
+Maquette::addNetworkDevice(string deviceName,string plugin,string ip,string port){
+    std::istringstream iss(port);
+    unsigned int portInt;
+    iss >> portInt;
+
+    MyDevice newDevice(deviceName,plugin,portInt,ip);
+    _devices[deviceName]=newDevice;
+    _engines->addNetworkDevice(deviceName,plugin,ip,port);
 }
 
 double
@@ -2458,8 +2612,7 @@ Maquette::crossedTriggerPoint(bool waiting, unsigned int trgID)
 }
 
 void
-Maquette::executionFinished()
-{
+Maquette::executionFinished(){
 	_scene->timeEndReached();
 }
 
@@ -2472,6 +2625,45 @@ crossTransitionCallback(unsigned int boxID, unsigned int CPIndex, vector<unsigne
 }
 
 void
+enginesNetworkUpdateCallback(unsigned int boxID, string m1, string m2){
+    Q_UNUSED(boxID);
+    MaquetteScene *scene = Maquette::getInstance()->scene();
+
+    if(scene != NULL){
+        if(m1 == PLAY_ENGINES_MESSAGE){
+            scene->play();
+        }
+        else if(m1 == STOP_ENGINES_MESSAGE){
+            scene->stopWithGoto();
+        }
+        else if(m1 == STARTPOINT_ENGINES_MESSAGE){
+            if(!m2.empty()){
+                std::istringstream iss(m2);
+                unsigned int value;
+                iss >> value;
+                scene->gotoChanged(value);
+            }
+        }
+        else if(m1 == REWIND_ENGINES_MESSAGE){
+            scene->stopGotoStart();
+        }
+        else if(m1 == SPEED_ENGINES_MESSAGE){
+            if(!m2.empty()){
+                std::istringstream iss(m2);
+                double value;
+                iss >> value;
+                scene->speedChanged(value);
+            }
+        }
+        scene->view()->emitPlayModeChanged();
+    }
+#ifdef DEBUG
+    else
+        std::cerr << "Maquette::enginesNetworkCallback : attribute _scene == NULL" << std::endl;
+#endif
+}
+
+void
 crossTriggerPointCallback(bool waiting, unsigned int trgID, unsigned int boxID, unsigned int CPIndex, string message) {
 	Q_UNUSED(boxID);
 	Q_UNUSED(CPIndex);
@@ -2480,7 +2672,16 @@ crossTriggerPointCallback(bool waiting, unsigned int trgID, unsigned int boxID, 
 }
 
 void
-executionFinishedCallback()
-{
+executionFinishedCallback(){
 	Maquette::getInstance()->executionFinished();
+}
+
+void
+Maquette::setStartMessageToSend(unsigned int boxID,QTreeWidgetItem *item,QString address){
+    _boxes[boxID]->setStartMessage(item,address);
+}
+
+void
+Maquette::setEndMessageToSend(unsigned int boxID,QTreeWidgetItem *item,QString address){
+    _boxes[boxID]->setEndMessage(item,address);
 }

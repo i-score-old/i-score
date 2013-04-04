@@ -209,18 +209,11 @@ class AbstractBox : public Abstract
    * \brief Sets the messages to send at box start.
    * \param firstMsgs : the new messages to send at box start
    */
-  inline void setStartMessages(NetworkMessages *startMsgs){
-    _startMessages->clear();
-    _startMessages = new NetworkMessages(startMsgs->getMessages());
-    }
+  void setStartMessages(NetworkMessages *startMsgs);
   /*!
    * \brief Sets the items to send at box start.
    * \param items : the items to send at box start
    */
-//  inline void setNetworkTreeItems(QList<QTreeWidgetItem*> &items){
-//    _networkTreeItems.clear();
-//    _networkTreeItems = items;
-//    }
   inline void setNetworkTreeItems(QMap<QTreeWidgetItem*,Data> &items){
     _networkTreeItems.clear();
     _networkTreeItems = items;
@@ -263,12 +256,11 @@ class AbstractBox : public Abstract
    * \brief Sets the messages to send at box end.
    * \param lastMsgs : the new messages to send at box end
    */
-  inline void setEndMessages(NetworkMessages *endMsgs){
-    _endMessages->clear();
-    _endMessages = new NetworkMessages(endMsgs->getMessages());
-    }
+  void setEndMessages(NetworkMessages *endMsgs);
   inline bool hasFirstMsgs(){return !_startMessages->messages().empty();}
   inline bool hasLastMsgs(){return !_endMessages->messages().empty();}
+  void setStartMessage(QTreeWidgetItem *item,QString address);
+  void setEndMessage(QTreeWidgetItem *item,QString address);
 
  protected :
 
@@ -283,7 +275,6 @@ class AbstractBox : public Abstract
   std::vector<std::string> _lastMsgs; //!< Messages linked to the end of the box
   NetworkMessages *_startMessages; //!< pairs QTreeWidgetItem-Message
   NetworkMessages *_endMessages; //!< pairs QTreeWidgetItem-Message
-//  QList<QTreeWidgetItem*> _networkTreeItems;
   QMap<QTreeWidgetItem*,Data> _networkTreeItems;
   QList<QTreeWidgetItem*> _networkTreeExpandedItems;
 };

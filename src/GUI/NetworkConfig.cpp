@@ -86,16 +86,13 @@ NetworkConfig::NetworkConfig(MaquetteScene *scene, QWidget *parent)
   _pluginsComboBox = new QComboBox;
   _devices = _scene->getNetworkDevices();
   map<string,MyDevice>::iterator it;
-  MyDevice maxDevice;
-  unsigned int maxDeviceIndex = -1;
-  for (it = _devices.begin() ; it != _devices.end() ; ++it) {
-  	if (it->first == "MaxDevice") {
-  		maxDevice = it->second;
-  		maxDeviceIndex = _devicesComboBox->count();
-  	}
-  	else {
-  		std::cerr << "NetworkConfig::NetworkConfig : MaxDevice not Found" << std::endl;
-  	}
+  MyDevice minuitDevice;
+  unsigned int minuitDeviceIndex = -1;
+  for (it = _devices.begin() ; it != _devices.end() ; ++it) {      
+    if (it->first == "MinuitDevice1") {
+        minuitDevice = it->second;
+        minuitDeviceIndex = _devicesComboBox->count();
+    }
   	_devicesComboBox->addItem(QString::fromStdString(it->first));
   	if (_pluginsComboBox->findText(QString::fromStdString(it->second.plugin)) == -1) {
   		_pluginsComboBox->addItem(QString::fromStdString(it->second.plugin));
@@ -105,15 +102,15 @@ NetworkConfig::NetworkConfig(MaquetteScene *scene, QWidget *parent)
   //_pluginsComboBox->addItem("--Add--");
 
   int found = -1;
-  if ((found = _pluginsComboBox->findText(QString::fromStdString(maxDevice.plugin))) != -1) {
+  if ((found = _pluginsComboBox->findText(QString::fromStdString(minuitDevice.plugin))) != -1) {
   	_pluginsComboBox->setCurrentIndex(found);
   }
   else {
-  	QMessageBox::warning(this,"",tr("MaxDevice plugin not found : default selected"));
+    QMessageBox::warning(this,"",tr("MinuitDevice plugin not found : default selected"));
   	_pluginsComboBox->setCurrentIndex(0);
   }
-  _portBox->setValue(maxDevice.networkPort);
-  _IPBox->setText(QString::fromStdString(maxDevice.networkHost));
+  _portBox->setValue(minuitDevice.networkPort);
+  _IPBox->setText(QString::fromStdString(minuitDevice.networkHost));
 
   connect(_devicesComboBox,SIGNAL(activated(int)),this,SLOT(deviceSelected(int)));
   connect(_pluginsComboBox,SIGNAL(activated(int)),this,SLOT(setChanged()));
@@ -163,10 +160,19 @@ void NetworkConfig::deviceSelected(int indexSelected) {
 	}
 }
 
+void
+NetworkConfig::setNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, std::string port){
+    Q_UNUSED(deviceName); Q_UNUSED(pluginName);
+
+    _devices["OSCDevice"].networkPort = atoi(port.c_str());
+    _devices["OSCDevice"].networkHost = IP;
+    updateNetworkConfiguration();
+}
+
 void NetworkConfig::updateNetworkConfiguration() {
   if (_changed) {
     QHostAddress hostAddress(_IPBox->text());
-    if (!hostAddress.isNull()) {
+    if (!hostAddress.isNull()) {       
     	_scene->changeNetworkDevice(_devicesComboBox->currentText().toStdString(),_pluginsComboBox->currentText().toStdString(),
     			_IPBox->text().toStdString(),_portBox->text().toStdString());
       accept();

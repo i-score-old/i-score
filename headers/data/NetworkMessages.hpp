@@ -70,8 +70,10 @@ public :
      * \param device : the device to use
      * \param msg : the message to send
      */
-    void addMessageLong(QTreeWidgetItem *item, const QString &device, const QString &message, const QString &value);
-    void addMessageSimple(QTreeWidgetItem *item, QString address);
+    void addMessage(QTreeWidgetItem *item, const QString &device, const QString &message, const QString &value);
+    void addMessage(QTreeWidgetItem *item, QString address);
+    void changeMessage(QTreeWidgetItem *item, QString newName);
+    void changeDevice(QString oldName, QString newName);
     /*!
      * \brief Adds a list of messages.
      */
@@ -88,8 +90,13 @@ public :
      * \brief Sets the list of messages.
      */
     inline void setMessages(QMap<QTreeWidgetItem *, Message> *messages){
+        _messages->clear();
         _messages=messages;
      ;}
+    /*!
+     * \brief Sets the list of messages just for one device. Filter the list and clear/reset only message starting with deviceName.
+     */
+    void setDeviceMessages(QString deviceName, QMap<QTreeWidgetItem *, Message> *messages);
     /*!
      * \brief Set the list of messages.
      */
@@ -101,23 +108,23 @@ public :
       */
     bool setValue(QTreeWidgetItem *item, QString newValue);
 
+    QMap<QTreeWidgetItem *, Message> *getMessages();
 
-    inline QMap<QTreeWidgetItem *, Message> *getMessages(){return _messages;}
+    inline QList<QTreeWidgetItem *> getItems(){return _messages->keys();}
     std::string computeMessage(const Message &msg);
     std::string computeMessageWithoutValue(const Message &msg);
     inline QList<Message> messages(){return _messages->values();}
     QMap<QString, QString> toMapAddressValue();
+    inline bool isEmpty(){return _messages->isEmpty();}
 
 public slots :
-    void messageChanged();
-    void valueChanged();
-    void deviceChanged();
     void removeMessage(QTreeWidgetItem *item);
 
     /*!
      * \brief Clears messages list and set as modified.
      */
     void clear();
+    void clearDevicesMsgs(QList<QString> devices);
 
 signals :
     void messageChanged(const std::string &address);

@@ -66,6 +66,7 @@ class QLCDNumber;
 class LogarithmicSlider;
 class Help;
 class QDoubleSpinBox;
+class NetworkConfig;
 
 /*!
  * \class MainWindow
@@ -116,10 +117,16 @@ class MainWindow : public QMainWindow
   void timeEndReached();
   /*!
    * \brief Returns goto value in ms.
-   */
+   */  
   int gotoValue();
+  /*!
+   * \brief Get the Command Key state.
+   *
+   * \return True if pressed, false if not.
+   */
+  bool commandKey();
   void setMaquetteSceneTitle(QString name);
-  inline MaquetteWidget *maquetteWidget(){return _maquetteWidget;}
+  inline MaquetteWidget *maquetteWidget(){return _maquetteWidget;}  
 
  protected:
 
@@ -130,6 +137,8 @@ class MainWindow : public QMainWindow
    * \param event : the QT closing event
    */
   virtual void closeEvent(QCloseEvent *event);
+  virtual void keyPressEvent(QKeyEvent *event);
+  virtual void keyReleaseEvent(QKeyEvent *event);
 
   private slots:
 
@@ -223,6 +232,8 @@ class MainWindow : public QMainWindow
    * \brief Selects the whole set of boxes.
    */
   void selectAll();
+  void changeNetworkConfig(std::string deviceName,std::string pluginName, std::string IP, std::string port);
+  void updateCmdKeyState(bool state);
 
  private :
   /*!
@@ -332,6 +343,9 @@ class MainWindow : public QMainWindow
   QDoubleSpinBox *_gotoDisplay; //!< Goto value.
 
   MaquetteWidget *_maquetteWidget;
+  NetworkConfig *_networkConfig;
+
+  bool _commandKey; //!< State of Command Key state.
 };
 
 #endif

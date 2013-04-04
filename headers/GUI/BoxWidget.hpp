@@ -15,6 +15,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <QMenu>
 
 class QGridLayout;
 class CurveWidget;
@@ -49,7 +50,6 @@ public :
 
     bool contains(const std::string &address);
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
-    virtual void paintEngine();
 
     void curveActivationChanged(const QString &address,bool state);
     void curveRedundancyChanged(const QString &address,bool state);
@@ -63,19 +63,30 @@ public :
     inline void setStackedLayout(QStackedLayout *slayout){_stackedLayout = slayout;setLayout(_stackedLayout);}    
     void addToComboBox(const QString address);
     void displayCurve(const QString &address);
+    inline void setStartMenu(QMenu *menu){_startMenu = menu;}
+    inline void setEndMenu(QMenu *menu){_endMenu = menu;}
 
 public slots :
     void updateDisplay(const QString &address);
-
+    void jumpToStartCue();
+    void jumpToEndCue();
+    void updateStartCue();
+    void updateEndCue();
+    void execStartAction();
+    void execEndAction();
+    void displayStartMenu(QPoint pos);
+    void displayEndMenu(QPoint pos);
+    bool updateCurve(const std::string &address, bool forceUpdate);
 
 signals :
     void currentIndexChanged(QString address);
 
 protected :
     virtual void mousePressEvent(QMouseEvent *event);
+    virtual void keyPressEvent(QKeyEvent *event);
+    virtual void keyReleaseEvent(QKeyEvent *event);
 
 private :
-    bool updateCurve(const std::string &address, bool forceUpdate);
     void addCurve(QString address,CurveWidget *curveWidget);
     void clearCurves();
     QComboBox *_comboBox;
@@ -94,6 +105,9 @@ private :
     CurveWidget *_curveWidget;
     QStackedLayout *_stackedLayout;
     BasicBox *_box;
+    QMenu *_startMenu;
+    QMenu *_endMenu;
+
 };
 
 #endif // BOXWIDGET_H

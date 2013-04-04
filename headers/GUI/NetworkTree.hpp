@@ -49,16 +49,17 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <iostream>
 #include "NetworkMessages.hpp"
 #include "AbstractBox.hpp"
+#include "DeviceEdit.hpp"
 #include <QPair>
 #include <QMap>
 
 using std::vector;
 using std::string;
 using std::map;
-class QTreeView;
+
 
 enum {NodeNamespaceType = QTreeWidgetItem::UserType + 1, NodeNoNamespaceType = QTreeWidgetItem::UserType + 2 ,
-	LeaveType = QTreeWidgetItem::UserType + 3, AttributeType = QTreeWidgetItem::UserType + 4};
+    LeaveType = QTreeWidgetItem::UserType + 3, AttributeType = QTreeWidgetItem::UserType + 4, OSCNamespace = QTreeWidgetItem::UserType + 5, OSCNode = QTreeWidgetItem::UserType + 6,addOSCNode = QTreeWidgetItem::UserType + 7};
 
 
 
@@ -78,9 +79,7 @@ class NetworkTree : public QTreeWidget
          *                          General tools
          ***********************************************************************/
 
-
-
-        QMap<QTreeWidgetItem *, Data> treeSnapshot(unsigned int boxID);
+        QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot(unsigned int boxID);
 
 		std::vector<std::string> snapshot();
 		 /*!
@@ -89,6 +88,8 @@ class NetworkTree : public QTreeWidget
 		  * \param item : the item to get address for
 		  */
 		QString getAbsoluteAddress(QTreeWidgetItem *item) const;
+        QString getDeviceName(QTreeWidgetItem *item) const;
+        QString getAbsoluteAddressWithValue(QTreeWidgetItem *item, int column) const;
         /*!
          * \brief Gets the absolute address of an item in the snapshot tree.
          *
@@ -103,6 +104,10 @@ class NetworkTree : public QTreeWidget
          * \brief Sets start messages.
          * \param The messages to set.
          */
+        inline void setStartOSCMessages(NetworkMessages *messages){
+             _OSCStartMessages->clear();
+             _OSCStartMessages = new NetworkMessages(messages->getMessages());
+        }
         inline void setStartMessages(NetworkMessages *messages){
              _startMessages->clear();
              _startMessages = new NetworkMessages(messages->getMessages());
@@ -115,16 +120,20 @@ class NetworkTree : public QTreeWidget
             _endMessages->clear();
             _endMessages = new NetworkMessages(messages->getMessages());
         }
+        inline void setEndOSCMessages(NetworkMessages *messages){
+            _OSCEndMessages->clear();
+            _OSCEndMessages = new NetworkMessages(messages->getMessages());
+        }
         /*!
          * \brief Adds start messages.
          * \param The messages to add.
          */
-        inline void addStartMessage();
+        void addOSCStartMessage(QTreeWidgetItem *item, QString msg);
         /*!
          * \brief Adds start messages.
          * \param The messages to add.
          */
-        inline void addEndMessage();
+        void addOSCEndMessage(QTreeWidgetItem *item, QString msg);
         /*!
          * \brief Getter.
          * \return Start messages.
@@ -139,10 +148,12 @@ class NetworkTree : public QTreeWidget
          * \brief Clear start messages list.
          */
         void clearStartMsgs();
+        void clearDevicesStartMsgs(QList<QString> devices);
         /*!
          * \brief Clear end messages list.
          */
         void clearEndMsgs();
+        void clearDevicesEndMsgs(QList<QString> devices);
         /*!
          * \brief Checks item's messages, to knows if start and end messages are set.
          * \param The item we want to check.
@@ -157,14 +168,18 @@ class NetworkTree : public QTreeWidget
          * \brief Resets the network tree display (assigned/selected items).
          */
         void resetNetworkTree();
+        void clearOSCMessages();
+        void displayBoxContent(AbstractBox *abBox);
         /*!
          * \brief Refreshes the display of start messages.
          */
         void updateStartMsgsDisplay();
+        void updateStartOSCMsgsDisplay();
         /*!
          * \brief Refreshes the display of end messages.
          */
         void updateEndMsgsDisplay();
+        void updateEndOSCMsgsDisplay();
         /*!
          * \brief Clears a columns.
          * \param column : the column numero.
@@ -224,7 +239,7 @@ class NetworkTree : public QTreeWidget
          *
          * \param selectedItems : items assigned to the box
          */
-//        void assignItems(QList<QTreeWidgetItem*> selectedItems);
+         void assignItems(QList<QTreeWidgetItem*> selectedItems);
          void assignItems(QMap<QTreeWidgetItem*,Data> selectedItems);
         /*!
          * \brief True if all items' brothers have a value in their column.
@@ -287,7 +302,6 @@ class NetworkTree : public QTreeWidget
          * \brief Removes an item in the assigned items list.
          * \param The item to remove.
          */
-//        inline void removeAssignItem(QTreeWidgetItem* item){ _assignedItems.removeAll(item);}
          inline void removeAssignItem(QTreeWidgetItem* item){ _assignedItems.remove(item);}
         /*!
          * \brief Reset the display of assigned items (leaves) and clear the assigned items list.
@@ -296,27 +310,48 @@ class NetworkTree : public QTreeWidget
         /*!
          * \brief Reset the display of assigned fathers (full and partial nodes) and clear lists.
          */
-        void resetAssignedNodes();
-
+        void resetAssignedNodes();        
+        void addOSCMessage(QTreeWidgetItem *rootNode);
+        void addOSCMessage(QTreeWidgetItem *rootNode, QString message);
+        void setOSCMessageName(QTreeWidgetItem *item, QString name);
+        void assignOCSMsg(QTreeWidgetItem *item);
+        inline QMap<QTreeWidgetItem *,QString> OSCMessages(){return _OSCMessages;}
+        QList<QString> getOSCMessages();
 
         /***********************************************************************
          *                              Curves
          ***********************************************************************/
 
-        bool updateCurve(QTreeWidgetItem *item, unsigned int boxID);
-        void updateCurves(unsigned int boxID);
+        bool updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUpdate=false);
+        void updateCurves(unsigned int boxID,bool forceUpdate=false);
         unsigned int getSampleRate(QTreeWidgetItem *item);
         bool hasCurve(QTreeWidgetItem *item);
         void setSampleRate(QTreeWidgetItem *item, unsigned int sampleRate);
         void setHasCurve(QTreeWidgetItem *item, bool val);
         void setCurveActivated(QTreeWidgetItem *item, bool activated);
         void setRedundancy(QTreeWidgetItem *item, bool activated);
-        void updateLine(QTreeWidgetItem *item, bool interpolationState, int sampleRate, bool redundancy);
+        void updateLine(QTreeWidgetItem *item, bool interpolationState, int sampleRate, bool redundancy);        
+        void createItemsFromMessages(QList<QString> messageslist);
+        void createItemFromMessage(QString messages);
 
         virtual void keyPressEvent(QKeyEvent *event);
         virtual void keyReleaseEvent(QKeyEvent *event);
         virtual void mouseDoubleClickEvent(QMouseEvent *event);
+        virtual void contextMenuEvent(QContextMenuEvent *event);
 
+        static int NAME_COLUMN ;
+        static int VALUE_COLUMN ;
+        static int START_COLUMN ;
+        static int END_COLUMN ;
+        static int INTERPOLATION_COLUMN ;
+        static int REDUNDANCY_COLUMN ;
+        static int SR_COLUMN ;
+        static QString OSC_ADD_NODE_TEXT ;
+        static unsigned int TEXT_POINT_SIZE ;
+
+        bool VALUE_MODIFIED;
+        bool SR_MODIFIED;
+        bool NAME_MODIFIED;
 
     signals :
         void startValueChanged(QTreeWidgetItem *, QString newValue);
@@ -326,9 +361,20 @@ class NetworkTree : public QTreeWidget
         void curveActivationChanged(QTreeWidgetItem *, bool);
         void curveRedundancyChanged(QTreeWidgetItem *, bool);
         void curveSampleRateChanged(QTreeWidgetItem *, int);
+        void startOSCMessageChanged(QTreeWidgetItem *item, QString message);
+        void startOSCMessageAdded(QTreeWidgetItem *item, QString message);
+        void startOSCMessageRemoved(QTreeWidgetItem *item);
+        void endOSCMessageChanged(QTreeWidgetItem *item, QString message);
+        void endOSCMessageAdded(QTreeWidgetItem *item, QString message);
+        void endOSCMessageRemoved(QTreeWidgetItem *item);
+        void messageChanged(QTreeWidgetItem *item, QString address);
+        void deviceChanged(QString oldName, QString newName);
+        void pluginChanged(QString deviceName);
+        void cmdKeyStateChanged(bool);
 
     private :
-        void treeRecursiveExploration(QTreeWidgetItem *curItem);
+        void treeRecursiveExploration(QTreeWidgetItem *curItem, bool onflict);
+        void createOCSBranch(QTreeWidgetItem *curItem);
 
 
         /***********************************************************************
@@ -361,6 +407,7 @@ class NetworkTree : public QTreeWidget
         void assignTotally(QTreeWidgetItem *item);
         void unassignTotally(QTreeWidgetItem *item);
         void assignItem(QTreeWidgetItem *item,Data data);
+        void updateOSCAddresses();
 
         QMap<QTreeWidgetItem *,string> _addressMap;
         QList<QTreeWidgetItem*> _nodesWithSelectedChildren;
@@ -370,6 +417,13 @@ class NetworkTree : public QTreeWidget
 
         NetworkMessages *_startMessages;
         NetworkMessages *_endMessages;
+        NetworkMessages *_OSCStartMessages;
+        NetworkMessages *_OSCEndMessages;
+        QMap<QTreeWidgetItem *, QString> _OSCMessages;
+
+        int _OSCMessageCount;
+
+        DeviceEdit *_deviceEdit;
 
 	public slots:
         void itemCollapsed();
@@ -377,6 +431,11 @@ class NetworkTree : public QTreeWidget
         void valueChanged(QTreeWidgetItem* item,int column);
         void changeStartValue(QTreeWidgetItem* item,QString newValue);
         void changeEndValue(QTreeWidgetItem* item,QString newValue);
+        void changeNameValue(QTreeWidgetItem* item,QString newValue);
+        void updateDeviceName(QString newName, QString plugin);
+        void updateDevicePlugin(QString newName);
+
+        virtual void clear();
 };
 
 

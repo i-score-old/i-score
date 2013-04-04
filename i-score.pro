@@ -113,7 +113,8 @@ headers/data/NetworkMessages.hpp \
 headers/GUI/BoxWidget.hpp \
 headers/GUI/BoxCurveEdit.hpp \
 headers/GUI/MaquetteWidget.hpp \
-headers/GUI/TimeBarWidget.hpp
+headers/GUI/TimeBarWidget.hpp \
+headers/GUI/DeviceEdit.hpp
 
 SOURCES += main.cpp \
 src/data/Abstract.cpp \
@@ -162,7 +163,7 @@ src/GUI/BoxWidget.cpp \
 src/GUI/BoxCurveEdit.cpp \
 src/GUI/MaquetteWidget.cpp \
 src/GUI/TimeBarWidget.cpp \
-src/GUI/AttributeEditor.cpp
+src/GUI/DeviceEdit.cpp
 
 RESOURCES += i-score.qrc
 
