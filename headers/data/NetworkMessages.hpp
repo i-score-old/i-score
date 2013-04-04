@@ -70,8 +70,8 @@ public :
      * \param device : the device to use
      * \param msg : the message to send
      */
-    void addMessage(QTreeWidgetItem *item, const QString &device, const QString &message, const QString &value);
-    void addMessage(QTreeWidgetItem *item, QString address);
+    void addMessageLong(QTreeWidgetItem *item, const QString &device, const QString &message, const QString &value);
+    void addMessageSimple(QTreeWidgetItem *item, QString address);
     void changeMessage(QTreeWidgetItem *item, QString newName);
     void changeDevice(QString oldName, QString newName);
     /*!

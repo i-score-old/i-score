@@ -77,8 +77,8 @@ class AbstractBox : public Abstract
 	 friend class SoundBox;
 
   AbstractBox(const QPointF &newTopLeft = QPointF(0.,0.), const float &newWidth = 0., const float &newHeight = 0.,
-	      const std::string &newName = "", const QColor &newColor = Qt::black, unsigned int ID = NO_ID,
-	      unsigned int motherID = ROOT_BOX_ID);
+          const std::string &newName = "", const QColor &newColor = Qt::black, unsigned int ID = 0,
+          unsigned int motherID = 1);
 
   AbstractBox(const AbstractBox &other);
 

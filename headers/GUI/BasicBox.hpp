@@ -82,8 +82,8 @@ enum {BASIC_BOX_TYPE = QGraphicsItem::UserType + 1};
 /*!
  * \brief Enum used to manage various box extremities.
  */
-enum BoxExtremity {NO_EXTREMITY = -1, BOX_START = BEGIN_CONTROL_POINT_INDEX,
-		   BOX_END = END_CONTROL_POINT_INDEX};
+enum BoxExtremity {NO_EXTREMITY = -1, BOX_START = 1,
+           BOX_END = 2};
 
 /*!
  * \class BasicBox

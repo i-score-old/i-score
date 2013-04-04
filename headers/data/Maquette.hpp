@@ -69,7 +69,6 @@ knowledge of the CeCILL license and that you accept its terms.
 static const int NETWORK_PORT = 7000;
 static const int OSC_NETWORK_PORT = 9999;
 
-
 static const std::string PLAY_ENGINES_MESSAGE = "/Transport/Play";
 static const std::string STOP_ENGINES_MESSAGE  = "/Transport/Stop";
 static const std::string PAUSE_ENGINES_MESSAGE = "/Transport/Pause";
@@ -78,6 +77,11 @@ static const std::string STARTPOINT_ENGINES_MESSAGE = "/Transport/StartPoint";
 static const std::string SPEED_ENGINES_MESSAGE = "/Transport/Speed";
 
 #define NETWORK_PORT_STR "7000"
+
+// Those macro were defined in CSPTypes but we'll not need them
+#define SCENARIO_SIZE 600000
+#define CURVE_POW 1
+#define NO_ID 0
 
 class PaletteActor;
 
@@ -169,12 +173,10 @@ class Maquette : public QObject
 	 */
   void init();
 
-#ifdef USE_JAMOMA_MODULAR
     /*!
     * \brief Used to show how to deal with the TTNodeDirectory
     */
   void dumpAddressBelow(TTNodePtr aNode);
-#endif
 
 	/*!
 	 * \brief Sets a new scene.
@@ -815,8 +817,9 @@ class Maquette : public QObject
 
   //! The MaquetteScene managing display and interaction.
   MaquetteScene *_scene;
-  //! The Engines object managing temporal constraints.
-  TTEnginePtr _engines;
+
+  //! The main scenario object managing temporal constraints.
+  TimeProcessPtr _mainScenario;
 
   //! The map of boxes (identified by IDs) managed by the maquette.
   std::map<unsigned int,BasicBox*> _boxes;

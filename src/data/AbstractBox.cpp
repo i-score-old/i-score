@@ -62,12 +62,12 @@ AbstractBox::AbstractBox(const AbstractBox &other) :
 
 void
 AbstractBox::setStartMessage(QTreeWidgetItem *item,QString address){
-    _startMessages->addMessage(item,address);
+    _startMessages->addMessageSimple(item,address);
 }
 
 void
 AbstractBox::setEndMessage(QTreeWidgetItem *item,QString address){
-    _endMessages->addMessage(item,address);
+    _endMessages->addMessageSimple(item,address);
 }
 
 int
