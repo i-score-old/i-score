@@ -57,7 +57,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QTreeWidgetItem>
 #include "NetworkMessages.hpp"
 
-#include "TTScore.h"
+#include <TTScore.h>
 
 //! Defines abstract basic box type.
 enum {ABSTRACT_BOX_TYPE = 1};

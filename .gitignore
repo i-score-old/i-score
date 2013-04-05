@@ -36,6 +36,9 @@ xcuserdata
 *.mode1v3
 *.pbxuser
 *.perspectivev3
+*.mak
+*.plist
+*.pbxproj
 project.xcworkspace
 
 *.layout

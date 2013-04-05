@@ -3,6 +3,7 @@ CURRENT_PATH=`pwd`
 
 OS=$1
 
+# TODO this test is useless, important for windows path. better to work with CURRENT_PATH !
 if [ "$OS" = "LINUX" ] || [ "$OS" = "LINUX64" ]
 then
     {
@@ -12,14 +13,15 @@ then
 elif [ "$OS" = "MACOS" ] || [ "$OS" = "MACOS64" ]
 then
     {
-    SCORE_PATH='/Users/WALL-E/Documents/Jamoma/Core/Score'
-    I-SCORE_PATH='/Users/WALL-E/Documents/Iscore/i-score'
+    SCORE_PATH='/Users/jaimechao/Workspace/Score'
+    I-SCORE_PATH='/Users/jaimechao/Workspace/i-score'
     }
 fi
 
 QMAKE_LINUX='qmake -spec linux-g++'
 QMAKE_LINUX_64='qmake -spec linux-g++-64'
 QMAKE_MACOS='qmake -spec unsupported/macx-clang'
+# QMAKE_MACOS='qmake -spec unsupported/macx-clang'
 MAKE='make'
 MAKE_LINUX='make linux'
 MAKE_LINUX64='make linux64'
@@ -35,7 +37,7 @@ echo '-=[START]=-'
 #buildWithSupport.rb dev clean
 
 ## i-score Compilation
-cd $I-SCORE_PATH
+cd $SCORE_PATH
 echo '-=[i-score]=- Cleaning ...'
 $MAKE_CLEAN
 if [ "$OS" = "LINUX" ]
