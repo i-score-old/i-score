@@ -1,42 +1,42 @@
 /*
-Copyright: LaBRI / SCRIME
-
-Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
-
-luc.vercellin@labri.fr
-
-This software is a computer program whose purpose is to provide
-notation/composition combining synthesized as well as recorded
-sounds, providing answers to the problem of notation and, drawing,
-from its very design, on benefits from state of the art research
-in musicology and sound/music computing.
-
-This software is governed by the CeCILL license under French law and
-abiding by the rules of distribution of free software.  You can  use,
-modify and/ or redistribute the software under the terms of the CeCILL
-license as circulated by CEA, CNRS and INRIA at the following URL
-"http://www.cecill.info".
-
-As a counterpart to the access to the source code and  rights to copy,
-modify and redistribute granted by the license, users are provided only
-with a limited warranty  and the software's author,  the holder of the
-economic rights,  and the successive licensors  have only  limited
-liability.
-
-In this respect, the user's attention is drawn to the risks associated
-with loading,  using,  modifying and/or developing or reproducing the
-software by the user in light of its specific status of free software,
-that may mean  that it is complicated to manipulate,  and  that  also
-therefore means  that it is reserved for developers  and  experienced
-professionals having in-depth computer knowledge. Users are therefore
-encouraged to load and test the software's suitability as regards their
-requirements in conditions enabling the security of their systems and/or
-data to be ensured and,  more generally, to use and operate it in the
-same conditions as regards security.
-
-The fact that you are presently reading this means that you have had
-knowledge of the CeCILL license and that you accept its terms.
-*/
+ * Copyright: LaBRI / SCRIME
+ *
+ * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ *
+ * luc.vercellin@labri.fr
+ *
+ * This software is a computer program whose purpose is to provide
+ * notation/composition combining synthesized as well as recorded
+ * sounds, providing answers to the problem of notation and, drawing,
+ * from its very design, on benefits from state of the art research
+ * in musicology and sound/music computing.
+ *
+ * This software is governed by the CeCILL license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ */
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -72,781 +72,777 @@ using std::stringstream;
 using std::list;
 using std::pair;
 
-typedef map<unsigned int,BasicBox*> BoxesMap;
-typedef map<unsigned int,Relation*> RelationsMap;
-typedef map<unsigned int,TriggerPoint*> TrgPntMap;
+typedef map<unsigned int, BasicBox*> BoxesMap;
+typedef map<unsigned int, Relation*> RelationsMap;
+typedef map<unsigned int, TriggerPoint*> TrgPntMap;
 
 using namespace SndBoxProp;
 
 void
-Maquette::init() {
+Maquette::init()
+{
+  TTErr err;
+  TTValue args, v;
+  TTString applicationName = "i-score";                         // TODO : declare as global variable
+  TTObjectBasePtr iscore;                                       // TODO : declare as global variable
+  TTString configFile = "/usr/local/include/IScore/i-scoreConfiguration.xml";
+  TTString pluginsDir = "/usr/local/lib/IScore";
+  TTHash hashParameters;
 
-    TTErr               err;
-    TTValue             args, v;
-    TTString            applicationName = "i-score";            // TODO : declare as global variable
-    TTObjectBasePtr     iscore;                                 // TODO : declare as global variable
-    TTString            configFile = "/usr/local/include/IScore/i-scoreConfiguration.xml";
-    TTString            pluginsDir = "/usr/local/lib/IScore";
-    TTHash              hashParameters;
+  ///////////////////////////
+  // Init the Modular library
+  ///////////////////////////
 
-    ///////////////////////////
-    // Init the Modular library
-    ///////////////////////////
+  // this initializes the Modular framework and loads protocol plugins (in /usr/local/jamoma/extensions folder)
+  TTModularInit();
 
-    // this initializes the Modular framework and loads protocol plugins (in /usr/local/jamoma/extensions folder)
-    TTModularInit();
+  // create a local application named i-score
+  TTModularCreateLocalApplication(applicationName, configFile);
 
-    // create a local application named i-score
-    TTModularCreateLocalApplication(applicationName, configFile);
+  // get i-score application
+  iscore = getLocalApplication;
 
-    // get i-score application
-    iscore = getLocalApplication;
+  ///////////////////////////
+  // Init the Score library
+  ///////////////////////////
 
-    ///////////////////////////
-    // Init the Score library
-    ///////////////////////////
+  // this initializes the Score framework
+  TTScoreInit();
 
-    // this initializes the Score framework
-    TTScoreInit();
+  // create the main Scenario instance
+  err = TTObjectBaseInstantiate(TTSymbol("Scenario"), TTObjectBaseHandle(&_mainScenario), args);
 
-    // create the main Scenario instance
-    err = TTObjectBaseInstantiate(TTSymbol("Scenario"), TTObjectBaseHandle(&_mainScenario), args);
+  /* TODO : set callbacks (!! this will change in the future !!)
+   * if (!err) {
+   *  _mainScenario->addCrossingCtrlPointCallback(&crossTransitionCallback);
+   *  _mainScenario->addCrossingTrgPointCallback(&crossTriggerPointCallback);
+   *  _mainScenario->addExecutionFinishedCallback(&executionFinishedCallback);
+   * }
+   */
 
-    /* TODO : set callbacks (!! this will change in the future !!)
-    if (!err) {
-        _mainScenario->addCrossingCtrlPointCallback(&crossTransitionCallback);
-        _mainScenario->addCrossingTrgPointCallback(&crossTriggerPointCallback);
-        _mainScenario->addExecutionFinishedCallback(&executionFinishedCallback);
-    }
-    */
+  ////////////
+  // Example : Create a distant application
+  ////////////
+  TTObjectBasePtr anApplication = NULL;
 
-    ////////////
-    // Example : Create a distant application
-    ////////////
-    TTObjectBasePtr	anApplication = NULL;
+  // create an application called myApplication
+  args = TTValue(TTSymbol("myApplication"));
+  TTObjectBaseInstantiate(kTTSym_Application, TTObjectBaseHandle(&anApplication), args);
 
-    // create an application called myApplication
-    args = TTValue(TTSymbol("myApplication"));
-    TTObjectBaseInstantiate(kTTSym_Application, TTObjectBaseHandle(&anApplication), args);
+  ////////////
+  // Example : Register i-score and myApplication to the Minuit protocol
+  ////////////
 
-    ////////////
-    // Example : Register i-score and myApplication to the Minuit protocol
-    ////////////
+  // check if the Minuit protocol has been loaded
+  if (getProtocol(TTSymbol("Minuit"))) {
+      // register the local application to the Minuit protocol
+      v = TTValue(TTSymbol(applicationName));
+      getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), v, kTTValNONE);
 
-    // check if the Minuit protocol has been loaded
-    if (getProtocol(TTSymbol("Minuit"))) {
+      // set the Minuit parameters for the local application
+      hashParameters.clear();
+      hashParameters.append(TTSymbol("port"), 8002);
+      hashParameters.append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
 
-        // register the local application to the Minuit protocol
-        v = TTValue(TTSymbol(applicationName));
-        getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), v, kTTValNONE);
+      v = TTValue(TTSymbol(applicationName));
+      v.append(TTPtr(&hashParameters));
+      getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
 
-        // set the Minuit parameters for the local application
-        hashParameters.clear();
-        hashParameters.append(TTSymbol("port"), 8002);
-        hashParameters.append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
+      // register this application to the Minuit protocol
+      v = TTValue(TTSymbol("myApplication"));
+      getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), v, kTTValNONE);
 
-        v = TTValue(TTSymbol(applicationName));
-        v.append(TTPtr(&hashParameters));
-        getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
+      // set the Minuit parameters for the distant application
+      hashParameters.clear();
+      hashParameters.append(TTSymbol("port"), 9998);
+      hashParameters.append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
 
-        // register this application to the Minuit protocol
-        v = TTValue(TTSymbol("myApplication"));
-        getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), v, kTTValNONE);
+      v = TTValue(TTSymbol("myApplication"));
+      v.append(TTPtr(&hashParameters));
+      getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
 
-        // set the Minuit parameters for the distant application
-        hashParameters.clear();
-        hashParameters.append(TTSymbol("port"), 9998);
-        hashParameters.append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
-
-        v = TTValue(TTSymbol("myApplication"));
-        v.append(TTPtr(&hashParameters));
-        getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
-
-        // run the Minuit protocol
-        TTModularApplications->sendMessage(TTSymbol("ProtocolRun"), TTSymbol("Minuit"), kTTValNONE);
-    }
-
-    ////////////
-    // Example : Read the namespace of myApplication from a namespace file
-    ////////////
-
-    // create a TTXmlHandler class to parse a xml namespace file
-    TTXmlHandlerPtr myXmlHandler = NULL;
-    TTObjectBaseInstantiate(kTTSym_XmlHandler, TTObjectBaseHandle(&myXmlHandler), kTTValNONE);
-
-    // prepare the TTXmlHandler to pass the result of the parsing to myApplication
-    v = TTValue(anApplication);
-    myXmlHandler->setAttributeValue(TTSymbol("object"), v);
-
-    // read a namespace file
-    err = myXmlHandler->sendMessage(TTSymbol("Read"), TTSymbol("/Users/WALL-E/Documents/Jamoma/Modules/Modular/implementations/MaxMSP/jcom.modular/remoteApp - namespace.xml"), kTTValNONE);
-
-    if (!err) {
-
-        // get the root of the TNodeDirectory of myApplication
-        // note : the TTNodeDirectory is a tree structure used to registered and retrieve TTObjects using TTAddress
-        TTNodeDirectoryPtr anApplicationDirectory = getApplicationDirectory(TTSymbol("myApplication"));
-
-        // return all addresses of the TTNodeDirectory
-        std::cout <<"__ Dump myApplication directory __"<< std::endl;
-
-        // start to dump addresses recursilvely from the root of the directory
-        dumpAddressBelow(anApplicationDirectory->getRoot());
-
-        std::cout <<"__________________________________"<<std::endl;
+      // run the Minuit protocol
+      TTModularApplications->sendMessage(TTSymbol("ProtocolRun"), TTSymbol("Minuit"), kTTValNONE);
     }
 
-    ////////////
-    // Example : Build the namespace of myApplication using discovery feature (if the protocol provides it)
-    ////////////
+  ////////////
+  // Example : Read the namespace of myApplication from a namespace file
+  ////////////
 
-    // you can create an OSC receive on the 9998 port to see that a namespace request is sent by i-score (using Pure Data for example)
-    anApplication->sendMessage(TTSymbol("DirectoryBuild"));
+  // create a TTXmlHandler class to parse a xml namespace file
+  TTXmlHandlerPtr myXmlHandler = NULL;
+  TTObjectBaseInstantiate(kTTSym_XmlHandler, TTObjectBaseHandle(&myXmlHandler), kTTValNONE);
+
+  // prepare the TTXmlHandler to pass the result of the parsing to myApplication
+  v = TTValue(anApplication);
+  myXmlHandler->setAttributeValue(TTSymbol("object"), v);
+
+  // read a namespace file
+  err = myXmlHandler->sendMessage(TTSymbol("Read"), TTSymbol("/Users/WALL-E/Documents/Jamoma/Modules/Modular/implementations/MaxMSP/jcom.modular/remoteApp - namespace.xml"), kTTValNONE);
+
+  if (!err) {
+      // get the root of the TNodeDirectory of myApplication
+      // note : the TTNodeDirectory is a tree structure used to registered and retrieve TTObjects using TTAddress
+      TTNodeDirectoryPtr anApplicationDirectory = getApplicationDirectory(TTSymbol("myApplication"));
+
+      // return all addresses of the TTNodeDirectory
+      std::cout << "__ Dump myApplication directory __" << std::endl;
+
+      // start to dump addresses recursilvely from the root of the directory
+      dumpAddressBelow(anApplicationDirectory->getRoot());
+
+      std::cout << "__________________________________" << std::endl;
+    }
+
+  ////////////
+  // Example : Build the namespace of myApplication using discovery feature (if the protocol provides it)
+  ////////////
+
+  // you can create an OSC receive on the 9998 port to see that a namespace request is sent by i-score (using Pure Data for example)
+  anApplication->sendMessage(TTSymbol("DirectoryBuild"));
 }
 
 void
-Maquette::dumpAddressBelow(TTNodePtr aNode) {
+Maquette::dumpAddressBelow(TTNodePtr aNode)
+{
+  TTList returnedChildren;
+  TTAddress anAddress;
 
-    TTList      returnedChildren;
-    TTAddress   anAddress;
+  // fill a TTList with all children (because we use * (wilcard) for the name and the instance)
+  aNode->getChildren(S_WILDCARD, S_WILDCARD, returnedChildren);
 
-    // fill a TTList with all children (because we use * (wilcard) for the name and the instance)
-    aNode->getChildren(S_WILDCARD, S_WILDCARD, returnedChildren);
+  // for each child
+  for (returnedChildren.begin(); returnedChildren.end(); returnedChildren.next()) {
+      // get a node from the TTList
+      aNode = TTNodePtr((TTPtr)returnedChildren.current()[0]);
 
-    // for each child
-    for (returnedChildren.begin(); returnedChildren.end(); returnedChildren.next()) {
+      // compute his absolute address
+      aNode->getAddress(anAddress);
 
-        // get a node from the TTList
-        aNode = TTNodePtr((TTPtr)returnedChildren.current()[0]);
+      std::cout << "   " << anAddress.string() << std::endl;
 
-        // compute his absolute address
-        aNode->getAddress(anAddress);
-
-        std::cout <<"   "<< anAddress.string()<<std::endl;
-
-        // dump all addresses below this node (recursive call)
-        dumpAddressBelow(aNode);
+      // dump all addresses below this node (recursive call)
+      dumpAddressBelow(aNode);
     }
 }
 
-Maquette::Maquette():_mainScenario(NULL) {
-	//init();
+Maquette::Maquette() : _mainScenario(NULL)
+{
+  //init();
 }
 
 Maquette::~Maquette()
 {
-	_boxes.clear();
-	_parentBoxes.clear();
-    TTObjectBaseRelease(TTObjectBaseHandle(&_mainScenario));
+  _boxes.clear();
+  _parentBoxes.clear();
+  TTObjectBaseRelease(TTObjectBaseHandle(&_mainScenario));
 }
 
 void
-Maquette::setScene(MaquetteScene *scene) {
-	_scene = scene;
+Maquette::setScene(MaquetteScene *scene)
+{
+  _scene = scene;
 }
 
 vector<string>
-Maquette::getPlugins(){
-    return _plugins;
+Maquette::getPlugins()
+{
+  return _plugins;
 }
 
 vector<unsigned int>
 Maquette::getRelationsIDs(unsigned int boxID)
 {
-	vector<unsigned int> boxRelations;
-	RelationsMap::iterator rel;
-	unsigned int relID1 = NO_ID;
-	unsigned int relID2 = NO_ID;
+  vector<unsigned int> boxRelations;
+  RelationsMap::iterator rel;
+  unsigned int relID1 = NO_ID;
+  unsigned int relID2 = NO_ID;
 
 #ifdef TODO_SCORE
-	for (rel = _relations.begin() ; rel != _relations.end() ; rel++) {
-		if (rel->first != NO_ID) {
-            relID1 = _mainScenario->getRelationFirstBoxId(rel->first);
-            relID2 = _mainScenario->getRelationSecondBoxId(rel->first);
-			if (boxID == relID1 || boxID == relID2) {
-				boxRelations.push_back(rel->first);
-			}
-		}
-	}
+  for (rel = _relations.begin(); rel != _relations.end(); rel++) {
+      if (rel->first != NO_ID) {
+          relID1 = _mainScenario->getRelationFirstBoxId(rel->first);
+          relID2 = _mainScenario->getRelationSecondBoxId(rel->first);
+          if (boxID == relID1 || boxID == relID2) {
+              boxRelations.push_back(rel->first);
+            }
+        }
+    }
 #endif
 
-	return boxRelations;
+  return boxRelations;
 }
 
 Relation*
-Maquette::getRelation(unsigned int ID) {
-	RelationsMap::iterator it = _relations.find(ID);
-	if (it != _relations.end()) {
-		return it->second;
-	}
+Maquette::getRelation(unsigned int ID)
+{
+  RelationsMap::iterator it = _relations.find(ID);
+  if (it != _relations.end()) {
+      return it->second;
+    }
 
-	return NULL;
+  return NULL;
 }
 
 BasicBox*
 Maquette::getBox(unsigned int ID)
 {
-	BoxesMap::iterator it = _boxes.find(ID);
-	if (it != _boxes.end()) {
-		return it->second;
-	}
+  BoxesMap::iterator it = _boxes.find(ID);
+  if (it != _boxes.end()) {
+      return it->second;
+    }
 
-	return NULL;
+  return NULL;
 }
 
-map<unsigned int,ParentBox*>
+map<unsigned int, ParentBox*>
 Maquette::parentBoxes()
 {
-	return _parentBoxes;
+  return _parentBoxes;
 }
 
 unsigned int
 Maquette::sequentialID()
 {
-	return _boxes.size();
+  return _boxes.size();
 }
 
 unsigned int
 Maquette::addSoundBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const string & name,
-		const Palette &pal, unsigned int mother)
+                      const Palette &pal, unsigned int mother)
 {
-	if (ID != NO_ID) {
-
+  if (ID != NO_ID) {
 #ifdef TODO_SCORE
-		vector<string> firstMsgs;
-		vector<string> lastMsgs;
-        _mainScenario->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-        _mainScenario->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
+      vector<string> firstMsgs;
+      vector<string> lastMsgs;
+      _mainScenario->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
+      _mainScenario->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
 
-		SoundBox *newBox = new SoundBox(corner1, corner2, _scene);
+      SoundBox *newBox = new SoundBox(corner1, corner2, _scene);
 
-		newBox->setName(QString::fromStdString(name));
+      newBox->setName(QString::fromStdString(name));
 
-		_boxes[ID] = newBox;
-		newBox->setID(ID);
-		newBox->setPalette(pal);
-		if (mother != NO_ID && mother != ROOT_BOX_ID) {
-			BoxesMap::iterator it;
-			if ((it = _boxes.find(mother)) != _boxes.end()) {
-				if (it->second->type() == PARENT_BOX_TYPE) {
-					newBox->setMother(mother);
-				  static_cast<ParentBox*>(it->second)->addChild(ID);
-				}
-			}
-		}
+      _boxes[ID] = newBox;
+      newBox->setID(ID);
+      newBox->setPalette(pal);
+      if (mother != NO_ID && mother != ROOT_BOX_ID) {
+          BoxesMap::iterator it;
+          if ((it = _boxes.find(mother)) != _boxes.end()) {
+              if (it->second->type() == PARENT_BOX_TYPE) {
+                  newBox->setMother(mother);
+                  static_cast<ParentBox*>(it->second)->addChild(ID);
+                }
+            }
+        }
 
-		newBox->setFirstMessagesToSend(firstMsgs);
-		newBox->setLastMessagesToSend(lastMsgs);
+      newBox->setFirstMessagesToSend(firstMsgs);
+      newBox->setLastMessagesToSend(lastMsgs);
 #endif
     }
 
-	return ID;
+  return ID;
 }
 
 unsigned int
 Maquette::addSoundBox(const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
 {
-	QPointF firstCorner(std::min(corner1.x(),corner2.x()),std::min(corner1.y(),corner2.y()));
-	QPointF secondCorner(std::max(corner1.x(),corner2.x()),std::max(corner1.y(),corner2.y()));
+  QPointF firstCorner(std::min(corner1.x(), corner2.x()), std::min(corner1.y(), corner2.y()));
+  QPointF secondCorner(std::max(corner1.x(), corner2.x()), std::max(corner1.y(), corner2.y()));
 
-	SoundBox *newBox = new SoundBox(firstCorner, secondCorner, _scene);
+  SoundBox *newBox = new SoundBox(firstCorner, secondCorner, _scene);
 
-	ParentBox *motherBox = NULL;
-	int motherID = mother;
-	if (_boxes.find(mother) == _boxes.end()) {
-		motherID = ROOT_BOX_ID;
-	}
-	else {
-		BoxesMap::iterator it;
-		if ((it = _boxes.find(mother)) != _boxes.end()) {
-			if (it->second->type() == PARENT_BOX_TYPE) {
-				motherBox = static_cast<ParentBox*>(it->second);
-				firstCorner.rx() -= motherBox->beginPos();
-				secondCorner.rx() -= motherBox->beginPos();
-			}
-		}
-	}
+  ParentBox *motherBox = NULL;
+  int motherID = mother;
+  if (_boxes.find(mother) == _boxes.end()) {
+      motherID = ROOT_BOX_ID;
+    }
+  else {
+      BoxesMap::iterator it;
+      if ((it = _boxes.find(mother)) != _boxes.end()) {
+          if (it->second->type() == PARENT_BOX_TYPE) {
+              motherBox = static_cast<ParentBox*>(it->second);
+              firstCorner.rx() -= motherBox->beginPos();
+              secondCorner.rx() -= motherBox->beginPos();
+            }
+        }
+    }
 #ifdef TODO_SCORE
-    unsigned int newBoxID = _mainScenario->addBox(firstCorner.x() * MaquetteScene::MS_PER_PIXEL,
-			(secondCorner.x()-firstCorner.x()) * MaquetteScene::MS_PER_PIXEL , motherID);
+  unsigned int newBoxID = _mainScenario->addBox(firstCorner.x() * MaquetteScene::MS_PER_PIXEL,
+                                                (secondCorner.x() - firstCorner.x()) * MaquetteScene::MS_PER_PIXEL, motherID);
 #else
-    unsigned int newBoxID = NO_ID;
+  unsigned int newBoxID = NO_ID;
 #endif
 
-	if (newBoxID != NO_ID) {
-		newBox->setName(QString::fromStdString(name));
+  if (newBoxID != NO_ID) {
+      newBox->setName(QString::fromStdString(name));
 
-		_boxes[newBoxID] = newBox;
-		newBox->setID(newBoxID);
-		if (motherBox != NULL) {
-			newBox->setMother(motherID);
-			motherBox->addChild(newBoxID);
-		}
+      _boxes[newBoxID] = newBox;
+      newBox->setID(newBoxID);
+      if (motherBox != NULL) {
+          newBox->setMother(motherID);
+          motherBox->addChild(newBoxID);
+        }
 
 #ifdef TODO_SCORE
-        _mainScenario->setCtrlPointMessagesToSend(newBoxID,BEGIN_CONTROL_POINT_INDEX,newBox->firstMessagesToSend());
-        _mainScenario->setCtrlPointMessagesToSend(newBoxID,END_CONTROL_POINT_INDEX,newBox->lastMessagesToSend());
+      _mainScenario->setCtrlPointMessagesToSend(newBoxID, BEGIN_CONTROL_POINT_INDEX, newBox->firstMessagesToSend());
+      _mainScenario->setCtrlPointMessagesToSend(newBoxID, END_CONTROL_POINT_INDEX, newBox->lastMessagesToSend());
 #endif
-	}
+    }
 
-	return newBoxID;
+  return newBoxID;
 }
 
 unsigned int
 Maquette::addSoundBox(const AbstractSoundBox &abstract)
 {
-	return addSoundBox(abstract.topLeft(), QPointF(abstract.topLeft().x() + abstract.width() ,
-			abstract.topLeft().y() + abstract.height()),
-			abstract.name(),abstract.mother());
+  return addSoundBox(abstract.topLeft(), QPointF(abstract.topLeft().x() + abstract.width(),
+                                                 abstract.topLeft().y() + abstract.height()),
+                     abstract.name(), abstract.mother());
 }
 
 unsigned int
 Maquette::addControlBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
 {
-	vector<string> firstMsgs;
-	vector<string> lastMsgs;
+  vector<string> firstMsgs;
+  vector<string> lastMsgs;
 
 #ifdef TODO_MODULAR
-    _mainScenario->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-    _mainScenario->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
+  _mainScenario->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
+  _mainScenario->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
 #endif
 
-	ControlBox *newBox = new ControlBox(corner1, corner2, _scene);
+  ControlBox *newBox = new ControlBox(corner1, corner2, _scene);
 
-	if (ID != NO_ID) {
-		newBox->setName(QString::fromStdString(name));
+  if (ID != NO_ID) {
+      newBox->setName(QString::fromStdString(name));
 
-		_boxes[ID] = newBox;
-		newBox->setID(ID);
-		if (mother != NO_ID && mother != ROOT_BOX_ID) {
-			BoxesMap::iterator it;
-			if ((it = _boxes.find(mother)) != _boxes.end()) {
-				if (it->second->type() == PARENT_BOX_TYPE) {
-					newBox->setMother(mother);
-				  static_cast<ParentBox*>(it->second)->addChild(ID);
-				}
-			}
-		}
+      _boxes[ID] = newBox;
+      newBox->setID(ID);
+      if (mother != NO_ID && mother != ROOT_BOX_ID) {
+          BoxesMap::iterator it;
+          if ((it = _boxes.find(mother)) != _boxes.end()) {
+              if (it->second->type() == PARENT_BOX_TYPE) {
+                  newBox->setMother(mother);
+                  static_cast<ParentBox*>(it->second)->addChild(ID);
+                }
+            }
+        }
 
-		newBox->setFirstMessagesToSend(firstMsgs);
-		newBox->setLastMessagesToSend(lastMsgs);
-	}
+      newBox->setFirstMessagesToSend(firstMsgs);
+      newBox->setLastMessagesToSend(lastMsgs);
+    }
 
-	return ID;
+  return ID;
 }
 
 unsigned int
 Maquette::addControlBox(const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
 {
-	QPointF firstCorner(std::min(corner1.x(),corner2.x()),std::min(corner1.y(),corner2.y()));
-	QPointF secondCorner(std::max(corner1.x(),corner2.x()),std::max(corner1.y(),corner2.y()));
+  QPointF firstCorner(std::min(corner1.x(), corner2.x()), std::min(corner1.y(), corner2.y()));
+  QPointF secondCorner(std::max(corner1.x(), corner2.x()), std::max(corner1.y(), corner2.y()));
 
-	ControlBox *newBox = new ControlBox(firstCorner, secondCorner, _scene);
+  ControlBox *newBox = new ControlBox(firstCorner, secondCorner, _scene);
 
-	ParentBox *motherBox = NULL;
-	int motherID = mother;
-	if (_boxes.find(mother) == _boxes.end()) {
-		motherID = ROOT_BOX_ID;
-	}
-	else {
-		BoxesMap::iterator it;
-		if ((it = _boxes.find(mother)) != _boxes.end()) {
-			if (it->second->type() == PARENT_BOX_TYPE) {
-				motherBox = static_cast<ParentBox*>(it->second);
-				firstCorner.rx() -= motherBox->beginPos();
-				secondCorner.rx() -= motherBox->beginPos();
-			}
-		}
-	}
+  ParentBox *motherBox = NULL;
+  int motherID = mother;
+  if (_boxes.find(mother) == _boxes.end()) {
+      motherID = ROOT_BOX_ID;
+    }
+  else {
+      BoxesMap::iterator it;
+      if ((it = _boxes.find(mother)) != _boxes.end()) {
+          if (it->second->type() == PARENT_BOX_TYPE) {
+              motherBox = static_cast<ParentBox*>(it->second);
+              firstCorner.rx() -= motherBox->beginPos();
+              secondCorner.rx() -= motherBox->beginPos();
+            }
+        }
+    }
 
 #ifdef TODO_SCORE
-    unsigned int newBoxID = _mainScenario->addBox(firstCorner.x() * MaquetteScene::MS_PER_PIXEL,
-			(secondCorner.x()-firstCorner.x()) * MaquetteScene::MS_PER_PIXEL , motherID);
+  unsigned int newBoxID = _mainScenario->addBox(firstCorner.x() * MaquetteScene::MS_PER_PIXEL,
+                                                (secondCorner.x() - firstCorner.x()) * MaquetteScene::MS_PER_PIXEL, motherID);
 #else
-    unsigned int newBoxID = NO_ID;
+  unsigned int newBoxID = NO_ID;
 #endif
 
-	if (newBoxID != NO_ID) {
-		newBox->setName(QString::fromStdString(name));
+  if (newBoxID != NO_ID) {
+      newBox->setName(QString::fromStdString(name));
 
-		_boxes[newBoxID] = newBox;
-		newBox->setID(newBoxID);
-		if (motherBox != NULL) {
-			newBox->setMother(motherID);
-			motherBox->addChild(newBoxID);
-		}
+      _boxes[newBoxID] = newBox;
+      newBox->setID(newBoxID);
+      if (motherBox != NULL) {
+          newBox->setMother(motherID);
+          motherBox->addChild(newBoxID);
+        }
 
 #ifdef TODO_MODULAR
-        _mainScenario->setCtrlPointMessagesToSend(newBoxID,BEGIN_CONTROL_POINT_INDEX,newBox->firstMessagesToSend());
-        _mainScenario->setCtrlPointMessagesToSend(newBoxID,END_CONTROL_POINT_INDEX,newBox->lastMessagesToSend());
+      _mainScenario->setCtrlPointMessagesToSend(newBoxID, BEGIN_CONTROL_POINT_INDEX, newBox->firstMessagesToSend());
+      _mainScenario->setCtrlPointMessagesToSend(newBoxID, END_CONTROL_POINT_INDEX, newBox->lastMessagesToSend());
 #endif
+    }
 
-	}
-
-	return newBoxID;
+  return newBoxID;
 }
 
 unsigned int
 Maquette::addControlBox(const AbstractControlBox &abstract)
 {
-	return addControlBox(abstract.topLeft(), QPointF(abstract.topLeft().x() + abstract.width() ,
-			abstract.topLeft().y() + abstract.height()),abstract.name(), abstract.mother());
+  return addControlBox(abstract.topLeft(), QPointF(abstract.topLeft().x() + abstract.width(),
+                                                   abstract.topLeft().y() + abstract.height()), abstract.name(), abstract.mother());
 }
 
 unsigned int
 Maquette::addParentBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
 {
-	vector<string> firstMsgs;
-	vector<string> lastMsgs;
+  vector<string> firstMsgs;
+  vector<string> lastMsgs;
 
 #ifdef TODO_MODULAR
-    _mainScenario->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-    _mainScenario->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
+  _mainScenario->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
+  _mainScenario->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
 #endif
 
-    ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
+  ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
 
-	if (ID != NO_ID) {
-		newBox->setName(QString::fromStdString(name));
+  if (ID != NO_ID) {
+      newBox->setName(QString::fromStdString(name));
 
-		_boxes[ID] = newBox;
-		_parentBoxes[ID] = newBox;
-		newBox->setID(ID);
-		if (mother != NO_ID && mother != ROOT_BOX_ID) {
-			BoxesMap::iterator it;
-			if ((it = _boxes.find(mother)) != _boxes.end()) {
-				if (it->second->type() == PARENT_BOX_TYPE) {
-					newBox->setMother(mother);
-				  static_cast<ParentBox*>(it->second)->addChild(ID);
-				}
-				else {
-					newBox->setMother(ROOT_BOX_ID);
-				}
-			}
-		}
+      _boxes[ID] = newBox;
+      _parentBoxes[ID] = newBox;
+      newBox->setID(ID);
+      if (mother != NO_ID && mother != ROOT_BOX_ID) {
+          BoxesMap::iterator it;
+          if ((it = _boxes.find(mother)) != _boxes.end()) {
+              if (it->second->type() == PARENT_BOX_TYPE) {
+                  newBox->setMother(mother);
+                  static_cast<ParentBox*>(it->second)->addChild(ID);
+                }
+              else {
+                  newBox->setMother(ROOT_BOX_ID);
+                }
+            }
+        }
 
-		newBox->setFirstMessagesToSend(firstMsgs);
-		newBox->setLastMessagesToSend(lastMsgs);
-	}
+      newBox->setFirstMessagesToSend(firstMsgs);
+      newBox->setLastMessagesToSend(lastMsgs);
+    }
 
-	return ID;
+  return ID;
 }
 
 unsigned int
 Maquette::addParentBox(unsigned int ID, const unsigned int date, const unsigned int topLeftY, const unsigned int sizeY, const unsigned int duration, const string & name, unsigned int mother, QColor color)
 {
-    QPointF corner1(date/MaquetteScene::MS_PER_PIXEL,topLeftY);
-    QPointF corner2((date+duration)/MaquetteScene::MS_PER_PIXEL,topLeftY+sizeY);
+  QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
+  QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);
 
-    vector<string> firstMsgs;
-    vector<string> lastMsgs;
+  vector<string> firstMsgs;
+  vector<string> lastMsgs;
 
 #ifdef TODO_MODULAR
-    _mainScenario->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-    _mainScenario->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
+  _mainScenario->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
+  _mainScenario->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
 #endif
 
-    ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
+  ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
 
-    if (ID != NO_ID) {
-        newBox->setName(QString::fromStdString(name));
-        newBox->setColor(color);
-        _boxes[ID] = newBox;
-        _parentBoxes[ID] = newBox;
-        newBox->setID(ID);
-        if (mother != NO_ID && mother != ROOT_BOX_ID) {
-            BoxesMap::iterator it;
-            if ((it = _boxes.find(mother)) != _boxes.end()) {
-                if (it->second->type() == PARENT_BOX_TYPE) {
-                    newBox->setMother(mother);
+  if (ID != NO_ID) {
+      newBox->setName(QString::fromStdString(name));
+      newBox->setColor(color);
+      _boxes[ID] = newBox;
+      _parentBoxes[ID] = newBox;
+      newBox->setID(ID);
+      if (mother != NO_ID && mother != ROOT_BOX_ID) {
+          BoxesMap::iterator it;
+          if ((it = _boxes.find(mother)) != _boxes.end()) {
+              if (it->second->type() == PARENT_BOX_TYPE) {
+                  newBox->setMother(mother);
                   static_cast<ParentBox*>(it->second)->addChild(ID);
                 }
-                else {
-                    newBox->setMother(ROOT_BOX_ID);
+              else {
+                  newBox->setMother(ROOT_BOX_ID);
                 }
             }
         }
 
-        newBox->setFirstMessagesToSend(firstMsgs);
-        newBox->setLastMessagesToSend(lastMsgs);
+      newBox->setFirstMessagesToSend(firstMsgs);
+      newBox->setLastMessagesToSend(lastMsgs);
     }
 
-    return ID;
-
+  return ID;
 }
 
 unsigned int
 Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
 {
-    QPointF firstCorner(std::min(corner1.x(),corner2.x()),std::min(corner1.y(),corner2.y()));
-        QPointF secondCorner(std::max(corner1.x(),corner2.x()),std::max(corner1.y(),corner2.y()));
+  QPointF firstCorner(std::min(corner1.x(), corner2.x()), std::min(corner1.y(), corner2.y()));
+  QPointF secondCorner(std::max(corner1.x(), corner2.x()), std::max(corner1.y(), corner2.y()));
 
-        ParentBox *newBox = new ParentBox(firstCorner, secondCorner, _scene);
+  ParentBox *newBox = new ParentBox(firstCorner, secondCorner, _scene);
 
-        ParentBox *motherBox = NULL;
-        int motherID = mother;
-        if (_boxes.find(mother) == _boxes.end()) {
-            motherID = ROOT_BOX_ID;
-        }
-        else {
-            BoxesMap::iterator it;
-            if ((it = _boxes.find(mother)) != _boxes.end()) {
-                if (it->second->type() == PARENT_BOX_TYPE) {
-                    motherBox = static_cast<ParentBox*>(it->second);
-                    firstCorner.rx() -= motherBox->beginPos();
-                    secondCorner.rx() -= motherBox->beginPos();
-                }
+  ParentBox *motherBox = NULL;
+  int motherID = mother;
+  if (_boxes.find(mother) == _boxes.end()) {
+      motherID = ROOT_BOX_ID;
+    }
+  else {
+      BoxesMap::iterator it;
+      if ((it = _boxes.find(mother)) != _boxes.end()) {
+          if (it->second->type() == PARENT_BOX_TYPE) {
+              motherBox = static_cast<ParentBox*>(it->second);
+              firstCorner.rx() -= motherBox->beginPos();
+              secondCorner.rx() -= motherBox->beginPos();
             }
         }
+    }
 
 #ifdef TODO_SCORE
-        unsigned int newBoxID = _mainScenario->addBox(firstCorner.x() * MaquetteScene::MS_PER_PIXEL,
-                (secondCorner.x()-firstCorner.x()) * MaquetteScene::MS_PER_PIXEL , motherID);
+  unsigned int newBoxID = _mainScenario->addBox(firstCorner.x() * MaquetteScene::MS_PER_PIXEL,
+                                                (secondCorner.x() - firstCorner.x()) * MaquetteScene::MS_PER_PIXEL, motherID);
 #else
-        unsigned int newBoxID = NO_ID;
+  unsigned int newBoxID = NO_ID;
 #endif
 
-        if (newBoxID != NO_ID) {
-            newBox->setName(QString::fromStdString(name));
+  if (newBoxID != NO_ID) {
+      newBox->setName(QString::fromStdString(name));
 
-            _boxes[newBoxID] = newBox;
-            _parentBoxes[newBoxID] = newBox;
-            newBox->setID(newBoxID);
-            if (motherBox != NULL) {
-                newBox->setMother(motherID);
-                motherBox->addChild(newBoxID);
-            }
+      _boxes[newBoxID] = newBox;
+      _parentBoxes[newBoxID] = newBox;
+      newBox->setID(newBoxID);
+      if (motherBox != NULL) {
+          newBox->setMother(motherID);
+          motherBox->addChild(newBoxID);
+        }
 
 #ifdef TODO_MODULAR
-            _mainScenario->setCtrlPointMessagesToSend(newBoxID,BEGIN_CONTROL_POINT_INDEX,newBox->firstMessagesToSend());
-            _mainScenario->setCtrlPointMessagesToSend(newBoxID,END_CONTROL_POINT_INDEX,newBox->lastMessagesToSend());
+      _mainScenario->setCtrlPointMessagesToSend(newBoxID, BEGIN_CONTROL_POINT_INDEX, newBox->firstMessagesToSend());
+      _mainScenario->setCtrlPointMessagesToSend(newBoxID, END_CONTROL_POINT_INDEX, newBox->lastMessagesToSend());
 #endif
-            }
+    }
 
-        return newBoxID;
+  return newBoxID;
 }
 
 unsigned int
 Maquette::addParentBox(const AbstractParentBox &abstract)
 {
-	return addParentBox(abstract.topLeft(), QPointF(abstract.topLeft().x() + abstract.width() ,
-			abstract.topLeft().y() + abstract.height()), abstract.name(), abstract.mother());
+  return addParentBox(abstract.topLeft(), QPointF(abstract.topLeft().x() + abstract.width(),
+                                                  abstract.topLeft().y() + abstract.height()), abstract.name(), abstract.mother());
 }
 
-map<string,MyDevice>
-Maquette::getNetworkDevices() {
-	return _devices;
+map<string, MyDevice>
+Maquette::getNetworkDevices()
+{
+  return _devices;
 }
 
 int
 Maquette::requestNetworkNamespace(const string &address, vector<string>& nodes, vector<string>& leaves,
-					 vector<string>& attributes, vector<string>& attributesValue) {
+                                  vector<string>& attributes, vector<string>& attributesValue)
+{
 #ifdef TODO_MODULAR
-    return _mainScenario->requestNetworkNamespace(address,nodes, leaves, attributes, attributesValue);
+  return _mainScenario->requestNetworkNamespace(address, nodes, leaves, attributes, attributesValue);
+
 #else
-    return 0;
+  return 0;
 #endif
 }
 
 void
-Maquette::changeNetworkDevice(const string &deviceName, const string &pluginName, const string &IP, const string &port) {
+Maquette::changeNetworkDevice(const string &deviceName, const string &pluginName, const string &IP, const string &port)
+{
+  if (_devices.find(deviceName) != _devices.end()) {
+      removeNetworkDevice(deviceName);
+    }
 
-    if (_devices.find(deviceName) != _devices.end())
-        removeNetworkDevice(deviceName);
+  addNetworkDevice(deviceName, pluginName, IP, port);
 
-    addNetworkDevice(deviceName,pluginName,IP,port);
-
-    std::istringstream iss(port);
-    unsigned int portInt;
-    iss >> portInt;
+  std::istringstream iss(port);
+  unsigned int portInt;
+  iss >> portInt;
 
 //    MyDevice newDevice(deviceName,pluginName,portInt,IP);
 //    _devices[deviceName] = newDevice;
 
 //    _mainScenario->addNetworkDevice(deviceName,pluginName,IP,port);
-    _currentDevice = deviceName;
+  _currentDevice = deviceName;
 }
 
 void
-Maquette::getNetworkDeviceNames(vector<string> &deviceName, vector<bool> &namespaceRequestable) {
+Maquette::getNetworkDeviceNames(vector<string> &deviceName, vector<bool> &namespaceRequestable)
+{
+  TTValue applicationNames, protocolNames;
+  TTSymbol name;
 
-    TTValue applicationNames, protocolNames;
-    TTSymbol name;
+  // get all application name
+  TTModularApplications->getAttributeValue(TTSymbol("applicationNames"), applicationNames);
 
-    // get all application name
-    TTModularApplications->getAttributeValue(TTSymbol("applicationNames"), applicationNames);
+  for (TTUInt8 i = 0; i < applicationNames.size(); i++) {
+      // don't return the local application
+      name = applicationNames[i];
+      if (name == getLocalApplicationName) {
+          continue;
+        }
 
-    for (TTUInt8 i = 0; i < applicationNames.size(); i++) {
+      deviceName.push_back(name.c_str());
 
-        // don't return the local application
-        name = applicationNames[i];
-        if (name == getLocalApplicationName)
-            continue;
+      // get all protocol names used by this application
+      protocolNames = getApplicationProtocols(name);
 
-        deviceName.push_back(name.c_str());
-
-        // get all protocol names used by this application
-        protocolNames = getApplicationProtocols(name);
-
-        // if there is at least one protocol,
-        if (protocolNames.size()) {
-
-            // look if it provides namespace exploration
-            name = protocolNames[0];
-            namespaceRequestable.push_back(getProtocol(name)->mDiscover);
+      // if there is at least one protocol,
+      if (protocolNames.size()) {
+          // look if it provides namespace exploration
+          name = protocolNames[0];
+          namespaceRequestable.push_back(getProtocol(name)->mDiscover);
         }
     }
 }
 
-vector<string> Maquette::requestNetworkSnapShot(const string &address) {
+vector<string> Maquette::requestNetworkSnapShot(const string &address)
+{
 #ifdef TODO_MODULAR
-    return _mainScenario->requestNetworkSnapShot(address);
+  return _mainScenario->requestNetworkSnapShot(address);
+
 #else
-    vector<string> nothing;
-    return nothing;
+  vector<string> nothing;
+  return nothing;
 #endif
 }
 
 bool
-Maquette::updateMessagesToSend(unsigned int boxID) {
-
-	if (boxID != NO_ID) {
-
+Maquette::updateMessagesToSend(unsigned int boxID)
+{
+  if (boxID != NO_ID) {
 #ifdef TODO_MODULAR
-        _mainScenario->setCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,static_cast<SoundBox*>(_boxes[boxID])->firstMessagesToSend());
-        _mainScenario->setCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,static_cast<SoundBox*>(_boxes[boxID])->lastMessagesToSend());
+      _mainScenario->setCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, static_cast<SoundBox*>(_boxes[boxID])->firstMessagesToSend());
+      _mainScenario->setCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, static_cast<SoundBox*>(_boxes[boxID])->lastMessagesToSend());
 #endif
 
-		return true;
-	}
-	return false;
+      return true;
+    }
+  return false;
 }
 
 vector<string>
 Maquette::firstMessagesToSend(unsigned int boxID)
 {
-	vector<string> messages;
-	if (boxID != NO_ID && (getBox(boxID) != NULL)) {
-
+  vector<string> messages;
+  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
 #ifdef TODO_MODULAR
-        _mainScenario->getCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,messages);
+      _mainScenario->getCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, messages);
 #endif
-
-	}
-	return messages;
+    }
+  return messages;
 }
 
 vector<string>
 Maquette::lastMessagesToSend(unsigned int boxID)
 {
-	vector<string> messages;
-	if (boxID != NO_ID && (getBox(boxID) != NULL)) {
-
+  vector<string> messages;
+  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
 #ifdef TODO_MODULAR
-        _mainScenario->getCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,messages);
+      _mainScenario->getCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, messages);
 #endif
+    }
 
-	}
-
-	return messages;
+  return messages;
 }
 
 void
 Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, const vector<string> &endMsgs)
-{    
-    //QMap<address,value>
-    QMap<string,string> startMessages;
-    QMap<string,string> endMessages;
-    vector<string> curvesAddresses = getCurvesAddresses(boxID);
+{
+  //QMap<address,value>
+  QMap<string, string> startMessages;
+  QMap<string, string> endMessages;
+  vector<string> curvesAddresses = getCurvesAddresses(boxID);
 
-    vector<string>::const_iterator it;
-    string currentMsg;
-    string currentAddress;
-    string currentValue;
+  vector<string>::const_iterator it;
+  string currentMsg;
+  string currentAddress;
+  string currentValue;
 
-    /************  init start messages (QMap)  ************/
-    for (it = startMsgs.begin() ; it != startMsgs.end() ; ++it) {
-        size_t blankPos;
-        currentMsg = *it;
-        if ((blankPos = it->find_first_of(" ")) != string::npos) {
-            currentAddress = currentMsg.substr(0,blankPos);
-            if(blankPos != currentMsg.size())
-                currentValue = currentMsg.substr(blankPos+1,currentMsg.size());
-        }
-        startMessages.insert(currentAddress,currentValue);
-    }
-
-    /************  init end messages (QMap)  ************/
-    for (it = endMsgs.begin() ; it != endMsgs.end() ; ++it) {
-        size_t blankPos;
-        currentMsg = *it;
-        if ((blankPos = it->find_first_of(" ")) != string::npos) {
-            currentAddress = currentMsg.substr(0,blankPos);
-            if(blankPos != currentMsg.size())
-                currentValue = currentMsg.substr(blankPos+1,currentMsg.size());
-        }
-        endMessages.insert(currentAddress,currentValue);
-    }
-
-
-    /************    Pour le cas open file   ************/
-    for (it = curvesAddresses.begin() ; it != curvesAddresses.end() ; ++it) {
-        currentMsg = *it;
-        getBox(boxID)->addCurveAddress(currentMsg);
-        if(startMessages.contains(currentMsg)){
-            startMessages.remove(currentMsg);
-        }
-        if(endMessages.contains(currentMsg)){
-            endMessages.remove(currentMsg);
-        }
-    }
-
-
-    /************  addCurve if endAddress contains startAddress && endValue != startValue ************/
-    QList<string> startAddresses = startMessages.keys();
-    QList<string>::iterator startAddressIt;
-
-    for(startAddressIt = startAddresses.begin() ; startAddressIt != startAddresses.end() ; ++startAddressIt) {
-        string address = *startAddressIt;
-        if (endMessages.contains(address)) {
-            if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end() && startMessages.value(address)!=endMessages.value(address)) {
-
-#ifdef TODO_MODULAR
-                _mainScenario->addCurve(boxID,address);
-#endif
-                getBox(boxID)->addCurve(address);
+  /************  init start messages (QMap)  ************/
+  for (it = startMsgs.begin(); it != startMsgs.end(); ++it) {
+      size_t blankPos;
+      currentMsg = *it;
+      if ((blankPos = it->find_first_of(" ")) != string::npos) {
+          currentAddress = currentMsg.substr(0, blankPos);
+          if (blankPos != currentMsg.size()) {
+              currentValue = currentMsg.substr(blankPos + 1, currentMsg.size());
             }
         }
-        else {
-            if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) != curvesAddresses.end()) {
+      startMessages.insert(currentAddress, currentValue);
+    }
 
+  /************  init end messages (QMap)  ************/
+  for (it = endMsgs.begin(); it != endMsgs.end(); ++it) {
+      size_t blankPos;
+      currentMsg = *it;
+      if ((blankPos = it->find_first_of(" ")) != string::npos) {
+          currentAddress = currentMsg.substr(0, blankPos);
+          if (blankPos != currentMsg.size()) {
+              currentValue = currentMsg.substr(blankPos + 1, currentMsg.size());
+            }
+        }
+      endMessages.insert(currentAddress, currentValue);
+    }
+
+
+  /************    Pour le cas open file   ************/
+  for (it = curvesAddresses.begin(); it != curvesAddresses.end(); ++it) {
+      currentMsg = *it;
+      getBox(boxID)->addCurveAddress(currentMsg);
+      if (startMessages.contains(currentMsg)) {
+          startMessages.remove(currentMsg);
+        }
+      if (endMessages.contains(currentMsg)) {
+          endMessages.remove(currentMsg);
+        }
+    }
+
+
+  /************  addCurve if endAddress contains startAddress && endValue != startValue ************/
+  QList<string> startAddresses = startMessages.keys();
+  QList<string>::iterator startAddressIt;
+
+  for (startAddressIt = startAddresses.begin(); startAddressIt != startAddresses.end(); ++startAddressIt) {
+      string address = *startAddressIt;
+      if (endMessages.contains(address)) {
+          if (std::find(curvesAddresses.begin(), curvesAddresses.end(), address) == curvesAddresses.end() && startMessages.value(address) != endMessages.value(address)) {
 #ifdef TODO_MODULAR
-                _mainScenario->removeCurve(boxID,address);
+              _mainScenario->addCurve(boxID, address);
+#endif
+              getBox(boxID)->addCurve(address);
+            }
+        }
+      else {
+          if (std::find(curvesAddresses.begin(), curvesAddresses.end(), address) != curvesAddresses.end()) {
+#ifdef TODO_MODULAR
+              _mainScenario->removeCurve(boxID, address);
 #endif
             }
         }
     }
 
-    /************  addCurve if startAddress contains endAddress && endValue != startValue ************/
-    QList<string> endAddresses = endMessages.keys();
-    QList<string>::iterator endAddressIt;
+  /************  addCurve if startAddress contains endAddress && endValue != startValue ************/
+  QList<string> endAddresses = endMessages.keys();
+  QList<string>::iterator endAddressIt;
 
-    for(endAddressIt = endAddresses.begin() ; endAddressIt != endAddresses.end() ; ++endAddressIt) {
-        string address = *endAddressIt;
-        if (startMessages.contains(address)) {
-            if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) == curvesAddresses.end() && startMessages.value(address)!=endMessages.value(address)) {
-
+  for (endAddressIt = endAddresses.begin(); endAddressIt != endAddresses.end(); ++endAddressIt) {
+      string address = *endAddressIt;
+      if (startMessages.contains(address)) {
+          if (std::find(curvesAddresses.begin(), curvesAddresses.end(), address) == curvesAddresses.end() && startMessages.value(address) != endMessages.value(address)) {
 #ifdef TODO_MODULAR
-                _mainScenario->addCurve(boxID,address);
+              _mainScenario->addCurve(boxID, address);
 #endif
-                getBox(boxID)->addCurve(address);
+              getBox(boxID)->addCurve(address);
             }
         }
-        else {
-            if (std::find(curvesAddresses.begin(),curvesAddresses.end(),address) != curvesAddresses.end()) {
-
+      else {
+          if (std::find(curvesAddresses.begin(), curvesAddresses.end(), address) != curvesAddresses.end()) {
 #ifdef TODO_MODULAR
-                _mainScenario->removeCurve(boxID,address);
+              _mainScenario->removeCurve(boxID, address);
 #endif
             }
         }
@@ -854,2127 +850,2158 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
 }
 
 bool
-Maquette::setFirstMessagesToSend(unsigned int boxID, const vector<string> &firstMsgs) {
-    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
-
-       //PRINT
+Maquette::setFirstMessagesToSend(unsigned int boxID, const vector<string> &firstMsgs)
+{
+  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+      //PRINT
 //           std::cout<<"---- Maquette::setFirstMsgsToSend ----"<<std::endl;
 //           for(int i=0 ; i<firstMsgs.size(); i++ )
 //               std::cout<< firstMsgs[i]<<std::endl;
 //           std::cout<<std::endl<<std::endl;
-       //PRINT
+      //PRINT
 #ifdef TODO_MODULAR
-        _mainScenario->setCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
+      _mainScenario->setCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
 #endif
-		_boxes[boxID]->setFirstMessagesToSend(firstMsgs);
+      _boxes[boxID]->setFirstMessagesToSend(firstMsgs);
 
-		vector<string> lastMsgs;
+      vector<string> lastMsgs;
 #ifdef TODO_MODULAR
-        _mainScenario->getCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
+      _mainScenario->getCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, lastMsgs);
 #endif
-		updateCurves(boxID,firstMsgs,lastMsgs);
+      updateCurves(boxID, firstMsgs, lastMsgs);
 
-		return true;
-	}
-	return false;
+      return true;
+    }
+  return false;
 }
 
 bool
-Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages){
+Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages)
+{
+  vector<string> firstMsgs = messages->computeMessages();
 
-    vector<string> firstMsgs = messages->computeMessages();
+  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+#ifdef TODO_MODULAR
+      _mainScenario->setCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
+#endif
+      _boxes[boxID]->setStartMessages(messages);
 
-    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+      vector<string> lastMsgs;
 
 #ifdef TODO_MODULAR
-        _mainScenario->setCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
+      _mainScenario->getCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, lastMsgs);
 #endif
-        _boxes[boxID]->setStartMessages(messages);
+      updateCurves(boxID, firstMsgs, lastMsgs);
 
-        vector<string> lastMsgs;
-
-#ifdef TODO_MODULAR
-        _mainScenario->getCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
-#endif
-        updateCurves(boxID,firstMsgs,lastMsgs);
-
-        return true;
+      return true;
     }
-    return false;
+  return false;
 }
 
 NetworkMessages *
-Maquette::startMessages(unsigned int boxID){
-    if (boxID != NO_ID && (getBox(boxID) != NULL))
-        return _boxes[boxID]->startMessages();
-    else{
-        std::cerr<<"Maquette::startMessage : wrong boxID"<<std::endl;
-        return NULL;
+Maquette::startMessages(unsigned int boxID)
+{
+  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+      return _boxes[boxID]->startMessages();
+    }
+  else {
+      std::cerr << "Maquette::startMessage : wrong boxID" << std::endl;
+      return NULL;
     }
 }
 
 bool
-Maquette::setSelectedItemsToSend(unsigned int boxID,  QMap<QTreeWidgetItem*,Data> itemsSelected){
-    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+Maquette::setSelectedItemsToSend(unsigned int boxID, QMap<QTreeWidgetItem*, Data> itemsSelected)
+{
+  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+      _boxes[boxID]->setSelectedItemsToSend(itemsSelected);
 
-        _boxes[boxID]->setSelectedItemsToSend(itemsSelected);
-
-        return true;
+      return true;
     }
-    return false;
+  return false;
 }
 
 bool
-Maquette::setExpandedItemsList(unsigned int boxID,  QList<QTreeWidgetItem*> itemsExpanded){
-    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+Maquette::setExpandedItemsList(unsigned int boxID, QList<QTreeWidgetItem*> itemsExpanded)
+{
+  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+      _boxes[boxID]->setExpandedItemsList(itemsExpanded);
 
-        _boxes[boxID]->setExpandedItemsList(itemsExpanded);
-
-        return true;
+      return true;
     }
-    return false;
+  return false;
 }
 
 bool
-Maquette::addToExpandedItemsList(unsigned int boxID,  QTreeWidgetItem* item){
-    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+Maquette::addToExpandedItemsList(unsigned int boxID, QTreeWidgetItem* item)
+{
+  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+      _boxes[boxID]->addToExpandedItemsList(item);
 
-        _boxes[boxID]->addToExpandedItemsList(item);
-
-        return true;
+      return true;
     }
-    return false;
+  return false;
 }
 
 bool
-Maquette::removeFromExpandedItemsList(unsigned int boxID,  QTreeWidgetItem* item){
-    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+Maquette::removeFromExpandedItemsList(unsigned int boxID, QTreeWidgetItem* item)
+{
+  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+      _boxes[boxID]->removeFromExpandedItemsList(item);
 
-        _boxes[boxID]->removeFromExpandedItemsList(item);
-
-        return true;
+      return true;
     }
-    return false;
+  return false;
 }
 
 bool
-Maquette::setStartMessages(unsigned int boxID,  NetworkMessages* nm){
-    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
-
-        _boxes[boxID]->setStartMessages(nm);
-        return true;
+Maquette::setStartMessages(unsigned int boxID, NetworkMessages* nm)
+{
+  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+      _boxes[boxID]->setStartMessages(nm);
+      return true;
     }
-    return false;
+  return false;
 }
 
 bool
-Maquette::setEndMessages(unsigned int boxID,  NetworkMessages* nm){
-    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
-
-        _boxes[boxID]->setEndMessages(nm);
-        return true;
+Maquette::setEndMessages(unsigned int boxID, NetworkMessages* nm)
+{
+  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+      _boxes[boxID]->setEndMessages(nm);
+      return true;
     }
-    return false;
+  return false;
 }
 
 NetworkMessages *
-Maquette::endMessages(unsigned int boxID){
-    if (boxID != NO_ID && (getBox(boxID) != NULL))
-        return _boxes[boxID]->endMessages();
-    else{
-        std::cerr<<"Maquette::startMessage : wrong boxID"<<std::endl;
-        return NULL;
+Maquette::endMessages(unsigned int boxID)
+{
+  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+      return _boxes[boxID]->endMessages();
+    }
+  else {
+      std::cerr << "Maquette::startMessage : wrong boxID" << std::endl;
+      return NULL;
     }
 }
 
 bool
-Maquette::setLastMessagesToSend(unsigned int boxID, const vector<string> &lastMsgs) {
-	if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+Maquette::setLastMessagesToSend(unsigned int boxID, const vector<string> &lastMsgs)
+{
+  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+#ifdef TODO_MODULAR
+      _mainScenario->setCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, lastMsgs);
+#endif
+      _boxes[boxID]->setLastMessagesToSend(lastMsgs);
+
+      vector<string> firstMsgs;
 
 #ifdef TODO_MODULAR
-        _mainScenario->setCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
+      _mainScenario->getCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
 #endif
-		_boxes[boxID]->setLastMessagesToSend(lastMsgs);
+      updateCurves(boxID, firstMsgs, lastMsgs);
 
-		vector<string> firstMsgs;
-
-#ifdef TODO_MODULAR
-        _mainScenario->getCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
-#endif
-		updateCurves(boxID,firstMsgs,lastMsgs);
-
-		return true;
-	}
-	return false;
-}
-
-bool
-Maquette::setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages) {
-
-    vector<string> lastMsgs = messages->computeMessages();
-
-    if (boxID != NO_ID && (getBox(boxID) != NULL)) {
-
-#ifdef TODO_MODULAR
-        _mainScenario->setCtrlPointMessagesToSend(boxID,END_CONTROL_POINT_INDEX,lastMsgs);
-#endif
-        _boxes[boxID]->setEndMessages(messages);
-
-        vector<string> firstMsgs;
-#ifdef TODO_MODULAR
-        _mainScenario->getCtrlPointMessagesToSend(boxID,BEGIN_CONTROL_POINT_INDEX,firstMsgs);
-#endif
-        updateCurves(boxID,firstMsgs,lastMsgs);
-
-        return true;
+      return true;
     }
-    return false;
+  return false;
 }
 
 bool
-Maquette::sendMessage(const string &message) {
+Maquette::setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages)
+{
+  vector<string> lastMsgs = messages->computeMessages();
 
-	if (!message.empty()) {
+  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
 #ifdef TODO_MODULAR
-        _mainScenario->sendNetworkMessage(message);
+      _mainScenario->setCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, lastMsgs);
 #endif
-		return true;
-	}
-	return false;
+      _boxes[boxID]->setEndMessages(messages);
+
+      vector<string> firstMsgs;
+#ifdef TODO_MODULAR
+      _mainScenario->getCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
+#endif
+      updateCurves(boxID, firstMsgs, lastMsgs);
+
+      return true;
+    }
+  return false;
+}
+
+bool
+Maquette::sendMessage(const string &message)
+{
+  if (!message.empty()) {
+#ifdef TODO_MODULAR
+      _mainScenario->sendNetworkMessage(message);
+#endif
+      return true;
+    }
+  return false;
 }
 
 void
 Maquette::clear()
 {
-	BoxesMap::iterator it;
-	for (it = _boxes.begin() ; it != _boxes.end() ; it++) {
-		removeBox(it->first);
-	}
-	RelationsMap::iterator it2;
-	for (it2 = _relations.begin() ; it2 != _relations.end() ; it2++) {
-		removeRelation(it2->first);
-	}
-	_relations.clear();
+  BoxesMap::iterator it;
+  for (it = _boxes.begin(); it != _boxes.end(); it++) {
+      removeBox(it->first);
+    }
+  RelationsMap::iterator it2;
+  for (it2 = _relations.begin(); it2 != _relations.end(); it2++) {
+      removeRelation(it2->first);
+    }
+  _relations.clear();
 }
 
 vector<unsigned int>
 Maquette::removeBox(unsigned int boxID)
 {
-	vector<unsigned int> removedRelations;
-	if (boxID != NO_ID) {
-		RelationsMap::iterator it;
-		unsigned int relID = NO_ID;
-		for (it = _relations.begin(); it != _relations.end(); it++) {
-			relID = it->first;
-			if (relID != NO_ID) {
+  vector<unsigned int> removedRelations;
+  if (boxID != NO_ID) {
+      RelationsMap::iterator it;
+      unsigned int relID = NO_ID;
+      for (it = _relations.begin(); it != _relations.end(); it++) {
+          relID = it->first;
+          if (relID != NO_ID) {
+#ifdef TODO_SCORE
+              if (_mainScenario->getRelationFirstBoxId(relID) == boxID
+                  || _mainScenario->getRelationSecondBoxId(relID) == boxID) {
+                  removedRelations.push_back(relID);
+                }
+#endif
+            }
+        }
 
 #ifdef TODO_SCORE
-                if (_mainScenario->getRelationFirstBoxId(relID) == boxID
-                        || _mainScenario->getRelationSecondBoxId(relID) == boxID) {
-					removedRelations.push_back(relID);
-				}
-#endif
-			}
-		}
-
-#ifdef TODO_SCORE
-        _mainScenario->removeBox(boxID);
+      _mainScenario->removeBox(boxID);
 #endif
 
-		BoxesMap::iterator it2 = _boxes.find(boxID);
-		if (it2 != _boxes.end()) {
-			_boxes.erase(it2);
-		}
-		map<unsigned int,ParentBox*>::iterator it3 = _parentBoxes.find(boxID);
-		if (it3 != _parentBoxes.end()) {
-			_parentBoxes.erase(it3);
-		}
-	}
+      BoxesMap::iterator it2 = _boxes.find(boxID);
+      if (it2 != _boxes.end()) {
+          _boxes.erase(it2);
+        }
+      map<unsigned int, ParentBox*>::iterator it3 = _parentBoxes.find(boxID);
+      if (it3 != _parentBoxes.end()) {
+          _parentBoxes.erase(it3);
+        }
+    }
 
-	return removedRelations;
+  return removedRelations;
 }
 
 void
-Maquette::updateRelations() {
-	//   RelationsMap::iterator it;
-	//   for (it = _relations.begin() ; it != _relations.end() ; it++) {
-		//     it->second->setPos(it->second->getCenter());
-		//   }
-}
-
-bool Maquette::updateBox(unsigned int boxID, const Coords &coord) {
-	bool moveAccepted;
-	vector<unsigned int> moved;
-	vector<unsigned int>::iterator it;
-	if (boxID != NO_ID && boxID != ROOT_BOX_ID) {
-		BasicBox *box = _boxes[boxID];
-
-#ifdef TODO_SCORE
-        if (moveAccepted = _mainScenario->performBoxEditing(boxID, coord.topLeftX * MaquetteScene::MS_PER_PIXEL,
-				coord.topLeftX * MaquetteScene::MS_PER_PIXEL +
-                coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
-			box->setRelativeTopLeft(QPoint(coord.topLeftX,coord.topLeftY));
-			box->setSize(QPoint(coord.sizeX,coord.sizeY));
-			box->setPos(box->getCenter());
-			box->update();
-		}
-        else {
-            box->setRelativeTopLeft(QPoint(_mainScenario->getBoxBeginTime(boxID)/MaquetteScene::MS_PER_PIXEL,
-					box->getTopLeft().y()));
-            box->setSize(QPoint((_mainScenario->getBoxEndTime(boxID)/MaquetteScene::MS_PER_PIXEL -
-                    _mainScenario->getBoxBeginTime(boxID)/MaquetteScene::MS_PER_PIXEL),
-					box->getSize().y()));
-			box->setPos(box->getCenter());
-			box->update();
-#ifdef DEBUG
-			std::cerr << "Maquette::updateBox : Move refused by Engines" << std::endl;
-#endif
-		}
-#endif
-
-	}
-
-
-	if (moveAccepted) {
-		for (it = moved.begin() ; it != moved.end() ; it++) {
-#ifdef DEBUG
-			std::cerr << "Maquette::updateBoxes : box moved : " << *it << std::endl;
-#endif
-
-#ifdef TODO_SCORE
-            if ((_boxes[*it]->relativeBeginPos() != _mainScenario->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL ||
-                 (_mainScenario->getBoxEndTime(*it)/MaquetteScene::MS_PER_PIXEL - _mainScenario->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL) != _boxes[*it]->width())&& _mainScenario->getBoxBeginTime(*it)) {
-
-
-                _boxes[*it]->setRelativeTopLeft(QPoint(_mainScenario->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL,
-						_boxes[*it]->getTopLeft().y()));
-                _boxes[*it]->setSize(QPoint((_mainScenario->getBoxEndTime(*it)/MaquetteScene::MS_PER_PIXEL -
-                        _mainScenario->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL),
-						_boxes[*it]->getSize().y()));
-				_boxes[*it]->setPos(_boxes[*it]->getCenter());
-				_boxes[*it]->update();
-			}
-#endif
-		}
-	}
-
-	return moveAccepted;
+Maquette::updateRelations()
+{
+  //   RelationsMap::iterator it;
+  //   for (it = _relations.begin() ; it != _relations.end() ; it++) {
+  //     it->second->setPos(it->second->getCenter());
+  //   }
 }
 
 bool
-Maquette::updateBoxes(const map<unsigned int,Coords> &boxes) {
-
-	bool moveAccepted;
-	vector<unsigned int> moved;
-	map<unsigned int,Coords >::const_iterator it;
-	vector<unsigned int>::iterator it2;
-	for (it = boxes.begin() ; it!= boxes.end() ; it++) {
-		if (it->first != NO_ID && it->first != ROOT_BOX_ID) {
-			BasicBox *curBox = _boxes[it->first];
+Maquette::updateBox(unsigned int boxID, const Coords &coord)
+{
+  bool moveAccepted;
+  vector<unsigned int> moved;
+  vector<unsigned int>::iterator it;
+  if (boxID != NO_ID && boxID != ROOT_BOX_ID) {
+      BasicBox *box = _boxes[boxID];
 
 #ifdef TODO_SCORE
-            if (moveAccepted = _mainScenario->performBoxEditing(it->first, it->second.topLeftX * MaquetteScene::MS_PER_PIXEL,
-					it->second.topLeftX * MaquetteScene::MS_PER_PIXEL +
-					it->second.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
-				curBox->setRelativeTopLeft(QPoint(it->second.topLeftX,it->second.topLeftY));
-				curBox->setSize(QPoint(it->second.sizeX,it->second.sizeY));
-				curBox->setPos(_boxes[it->first]->getCenter());
-				curBox->update();
-			}
-			else {
-                curBox->setRelativeTopLeft(QPoint(_mainScenario->getBoxBeginTime(it->first)/MaquetteScene::MS_PER_PIXEL,
-						curBox->getTopLeft().y()));
-                curBox->setSize(QPoint((_mainScenario->getBoxEndTime(it->first)/MaquetteScene::MS_PER_PIXEL -
-                        _mainScenario->getBoxBeginTime(it->first)/MaquetteScene::MS_PER_PIXEL),
-						curBox->getSize().y()));
-				curBox->setPos(curBox->getCenter());
-				curBox->update();
+      if (moveAccepted = _mainScenario->performBoxEditing(boxID, coord.topLeftX * MaquetteScene::MS_PER_PIXEL,
+                                                          coord.topLeftX * MaquetteScene::MS_PER_PIXEL +
+                                                          coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
+          box->setRelativeTopLeft(QPoint(coord.topLeftX, coord.topLeftY));
+          box->setSize(QPoint(coord.sizeX, coord.sizeY));
+          box->setPos(box->getCenter());
+          box->update();
+        }
+      else {
+          box->setRelativeTopLeft(QPoint(_mainScenario->getBoxBeginTime(boxID) / MaquetteScene::MS_PER_PIXEL,
+                                         box->getTopLeft().y()));
+          box->setSize(QPoint((_mainScenario->getBoxEndTime(boxID) / MaquetteScene::MS_PER_PIXEL -
+                               _mainScenario->getBoxBeginTime(boxID) / MaquetteScene::MS_PER_PIXEL),
+                              box->getSize().y()));
+          box->setPos(box->getCenter());
+          box->update();
 #ifdef DEBUG
-				std::cerr << "Maquette::updateBoxes : Move refused by Engines" << std::endl;
+          std::cerr << "Maquette::updateBox : Move refused by Engines" << std::endl;
 #endif
-			}
+        }
 #endif
+    }
 
-		}
-	}
 
-	if (moveAccepted) {
-		for (it2 = moved.begin() ; it2 != moved.end() ; it2++) {
+  if (moveAccepted) {
+      for (it = moved.begin(); it != moved.end(); it++) {
 #ifdef DEBUG
-			std::cerr << "Maquette::updateBoxes : box moved : " << *it2 << std::endl;
+          std::cerr << "Maquette::updateBoxes : box moved : " << *it << std::endl;
 #endif
 
 #ifdef TODO_SCORE
-            if (_boxes[*it2]->relativeBeginPos() != _mainScenario->getBoxBeginTime(*it2)/MaquetteScene::MS_PER_PIXEL ||
-                    (_mainScenario->getBoxEndTime(*it2)/MaquetteScene::MS_PER_PIXEL - _mainScenario->getBoxBeginTime(*it2)/MaquetteScene::MS_PER_PIXEL) != _boxes[*it2]->width()) {
-                _boxes[*it2]->setRelativeTopLeft(QPoint(_mainScenario->getBoxBeginTime(*it2)/MaquetteScene::MS_PER_PIXEL,
-						_boxes[*it2]->getTopLeft().y()));
-                _boxes[*it2]->setSize(QPoint((_mainScenario->getBoxEndTime(*it2)/MaquetteScene::MS_PER_PIXEL -
-                        _mainScenario->getBoxBeginTime(*it2)/MaquetteScene::MS_PER_PIXEL),
-						_boxes[*it2]->getSize().y()));
-				_boxes[*it2]->setPos(_boxes[*it2]->getCenter());
-				_boxes[*it2]->update();
-			}
+          if ((_boxes[*it]->relativeBeginPos() != _mainScenario->getBoxBeginTime(*it) / MaquetteScene::MS_PER_PIXEL ||
+               (_mainScenario->getBoxEndTime(*it) / MaquetteScene::MS_PER_PIXEL - _mainScenario->getBoxBeginTime(*it) / MaquetteScene::MS_PER_PIXEL) != _boxes[*it]->width()) && _mainScenario->getBoxBeginTime(*it)) {
+              _boxes[*it]->setRelativeTopLeft(QPoint(_mainScenario->getBoxBeginTime(*it) / MaquetteScene::MS_PER_PIXEL,
+                                                     _boxes[*it]->getTopLeft().y()));
+              _boxes[*it]->setSize(QPoint((_mainScenario->getBoxEndTime(*it) / MaquetteScene::MS_PER_PIXEL -
+                                           _mainScenario->getBoxBeginTime(*it) / MaquetteScene::MS_PER_PIXEL),
+                                          _boxes[*it]->getSize().y()));
+              _boxes[*it]->setPos(_boxes[*it]->getCenter());
+              _boxes[*it]->update();
+            }
+#endif
+        }
+    }
+
+  return moveAccepted;
+}
+
+bool
+Maquette::updateBoxes(const map<unsigned int, Coords> &boxes)
+{
+  bool moveAccepted;
+  vector<unsigned int> moved;
+  map<unsigned int, Coords >::const_iterator it;
+  vector<unsigned int>::iterator it2;
+  for (it = boxes.begin(); it != boxes.end(); it++) {
+      if (it->first != NO_ID && it->first != ROOT_BOX_ID) {
+          BasicBox *curBox = _boxes[it->first];
+
+#ifdef TODO_SCORE
+          if (moveAccepted = _mainScenario->performBoxEditing(it->first, it->second.topLeftX * MaquetteScene::MS_PER_PIXEL,
+                                                              it->second.topLeftX * MaquetteScene::MS_PER_PIXEL +
+                                                              it->second.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
+              curBox->setRelativeTopLeft(QPoint(it->second.topLeftX, it->second.topLeftY));
+              curBox->setSize(QPoint(it->second.sizeX, it->second.sizeY));
+              curBox->setPos(_boxes[it->first]->getCenter());
+              curBox->update();
+            }
+          else {
+              curBox->setRelativeTopLeft(QPoint(_mainScenario->getBoxBeginTime(it->first) / MaquetteScene::MS_PER_PIXEL,
+                                                curBox->getTopLeft().y()));
+              curBox->setSize(QPoint((_mainScenario->getBoxEndTime(it->first) / MaquetteScene::MS_PER_PIXEL -
+                                      _mainScenario->getBoxBeginTime(it->first) / MaquetteScene::MS_PER_PIXEL),
+                                     curBox->getSize().y()));
+              curBox->setPos(curBox->getCenter());
+              curBox->update();
+#ifdef DEBUG
+              std::cerr << "Maquette::updateBoxes : Move refused by Engines" << std::endl;
+#endif
+            }
+#endif
+        }
+    }
+
+  if (moveAccepted) {
+      for (it2 = moved.begin(); it2 != moved.end(); it2++) {
+#ifdef DEBUG
+          std::cerr << "Maquette::updateBoxes : box moved : " << *it2 << std::endl;
 #endif
 
-		}
-	}
-    return moveAccepted;
+#ifdef TODO_SCORE
+          if (_boxes[*it2]->relativeBeginPos() != _mainScenario->getBoxBeginTime(*it2) / MaquetteScene::MS_PER_PIXEL ||
+              (_mainScenario->getBoxEndTime(*it2) / MaquetteScene::MS_PER_PIXEL - _mainScenario->getBoxBeginTime(*it2) / MaquetteScene::MS_PER_PIXEL) != _boxes[*it2]->width()) {
+              _boxes[*it2]->setRelativeTopLeft(QPoint(_mainScenario->getBoxBeginTime(*it2) / MaquetteScene::MS_PER_PIXEL,
+                                                      _boxes[*it2]->getTopLeft().y()));
+              _boxes[*it2]->setSize(QPoint((_mainScenario->getBoxEndTime(*it2) / MaquetteScene::MS_PER_PIXEL -
+                                            _mainScenario->getBoxBeginTime(*it2) / MaquetteScene::MS_PER_PIXEL),
+                                           _boxes[*it2]->getSize().y()));
+              _boxes[*it2]->setPos(_boxes[*it2]->getCenter());
+              _boxes[*it2]->update();
+            }
+#endif
+        }
+    }
+  return moveAccepted;
 }
 
 void
 Maquette::simulateTriggeringMessage(const string &message)
 {
 #ifdef TODO_MODULAR
-    _mainScenario->simulateNetworkMessageReception(message);
+  _mainScenario->simulateNetworkMessageReception(message);
 #endif
 }
 
 int
-Maquette::addTriggerPoint(const AbstractTriggerPoint &abstract) {
-	if (abstract.ID() == NO_ID) {
-		return addTriggerPoint(abstract.boxID(),abstract.boxExtremity(),abstract.message());
-	}
-	else {
-		TriggerPoint* newTP = new TriggerPoint(abstract.boxID(),abstract.boxExtremity(),abstract.message(),abstract.ID(),_scene);
-		newTP->setID(abstract.ID());
-		_scene->addItem(newTP);
-
-		_triggerPoints[abstract.ID()] = newTP;
-        _boxes[abstract.boxID()]->addTriggerPoint(abstract.boxExtremity(),newTP);
-		return (int)abstract.ID();
+Maquette::addTriggerPoint(const AbstractTriggerPoint &abstract)
+{
+  if (abstract.ID() == NO_ID) {
+      return addTriggerPoint(abstract.boxID(), abstract.boxExtremity(), abstract.message());
     }
-	return RETURN_ERROR;
+  else {
+      TriggerPoint* newTP = new TriggerPoint(abstract.boxID(), abstract.boxExtremity(), abstract.message(), abstract.ID(), _scene);
+      newTP->setID(abstract.ID());
+      _scene->addItem(newTP);
+
+      _triggerPoints[abstract.ID()] = newTP;
+      _boxes[abstract.boxID()]->addTriggerPoint(abstract.boxExtremity(), newTP);
+      return (int)abstract.ID();
+    }
+  return RETURN_ERROR;
 }
 
 int
-Maquette::addTriggerPoint(unsigned int boxID, BoxExtremity extremity, const string &message) {
-	if (boxID == NO_ID) {
-		return ARGS_ERROR;
-	}
+Maquette::addTriggerPoint(unsigned int boxID, BoxExtremity extremity, const string &message)
+{
+  if (boxID == NO_ID) {
+      return ARGS_ERROR;
+    }
 
 #ifdef TODO_SCORE
-    unsigned int triggerID = _mainScenario->addTriggerPoint(_boxes[boxID]->mother());
+  unsigned int triggerID = _mainScenario->addTriggerPoint(_boxes[boxID]->mother());
 #else
-    unsigned int triggerID = NO_ID;
+  unsigned int triggerID = NO_ID;
 #endif
 
-	unsigned int controlPointID = NO_ID;
-	if (extremity == BOX_START) {
-		controlPointID = BEGIN_CONTROL_POINT_INDEX;
-	}
-	else if (extremity == BOX_END) {
-		controlPointID = END_CONTROL_POINT_INDEX;
-	}
-	if (controlPointID == NO_ID) {
-		return RETURN_ERROR;
-	}
+  unsigned int controlPointID = NO_ID;
+  if (extremity == BOX_START) {
+      controlPointID = BEGIN_CONTROL_POINT_INDEX;
+    }
+  else if (extremity == BOX_END) {
+      controlPointID = END_CONTROL_POINT_INDEX;
+    }
+  if (controlPointID == NO_ID) {
+      return RETURN_ERROR;
+    }
 
 #ifdef TODO_SCORE
-    if (!_mainScenario->assignCtrlPointToTriggerPoint(triggerID,boxID,controlPointID)) {
-		_scene->displayMessage(tr("Trigger point already linked to a control point.").toStdString(),INDICATION_LEVEL);
-		return NO_MODIFICATION;
-	}
-	else {
-		_scene->displayMessage(tr("Trigger point succesfully added").toStdString(),INDICATION_LEVEL);
-        _mainScenario->setTriggerPointMessage(triggerID,message);
-		TriggerPoint * newTP = new TriggerPoint(boxID,extremity,message,triggerID,_scene);
-		_scene->addItem(newTP);
-        _triggerPoints[triggerID] = newTP;
-		_boxes[boxID]->addTriggerPoint(extremity,_triggerPoints[triggerID]);
+  if (!_mainScenario->assignCtrlPointToTriggerPoint(triggerID, boxID, controlPointID)) {
+      _scene->displayMessage(tr("Trigger point already linked to a control point.").toStdString(), INDICATION_LEVEL);
+      return NO_MODIFICATION;
+    }
+  else {
+      _scene->displayMessage(tr("Trigger point succesfully added").toStdString(), INDICATION_LEVEL);
+      _mainScenario->setTriggerPointMessage(triggerID, message);
+      TriggerPoint * newTP = new TriggerPoint(boxID, extremity, message, triggerID, _scene);
+      _scene->addItem(newTP);
+      _triggerPoints[triggerID] = newTP;
+      _boxes[boxID]->addTriggerPoint(extremity, _triggerPoints[triggerID]);
 
-		return triggerID;
+      return triggerID;
     }
 #endif
 
-	return RETURN_ERROR;
+  return RETURN_ERROR;
 }
 
 void
 Maquette::removeTriggerPoint(unsigned int ID)
 {
-	TrgPntMap::iterator it;
-	if ((it = _triggerPoints.find(ID)) != _triggerPoints.end()) {
-
+  TrgPntMap::iterator it;
+  if ((it = _triggerPoints.find(ID)) != _triggerPoints.end()) {
 #ifdef TODO_SCORE
-        _mainScenario->removeTriggerPoint(ID);
+      _mainScenario->removeTriggerPoint(ID);
 #endif
-		delete it->second;
-		_triggerPoints.erase(it);
-
-	}
+      delete it->second;
+      _triggerPoints.erase(it);
+    }
 }
 
 TriggerPoint *
 Maquette::getTriggerPoint(unsigned int ID)
 {
-	TrgPntMap::iterator it;
-	if ((it = _triggerPoints.find(ID)) != _triggerPoints.end()) {
-		return it->second;
-	}
-	return NULL;
+  TrgPntMap::iterator it;
+  if ((it = _triggerPoints.find(ID)) != _triggerPoints.end()) {
+      return it->second;
+    }
+  return NULL;
 }
 
 bool
-Maquette::setTriggerPointMessage(unsigned int trgID, const string &message) {
-	bool ret = false;
-	TrgPntMap::iterator it;
-	if ((it = _triggerPoints.find(trgID)) != _triggerPoints.end()) {
-
+Maquette::setTriggerPointMessage(unsigned int trgID, const string &message)
+{
+  bool ret = false;
+  TrgPntMap::iterator it;
+  if ((it = _triggerPoints.find(trgID)) != _triggerPoints.end()) {
 #ifdef TODO_MODULAR
-        _mainScenario->setTriggerPointMessage(trgID,message);
+      _mainScenario->setTriggerPointMessage(trgID, message);
 #endif
-		ret = true;
-	}
-	return ret;
+      ret = true;
+    }
+  return ret;
 }
 
-void Maquette::addCurve(unsigned int boxID, const string &address)
+void
+Maquette::addCurve(unsigned int boxID, const string &address)
 {
 #ifdef TODO_MODULAR
-    _mainScenario->addCurve(boxID,address);
-#endif
-}
-
-void Maquette::removeCurve(unsigned int boxID, const string &address)
-{
-#ifdef TODO_MODULAR
-    _mainScenario->removeCurve(boxID,address);
+  _mainScenario->addCurve(boxID, address);
 #endif
 }
 
-void Maquette::clearCurves(unsigned int boxID)
+void
+Maquette::removeCurve(unsigned int boxID, const string &address)
 {
 #ifdef TODO_MODULAR
-    _mainScenario->clearCurves(boxID);
+  _mainScenario->removeCurve(boxID, address);
+#endif
+}
+
+void
+Maquette::clearCurves(unsigned int boxID)
+{
+#ifdef TODO_MODULAR
+  _mainScenario->clearCurves(boxID);
 #endif
 }
 
 vector<string> Maquette::getCurvesAddresses(unsigned int boxID)
 {
 #ifdef TODO_MODULAR
-    return _mainScenario->getCurvesAddress(boxID);
+  return _mainScenario->getCurvesAddress(boxID);
+
 #else
-    vector<string> nothing;
-    return nothing;
+  vector<string> nothing;
+  return nothing;
 #endif
 }
 
-void Maquette::setCurveRedundancy(unsigned int boxID, const string &address, bool redundancy) {
-
+void
+Maquette::setCurveRedundancy(unsigned int boxID, const string &address, bool redundancy)
+{
 #ifdef TODO_MODULAR
-    _mainScenario->setCurveRedundancy(boxID,address,redundancy);
+  _mainScenario->setCurveRedundancy(boxID, address, redundancy);
 #endif
-
 }
 
 bool
-Maquette::getCurveRedundancy(unsigned int boxID, const std::string &address){
-
+Maquette::getCurveRedundancy(unsigned int boxID, const std::string &address)
+{
 #ifdef TODO_MODULAR
-    return _mainScenario->getCurveRedundancy(boxID,address);
+  return _mainScenario->getCurveRedundancy(boxID, address);
 #endif
-
 }
 
-void Maquette::setCurveSampleRate(unsigned int boxID, const string &address, int sampleRate) {
-
+void
+Maquette::setCurveSampleRate(unsigned int boxID, const string &address, int sampleRate)
+{
 #ifdef TODO_MODULAR
-    _mainScenario->setCurveSampleRate(boxID,address,sampleRate);
+  _mainScenario->setCurveSampleRate(boxID, address, sampleRate);
 #endif
-
 }
 
 unsigned int
-Maquette::getCurveSampleRate(unsigned int boxID, const std::string &address){
-
-#ifdef TODO_MODULAR
-    return _mainScenario->getCurveSampleRate(boxID,address);
-#endif
-
-}
-
-void Maquette::setCurveMuteState(unsigned int boxID, const string &address, bool muteState) {
-
-#ifdef TODO_MODULAR
-    _mainScenario->setCurveMuteState(boxID,address,muteState);
-#endif
-
-}
-
-bool Maquette::getCurveMuteState(unsigned int boxID, const string &address) {
-
-#ifdef TODO_MODULAR
-    return _mainScenario->getCurveMuteState(boxID,address);
-#else
-    return NO;
-#endif
-
-}
-
-bool Maquette::setCurveSections(unsigned int boxID, const string &address, unsigned int argPosition,
-			const vector<float> &xPercents, const vector<float> &yValues, const vector<short> &sectionType, const vector<float> &coeff)
+Maquette::getCurveSampleRate(unsigned int boxID, const std::string &address)
 {
 #ifdef TODO_MODULAR
-    return _mainScenario->setCurveSections(boxID,address,argPosition,xPercents,yValues,sectionType,coeff);
+  return _mainScenario->getCurveSampleRate(boxID, address);
 #endif
 }
 
-bool Maquette::getCurveAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition,
-	unsigned int &sampleRate, bool &redundancy, bool &interpolate, vector<float>& values, vector<string> &argTypes,
-	vector<float> &xPercents, vector<float> &yValues, vector<short> &sectionType, vector<float> &coeff) {
-
+void
+Maquette::setCurveMuteState(unsigned int boxID, const string &address, bool muteState)
+{
 #ifdef TODO_MODULAR
-    if (_mainScenario->getCurveValues(boxID,address,argPosition,values)) {
-        if (_mainScenario->getCurveSections(boxID,address,argPosition,xPercents,yValues,sectionType,coeff)) {
-            sampleRate = _mainScenario->getCurveSampleRate(boxID,address);
-            redundancy = _mainScenario->getCurveRedundancy(boxID,address);
-            interpolate = !_mainScenario->getCurveMuteState(boxID,address);
-            _mainScenario->getCurveArgTypes(address,argTypes);
-			return true;
-		}
-	}
+  _mainScenario->setCurveMuteState(boxID, address, muteState);
+#endif
+}
+
+bool
+Maquette::getCurveMuteState(unsigned int boxID, const string &address)
+{
+#ifdef TODO_MODULAR
+  return _mainScenario->getCurveMuteState(boxID, address);
+
+#else
+  return NO;
+#endif
+}
+
+bool
+Maquette::setCurveSections(unsigned int boxID, const string &address, unsigned int argPosition,
+                           const vector<float> &xPercents, const vector<float> &yValues, const vector<short> &sectionType, const vector<float> &coeff)
+{
+#ifdef TODO_MODULAR
+  return _mainScenario->setCurveSections(boxID, address, argPosition, xPercents, yValues, sectionType, coeff);
+#endif
+}
+
+bool
+Maquette::getCurveAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition,
+                             unsigned int &sampleRate, bool &redundancy, bool &interpolate, vector<float>& values, vector<string> &argTypes,
+                             vector<float> &xPercents, vector<float> &yValues, vector<short> &sectionType, vector<float> &coeff)
+{
+#ifdef TODO_MODULAR
+  if (_mainScenario->getCurveValues(boxID, address, argPosition, values)) {
+      if (_mainScenario->getCurveSections(boxID, address, argPosition, xPercents, yValues, sectionType, coeff)) {
+          sampleRate = _mainScenario->getCurveSampleRate(boxID, address);
+          redundancy = _mainScenario->getCurveRedundancy(boxID, address);
+          interpolate = !_mainScenario->getCurveMuteState(boxID, address);
+          _mainScenario->getCurveArgTypes(address, argTypes);
+          return true;
+        }
+    }
 #endif
 
-	return false;
+  return false;
 }
 
 void
 Maquette::updateBoxesFromEngines(const vector<unsigned int> &movedBoxes)
 {
-	vector<unsigned int>::const_iterator it;
-	if (!movedBoxes.empty()) {
-        for (it = movedBoxes.begin() ; it != movedBoxes.end() ; it++) {
-
+  vector<unsigned int>::const_iterator it;
+  if (!movedBoxes.empty()) {
+      for (it = movedBoxes.begin(); it != movedBoxes.end(); it++) {
 #ifdef TODO_SCORE
-            if ((_boxes[*it]->relativeBeginPos() != _mainScenario->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL ||
-                    (_mainScenario->getBoxEndTime(*it)/MaquetteScene::MS_PER_PIXEL - _mainScenario->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL) != _boxes[*it]->width())) {
-                _boxes[*it]->setRelativeTopLeft(QPoint(_mainScenario->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL,
-						_boxes[*it]->getTopLeft().y()));
-                _boxes[*it]->setSize(QPoint((_mainScenario->getBoxEndTime(*it)/MaquetteScene::MS_PER_PIXEL -
-                        _mainScenario->getBoxBeginTime(*it)/MaquetteScene::MS_PER_PIXEL),
-						_boxes[*it]->getSize().y()));
-				_boxes[*it]->setPos(_boxes[*it]->getCenter());
-				_boxes[*it]->update();
-			}
+          if ((_boxes[*it]->relativeBeginPos() != _mainScenario->getBoxBeginTime(*it) / MaquetteScene::MS_PER_PIXEL ||
+               (_mainScenario->getBoxEndTime(*it) / MaquetteScene::MS_PER_PIXEL - _mainScenario->getBoxBeginTime(*it) / MaquetteScene::MS_PER_PIXEL) != _boxes[*it]->width())) {
+              _boxes[*it]->setRelativeTopLeft(QPoint(_mainScenario->getBoxBeginTime(*it) / MaquetteScene::MS_PER_PIXEL,
+                                                     _boxes[*it]->getTopLeft().y()));
+              _boxes[*it]->setSize(QPoint((_mainScenario->getBoxEndTime(*it) / MaquetteScene::MS_PER_PIXEL -
+                                           _mainScenario->getBoxBeginTime(*it) / MaquetteScene::MS_PER_PIXEL),
+                                          _boxes[*it]->getSize().y()));
+              _boxes[*it]->setPos(_boxes[*it]->getCenter());
+              _boxes[*it]->update();
+            }
 #endif
-
-		}
-	}
+        }
+    }
 }
 
 void
 Maquette::updateBoxesFromEngines()
 {
-	BoxesMap::iterator it;
-	for (it = _boxes.begin() ; it != _boxes.end() ; ++it) {
-
+  BoxesMap::iterator it;
+  for (it = _boxes.begin(); it != _boxes.end(); ++it) {
 #ifdef TODO_SCORE
-        it->second->setRelativeTopLeft(QPoint(_mainScenario->getBoxBeginTime(it->first)/MaquetteScene::MS_PER_PIXEL,
-				it->second->getTopLeft().y()));
-        it->second->setSize(QPoint((_mainScenario->getBoxEndTime(it->first)/MaquetteScene::MS_PER_PIXEL -
-                _mainScenario->getBoxBeginTime(it->first)/MaquetteScene::MS_PER_PIXEL),
-				it->second->getSize().y()));
-		it->second->setPos(it->second->getCenter());
-        it->second->centerWidget();
-        it->second->update();
+      it->second->setRelativeTopLeft(QPoint(_mainScenario->getBoxBeginTime(it->first) / MaquetteScene::MS_PER_PIXEL,
+                                            it->second->getTopLeft().y()));
+      it->second->setSize(QPoint((_mainScenario->getBoxEndTime(it->first) / MaquetteScene::MS_PER_PIXEL -
+                                  _mainScenario->getBoxBeginTime(it->first) / MaquetteScene::MS_PER_PIXEL),
+                                 it->second->getSize().y()));
+      it->second->setPos(it->second->getCenter());
+      it->second->centerWidget();
+      it->second->update();
 #endif
-	}
+    }
 }
 
 
 int
 Maquette::addRelation(unsigned int ID1, BoxExtremity firstExtremum, unsigned int ID2,
-		BoxExtremity secondExtremum, int antPostType) {
+                      BoxExtremity secondExtremum, int antPostType)
+{
+  if (ID1 == NO_ID || ID2 == NO_ID) {
+      return ARGS_ERROR;
+    }
+  vector<unsigned int> movedBoxes;
+  unsigned int controlPointID1 = NO_ID;
+  unsigned int controlPointID2 = NO_ID;
+  if (firstExtremum == BOX_START) {
+      controlPointID1 = BEGIN_CONTROL_POINT_INDEX;
+    }
+  else if (firstExtremum == BOX_END) {
+      controlPointID1 = END_CONTROL_POINT_INDEX;
+    }
+  if (secondExtremum == BOX_START) {
+      controlPointID2 = BEGIN_CONTROL_POINT_INDEX;
+    }
+  else if (secondExtremum == BOX_END) {
+      controlPointID2 = END_CONTROL_POINT_INDEX;
+    }
 
-	if (ID1 == NO_ID || ID2 == NO_ID) {
-		return ARGS_ERROR;
-	}
-	vector<unsigned int> movedBoxes;
-	unsigned int controlPointID1 = NO_ID;
-	unsigned int controlPointID2 = NO_ID;
-	if (firstExtremum == BOX_START) {
-		controlPointID1 = BEGIN_CONTROL_POINT_INDEX;
-	}
-	else if (firstExtremum == BOX_END) {
-		controlPointID1 = END_CONTROL_POINT_INDEX;
-	}
-	if (secondExtremum == BOX_START) {
-		controlPointID2 = BEGIN_CONTROL_POINT_INDEX;
-	}
-	else if (secondExtremum == BOX_END) {
-		controlPointID2 = END_CONTROL_POINT_INDEX;
-	}
-
-	unsigned int relationID = NO_ID;
+  unsigned int relationID = NO_ID;
 
 #ifdef TODO_SCORE
-    if (_mainScenario->isTemporalRelationExisting(ID1,controlPointID1,ID2,controlPointID2)) {
-		return NO_MODIFICATION;
-	}
+  if (_mainScenario->isTemporalRelationExisting(ID1, controlPointID1, ID2, controlPointID2)) {
+      return NO_MODIFICATION;
+    }
 
-    relationID = _mainScenario->addTemporalRelation(ID1,controlPointID1,ID2,controlPointID2,
-			TemporalRelationType(antPostType),movedBoxes);
+  relationID = _mainScenario->addTemporalRelation(ID1, controlPointID1, ID2, controlPointID2,
+                                                  TemporalRelationType(antPostType), movedBoxes);
 
-    if (!_mainScenario->isTemporalRelationExisting(ID1,controlPointID1,ID2,controlPointID2)) {
-		return RETURN_ERROR;
-	}
+  if (!_mainScenario->isTemporalRelationExisting(ID1, controlPointID1, ID2, controlPointID2)) {
+      return RETURN_ERROR;
+    }
 #endif
 
-	if (relationID != NO_ID) {
-		Relation* newRel = new Relation(ID1,firstExtremum,ID2,secondExtremum,_scene);
-		_relations[relationID] = newRel;
+  if (relationID != NO_ID) {
+      Relation* newRel = new Relation(ID1, firstExtremum, ID2, secondExtremum, _scene);
+      _relations[relationID] = newRel;
 
-		_boxes[ID1]->addRelation(firstExtremum,newRel);
-        _boxes[ID2]->addRelation(secondExtremum,newRel);
-		_scene->addItem(newRel);
-		updateBoxesFromEngines(movedBoxes);
+      _boxes[ID1]->addRelation(firstExtremum, newRel);
+      _boxes[ID2]->addRelation(secondExtremum, newRel);
+      _scene->addItem(newRel);
+      updateBoxesFromEngines(movedBoxes);
 
-        //TODO : Check if can be comment
+      //TODO : Check if can be comment
 //        _scene->boxesMoved(movedBoxes);
 
-		return (int)relationID;
-	}
+      return (int)relationID;
+    }
 
-	return RETURN_ERROR;
+  return RETURN_ERROR;
 }
 
 int
-Maquette::addRelation(const AbstractRelation &abstract) {
-    if (abstract.ID() == NO_ID) {
-		return addRelation(abstract.firstBox(),abstract.firstExtremity(),abstract.secondBox(),abstract.secondExtremity(),ANTPOST_ANTERIORITY);
-	}
-	else {
-        Relation* newRel = new Relation(abstract.firstBox(),abstract.firstExtremity(),abstract.secondBox(),abstract.secondExtremity(),_scene);
-		newRel->setID(abstract.ID());
-        newRel->changeBounds(abstract.minBound(),abstract.maxBound());
+Maquette::addRelation(const AbstractRelation &abstract)
+{
+  if (abstract.ID() == NO_ID) {
+      return addRelation(abstract.firstBox(), abstract.firstExtremity(), abstract.secondBox(), abstract.secondExtremity(), ANTPOST_ANTERIORITY);
+    }
+  else {
+      Relation* newRel = new Relation(abstract.firstBox(), abstract.firstExtremity(), abstract.secondBox(), abstract.secondExtremity(), _scene);
+      newRel->setID(abstract.ID());
+      newRel->changeBounds(abstract.minBound(), abstract.maxBound());
 
-		_relations[abstract.ID()] = newRel;
-		_scene->addItem(newRel);
-		_boxes[abstract.firstBox()]->addRelation(abstract.firstExtremity(),newRel);
-        _boxes[abstract.secondBox()]->addRelation(abstract.secondExtremity(),newRel);        
-		newRel->updateCoordinates();        
-		return (int)abstract.ID();
-	}
+      _relations[abstract.ID()] = newRel;
+      _scene->addItem(newRel);
+      _boxes[abstract.firstBox()]->addRelation(abstract.firstExtremity(), newRel);
+      _boxes[abstract.secondBox()]->addRelation(abstract.secondExtremity(), newRel);
+      newRel->updateCoordinates();
+      return (int)abstract.ID();
+    }
 }
 
 bool
 Maquette::addInterval(unsigned int /*ID1*/, unsigned int /*ID2*/, int /*value*/, int /*tolerance*/)
 {
-	return false;
+  return false;
 }
 
 void
 Maquette::removeRelation(unsigned int relationID)
 {
-	RelationsMap::iterator it;
-	if ((it = _relations.find(relationID)) != _relations.end()) {
-
+  RelationsMap::iterator it;
+  if ((it = _relations.find(relationID)) != _relations.end()) {
 #ifdef TODO_SCORE
-        _mainScenario->removeTemporalRelation(relationID);
+      _mainScenario->removeTemporalRelation(relationID);
 #endif
 
-		_relations.erase(it);
-	}
+      _relations.erase(it);
+    }
 }
 
 bool
-Maquette::areRelated(unsigned int ID1, unsigned int  ID2)
+Maquette::areRelated(unsigned int ID1, unsigned int ID2)
 {
-	RelationsMap::iterator rel;
-	unsigned int relID1 = NO_ID;
-	unsigned int relID2 = NO_ID;
-	for (rel = _relations.begin() ; rel != _relations.end() ; rel++) {
-
+  RelationsMap::iterator rel;
+  unsigned int relID1 = NO_ID;
+  unsigned int relID2 = NO_ID;
+  for (rel = _relations.begin(); rel != _relations.end(); rel++) {
 #ifdef TODO_SCORE
-        relID1 = _mainScenario->getRelationFirstBoxId(rel->first);
-        relID2 = _mainScenario->getRelationSecondBoxId(rel->first);
+      relID1 = _mainScenario->getRelationFirstBoxId(rel->first);
+      relID2 = _mainScenario->getRelationSecondBoxId(rel->first);
 #endif
 
-		if ((relID1 == ID1 && relID2 == ID2) || (relID1 == ID2 && relID2 == ID1)) {
-			return true;
-		}
-	}
-	return false;
+      if ((relID1 == ID1 && relID2 == ID2) || (relID1 == ID2 && relID2 == ID1)) {
+          return true;
+        }
+    }
+  return false;
 }
 
 void
 Maquette::changeRelationBounds(unsigned int relID, const float &minBound, const float &maxBound)
 {
-	vector<unsigned int> movedBoxes;
-	int minBoundMS = NO_BOUND;
-	if (minBound != NO_BOUND) {
-        minBoundMS = minBound * (MaquetteScene::MS_PER_PIXEL*_scene->zoom());
-	}
-	int maxBoundMS = NO_BOUND;
-	if (maxBound != NO_BOUND) {
-        maxBoundMS = maxBound * (MaquetteScene::MS_PER_PIXEL*_scene->zoom());
-	}
+  vector<unsigned int> movedBoxes;
+  int minBoundMS = NO_BOUND;
+  if (minBound != NO_BOUND) {
+      minBoundMS = minBound * (MaquetteScene::MS_PER_PIXEL * _scene->zoom());
+    }
+  int maxBoundMS = NO_BOUND;
+  if (maxBound != NO_BOUND) {
+      maxBoundMS = maxBound * (MaquetteScene::MS_PER_PIXEL * _scene->zoom());
+    }
 #ifdef TODO_SCORE
-    _mainScenario->changeTemporalRelationBounds(relID,minBoundMS,maxBoundMS,movedBoxes);
+  _mainScenario->changeTemporalRelationBounds(relID, minBoundMS, maxBoundMS, movedBoxes);
 #endif
-    updateBoxesFromEngines(movedBoxes);
+  updateBoxesFromEngines(movedBoxes);
 }
 
 int
 Maquette::duration()
 {
-	int duration = 0;
+  int duration = 0;
 
-	for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
-		if ((it->second->beginPos() + it->second->width()) * MaquetteScene::MS_PER_PIXEL > duration ) {
-			duration = (it->second->beginPos() + it->second->width()) * MaquetteScene::MS_PER_PIXEL;
-		}
-	}
+  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
+      if ((it->second->beginPos() + it->second->width()) * MaquetteScene::MS_PER_PIXEL > duration) {
+          duration = (it->second->beginPos() + it->second->width()) * MaquetteScene::MS_PER_PIXEL;
+        }
+    }
 
-	return duration;
+  return duration;
 }
 
 unsigned int
-Maquette::getCurrentTime() const {
-
+Maquette::getCurrentTime() const
+{
 #ifdef TODO_SCORE
-    return _mainScenario->getCurrentExecutionTime();
-#else
-    return 0;
-#endif
+  return _mainScenario->getCurrentExecutionTime();
 
+#else
+  return 0;
+#endif
 }
 
 float
 Maquette::getProgression(unsigned int boxID)
 {
 #ifdef TODO_SCORE
-    return (float)_mainScenario->getProcessProgression(boxID);
-#else
-    return 0.;
-#endif
+  return (float)_mainScenario->getProcessProgression(boxID);
 
+#else
+  return 0.;
+#endif
 }
 
 void
-Maquette::setGotoValue(int gotoValue) {
-    _scene->view()->setGotoValue(gotoValue);
+Maquette::setGotoValue(int gotoValue)
+{
+  _scene->view()->setGotoValue(gotoValue);
 
 #ifdef TODO_SCORE
-    _mainScenario->setGotoValue(gotoValue);
+  _mainScenario->setGotoValue(gotoValue);
 #endif
-
 }
 
 void
-Maquette::generateTriggerQueue(){
-    _scene->triggersQueueList().clear();
-    TrgPntMap::iterator it1;
-    for(it1=_triggerPoints.begin() ; it1!=_triggerPoints.end() ; ++it1){
-        _scene->addToTriggerQueue(it1->second);
+Maquette::generateTriggerQueue()
+{
+  _scene->triggersQueueList().clear();
+  TrgPntMap::iterator it1;
+  for (it1 = _triggerPoints.begin(); it1 != _triggerPoints.end(); ++it1) {
+      _scene->addToTriggerQueue(it1->second);
     }
 }
 
 void
-Maquette::initSceneState(){
-    //Pour palier au bug du moteur (qui envoyait tous les messages début et fin de toutes les boîtes < Goto)
+Maquette::initSceneState()
+{
+  //Pour palier au bug du moteur (qui envoyait tous les messages début et fin de toutes les boîtes < Goto)
 
 #ifdef TODO_SCORE
-    double gotoValue = (double)_mainScenario->getGotoValue();
+  double gotoValue = (double)_mainScenario->getGotoValue();
 #else
-    double gotoValue = 0.;
+  double gotoValue = 0.;
 #endif
 
-    unsigned int boxID;
-    QMap<QString,QPair<QString,unsigned int> > msgs, boxMsgs;
-    QList<QString> boxAddresses;
-    BasicBox *currentBox;
-    std::vector<string> curvesList;
+  unsigned int boxID;
+  QMap<QString, QPair<QString, unsigned int> > msgs, boxMsgs;
+  QList<QString> boxAddresses;
+  BasicBox *currentBox;
+  std::vector<string> curvesList;
 
-    //Pour toutes les boîtes avant le goto, on récupère leur état final (on simule leur exécution)
-    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
-        boxID = it->first;
-        currentBox = (*it).second;
+  //Pour toutes les boîtes avant le goto, on récupère leur état final (on simule leur exécution)
+  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
+      boxID = it->first;
+      currentBox = (*it).second;
 
-        //réinit : On démute toutes les boîtes, elles ont potentiellement pu être mutées à la fin de l'algo
+      //réinit : On démute toutes les boîtes, elles ont potentiellement pu être mutées à la fin de l'algo
 #ifdef TODO_SCORE
-        _mainScenario->setCtrlPointMutingState(boxID,1,false);
-        _mainScenario->setCtrlPointMutingState(boxID,2,false);
+      _mainScenario->setCtrlPointMutingState(boxID, 1, false);
+      _mainScenario->setCtrlPointMutingState(boxID, 2, false);
 #endif
 
-        if(currentBox->date() < gotoValue && (currentBox->date()+currentBox->duration()) <= gotoValue ){
-            boxMsgs = currentBox->getFinalState();
-
+      if (currentBox->date() < gotoValue && (currentBox->date() + currentBox->duration()) <= gotoValue) {
+          boxMsgs = currentBox->getFinalState();
         }
-        else if(gotoValue > currentBox->date() && gotoValue < (currentBox->date()+currentBox->duration())){
-            //goto au milieu d'une boîte : On envoie la valeur du début de boîte            
-            boxMsgs = currentBox->getStartState();
+      else if (gotoValue > currentBox->date() && gotoValue < (currentBox->date() + currentBox->duration())) {
+          //goto au milieu d'une boîte : On envoie la valeur du début de boîte
+          boxMsgs = currentBox->getStartState();
 
 #ifdef TODO_MODULAR
-            curvesList = _mainScenario->getCurvesAddress(boxID);
+          curvesList = _mainScenario->getCurvesAddress(boxID);
 #endif
 
-            //On supprime les messages si ils sont déjà associés à une courbe (le moteur les envoie automatiquement)
-            for (unsigned int i=0 ; i<curvesList.size() ; i++){
-                //sauf si la courbe a été désactivée manuellement
-                if(!getCurveMuteState(boxID,curvesList[i])){
-                    msgs.remove(QString::fromStdString(curvesList[i]));
-                }
-            }            
-        }
-        else if(gotoValue == currentBox->date()){            
-            boxMsgs = currentBox->getStartState();            
-        }
-        boxAddresses = boxMsgs.keys();
-
-        //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
-        for(QList<QString>::iterator it2 = boxAddresses.begin() ; it2!=boxAddresses.end() ; it2++){
-            if(msgs.contains(*it2)){                
-                if(msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second <= gotoValue){
-                    msgs.insert(*it2,boxMsgs.value(*it2));                    
+          //On supprime les messages si ils sont déjà associés à une courbe (le moteur les envoie automatiquement)
+          for (unsigned int i = 0; i < curvesList.size(); i++) {
+              //sauf si la courbe a été désactivée manuellement
+              if (!getCurveMuteState(boxID, curvesList[i])) {
+                  msgs.remove(QString::fromStdString(curvesList[i]));
                 }
             }
-            //sinon on ajoute dans la liste de messages
-            else
-                if(boxMsgs.value(*it2).second <= gotoValue){
-                    msgs.insert(*it2,boxMsgs.value(*it2));
+        }
+      else if (gotoValue == currentBox->date()) {
+          boxMsgs = currentBox->getStartState();
+        }
+      boxAddresses = boxMsgs.keys();
+
+      //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
+      for (QList<QString>::iterator it2 = boxAddresses.begin(); it2 != boxAddresses.end(); it2++) {
+          if (msgs.contains(*it2)) {
+              if (msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second <= gotoValue) {
+                  msgs.insert(*it2, boxMsgs.value(*it2));
                 }
+            }
+
+          //sinon on ajoute dans la liste de messages
+          else
+          if (boxMsgs.value(*it2).second <= gotoValue) {
+              msgs.insert(*it2, boxMsgs.value(*it2));
+            }
         }
 
 #ifdef TODO_SCORE
-        //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
-        //    Start messages
-        if(currentBox->date() < gotoValue){
-            _mainScenario->setCtrlPointMutingState(boxID,1,true);
+
+      //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
+      //    Start messages
+      if (currentBox->date() < gotoValue) {
+          _mainScenario->setCtrlPointMutingState(boxID, 1, true);
         }
-        //    End messages
-        if(currentBox->date()+currentBox->duration()<gotoValue){            
-            _mainScenario->setCtrlPointMutingState(boxID,2,true);
+
+      //    End messages
+      if (currentBox->date() + currentBox->duration() < gotoValue) {
+          _mainScenario->setCtrlPointMutingState(boxID, 2, true);
         }
 #endif
-
     }
 
 
-    //traduction en QMap<QString,QString>, on supprime le champs date des messages
-    QList<QString> addresses = msgs.keys();
+  //traduction en QMap<QString,QString>, on supprime le champs date des messages
+  QList<QString> addresses = msgs.keys();
 
-    QString message;
-    for(QList<QString>::iterator it = addresses.begin() ; it != addresses.end() ; it++){         
-         message = *it+" "+msgs.value(*it).first;
-         sendMessage(message.toStdString());
+  QString message;
+  for (QList<QString>::iterator it = addresses.begin(); it != addresses.end(); it++) {
+      message = *it + " " + msgs.value(*it).first;
+      sendMessage(message.toStdString());
     }
 }
 
 void
-Maquette::pause(){
+Maquette::pause()
+{
 #ifdef TODO_SCORE
-    _mainScenario->pause(true);
+  _mainScenario->pause(true);
 #endif
 }
 
 void
-Maquette::startPlaying(){
-
+Maquette::startPlaying()
+{
 #ifdef TODO_SCORE
-    _mainScenario->pause(false);
-    double gotoValue = (double)_mainScenario->getGotoValue();
+  _mainScenario->pause(false);
+  double gotoValue = (double)_mainScenario->getGotoValue();
 #else
-    double gotoValue = 0.;
+  double gotoValue = 0.;
 #endif
 
-    initSceneState();
-    generateTriggerQueue();
-    int nbTrg = _scene->triggersQueueList().size();
+  initSceneState();
+  generateTriggerQueue();
+  int nbTrg = _scene->triggersQueueList().size();
 
-    try{
-        for(int i=0 ; i<nbTrg ; i++){
-            if( gotoValue >= _scene->triggersQueueList().first()->date() ){
-                _scene->triggersQueueList().removeFirst();
+  try{
+      for (int i = 0; i < nbTrg; i++) {
+          if (gotoValue >= _scene->triggersQueueList().first()->date()) {
+              _scene->triggersQueueList().removeFirst();
             }
-            else
-                break;
+          else {
+              break;
+            }
         }
     }
-    catch (const std::exception & e){
-       std::cerr << e.what();
-   }
+  catch (const std::exception & e) {
+      std::cerr << e.what();
+    }
 
 #ifdef TODO_SCORE
-    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
-        it->second->lock();
-        if (it->second->type() == SOUND_BOX_TYPE) {
-            if (it->second->date() >= _mainScenario->getGotoValue()) {
-                sendMessage(static_cast<SoundBox*>(it->second)->getPalette().toString());
+  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
+      it->second->lock();
+      if (it->second->type() == SOUND_BOX_TYPE) {
+          if (it->second->date() >= _mainScenario->getGotoValue()) {
+              sendMessage(static_cast<SoundBox*>(it->second)->getPalette().toString());
             }
         }
     }
-    _mainScenario->play();
+  _mainScenario->play();
 #endif
-
 }
 
 void
 Maquette::stopPlayingGotoStart()
 {
-    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
-        it->second->unlock();
+  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
+      it->second->unlock();
     }
 
 #ifdef TODO_SCORE
-    _mainScenario->stop();
+  _mainScenario->stop();
 #endif
 
-    BoxesMap::iterator it;
-    for (it = _boxes.begin() ; it != _boxes.end() ; it++) {
-        int type = it->second->type();
-        if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
-            static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
+  BoxesMap::iterator it;
+  for (it = _boxes.begin(); it != _boxes.end(); it++) {
+      int type = it->second->type();
+      if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+          static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
         }
     }
-    _scene->triggersQueueList().clear();
+  _scene->triggersQueueList().clear();
 
-    setGotoValue(0);
+  setGotoValue(0);
 }
 
 void
-Maquette::stopPlaying(){
-    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
-        it->second->unlock();
+Maquette::stopPlaying()
+{
+  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
+      it->second->unlock();
     }
 
 #ifdef TODO_SCORE
-    _mainScenario->stop();
+  _mainScenario->stop();
 #endif
 
-    BoxesMap::iterator it;
-    for (it = _boxes.begin() ; it != _boxes.end() ; it++) {
-        int type = it->second->type();
-        if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
-            static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
+  BoxesMap::iterator it;
+  for (it = _boxes.begin(); it != _boxes.end(); it++) {
+      int type = it->second->type();
+      if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+          static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
         }
     }
-    _scene->triggersQueueList().clear();
+  _scene->triggersQueueList().clear();
 }
 
 void
 Maquette::stopPlayingWithGoto()
 {
-    unsigned int gotoValue = _scene->getCurrentTime();
-    for (BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; it++) {
-        it->second->unlock();
+  unsigned int gotoValue = _scene->getCurrentTime();
+  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
+      it->second->unlock();
     }
 
 #ifdef TODO_SCORE
-    _mainScenario->stop();
+  _mainScenario->stop();
 #endif
 
-    BoxesMap::iterator it;
-    for (it = _boxes.begin() ; it != _boxes.end() ; it++) {
-        int type = it->second->type();
-        if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
-            static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
+  BoxesMap::iterator it;
+  for (it = _boxes.begin(); it != _boxes.end(); it++) {
+      int type = it->second->type();
+      if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+          static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
         }
     }
-    _scene->triggersQueueList().clear();
-    setGotoValue(gotoValue);
+  _scene->triggersQueueList().clear();
+  setGotoValue(gotoValue);
 }
 
 void
 Maquette::saveBox(unsigned int boxID)
 {
-    // TODO : handle others boxes further attributes during save
-    QString boxType = "unknown";
-    if (_boxes[boxID]->type() == SOUND_BOX_TYPE) {
-        boxType = QString("sound");
+  // TODO : handle others boxes further attributes during save
+  QString boxType = "unknown";
+  if (_boxes[boxID]->type() == SOUND_BOX_TYPE) {
+      boxType = QString("sound");
     }
-    else if (_boxes[boxID]->type() == CONTROL_BOX_TYPE) {
-        boxType = QString("control");
+  else if (_boxes[boxID]->type() == CONTROL_BOX_TYPE) {
+      boxType = QString("control");
     }
-    else if (_boxes[boxID]->type() == PARENT_BOX_TYPE) {
-        boxType = QString("parent");
+  else if (_boxes[boxID]->type() == PARENT_BOX_TYPE) {
+      boxType = QString("parent");
     }
-    else {
-        boxType = QString("unknown");
-    }
-
-    /* Provided for convenience */
-    BasicBox *box = _boxes[boxID];
-    unsigned int date = box->date();
-    unsigned int duration = box->duration();
-    unsigned int topLeftY = box->getTopLeft().y();
-    unsigned int sizeY = box->getSize().y();
-    QColor color = box->color();
-    QString name = box->name();
-    int mother = box->mother();
-
-    // root node
-    QDomElement root = _doc->documentElement();
-    QDomElement boxNode = _doc->createElement("box");
-    root.firstChild().appendChild(boxNode);
-
-    boxNode.setAttribute("type",boxType);
-    boxNode.setAttribute("ID",boxID);
-    boxNode.setAttribute("name",name);
-    boxNode.setAttribute("mother",mother);
-
-    QDomElement positionNode = _doc->createElement("position");
-
-    QDomElement dateNode = _doc->createElement("date");
-    dateNode.setAttribute("begin",date);
-    dateNode.setAttribute("duration",duration);
-
-    QDomElement topLeftNode = _doc->createElement("top-left");
-    topLeftNode.setAttribute("y",topLeftY);
-
-    QDomElement sizeNode = _doc->createElement("size");
-    sizeNode.setAttribute("y",sizeY);
-
-    positionNode.appendChild(dateNode);
-    positionNode.appendChild(topLeftNode);
-    positionNode.appendChild(sizeNode);
-
-    boxNode.appendChild(positionNode);
-
-    QDomElement colorNode = _doc->createElement("color");
-    colorNode.setAttribute("red",color.red());
-    colorNode.setAttribute("green",color.green());
-    colorNode.setAttribute("blue",color.blue());
-
-    boxNode.appendChild(colorNode);
-
-    colorNode.setAttribute("red",color.red());
-    colorNode.setAttribute("green",color.green());
-    colorNode.setAttribute("blue",color.blue());
-
-    if (boxType == "sound") {
-        Palette pal = static_cast<SoundBox*>(box)->getPalette();
-        QString soundFile = static_cast<SoundBox*>(box)->soundSelected();
-        QDomElement attributesNode = _doc->createElement("attributes");
-        QDomElement dynamicNode = _doc->createElement("dynamic");
-        dynamicNode.setAttribute("shape",pal.shape());
-        attributesNode.appendChild(dynamicNode);
-        QDomElement rythmNode = _doc->createElement("rythm");
-        rythmNode.setAttribute("speed",pal.speed());
-        rythmNode.setAttribute("speed-variation",pal.speedVariation());
-        rythmNode.setAttribute("grain",pal.grain());
-        attributesNode.appendChild(rythmNode);
-        QDomElement melodicNode = _doc->createElement("melodic");
-        melodicNode.setAttribute("pitch-start",pal.pitchStart());
-        melodicNode.setAttribute("pitch-random",pal.pitchRandom());
-        melodicNode.setAttribute("pitch-vibrato",pal.pitchVibrato());
-        melodicNode.setAttribute("pitch-end",pal.pitchEnd());
-        melodicNode.setAttribute("pitch-amplitude",pal.pitchAmplitude());
-        melodicNode.setAttribute("pitch-grade",pal.pitchGrade());
-        attributesNode.appendChild(melodicNode);
-        QDomElement harmonicNode = _doc->createElement("harmonic");
-        harmonicNode.setAttribute("harmony",pal.harmo());
-        harmonicNode.setAttribute("harmony-variation",pal.harmoVariation());
-        attributesNode.appendChild(harmonicNode);
-        QDomElement impulsiveNode = _doc->createElement("impulsive");
-        impulsiveNode.setAttribute("state",pal.impulsive());
-        attributesNode.appendChild(impulsiveNode);
-        QDomElement soundNode = _doc->createElement("sound");
-        soundNode.setAttribute("mode",pal.playingMode());
-        soundNode.setAttribute("file",soundFile);
-        attributesNode.appendChild(soundNode);
-        boxNode.appendChild(attributesNode);
+  else {
+      boxType = QString("unknown");
     }
 
-    //return true;
+  /* Provided for convenience */
+  BasicBox *box = _boxes[boxID];
+  unsigned int date = box->date();
+  unsigned int duration = box->duration();
+  unsigned int topLeftY = box->getTopLeft().y();
+  unsigned int sizeY = box->getSize().y();
+  QColor color = box->color();
+  QString name = box->name();
+  int mother = box->mother();
+
+  // root node
+  QDomElement root = _doc->documentElement();
+  QDomElement boxNode = _doc->createElement("box");
+  root.firstChild().appendChild(boxNode);
+
+  boxNode.setAttribute("type", boxType);
+  boxNode.setAttribute("ID", boxID);
+  boxNode.setAttribute("name", name);
+  boxNode.setAttribute("mother", mother);
+
+  QDomElement positionNode = _doc->createElement("position");
+
+  QDomElement dateNode = _doc->createElement("date");
+  dateNode.setAttribute("begin", date);
+  dateNode.setAttribute("duration", duration);
+
+  QDomElement topLeftNode = _doc->createElement("top-left");
+  topLeftNode.setAttribute("y", topLeftY);
+
+  QDomElement sizeNode = _doc->createElement("size");
+  sizeNode.setAttribute("y", sizeY);
+
+  positionNode.appendChild(dateNode);
+  positionNode.appendChild(topLeftNode);
+  positionNode.appendChild(sizeNode);
+
+  boxNode.appendChild(positionNode);
+
+  QDomElement colorNode = _doc->createElement("color");
+  colorNode.setAttribute("red", color.red());
+  colorNode.setAttribute("green", color.green());
+  colorNode.setAttribute("blue", color.blue());
+
+  boxNode.appendChild(colorNode);
+
+  colorNode.setAttribute("red", color.red());
+  colorNode.setAttribute("green", color.green());
+  colorNode.setAttribute("blue", color.blue());
+
+  if (boxType == "sound") {
+      Palette pal = static_cast<SoundBox*>(box)->getPalette();
+      QString soundFile = static_cast<SoundBox*>(box)->soundSelected();
+      QDomElement attributesNode = _doc->createElement("attributes");
+      QDomElement dynamicNode = _doc->createElement("dynamic");
+      dynamicNode.setAttribute("shape", pal.shape());
+      attributesNode.appendChild(dynamicNode);
+      QDomElement rythmNode = _doc->createElement("rythm");
+      rythmNode.setAttribute("speed", pal.speed());
+      rythmNode.setAttribute("speed-variation", pal.speedVariation());
+      rythmNode.setAttribute("grain", pal.grain());
+      attributesNode.appendChild(rythmNode);
+      QDomElement melodicNode = _doc->createElement("melodic");
+      melodicNode.setAttribute("pitch-start", pal.pitchStart());
+      melodicNode.setAttribute("pitch-random", pal.pitchRandom());
+      melodicNode.setAttribute("pitch-vibrato", pal.pitchVibrato());
+      melodicNode.setAttribute("pitch-end", pal.pitchEnd());
+      melodicNode.setAttribute("pitch-amplitude", pal.pitchAmplitude());
+      melodicNode.setAttribute("pitch-grade", pal.pitchGrade());
+      attributesNode.appendChild(melodicNode);
+      QDomElement harmonicNode = _doc->createElement("harmonic");
+      harmonicNode.setAttribute("harmony", pal.harmo());
+      harmonicNode.setAttribute("harmony-variation", pal.harmoVariation());
+      attributesNode.appendChild(harmonicNode);
+      QDomElement impulsiveNode = _doc->createElement("impulsive");
+      impulsiveNode.setAttribute("state", pal.impulsive());
+      attributesNode.appendChild(impulsiveNode);
+      QDomElement soundNode = _doc->createElement("sound");
+      soundNode.setAttribute("mode", pal.playingMode());
+      soundNode.setAttribute("file", soundFile);
+      attributesNode.appendChild(soundNode);
+      boxNode.appendChild(attributesNode);
+    }
+
+  //return true;
 }
 
 std::string
-Maquette::getNetworkHost(){
-    return _devices.at(_currentDevice).networkHost;
-}
-
-void
-Maquette::save(const string &fileName) {
-
-#ifdef TODO_SCORE
-    _mainScenario->store(fileName+".simone");
-#endif
-
-    QFile file(QString::fromStdString(fileName));
-
-    if (!file.open(QFile::WriteOnly | QFile::Text)) {
-        _scene->displayMessage(((QString("Cannot write file %1:\n%2.")).arg(QString::fromStdString(fileName)).
-                arg(file.errorString())).toStdString(),WARNING_LEVEL);
-        //return false;
-    }
-
-    QDomImplementation impl = QDomDocument().implementation();
-
-    QString publicId = "i-score 2012";
-    QString systemId = "http://scrime.labri.fr";
-    QString typeId = "i-scoreSave";
-    _doc = new QDomDocument(impl.createDocumentType(typeId,publicId,systemId));
-
-    QDomElement root = _doc->createElement("GRAPHICS");
-    root.setAttribute("zoom",_scene->zoom());
-    root.setAttribute("centerX",_scene->view()->getCenterCoordinates().x());
-    root.setAttribute("centerY",_scene->view()->getCenterCoordinates().y());
-    _doc->appendChild(root);
-
-    QDomElement boxesNode = _doc->createElement("boxes");
-    root.appendChild(boxesNode);
-
-    for(BoxesMap::iterator it = _boxes.begin() ; it != _boxes.end() ; ++it ) {
-        saveBox(it->first);
-    }
-
-    //****************************  Devices ****************************
-    QDomElement devicesNode = _doc->createElement("Devices");
-    QDomElement deviceNode;
-
-    std::map<std::string,MyDevice>::iterator it;
-    string deviceName;
-    unsigned int networkPort;
-    string networkHost;
-    string plugin;
-    MyDevice curDevice;
-
-    for( it = _devices.begin(); it!=_devices.end(); it++){
-        curDevice = it->second;
-
-        deviceName = curDevice.name;
-        networkPort = curDevice.networkPort;
-        networkHost = curDevice.networkHost;
-        plugin = curDevice.plugin;
-
-        deviceNode = _doc->createElement("Device");
-        deviceNode.setAttribute("IP",QString::fromStdString(networkHost));
-        deviceNode.setAttribute("port",networkPort);
-        deviceNode.setAttribute("plugin",QString::fromStdString(plugin));
-        deviceNode.setAttribute("name",QString::fromStdString(deviceName));
-
-        devicesNode.appendChild(deviceNode);
-    }
-
-    root.appendChild(devicesNode);
-
-    //OSC Messages
-    QList<QString> OSCMessages = _scene->editor()->networkTree()->getOSCMessages();
-
-    QDomElement OSCMessagesNode = _doc->createElement("OSCMessages");
-    QDomElement OSCMessageNode;
-
-    for(QList<QString>::iterator it=OSCMessages.begin() ; it!=OSCMessages.end() ; it++){
-
-        OSCMessageNode = _doc->createElement("OSC");
-        OSCMessageNode.setAttribute("message",*it);
-        OSCMessagesNode.appendChild(OSCMessageNode);
-    }
-    root.appendChild(OSCMessagesNode);
-
-    //***************************************************************
-
-    QTextStream ts(&file);
-    ts << _doc->toString();
-    file.close();
-
-    delete _doc;
-}
-
-void
-Maquette::loadOLD(const string &fileName){
-
-#ifdef TODO_SCORE
-    _mainScenario->load(fileName + ".simone");
-    _mainScenario->addCrossingCtrlPointCallback(&crossTransitionCallback);
-    _mainScenario->addExecutionFinishedCallback(&executionFinishedCallback);
-#endif
-
-    QFile enginesFile(QString::fromStdString(fileName + ".simone"));
-    QFile file(QString::fromStdString(fileName));
-
-    _doc = new QDomDocument;
-
-    if (enginesFile.open(QFile::ReadOnly)) {
-        if (!file.open(QFile::ReadOnly | QFile::Text)) {
-            _scene->displayMessage((tr("Cannot read file %1:\n%2.")
-                    .arg(QString::fromStdString(fileName))
-                    .arg(file.errorString())).toStdString(),
-                    WARNING_LEVEL);
-            return;
-        }
-        else if (!_doc->setContent(&file)) {
-            _scene->displayMessage((tr("Cannot import xml document from %1:\n%2.")
-                    .arg(QString::fromStdString(fileName))
-                    .arg(file.errorString())).toStdString(),
-                    WARNING_LEVEL);
-            file.close();
-            return;
-        }
-    }
-    else {
-        if (!file.open(QFile::ReadOnly | QFile::Text)) {
-            _scene->displayMessage((tr("Cannot read neither file %1 or %2 :\n%3.")
-                    .arg(QString::fromStdString(fileName))
-                    .arg(QString::fromStdString(fileName+".simone"))
-                    .arg(file.errorString())).toStdString(),
-                    WARNING_LEVEL);
-        }
-        else {
-            _scene->displayMessage((tr("Cannot read file %1 :\n%2.")
-                    .arg(QString::fromStdString(fileName+".simone"))
-                    .arg(file.errorString())).toStdString(),
-                    WARNING_LEVEL);
-        }
-    }
-
-    QDomElement root = _doc->documentElement();
-    if (root.tagName() != "GRAPHICS") {
-        _scene->displayMessage((tr("Unvailable xml document %1").
-                arg(QString::fromStdString(fileName))).toStdString(),
-                WARNING_LEVEL);
-        file.close();
-        return;
-    }
-
-    _scene->clear();
-
-    QPointF topLeft,size,bottomRight;    
-    QString name,boxType,relType;
-    QColor color(1.,1.,1.);
-    Palette pal;
-    int boxID,motherID;
-    QMap<int,unsigned int> hashMap;
-    QDomNode mainNode = root.firstChild(); // Boxes
-    while (!mainNode.isNull()) {
-        QDomNode node1 = mainNode.firstChild(); // Box
-        while (!node1.isNull()) {
-            QDomElement elt1 = node1.toElement();
-            if (!elt1.isNull()) {
-                if (elt1.tagName() == "box") {
-                    boxID = elt1.attribute("ID",QString("%1").arg(NO_ID)).toInt();
-                    boxType = elt1.attribute("type","unknown");
-                    name = elt1.attribute("name","unknown");
-                    motherID = elt1.attribute("mother",QString("%1").arg(ROOT_BOX_ID)).toInt();
-                }
-                QDomNode node2 = node1.firstChild();
-                while (!node2.isNull()) {
-                    QDomElement elt2 = node2.toElement();
-                    if (!elt2.isNull()) {
-                        if (elt2.tagName() == "color") {
-                            color = QColor(elt2.attribute("red","1").toFloat() * 255,elt2.attribute("green","1").toFloat() * 255,
-                                    elt2.attribute("blue","1").toFloat() * 255);
-                            pal.setColor(color);
-                        }
-                        QDomNode node3 = node2.firstChild();
-                        while (!node3.isNull()) {
-                            QDomElement elt3 = node3.toElement();
-                            if (elt2.tagName() == "position") {
-                                QPointF tmp(elt3.attribute("x","0").toInt(),elt3.attribute("y","0").toInt());
-                                if (elt3.tagName() == "top-left") {
-                                    topLeft = tmp;
-                                }
-                                else if (elt3.tagName() == "size") {
-                                    size = tmp;
-                                }
-                            }
-                            else if (elt2.tagName() == "attributes") {
-                                if (elt3.tagName() == "dynamic")
-                                    pal.setShape(Shape(elt3.attribute("shape","0").toInt()));
-                                else if (elt3.tagName() == "rythm") {
-                                    pal.setSpeed(Speed(elt3.attribute("speed","0").toInt()));
-                                    pal.setSpeedVariation(SpeedVariation(elt3.attribute("speed-variation","0").toInt()));
-                                    pal.setGrain(Grain(elt3.attribute("grain","0").toInt()));
-                                }
-                                else if (elt3.tagName() == "melodic") {
-                                    pal.setPitchStart(Pitch(elt3.attribute("pitch-start","0").toInt()));
-                                    pal.setPitchRandom(elt3.attribute("pitch-random","0").toInt() == 1);
-                                    pal.setPitchVibrato(elt3.attribute("pitch-vibrato","0").toInt() == 1);
-                                    pal.setPitchEnd(Pitch(elt3.attribute("pitch-end","0").toInt()));
-                                    pal.setPitchAmplitude(PitchVariation(elt3.attribute("pitch-amplitude","0").toInt()));
-                                    pal.setPitchGrade(PitchVariation(elt3.attribute("pitch-grade","0").toInt()));
-                                }
-                                else if (elt3.tagName() == "harmonic") {
-                                    pal.setHarmo(Harmo(elt3.attribute("harmony","0").toInt()));
-                                    pal.setHarmoVariation(HarmoVariation(elt3.attribute("harmony-variation","0").toInt()));
-                                }
-                                else if (elt3.tagName() == "impulsive") {
-                                    pal.setImpulsive(elt3.attribute("state","0").toInt() == 1);
-                                }
-                                else if (elt3.tagName() == "sound") {
-                                    pal.setPlayingMode((PlayingMode)(elt3.attribute("mode","0").toInt()));
-                                    QString file = elt3.attribute("file","");
-                                    if (pal.playingMode() == FileMode) {
-                                        if (QFile(file).exists()) {
-                                            pal.setSoundFile(file);
-                                        }
-                                        else {
-                                            pal.setSoundFile("");
-                                            _scene->displayMessage((QString("Unvalid sound directory \"%1\" in box \"%2\"").
-                                                    arg(file).arg(name)).toStdString(),WARNING_LEVEL);
-                                        }
-                                    }
-                                }
-                                // TODO : handle other boxes' attributes
-                            }
-                            node3 = node3.nextSibling();
-                        }
-                    }
-                    node2 = node2.nextSibling();
-                }
-            }
-            if (!elt1.isNull()) {
-                if (elt1.tagName() == "box") {
-                    if (boxType != "unknown") {
-                        bottomRight = topLeft + size;
-                        unsigned int ID = NO_ID;
-                        if (boxType == "sound") {
-                            pal.setColor(color);
-                            ID = addSoundBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),pal,motherID);
-                            _scene->addSoundBox(ID);
-                        }
-                        else if (boxType == "control") {
-                            ID = addControlBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);
-                            _scene->addControlBox(ID);
-                            _scene->getBox(ID)->updateWidgets();
-                            //OPEN FILE
-                        }
-                        else if (boxType == "parent") {
-                            ID = addParentBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);
-                            _scene->addParentBox(ID);
-                        }
-                        else {
-                            _scene->displayMessage((QString("Unavailable box type through loading %1")
-                                    .arg(QString::fromStdString(fileName))).toStdString(),
-                                    WARNING_LEVEL);
-                        }
-                    }
-                }
-            }
-            node1 = node1.nextSibling(); // next Box
-        }
-        mainNode = mainNode.nextSibling();
-    }
-
-    vector<unsigned int> boxesID;
-
-#ifdef TODO_SCORE
-    _mainScenario->getBoxesId(boxesID);
-#endif
-
-    vector<unsigned int>::iterator it;
-
-    /************************ TRIGGER ************************/
-    vector<unsigned int> triggersID;
-
-#ifdef TODO_SCORE
-    _mainScenario->getTriggersPointId(triggersID);
-#endif
-
-    for (it = triggersID.begin() ; it != triggersID.end() ; it++){
-        AbstractTriggerPoint abstractTrgPnt;
-        abstractTrgPnt.setID(*it);
-
-#ifdef TODO_SCORE
-        unsigned int tpBoxID = _mainScenario->getTriggerPointRelatedBoxId(*it);
-#else
-        unsigned int tpBoxID = NO_ID;
-#endif
-        if (tpBoxID != NO_ID) {
-            BasicBox *tpBox = getBox(tpBoxID);
-            if (tpBox != NULL) {
-                abstractTrgPnt.setBoxID(tpBoxID);
-
-#ifdef TODO_SCORE
-                switch(_mainScenario->getTriggerPointRelatedCtrlPointIndex(*it)) {
-                case BEGIN_CONTROL_POINT_INDEX :
-                    abstractTrgPnt.setBoxExtremity(BOX_START);
-                    break;
-                case END_CONTROL_POINT_INDEX :
-                    abstractTrgPnt.setBoxExtremity(BOX_END);
-                    break;
-                default :
-                    std::cerr << "Maquette::load : unrecognized box extremity for Trigger Point " << *it << std::endl;
-                    abstractTrgPnt.setBoxExtremity(BOX_START);
-                    break;
-                }
-#endif
-
-#ifdef TODO_MODULAR
-                std::string tpMsg = _mainScenario->getTriggerPointMessage(*it);
-#else
-                std::string tpMsg = "";
-#endif
-
-                if (tpMsg != "") {
-                    abstractTrgPnt.setMessage(tpMsg);
-                }
-                else {
-#ifdef DEBUG
-                    std::cerr << "Maquette::load : empty message found for Trigger Point " << *it << std::endl;
-#endif
-                }
-                addTriggerPoint(abstractTrgPnt);
-            }
-            else {
-#ifdef DEBUG
-                std::cerr << "Maquette::load : NULL box found for trigger point " << *it << std::endl;
-#endif
-            }
-        }
-        else {
-#ifdef DEBUG
-            std::cerr << "Maquette::load : box with NO_ID found for trigger point " << *it << std::endl;
-#endif
-        }
-    }
-
-    /************************ RELATIONS ************************/
-    vector<unsigned int> relationsID;
-
-#ifdef TODO_SCORE
-    _mainScenario->getRelationsId(relationsID);
-#endif
-
-    for (it = relationsID.begin() ; it != relationsID.end() ; it++) {
-        AbstractRelation abstractRel;
-
-#ifdef TODO_SCORE
-        unsigned int firstBoxID = _mainScenario->getRelationFirstBoxId(*it);
-        unsigned int secondBoxID = _mainScenario->getRelationSecondBoxId(*it);
-#else
-    unsigned int firstBoxID = NO_ID;
-    unsigned int secondBoxID = NO_ID;
-#endif
-
-        if (firstBoxID != NO_ID && firstBoxID != ROOT_BOX_ID && secondBoxID != NO_ID
-                && secondBoxID != ROOT_BOX_ID && firstBoxID != secondBoxID) {
-            abstractRel.setFirstBox(firstBoxID);
-            abstractRel.setSecondBox(secondBoxID);
-
-#ifdef TODO_SCORE
-            switch (_mainScenario->getRelationFirstCtrlPointIndex(*it)) {
-            case BEGIN_CONTROL_POINT_INDEX :
-                abstractRel.setFirstExtremity(BOX_START);
-                break;
-            case END_CONTROL_POINT_INDEX :
-                abstractRel.setFirstExtremity(BOX_END);
-                break;
-            }
-#endif
-
-#ifdef TODO_SCORE
-            switch (_mainScenario->getRelationSecondCtrlPointIndex(*it)) {
-            case BEGIN_CONTROL_POINT_INDEX :
-                abstractRel.setSecondExtremity(BOX_START);
-                break;
-            case END_CONTROL_POINT_INDEX :
-                abstractRel.setSecondExtremity(BOX_END);
-                break;
-            }
-#endif
-
-#ifdef TODO_SCORE
-            int minBoundMS = _mainScenario->getRelationMinBound(*it);
-#else
-            int minBoundMS = 0;
-#endif
-
-            float minBoundPXL = NO_BOUND;
-            if (minBoundMS != NO_BOUND) {
-                minBoundPXL = (float)minBoundMS/MaquetteScene::MS_PER_PIXEL;
-            }
-
-
-#ifdef TODO_SCORE
-            int maxBoundMS = _mainScenario->getRelationMaxBound(*it);
-#else
-            int maxBoundMS = 0;
-#endif
-
-            float maxBoundPXL = NO_BOUND;
-            if (maxBoundMS != NO_BOUND) {
-                maxBoundPXL = (float)maxBoundMS/MaquetteScene::MS_PER_PIXEL;
-            }
-
-            abstractRel.setMinBound(minBoundPXL);
-            abstractRel.setMaxBound(maxBoundPXL);
-            abstractRel.setID(*it);
-            addRelation(abstractRel);
-        }
-    }
-
-
-    delete _doc;
-}
-
-void
-Maquette::load(const string &fileName){
-
-#ifdef TODO_SCORE
-    _mainScenario->load(fileName + ".simone");
-    _mainScenario->addCrossingCtrlPointCallback(&crossTransitionCallback);
-    _mainScenario->addExecutionFinishedCallback(&executionFinishedCallback);
-#endif
-
-    QFile enginesFile(QString::fromStdString(fileName + ".simone"));
-    QFile file(QString::fromStdString(fileName));
-
-    _doc = new QDomDocument;
-
-    if (enginesFile.open(QFile::ReadOnly)) {
-        if (!file.open(QFile::ReadOnly | QFile::Text)) {
-            _scene->displayMessage((tr("Cannot read file %1:\n%2.")
-                    .arg(QString::fromStdString(fileName))
-                    .arg(file.errorString())).toStdString(),
-                    WARNING_LEVEL);
-            return;
-        }
-        else if (!_doc->setContent(&file)) {
-            _scene->displayMessage((tr("Cannot import xml document from %1:\n%2.")
-                    .arg(QString::fromStdString(fileName))
-                    .arg(file.errorString())).toStdString(),
-                    WARNING_LEVEL);
-            file.close();
-            return;
-        }
-    }
-    else {
-        if (!file.open(QFile::ReadOnly | QFile::Text)) {
-            _scene->displayMessage((tr("Cannot read neither file %1 or %2 :\n%3.")
-                    .arg(QString::fromStdString(fileName))
-                    .arg(QString::fromStdString(fileName+".simone"))
-                    .arg(file.errorString())).toStdString(),
-                    WARNING_LEVEL);
-        }
-        else {
-            _scene->displayMessage((tr("Cannot read file %1 :\n%2.")
-                    .arg(QString::fromStdString(fileName+".simone"))
-                    .arg(file.errorString())).toStdString(),
-                    WARNING_LEVEL);
-        }
-    }
-
-    if(_doc->doctype().nodeName()!="i-scoreSave"){
-        loadOLD(fileName);
-        return;
-    }
-
-    QDomElement root = _doc->documentElement();
-
-    if (root.tagName() != "GRAPHICS") {
-        _scene->displayMessage((tr("Unvailable xml document %1").
-                arg(QString::fromStdString(fileName))).toStdString(),
-                WARNING_LEVEL);
-        file.close();
-        return;
-    }
-
-    _scene->clear();
-
-    QPointF topLeft,size,bottomRight;
-    unsigned int begin,duration,topLeftY,sizeY;
-    QString name,boxType;
-    QColor color(1.,1.,1.);
-    Palette pal;
-    int boxID,motherID;
-    float zoom;
-    QPointF centerCoordinates;
-
-    zoom = root.attribute("zoom","1").toFloat();
-    centerCoordinates = QPointF(root.attribute("centerX","0.").toFloat(),root.attribute("centerY","0.").toFloat());
-
-    _scene->view()->setZoom(zoom);
-    _scene->view()->centerOn(centerCoordinates);
-
-    QDomNode mainNode = root.firstChild(); // Boxes
-    while (!mainNode.isNull()) {
-        QDomNode node1 = mainNode.firstChild(); // Box
-        while (!node1.isNull()) {
-            QDomElement elt1 = node1.toElement();
-            if (!elt1.isNull()) {
-                if (elt1.tagName() == "box") {
-                    boxID = elt1.attribute("ID",QString("%1").arg(NO_ID)).toInt();
-                    boxType = elt1.attribute("type","unknown");
-                    name = elt1.attribute("name","unknown");
-                    motherID = elt1.attribute("mother",QString("%1").arg(ROOT_BOX_ID)).toInt();
-                }
-                QDomNode node2 = node1.firstChild();
-                while (!node2.isNull()) {
-                    QDomElement elt2 = node2.toElement();
-                    if (!elt2.isNull()) {
-                        if (elt2.tagName() == "color") {
-                            color = QColor(elt2.attribute("red","1").toInt(),elt2.attribute("green","1").toInt(),
-                                    elt2.attribute("blue","1").toInt());
-                            pal.setColor(color);
-                        }
-                        QDomNode node3 = node2.firstChild();
-                        while (!node3.isNull()) {
-                            QDomElement elt3 = node3.toElement();
-                            if (elt2.tagName() == "position") {
-                                if (elt3.tagName() == "date") {
-                                    begin = elt3.attribute("begin","0").toInt();
-                                    duration = elt3.attribute("duration","0").toInt();
-                                }
-                                else if (elt3.tagName() == "top-left") {
-                                    topLeftY = sizeY = elt3.attribute("y","0").toInt();
-                                }
-                                else if (elt3.tagName() == "size") {
-                                    sizeY = elt3.attribute("y","0").toInt();
-                                }
-                            }
-                            else if (elt2.tagName() == "attributes") {
-                                if (elt3.tagName() == "dynamic")
-                                    pal.setShape(Shape(elt3.attribute("shape","0").toInt()));
-                                else if (elt3.tagName() == "rythm") {
-                                    pal.setSpeed(Speed(elt3.attribute("speed","0").toInt()));
-                                    pal.setSpeedVariation(SpeedVariation(elt3.attribute("speed-variation","0").toInt()));
-                                    pal.setGrain(Grain(elt3.attribute("grain","0").toInt()));
-                                }
-                                else if (elt3.tagName() == "melodic") {
-                                    pal.setPitchStart(Pitch(elt3.attribute("pitch-start","0").toInt()));
-                                    pal.setPitchRandom(elt3.attribute("pitch-random","0").toInt() == 1);
-                                    pal.setPitchVibrato(elt3.attribute("pitch-vibrato","0").toInt() == 1);
-                                    pal.setPitchEnd(Pitch(elt3.attribute("pitch-end","0").toInt()));
-                                    pal.setPitchAmplitude(PitchVariation(elt3.attribute("pitch-amplitude","0").toInt()));
-                                    pal.setPitchGrade(PitchVariation(elt3.attribute("pitch-grade","0").toInt()));
-                                }
-                                else if (elt3.tagName() == "harmonic") {
-                                    pal.setHarmo(Harmo(elt3.attribute("harmony","0").toInt()));
-                                    pal.setHarmoVariation(HarmoVariation(elt3.attribute("harmony-variation","0").toInt()));
-                                }
-                                else if (elt3.tagName() == "impulsive") {
-                                    pal.setImpulsive(elt3.attribute("state","0").toInt() == 1);
-                                }
-                                else if (elt3.tagName() == "sound") {
-                                    pal.setPlayingMode((PlayingMode)(elt3.attribute("mode","0").toInt()));
-                                    QString file = elt3.attribute("file","");
-                                    if (pal.playingMode() == FileMode) {
-                                        if (QFile(file).exists()) {
-                                            pal.setSoundFile(file);
-                                        }
-                                        else {
-                                            pal.setSoundFile("");
-                                            _scene->displayMessage((QString("Unvalid sound directory \"%1\" in box \"%2\"").
-                                                    arg(file).arg(name)).toStdString(),WARNING_LEVEL);
-                                        }
-                                    }
-                                }
-                                // TODO : handle other boxes' attributes
-                            }
-                            node3 = node3.nextSibling();
-                        }
-                    }
-                    node2 = node2.nextSibling();
-                }
-            }
-            if (!elt1.isNull()) {
-                if (elt1.tagName() == "box") {
-                    if (boxType != "unknown") {
-                        bottomRight = topLeft + size;
-                        unsigned int ID = NO_ID;
-                        if (boxType == "sound") {
-                            pal.setColor(color);
-                            ID = addSoundBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),pal,motherID);
-                            _scene->addSoundBox(ID);
-                        }
-                        else if (boxType == "control") {
-                            ID = addControlBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);
-                            _scene->addControlBox(ID);
-                            _scene->getBox(ID)->updateWidgets();
-                            //OPEN FILE
-                        }
-                        else if (boxType == "parent") {
-//                            ID = addParentBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);
-                            ID = addParentBox((unsigned int)boxID,(unsigned int)begin,(unsigned int)topLeftY,(unsigned int)sizeY,(unsigned int)duration,name.toStdString(),motherID,color);
-                            _scene->addParentBox(ID);
-                        }
-                        else {
-                            _scene->displayMessage((QString("Unavailable box type through loading %1")
-                                    .arg(QString::fromStdString(fileName))).toStdString(),
-                                    WARNING_LEVEL);
-                        }
-                    }
-                }
-            }
-            node1 = node1.nextSibling(); // next Box
-        }
-        mainNode = mainNode.nextSibling();
-    }
-
-    vector<unsigned int> boxesID;
-
-#ifdef TODO_SCORE
-    _mainScenario->getBoxesId(boxesID);
-#endif
-
-    vector<unsigned int>::iterator it;
-
-    /************************ TRIGGER ************************/
-    vector<unsigned int> triggersID;
-
-#ifdef TODO_SCORE
-    _mainScenario->getTriggersPointId(triggersID);
-#endif
-
-    for (it = triggersID.begin() ; it != triggersID.end() ; it++){
-        AbstractTriggerPoint abstractTrgPnt;
-        abstractTrgPnt.setID(*it);
-
-#ifdef TODO_SCORE
-        unsigned int tpBoxID = _mainScenario->getTriggerPointRelatedBoxId(*it);
-#else
-        unsigned int tpBoxID = NO_ID;
-#endif
-
-        if (tpBoxID != NO_ID) {
-            BasicBox *tpBox = getBox(tpBoxID);
-            if (tpBox != NULL) {
-                abstractTrgPnt.setBoxID(tpBoxID);
-
-#ifdef TODO_SCORE
-                switch(_mainScenario->getTriggerPointRelatedCtrlPointIndex(*it)) {
-                case BEGIN_CONTROL_POINT_INDEX :
-                    abstractTrgPnt.setBoxExtremity(BOX_START);
-                    break;
-                case END_CONTROL_POINT_INDEX :
-                    abstractTrgPnt.setBoxExtremity(BOX_END);
-                    break;
-                default :
-                    std::cerr << "Maquette::load : unrecognized box extremity for Trigger Point " << *it << std::endl;
-                    abstractTrgPnt.setBoxExtremity(BOX_START);
-                    break;
-                }
-#endif
-
-#ifdef TODO_MODULAR
-                std::string tpMsg = _mainScenario->getTriggerPointMessage(*it);
-#else
-                std::string tpMsg = "";
-#endif
-
-                if (tpMsg != "") {
-                    abstractTrgPnt.setMessage(tpMsg);
-                }
-                else {
-#ifdef DEBUG
-                    std::cerr << "Maquette::load : empty message found for Trigger Point " << *it << std::endl;
-#endif
-                }
-                addTriggerPoint(abstractTrgPnt);
-            }
-            else {
-#ifdef DEBUG
-                std::cerr << "Maquette::load : NULL box found for trigger point " << *it << std::endl;
-#endif
-            }
-        }
-        else {
-#ifdef DEBUG
-            std::cerr << "Maquette::load : box with NO_ID found for trigger point " << *it << std::endl;
-#endif
-        }
-    }
-
-    /************************ RELATIONS ************************/
-    vector<unsigned int> relationsID;
-#ifdef TODO_SCORE
-    _mainScenario->getRelationsId(relationsID);
-#endif
-
-    for (it = relationsID.begin() ; it != relationsID.end() ; it++) {
-        AbstractRelation abstractRel;
-
-#ifdef TODO_SCORE
-        unsigned int firstBoxID = _mainScenario->getRelationFirstBoxId(*it);
-        unsigned int secondBoxID = _mainScenario->getRelationSecondBoxId(*it);
-#else
-        unsigned int firstBoxID = NO_ID;
-        unsigned int secondBoxID = NO_ID;
-#endif
-
-        if (firstBoxID != NO_ID && firstBoxID != ROOT_BOX_ID && secondBoxID != NO_ID
-                && secondBoxID != ROOT_BOX_ID && firstBoxID != secondBoxID) {
-            abstractRel.setFirstBox(firstBoxID);
-            abstractRel.setSecondBox(secondBoxID);
-
-#ifdef TODO_SCORE
-            switch (_mainScenario->getRelationFirstCtrlPointIndex(*it)) {
-            case BEGIN_CONTROL_POINT_INDEX :
-                abstractRel.setFirstExtremity(BOX_START);
-                break;
-            case END_CONTROL_POINT_INDEX :
-                abstractRel.setFirstExtremity(BOX_END);
-                break;
-            }
-#endif
-
-#ifdef TODO_SCORE
-            switch (_mainScenario->getRelationSecondCtrlPointIndex(*it)) {
-            case BEGIN_CONTROL_POINT_INDEX :
-                abstractRel.setSecondExtremity(BOX_START);
-                break;
-            case END_CONTROL_POINT_INDEX :
-                abstractRel.setSecondExtremity(BOX_END);
-                break;
-            }
-#endif
-
-#ifdef TODO_SCORE
-            int minBoundMS = _mainScenario->getRelationMinBound(*it);
-#else
-            int minBoundMS = 0;
-#endif
-
-            float minBoundPXL = NO_BOUND;
-            if (minBoundMS != NO_BOUND) {
-                minBoundPXL = (float)minBoundMS/(MaquetteScene::MS_PER_PIXEL*zoom);
-            }
-
-#ifdef TODO_SCORE
-            int maxBoundMS = _mainScenario->getRelationMaxBound(*it);
-#else
-            int maxBoundMS = 0;
-#endif
-
-            float maxBoundPXL = NO_BOUND;
-            if (maxBoundMS != NO_BOUND) {
-                maxBoundPXL = (float)maxBoundMS/(MaquetteScene::MS_PER_PIXEL*zoom);
-            }
-            abstractRel.setMinBound(minBoundPXL);
-            abstractRel.setMaxBound(maxBoundPXL);
-            abstractRel.setID(*it);
-            addRelation(abstractRel);
-        }
-    }
-
-
-    /************************ Devices ************************/
-    MyDevice OSCDevice;
-    string OSCDevicePort;
-
-    //clean
-    vector<string> deviceNames;
-    vector<bool> deviceRequestable;
-
-#ifdef TODO_MODULAR
-    _mainScenario->getNetworkDevicesName(deviceNames,deviceRequestable);
-    for(unsigned int i=0; i<deviceNames.size(); i++)
-        _mainScenario->removeNetworkDevice(deviceNames[i]);
-    _devices.clear();
-#endif
-
-    //read from xml
-    if(root.childNodes().size()>=2){ //Devices
-        QDomElement devices = root.childNodes().at(1).toElement();
-        if (devices.tagName() != "Devices") {
-            _scene->displayMessage((tr("Unvailable xml document %1 - Devices problem").
-                    arg(QString::fromStdString(fileName))).toStdString(),
-                    WARNING_LEVEL);
-            file.close();
-            return;
-        }
-        else{ //get device infos
-            QString deviceName;
-            QString ip;
-            QString port;
-            QString plugin;
-
-            for(int i=0 ; i<devices.childNodes().size() ; i++){ //Device
-                if(devices.childNodes().at(i).toElement().tagName()=="Device"){
-                    deviceName = devices.childNodes().at(i).toElement().attribute("name");
-                    ip = devices.childNodes().at(i).toElement().attribute("IP");
-                    port = devices.childNodes().at(i).toElement().attribute("port");
-                    plugin = devices.childNodes().at(i).toElement().attribute("plugin");
-
-                    addNetworkDevice(deviceName.toStdString(),plugin.toStdString(),ip.toStdString(),port.toStdString());
-
-                    //save OSC device (for OSCMessages)
-                    if(plugin == "OSC"){
-                        OSCDevice.name = deviceName.toStdString();
-                        OSCDevice.networkHost = ip.toStdString();
-                        OSCDevicePort = port.toStdString();
-                        OSCDevice.plugin = plugin.toStdString();
-                    }
-                }
-            }
-        }
-    }
-
-    //reload networkTree
-    _scene->editor()->networkTree()->load();
-
-    /************************ OSC ************************/
-    if(root.childNodes().size()>=2){
-        QDomElement OSC = root.childNodes().at(2).toElement();
-
-        if (OSC.tagName() != "OSCMessages") {
-            _scene->displayMessage((tr("Unvailable xml document %1 - OSC Messages problem").
-                    arg(QString::fromStdString(fileName))).toStdString(),
-                    WARNING_LEVEL);
-            file.close();
-            return;
-        }
-
-        QList<QString> OSCMessagesList;
-        for(int i=0 ; i<OSC.childNodes().size() ; i++){
-            if(OSC.childNodes().at(i).toElement().tagName()=="OSC")
-                OSCMessagesList<<OSC.childNodes().at(i).toElement().attribute("message");
-        }
-
-        _scene->setNetworDeviceConfig(OSCDevice.name,OSCDevice.plugin,OSCDevice.networkHost,OSCDevicePort);
-        _scene->editor()->networkTree()->createItemsFromMessages(OSCMessagesList);
-    }
-
-    delete _doc;
-}
-
-void
-Maquette::addNetworkDevice(string deviceName,string plugin,string ip,string port){
-    std::istringstream iss(port);
-    unsigned int portInt;
-    iss >> portInt;
-
-    MyDevice newDevice(deviceName,plugin,portInt,ip);
-    _devices[deviceName]=newDevice;
-
-#ifdef TODO_MODULAR
-    _mainScenario->addNetworkDevice(deviceName,plugin,ip,port);
-#endif
-
-}
-
-void Maquette::removeNetworkDevice(string deviceName)
+Maquette::getNetworkHost()
 {
-    ;
+  return _devices.at(_currentDevice).networkHost;
+}
+
+void
+Maquette::save(const string &fileName)
+{
+#ifdef TODO_SCORE
+  _mainScenario->store(fileName + ".simone");
+#endif
+
+  QFile file(QString::fromStdString(fileName));
+
+  if (!file.open(QFile::WriteOnly | QFile::Text)) {
+      _scene->displayMessage(((QString("Cannot write file %1:\n%2.")).arg(QString::fromStdString(fileName)).
+                              arg(file.errorString())).toStdString(), WARNING_LEVEL);
+
+      //return false;
+    }
+
+  QDomImplementation impl = QDomDocument().implementation();
+
+  QString publicId = "i-score 2012";
+  QString systemId = "http://scrime.labri.fr";
+  QString typeId = "i-scoreSave";
+  _doc = new QDomDocument(impl.createDocumentType(typeId, publicId, systemId));
+
+  QDomElement root = _doc->createElement("GRAPHICS");
+  root.setAttribute("zoom", _scene->zoom());
+  root.setAttribute("centerX", _scene->view()->getCenterCoordinates().x());
+  root.setAttribute("centerY", _scene->view()->getCenterCoordinates().y());
+  _doc->appendChild(root);
+
+  QDomElement boxesNode = _doc->createElement("boxes");
+  root.appendChild(boxesNode);
+
+  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); ++it) {
+      saveBox(it->first);
+    }
+
+  //****************************  Devices ****************************
+  QDomElement devicesNode = _doc->createElement("Devices");
+  QDomElement deviceNode;
+
+  std::map<std::string, MyDevice>::iterator it;
+  string deviceName;
+  unsigned int networkPort;
+  string networkHost;
+  string plugin;
+  MyDevice curDevice;
+
+  for (it = _devices.begin(); it != _devices.end(); it++) {
+      curDevice = it->second;
+
+      deviceName = curDevice.name;
+      networkPort = curDevice.networkPort;
+      networkHost = curDevice.networkHost;
+      plugin = curDevice.plugin;
+
+      deviceNode = _doc->createElement("Device");
+      deviceNode.setAttribute("IP", QString::fromStdString(networkHost));
+      deviceNode.setAttribute("port", networkPort);
+      deviceNode.setAttribute("plugin", QString::fromStdString(plugin));
+      deviceNode.setAttribute("name", QString::fromStdString(deviceName));
+
+      devicesNode.appendChild(deviceNode);
+    }
+
+  root.appendChild(devicesNode);
+
+  //OSC Messages
+  QList<QString> OSCMessages = _scene->editor()->networkTree()->getOSCMessages();
+
+  QDomElement OSCMessagesNode = _doc->createElement("OSCMessages");
+  QDomElement OSCMessageNode;
+
+  for (QList<QString>::iterator it = OSCMessages.begin(); it != OSCMessages.end(); it++) {
+      OSCMessageNode = _doc->createElement("OSC");
+      OSCMessageNode.setAttribute("message", *it);
+      OSCMessagesNode.appendChild(OSCMessageNode);
+    }
+  root.appendChild(OSCMessagesNode);
+
+  //***************************************************************
+
+  QTextStream ts(&file);
+  ts << _doc->toString();
+  file.close();
+
+  delete _doc;
+}
+
+void
+Maquette::loadOLD(const string &fileName)
+{
+#ifdef TODO_SCORE
+  _mainScenario->load(fileName + ".simone");
+  _mainScenario->addCrossingCtrlPointCallback(&crossTransitionCallback);
+  _mainScenario->addExecutionFinishedCallback(&executionFinishedCallback);
+#endif
+
+  QFile enginesFile(QString::fromStdString(fileName + ".simone"));
+  QFile file(QString::fromStdString(fileName));
+
+  _doc = new QDomDocument;
+
+  if (enginesFile.open(QFile::ReadOnly)) {
+      if (!file.open(QFile::ReadOnly | QFile::Text)) {
+          _scene->displayMessage((tr("Cannot read file %1:\n%2.")
+                                  .arg(QString::fromStdString(fileName))
+                                  .arg(file.errorString())).toStdString(),
+                                 WARNING_LEVEL);
+          return;
+        }
+      else if (!_doc->setContent(&file)) {
+          _scene->displayMessage((tr("Cannot import xml document from %1:\n%2.")
+                                  .arg(QString::fromStdString(fileName))
+                                  .arg(file.errorString())).toStdString(),
+                                 WARNING_LEVEL);
+          file.close();
+          return;
+        }
+    }
+  else {
+      if (!file.open(QFile::ReadOnly | QFile::Text)) {
+          _scene->displayMessage((tr("Cannot read neither file %1 or %2 :\n%3.")
+                                  .arg(QString::fromStdString(fileName))
+                                  .arg(QString::fromStdString(fileName + ".simone"))
+                                  .arg(file.errorString())).toStdString(),
+                                 WARNING_LEVEL);
+        }
+      else {
+          _scene->displayMessage((tr("Cannot read file %1 :\n%2.")
+                                  .arg(QString::fromStdString(fileName + ".simone"))
+                                  .arg(file.errorString())).toStdString(),
+                                 WARNING_LEVEL);
+        }
+    }
+
+  QDomElement root = _doc->documentElement();
+  if (root.tagName() != "GRAPHICS") {
+      _scene->displayMessage((tr("Unvailable xml document %1").
+                              arg(QString::fromStdString(fileName))).toStdString(),
+                             WARNING_LEVEL);
+      file.close();
+      return;
+    }
+
+  _scene->clear();
+
+  QPointF topLeft, size, bottomRight;
+  QString name, boxType, relType;
+  QColor color(1., 1., 1.);
+  Palette pal;
+  int boxID, motherID;
+  QMap<int, unsigned int> hashMap;
+  QDomNode mainNode = root.firstChild();      // Boxes
+  while (!mainNode.isNull()) {
+      QDomNode node1 = mainNode.firstChild(); // Box
+      while (!node1.isNull()) {
+          QDomElement elt1 = node1.toElement();
+          if (!elt1.isNull()) {
+              if (elt1.tagName() == "box") {
+                  boxID = elt1.attribute("ID", QString("%1").arg(NO_ID)).toInt();
+                  boxType = elt1.attribute("type", "unknown");
+                  name = elt1.attribute("name", "unknown");
+                  motherID = elt1.attribute("mother", QString("%1").arg(ROOT_BOX_ID)).toInt();
+                }
+              QDomNode node2 = node1.firstChild();
+              while (!node2.isNull()) {
+                  QDomElement elt2 = node2.toElement();
+                  if (!elt2.isNull()) {
+                      if (elt2.tagName() == "color") {
+                          color = QColor(elt2.attribute("red", "1").toFloat() * 255, elt2.attribute("green", "1").toFloat() * 255,
+                                         elt2.attribute("blue", "1").toFloat() * 255);
+                          pal.setColor(color);
+                        }
+                      QDomNode node3 = node2.firstChild();
+                      while (!node3.isNull()) {
+                          QDomElement elt3 = node3.toElement();
+                          if (elt2.tagName() == "position") {
+                              QPointF tmp(elt3.attribute("x", "0").toInt(), elt3.attribute("y", "0").toInt());
+                              if (elt3.tagName() == "top-left") {
+                                  topLeft = tmp;
+                                }
+                              else if (elt3.tagName() == "size") {
+                                  size = tmp;
+                                }
+                            }
+                          else if (elt2.tagName() == "attributes") {
+                              if (elt3.tagName() == "dynamic") {
+                                  pal.setShape(Shape(elt3.attribute("shape", "0").toInt()));
+                                }
+                              else if (elt3.tagName() == "rythm") {
+                                  pal.setSpeed(Speed(elt3.attribute("speed", "0").toInt()));
+                                  pal.setSpeedVariation(SpeedVariation(elt3.attribute("speed-variation", "0").toInt()));
+                                  pal.setGrain(Grain(elt3.attribute("grain", "0").toInt()));
+                                }
+                              else if (elt3.tagName() == "melodic") {
+                                  pal.setPitchStart(Pitch(elt3.attribute("pitch-start", "0").toInt()));
+                                  pal.setPitchRandom(elt3.attribute("pitch-random", "0").toInt() == 1);
+                                  pal.setPitchVibrato(elt3.attribute("pitch-vibrato", "0").toInt() == 1);
+                                  pal.setPitchEnd(Pitch(elt3.attribute("pitch-end", "0").toInt()));
+                                  pal.setPitchAmplitude(PitchVariation(elt3.attribute("pitch-amplitude", "0").toInt()));
+                                  pal.setPitchGrade(PitchVariation(elt3.attribute("pitch-grade", "0").toInt()));
+                                }
+                              else if (elt3.tagName() == "harmonic") {
+                                  pal.setHarmo(Harmo(elt3.attribute("harmony", "0").toInt()));
+                                  pal.setHarmoVariation(HarmoVariation(elt3.attribute("harmony-variation", "0").toInt()));
+                                }
+                              else if (elt3.tagName() == "impulsive") {
+                                  pal.setImpulsive(elt3.attribute("state", "0").toInt() == 1);
+                                }
+                              else if (elt3.tagName() == "sound") {
+                                  pal.setPlayingMode((PlayingMode)(elt3.attribute("mode", "0").toInt()));
+                                  QString file = elt3.attribute("file", "");
+                                  if (pal.playingMode() == FileMode) {
+                                      if (QFile(file).exists()) {
+                                          pal.setSoundFile(file);
+                                        }
+                                      else {
+                                          pal.setSoundFile("");
+                                          _scene->displayMessage((QString("Unvalid sound directory \"%1\" in box \"%2\"").
+                                                                  arg(file).arg(name)).toStdString(), WARNING_LEVEL);
+                                        }
+                                    }
+                                }
+
+                              // TODO : handle other boxes' attributes
+                            }
+                          node3 = node3.nextSibling();
+                        }
+                    }
+                  node2 = node2.nextSibling();
+                }
+            }
+          if (!elt1.isNull()) {
+              if (elt1.tagName() == "box") {
+                  if (boxType != "unknown") {
+                      bottomRight = topLeft + size;
+                      unsigned int ID = NO_ID;
+                      if (boxType == "sound") {
+                          pal.setColor(color);
+                          ID = addSoundBox((unsigned int)boxID, topLeft, bottomRight, name.toStdString(), pal, motherID);
+                          _scene->addSoundBox(ID);
+                        }
+                      else if (boxType == "control") {
+                          ID = addControlBox((unsigned int)boxID, topLeft, bottomRight, name.toStdString(), motherID);
+                          _scene->addControlBox(ID);
+                          _scene->getBox(ID)->updateWidgets();
+
+                          //OPEN FILE
+                        }
+                      else if (boxType == "parent") {
+                          ID = addParentBox((unsigned int)boxID, topLeft, bottomRight, name.toStdString(), motherID);
+                          _scene->addParentBox(ID);
+                        }
+                      else {
+                          _scene->displayMessage((QString("Unavailable box type through loading %1")
+                                                  .arg(QString::fromStdString(fileName))).toStdString(),
+                                                 WARNING_LEVEL);
+                        }
+                    }
+                }
+            }
+          node1 = node1.nextSibling();   // next Box
+        }
+      mainNode = mainNode.nextSibling();
+    }
+
+  vector<unsigned int> boxesID;
+
+#ifdef TODO_SCORE
+  _mainScenario->getBoxesId(boxesID);
+#endif
+
+  vector<unsigned int>::iterator it;
+
+  /************************ TRIGGER ************************/
+  vector<unsigned int> triggersID;
+
+#ifdef TODO_SCORE
+  _mainScenario->getTriggersPointId(triggersID);
+#endif
+
+  for (it = triggersID.begin(); it != triggersID.end(); it++) {
+      AbstractTriggerPoint abstractTrgPnt;
+      abstractTrgPnt.setID(*it);
+
+#ifdef TODO_SCORE
+      unsigned int tpBoxID = _mainScenario->getTriggerPointRelatedBoxId(*it);
+#else
+      unsigned int tpBoxID = NO_ID;
+#endif
+      if (tpBoxID != NO_ID) {
+          BasicBox *tpBox = getBox(tpBoxID);
+          if (tpBox != NULL) {
+              abstractTrgPnt.setBoxID(tpBoxID);
+
+#ifdef TODO_SCORE
+              switch (_mainScenario->getTriggerPointRelatedCtrlPointIndex(*it)) {
+                  case BEGIN_CONTROL_POINT_INDEX:
+                    abstractTrgPnt.setBoxExtremity(BOX_START);
+                    break;
+
+                  case END_CONTROL_POINT_INDEX:
+                    abstractTrgPnt.setBoxExtremity(BOX_END);
+                    break;
+
+                  default:
+                    std::cerr << "Maquette::load : unrecognized box extremity for Trigger Point " << *it << std::endl;
+                    abstractTrgPnt.setBoxExtremity(BOX_START);
+                    break;
+                }
+#endif
+
+#ifdef TODO_MODULAR
+              std::string tpMsg = _mainScenario->getTriggerPointMessage(*it);
+#else
+              std::string tpMsg = "";
+#endif
+
+              if (tpMsg != "") {
+                  abstractTrgPnt.setMessage(tpMsg);
+                }
+              else {
+#ifdef DEBUG
+                  std::cerr << "Maquette::load : empty message found for Trigger Point " << *it << std::endl;
+#endif
+                }
+              addTriggerPoint(abstractTrgPnt);
+            }
+          else {
+#ifdef DEBUG
+              std::cerr << "Maquette::load : NULL box found for trigger point " << *it << std::endl;
+#endif
+            }
+        }
+      else {
+#ifdef DEBUG
+          std::cerr << "Maquette::load : box with NO_ID found for trigger point " << *it << std::endl;
+#endif
+        }
+    }
+
+  /************************ RELATIONS ************************/
+  vector<unsigned int> relationsID;
+
+#ifdef TODO_SCORE
+  _mainScenario->getRelationsId(relationsID);
+#endif
+
+  for (it = relationsID.begin(); it != relationsID.end(); it++) {
+      AbstractRelation abstractRel;
+
+#ifdef TODO_SCORE
+      unsigned int firstBoxID = _mainScenario->getRelationFirstBoxId(*it);
+      unsigned int secondBoxID = _mainScenario->getRelationSecondBoxId(*it);
+#else
+      unsigned int firstBoxID = NO_ID;
+      unsigned int secondBoxID = NO_ID;
+#endif
+
+      if (firstBoxID != NO_ID && firstBoxID != ROOT_BOX_ID && secondBoxID != NO_ID
+          && secondBoxID != ROOT_BOX_ID && firstBoxID != secondBoxID) {
+          abstractRel.setFirstBox(firstBoxID);
+          abstractRel.setSecondBox(secondBoxID);
+
+#ifdef TODO_SCORE
+          switch (_mainScenario->getRelationFirstCtrlPointIndex(*it)) {
+              case BEGIN_CONTROL_POINT_INDEX:
+                abstractRel.setFirstExtremity(BOX_START);
+                break;
+
+              case END_CONTROL_POINT_INDEX:
+                abstractRel.setFirstExtremity(BOX_END);
+                break;
+            }
+#endif
+
+#ifdef TODO_SCORE
+          switch (_mainScenario->getRelationSecondCtrlPointIndex(*it)) {
+              case BEGIN_CONTROL_POINT_INDEX:
+                abstractRel.setSecondExtremity(BOX_START);
+                break;
+
+              case END_CONTROL_POINT_INDEX:
+                abstractRel.setSecondExtremity(BOX_END);
+                break;
+            }
+#endif
+
+#ifdef TODO_SCORE
+          int minBoundMS = _mainScenario->getRelationMinBound(*it);
+#else
+          int minBoundMS = 0;
+#endif
+
+          float minBoundPXL = NO_BOUND;
+          if (minBoundMS != NO_BOUND) {
+              minBoundPXL = (float)minBoundMS / MaquetteScene::MS_PER_PIXEL;
+            }
+
+
+#ifdef TODO_SCORE
+          int maxBoundMS = _mainScenario->getRelationMaxBound(*it);
+#else
+          int maxBoundMS = 0;
+#endif
+
+          float maxBoundPXL = NO_BOUND;
+          if (maxBoundMS != NO_BOUND) {
+              maxBoundPXL = (float)maxBoundMS / MaquetteScene::MS_PER_PIXEL;
+            }
+
+          abstractRel.setMinBound(minBoundPXL);
+          abstractRel.setMaxBound(maxBoundPXL);
+          abstractRel.setID(*it);
+          addRelation(abstractRel);
+        }
+    }
+
+
+  delete _doc;
+}
+
+void
+Maquette::load(const string &fileName)
+{
+#ifdef TODO_SCORE
+  _mainScenario->load(fileName + ".simone");
+  _mainScenario->addCrossingCtrlPointCallback(&crossTransitionCallback);
+  _mainScenario->addExecutionFinishedCallback(&executionFinishedCallback);
+#endif
+
+  QFile enginesFile(QString::fromStdString(fileName + ".simone"));
+  QFile file(QString::fromStdString(fileName));
+
+  _doc = new QDomDocument;
+
+  if (enginesFile.open(QFile::ReadOnly)) {
+      if (!file.open(QFile::ReadOnly | QFile::Text)) {
+          _scene->displayMessage((tr("Cannot read file %1:\n%2.")
+                                  .arg(QString::fromStdString(fileName))
+                                  .arg(file.errorString())).toStdString(),
+                                 WARNING_LEVEL);
+          return;
+        }
+      else if (!_doc->setContent(&file)) {
+          _scene->displayMessage((tr("Cannot import xml document from %1:\n%2.")
+                                  .arg(QString::fromStdString(fileName))
+                                  .arg(file.errorString())).toStdString(),
+                                 WARNING_LEVEL);
+          file.close();
+          return;
+        }
+    }
+  else {
+      if (!file.open(QFile::ReadOnly | QFile::Text)) {
+          _scene->displayMessage((tr("Cannot read neither file %1 or %2 :\n%3.")
+                                  .arg(QString::fromStdString(fileName))
+                                  .arg(QString::fromStdString(fileName + ".simone"))
+                                  .arg(file.errorString())).toStdString(),
+                                 WARNING_LEVEL);
+        }
+      else {
+          _scene->displayMessage((tr("Cannot read file %1 :\n%2.")
+                                  .arg(QString::fromStdString(fileName + ".simone"))
+                                  .arg(file.errorString())).toStdString(),
+                                 WARNING_LEVEL);
+        }
+    }
+
+  if (_doc->doctype().nodeName() != "i-scoreSave") {
+      loadOLD(fileName);
+      return;
+    }
+
+  QDomElement root = _doc->documentElement();
+
+  if (root.tagName() != "GRAPHICS") {
+      _scene->displayMessage((tr("Unvailable xml document %1").
+                              arg(QString::fromStdString(fileName))).toStdString(),
+                             WARNING_LEVEL);
+      file.close();
+      return;
+    }
+
+  _scene->clear();
+
+  QPointF topLeft, size, bottomRight;
+  unsigned int begin, duration, topLeftY, sizeY;
+  QString name, boxType;
+  QColor color(1., 1., 1.);
+  Palette pal;
+  int boxID, motherID;
+  float zoom;
+  QPointF centerCoordinates;
+
+  zoom = root.attribute("zoom", "1").toFloat();
+  centerCoordinates = QPointF(root.attribute("centerX", "0.").toFloat(), root.attribute("centerY", "0.").toFloat());
+
+  _scene->view()->setZoom(zoom);
+  _scene->view()->centerOn(centerCoordinates);
+
+  QDomNode mainNode = root.firstChild();      // Boxes
+  while (!mainNode.isNull()) {
+      QDomNode node1 = mainNode.firstChild(); // Box
+      while (!node1.isNull()) {
+          QDomElement elt1 = node1.toElement();
+          if (!elt1.isNull()) {
+              if (elt1.tagName() == "box") {
+                  boxID = elt1.attribute("ID", QString("%1").arg(NO_ID)).toInt();
+                  boxType = elt1.attribute("type", "unknown");
+                  name = elt1.attribute("name", "unknown");
+                  motherID = elt1.attribute("mother", QString("%1").arg(ROOT_BOX_ID)).toInt();
+                }
+              QDomNode node2 = node1.firstChild();
+              while (!node2.isNull()) {
+                  QDomElement elt2 = node2.toElement();
+                  if (!elt2.isNull()) {
+                      if (elt2.tagName() == "color") {
+                          color = QColor(elt2.attribute("red", "1").toInt(), elt2.attribute("green", "1").toInt(),
+                                         elt2.attribute("blue", "1").toInt());
+                          pal.setColor(color);
+                        }
+                      QDomNode node3 = node2.firstChild();
+                      while (!node3.isNull()) {
+                          QDomElement elt3 = node3.toElement();
+                          if (elt2.tagName() == "position") {
+                              if (elt3.tagName() == "date") {
+                                  begin = elt3.attribute("begin", "0").toInt();
+                                  duration = elt3.attribute("duration", "0").toInt();
+                                }
+                              else if (elt3.tagName() == "top-left") {
+                                  topLeftY = sizeY = elt3.attribute("y", "0").toInt();
+                                }
+                              else if (elt3.tagName() == "size") {
+                                  sizeY = elt3.attribute("y", "0").toInt();
+                                }
+                            }
+                          else if (elt2.tagName() == "attributes") {
+                              if (elt3.tagName() == "dynamic") {
+                                  pal.setShape(Shape(elt3.attribute("shape", "0").toInt()));
+                                }
+                              else if (elt3.tagName() == "rythm") {
+                                  pal.setSpeed(Speed(elt3.attribute("speed", "0").toInt()));
+                                  pal.setSpeedVariation(SpeedVariation(elt3.attribute("speed-variation", "0").toInt()));
+                                  pal.setGrain(Grain(elt3.attribute("grain", "0").toInt()));
+                                }
+                              else if (elt3.tagName() == "melodic") {
+                                  pal.setPitchStart(Pitch(elt3.attribute("pitch-start", "0").toInt()));
+                                  pal.setPitchRandom(elt3.attribute("pitch-random", "0").toInt() == 1);
+                                  pal.setPitchVibrato(elt3.attribute("pitch-vibrato", "0").toInt() == 1);
+                                  pal.setPitchEnd(Pitch(elt3.attribute("pitch-end", "0").toInt()));
+                                  pal.setPitchAmplitude(PitchVariation(elt3.attribute("pitch-amplitude", "0").toInt()));
+                                  pal.setPitchGrade(PitchVariation(elt3.attribute("pitch-grade", "0").toInt()));
+                                }
+                              else if (elt3.tagName() == "harmonic") {
+                                  pal.setHarmo(Harmo(elt3.attribute("harmony", "0").toInt()));
+                                  pal.setHarmoVariation(HarmoVariation(elt3.attribute("harmony-variation", "0").toInt()));
+                                }
+                              else if (elt3.tagName() == "impulsive") {
+                                  pal.setImpulsive(elt3.attribute("state", "0").toInt() == 1);
+                                }
+                              else if (elt3.tagName() == "sound") {
+                                  pal.setPlayingMode((PlayingMode)(elt3.attribute("mode", "0").toInt()));
+                                  QString file = elt3.attribute("file", "");
+                                  if (pal.playingMode() == FileMode) {
+                                      if (QFile(file).exists()) {
+                                          pal.setSoundFile(file);
+                                        }
+                                      else {
+                                          pal.setSoundFile("");
+                                          _scene->displayMessage((QString("Unvalid sound directory \"%1\" in box \"%2\"").
+                                                                  arg(file).arg(name)).toStdString(), WARNING_LEVEL);
+                                        }
+                                    }
+                                }
+
+                              // TODO : handle other boxes' attributes
+                            }
+                          node3 = node3.nextSibling();
+                        }
+                    }
+                  node2 = node2.nextSibling();
+                }
+            }
+          if (!elt1.isNull()) {
+              if (elt1.tagName() == "box") {
+                  if (boxType != "unknown") {
+                      bottomRight = topLeft + size;
+                      unsigned int ID = NO_ID;
+                      if (boxType == "sound") {
+                          pal.setColor(color);
+                          ID = addSoundBox((unsigned int)boxID, topLeft, bottomRight, name.toStdString(), pal, motherID);
+                          _scene->addSoundBox(ID);
+                        }
+                      else if (boxType == "control") {
+                          ID = addControlBox((unsigned int)boxID, topLeft, bottomRight, name.toStdString(), motherID);
+                          _scene->addControlBox(ID);
+                          _scene->getBox(ID)->updateWidgets();
+
+                          //OPEN FILE
+                        }
+                      else if (boxType == "parent") {
+//                            ID = addParentBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);
+                          ID = addParentBox((unsigned int)boxID, (unsigned int)begin, (unsigned int)topLeftY, (unsigned int)sizeY, (unsigned int)duration, name.toStdString(), motherID, color);
+                          _scene->addParentBox(ID);
+                        }
+                      else {
+                          _scene->displayMessage((QString("Unavailable box type through loading %1")
+                                                  .arg(QString::fromStdString(fileName))).toStdString(),
+                                                 WARNING_LEVEL);
+                        }
+                    }
+                }
+            }
+          node1 = node1.nextSibling();   // next Box
+        }
+      mainNode = mainNode.nextSibling();
+    }
+
+  vector<unsigned int> boxesID;
+
+#ifdef TODO_SCORE
+  _mainScenario->getBoxesId(boxesID);
+#endif
+
+  vector<unsigned int>::iterator it;
+
+  /************************ TRIGGER ************************/
+  vector<unsigned int> triggersID;
+
+#ifdef TODO_SCORE
+  _mainScenario->getTriggersPointId(triggersID);
+#endif
+
+  for (it = triggersID.begin(); it != triggersID.end(); it++) {
+      AbstractTriggerPoint abstractTrgPnt;
+      abstractTrgPnt.setID(*it);
+
+#ifdef TODO_SCORE
+      unsigned int tpBoxID = _mainScenario->getTriggerPointRelatedBoxId(*it);
+#else
+      unsigned int tpBoxID = NO_ID;
+#endif
+
+      if (tpBoxID != NO_ID) {
+          BasicBox *tpBox = getBox(tpBoxID);
+          if (tpBox != NULL) {
+              abstractTrgPnt.setBoxID(tpBoxID);
+
+#ifdef TODO_SCORE
+              switch (_mainScenario->getTriggerPointRelatedCtrlPointIndex(*it)) {
+                  case BEGIN_CONTROL_POINT_INDEX:
+                    abstractTrgPnt.setBoxExtremity(BOX_START);
+                    break;
+
+                  case END_CONTROL_POINT_INDEX:
+                    abstractTrgPnt.setBoxExtremity(BOX_END);
+                    break;
+
+                  default:
+                    std::cerr << "Maquette::load : unrecognized box extremity for Trigger Point " << *it << std::endl;
+                    abstractTrgPnt.setBoxExtremity(BOX_START);
+                    break;
+                }
+#endif
+
+#ifdef TODO_MODULAR
+              std::string tpMsg = _mainScenario->getTriggerPointMessage(*it);
+#else
+              std::string tpMsg = "";
+#endif
+
+              if (tpMsg != "") {
+                  abstractTrgPnt.setMessage(tpMsg);
+                }
+              else {
+#ifdef DEBUG
+                  std::cerr << "Maquette::load : empty message found for Trigger Point " << *it << std::endl;
+#endif
+                }
+              addTriggerPoint(abstractTrgPnt);
+            }
+          else {
+#ifdef DEBUG
+              std::cerr << "Maquette::load : NULL box found for trigger point " << *it << std::endl;
+#endif
+            }
+        }
+      else {
+#ifdef DEBUG
+          std::cerr << "Maquette::load : box with NO_ID found for trigger point " << *it << std::endl;
+#endif
+        }
+    }
+
+  /************************ RELATIONS ************************/
+  vector<unsigned int> relationsID;
+#ifdef TODO_SCORE
+  _mainScenario->getRelationsId(relationsID);
+#endif
+
+  for (it = relationsID.begin(); it != relationsID.end(); it++) {
+      AbstractRelation abstractRel;
+
+#ifdef TODO_SCORE
+      unsigned int firstBoxID = _mainScenario->getRelationFirstBoxId(*it);
+      unsigned int secondBoxID = _mainScenario->getRelationSecondBoxId(*it);
+#else
+      unsigned int firstBoxID = NO_ID;
+      unsigned int secondBoxID = NO_ID;
+#endif
+
+      if (firstBoxID != NO_ID && firstBoxID != ROOT_BOX_ID && secondBoxID != NO_ID
+          && secondBoxID != ROOT_BOX_ID && firstBoxID != secondBoxID) {
+          abstractRel.setFirstBox(firstBoxID);
+          abstractRel.setSecondBox(secondBoxID);
+
+#ifdef TODO_SCORE
+          switch (_mainScenario->getRelationFirstCtrlPointIndex(*it)) {
+              case BEGIN_CONTROL_POINT_INDEX:
+                abstractRel.setFirstExtremity(BOX_START);
+                break;
+
+              case END_CONTROL_POINT_INDEX:
+                abstractRel.setFirstExtremity(BOX_END);
+                break;
+            }
+#endif
+
+#ifdef TODO_SCORE
+          switch (_mainScenario->getRelationSecondCtrlPointIndex(*it)) {
+              case BEGIN_CONTROL_POINT_INDEX:
+                abstractRel.setSecondExtremity(BOX_START);
+                break;
+
+              case END_CONTROL_POINT_INDEX:
+                abstractRel.setSecondExtremity(BOX_END);
+                break;
+            }
+#endif
+
+#ifdef TODO_SCORE
+          int minBoundMS = _mainScenario->getRelationMinBound(*it);
+#else
+          int minBoundMS = 0;
+#endif
+
+          float minBoundPXL = NO_BOUND;
+          if (minBoundMS != NO_BOUND) {
+              minBoundPXL = (float)minBoundMS / (MaquetteScene::MS_PER_PIXEL * zoom);
+            }
+
+#ifdef TODO_SCORE
+          int maxBoundMS = _mainScenario->getRelationMaxBound(*it);
+#else
+          int maxBoundMS = 0;
+#endif
+
+          float maxBoundPXL = NO_BOUND;
+          if (maxBoundMS != NO_BOUND) {
+              maxBoundPXL = (float)maxBoundMS / (MaquetteScene::MS_PER_PIXEL * zoom);
+            }
+          abstractRel.setMinBound(minBoundPXL);
+          abstractRel.setMaxBound(maxBoundPXL);
+          abstractRel.setID(*it);
+          addRelation(abstractRel);
+        }
+    }
+
+
+  /************************ Devices ************************/
+  MyDevice OSCDevice;
+  string OSCDevicePort;
+
+  //clean
+  vector<string> deviceNames;
+  vector<bool> deviceRequestable;
+
+#ifdef TODO_MODULAR
+  _mainScenario->getNetworkDevicesName(deviceNames, deviceRequestable);
+  for (unsigned int i = 0; i < deviceNames.size(); i++) {
+      _mainScenario->removeNetworkDevice(deviceNames[i]);
+    }
+  _devices.clear();
+#endif
+
+  //read from xml
+  if (root.childNodes().size() >= 2) { //Devices
+      QDomElement devices = root.childNodes().at(1).toElement();
+      if (devices.tagName() != "Devices") {
+          _scene->displayMessage((tr("Unvailable xml document %1 - Devices problem").
+                                  arg(QString::fromStdString(fileName))).toStdString(),
+                                 WARNING_LEVEL);
+          file.close();
+          return;
+        }
+      else {  //get device infos
+          QString deviceName;
+          QString ip;
+          QString port;
+          QString plugin;
+
+          for (int i = 0; i < devices.childNodes().size(); i++) { //Device
+              if (devices.childNodes().at(i).toElement().tagName() == "Device") {
+                  deviceName = devices.childNodes().at(i).toElement().attribute("name");
+                  ip = devices.childNodes().at(i).toElement().attribute("IP");
+                  port = devices.childNodes().at(i).toElement().attribute("port");
+                  plugin = devices.childNodes().at(i).toElement().attribute("plugin");
+
+                  addNetworkDevice(deviceName.toStdString(), plugin.toStdString(), ip.toStdString(), port.toStdString());
+
+                  //save OSC device (for OSCMessages)
+                  if (plugin == "OSC") {
+                      OSCDevice.name = deviceName.toStdString();
+                      OSCDevice.networkHost = ip.toStdString();
+                      OSCDevicePort = port.toStdString();
+                      OSCDevice.plugin = plugin.toStdString();
+                    }
+                }
+            }
+        }
+    }
+
+  //reload networkTree
+  _scene->editor()->networkTree()->load();
+
+  /************************ OSC ************************/
+  if (root.childNodes().size() >= 2) {
+      QDomElement OSC = root.childNodes().at(2).toElement();
+
+      if (OSC.tagName() != "OSCMessages") {
+          _scene->displayMessage((tr("Unvailable xml document %1 - OSC Messages problem").
+                                  arg(QString::fromStdString(fileName))).toStdString(),
+                                 WARNING_LEVEL);
+          file.close();
+          return;
+        }
+
+      QList<QString> OSCMessagesList;
+      for (int i = 0; i < OSC.childNodes().size(); i++) {
+          if (OSC.childNodes().at(i).toElement().tagName() == "OSC") {
+              OSCMessagesList << OSC.childNodes().at(i).toElement().attribute("message");
+            }
+        }
+
+      _scene->setNetworDeviceConfig(OSCDevice.name, OSCDevice.plugin, OSCDevice.networkHost, OSCDevicePort);
+      _scene->editor()->networkTree()->createItemsFromMessages(OSCMessagesList);
+    }
+
+  delete _doc;
+}
+
+void
+Maquette::addNetworkDevice(string deviceName, string plugin, string ip, string port)
+{
+  std::istringstream iss(port);
+  unsigned int portInt;
+  iss >> portInt;
+
+  MyDevice newDevice(deviceName, plugin, portInt, ip);
+  _devices[deviceName] = newDevice;
+
+#ifdef TODO_MODULAR
+  _mainScenario->addNetworkDevice(deviceName, plugin, ip, port);
+#endif
+}
+
+void
+Maquette::removeNetworkDevice(string deviceName)
+{
+  ;
 }
 
 double
-Maquette::accelerationFactor(){
-
+Maquette::accelerationFactor()
+{
 #ifdef TODO_SCORE
-    return _mainScenario->getExecutionSpeedFactor();
-#else
-    return 1;
-#endif
+  return _mainScenario->getExecutionSpeedFactor();
 
+#else
+  return 1;
+#endif
 }
 
 void
-Maquette::setAccelerationFactor(const float &factor) {
-
+Maquette::setAccelerationFactor(const float &factor)
+{
 #ifdef TODO_SCORE
-    _mainScenario->setExecutionSpeedFactor(factor);
+  _mainScenario->setExecutionSpeedFactor(factor);
 #endif
-
 }
 
 void
 Maquette::crossedTransition(unsigned int boxID, unsigned int CPIndex)
 {
-	int type = getBox(boxID)->type();
-	if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE ||type == PARENT_BOX_TYPE) {
-		if (CPIndex == BEGIN_CONTROL_POINT_INDEX) {
-			static_cast<BasicBox*>(_boxes[boxID])->setCrossedExtremity(BOX_START);
-		}
-		else if (CPIndex == END_CONTROL_POINT_INDEX) {
-			static_cast<BasicBox*>(_boxes[boxID])->setCrossedExtremity(BOX_END);
-		}
-		else {
-			std::cerr << "Maquette::crossTransitionCallback : unrecognized control point index" << std::endl;
-		}
-	}
+  int type = getBox(boxID)->type();
+  if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+      if (CPIndex == BEGIN_CONTROL_POINT_INDEX) {
+          static_cast<BasicBox*>(_boxes[boxID])->setCrossedExtremity(BOX_START);
+        }
+      else if (CPIndex == END_CONTROL_POINT_INDEX) {
+          static_cast<BasicBox*>(_boxes[boxID])->setCrossedExtremity(BOX_END);
+        }
+      else {
+          std::cerr << "Maquette::crossTransitionCallback : unrecognized control point index" << std::endl;
+        }
+    }
 }
 
 void
 Maquette::crossedTriggerPoint(bool waiting, unsigned int trgID)
 {
-    TriggerPoint *trgPnt = getTriggerPoint(trgID);
+  TriggerPoint *trgPnt = getTriggerPoint(trgID);
 
-     if (trgPnt != NULL) {
-          if(waiting){
-              trgPnt->setWaiting(waiting);
-              if (_scene->triggersQueueList().isEmpty())
-                  generateTriggerQueue();
-                  _scene->setFocusItem(_scene->triggersQueueList().first(),Qt::OtherFocusReason);
-              }
-
-           else{
-              trgPnt->setWaiting(waiting);
-              _scene->triggersQueueList().removeAll(trgPnt);
-              if(!_scene->triggersQueueList().isEmpty())
-                 _scene->setFocusItem(_scene->triggersQueueList().first(),Qt::OtherFocusReason);
-           }
-      }
-}
-
-void
-Maquette::executionFinished(){
-	_scene->timeEndReached();
-}
-
-void
-crossTransitionCallback(unsigned int boxID, unsigned int CPIndex, vector<unsigned int> processesToStop) {
-	Maquette::getInstance()->crossedTransition(boxID,CPIndex);
-	for (vector<unsigned int>::iterator it = processesToStop.begin() ; it != processesToStop.end() ; ++it) {
-		Maquette::getInstance()->crossedTransition(*it,END_CONTROL_POINT_INDEX);
-	}
-}
-
-void
-enginesNetworkUpdateCallback(unsigned int boxID, string m1, string m2){
-    Q_UNUSED(boxID);
-    MaquetteScene *scene = Maquette::getInstance()->scene();
-
-    if(scene != NULL){
-
-#ifdef TODO_SCORE
-        if(m1 == PLAY_mainScenario_MESSAGE){
-            scene->play();
+  if (trgPnt != NULL) {
+      if (waiting) {
+          trgPnt->setWaiting(waiting);
+          if (_scene->triggersQueueList().isEmpty()) {
+              generateTriggerQueue();
+            }
+          _scene->setFocusItem(_scene->triggersQueueList().first(), Qt::OtherFocusReason);
         }
-        else if(m1 == STOP_mainScenario_MESSAGE){
-            scene->stopWithGoto();
-        }
-        else if(m1 == STARTPOINT_mainScenario_MESSAGE){
-            if(!m2.empty()){
-                std::istringstream iss(m2);
-                unsigned int value;
-                iss >> value;
-                scene->gotoChanged(value);
+
+      else {
+          trgPnt->setWaiting(waiting);
+          _scene->triggersQueueList().removeAll(trgPnt);
+          if (!_scene->triggersQueueList().isEmpty()) {
+              _scene->setFocusItem(_scene->triggersQueueList().first(), Qt::OtherFocusReason);
             }
         }
-        else if(m1 == REWIND_mainScenario_MESSAGE){
-            scene->stopGotoStart();
+    }
+}
+
+void
+Maquette::executionFinished()
+{
+  _scene->timeEndReached();
+}
+
+void
+crossTransitionCallback(unsigned int boxID, unsigned int CPIndex, vector<unsigned int> processesToStop)
+{
+  Maquette::getInstance()->crossedTransition(boxID, CPIndex);
+  for (vector<unsigned int>::iterator it = processesToStop.begin(); it != processesToStop.end(); ++it) {
+      Maquette::getInstance()->crossedTransition(*it, END_CONTROL_POINT_INDEX);
+    }
+}
+
+void
+enginesNetworkUpdateCallback(unsigned int boxID, string m1, string m2)
+{
+  Q_UNUSED(boxID);
+  MaquetteScene *scene = Maquette::getInstance()->scene();
+
+  if (scene != NULL) {
+#ifdef TODO_SCORE
+      if (m1 == PLAY_mainScenario_MESSAGE) {
+          scene->play();
         }
-        else if(m1 == SPEED_mainScenario_MESSAGE){
-            if(!m2.empty()){
-                std::istringstream iss(m2);
-                double value;
-                iss >> value;
-                scene->speedChanged(value);
+      else if (m1 == STOP_mainScenario_MESSAGE) {
+          scene->stopWithGoto();
+        }
+      else if (m1 == STARTPOINT_mainScenario_MESSAGE) {
+          if (!m2.empty()) {
+              std::istringstream iss(m2);
+              unsigned int value;
+              iss >> value;
+              scene->gotoChanged(value);
+            }
+        }
+      else if (m1 == REWIND_mainScenario_MESSAGE) {
+          scene->stopGotoStart();
+        }
+      else if (m1 == SPEED_mainScenario_MESSAGE) {
+          if (!m2.empty()) {
+              std::istringstream iss(m2);
+              double value;
+              iss >> value;
+              scene->speedChanged(value);
             }
         }
 #endif
 
-        scene->view()->emitPlayModeChanged();
+      scene->view()->emitPlayModeChanged();
     }
 #ifdef DEBUG
-    else
-        std::cerr << "Maquette::enginesNetworkCallback : attribute _scene == NULL" << std::endl;
+  else {
+      std::cerr << "Maquette::enginesNetworkCallback : attribute _scene == NULL" << std::endl;
+    }
 #endif
 }
 
 void
-crossTriggerPointCallback(bool waiting, unsigned int trgID, unsigned int boxID, unsigned int CPIndex, string message) {
-	Q_UNUSED(boxID);
-	Q_UNUSED(CPIndex);
-    Q_UNUSED(message);
-    Maquette::getInstance()->crossedTriggerPoint(waiting,trgID);
+crossTriggerPointCallback(bool waiting, unsigned int trgID, unsigned int boxID, unsigned int CPIndex, string message)
+{
+  Q_UNUSED(boxID);
+  Q_UNUSED(CPIndex);
+  Q_UNUSED(message);
+  Maquette::getInstance()->crossedTriggerPoint(waiting, trgID);
 }
 
 void
-executionFinishedCallback(){
-	Maquette::getInstance()->executionFinished();
+executionFinishedCallback()
+{
+  Maquette::getInstance()->executionFinished();
 }
 
 void
-Maquette::setStartMessageToSend(unsigned int boxID,QTreeWidgetItem *item,QString address){
-    _boxes[boxID]->setStartMessage(item,address);
+Maquette::setStartMessageToSend(unsigned int boxID, QTreeWidgetItem *item, QString address)
+{
+  _boxes[boxID]->setStartMessage(item, address);
 }
 
 void
-Maquette::setEndMessageToSend(unsigned int boxID,QTreeWidgetItem *item,QString address){
-    _boxes[boxID]->setEndMessage(item,address);
+Maquette::setEndMessageToSend(unsigned int boxID, QTreeWidgetItem *item, QString address)
+{
+  _boxes[boxID]->setEndMessage(item, address);
 }

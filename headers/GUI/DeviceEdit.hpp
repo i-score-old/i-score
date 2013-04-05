@@ -22,23 +22,23 @@ class MaquetteScene;
 
 class DeviceEdit : public QDialog
 {
-    Q_OBJECT
+  Q_OBJECT
 
- public:
+  public:
     DeviceEdit(QWidget *parent);
 
- public slots:
+  public slots:
     void edit(QString name);
     void setChanged();
     void setPluginChanged();
     void updateNetworkConfiguration();
     void deviceNameChanged();
 
- signals:
-    void deviceNameChanged(QString,QString);
+  signals:
+    void deviceNameChanged(QString, QString);
     void devicePluginChanged(QString);
 
- private :
+  private:
     void init();
 
     bool _changed;
@@ -51,18 +51,16 @@ class DeviceEdit : public QDialog
     QLabel *_deviceNameLabel;
     QLineEdit *_nameEdit;
 
-    QLabel *_devicesLabel; //!< QLabel for devices.
-    QLabel *_pluginsLabel; //!< QLabel for plugins.
-    QLabel *_portLabel; //!< QLabel for ports.
-    QLabel *_IPLabel; //!< QLabel for network adress.
+    QLabel *_devicesLabel;       //!< QLabel for devices.
+    QLabel *_pluginsLabel;       //!< QLabel for plugins.
+    QLabel *_portLabel;          //!< QLabel for ports.
+    QLabel *_IPLabel;            //!< QLabel for network adress.
 
     QComboBox *_pluginsComboBox; //!< QComboBox handling various plug-ins available.
-    QSpinBox *_portBox; //!< QSpinBox managing port value.
-    QLineEdit *_IPBox; //!< QLineEdit
+    QSpinBox *_portBox;          //!< QSpinBox managing port value.
+    QLineEdit *_IPBox;           //!< QLineEdit
 
-    QPushButton *_okButton; //!< Button used to confirme.
-    QPushButton *_cancelButton; //!< Button used to cancel.
-
+    QPushButton *_okButton;      //!< Button used to confirme.
+    QPushButton *_cancelButton;  //!< Button used to cancel.
 };
-
 #endif // DEVICEEDIT_HPP

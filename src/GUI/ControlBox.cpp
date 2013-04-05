@@ -1,42 +1,42 @@
 /*
-Copyright: LaBRI / SCRIME
-
-Authors: Luc Vercellin (17/05/2010)
-
-luc.vercellin@labri.fr
-
-This software is a computer program whose purpose is to provide
-notation/composition combining synthesized as well as recorded
-sounds, providing answers to the problem of notation and, drawing,
-from its very design, on benefits from state of the art research
-in musicology and sound/music computing.
-
-This software is governed by the CeCILL license under French law and
-abiding by the rules of distribution of free software.  You can  use,
-modify and/ or redistribute the software under the terms of the CeCILL
-license as circulated by CEA, CNRS and INRIA at the following URL
-"http://www.cecill.info".
-
-As a counterpart to the access to the source code and  rights to copy,
-modify and redistribute granted by the license, users are provided only
-with a limited warranty  and the software's author,  the holder of the
-economic rights,  and the successive licensors  have only  limited
-liability.
-
-In this respect, the user's attention is drawn to the risks associated
-with loading,  using,  modifying and/or developing or reproducing the
-software by the user in light of its specific status of free software,
-that may mean  that it is complicated to manipulate,  and  that  also
-therefore means  that it is reserved for developers  and  experienced
-professionals having in-depth computer knowledge. Users are therefore
-encouraged to load and test the software's suitability as regards their
-requirements in conditions enabling the security of their systems and/or
-data to be ensured and,  more generally, to use and operate it in the
-same conditions as regards security.
-
-The fact that you are presently reading this means that you have had
-knowledge of the CeCILL license and that you accept its terms.
-*/
+ * Copyright: LaBRI / SCRIME
+ *
+ * Authors: Luc Vercellin (17/05/2010)
+ *
+ * luc.vercellin@labri.fr
+ *
+ * This software is a computer program whose purpose is to provide
+ * notation/composition combining synthesized as well as recorded
+ * sounds, providing answers to the problem of notation and, drawing,
+ * from its very design, on benefits from state of the art research
+ * in musicology and sound/music computing.
+ *
+ * This software is governed by the CeCILL license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ */
 #include <iostream>
 #include "BasicBox.hpp"
 #include "ControlBox.hpp"
@@ -80,7 +80,7 @@ ControlBox::ControlBox(const QPointF &corner1, const QPointF &corner2, MaquetteS
 }
 
 ControlBox::ControlBox(AbstractControlBox *abstract, MaquetteScene *parent) :
-  BasicBox((AbstractBox*)abstract,parent)
+  BasicBox((AbstractBox*)abstract, parent)
 {
 }
 
@@ -92,19 +92,21 @@ void
 ControlBox::init()
 {
   BasicBox::init();
-  _contextMenu =  new ControlBoxContextMenu(this);
+  _contextMenu = new ControlBoxContextMenu(this);
 
   _hasContextMenu = true;
   setAcceptDrops(true);
 }
 
 void
-ControlBox::play() {
-	// TODO : control box play function
+ControlBox::play()
+{
+  // TODO : control box play function
 }
 
 Abstract*
-ControlBox::abstract() const {
+ControlBox::abstract() const
+{
   return (AbstractControlBox*)_abstract;
 }
 
@@ -118,31 +120,31 @@ void
 ControlBox::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {
   if (event->mimeData()->hasFormat("text/csv")) {
-    event->accept();
-    event->acceptProposedAction();
-    setSelected(true);
-  }
+      event->accept();
+      event->acceptProposedAction();
+      setSelected(true);
+    }
   else {
-  	std::cerr << "ControlBox::dragEnterEvent : Unrecognized format during drop" << std::endl;
-  }
+      std::cerr << "ControlBox::dragEnterEvent : Unrecognized format during drop" << std::endl;
+    }
 }
 
 void
 ControlBox::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
 {
   if (event->mimeData()->hasFormat("text/csv")) {
-    event->accept();
-    setSelected(false);
-  }
+      event->accept();
+      setSelected(false);
+    }
 }
 
 void
 ControlBox::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
 {
   if (event->mimeData()->hasFormat("text/csv")) {
-    event->accept();
-    event->acceptProposedAction();
-  }
+      event->accept();
+      event->acceptProposedAction();
+    }
 }
 
 void
@@ -168,9 +170,9 @@ ControlBox::dropEvent(QGraphicsSceneDragDropEvent *event)
 void
 ControlBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-	BasicBox::paint(painter,option,widget);
+  BasicBox::paint(painter, option, widget);
 
-    painter->translate(boxRect().topLeft());
+  painter->translate(boxRect().topLeft());
 
   painter->setRenderHint(QPainter::Antialiasing, true);
 
@@ -180,5 +182,5 @@ ControlBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
   painter->setPen(pen);
   painter->setBrush(brush);
 
-  painter->translate(0,0);
+  painter->translate(0, 0);
 }

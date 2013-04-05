@@ -35,25 +35,25 @@ class MaquetteScene;
 
 class MaquetteWidget : public QWidget
 {
-    Q_OBJECT
+  Q_OBJECT
 
-public :
+  public:
     MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScene *scene);
     ~MaquetteWidget();
 
     void init();
-    void setName(QString name);    
-    inline TimeBarWidget *timeBar(){return _timeBar;}    
+    void setName(QString name);
+    inline TimeBarWidget *
+    timeBar(){ return _timeBar; }
     static const float HEADER_HEIGHT;
     static const float NAME_POINT_SIZE;
 
-signals:
+  signals:
     void beginPlaying();
     void stopSignal();
     void accelerationValueChanged(int);
 
-
-public slots:
+  public slots:
     void play();
     void stop();
     void pause();
@@ -62,14 +62,14 @@ public slots:
     void changeZoom(float value);
     void updateHeader();
 
-protected :
+  protected:
     virtual void paintEvent(QPaintEvent *event);
 
-private:
+  private:
     void createActions();
     void createToolBar();
     void createNameLabel();
-    void createHeader();    
+    void createHeader();
     void createMenuWidget();
     void createReadingSpeedWidget();
 
@@ -90,7 +90,7 @@ private:
 
     QColor _color;
     QGridLayout *_maquetteLayout;
-    LogarithmicSlider *_accelerationSlider;    
+    LogarithmicSlider *_accelerationSlider;
     QDoubleSpinBox *_accelerationDisplay;
     QWidget *_readingSpeedWidget;
     TimeBarWidget *_timeBar;
@@ -99,6 +99,4 @@ private:
     bool _sliderMoved;
     bool _valueEntered;
 };
-
-
 #endif // MAQUETTEWIDGET_HPP
