@@ -308,6 +308,7 @@ NetworkTree::createItemsFromMessages(QList<QString> messageslist){
 
 void
 NetworkTree::createItemFromMessage(QString message){
+
     QStringList splitMessage = message.split("/");
     QStringList name;    
     QList<QTreeWidgetItem *>  itemsFound;
@@ -332,7 +333,8 @@ NetworkTree::createItemFromMessage(QString message){
     map<string,MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
     map<string,MyDevice>::iterator it2 = devices.find(device.toStdString());
 
-    if(it2!=devices.end() && it2->second.plugin == "OSC"){        
+    if(it2!=devices.end() && it2->second.plugin == "OSC"){
+
         nodeType = OSCNode;
         addOSCMessage(father,*(++it));
     }
@@ -366,6 +368,7 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode){
 
 void
 NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode, QString message){
+
     rootNode->setCheckState(START_COLUMN,Qt::Unchecked);
     rootNode->setCheckState(END_COLUMN,Qt::Unchecked);
 
@@ -376,9 +379,9 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode, QString message){
     newItem->setCheckState(REDUNDANCY_COLUMN,Qt::Unchecked);
     newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
 
-    _OSCMessages.insert(newItem,getAbsoluteAddress(newItem));
 
     rootNode->insertChild(rootNode->childCount()-1,newItem);
+    _OSCMessages.insert(newItem,getAbsoluteAddress(newItem));
 }
 
 void
@@ -940,6 +943,7 @@ NetworkTree::unassignItem(QTreeWidgetItem *item){
 
 void
 NetworkTree::assignTotally(QTreeWidgetItem *item){
+    std::cout<<getAbsoluteAddress(item).toStdString()<<" > assignTotally"<<std::endl;
     QFont font;
     if(item->type() != OSCNode)
         item->setSelected(true);
@@ -951,6 +955,7 @@ NetworkTree::assignTotally(QTreeWidgetItem *item){
 
 void
 NetworkTree::assignPartially(QTreeWidgetItem *item){
+    std::cout<<getAbsoluteAddress(item).toStdString()<<" > assignPartially"<<std::endl;
 
     QFont font;
     item->setSelected(false);
@@ -992,20 +997,19 @@ NetworkTree::unassignTotally(QTreeWidgetItem *item){
 
 void
 NetworkTree::fathersAssignation(QTreeWidgetItem *item){
+    std::cout<<"------- fatherAssignation("<<getAbsoluteAddress(item).toStdString()<<") -------"<<std::endl;
     QTreeWidgetItem *father;
 
     if(item->parent()!=NULL){
         father=item->parent();
 
-        if(!allBrothersAssigned(item)){
-//            std::cout<<getAbsoluteAddress(father).toStdString()<<" assignPartially"<<std::endl<<std::endl;
+        if(!allBrothersAssigned(item)){            
             assignPartially(father);
         }
         else
             if(allBrothersAssigned(item)){
                 QTreeWidgetItem *father;
                 father=item->parent();
-//                std::cout<<getAbsoluteAddress(father).toStdString()<<" assignTotally"<<std::endl<<std::endl;
                 assignTotally(father);
             }
         fathersAssignation(father);
