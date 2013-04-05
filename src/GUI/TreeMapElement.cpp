@@ -266,6 +266,7 @@ TreeMapElement::setSelected(bool selected) {
 
 void TreeMapElement::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    Q_UNUSED(event);
 	//QWidget::mouseDoubleClickEvent(event);
 
 	std::cerr << "TreeMapElement::mouseDoubleClickEvent : for " << address() << std::endl;

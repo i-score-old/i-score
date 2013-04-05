@@ -49,5 +49,9 @@
         <file>images/playSimple.svg</file>
         <file>images/stopSimple.svg</file>
         <file>images/i-score.icns</file>
+        <file>images/addANode.png</file>
+        <file>images/error-icon.png</file>
+        <file>images/boxStartMenu.svg</file>
+        <file>images/boxEndMenu.svg</file>
     </qresource>
 </RCC>

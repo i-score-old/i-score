@@ -74,7 +74,7 @@ MaquetteView::MaquetteView(MainWindow *mw)
   setAlignment(Qt::AlignLeft | Qt::AlignTop);
   centerOn(0,0);
   _zoom = 1;
-  _gotoValue = 0;
+  _gotoValue = 0;  
 }
 
 MaquetteView::~MaquetteView(){
@@ -128,14 +128,13 @@ MaquetteView::updateScene(){
 }
 
 void
-MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
+MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){          
+
   QGraphicsView::drawBackground(painter,rect);
-//  QPen pen(Qt::darkGreen);
   QPen pen(QColor(145,145,145));
 
   painter->setPen(pen);
 
-  QPointF upperPoint,downPoint;
   static const int S_TO_MS = 1000;
   const int WIDTH = sceneRect().width();
   const int HEIGHT = sceneRect().height();
@@ -144,7 +143,6 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
     if (_zoom < 1 && ((i % (int)(1./_zoom)) != 0 )) {
         continue;
     }
-// 	 painter->drawText(QPointF(i_PXL, 10),QString("%1").arg(i));
    painter->drawLine(QPointF(i_PXL, 0), QPointF(i_PXL, HEIGHT));
 
    if (_zoom > 1) {
@@ -164,25 +162,7 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect){
     }
   }
 
-//  if(!_scene->playing()){
-//      //drawGotoBar
-//      std::cout<<"not playing"<<std::endl;
-//      double gotoBarPosX = _gotoValue/(float)MaquetteScene::MS_PER_PIXEL;
-//      QPen reSavedPen = painter->pen();
-//      QPen pen3(Qt::black);
-//      pen3.setWidth(3);
-//      painter->setPen(pen3);
-//      painter->drawLine(QPointF(gotoBarPosX,0),QPointF(gotoBarPosX,HEIGHT));
-
-//    //  pen3.setColor(Qt::white);
-//    //  pen3.setWidth(1);
-//    //  painter->setPen(pen3);
-//    //  painter->drawLine(QPointF(progressBarPosX,0),QPointF(progressBarPosX,HEIGHT));
-
-//      painter->setPen(reSavedPen);
-//  }
-
-  if (_scene->tracksView()) {
+  if (_scene->tracksView()) {      
     QPen pen2(Qt::darkGray);
     pen2.setStyle(Qt::SolidLine);
     pen2.setWidth(4);
@@ -238,7 +218,8 @@ MaquetteView::triggerShortcut(int shorcut){
 void
 MaquetteView::keyPressEvent(QKeyEvent *event)
 {
-    QGraphicsView::keyPressEvent(event);
+    QGraphicsView::keyPressEvent(event);    
+
 	if (event->matches(QKeySequence::Copy)) {
 		_scene->copyBoxes();
 		_scene->displayMessage(tr("Selection copied").toStdString(),INDICATION_LEVEL);
@@ -260,24 +241,24 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
 		_scene->displayMessage(tr("Selection removed").toStdString(),INDICATION_LEVEL);
     }
     else if ((event->key()==Qt::Key_Space || event->key()==Qt::Key_Comma || event->key()==Qt::Key_Period) && !_scene->playing()) {
-        _scene->play();
-        _scene->displayMessage(tr("Start playing").toStdString(),INDICATION_LEVEL);
+        _scene->play();        
         emit(playModeChanged());
     }
-    else if ((event->key()==Qt::Key_Space || event->key()==Qt::Key_Comma || event->key()==Qt::Key_Period) && _scene->playing()) {
-        _scene->pause();
-        _scene->displayMessage(tr("Stop playing").toStdString(),INDICATION_LEVEL);
+    else if ((event->key()==Qt::Key_Comma || event->key()==Qt::Key_Period) && _scene->playing()) {
+        _scene->pause();        
+        emit(playModeChanged());
+    }
+    else if (event->key()==Qt::Key_Space && _scene->playing()) {
+        _scene->stopWithGoto();
         emit(playModeChanged());
     }
     else if (event->key()==Qt::Key_Enter || event->key()==Qt::Key_Return) {
-        _scene->stopGotoStart();
-        _scene->displayMessage(tr("Stop playing and go to start").toStdString(),INDICATION_LEVEL);
+        _scene->stopGotoStart();        
         emit(playModeChanged());
     }
     else if (event->key()==Qt::Key_0){
         if(!_scene->playing()){
-            _scene->play();
-            _scene->displayMessage(tr("Start playing").toStdString(),INDICATION_LEVEL);
+            _scene->play();            
             emit(playModeChanged());
         }
         else
@@ -285,7 +266,16 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
     }
     else if (event->key()==Qt::Key_1 || event->key()==Qt::Key_2 || event->key()==Qt::Key_3)
         triggerShortcut(event->key());
+}
 
+void
+MaquetteView::emitPlayModeChanged(){
+    emit(playModeChanged());
+}
+
+void
+MaquetteView::keyReleaseEvent(QKeyEvent *event){
+    QGraphicsView::keyReleaseEvent(event);    
 }
 
 QList<TriggerPoint *>
@@ -298,7 +288,7 @@ MaquetteView::triggersQueueList(){
  */
 void
 MaquetteView::zoomIn()
-{
+{    
 	if (MaquetteScene::MS_PER_PIXEL > 0.125) {
 		MaquetteScene::MS_PER_PIXEL /= 2;
 		_zoom *= 2;
@@ -307,12 +297,16 @@ MaquetteView::zoomIn()
         _scene->update();
 
         Maquette::getInstance()->updateBoxesFromEngines();
+
+        QPointF newCenter(2*getCenterCoordinates().x(),2*getCenterCoordinates().y());
+        centerOn(newCenter);
+        _scene->updateProgressBar();
 	}
 }
 
 QPointF
 MaquetteView::getCenterCoordinates(){
-    QPointF centerCoordinates =  mapToScene(viewport()->rect().center());
+    QPointF centerCoordinates =  mapToScene(viewport()->rect().center()-=QPoint(viewport()->rect().center().y()/2,viewport()->rect().center().y()/2));
     return centerCoordinates;
 }
 
@@ -344,7 +338,10 @@ MaquetteView::setZoom(float value){
     }
     repaint();
     resetCachedContent();
+
+// TODO check if can be comment
     _scene->update();
+
     Maquette::getInstance()->updateBoxesFromEngines();
 }
 
@@ -353,11 +350,15 @@ MaquetteView::setZoom(float value){
  */
 void
 MaquetteView::zoomOut()
-{
+{    
     MaquetteScene::MS_PER_PIXEL *= 2;
 
     _zoom /= 2.;
     resetCachedContent();
     _scene->update();
-    Maquette::getInstance()->updateBoxesFromEngines();
+    Maquette::getInstance()->updateBoxesFromEngines();    
+
+    QPointF newCenter(getCenterCoordinates().x()/2,getCenterCoordinates().y()/2);
+    centerOn(newCenter);
+    _scene->updateProgressBar();
 }

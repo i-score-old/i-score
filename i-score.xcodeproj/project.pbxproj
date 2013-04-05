@@ -1,0 +1,406 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		46B522F4170EB46200F6DF2A /* Abstract.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Abstract.hpp; sourceTree = "<group>"; };
+		46B522F5170EB46200F6DF2A /* AbstractBox.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractBox.hpp; sourceTree = "<group>"; };
+		46B522F6170EB46200F6DF2A /* AbstractComment.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractComment.hpp; sourceTree = "<group>"; };
+		46B522F7170EB46200F6DF2A /* AbstractControlBox.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractControlBox.hpp; sourceTree = "<group>"; };
+		46B522F8170EB46200F6DF2A /* AbstractCurve.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractCurve.hpp; sourceTree = "<group>"; };
+		46B522F9170EB46200F6DF2A /* AbstractParentBox.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractParentBox.hpp; sourceTree = "<group>"; };
+		46B522FA170EB46200F6DF2A /* AbstractRelation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractRelation.hpp; sourceTree = "<group>"; };
+		46B522FB170EB46200F6DF2A /* AbstractSoundBox.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractSoundBox.hpp; sourceTree = "<group>"; };
+		46B522FC170EB46200F6DF2A /* AbstractTriggerPoint.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractTriggerPoint.hpp; sourceTree = "<group>"; };
+		46B522FD170EB46200F6DF2A /* EnumPalette.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = EnumPalette.hpp; sourceTree = "<group>"; };
+		46B522FE170EB46200F6DF2A /* Maquette.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Maquette.hpp; sourceTree = "<group>"; };
+		46B522FF170EB46200F6DF2A /* NetworkMessages.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = NetworkMessages.hpp; sourceTree = "<group>"; };
+		46B52300170EB46200F6DF2A /* Palette.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Palette.hpp; sourceTree = "<group>"; };
+		46B52302170EB46200F6DF2A /* AttributesEditor.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AttributesEditor.hpp; sourceTree = "<group>"; };
+		46B52303170EB46200F6DF2A /* BasicBox.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BasicBox.hpp; sourceTree = "<group>"; };
+		46B52304170EB46200F6DF2A /* BoxContextMenu.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BoxContextMenu.hpp; sourceTree = "<group>"; };
+		46B52305170EB46200F6DF2A /* BoxCurveEdit.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BoxCurveEdit.hpp; sourceTree = "<group>"; };
+		46B52306170EB46200F6DF2A /* BoxWidget.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BoxWidget.hpp; sourceTree = "<group>"; };
+		46B52307170EB46200F6DF2A /* ChooseTemporalRelation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChooseTemporalRelation.hpp; sourceTree = "<group>"; };
+		46B52308170EB46200F6DF2A /* Comment.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Comment.hpp; sourceTree = "<group>"; };
+		46B52309170EB46200F6DF2A /* ControlBox.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ControlBox.hpp; sourceTree = "<group>"; };
+		46B5230A170EB46200F6DF2A /* ControlBoxContextMenu.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ControlBoxContextMenu.hpp; sourceTree = "<group>"; };
+		46B5230B170EB46200F6DF2A /* CurvesWidget.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CurvesWidget.hpp; sourceTree = "<group>"; };
+		46B5230C170EB46200F6DF2A /* CurveWidget.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CurveWidget.hpp; sourceTree = "<group>"; };
+		46B5230D170EB46200F6DF2A /* DeviceEdit.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DeviceEdit.hpp; sourceTree = "<group>"; };
+		46B5230E170EB46200F6DF2A /* Help.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Help.hpp; sourceTree = "<group>"; };
+		46B5230F170EB46200F6DF2A /* Interpolation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Interpolation.hpp; sourceTree = "<group>"; };
+		46B52310170EB46200F6DF2A /* LogarithmicSlider.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LogarithmicSlider.hpp; sourceTree = "<group>"; };
+		46B52311170EB46200F6DF2A /* MainWindow.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MainWindow.hpp; sourceTree = "<group>"; };
+		46B52312170EB46200F6DF2A /* MaquetteScene.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MaquetteScene.hpp; sourceTree = "<group>"; };
+		46B52313170EB46200F6DF2A /* MaquetteView.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MaquetteView.hpp; sourceTree = "<group>"; };
+		46B52314170EB46200F6DF2A /* MaquetteWidget.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MaquetteWidget.hpp; sourceTree = "<group>"; };
+		46B52315170EB46200F6DF2A /* NetworkConfig.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = NetworkConfig.hpp; sourceTree = "<group>"; };
+		46B52316170EB46200F6DF2A /* NetworkMessagesEditor.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = NetworkMessagesEditor.hpp; sourceTree = "<group>"; };
+		46B52317170EB46200F6DF2A /* NetworkTree.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = NetworkTree.hpp; sourceTree = "<group>"; };
+		46B52318170EB46200F6DF2A /* ParentBox.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ParentBox.hpp; sourceTree = "<group>"; };
+		46B52319170EB46200F6DF2A /* ParentBoxContextMenu.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ParentBoxContextMenu.hpp; sourceTree = "<group>"; };
+		46B5231A170EB46200F6DF2A /* PlayingThread.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PlayingThread.hpp; sourceTree = "<group>"; };
+		46B5231B170EB46200F6DF2A /* PreviewArea.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PreviewArea.hpp; sourceTree = "<group>"; };
+		46B5231C170EB46200F6DF2A /* Relation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Relation.hpp; sourceTree = "<group>"; };
+		46B5231D170EB46200F6DF2A /* RelationEdit.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RelationEdit.hpp; sourceTree = "<group>"; };
+		46B5231E170EB46200F6DF2A /* SoundBox.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SoundBox.hpp; sourceTree = "<group>"; };
+		46B5231F170EB46200F6DF2A /* SoundBoxContextMenu.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SoundBoxContextMenu.hpp; sourceTree = "<group>"; };
+		46B52320170EB46200F6DF2A /* TextEdit.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TextEdit.hpp; sourceTree = "<group>"; };
+		46B52321170EB46200F6DF2A /* TimeBarWidget.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TimeBarWidget.hpp; sourceTree = "<group>"; };
+		46B52322170EB46200F6DF2A /* TreeMap.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TreeMap.hpp; sourceTree = "<group>"; };
+		46B52323170EB46200F6DF2A /* TreeMapElement.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TreeMapElement.hpp; sourceTree = "<group>"; };
+		46B52324170EB46200F6DF2A /* TriggerPoint.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TriggerPoint.hpp; sourceTree = "<group>"; };
+		46B52325170EB46200F6DF2A /* ViewRelations.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ViewRelations.hpp; sourceTree = "<group>"; };
+		46B52328170EB47E00F6DF2A /* Abstract.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Abstract.cpp; sourceTree = "<group>"; };
+		46B52329170EB47E00F6DF2A /* AbstractBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractBox.cpp; sourceTree = "<group>"; };
+		46B5232A170EB47E00F6DF2A /* AbstractComment.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractComment.cpp; sourceTree = "<group>"; };
+		46B5232B170EB47E00F6DF2A /* AbstractControlBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractControlBox.cpp; sourceTree = "<group>"; };
+		46B5232C170EB47E00F6DF2A /* AbstractCurve.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractCurve.cpp; sourceTree = "<group>"; };
+		46B5232D170EB47E00F6DF2A /* AbstractParentBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractParentBox.cpp; sourceTree = "<group>"; };
+		46B5232E170EB47E00F6DF2A /* AbstractRelation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractRelation.cpp; sourceTree = "<group>"; };
+		46B5232F170EB47E00F6DF2A /* AbstractSoundBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractSoundBox.cpp; sourceTree = "<group>"; };
+		46B52330170EB47E00F6DF2A /* AbstractTriggerPoint.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractTriggerPoint.cpp; sourceTree = "<group>"; };
+		46B52331170EB47E00F6DF2A /* Maquette.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Maquette.cpp; sourceTree = "<group>"; };
+		46B52332170EB47E00F6DF2A /* NetworkMessages.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkMessages.cpp; sourceTree = "<group>"; };
+		46B52333170EB47E00F6DF2A /* Palette.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Palette.cpp; sourceTree = "<group>"; };
+		46B52335170EB47E00F6DF2A /* AttributesEditor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AttributesEditor.cpp; sourceTree = "<group>"; };
+		46B52336170EB47E00F6DF2A /* BasicBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BasicBox.cpp; sourceTree = "<group>"; };
+		46B52337170EB47E00F6DF2A /* BoxContextMenu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BoxContextMenu.cpp; sourceTree = "<group>"; };
+		46B52338170EB47E00F6DF2A /* BoxCurveEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BoxCurveEdit.cpp; sourceTree = "<group>"; };
+		46B52339170EB47E00F6DF2A /* BoxWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BoxWidget.cpp; sourceTree = "<group>"; };
+		46B5233A170EB47E00F6DF2A /* ChooseTemporalRelation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChooseTemporalRelation.cpp; sourceTree = "<group>"; };
+		46B5233B170EB47E00F6DF2A /* Comment.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Comment.cpp; sourceTree = "<group>"; };
+		46B5233C170EB47E00F6DF2A /* ControlBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ControlBox.cpp; sourceTree = "<group>"; };
+		46B5233D170EB47E00F6DF2A /* ControlBoxContextMenu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ControlBoxContextMenu.cpp; sourceTree = "<group>"; };
+		46B5233E170EB47E00F6DF2A /* CurvesWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CurvesWidget.cpp; sourceTree = "<group>"; };
+		46B5233F170EB47E00F6DF2A /* CurveWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CurveWidget.cpp; sourceTree = "<group>"; };
+		46B52340170EB47E00F6DF2A /* DeviceEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DeviceEdit.cpp; sourceTree = "<group>"; };
+		46B52341170EB47E00F6DF2A /* Help.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Help.cpp; sourceTree = "<group>"; };
+		46B52342170EB47E00F6DF2A /* Interpolation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Interpolation.cpp; sourceTree = "<group>"; };
+		46B52343170EB47E00F6DF2A /* LogarithmicSlider.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LogarithmicSlider.cpp; sourceTree = "<group>"; };
+		46B52344170EB47E00F6DF2A /* MainWindow.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MainWindow.cpp; sourceTree = "<group>"; };
+		46B52345170EB47E00F6DF2A /* MaquetteScene.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MaquetteScene.cpp; sourceTree = "<group>"; };
+		46B52346170EB47E00F6DF2A /* MaquetteView.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MaquetteView.cpp; sourceTree = "<group>"; };
+		46B52347170EB47E00F6DF2A /* MaquetteWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MaquetteWidget.cpp; sourceTree = "<group>"; };
+		46B52348170EB47E00F6DF2A /* NetworkConfig.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkConfig.cpp; sourceTree = "<group>"; };
+		46B52349170EB47E00F6DF2A /* NetworkMessagesEditor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkMessagesEditor.cpp; sourceTree = "<group>"; };
+		46B5234A170EB47E00F6DF2A /* NetworkTree.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkTree.cpp; sourceTree = "<group>"; };
+		46B5234B170EB47E00F6DF2A /* ParentBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParentBox.cpp; sourceTree = "<group>"; };
+		46B5234C170EB47E00F6DF2A /* ParentBoxContextMenu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParentBoxContextMenu.cpp; sourceTree = "<group>"; };
+		46B5234D170EB47E00F6DF2A /* PlayingThread.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PlayingThread.cpp; sourceTree = "<group>"; };
+		46B5234E170EB47E00F6DF2A /* PreviewArea.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PreviewArea.cpp; sourceTree = "<group>"; };
+		46B5234F170EB47E00F6DF2A /* Relation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Relation.cpp; sourceTree = "<group>"; };
+		46B52350170EB47E00F6DF2A /* RelationEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RelationEdit.cpp; sourceTree = "<group>"; };
+		46B52351170EB47E00F6DF2A /* SoundBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SoundBox.cpp; sourceTree = "<group>"; };
+		46B52352170EB47E00F6DF2A /* SoundBoxContextMenu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SoundBoxContextMenu.cpp; sourceTree = "<group>"; };
+		46B52353170EB47E00F6DF2A /* TextEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TextEdit.cpp; sourceTree = "<group>"; };
+		46B52354170EB47E00F6DF2A /* TimeBarWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TimeBarWidget.cpp; sourceTree = "<group>"; };
+		46B52355170EB47E00F6DF2A /* TreeMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TreeMap.cpp; sourceTree = "<group>"; };
+		46B52356170EB47E00F6DF2A /* TreeMapElement.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TreeMapElement.cpp; sourceTree = "<group>"; };
+		46B52357170EB47E00F6DF2A /* TriggerPoint.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TriggerPoint.cpp; sourceTree = "<group>"; };
+		46B52358170EB47E00F6DF2A /* ViewRelations.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ViewRelations.cpp; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		46B522E7170EB42300F6DF2A = {
+			isa = PBXGroup;
+			children = (
+				46B522F2170EB46200F6DF2A /* headers */,
+				46B52326170EB47E00F6DF2A /* src */,
+			);
+			sourceTree = "<group>";
+		};
+		46B522F2170EB46200F6DF2A /* headers */ = {
+			isa = PBXGroup;
+			children = (
+				46B522F3170EB46200F6DF2A /* data */,
+				46B52301170EB46200F6DF2A /* GUI */,
+			);
+			path = headers;
+			sourceTree = "<group>";
+		};
+		46B522F3170EB46200F6DF2A /* data */ = {
+			isa = PBXGroup;
+			children = (
+				46B522F4170EB46200F6DF2A /* Abstract.hpp */,
+				46B522F5170EB46200F6DF2A /* AbstractBox.hpp */,
+				46B522F6170EB46200F6DF2A /* AbstractComment.hpp */,
+				46B522F7170EB46200F6DF2A /* AbstractControlBox.hpp */,
+				46B522F8170EB46200F6DF2A /* AbstractCurve.hpp */,
+				46B522F9170EB46200F6DF2A /* AbstractParentBox.hpp */,
+				46B522FA170EB46200F6DF2A /* AbstractRelation.hpp */,
+				46B522FB170EB46200F6DF2A /* AbstractSoundBox.hpp */,
+				46B522FC170EB46200F6DF2A /* AbstractTriggerPoint.hpp */,
+				46B522FD170EB46200F6DF2A /* EnumPalette.hpp */,
+				46B522FE170EB46200F6DF2A /* Maquette.hpp */,
+				46B522FF170EB46200F6DF2A /* NetworkMessages.hpp */,
+				46B52300170EB46200F6DF2A /* Palette.hpp */,
+			);
+			path = data;
+			sourceTree = "<group>";
+		};
+		46B52301170EB46200F6DF2A /* GUI */ = {
+			isa = PBXGroup;
+			children = (
+				46B52302170EB46200F6DF2A /* AttributesEditor.hpp */,
+				46B52303170EB46200F6DF2A /* BasicBox.hpp */,
+				46B52304170EB46200F6DF2A /* BoxContextMenu.hpp */,
+				46B52305170EB46200F6DF2A /* BoxCurveEdit.hpp */,
+				46B52306170EB46200F6DF2A /* BoxWidget.hpp */,
+				46B52307170EB46200F6DF2A /* ChooseTemporalRelation.hpp */,
+				46B52308170EB46200F6DF2A /* Comment.hpp */,
+				46B52309170EB46200F6DF2A /* ControlBox.hpp */,
+				46B5230A170EB46200F6DF2A /* ControlBoxContextMenu.hpp */,
+				46B5230B170EB46200F6DF2A /* CurvesWidget.hpp */,
+				46B5230C170EB46200F6DF2A /* CurveWidget.hpp */,
+				46B5230D170EB46200F6DF2A /* DeviceEdit.hpp */,
+				46B5230E170EB46200F6DF2A /* Help.hpp */,
+				46B5230F170EB46200F6DF2A /* Interpolation.hpp */,
+				46B52310170EB46200F6DF2A /* LogarithmicSlider.hpp */,
+				46B52311170EB46200F6DF2A /* MainWindow.hpp */,
+				46B52312170EB46200F6DF2A /* MaquetteScene.hpp */,
+				46B52313170EB46200F6DF2A /* MaquetteView.hpp */,
+				46B52314170EB46200F6DF2A /* MaquetteWidget.hpp */,
+				46B52315170EB46200F6DF2A /* NetworkConfig.hpp */,
+				46B52316170EB46200F6DF2A /* NetworkMessagesEditor.hpp */,
+				46B52317170EB46200F6DF2A /* NetworkTree.hpp */,
+				46B52318170EB46200F6DF2A /* ParentBox.hpp */,
+				46B52319170EB46200F6DF2A /* ParentBoxContextMenu.hpp */,
+				46B5231A170EB46200F6DF2A /* PlayingThread.hpp */,
+				46B5231B170EB46200F6DF2A /* PreviewArea.hpp */,
+				46B5231C170EB46200F6DF2A /* Relation.hpp */,
+				46B5231D170EB46200F6DF2A /* RelationEdit.hpp */,
+				46B5231E170EB46200F6DF2A /* SoundBox.hpp */,
+				46B5231F170EB46200F6DF2A /* SoundBoxContextMenu.hpp */,
+				46B52320170EB46200F6DF2A /* TextEdit.hpp */,
+				46B52321170EB46200F6DF2A /* TimeBarWidget.hpp */,
+				46B52322170EB46200F6DF2A /* TreeMap.hpp */,
+				46B52323170EB46200F6DF2A /* TreeMapElement.hpp */,
+				46B52324170EB46200F6DF2A /* TriggerPoint.hpp */,
+				46B52325170EB46200F6DF2A /* ViewRelations.hpp */,
+			);
+			path = GUI;
+			sourceTree = "<group>";
+		};
+		46B52326170EB47E00F6DF2A /* src */ = {
+			isa = PBXGroup;
+			children = (
+				46B52327170EB47E00F6DF2A /* data */,
+				46B52334170EB47E00F6DF2A /* GUI */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		46B52327170EB47E00F6DF2A /* data */ = {
+			isa = PBXGroup;
+			children = (
+				46B52328170EB47E00F6DF2A /* Abstract.cpp */,
+				46B52329170EB47E00F6DF2A /* AbstractBox.cpp */,
+				46B5232A170EB47E00F6DF2A /* AbstractComment.cpp */,
+				46B5232B170EB47E00F6DF2A /* AbstractControlBox.cpp */,
+				46B5232C170EB47E00F6DF2A /* AbstractCurve.cpp */,
+				46B5232D170EB47E00F6DF2A /* AbstractParentBox.cpp */,
+				46B5232E170EB47E00F6DF2A /* AbstractRelation.cpp */,
+				46B5232F170EB47E00F6DF2A /* AbstractSoundBox.cpp */,
+				46B52330170EB47E00F6DF2A /* AbstractTriggerPoint.cpp */,
+				46B52331170EB47E00F6DF2A /* Maquette.cpp */,
+				46B52332170EB47E00F6DF2A /* NetworkMessages.cpp */,
+				46B52333170EB47E00F6DF2A /* Palette.cpp */,
+			);
+			path = data;
+			sourceTree = "<group>";
+		};
+		46B52334170EB47E00F6DF2A /* GUI */ = {
+			isa = PBXGroup;
+			children = (
+				46B52335170EB47E00F6DF2A /* AttributesEditor.cpp */,
+				46B52336170EB47E00F6DF2A /* BasicBox.cpp */,
+				46B52337170EB47E00F6DF2A /* BoxContextMenu.cpp */,
+				46B52338170EB47E00F6DF2A /* BoxCurveEdit.cpp */,
+				46B52339170EB47E00F6DF2A /* BoxWidget.cpp */,
+				46B5233A170EB47E00F6DF2A /* ChooseTemporalRelation.cpp */,
+				46B5233B170EB47E00F6DF2A /* Comment.cpp */,
+				46B5233C170EB47E00F6DF2A /* ControlBox.cpp */,
+				46B5233D170EB47E00F6DF2A /* ControlBoxContextMenu.cpp */,
+				46B5233E170EB47E00F6DF2A /* CurvesWidget.cpp */,
+				46B5233F170EB47E00F6DF2A /* CurveWidget.cpp */,
+				46B52340170EB47E00F6DF2A /* DeviceEdit.cpp */,
+				46B52341170EB47E00F6DF2A /* Help.cpp */,
+				46B52342170EB47E00F6DF2A /* Interpolation.cpp */,
+				46B52343170EB47E00F6DF2A /* LogarithmicSlider.cpp */,
+				46B52344170EB47E00F6DF2A /* MainWindow.cpp */,
+				46B52345170EB47E00F6DF2A /* MaquetteScene.cpp */,
+				46B52346170EB47E00F6DF2A /* MaquetteView.cpp */,
+				46B52347170EB47E00F6DF2A /* MaquetteWidget.cpp */,
+				46B52348170EB47E00F6DF2A /* NetworkConfig.cpp */,
+				46B52349170EB47E00F6DF2A /* NetworkMessagesEditor.cpp */,
+				46B5234A170EB47E00F6DF2A /* NetworkTree.cpp */,
+				46B5234B170EB47E00F6DF2A /* ParentBox.cpp */,
+				46B5234C170EB47E00F6DF2A /* ParentBoxContextMenu.cpp */,
+				46B5234D170EB47E00F6DF2A /* PlayingThread.cpp */,
+				46B5234E170EB47E00F6DF2A /* PreviewArea.cpp */,
+				46B5234F170EB47E00F6DF2A /* Relation.cpp */,
+				46B52350170EB47E00F6DF2A /* RelationEdit.cpp */,
+				46B52351170EB47E00F6DF2A /* SoundBox.cpp */,
+				46B52352170EB47E00F6DF2A /* SoundBoxContextMenu.cpp */,
+				46B52353170EB47E00F6DF2A /* TextEdit.cpp */,
+				46B52354170EB47E00F6DF2A /* TimeBarWidget.cpp */,
+				46B52355170EB47E00F6DF2A /* TreeMap.cpp */,
+				46B52356170EB47E00F6DF2A /* TreeMapElement.cpp */,
+				46B52357170EB47E00F6DF2A /* TriggerPoint.cpp */,
+				46B52358170EB47E00F6DF2A /* ViewRelations.cpp */,
+			);
+			path = GUI;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		46B522EC170EB42300F6DF2A /* i-score */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION) $(Configuration)";
+			buildConfigurationList = 46B522EF170EB42300F6DF2A /* Build configuration list for PBXLegacyTarget "i-score" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "";
+			dependencies = (
+			);
+			name = "i-score";
+			passBuildSettingsInEnvironment = 1;
+			productName = "i-score";
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		46B522E8170EB42300F6DF2A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0460;
+				ORGANIZATIONNAME = OSSIA;
+			};
+			buildConfigurationList = 46B522EB170EB42300F6DF2A /* Build configuration list for PBXProject "i-score" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 46B522E7170EB42300F6DF2A;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				46B522EC170EB42300F6DF2A /* i-score */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		46B522ED170EB42300F6DF2A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		46B522EE170EB42300F6DF2A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		46B522F0170EB42300F6DF2A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUGGING_SYMBOLS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		46B522F1170EB42300F6DF2A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		46B522EB170EB42300F6DF2A /* Build configuration list for PBXProject "i-score" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				46B522ED170EB42300F6DF2A /* Debug */,
+				46B522EE170EB42300F6DF2A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		46B522EF170EB42300F6DF2A /* Build configuration list for PBXLegacyTarget "i-score" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				46B522F0170EB42300F6DF2A /* Debug */,
+				46B522F1170EB42300F6DF2A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 46B522E8170EB42300F6DF2A /* Project object */;
+}

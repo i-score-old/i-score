@@ -49,6 +49,7 @@ knowledge of the CeCILL license and that you accept its terms.
 #include "SoundBox.hpp"
 #include "ViewRelations.hpp"
 #include "MaquetteWidget.hpp"
+#include "NetworkTree.hpp"
 
 #include <QResource>
 #include <QString>
@@ -114,25 +115,25 @@ MainWindow::MainWindow()
   _editor->init();
   _editor->show();
 
+  _commandKey = false;
+
   // Central Widget
   _maquetteWidget = new MaquetteWidget(this,_view,_scene);
-
-//  createMaquetteWidget();
+  _networkConfig = new NetworkConfig(_scene,this);
   setCentralWidget(_maquetteWidget);
-//  setCentralWidget(_view);
 
   // Creating widgets
   createActions();
   createMenus();
-//  createToolBars();
   createStatusBar();
 
   setCurrentFile("");
-
   setAcceptDrops(false);
-//  connect(_maquetteWidget,SIGNAL(beginPlaying()),this,SLOT(play()));
+
   connect(_maquetteWidget,SIGNAL(accelerationValueChanged(int)),this,SLOT(accelerationChanged(int)));
   connect(_view->verticalScrollBar(),SIGNAL(valueChanged(int)),_scene,SLOT(verticalScroll(int)));
+  connect(_scene,SIGNAL(networkConfigChanged(std::string,std::string,std::string,std::string)),this,SLOT(changeNetworkConfig(std::string,std::string,std::string,std::string)));
+  connect(_editor->networkTree(),SIGNAL(cmdKeyStateChanged(bool)),this,SLOT(updateCmdKeyState(bool)));
 }
 
 MainWindow::~MainWindow()
@@ -183,6 +184,7 @@ MainWindow::~MainWindow()
   delete _freePlayAct;
 
   delete _helpDialog;
+  delete _networkConfig;
 }
 
 void
@@ -265,7 +267,12 @@ MainWindow::newFile()
       break;
     }
   }
-  _scene->clear();
+  _scene->clear();  
+  _editor->clear();
+
+  _scene->init();
+  _editor->init();
+
   setCurrentFile("");  
 }
 
@@ -298,12 +305,12 @@ MainWindow::open()
 
 bool
 MainWindow::save()
-{
+{    
   if (_curFile.isEmpty()) {
     return saveAs();
   }
   else {
-    return saveFile(_curFile);
+    return saveFile(_curFile);    
   }
 }
 
@@ -516,16 +523,34 @@ MainWindow::escapeKeyPressed() {
 */
 
 void
-MainWindow::timeEndReached() {
+MainWindow::keyPressEvent(QKeyEvent *event){
+    QMainWindow::keyPressEvent(event);
+    if(event->key()==Qt::Key_Control){
+        updateCmdKeyState(true);
+    }
+}
 
+void
+MainWindow::keyReleaseEvent(QKeyEvent *event){
+    QMainWindow::keyReleaseEvent(event);
+    updateCmdKeyState(false);
+    _commandKey = false;
+}
+
+bool
+MainWindow::commandKey(){
+    return _commandKey;
+}
+
+void
+MainWindow::timeEndReached() {
   _accelerationSlider->setEnabled(true);
   _accelerationDisplay->setEnabled(true);
   _playAct->setChecked(false);
 }
 
 void
-MainWindow::play()
-{
+MainWindow::play(){
   //_accelerationSlider->setDisabled(true);
   _playAct->setChecked(true);
   _scene->play();
@@ -631,8 +656,8 @@ MainWindow::selectMode(const InteractionMode &mode,const BoxCreationMode &boxMod
 }
 
 void MainWindow::networkConfig() {
-  NetworkConfig network(_scene, this);
-  network.exec();
+//  _networkConfig = new NetworkConfig(_scene, this);
+  _networkConfig->exec();
 }
 
 bool
@@ -993,19 +1018,45 @@ MainWindow::loadFile(const QString &fileName)
 {
   QApplication::setOverrideCursor(Qt::WaitCursor);
   _scene->clear();
-  _scene->load(fileName.toStdString());
+  _editor->clear();  
+
+  _scene->load(fileName.toStdString());    
 
   QApplication::restoreOverrideCursor();
 
   setCurrentFile(fileName);
   statusBar()->showMessage(tr("File loaded"), 2000);
-
   update();
 }
 
 bool
 MainWindow::saveFile(const QString &fileName)
 {
+    /**** Backup automatique Résidence Albi ****/
+//    QDate date = QDate::currentDate();
+//    QTime time = QTime::currentTime();
+//    QString timeString = time.toString();
+
+//    QString concat(tr("(")+QString("%1-%2-%3").arg(date.day()).arg(date.month()).arg(date.year())+tr("-")+timeString+tr(")"));
+
+//    QString backupName = fileName;
+//    int i = fileName.indexOf(".xml");
+//    backupName.insert(i,concat);
+
+//    QProcess process;
+//    QStringList XMLargs, SIMONEargs;
+
+//    XMLargs<< fileName;
+//    XMLargs<< backupName;
+
+//    SIMONEargs<< QString(fileName+tr(".simone"));
+//    SIMONEargs<< QString(backupName+tr(".simone"));
+
+//    process.start("cp", XMLargs);
+//    process.execute("cp", SIMONEargs);
+//    process.close();
+    /*******************************************/
+
   QString fileN;
   if (!fileName.endsWith(".xml")) {
     fileN = fileName + ".xml";
@@ -1052,4 +1103,15 @@ QString
 MainWindow::strippedName(const QString &fullFileName)
 {
   return QFileInfo(fullFileName).fileName();
+}
+
+void
+MainWindow::changeNetworkConfig(std::string deviceName,std::string pluginName, std::string IP, std::string port){
+    _networkConfig->setNetworkConfig(deviceName,pluginName, IP,port);
+}
+
+void
+MainWindow::updateCmdKeyState(bool state){    
+    displayMessage(state ? tr("command key pressed") : tr(""),INDICATION_LEVEL);
+    _commandKey = state;
 }

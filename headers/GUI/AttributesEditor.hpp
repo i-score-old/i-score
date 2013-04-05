@@ -134,6 +134,16 @@ class AttributesEditor : public QDockWidget
    * \brief Updates values of widgets according to the editor current attributes
    **/
   void updateWidgets(bool boxModified);
+  /*!
+   * \brief Assigns the snapshot to the start of the box.
+   */
+  void snapshotStartAssignment();
+  /*!
+   * \brief Assigns the snapshot to the end of the box.
+   */
+  void snapshotEndAssignment();
+  inline NetworkTree *networkTree(){return _networkTree;}  
+  virtual void clear();
 
  protected:
   /*!
@@ -155,7 +165,8 @@ class AttributesEditor : public QDockWidget
    * \brief Associates slots with QWidgets' signals.
    **/
   void connectSlots();
-
+  void keyPressEvent(QKeyEvent *event);
+  void keyReleaseEvent(QKeyEvent *event);
 
   private slots:
 
@@ -241,16 +252,17 @@ class AttributesEditor : public QDockWidget
   void curveActivationChanged(QTreeWidgetItem *item, bool activated);
   void curveRedundancyChanged(QTreeWidgetItem *item, bool activated);
   void curveSampleRateChanged(QTreeWidgetItem *item, int value);
-
+  void deployMessageChanged(QTreeWidgetItem *item, QString address);
+  void deployDeviceChanged(QString oldName, QString newName);
 
   /*!
    * \brief Updates box start message
    */
-  void startMessagesChanged();
+  void startMessagesChanged(bool forceUpdate=false);
   /*!
    * \brief Updates box end message
    */
-  void endMessagesChanged();
+  void endMessagesChanged(bool forceUpdate=false);
   /*!
    * \brief Called when profiles are modified.
    */
@@ -271,14 +283,7 @@ class AttributesEditor : public QDockWidget
    * \brief Called when the name of the box is changed.
    */
   void nameChanged();
-  /*!
-   * \brief Assigns the snapshot to the start of the box.
-   */
-  void snapshotStartAssignment();
-  /*!
-   * \brief Assigns the snapshot to the end of the box.
-   */
-  void snapshotEndAssignment();
+
 
   void treeMapStartAssignment();
   void treeMapEndAssignment();

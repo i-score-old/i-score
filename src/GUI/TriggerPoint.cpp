@@ -157,12 +157,12 @@ TriggerPoint::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 void
 TriggerPoint::keyPressEvent(QKeyEvent *event){
 
-//    if(event->key() == Qt::Key_Right || event->key() == Qt::Key_0 ){
-//        if (_abstract->waiting()) {
-//            _scene->trigger(this);
-//            setSelected(false);
-//        }
-//    }
+    if(event->key() == Qt::Key_Right){
+        if (_abstract->waiting()) {
+            _scene->trigger(this);
+            setSelected(false);
+        }
+    }
 }
 
 QInputDialog *

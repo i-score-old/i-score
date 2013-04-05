@@ -49,7 +49,6 @@ knowledge of the CeCILL license and that you accept its terms.
 
 class MaquetteScene;
 
-
 const float TimeBarWidget::TIME_BAR_HEIGHT =  15.;
 const float TimeBarWidget::LEFT_MARGIN =  0.5;
 const float TimeBarWidget::NUMBERS_POINT_SIZE =  10.;
@@ -101,12 +100,14 @@ TimeBarWidget::updateZoom(float newValue){
 
 void
 TimeBarWidget::drawBackground(QPainter *painter, QRect rect){
+    Q_UNUSED(rect);
+
     painter->save();
 
     const int WIDTH = width();
     const int HEIGHT = TIME_BAR_HEIGHT;
 
-    float j_PXL,i_PXL;
+    float i_PXL;
     QFont *font = new QFont();
     font->setPointSize(NUMBERS_POINT_SIZE);
     painter->setFont(*font);
@@ -119,7 +120,14 @@ TimeBarWidget::drawBackground(QPainter *painter, QRect rect){
         i_PXL = i * S_TO_MS / MaquetteScene::MS_PER_PIXEL + LEFT_MARGIN;
 
         painter->drawLine(QPointF(i_PXL, 3*HEIGHT/4), QPointF(i_PXL, HEIGHT));
-        painter->drawText(QPointF(i_PXL, 2*HEIGHT/3),QString("%1").arg(i));
+
+        if(factor>=1){
+            int m = (int)i / 60;
+            int s = i-(m*60);
+            painter->drawText(QPointF(i_PXL, 2*HEIGHT/3),QString("%1'%2").arg(m).arg(s));
+        }
+        else
+            painter->drawText(QPointF(i_PXL, 2*HEIGHT/3),QString("%1").arg(i));
     }
 
     painter->restore();
@@ -127,10 +135,11 @@ TimeBarWidget::drawBackground(QPainter *painter, QRect rect){
 
 void
 TimeBarWidget::paintEvent(QPaintEvent *event){
+    Q_UNUSED(event);
+
     QPainter *painter = new QPainter(this);
     painter->setRenderHint(QPainter::Antialiasing, true);
 
-    QPen *pen = new QPen;
     painter->drawRect(_rect);
     drawBackground(painter,_rect);
     delete painter;

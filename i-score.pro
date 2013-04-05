@@ -66,12 +66,11 @@ macx-clang {
     QMAKE_LFLAGS += -L/usr/local/lib/ -L/usr/local/jamoma/lib -L/System/Library/Frameworks/ -L/Library/Frameworks/
     #QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
     #QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
-    LIBS += /usr/local/jamoma/lib/JamomaFoundation.dylib /usr/local/jamoma/lib/JamomaDSP.dylib /usr/local/jamoma/lib/JamomaScore.dylib /usr/local/jamoma/lib/JamomaModular.dylib -lDeviceManager -framework gecode -lxml2
+    LIBS += /usr/local/jamoma/lib/JamomaFoundation.dylib /usr/local/jamoma/lib/JamomaDSP.dylib /usr/local/jamoma/lib/JamomaScore.dylib /usr/local/jamoma/lib/JamomaModular.dylib -framework gecode -lxml2
 }
 
 # Input
 HEADERS += /usr/local/jamoma/includes/TTScore.h \
-/usr/local/jamoma/includes/CSPTypes.hpp \
 /usr/local/jamoma/includes/TTModular.h \
 /usr/local/jamoma/includes/TTDSP.h \
 /usr/local/jamoma/includes/TTDictionnary.h \
@@ -122,7 +121,8 @@ headers/data/NetworkMessages.hpp \
 headers/GUI/BoxWidget.hpp \
 headers/GUI/BoxCurveEdit.hpp \
 headers/GUI/MaquetteWidget.hpp \
-headers/GUI/TimeBarWidget.hpp
+headers/GUI/TimeBarWidget.hpp \
+headers/GUI/DeviceEdit.hpp \
 
 SOURCES += src/main.cpp \
 src/data/Abstract.cpp \
@@ -136,6 +136,7 @@ src/data/AbstractSoundBox.cpp \
 src/data/AbstractTriggerPoint.cpp \
 src/data/Maquette.cpp \
 src/data/Palette.cpp \
+src/GUI/AttributesEditor.cpp \
 src/GUI/BasicBox.cpp \
 src/GUI/BoxContextMenu.cpp \
 src/GUI/ChooseTemporalRelation.cpp \
@@ -171,5 +172,4 @@ src/GUI/BoxWidget.cpp \
 src/GUI/BoxCurveEdit.cpp \
 src/GUI/MaquetteWidget.cpp \
 src/GUI/TimeBarWidget.cpp \
-src/GUI/AttributeEditor.cpp
-
+src/GUI/DeviceEdit.cpp \

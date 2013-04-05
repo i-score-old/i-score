@@ -89,9 +89,10 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
     setLayout(_maquetteLayout);
 
 
-//    connect(_scene,SIGNAL(stopPlaying()),this,SLOT(stop()));
+    connect(_scene,SIGNAL(stopPlaying()),this,SLOT(stop()));
     connect(_view,SIGNAL(zoomChanged(float)),this,SLOT(changeZoom(float)));
     connect(_view,SIGNAL(playModeChanged()),this,SLOT(updateHeader()));
+    connect(_scene,SIGNAL(playModeChanged()),this,SLOT(updateHeader()));
 //    connect(_view,SIGNAL(zoomChanged(float)),_timeBar,SLOT(updateZoom(float)));
 }
 
@@ -118,7 +119,6 @@ MaquetteWidget::paintEvent(QPaintEvent *event){
 //    painter->setPen(pen);
 //    painter->drawRect(QRect(0,3,10,10));
 ////    painter->drawPath(path);
-//    std::cout<<"PINA"<<std::endl;
 //    delete painter;
 }
 
@@ -274,7 +274,10 @@ MaquetteWidget::play(){
 
 void
 MaquetteWidget::stop(){
-    _scene->pause();
+    if(_scene->playing())
+        _scene->pause();
+    else
+        _scene->stopGotoStart();
     updateHeader();
 }
 
@@ -296,6 +299,7 @@ MaquetteWidget::setName(QString name){
 
 void
 MaquetteWidget::setAvailableMenu(QWidget *widget){
+    Q_UNUSED(widget);
     //TODO
 }
 

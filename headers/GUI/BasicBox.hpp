@@ -59,6 +59,8 @@ knowledge of the CeCILL license and that you accept its terms.
 #include <QComboBox>
 #include <QGraphicsProxyWidget>
 #include <QObject>
+#include <QPushButton>
+#include <QMenu>
 
 #include "TTScore.h"
 
@@ -80,8 +82,8 @@ enum {BASIC_BOX_TYPE = QGraphicsItem::UserType + 1};
 /*!
  * \brief Enum used to manage various box extremities.
  */
-enum BoxExtremity {NO_EXTREMITY = -1, BOX_START = BEGIN_CONTROL_POINT_INDEX,
-		   BOX_END = END_CONTROL_POINT_INDEX};
+enum BoxExtremity {NO_EXTREMITY = -1, BOX_START = 1,
+           BOX_END = 2};
 
 /*!
  * \class BasicBox
@@ -285,6 +287,9 @@ class BasicBox : public QObject, public QGraphicsItem
   QRectF boxRect();
   QRectF boxBody();
   void curveActivationChanged(string address, bool activated);
+  void setMessage(QTreeWidgetItem *item, QString address);
+  void createActions();
+  void createMenus();
 
   /*!
    * \brief Gets the top left of the box in the scene coordinates.
@@ -489,6 +494,8 @@ class BasicBox : public QObject, public QGraphicsItem
    * \param messages : the messages to send at box's start
    */
   void setStartMessages(NetworkMessages *messages);
+  NetworkMessages *startMessages();
+  void setStartMessage(QTreeWidgetItem *item, QString address);
   /*!
    * \brief Sets networkTreeItems to send when the start of the box is reached.
    *
@@ -529,12 +536,15 @@ class BasicBox : public QObject, public QGraphicsItem
    * \param messages : the messages to send at box's end
    */
   void setEndMessages(NetworkMessages *messages);
+  NetworkMessages *endMessages();
+  void setEndMessage(QTreeWidgetItem *item, QString address);
+
   void updateWidgets();
   //! \brief Handles line width.
   static const unsigned int LINE_WIDTH = 2;
   //! \brief Handles resizing tolerance.
   static const unsigned int RESIZE_TOLERANCE = 25;
-  static const unsigned int BOX_MARGIN = 10;
+  static unsigned int BOX_MARGIN;
   static const float TRIGGER_ZONE_WIDTH;
   static const float TRIGGER_ZONE_HEIGHT;
   static const float TRIGGER_EXPANSION_FACTOR;
@@ -564,25 +574,27 @@ class BasicBox : public QObject, public QGraphicsItem
    */
   bool operator<(BasicBox *box) const;
   void updateCurves();
+  void updateCurve(string address, bool forceUpdate);
   void centerWidget();
   void createWidget();
   void drawInteractionGrips(QPainter *painter);
   void drawTriggerGrips(QPainter *painter);
+  void drawHoverShape(QPainter *painter);
+
   void updateBoxSize();
   inline QRectF leftEar(){return _leftEar;}
   inline QRectF rightEar(){return _rightEar;}
-  inline BoxWidget *curvesWidget(){return _curvesWidget;}
+  inline BoxWidget *boxContentWidget(){return _boxContentWidget;}
   inline QWidget *boxWidget(){return _boxWidget;}
   inline MaquetteScene *maquetteScene(){return _scene;}
-  inline void setComboBox(QComboBox *cbox){curvesWidget()->setComboBox(cbox);}
-  inline void setStackedLayout(QStackedLayout *slayout){curvesWidget()->setStackedLayout(slayout);}
+  inline void setComboBox(QComboBox *cbox){boxContentWidget()->setComboBox(cbox);}
+  inline void setStackedLayout(QStackedLayout *slayout){boxContentWidget()->setStackedLayout(slayout);}
   inline bool hasCurve(string address){return _curvesAddresses.contains(address);}
   void refresh();
 
   QPointF getLeftGripPoint();
   QPointF getRightGripPoint();
   void displayCurveEditWindow();
-  void drawBox(QPainter *painter);
   inline bool hasStartMsgs(){return _abstract->hasFirstMsgs();}
   inline bool hasEndMsgs(){return _abstract->hasLastMsgs();}
   void drawMsgsIndicators(QPainter *painter);  
@@ -685,7 +697,7 @@ class BasicBox : public QObject, public QGraphicsItem
   QMap<BoxExtremity,TriggerPoint*> *_triggerPoints; //!< The trigger points.
   std::map < BoxExtremity,std::map < unsigned int, Relation* > > _relations; //!< The relations.
   std::map<std::string,AbstractCurve*> _abstractCurves; //!< The Curves
-  BoxWidget *_curvesWidget;
+  BoxWidget *_boxContentWidget;
 
   QRectF _boxRect;
   QRectF _leftEar;
@@ -706,6 +718,20 @@ class BasicBox : public QObject, public QGraphicsItem
   QColor _colorUnselected;
   bool _low;
   bool _hover;
+
+  QAction *_jumpToStartCue;
+  QAction *_jumpToEndCue;
+  QAction *_updateStartCue;
+  QAction *_updateEndCue;
+
+  QMenu *_startMenu;
+  QMenu *_endMenu;
+
+  QPushButton *_startMenuButton;
+  QPushButton *_endMenuButton;
+
 };
+
+
 
 #endif

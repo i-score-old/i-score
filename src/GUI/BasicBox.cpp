@@ -89,12 +89,17 @@ const float BasicBox::MSGS_INDICATOR_WIDTH = 50;
 const float BasicBox::EAR_WIDTH = 9;
 const float BasicBox::EAR_HEIGHT = 30;
 const float BasicBox::GRIP_CIRCLE_SIZE = 5;
+unsigned int BasicBox::BOX_MARGIN = 25;
 const QString BasicBox::SUB_SCENARIO_MODE_TEXT = tr("Scenario");
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
 : QGraphicsItem()
 {
     _scene = parent;
+    _startMenu = NULL;
+    _endMenu = NULL;
+    _startMenuButton = NULL;
+    _endMenuButton = NULL;
 
     int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
 
@@ -109,26 +114,95 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
     _abstract->setWidth(xmax-xmin);
     _abstract->setHeight(ymax-ymin);
 
-    createWidget();
-
     init();
 
-    update();
-    connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),_curvesWidget, SLOT(updateDisplay(const QString&)));
-//    connect(_comboBox,SIGNAL(activated(const QString&)),_curvesWidget, SLOT(displayCurve(const QString&)));
+    createWidget();
+    createActions();
+    createMenus();
 
+    update();
+    connect(_comboBox,SIGNAL(currentIndexChanged(const QString&)),_boxContentWidget, SLOT(updateDisplay(const QString&)));
 }
 
 void
 BasicBox::centerWidget(){
-
     _boxWidget->move(-(width())/2+LINE_WIDTH,-(height())/2 + (1.2*RESIZE_TOLERANCE));
     _boxWidget->resize(width()-2*LINE_WIDTH,height()-1.5*RESIZE_TOLERANCE);
 
     _comboBox->move(0,-(height()/2+LINE_WIDTH));
-    _comboBox->resize((width() - 2*LINE_WIDTH)/2,COMBOBOX_HEIGHT);
+    _comboBox->resize((width() - 4*LINE_WIDTH - BOX_MARGIN)/2,COMBOBOX_HEIGHT);
+
+    _startMenuButton->move(-(width())/2+LINE_WIDTH,-(height())/2);
+    _endMenuButton->move((width())/2+2*LINE_WIDTH-BOX_MARGIN,-(height())/2+LINE_WIDTH);
 }
 
+void
+BasicBox::createActions(){
+    _jumpToStartCue = new QAction("Jump to cue",this);
+    _jumpToEndCue = new QAction("Jump to cue",this);        
+    _updateStartCue = new QAction("Update cue",this);
+    _updateEndCue = new QAction("Update cue",this);
+
+    connect(_jumpToStartCue,SIGNAL(triggered()),_boxContentWidget,SLOT(jumpToStartCue()));
+    connect(_jumpToEndCue,SIGNAL(triggered()),_boxContentWidget,SLOT(jumpToEndCue()));
+    connect(_updateStartCue,SIGNAL(triggered()),_boxContentWidget,SLOT(updateStartCue()));
+    connect(_updateEndCue,SIGNAL(triggered()),_boxContentWidget,SLOT(updateEndCue()));
+}
+
+void
+BasicBox::createMenus(){
+
+    _startMenu = new QMenu(tr("&StartMenu"));
+    _startMenu->setParent(_boxWidget);
+    _startMenu->setWindowModality(Qt::ApplicationModal);
+    _startMenu->addAction(_jumpToStartCue);
+    _startMenu->addAction(_updateStartCue);
+
+    _endMenu = new QMenu(tr("&EndMenu"));
+    _endMenu->setParent(_boxWidget);
+    _endMenu->setWindowModality(Qt::ApplicationModal);
+    _endMenu->addAction(_jumpToEndCue);
+    _endMenu->addAction(_updateEndCue);
+
+    //--- start button ---
+    QIcon startMenuIcon(":/images/boxStartMenu.svg");
+    _startMenuButton = new QPushButton();    
+    _startMenuButton->setIcon(startMenuIcon);
+    _startMenuButton->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    _startMenuButton->setStyleSheet(
+            "QPushButton {"
+            "border: none;"
+            "border-radius: none;"
+            "background-color: transparent;"
+            "};"
+            );
+    _boxContentWidget->setStartMenu(_startMenu);
+
+    //--- end button ---
+    QIcon endMenuIcon(":/images/boxEndMenu.svg");
+    _endMenuButton = new QPushButton();
+    _endMenuButton->setIcon(endMenuIcon);
+    _endMenuButton->setShortcutEnabled(1,false);
+    _endMenuButton->setStyleSheet(
+                "QPushButton {"
+                "border: none;"
+                "border-radius: none;"
+                "background-color: transparent;"
+                "}"
+                );
+    _boxContentWidget->setEndMenu(_endMenu);
+
+    QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
+    startMenuProxy->setWidget(_startMenuButton);
+    QGraphicsProxyWidget *endMenuProxy =  new QGraphicsProxyWidget(this);
+    endMenuProxy->setWidget(_endMenuButton);
+
+    connect(_startMenuButton,SIGNAL(clicked()),_boxContentWidget,SLOT(execStartAction()));
+    connect(_endMenuButton,SIGNAL(clicked()),_boxContentWidget,SLOT(execEndAction()));    
+    connect(_startMenuButton,SIGNAL(customContextMenuRequested(QPoint)),_boxContentWidget,SLOT(displayStartMenu(QPoint)));
+    connect(_endMenuButton,SIGNAL(customContextMenuRequested(QPoint)),_boxContentWidget,SLOT(displayEndMenu(QPoint)));
+}
 
 void
 BasicBox::updateWidgets(){
@@ -137,7 +211,7 @@ BasicBox::updateWidgets(){
 
 void
 BasicBox::updateDisplay(QString displayMode){
-
+    Q_UNUSED(displayMode)
 }
 
 void
@@ -150,18 +224,16 @@ BasicBox::createWidget(){
     QPalette palette;
     palette.setBrush(QPalette::Background,brush);
 
-
     //---------------------- Curve widget ----------------------//
-
     _boxWidget = new QWidget();
-    _curvesWidget = new BoxWidget(_boxWidget,this);
+    _boxContentWidget = new BoxWidget(_boxWidget,this);
     QGridLayout *layout = new QGridLayout;
-    layout->addWidget(_curvesWidget);
+    layout->addWidget(_boxContentWidget);
     layout->setMargin(0);
     layout->setContentsMargins(0,0,0,0);
     layout->setAlignment(_boxWidget,Qt::AlignLeft);
     _boxWidget->setLayout(layout);
-    _curvesWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    _boxContentWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
     _curveProxy = new QGraphicsProxyWidget(this);
 
@@ -173,7 +245,6 @@ BasicBox::createWidget(){
     _curveProxy->setAcceptsHoverEvents(true);
     _curveProxy->setWidget(_boxWidget);
     _curveProxy->setPalette(palette);
-
 
     //---------------- ComboBox (curves list) ------------------//
     _comboBox = new QComboBox;
@@ -187,7 +258,8 @@ BasicBox::createWidget(){
     _comboBoxProxy = new QGraphicsProxyWidget(this);
     _comboBoxProxy->setWidget(_comboBox);
     _comboBoxProxy->setPalette(palette);
-    _curvesWidget->setComboBox(_comboBox);    
+    _boxContentWidget->setComboBox(_comboBox);
+
 }
 
 BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
@@ -223,7 +295,7 @@ BasicBox::updateFlexibility(){
 
 void
 BasicBox::init()
-{
+{    
     _hasContextMenu = false;
     _shift = false;
     _playing = false;
@@ -257,12 +329,18 @@ BasicBox::changeColor(QColor color){
 
 void
 BasicBox::addToComboBox(QString address){
-    _curvesWidget->addToComboBox(address);
+    _boxContentWidget->addToComboBox(address);
 }
 
 void
 BasicBox::updateCurves(){
-    _curvesWidget->updateMessages(_abstract->ID(),true);
+    _boxContentWidget->updateMessages(_abstract->ID(),true);
+    update();
+}
+
+void
+BasicBox::updateCurve(string address, bool forceUpdate){
+    _boxContentWidget->updateCurve(address,forceUpdate);
     update();
 }
 
@@ -310,7 +388,7 @@ BasicBox::getSize() const
 
 QPointF
 BasicBox::getLeftGripPoint()
-{
+{    
     return QPointF(_abstract->topLeft().x(), _abstract->topLeft().y() + _abstract->height()/2.);
 }
 
@@ -383,8 +461,7 @@ void
 BasicBox::setSize(const QPointF & size)
 {
     _abstract->setWidth(std::max((float)size.x(),MaquetteScene::MS_PRECISION / MaquetteScene::MS_PER_PIXEL));
-    _abstract->setHeight(size.y());
-
+    _abstract->setHeight(size.y());    
     updateStuff();
 }
 
@@ -459,8 +536,9 @@ BasicBox::getStartState(){
 
     //Start values
     QList<QString> startAddresses = startMsgs.keys();
-    for(QList<QString>::iterator it = startAddresses.begin() ; it!=startAddresses.end() ; it++)
-        finalMessages.insert(*it,QPair<QString,unsigned int>(startMsgs.value(*it),date()));
+    for(QList<QString>::iterator it = startAddresses.begin() ; it!=startAddresses.end() ; it++){
+        finalMessages.insert(*it,QPair<QString,unsigned int>(startMsgs.value(*it),date()));        
+    }
 
     return finalMessages;
 }
@@ -533,6 +611,7 @@ BasicBox::setColor(const QColor & color)
 
 void
 BasicBox::updateRelations(BoxExtremity extremity){
+
     std::map< BoxExtremity,std::map < unsigned int, Relation* > >::iterator it;
     std::map< unsigned int, Relation* >::iterator it2;
     std::map< unsigned int, Relation* >cur;
@@ -552,7 +631,7 @@ BasicBox::updateRelations(BoxExtremity extremity){
 
 void
 BasicBox::updateStuff()
-{
+{    
     updateBoxSize();
     if (_comment != NULL) {
         _comment->updatePos();
@@ -576,7 +655,7 @@ BasicBox::updateStuff()
 
 void
 BasicBox::addRelation(BoxExtremity extremity, Relation *rel)
-{
+{    
     map<BoxExtremity,Relation*>::iterator it;
     _relations[extremity][rel->ID()] = rel;
     _relations[extremity][rel->ID()]->updateCoordinates();
@@ -670,16 +749,9 @@ BasicBox::setCrossedTriggerPoint(bool waiting, BoxExtremity extremity)
 
 
 bool
-BasicBox::hasTriggerPoint(BoxExtremity extremity)
-{
-//    if(!_triggerPoints != NULL){
-//        std::cout<<"bug"<<std::endl;
-        bool result = _triggerPoints->contains(extremity);
-//        std::cout<<"ah non "<<std::endl;
-        return result;
-//    }
-//    else
-//        return false;
+BasicBox::hasTriggerPoint(BoxExtremity extremity){
+    bool result = _triggerPoints->contains(extremity);
+    return result;
 }
 
 bool
@@ -701,7 +773,6 @@ BasicBox::addTriggerPoint(BoxExtremity extremity)
     }
 
     bool ret = false;
-//    if (_triggerPoints.find(extremity) == _triggerPoints.end()) {
     if(!_triggerPoints->contains(extremity)){
 
         int trgID = _scene->addTriggerPoint(_abstract->ID(),extremity,trgName);
@@ -795,7 +866,6 @@ BasicBox::setFirstMessagesToSend(const vector<string> &messages) {
 void
 BasicBox::setStartMessages(NetworkMessages *messages) {
     _abstract->setStartMessages(messages);
-
 }
 
 void
@@ -833,6 +903,25 @@ BasicBox::setEndMessages(NetworkMessages *messages) {
     _abstract->setEndMessages(messages);
 }
 
+NetworkMessages *
+BasicBox::endMessages(){
+    return _abstract->endMessages();
+}
+
+void
+BasicBox::setStartMessage(QTreeWidgetItem *item, QString address) {
+    _abstract->setStartMessage(item,address);
+}
+
+NetworkMessages *
+BasicBox::startMessages(){
+    return _abstract->startMessages();
+}
+
+void
+BasicBox::setEndMessage(QTreeWidgetItem *item, QString address) {
+    _abstract->setEndMessage(item,address);
+}
 vector<string>
 BasicBox::firstMessagesToSend() const {
     return _abstract->firstMsgs();
@@ -860,7 +949,7 @@ BasicBox::curveActivationChanged(string address, bool activated){
     if(!hasCurve(address))
         addCurve(address);
 
-    _curvesWidget->curveActivationChanged(QString::fromStdString(address),activated);
+    _boxContentWidget->curveActivationChanged(QString::fromStdString(address),activated);
 
     if(!activated)
         removeCurve(address);
@@ -897,7 +986,7 @@ BasicBox::removeCurve(const string &address)
     if (it != _abstractCurves.end()) {
         _abstractCurves.erase(it);
     }
-    _curvesWidget->removeCurve(address);
+    _boxContentWidget->removeCurve(address);
 }
 
 void
@@ -1067,7 +1156,7 @@ BasicBox::boxBody()
 }
 void
 BasicBox::keyPressEvent(QKeyEvent *event){
-    QGraphicsItem::keyPressEvent(event);
+    QGraphicsItem::keyPressEvent(event);    
 }
 
 void
@@ -1079,8 +1168,23 @@ void
 BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsItem::mousePressEvent(event);
+
+    if(_startMenu != NULL)
+        _startMenu->close();
+    if(_endMenu != NULL)
+        _endMenu->close();
+
     if (event->button() == Qt::LeftButton) {
         setSelected(true);
+
+//        if(_startMenuButton->is){
+//            std::cout<<"<<<<<CHECKED>>>>>"<<std::endl;
+//            if(event->modifiers()==Qt::ControlModifier){
+//                std::cout<<"<<<<<STARTMENU>>>>>"<<std::endl;
+//                _updateStartCue->trigger();
+//            }
+//        }
+
         if(cursor().shape() == Qt::OpenHandCursor)
             setCursor(Qt::ClosedHandCursor);
         if (cursor().shape() == Qt::ArrowCursor) {
@@ -1139,13 +1243,15 @@ BasicBox::lower(bool state){
 }
 
 void
-BasicBox::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
+BasicBox::contextMenuEvent(QGraphicsSceneContextMenuEvent * event )
 {
     QGraphicsItem::contextMenuEvent(event);
+
     if (_hasContextMenu) {
         setSelected(false);
         _contextMenu->exec(event->screenPos());
     }
+
 }
 
 QInputDialog *
@@ -1201,7 +1307,7 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
     QGraphicsItem::mouseMoveEvent(event);
     // Draw cursor coordinates as a tooltip
-//    CurveWidget *curve = (static_cast<CurveWidget *>(_curvesWidget->_stackedLayout->currentWidget()));
+//    CurveWidget *curve = (static_cast<CurveWidget *>(_boxContentWidget->_stackedLayout->currentWidget()));
 //    QPointF mousePos = curve->relativeCoordinates(event->pos());
 //    QRect rect;
 //    QString posStr = QString("%1 ; %2").arg(mousePos.x(),0,'f',2).arg(mousePos.y(),0,'f',2);
@@ -1255,7 +1361,8 @@ BasicBox::hoverEnterEvent ( QGraphicsSceneHoverEvent * event )
 {
     QGraphicsItem::hoverEnterEvent(event);
 
-    _hover=true;
+    _hover=true;        
+
     const float RESIZE_ZONE_WIDTH = 3*LINE_WIDTH;
 
     QRectF textRect(_boxRect.topLeft(),_boxRect.topRight() + QPointF(0,RESIZE_TOLERANCE));
@@ -1498,12 +1605,6 @@ BasicBox::drawInteractionGrips(QPainter *painter){
 }
 
 void
-BasicBox::drawBox(QPainter *painter){
-
-
-}
-
-void
 BasicBox::drawMsgsIndicators(QPainter *painter){
 
     if(width()>2*RESIZE_TOLERANCE){
@@ -1534,8 +1635,31 @@ BasicBox::drawMsgsIndicators(QPainter *painter){
 }
 
 void
+BasicBox::drawHoverShape(QPainter *painter){
+
+    float interspace = 2.;
+    int width = 2;
+
+    painter->save();
+
+    QPen penBlue(Qt::blue);
+    penBlue.setWidth(width);
+    painter->setPen(penBlue);
+
+    QPainterPath path;
+    path.addRect(_boxRect);
+    QRect hoverRect(QPoint(_boxRect.topLeft().x()-interspace,_boxRect.topLeft().y()-interspace) ,
+                    QPoint(_boxRect.bottomRight().x()+interspace,_boxRect.bottomRight().y()+interspace));
+
+    path.addRect(hoverRect);
+    painter->drawPath(path);
+
+    painter->restore();
+}
+
+void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
+{    
     Q_UNUSED(option);
     Q_UNUSED(widget);
 //    QPen penR(Qt::lightGray,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
@@ -1545,12 +1669,12 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     //************* pour afficher la shape *************
     QPen penG(Qt::blue);
     penG.setWidth(4);
-//    if(_hover){
-//        painter->setPen(penG);
-//        painter->drawRect(boundingRect());
-//        QPainterPath path = shape();
-//        painter->drawPath(path);
-//    }
+    if(isSelected())
+        drawHoverShape(painter);
+    else if(_hover)
+        drawHoverShape(painter);
+
+
 //    painter->drawRect(_leftEar);
 //    painter->drawRect(_rightEar);
 //    painter->drawRect(_startTriggerGrip);
@@ -1597,7 +1721,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
     painter->save();
     painter->setPen(QPen(Qt::black));
-    painter->drawText(QRectF(10,0,textRect.width(),textRect.height()),Qt::AlignLeft,name());
+    painter->drawText(QRectF(BOX_MARGIN,0,textRect.width(),textRect.height()),Qt::AlignLeft,name());
     painter->restore();
 
     if (_abstract->width() <= 3*RESIZE_TOLERANCE) {
@@ -1637,7 +1761,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
 void
 BasicBox::curveShowChanged(const QString &address,bool state){
-    _curvesWidget->curveShowChanged(address,state);
+    _boxContentWidget->curveShowChanged(address,state);
 }
 
 void

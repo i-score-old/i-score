@@ -62,7 +62,10 @@ using std::string;
 #include "Interpolation.hpp"
 #include "Maquette.hpp"
 #include "MaquetteScene.hpp"
+#include "MaquetteView.hpp"
 #include "ParentBox.hpp"
+#include "AttributesEditor.hpp"
+#include "MainWindow.hpp"
 
 #define COMBOBOX_WIDTH 500
 
@@ -77,6 +80,7 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
     QPalette palette;
     palette.setColor(QPalette::Background,QColor(255, 0, 0, 127));
     setPalette(palette);
+    setWindowFlags(Qt::Widget);
 
     update(); 
 
@@ -95,6 +99,8 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
     _parentWidget = parent;
     _curveWidgetList = new QList<CurveWidget *>;
 
+    _startMenu = NULL;
+    _endMenu = NULL;
 }
 
 BoxWidget::~BoxWidget(){
@@ -103,26 +109,29 @@ BoxWidget::~BoxWidget(){
 
 void
 BoxWidget::mousePressEvent(QMouseEvent *event){
+    Q_UNUSED(event);
+
+    if(_box->maquetteScene()->paused())
+        _box->maquetteScene()->stopWithGoto();
 
     if(_box->isSelected()){
         hide();
         setWindowModality(Qt::WindowModal);
         show();
-    }
+    }    
 }
 
 void BoxWidget::curveActivationChanged(const QString &address, bool state) {
-//    std::cout<<"BoxWidget::CurveActivation Changed"<<std::endl;
     if (_boxID != NO_ID) {
         Maquette::getInstance()->setCurveMuteState(_boxID,address.toStdString(),!state);
-        updateCurve(address.toStdString(),true);
+        updateCurve(address.toStdString(),false);
     }
 }
 
 void BoxWidget::curveRedundancyChanged(const QString &address,bool state) {
     if (_boxID != NO_ID) {
         Maquette::getInstance()->setCurveRedundancy(_boxID,address.toStdString(),state);
-        updateCurve(address.toStdString(),true);
+        updateCurve(address.toStdString(),false);
     }
 }
 
@@ -133,14 +142,14 @@ void BoxWidget::curveShowChanged(const QString &address, bool state) {
             curve->_show = state;
 
         }
-    updateCurve(address.toStdString(),true);
+    updateCurve(address.toStdString(),false);
     }
 }
 
 void BoxWidget::curveSampleRateChanged(const QString &address,int value) {
     if (_boxID != NO_ID) {
         Maquette::getInstance()->setCurveSampleRate(_boxID,address.toStdString(),value);
-        updateCurve(address.toStdString(),true);
+        updateCurve(address.toStdString(),false);
     }
 }
 
@@ -150,9 +159,7 @@ BoxWidget::updateDisplay(const QString &address){
     displayCurve(address);
 }
 
-void BoxWidget::displayCurve(const QString &address){
-//    std::cout<<"display : "<<address.toStdString()<<std::endl;
-
+void BoxWidget::displayCurve(const QString &address){    
     std::string add = address.toStdString();
     QMap<string,CurveWidget *>::iterator curveIt;
     CurveWidget *curveWidget;
@@ -160,11 +167,11 @@ void BoxWidget::displayCurve(const QString &address){
 
    //Unactive curves
     QList<CurveWidget *> values = _curveMap->values();
-    int count = values.size(), i=0;
+    int count = values.size();
 
     CurveWidget *cur;
 
-    for(i ; i<count ; i++){
+    for(int i=0 ; i<count ; i++){
         cur = values.at(i);
         cur->setLowerStyle(true);
         cur->repaint();
@@ -186,80 +193,6 @@ void BoxWidget::displayCurve(const QString &address){
         setEnabled(false);
     }
 }
-
-//void BoxWidget::displayCurve(const QString &address){
-////    std::cout<<"display : "<<address.toStdString()<<std::endl;
-
-//    std::string add = address.toStdString();
-//    QMap<string,CurveWidget *>::iterator curveIt;
-//    CurveWidget *curveWidget;
-
-
-//   //Unactive curves
-//    QList<CurveWidget *> values = _curveMap->values();
-//    int count = values.size(), i=0;
-
-//    CurveWidget *cur;
-
-//    for(i ; i<count ; i++){
-//        cur = values.at(i);
-//        cur->setLowerStyle(true);
-//        cur->repaint();
-//    }
-
-//    if(address!=BasicBox::SUB_SCENARIO_MODE_TEXT){
-//        std::cout<<address.toStdString()<<std::endl;
-//        setEnabled(true);
-//        curveIt = _curveMap->find(add);
-//        bool curveFound = (curveIt != _curveMap->end());
-
-//        if (curveFound) {
-//            curveWidget = curveIt.value();
-
-//            curveWidget->setLowerStyle(false);
-//            curveWidget->repaint();
-//            _stackedLayout->setCurrentWidget(curveWidget);
-
-//            if(_box->type() == PARENT_BOX_TYPE){
-//                BasicBox *child;
-//                std::map<unsigned int,BasicBox*>::iterator it;
-//                std::map<unsigned int,BasicBox*> children = static_cast<ParentBox*>(_box)->children();
-//                if(!children.empty()){
-//                    std::cout<<"Lower -> ";
-
-//                    for (it = static_cast<ParentBox*>(_box)->children().begin() ; it != static_cast<ParentBox*>(_box)->children().end() ; ++it){
-//                        child = it->second;
-//                        if(child!=NULL){
-//                            child->lower(true);
-//                            std::cout<<child->name().toStdString();
-//                        }
-//                    }
-//                    std::cout<<std::endl;
-//                }
-//            }
-//        }
-//    }
-//    else{
-//        setEnabled(false);
-//        if(_box->type() == PARENT_BOX_TYPE){
-//            BasicBox *child;
-//            std::map<unsigned int,BasicBox*>::iterator it;
-//            std::map<unsigned int,BasicBox*> children = static_cast<ParentBox*>(_box)->children();
-//            if(!children.empty()){
-//                for (it = static_cast<ParentBox*>(_box)->children().begin() ; it != static_cast<ParentBox*>(_box)->children().end() ; ++it){
-
-//                    child = it->second;//lows tous les _children
-//                    std::cout<<"rise -> ";
-//                    if(child!=NULL){
-////                        child->lower(false);
-//                        std::cout<<child->name().toStdString()<<std::endl;
-//                    }
-//                    std::cout<<std::endl;
-//                }
-//            }
-//        }
-//    }
-//}
 
 bool
 BoxWidget::contains(const string &address) {
@@ -302,7 +235,6 @@ BoxWidget::clearCurves(){
     for(int i=0 ; i<widgets.size() ; i++)
         _stackedLayout->removeWidget(widgets.at(i));
 
-//    _comboBox->clear();
     _curveMap->clear();
     _curveIndexes.clear();
     _curveWidgetList->clear();
@@ -310,7 +242,6 @@ BoxWidget::clearCurves(){
 
 void
 BoxWidget::updateMessages(unsigned int boxID, bool forceUpdate) {
-
     clearCurves();
 
     _boxID = boxID;
@@ -346,14 +277,14 @@ BoxWidget::addToComboBox(const QString address){
 
 bool
 BoxWidget::updateCurve(const string &address, bool forceUpdate){
-//    std::cout<<"\n\n--- BoxWidget::updateCurve ---\n"<<address<<std::endl;
+    Q_UNUSED(forceUpdate);
     BasicBox *box = Maquette::getInstance()->getBox(_boxID);
-
     if (box != NULL) // Box Found
     {
         if(box->hasCurve(address)){
             AbstractCurve *abCurve = box->getCurve(address);
             QMap<string,CurveWidget *>::iterator curveIt2 = _curveMap->find(address);
+            QString curveAddressStr = QString::fromStdString(address);
 
             bool curveFound = (curveIt2 != _curveMap->end());
             CurveWidget *curveTab = NULL;
@@ -365,24 +296,38 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
             vector<short> sectionType;
 
             bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
+
             if (getCurveSuccess){
 
                 /********** Abstract Curve found ***********/
                 if (abCurve != NULL){
-//                    std::cout<<"> abstractCurve found"<<std::endl;
                     if (curveFound){
-//                        std::cout<<"  > curve found"<<std::endl;
                         curveTab = curveIt2.value();
+
                         curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,abCurve->_show,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
+                        bool muteState = Maquette::getInstance()->getCurveMuteState(_boxID,address);
+
+                        if(forceUpdate){
+                            if(!muteState){
+                                addCurve(curveAddressStr,curveTab);
+                            }
+                            else{
+                                removeCurve(address);
+                            }
+                        }
                     }
                     else{
                         //Create
-//                        std::cout<<"  > curve !found"<<std::endl;
                         curveTab = new CurveWidget(NULL);
-                        QString curveAddressStr = QString::fromStdString(address);
-                        curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,abCurve->_show,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
-                        if(interpolate)
-                            addCurve(curveAddressStr,curveTab);
+
+                        curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,abCurve->_show,interpolate,argTypes,xPercents,yValues,sectionType,coeff);                        
+                        bool muteState = Maquette::getInstance()->getCurveMuteState(_boxID,address);
+                        if(!muteState){
+                            addCurve(curveAddressStr,curveTab);                            
+                        }
+                        else{
+                            removeCurve(address);
+                        }
                     }
 
                     //Set attributes
@@ -392,21 +337,23 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
 
                 /******* Abstract Curve not found ********/
                 else{
-//                    std::cout<<"> abstractCurve !found"<<std::endl;
                     bool show = true;
-                    interpolate = true;
-                    if (xPercents.empty() && yValues.empty() && values.size() >= 2) {
-                        if (values.front() == values.back()) {
-                            show = false;
-                            interpolate = false;
-                        }
-                    }
+
+//                    interpolate = !Maquette::getInstance()->getCurveMuteState(_boxID,address);
+//                    if (xPercents.empty() && yValues.empty() && values.size() >= 2) {
+//                        if (values.front() == values.back()) {
+//                            show = false;
+//                            interpolate = false;
+//                        }
+//                    }
                     //Set attributes
                     curveTab = new CurveWidget(NULL);
                     QString curveAddressStr = QString::fromStdString(address);
                     curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,show,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
-                    addCurve(curveAddressStr,curveTab);
-                    box->setCurve(address,curveTab->abstractCurve());
+                    if(interpolate){
+                        addCurve(curveAddressStr,curveTab);
+                        box->setCurve(address,curveTab->abstractCurve());
+                    }
                 }
             }
         }
@@ -419,223 +366,100 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
     return false;
 }
 
-
-//bool
-//BoxWidget::updateCurve(const string &address, bool forceUpdate){
-//    std::cout<<"BoxWidget::updateCurve"<<address<<std::endl;
-//    BasicBox *box = Maquette::getInstance()->getBox(_boxID);
-//    if (box != NULL) // Box Found
-//    {
-//        AbstractCurve *abCurve = box->getCurve(address);
-//        QMap<string,CurveWidget *>::iterator curveIt2 = _curveMap->find(address);
-//        bool curveFound = (curveIt2 != _curveMap->end());
-//        unsigned int curveTabIndex = 0;
-//        CurveWidget *curveTab = NULL;
-//        if (curveFound) {
-//            curveTab = curveIt2.value();
-//        }
-
-//        static const bool FORCE_SHOW = true;
-//        static const bool FORCE_HIDE = false;
-
-//        unsigned int sampleRate;
-//        bool redundancy,interpolate;
-//        vector<float> values,xPercents,yValues,coeff;
-//        vector<string> argTypes;
-//        vector<short> sectionType;
-
-//        if (abCurve != NULL) // Abstract Curve found
-//        {
-//            std::cout<<"CP1 -> ";
-//            if (abCurve->_show) // Abstract curve showing
-//            {
-//                std::cout<<"abCurve->_show"<<std::endl;
-//                if (curveFound) // Curve tab existing
-//                {
-//                     std::cout<<"curveFound"<<std::endl;
-//                    if (forceUpdate) // Force updating through engines
-//                    {
-//                        std::cout<<"forceUpdate"<<std::endl;
-//                        bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
-//                        if (getCurveSuccess) {
-//                            curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
-//                            box->setCurve(address,curveTab->abstractCurve());
-//                        }
-//                    }
-//                    else // No forcing : updating through abstract curve
-//                    {
-//                        std::cout<<"!forceUpdate"<<std::endl;
-//                        curveTab->setAttributes(abCurve);
-//                    }
-//                }
-//                else // Curve tab not existing
-//                {
-//                    std::cout<<"!curveFound"<<std::endl;
-//                    if (forceUpdate) // Force creating through engines
-//                    {
-//                        std::cout<<"force update"<<std::endl;
-//                        bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
-//                        if (getCurveSuccess) {
-//                            // Create and set
-//                            curveTab = new CurveWidget(NULL);
-//                            _curvePageLayout->removeWidget(_curveWidget);
-//                            curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
-//                            QString curveAddressStr = QString::fromStdString(address);
-
-//                            // Add tab and store
-//                            addCurve(curveAddressStr,curveTab);
-////                            emit(_comboBox->currentIndexChanged(curveAddressStr));
-//                            // Set box curve
-//                            box->setCurve(address,curveTab->abstractCurve());
-//                        }
-//                    }
-
-//                    else // No forcing : create through abstract curve
-//                    {
-//                        std::cout<<"!force update"<<std::endl;
-//                        // Create and set
-//                        curveTab = new CurveWidget(NULL);
-//                        curveTab->setAttributes(abCurve);
-//                        QString curveAddressStr = QString::fromStdString(address);
-
-//                        // Add tab and store
-//                        addCurve(curveAddressStr,curveTab);
-
-//                        _curveMap->insert(address, curveTab);
-////                        displayCurve(_comboBox->currentText());
-//                    }
-//                }
-//            }
-//            else // Abstract curve hiding
-//            {
-//                std::cout<<"!abst->show"<<std::endl;
-
-//                //NICO
-
-//                if (curveFound) // Curve tab existing
-//                {
-//                    std::cout<<"curveFound"<<std::endl;
-
-
-//                        std::cout<<"force update"<<std::endl;
-//                        bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
-//                        if (getCurveSuccess) {
-//                            if (values.front() != values.back()) {
-//                                curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
-//                            }
-//                            else{
-//                            // Set and assign new abstract curve to box
-//                                std::cout<<"BoxWidget getCurveSuccess"<<std::endl;
-//                                curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
-//                            }
-//                        box->setCurve(address,curveTab->abstractCurve());
-//                        }
-
-
-
-//                    // Remove curve tab anyway
-//                    removeCurve(address);
-//                    _comboBox->setCurrentIndex(curveTabIndex);
-////                    displayCurve(_comboBox->currentText());
-//                    delete curveTab;
-//                }
-//                else // Curve tab not existing
-//                {
-//                    std::cout<<"!curveFound"<<std::endl;
-
-//                        std::cout<<"forceUpdate"<<std::endl;
-//                        bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
-//                        if (getCurveSuccess) {
-//                            std::cout<<"getCurveSuccess"<<std::endl;
-//                            // Create, set and assign new abstract curve to box
-//                            curveTab = new CurveWidget(NULL);
-//                            curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
-//                            box->setCurve(address,curveTab->abstractCurve());
-//                            delete curveTab;
-//                        }
-
-//                }
-//            }
-//        }
-//        else // Abstract Curve not found
-//        {
-//            std::cout<<"CP2 -> ";
-//            // Get attributes and determine if shown
-//            bool show = true;
-//            interpolate = true;
-
-//            bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
-//            if (getCurveSuccess) {
-//                if (xPercents.empty() && yValues.empty() && values.size() >= 2) {
-//                    if (values.front() == values.back()) {
-//                        show = false;
-//                        interpolate = false;
-//                    }
-//                }
-//                if (show) // Curve showing
-//                {
-//                    std::cout<<"curve show"<<std::endl;
-//                    if (!curveFound) // Curve tab not existing
-//                    {
-//                        std::cout<<"!curveFound"<<std::endl;
-//                        // Creating curve tab from engines anyway (no abstract curve)
-
-//                        // Create and set
-//                        curveTab = new CurveWidget(NULL);
-//                        curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
-//                         box->setCurve(address,curveTab->abstractCurve());
-//                        QString curveAddressStr = QString::fromStdString(address);
-
-//                        // Add tab and store
-//                        addCurve(curveAddressStr,curveTab);
-//                        std::cout<<"WE WANT TO DISPLAY " <<_comboBox->currentText().toStdString()<<std::endl;
-////                        displayCurve(_comboBox->currentText());
-//                    }
-//                    else // Curve tab existing
-//                    {
-//                        // Updating curve tab from engines anyway (no abstract curve)
-//                        std::cout<<"curveFound"<<std::endl;
-//                    }
-
-////                    curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_SHOW,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
-//                    // Set box curve
-////                    box->setCurve(address,curveTab->abstractCurve());
-//                }
-//                else // Curve hiding
-//                {
-
-//                    std::cout<<"!curveFound"<<std::endl;
-//                    // Creating curve tab from engines anyway (no abstract curve)
-//                    curveTab = new CurveWidget(NULL);
-//                    curveTab->setAttributes(_boxID,address,0,values,sampleRate,redundancy,FORCE_HIDE,interpolate,argTypes,xPercents,yValues,sectionType,coeff);
-//                    box->setCurve(address,curveTab->abstractCurve());
-//                    delete curveTab;
-
-//                }
-//            }
-//        }
-//    }
-//    else // Box Not Found
-//    {
-//        std::cout<<"BoxWidget curve==NULL"<<std::endl;
-//        return false;
-//    }
-//    std::cout<<std::endl;
-//    return false;
-//}
-
-
 void
 BoxWidget::mouseDoubleClickEvent(QMouseEvent *event){
-    //TODO
+    Q_UNUSED(event);
 }
 
 void
-BoxWidget::paintEngine(){
+BoxWidget::keyPressEvent(QKeyEvent *event){
+    QWidget::keyPressEvent(event);
+}
 
+void
+BoxWidget::keyReleaseEvent(QKeyEvent *event){
+    QWidget::keyReleaseEvent(event);
 }
 
 void
 BoxWidget::setComboBox(QComboBox *cbox){
     _comboBox = cbox;
+}
+
+void
+BoxWidget::execStartAction(){
+    MainWindow *ui = _box->maquetteScene()->view()->mainWindow();
+
+    if(ui->commandKey())
+        updateStartCue();
+    else
+        jumpToStartCue();
+
+    //set button focus off
+    _box->setFocus();
+}
+
+void
+BoxWidget::execEndAction(){
+    MainWindow *ui = _box->maquetteScene()->view()->mainWindow();
+
+    if(ui->commandKey())
+        updateEndCue();
+    else
+        jumpToEndCue();
+
+    //unactive button focus
+    _box->setFocus();
+}
+
+void
+BoxWidget::jumpToStartCue(){
+    if(_startMenu!=NULL)
+        _startMenu->close();
+    _box->setSelected(true);
+    _box->update();
+    unsigned int gotoValue = _box->date();
+    _box->maquetteScene()->gotoChanged(gotoValue);
+    Maquette::getInstance()->initSceneState(); //reload scene (reset the remote application state)
+}
+
+void
+BoxWidget::jumpToEndCue(){
+    if(_endMenu!=NULL)
+        _endMenu->close();
+    _box->setSelected(true);
+    _box->update();
+    unsigned int gotoValue = _box->date() + _box->duration();
+    _box->maquetteScene()->gotoChanged(gotoValue);
+    Maquette::getInstance()->initSceneState(); //reload scene (reset the remote application state)
+}
+
+void
+BoxWidget::updateStartCue(){
+    if(_startMenu!=NULL)
+        _startMenu->close();
+    _box->setSelected(true);
+    _box->update();
+    _box->maquetteScene()->editor()->snapshotStartAssignment();
+}
+
+void
+BoxWidget::updateEndCue(){
+    if(_endMenu!=NULL)
+        _endMenu->close();
+    _box->setSelected(true);
+    _box->update();
+    _box->maquetteScene()->editor()->snapshotEndAssignment();
+}
+
+void
+BoxWidget::displayStartMenu(QPoint pos){
+    if(_startMenu != NULL)
+        _startMenu->exec(pos);
+}
+
+void
+BoxWidget::displayEndMenu(QPoint pos){
+    if(_endMenu != NULL)
+        _endMenu->exec(pos);
 }
