@@ -81,7 +81,6 @@ class NetworkTree : public QTreeWidget
 
         QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot(unsigned int boxID);
 
-		std::vector<std::string> snapshot();
 		 /*!
 		  * \brief Gets the absolute address of an item in the snapshot tree.
 		  *
@@ -263,7 +262,6 @@ class NetworkTree : public QTreeWidget
          * \brief Getter
          * \return The assigned items list.
          */
-//        inline QList<QTreeWidgetItem*> assignedItems() {return _assignedItems;}
          inline QMap<QTreeWidgetItem*,Data> assignedItems() {return _assignedItems;}
         /*!
          * \brief Getter
@@ -279,19 +277,11 @@ class NetworkTree : public QTreeWidget
          * \brief Sets the assigned items list.
          * \param The assigned items list.
          */
-//        inline void setAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems.clear(); _assignedItems=items;}
         inline void setAssignedItems(QMap<QTreeWidgetItem*,Data> items){_assignedItems.clear(); _assignedItems=items;}
-        /*!
-         * \brief Adds a list to the assigned items list.
-         * \param The assigned items list to add.
-         */
-//        inline void addAssignedItems(QList<QTreeWidgetItem*> items){_assignedItems << items;}
-//        inline void addAssignedItems(QMap<QTreeWidgetItem*,Data> items){_assignedItems << items;}
         /*!
          * \brief Adds an item to the assigned items list.
          * \param The assigned item to add.
          */
-//        inline void addAssignedItem(QTreeWidgetItem* item){_assignedItems << item;}
         inline void addAssignedItem(QTreeWidgetItem* item, Data data){_assignedItems.insert(item,data);}
         /*!
          * \brief Return true if item is already assigned.
@@ -330,6 +320,7 @@ class NetworkTree : public QTreeWidget
         void setHasCurve(QTreeWidgetItem *item, bool val);
         void setCurveActivated(QTreeWidgetItem *item, bool activated);
         void setRedundancy(QTreeWidgetItem *item, bool activated);
+
         void updateLine(QTreeWidgetItem *item, bool interpolationState, int sampleRate, bool redundancy);        
         void createItemsFromMessages(QList<QString> messageslist);
         void createItemFromMessage(QString messages);
@@ -337,7 +328,6 @@ class NetworkTree : public QTreeWidget
         virtual void keyPressEvent(QKeyEvent *event);
         virtual void keyReleaseEvent(QKeyEvent *event);
         virtual void mouseDoubleClickEvent(QMouseEvent *event);
-        virtual void contextMenuEvent(QContextMenuEvent *event);
 
         static int NAME_COLUMN ;
         static int VALUE_COLUMN ;
