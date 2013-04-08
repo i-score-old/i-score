@@ -1,42 +1,42 @@
 /*
-Copyright: LaBRI / SCRIME
-
-Authors: Luc Vercellin (08/03/2010)
-
-luc.vercellin@labri.fr
-
-This software is a computer program whose purpose is to provide
-notation/composition combining synthesized as well as recorded
-sounds, providing answers to the problem of notation and, drawing,
-from its very design, on benefits from state of the art research
-in musicology and sound/music computing.
-
-This software is governed by the CeCILL license under French law and
-abiding by the rules of distribution of free software.  You can  use,
-modify and/ or redistribute the software under the terms of the CeCILL
-license as circulated by CEA, CNRS and INRIA at the following URL
-"http://www.cecill.info".
-
-As a counterpart to the access to the source code and  rights to copy,
-modify and redistribute granted by the license, users are provided only
-with a limited warranty  and the software's author,  the holder of the
-economic rights,  and the successive licensors  have only  limited
-liability.
-
-In this respect, the user's attention is drawn to the risks associated
-with loading,  using,  modifying and/or developing or reproducing the
-software by the user in light of its specific status of free software,
-that may mean  that it is complicated to manipulate,  and  that  also
-therefore means  that it is reserved for developers  and  experienced
-professionals having in-depth computer knowledge. Users are therefore
-encouraged to load and test the software's suitability as regards their
-requirements in conditions enabling the security of their systems and/or
-data to be ensured and,  more generally, to use and operate it in the
-same conditions as regards security.
-
-The fact that you are presently reading this means that you have had
-knowledge of the CeCILL license and that you accept its terms.
-*/
+ * Copyright: LaBRI / SCRIME
+ *
+ * Authors: Luc Vercellin (08/03/2010)
+ *
+ * luc.vercellin@labri.fr
+ *
+ * This software is a computer program whose purpose is to provide
+ * notation/composition combining synthesized as well as recorded
+ * sounds, providing answers to the problem of notation and, drawing,
+ * from its very design, on benefits from state of the art research
+ * in musicology and sound/music computing.
+ *
+ * This software is governed by the CeCILL license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ */
 #include "NetworkConfig.hpp"
 
 #include <QMessageBox>
@@ -78,42 +78,42 @@ NetworkConfig::NetworkConfig(MaquetteScene *scene, QWidget *parent)
   _IPLabel = new QLabel(tr("IP"));
 
   _portBox = new QSpinBox;
-  _portBox->setRange(0,10000);
+  _portBox->setRange(0, 10000);
 
   _IPBox = new QLineEdit;
 
   _devicesComboBox = new QComboBox;
   _pluginsComboBox = new QComboBox;
   _devices = _scene->getNetworkDevices();
-  map<string,MyDevice>::iterator it;
+  map<string, MyDevice>::iterator it;
   MyDevice minuitDevice;
   unsigned int minuitDeviceIndex = -1;
-  for (it = _devices.begin() ; it != _devices.end() ; ++it) {      
-    if (it->first == "MinuitDevice1") {
-        minuitDevice = it->second;
-        minuitDeviceIndex = _devicesComboBox->count();
+  for (it = _devices.begin(); it != _devices.end(); ++it) {
+      if (it->first == "MinuitDevice1") {
+          minuitDevice = it->second;
+          minuitDeviceIndex = _devicesComboBox->count();
+        }
+      _devicesComboBox->addItem(QString::fromStdString(it->first));
+      if (_pluginsComboBox->findText(QString::fromStdString(it->second.plugin)) == -1) {
+          _pluginsComboBox->addItem(QString::fromStdString(it->second.plugin));
+        }
     }
-  	_devicesComboBox->addItem(QString::fromStdString(it->first));
-  	if (_pluginsComboBox->findText(QString::fromStdString(it->second.plugin)) == -1) {
-  		_pluginsComboBox->addItem(QString::fromStdString(it->second.plugin));
-  	}
-  }
 
   //_pluginsComboBox->addItem("--Add--");
 
   int found = -1;
   if ((found = _pluginsComboBox->findText(QString::fromStdString(minuitDevice.plugin))) != -1) {
-  	_pluginsComboBox->setCurrentIndex(found);
-  }
+      _pluginsComboBox->setCurrentIndex(found);
+    }
   else {
-    QMessageBox::warning(this,"",tr("MinuitDevice plugin not found : default selected"));
-  	_pluginsComboBox->setCurrentIndex(0);
-  }
+      QMessageBox::warning(this, "", tr("MinuitDevice plugin not found : default selected"));
+      _pluginsComboBox->setCurrentIndex(0);
+    }
   _portBox->setValue(minuitDevice.networkPort);
   _IPBox->setText(QString::fromStdString(minuitDevice.networkHost));
 
-  connect(_devicesComboBox,SIGNAL(activated(int)),this,SLOT(deviceSelected(int)));
-  connect(_pluginsComboBox,SIGNAL(activated(int)),this,SLOT(setChanged()));
+  connect(_devicesComboBox, SIGNAL(activated(int)), this, SLOT(deviceSelected(int)));
+  connect(_pluginsComboBox, SIGNAL(activated(int)), this, SLOT(setChanged()));
   connect(_portBox, SIGNAL(valueChanged(int)), this, SLOT(setChanged()));
   connect(_IPBox, SIGNAL(textChanged(const QString &)), this, SLOT(setChanged()));
 
@@ -135,53 +135,59 @@ NetworkConfig::NetworkConfig(MaquetteScene *scene, QWidget *parent)
   _layout->addWidget(_cancelButton, 3, 3, 1, 1);
 }
 
-void NetworkConfig::setChanged() {
+void
+NetworkConfig::setChanged()
+{
   _changed = true;
 }
 
-void NetworkConfig::deviceSelected(int indexSelected) {
-	if (indexSelected != -1) {
-		map<string,MyDevice>::iterator it;
-		if ((it = _devices.find(_devicesComboBox->itemText(indexSelected).toStdString())) != _devices.end()) {
-		  int found = -1;
-		  if ((found = _pluginsComboBox->findText(QString::fromStdString(it->second.plugin))) != -1) {
-		  	_pluginsComboBox->setCurrentIndex(found);
-		  }
-		  else {
-		  	QMessageBox::warning(this,"",tr("Device plugin not found : default selected"));
-		  	_pluginsComboBox->setCurrentIndex(0);
-		  }
-		  _portBox->setValue(it->second.networkPort);
-		  _IPBox->setText(QString::fromStdString(it->second.networkHost));
-		}
-	}
-	else {
-
-	}
+void
+NetworkConfig::deviceSelected(int indexSelected)
+{
+  if (indexSelected != -1) {
+      map<string, MyDevice>::iterator it;
+      if ((it = _devices.find(_devicesComboBox->itemText(indexSelected).toStdString())) != _devices.end()) {
+          int found = -1;
+          if ((found = _pluginsComboBox->findText(QString::fromStdString(it->second.plugin))) != -1) {
+              _pluginsComboBox->setCurrentIndex(found);
+            }
+          else {
+              QMessageBox::warning(this, "", tr("Device plugin not found : default selected"));
+              _pluginsComboBox->setCurrentIndex(0);
+            }
+          _portBox->setValue(it->second.networkPort);
+          _IPBox->setText(QString::fromStdString(it->second.networkHost));
+        }
+    }
+  else {
+    }
 }
 
 void
-NetworkConfig::setNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, std::string port){
-    Q_UNUSED(deviceName); Q_UNUSED(pluginName);
+NetworkConfig::setNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, std::string port)
+{
+  Q_UNUSED(deviceName); Q_UNUSED(pluginName);
 
-    _devices["OSCDevice"].networkPort = atoi(port.c_str());
-    _devices["OSCDevice"].networkHost = IP;
-    updateNetworkConfiguration();
+  _devices["OSCDevice"].networkPort = atoi(port.c_str());
+  _devices["OSCDevice"].networkHost = IP;
+  updateNetworkConfiguration();
 }
 
-void NetworkConfig::updateNetworkConfiguration() {
+void
+NetworkConfig::updateNetworkConfiguration()
+{
   if (_changed) {
-    QHostAddress hostAddress(_IPBox->text());
-    if (!hostAddress.isNull()) {       
-    	_scene->changeNetworkDevice(_devicesComboBox->currentText().toStdString(),_pluginsComboBox->currentText().toStdString(),
-    			_IPBox->text().toStdString(),_portBox->text().toStdString());
+      QHostAddress hostAddress(_IPBox->text());
+      if (!hostAddress.isNull()) {
+          _scene->changeNetworkDevice(_devicesComboBox->currentText().toStdString(), _pluginsComboBox->currentText().toStdString(),
+                                      _IPBox->text().toStdString(), _portBox->text().toStdString());
+          accept();
+        }
+      else {
+          QMessageBox::warning(this, "", tr("Unvalid IP address"));
+        }
+    }
+  else {
       accept();
     }
-    else {
-      QMessageBox::warning(this,"",tr("Unvalid IP address"));
-    }
-  }
-  else {
-    accept();
-  }
 }

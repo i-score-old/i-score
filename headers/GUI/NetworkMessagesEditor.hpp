@@ -1,42 +1,42 @@
 /*
-Copyright: LaBRI / SCRIME
-
-Authors: Luc Vercellin (08/03/2010)
-
-luc.vercellin@labri.fr
-
-This software is a computer program whose purpose is to provide
-notation/composition combining synthesized as well as recorded
-sounds, providing answers to the problem of notation and, drawing,
-from its very design, on benefits from state of the art research
-in musicology and sound/music computing.
-
-This software is governed by the CeCILL license under French law and
-abiding by the rules of distribution of free software.  You can  use,
-modify and/ or redistribute the software under the terms of the CeCILL
-license as circulated by CEA, CNRS and INRIA at the following URL
-"http://www.cecill.info".
-
-As a counterpart to the access to the source code and  rights to copy,
-modify and redistribute granted by the license, users are provided only
-with a limited warranty  and the software's author,  the holder of the
-economic rights,  and the successive licensors  have only  limited
-liability.
-
-In this respect, the user's attention is drawn to the risks associated
-with loading,  using,  modifying and/or developing or reproducing the
-software by the user in light of its specific status of free software,
-that may mean  that it is complicated to manipulate,  and  that  also
-therefore means  that it is reserved for developers  and  experienced
-professionals having in-depth computer knowledge. Users are therefore
-encouraged to load and test the software's suitability as regards their
-requirements in conditions enabling the security of their systems and/or
-data to be ensured and,  more generally, to use and operate it in the
-same conditions as regards security.
-
-The fact that you are presently reading this means that you have had
-knowledge of the CeCILL license and that you accept its terms.
-*/
+ * Copyright: LaBRI / SCRIME
+ *
+ * Authors: Luc Vercellin (08/03/2010)
+ *
+ * luc.vercellin@labri.fr
+ *
+ * This software is a computer program whose purpose is to provide
+ * notation/composition combining synthesized as well as recorded
+ * sounds, providing answers to the problem of notation and, drawing,
+ * from its very design, on benefits from state of the art research
+ * in musicology and sound/music computing.
+ *
+ * This software is governed by the CeCILL license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ */
 #ifndef NETWORK_MESSAGES_EDITOR_H
 #define NETWORK_MESSAGES_EDITOR_H
 
@@ -64,10 +64,10 @@ class QSpinBox;
  * \brief Used to store several composants of a network line.
  */
 struct NetworkLine {
-	QComboBox *devicesBox;
-	QLineEdit *valueBox;
-	QLineEdit *messageBox;
-	unsigned int index;
+  QComboBox *devicesBox;
+  QLineEdit *valueBox;
+  QLineEdit *messageBox;
+  unsigned int index;
 };
 
 
@@ -78,93 +78,100 @@ struct NetworkLine {
  */
 class NetworkMessagesEditor : public QTableWidget {
   Q_OBJECT
-public :
-	NetworkMessagesEditor(QWidget *parent);
-	~NetworkMessagesEditor();
 
-	/*!
-	 * \brief Fills a list with all messages.
-	 *
-	 * return a list filled with messages
-	 */
-	std::vector<std::string> computeMessages();
-	/*!
-	 * \brief Adds a message to send with a specific device.
-	 *
-	 * \param device : the device to use
-	 * \param msg : the message to send
-	 */
-	void addMessage(const std::string &device, const std::string &msg, const std::string &value);
-	/*!
-	 * \brief Adds a list of messages.
-	 */
-	void addMessages(const std::vector<std::string> &messages);
-	/*!
-	 * \brief Clears messages contained in the editor.
-	 */
+  public:
+    NetworkMessagesEditor(QWidget *parent);
+    ~NetworkMessagesEditor();
+
+    /*!
+     * \brief Fills a list with all messages.
+     *
+     * return a list filled with messages
+     */
+    std::vector<std::string> computeMessages();
+
+    /*!
+     * \brief Adds a message to send with a specific device.
+     *
+     * \param device : the device to use
+     * \param msg : the message to send
+     */
+    void addMessage(const std::string &device, const std::string &msg, const std::string &value);
+
+    /*!
+     * \brief Adds a list of messages.
+     */
+    void addMessages(const std::vector<std::string> &messages);
+
+    /*!
+     * \brief Clears messages contained in the editor.
+     */
+
     /*!
      * \brief Set the list of messages.
      */
     void setMessages(const std::vector<std::string> &messages);
 
-	void reset();
+    void reset();
 
-	static const int WIDTH = 350; //!< Width of the editor
+    static const int WIDTH = 350;     //!< Width of the editor
 
-public slots :
-	/*!
-	 * \brief Push back an empty line.
-	 */
-	void addLine();
-	/*!
-	 * \brief Remove the selected lines if some.
-	 */
-	void removeLines();
+  public slots:
+    /*!
+     * \brief Push back an empty line.
+     */
+    void addLine();
 
-	void messageChanged();
+    /*!
+     * \brief Remove the selected lines if some.
+     */
+    void removeLines();
 
-	void valueChanged();
+    void messageChanged();
 
-	void deviceChanged();
+    void valueChanged();
 
-	/*!
-	 * \brief Called to paste messages from clipboard.
-	 */
-	void importMessages();
-	/*!
-	 * \brief Called to copy messages to clipboard.
-	 */
-	void exportMessages();
-	/*!
-	 * \brief Clears messages contained in the editor and set as modified.
-	 */
-	void clear();
+    void deviceChanged();
 
-signals :
-	void messageChanged(const std::string &address);
-	void messageRemoved(const std::string &address);
-	void messagesChanged();
+    /*!
+     * \brief Called to paste messages from clipboard.
+     */
+    void importMessages();
 
-private :
-	std::string computeMessage(const NetworkLine &line);
-	bool lineToStrings(const NetworkLine &line,std::string &device, std::string &message, std::string &value);
-	void lineDeleted(const NetworkLine &line);
+    /*!
+     * \brief Called to copy messages to clipboard.
+     */
+    void exportMessages();
 
-	void lineChanged(const NetworkLine &line, const std::string &changeString);
+    /*!
+     * \brief Clears messages contained in the editor and set as modified.
+     */
+    void clear();
+
+  signals:
+    void messageChanged(const std::string &address);
+    void messageRemoved(const std::string &address);
+    void messagesChanged();
+
+  private:
+    std::string computeMessage(const NetworkLine &line);
+    bool lineToStrings(const NetworkLine &line, std::string &device, std::string &message, std::string &value);
+    void lineDeleted(const NetworkLine &line);
+
+    void lineChanged(const NetworkLine &line, const std::string &changeString);
 
 
-	QWidget *_parent; //!< The parent widget.
-	unsigned int _currentLine; //!< The next line index given.
-	QVBoxLayout *_layout; //!< The layout handling lines.
-	std::vector<NetworkLine> _networkLines; //!< Set of existing lines.
-	std::map<QWidget*,unsigned int> _widgetIndex;
-	static QStringList _devicesList; //!< List of existing devices names.
-    QClipboard *_clipboard; //!< Clipboard handling system's copy/paste.
+    QWidget *_parent;                       //!< The parent widget.
+    unsigned int _currentLine;              //!< The next line index given.
+    QVBoxLayout *_layout;                   //!< The layout handling lines.
+    std::vector<NetworkLine> _networkLines; //!< Set of existing lines.
+    std::map<QWidget*, unsigned int> _widgetIndex;
+    static QStringList _devicesList;        //!< List of existing devices names.
+    QClipboard *_clipboard;                 //!< Clipboard handling system's copy/paste.
 
-protected :
-	void keyPressEvent(QKeyEvent *event);
-	void keyReleaseEvent(QKeyEvent *event);
+  protected:
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
 };
-
 #endif
 

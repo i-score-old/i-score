@@ -31,16 +31,18 @@ class BasicBox;
 
 class BoxWidget : public QWidget
 {
-    Q_OBJECT
+  Q_OBJECT
 
-public :
+  public:
     BoxWidget(QWidget *parent, BasicBox *box);
 
     ~BoxWidget();
+
     /*!
      * \brief Updates the widget.
      */
     void applyChanges();
+
     /*!
      * \brief Update curves from messages handled by a box.
      *
@@ -51,22 +53,27 @@ public :
     bool contains(const std::string &address);
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
 
-    void curveActivationChanged(const QString &address,bool state);
-    void curveRedundancyChanged(const QString &address,bool state);
-    void curveSampleRateChanged(const QString &address,int value);
-    void curveShowChanged(const QString &address,bool state);
+    void curveActivationChanged(const QString &address, bool state);
+    void curveRedundancyChanged(const QString &address, bool state);
+    void curveSampleRateChanged(const QString &address, int value);
+    void curveShowChanged(const QString &address, bool state);
     void updateCurve(const std::string &address);
     void removeCurve(const std::string &address);
-    void setComboBox(QComboBox *cbox);    
-    inline QStackedLayout *stackedLayout(){return _stackedLayout;}
-    inline QComboBox *comboBox(){return _comboBox;}
-    inline void setStackedLayout(QStackedLayout *slayout){_stackedLayout = slayout;setLayout(_stackedLayout);}    
+    void setComboBox(QComboBox *cbox);
+    inline QStackedLayout *
+    stackedLayout(){ return _stackedLayout; }
+    inline QComboBox *
+    comboBox(){ return _comboBox; }
+    inline void
+    setStackedLayout(QStackedLayout *slayout){ _stackedLayout = slayout; setLayout(_stackedLayout); }
     void addToComboBox(const QString address);
     void displayCurve(const QString &address);
-    inline void setStartMenu(QMenu *menu){_startMenu = menu;}
-    inline void setEndMenu(QMenu *menu){_endMenu = menu;}
+    inline void
+    setStartMenu(QMenu *menu){ _startMenu = menu; }
+    inline void
+    setEndMenu(QMenu *menu){ _endMenu = menu; }
 
-public slots :
+  public slots:
     void updateDisplay(const QString &address);
     void jumpToStartCue();
     void jumpToEndCue();
@@ -78,23 +85,23 @@ public slots :
     void displayEndMenu(QPoint pos);
     bool updateCurve(const std::string &address, bool forceUpdate);
 
-signals :
+  signals:
     void currentIndexChanged(QString address);
 
-protected :
+  protected:
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void keyPressEvent(QKeyEvent *event);
     virtual void keyReleaseEvent(QKeyEvent *event);
 
-private :
-    void addCurve(QString address,CurveWidget *curveWidget);
+  private:
+    void addCurve(QString address, CurveWidget *curveWidget);
     void clearCurves();
     QComboBox *_comboBox;
     QTabWidget *_tabWidget;
     Interpolation *_interpolation;
-    std::map<std::string,unsigned int> _curveIndexes; //!< Map of curves tabs' indexes mapped by their addresses
+    std::map<std::string, unsigned int> _curveIndexes; //!< Map of curves tabs' indexes mapped by their addresses
 //    std::map<std::string,CurveWidget *> _curveMap; //!< Map of curves tabs mapped by their addresses
-    QMap<std::string,CurveWidget *> *_curveMap; //!< Map of curves tabs mapped by their addresses
+    QMap<std::string, CurveWidget *> *_curveMap;       //!< Map of curves tabs mapped by their addresses
     unsigned int _width;
     unsigned int _height;
     unsigned int _boxID;
@@ -107,7 +114,5 @@ private :
     BasicBox *_box;
     QMenu *_startMenu;
     QMenu *_endMenu;
-
 };
-
 #endif // BOXWIDGET_H
