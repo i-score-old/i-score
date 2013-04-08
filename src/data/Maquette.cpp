@@ -2391,6 +2391,7 @@ Maquette::load(const string &fileName){
 
     /************************ OSC ************************/
     if(root.childNodes().size()>=2){
+
         QDomElement OSC = root.childNodes().at(2).toElement();
 
         if (OSC.tagName() != "OSCMessages") {
@@ -2403,8 +2404,9 @@ Maquette::load(const string &fileName){
 
         QList<QString> OSCMessagesList;
         for(int i=0 ; i<OSC.childNodes().size() ; i++){
-            if(OSC.childNodes().at(i).toElement().tagName()=="OSC")
+            if(OSC.childNodes().at(i).toElement().tagName()=="OSC"){
                 OSCMessagesList<<OSC.childNodes().at(i).toElement().attribute("message");
+            }
         }
 
         _scene->setNetworDeviceConfig(OSCDevice.name,OSCDevice.plugin,OSCDevice.networkHost,OSCDevicePort);

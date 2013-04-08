@@ -242,6 +242,7 @@ BoxWidget::clearCurves(){
 
 void
 BoxWidget::updateMessages(unsigned int boxID, bool forceUpdate) {
+
     clearCurves();
 
     _boxID = boxID;
@@ -279,6 +280,7 @@ bool
 BoxWidget::updateCurve(const string &address, bool forceUpdate){
     Q_UNUSED(forceUpdate);
     BasicBox *box = Maquette::getInstance()->getBox(_boxID);
+
     if (box != NULL) // Box Found
     {
         if(box->hasCurve(address)){
@@ -296,6 +298,14 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate){
             vector<short> sectionType;
 
             bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID,address,0,sampleRate,redundancy,interpolate,values,argTypes,xPercents,yValues,sectionType,coeff);
+
+            //--- PRINT ---
+//            std::cout<<"values : "<<std::endl;
+//            for (unsigned int i = 0; i < yValues.size() ; i++) {
+//                std::cout<<"  "<<yValues[i]<<std::endl;
+//            }
+//            std::cout<<std::endl;
+            //-------------
 
             if (getCurveSuccess){
 
