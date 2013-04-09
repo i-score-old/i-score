@@ -8,7 +8,7 @@
 int
 main(int argc, char *argv[])
 {
-  Q_INIT_RESOURCE(application);
+  Q_INIT_RESOURCE(i_score);
   QApplication app(argc, argv);
 
   app.setOrganizationName("SCRIME");

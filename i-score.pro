@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET = i-score
 CONFIG += debug x86_64
-QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6.8
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8.3
 
 QMAKE_CXXFLAGS += -O0 -fPIC -msse3
 
@@ -49,32 +49,28 @@ macx-g++ {
     QMAKE_CXX = /usr/bin/g++
     #QMAKE_CXXFLAGS += -std=c++11  #have to update g++ to v2.4
 
-    #INCLUDEPATH += . headers/GUI headers/data /Library/Frameworks/ /usr/local/include/libxml2
-    INCLUDEPATH += . headers/GUI headers/data /Library/Frameworks/ /usr/local/jamoma/includes /usr/local/include/libxml2
+    INCLUDEPATH += . headers/GUI headers/data /Library/Frameworks/ /usr/local/include/libxml2 /usr/local/include/IScore
     QMAKE_LFLAGS += -L/usr/local/lib/ -L/System/Library/Frameworks/ -L/Library/Frameworks/
-    #QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
+    QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
     QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
-    #LIBS += -lIscore -lDeviceManager -framework gecode -lxml2
-    LIBS += -L/usr/local/jamoma/lib -lDeviceManager -lframework -lgecode -lxml2
+    LIBS += -lIscore -lDeviceManager -framework gecode -lxml2
+    #LIBS += -L/usr/local/jamoma/lib -lDeviceManager -lframework -lgecode -lxml2
 }
 
 macx-clang {
     QMAKE_CXX = /usr/bin/clang
     QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
 
-    INCLUDEPATH += . headers/GUI headers/data /Library/Frameworks/ /usr/local/jamoma/includes /usr/local/include/libxml2
-    QMAKE_LFLAGS += -L/usr/local/lib/ -L/usr/local/jamoma/lib -L/System/Library/Frameworks/ -L/Library/Frameworks/
-    #QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
-    #QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
-    LIBS += /usr/local/jamoma/lib/JamomaFoundation.dylib /usr/local/jamoma/lib/JamomaDSP.dylib /usr/local/jamoma/lib/JamomaScore.dylib /usr/local/jamoma/lib/JamomaModular.dylib -framework gecode -lxml2
+    INCLUDEPATH += . headers/GUI headers/data /Library/Frameworks /usr/local/include/libxml2 /usr/local/include/IScore
+    QMAKE_LFLAGS += -L/usr/local/lib/ -L/System/Library/Frameworks/ -L/Library/Frameworks/
+    QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
+    QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
+    #LIBS += /usr/local/jamoma/lib/JamomaFoundation.dylib /usr/local/jamoma/lib/JamomaDSP.dylib /usr/local/jamoma/lib/JamomaScore.dylib /usr/local/jamoma/lib/JamomaModular.dylib -framework gecode -lxml2
+    LIBS += -lIscore -lDeviceManager -framework gecode -lxml2
 }
 
 # Input
-HEADERS += /usr/local/jamoma/includes/TTScore.h \
-/usr/local/jamoma/includes/TTModular.h \
-/usr/local/jamoma/includes/TTDSP.h \
-/usr/local/jamoma/includes/TTDictionnary.h \
-headers/data/Abstract.hpp \
+HEADERS += headers/data/Abstract.hpp \
 headers/data/AbstractBox.hpp \
 headers/data/AbstractComment.hpp \
 headers/data/AbstractCurve.hpp \
@@ -122,7 +118,7 @@ headers/GUI/BoxWidget.hpp \
 headers/GUI/BoxCurveEdit.hpp \
 headers/GUI/MaquetteWidget.hpp \
 headers/GUI/TimeBarWidget.hpp \
-headers/GUI/DeviceEdit.hpp \
+headers/GUI/DeviceEdit.hpp
 
 SOURCES += src/main.cpp \
 src/data/Abstract.cpp \
@@ -172,4 +168,4 @@ src/GUI/BoxWidget.cpp \
 src/GUI/BoxCurveEdit.cpp \
 src/GUI/MaquetteWidget.cpp \
 src/GUI/TimeBarWidget.cpp \
-src/GUI/DeviceEdit.cpp \
+src/GUI/DeviceEdit.cpp
