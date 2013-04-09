@@ -5,9 +5,8 @@
 
 #include "MaquetteScene.hpp"
 
-class TimeBarWidget : public QWidget{
-
-    Q_OBJECT
+class TimeBarWidget : public QWidget {
+  Q_OBJECT
 
   public:
     TimeBarWidget(QWidget *parent, MaquetteScene *scene);
@@ -18,25 +17,23 @@ class TimeBarWidget : public QWidget{
     void init();
     void setZoomValue(float value);
 
-signals:
+  signals:
     void gotoValueEntered(double value);
 
-public slots:
+  public slots:
     void updateZoom(float newValue);
 
-protected:
+  protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual void paintEngine();
     virtual void mousePressEvent(QMouseEvent *event);
     float _zoom;
 
   private:
-    void drawBackground(QPainter *painter, QRect rect);    
+    void drawBackground(QPainter *painter, QRect rect);
 
     MaquetteScene *_scene;
     float _sceneHeight;
     QRect _rect;
-
 };
-
 #endif // TIMEBARWIDGET_HPP

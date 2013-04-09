@@ -29,26 +29,23 @@ class QString;
 
 class BoxCurveEdit : public QWidget
 {
-    Q_OBJECT
+  Q_OBJECT
 
-public :
-    BoxCurveEdit(QWidget *parent,BasicBox *box);
+  public:
+    BoxCurveEdit(QWidget *parent, BasicBox *box);
     ~BoxCurveEdit();
 
     void init();
     void resetBox();
     void exec();
 
-protected :
+  protected:
     virtual void closeEvent(QCloseEvent *);
 
-private :
-
+  private:
     BasicBox *_basicBox;
     QStackedLayout *_stackedLayout;
     QComboBox *_comboBox;
     MaquetteScene *_scene;
-
 };
-
 #endif // BOXCURVEEDIT_HPP

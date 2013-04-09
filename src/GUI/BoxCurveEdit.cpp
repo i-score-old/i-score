@@ -4,43 +4,48 @@
 #include "BasicBox.hpp"
 
 
-BoxCurveEdit::BoxCurveEdit(QWidget *parent,BasicBox *box):QWidget(parent){
-    _basicBox = box;
-    _stackedLayout = new QStackedLayout;
+BoxCurveEdit::BoxCurveEdit(QWidget *parent, BasicBox *box) : QWidget(parent)
+{
+  _basicBox = box;
+  _stackedLayout = new QStackedLayout;
+
 //    _comboBox = new QComboBox(this);
-    init();
+  init();
 }
 
 void
-BoxCurveEdit::init(){
+BoxCurveEdit::init()
+{
+  _stackedLayout = _basicBox->boxContentWidget()->stackedLayout();
+  _comboBox = _basicBox->boxContentWidget()->comboBox();
+  _scene = _basicBox->maquetteScene();
 
-    _stackedLayout = _basicBox->boxContentWidget()->stackedLayout();
-    _comboBox = _basicBox->boxContentWidget()->comboBox();
-    _scene = _basicBox->maquetteScene();
 
-
-    setWindowModality(Qt::ApplicationModal);
-    setGeometry(_scene->sceneRect().toRect());
-    setLayout(_stackedLayout);
+  setWindowModality(Qt::ApplicationModal);
+  setGeometry(_scene->sceneRect().toRect());
+  setLayout(_stackedLayout);
 }
 
-BoxCurveEdit::~BoxCurveEdit(){
-
-}
-
-void
-BoxCurveEdit::closeEvent(QCloseEvent *){
-    resetBox();
+BoxCurveEdit::~BoxCurveEdit()
+{
 }
 
 void
-BoxCurveEdit::resetBox(){
-    _basicBox->setComboBox(_comboBox);
-    _basicBox->setStackedLayout(_stackedLayout);
-    _basicBox->update();
+BoxCurveEdit::closeEvent(QCloseEvent *)
+{
+  resetBox();
 }
 
 void
-BoxCurveEdit::exec(){
-    show();
+BoxCurveEdit::resetBox()
+{
+  _basicBox->setComboBox(_comboBox);
+  _basicBox->setStackedLayout(_stackedLayout);
+  _basicBox->update();
+}
+
+void
+BoxCurveEdit::exec()
+{
+  show();
 }

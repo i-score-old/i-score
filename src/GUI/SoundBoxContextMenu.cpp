@@ -1,42 +1,42 @@
 /*
-Copyright: LaBRI / SCRIME
-
-Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
-
-luc.vercellin@labri.fr
-
-This software is a computer program whose purpose is to provide
-notation/composition combining synthesized as well as recorded
-sounds, providing answers to the problem of notation and, drawing,
-from its very design, on benefits from state of the art research
-in musicology and sound/music computing.
-
-This software is governed by the CeCILL license under French law and
-abiding by the rules of distribution of free software.  You can  use,
-modify and/ or redistribute the software under the terms of the CeCILL
-license as circulated by CEA, CNRS and INRIA at the following URL
-"http://www.cecill.info".
-
-As a counterpart to the access to the source code and  rights to copy,
-modify and redistribute granted by the license, users are provided only
-with a limited warranty  and the software's author,  the holder of the
-economic rights,  and the successive licensors  have only  limited
-liability.
-
-In this respect, the user's attention is drawn to the risks associated
-with loading,  using,  modifying and/or developing or reproducing the
-software by the user in light of its specific status of free software,
-that may mean  that it is complicated to manipulate,  and  that  also
-therefore means  that it is reserved for developers  and  experienced
-professionals having in-depth computer knowledge. Users are therefore
-encouraged to load and test the software's suitability as regards their
-requirements in conditions enabling the security of their systems and/or
-data to be ensured and,  more generally, to use and operate it in the
-same conditions as regards security.
-
-The fact that you are presently reading this means that you have had
-knowledge of the CeCILL license and that you accept its terms.
-*/
+ * Copyright: LaBRI / SCRIME
+ *
+ * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ *
+ * luc.vercellin@labri.fr
+ *
+ * This software is a computer program whose purpose is to provide
+ * notation/composition combining synthesized as well as recorded
+ * sounds, providing answers to the problem of notation and, drawing,
+ * from its very design, on benefits from state of the art research
+ * in musicology and sound/music computing.
+ *
+ * This software is governed by the CeCILL license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ */
 #include "SoundBoxContextMenu.hpp"
 
 #include <QColor>
@@ -47,47 +47,47 @@ knowledge of the CeCILL license and that you accept its terms.
 using namespace SndBoxProp;
 
 SoundBoxContextMenu::SoundBoxContextMenu(SoundBox *box) :
-  BoxContextMenu((BasicBox*)box) {
-
-  _box  = box;
+  BoxContextMenu((BasicBox*)box)
+{
+  _box = box;
 
   setWindowModality(Qt::ApplicationModal);
 
-  _aspectMenu = new QMenu("Aspect",this);
+  _aspectMenu = new QMenu("Aspect", this);
 
-  _copyGraphicAspectAct = new QAction(tr("Copy"),this);
+  _copyGraphicAspectAct = new QAction(tr("Copy"), this);
   _aspectMenu->addAction(_copyGraphicAspectAct);
   connect(_copyGraphicAspectAct, SIGNAL(triggered()), this, SLOT(copyAspect()));
 
-  _pasteGraphicAspectAct = new QAction(tr("Paste"),this);
+  _pasteGraphicAspectAct = new QAction(tr("Paste"), this);
   _aspectMenu->addAction(_pasteGraphicAspectAct);
   connect(_pasteGraphicAspectAct, SIGNAL(triggered()), this, SLOT(pasteAspect()));
 
   /*_editGraphicAspectAct = new QAction(tr("Edit"),this);
-  _aspectMenu->addAction(_editGraphicAspectAct);
-  connect(_editGraphicAspectAct, SIGNAL(triggered()), this, SLOT(editAspect()));
-
-  _importGraphicAspectAct = new QAction(tr("Import"),this);
-  _aspectMenu->addAction(_importGraphicAspectAct);
-  connect(_importGraphicAspectAct, SIGNAL(triggered()), this, SLOT(importAspect()));
-
-  _makeImpulsiveAct = new QAction(tr("Make impulsive"),this);
-  _aspectMenu->addAction(_makeImpulsiveAct);
-  connect(_makeImpulsiveAct, SIGNAL(triggered()), this, SLOT(switchImpulsive()));
-*/
+   * _aspectMenu->addAction(_editGraphicAspectAct);
+   * connect(_editGraphicAspectAct, SIGNAL(triggered()), this, SLOT(editAspect()));
+   *
+   * _importGraphicAspectAct = new QAction(tr("Import"),this);
+   * _aspectMenu->addAction(_importGraphicAspectAct);
+   * connect(_importGraphicAspectAct, SIGNAL(triggered()), this, SLOT(importAspect()));
+   *
+   * _makeImpulsiveAct = new QAction(tr("Make impulsive"),this);
+   * _aspectMenu->addAction(_makeImpulsiveAct);
+   * connect(_makeImpulsiveAct, SIGNAL(triggered()), this, SLOT(switchImpulsive()));
+   */
   addMenu(_aspectMenu);
 
-  _soundMenu = new QMenu(tr("Sound"),this);
+  _soundMenu = new QMenu(tr("Sound"), this);
 
-  _selectModeMenu = new QMenu(tr("Mode"),this);
+  _selectModeMenu = new QMenu(tr("Mode"), this);
 
-  _synthModeAct = new QAction(tr("Synthesis"),this);
+  _synthModeAct = new QAction(tr("Synthesis"), this);
   _synthModeAct->setCheckable(true);
   _synthModeAct->setChecked(true);
   _selectModeMenu->addAction(_synthModeAct);
   connect(_synthModeAct, SIGNAL(triggered()), this, SLOT(selectSynthMode()));
 
-  _directModeAct = new QAction(tr("File"),this);
+  _directModeAct = new QAction(tr("File"), this);
   _directModeAct->setCheckable(true);
   _directModeAct->setChecked(false);
   _selectModeMenu->addAction(_directModeAct);
@@ -102,22 +102,23 @@ SoundBoxContextMenu::SoundBoxContextMenu(SoundBox *box) :
 
   _soundMenu->addMenu(_selectModeMenu);
 
-  _selectSoundAct = new QAction(tr("Select File"),this);
+  _selectSoundAct = new QAction(tr("Select File"), this);
   _soundMenu->addAction(_selectSoundAct);
   connect(_selectSoundAct, SIGNAL(triggered()), this, SLOT(selectSound()));
 
-  _playAct = new QAction(tr("Play"),this);
+  _playAct = new QAction(tr("Play"), this);
   _soundMenu->addAction(_playAct);
   connect(_playAct, SIGNAL(triggered()), this, SLOT(play()));
 
-  _fineTuneAct = new QAction(tr("Fine Tune"),this);
+  _fineTuneAct = new QAction(tr("Fine Tune"), this);
   _soundMenu->addAction(_fineTuneAct);
   connect(_fineTuneAct, SIGNAL(triggered()), this, SLOT(fineTune()));
 
   addMenu(_soundMenu);
 }
 
-SoundBoxContextMenu::~SoundBoxContextMenu() {
+SoundBoxContextMenu::~SoundBoxContextMenu()
+{
   delete _copyGraphicAspectAct;
   delete _pasteGraphicAspectAct;
   delete _editGraphicAspectAct;
@@ -152,9 +153,9 @@ void
 SoundBoxContextMenu::selectDirectMode()
 {
   if (static_cast<SoundBox*>(_box)->soundSelected().isEmpty()) {
-    selectSound();
-  }
-	static_cast<SoundBox*>(_box)->selectMode(FileMode);
+      selectSound();
+    }
+  static_cast<SoundBox*>(_box)->selectMode(FileMode);
 }
 
 void
@@ -188,23 +189,27 @@ SoundBoxContextMenu::pasteAspect()
 }
 
 void
-SoundBoxContextMenu::editAspect() {
+SoundBoxContextMenu::editAspect()
+{
   static_cast<SoundBox*>(_box)->editAspect();
 }
 
 void
-SoundBoxContextMenu::importAspect() {
+SoundBoxContextMenu::importAspect()
+{
   static_cast<SoundBox*>(_box)->importAspect();
 }
 
-void SoundBoxContextMenu::switchImpulsive() {
+void
+SoundBoxContextMenu::switchImpulsive()
+{
   bool impulsive = static_cast<SoundBox*>(_box)->impulsive();
   static_cast<SoundBox*>(_box)->setImpulsive(!impulsive);
   if (!impulsive) {
-    _makeImpulsiveAct->setText(tr("Unmake impulsive"));
-  }
+      _makeImpulsiveAct->setText(tr("Unmake impulsive"));
+    }
   else {
-    _makeImpulsiveAct->setText(tr("Make impulsive"));
-  }
+      _makeImpulsiveAct->setText(tr("Make impulsive"));
+    }
   update();
 }
