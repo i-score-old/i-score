@@ -49,7 +49,7 @@
 #include "Palette.hpp"
 #include "AbstractBox.hpp"
 #include <string>
-#include "CSPTypes.hpp"
+#include "Engine.h"
 
 //! Defines abstract sound box type.
 enum { ABSTRACT_SOUND_BOX_TYPE = 2 };

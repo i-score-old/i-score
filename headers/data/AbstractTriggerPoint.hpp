@@ -45,7 +45,7 @@
  *
  * \author Luc Vercellin
  */
-#include "CSPTypes.hpp"
+#include "Engine.h"
 #include "Abstract.hpp"
 #include "BasicBox.hpp"
 #include "MaquetteScene.hpp"

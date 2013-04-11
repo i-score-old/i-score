@@ -49,7 +49,7 @@
 #include "Palette.hpp"
 #include "AbstractBox.hpp"
 #include <string>
-#include "CSPTypes.hpp"
+#include "Engine.h"
 
 //! Defines abstract parent box type.
 enum { ABSTRACT_PARENT_BOX_TYPE = 7 };

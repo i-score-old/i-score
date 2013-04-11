@@ -59,8 +59,7 @@
 #include "NetworkMessages.hpp"
 #include "BasicBox.hpp"
 
-#include "TTScore.h"
-#include "TTModular.h"
+#include "Engine.h"
 
 //! Default network host.
 
@@ -78,11 +77,6 @@ static const std::string STARTPOINT_ENGINES_MESSAGE = "/Transport/StartPoint";
 static const std::string SPEED_ENGINES_MESSAGE = "/Transport/Speed";
 
 #define NETWORK_PORT_STR "7000"
-
-// Those macro were defined in CSPTypes but we'll not need them
-#define SCENARIO_SIZE 600000
-#define CURVE_POW 1
-#define NO_ID 0
 
 class PaletteActor;
 
@@ -177,11 +171,6 @@ class Maquette : public QObject
      * \brief Initialise the maquette elements.
      */
     void init();
-
-    /*!
-     * \brief Used to show how to deal with the TTNodeDirectory
-     */
-    void dumpAddressBelow(TTNodePtr aNode);
 
     /*!
      * \brief Sets a new scene.
@@ -786,20 +775,21 @@ class Maquette : public QObject
     double accelerationFactor();
 
     /*!
-     * \brief Called by the callback when a transition is crossed.
+     * \brief Called by the callback when the running state of a box change
      *
-     * \param boxID : the box whose transition is crossed
-     * \param CPIndex : index of the box's control point crossed
+     * \param boxID : the box whose running state have cahnged
+     * \param runnging : the new running state
      */
-    void crossedTransition(unsigned int boxID, unsigned int CPIndex);
+    void updateBoxRunningStatus(unsigned int boxID, bool running);
 
     /*!
-     * \brief Called by the callback when a triggerPoint is triggered.
+     * \brief Called by the callback when the active state of a triggerPoint change.
      *
-     * \param waiting : new waiting state of the triggerPoint
+     * \param waiting : new active state of the triggerPoint
      * \param trgID : trigger point ID
      */
-    void crossedTriggerPoint(bool waiting, unsigned int trgID);
+    void updateTriggerPointActiveStatus(unsigned int trgID, bool active);
+    
     inline std::map<unsigned int, BasicBox*> getBoxes(){ return _boxes; }
 
     /*!
@@ -890,8 +880,8 @@ class Maquette : public QObject
     //! The MaquetteScene managing display and interaction.
     MaquetteScene *_scene;
 
-    //! The main scenario object managing temporal constraints.
-    TimeProcessPtr _mainScenario;
+    //! The Engines object managing temporal constraints.
+    Engine *_engines;
 
     //! The map of boxes (identified by IDs) managed by the maquette.
     std::map<unsigned int, BasicBox*> _boxes;
@@ -928,24 +918,28 @@ class Maquette : public QObject
 };
 
 /*!
- * \brief Callback called when a transition is crossed.
+ * \brief Callback called when a Trigger Point active state change
  *
- * \param boxID : the box whose transition is crossed
- * \param CPIndex : index of the box's control point crossed
+ * \param trgID : index of the box's Trigger Point
+ * \param waiting : the active state of the Trigger Point
  */
-void crossTransitionCallback(unsigned int boxID, unsigned int CPIndex, std::vector<unsigned int> processesToStop);
-void enginesNetworkUpdateCallback(unsigned int boxID, string m1, string m2);
+void triggerPointIsActiveCallback(unsigned int trgID, bool active);
 
 /*!
- * \brief Callback called when a Trigger Point is triggered is crossed.
+ * \brief Callback called when the running state of a box change.
  *
- * \param waiting : the waiting state of the Trigger Point
- * \param trgID : index of the box's Trigger Point crossed
- * \param boxID : the box whose transition is crossed
- * \param CPIndex : index of the box's control point associated with trigger point
- * \param message : the message of the Trigger Point
+ * \param boxID : the box whose changing his running status
+ * \param running : the new running state of the box
  */
-void crossTriggerPointCallback(bool waiting, unsigned int trgID, unsigned int boxID, unsigned int CPIndex, std::string message);
+void boxIsRunningCallback(unsigned int boxID, bool running);
+
+/*!
+ * \brief Callback called when a transport feature is used
+ *
+ * \param transpport : a transport feature being used
+ * \param value : a value related to the transport
+ */
+void transportCallback(TTSymbol& transport, const TTValue& value);
 
 /*!
  * \brief Callback called when the execution is finished.
