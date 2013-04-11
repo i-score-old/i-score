@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET = i-score
 CONFIG += debug x86_64
-QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6.8
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8.3
 
 QMAKE_CXXFLAGS += -O0 -fPIC -msse3
 
@@ -23,7 +23,6 @@ RESOURCES += i-score.qrc
 
 # qmake adds the values of this variable as compiler C preprocessor macros (-D option).
 DEFINES += __Types__
-#DEFINES += USE_JAMOMA_MODULAR
 
 ICON = images/acousmoscribe.icns
 
@@ -59,7 +58,7 @@ macx-g++ {
 }
 
 macx-clang {
-    QMAKE_CXX = /usr/bin/clang
+    QMAKE_CXX = /usr/bin/clang++
     QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
 
     INCLUDEPATH += . headers/GUI headers/data /Library/Frameworks/ /usr/local/jamoma/includes /usr/local/include/libxml2
@@ -73,7 +72,6 @@ macx-clang {
 HEADERS += /usr/local/jamoma/includes/TTScore.h \
 /usr/local/jamoma/includes/TTModular.h \
 /usr/local/jamoma/includes/TTDSP.h \
-/usr/local/jamoma/includes/TTDictionnary.h \
 headers/data/Abstract.hpp \
 headers/data/AbstractBox.hpp \
 headers/data/AbstractComment.hpp \
@@ -83,8 +81,10 @@ headers/data/AbstractSoundBox.hpp \
 headers/data/AbstractControlBox.hpp \
 headers/data/AbstractParentBox.hpp \
 headers/data/AbstractTriggerPoint.hpp \
+headers/data/Engine.h \
 headers/data/EnumPalette.hpp \
 headers/data/Maquette.hpp \
+headers/data/NetworkMessages.hpp \
 headers/data/Palette.hpp \
 headers/GUI/AttributesEditor.hpp \
 headers/GUI/BasicBox.hpp \
@@ -117,12 +117,11 @@ headers/GUI/TriggerPoint.hpp \
 headers/GUI/TreeMap.hpp \
 headers/GUI/TreeMapElement.hpp \
 headers/GUI/ViewRelations.hpp \
-headers/data/NetworkMessages.hpp \
 headers/GUI/BoxWidget.hpp \
 headers/GUI/BoxCurveEdit.hpp \
 headers/GUI/MaquetteWidget.hpp \
 headers/GUI/TimeBarWidget.hpp \
-headers/GUI/DeviceEdit.hpp \
+headers/GUI/DeviceEdit.hpp
 
 SOURCES += src/main.cpp \
 src/data/Abstract.cpp \
@@ -134,7 +133,9 @@ src/data/AbstractParentBox.cpp \
 src/data/AbstractRelation.cpp \
 src/data/AbstractSoundBox.cpp \
 src/data/AbstractTriggerPoint.cpp \
+src/data/Engine.cpp \
 src/data/Maquette.cpp \
+src/data/NetworkMessages.cpp \
 src/data/Palette.cpp \
 src/GUI/AttributesEditor.cpp \
 src/GUI/BasicBox.cpp \
@@ -167,9 +168,9 @@ src/GUI/TriggerPoint.cpp \
 src/GUI/TreeMap.cpp \
 src/GUI/TreeMapElement.cpp \
 src/GUI/ViewRelations.cpp \
-src/data/NetworkMessages.cpp \
 src/GUI/BoxWidget.cpp \
 src/GUI/BoxCurveEdit.cpp \
 src/GUI/MaquetteWidget.cpp \
 src/GUI/TimeBarWidget.cpp \
-src/GUI/DeviceEdit.cpp \
+src/GUI/DeviceEdit.cpp
+
