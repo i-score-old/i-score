@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		4699ECBD17160BF700E6526C /* Engine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Engine.h; sourceTree = "<group>"; };
+		4699ECBE17160C2D00E6526C /* Engine.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Engine.cpp; sourceTree = "<group>"; };
 		46B522F4170EB46200F6DF2A /* Abstract.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Abstract.hpp; sourceTree = "<group>"; };
 		46B522F5170EB46200F6DF2A /* AbstractBox.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractBox.hpp; sourceTree = "<group>"; };
 		46B522F6170EB46200F6DF2A /* AbstractComment.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractComment.hpp; sourceTree = "<group>"; };
@@ -136,6 +138,7 @@
 				46B522FA170EB46200F6DF2A /* AbstractRelation.hpp */,
 				46B522FB170EB46200F6DF2A /* AbstractSoundBox.hpp */,
 				46B522FC170EB46200F6DF2A /* AbstractTriggerPoint.hpp */,
+				4699ECBD17160BF700E6526C /* Engine.h */,
 				46B522FD170EB46200F6DF2A /* EnumPalette.hpp */,
 				46B522FE170EB46200F6DF2A /* Maquette.hpp */,
 				46B522FF170EB46200F6DF2A /* NetworkMessages.hpp */,
@@ -208,6 +211,7 @@
 				46B5232E170EB47E00F6DF2A /* AbstractRelation.cpp */,
 				46B5232F170EB47E00F6DF2A /* AbstractSoundBox.cpp */,
 				46B52330170EB47E00F6DF2A /* AbstractTriggerPoint.cpp */,
+				4699ECBE17160C2D00E6526C /* Engine.cpp */,
 				46B52331170EB47E00F6DF2A /* Maquette.cpp */,
 				46B52332170EB47E00F6DF2A /* NetworkMessages.cpp */,
 				46B52333170EB47E00F6DF2A /* Palette.cpp */,
