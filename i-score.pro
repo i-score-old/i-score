@@ -58,14 +58,31 @@ macx-g++ {
 }
 
 macx-clang {
-    QMAKE_CXX = /usr/bin/clang++
-    QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
 
-    INCLUDEPATH += . headers/GUI headers/data /Library/Frameworks/ /usr/local/jamoma/includes /usr/local/include/libxml2
+    QMAKE_CXX = /usr/bin/clang++
+
+    QMAKE_CXXFLAGS += -std=c++11
+    QMAKE_CXXFLAGS += -stdlib=libc++
+    QMAKE_CXXFLAGS += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
+
+    QMAKE_LFLAGS += -std=c++11
+    QMAKE_LFLAGS += -stdlib=libc++
+    QMAKE_LFLAGS += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
     QMAKE_LFLAGS += -L/usr/local/lib/ -L/usr/local/jamoma/lib -L/System/Library/Frameworks/ -L/Library/Frameworks/
-    #QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
-    #QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
-    LIBS += /usr/local/jamoma/lib/JamomaFoundation.dylib /usr/local/jamoma/lib/JamomaDSP.dylib /usr/local/jamoma/lib/JamomaScore.dylib /usr/local/jamoma/lib/JamomaModular.dylib -framework gecode -lxml2
+
+    INCLUDEPATH += .
+    INCLUDEPATH += headers/GUI
+    INCLUDEPATH += headers/data
+    INCLUDEPATH += /Library/Frameworks/
+    INCLUDEPATH += /usr/local/jamoma/includes
+    INCLUDEPATH += /usr/local/include/libxml2
+
+    LIBS += /usr/local/jamoma/lib/JamomaFoundation.dylib
+    LIBS += /usr/local/jamoma/lib/JamomaDSP.dylib
+    LIBS += /usr/local/jamoma/lib/JamomaScore.dylib
+    LIBS += /usr/local/jamoma/lib/JamomaModular.dylib
+    LIBS += -framework gecode
+    LIBS += -lxml2
 }
 
 # Input
