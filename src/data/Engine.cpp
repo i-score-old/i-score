@@ -19,6 +19,16 @@ using namespace std;
  * \date 2012-2013
  */
 
+EngineCacheElement::EngineCacheElement()
+{
+    ;
+}
+
+EngineCacheElement::~EngineCacheElement()
+{
+    ;
+}
+
 Engine::Engine(void(*interactiveEventActiveAttributeCallback)(InteractiveEventId, bool),
                void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
                void(*transportDataValueCallback)(TTSymbol&, const TTValue&))
@@ -211,8 +221,8 @@ void Engine::initScore()
     
     // TODO : create a TTCallback to observe each time process scheduler running attribute (using TimeProcessSchedulerRunningAttributeCallback)
     
-    // Store the main scenario as ROOT_BOX_ID
-    m_timeProcessMap[ROOT_BOX_ID] = TTValue(TTObjectBasePtr(m_mainScenario));
+    // Store the main scenario (so ROOT_BOX_ID is 1)
+    cacheTimeProcess(m_mainScenario);
 }
 
 void Engine::dumpAddressBelow(TTNodePtr aNode)
@@ -243,6 +253,34 @@ Engine::~Engine()
     TTObjectBaseRelease(TTObjectBaseHandle(&m_mainScenario));
 }
 
+TimeProcessId Engine::cacheTimeProcess(TimeProcessPtr timeProcess)
+{
+    TimeProcessId id;
+    EngineCacheElementPtr e;
+    
+    e = new EngineCacheElement();
+    e->object = TTObjectBasePtr(timeProcess);
+    
+    id = m_timeProcessMap.size() + 1;
+    m_timeProcessMap[id] = e;
+    
+    return id;
+}
+
+IntervalId Engine::cacheInterval(TimeProcessPtr timeProcess)
+{
+    TimeProcessId id;
+    EngineCacheElementPtr e;
+    
+    e = new EngineCacheElement();
+    e->object = TTObjectBasePtr(timeProcess);
+    
+    id = m_timeProcessMap.size() + 1;
+    m_intervalMap[id] = e;
+    
+    return id;
+}
+
 // Edition ////////////////////////////////////////////////////////////////////////
 
 TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, TimeProcessId motherId)
@@ -258,21 +296,20 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, TimePro
     // Add the time process to the main scenario
     // TODO : get the parent process using motherID and add the time process to this parent process
     v = TTValue(TTObjectBasePtr(timeProcess));
-    m_mainScenario->sendMessage(TTSymbol("TimeProcessAdd"), v, kTTValNONE);
+    // CRASH_ENGINE  m_mainScenario->sendMessage(TTSymbol("TimeProcessAdd"), v, kTTValNONE);
+    
+    // Cache it and get an unique id for this process
+    boxId = cacheTimeProcess(timeProcess);
     
     // Set the start and end event dates
     timeProcess->setAttributeValue(TTSymbol("startDate"), boxBeginPos);
     timeProcess->setAttributeValue(TTSymbol("endDate"), boxBeginPos+boxLength);
     
     // TODO : create a TTCallback to observe each time process event active attribute (using InteractiveEventActiveAttributeCallback)
-    // v.append();
+    // getTimeProcess(boxId)->appendObserver() ?
     
     // TODO : create a TTCallback to observe each time process scheduler running attribute (using TimeProcessSchedulerRunningAttributeCallback)
-    // v.append();
-    
-    // Get an unique id for this process and store it
-    boxId = m_timeProcessMap.size() + 1;
-    m_timeProcessMap[boxId] = v;
+    // getTimeProcess(boxId)->appendObserver() ?
     
 	return boxId;
 }
@@ -285,7 +322,7 @@ void Engine::removeBox(TimeProcessId boxId)
     timeProcess = getTimeProcess(boxId);
     
     // TODO : delete TTCallback used to observe each time process scheduler running attribute
-    // observer = v[1];
+    // getTimeProcess(boxId)->removeObserver() ?
     
     // Delete the time process (the process is removed from the scenario during the destruction)
     TTObjectBaseRelease(TTObjectBaseHandle(&timeProcess));
@@ -305,6 +342,9 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
     // Create a new interval time process
     timeProcess = NULL;
     TTObjectBaseInstantiate(TTSymbol("Interval"), TTObjectBaseHandle(&timeProcess), kTTValNONE);
+    
+    // Cache it and get an unique id for this process
+    relationId = cacheInterval(timeProcess);
     
     // Get the events from the given box ids and pass them to the time process
     tp1 = getTimeProcess(boxId1);
@@ -329,10 +369,6 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
     m_mainScenario->sendMessage(TTSymbol("TimeProcessAdd"), v, kTTValNONE);
     
     // TODO : how to fill the movedBoxes ? return the entire timeProcessMap
-    
-    // Get an unique id for this process and store it
-    relationId = m_intervalMap.size() + 1;
-    m_intervalMap[relationId] = v;
     
 	return relationId;
 }
@@ -387,7 +423,7 @@ bool Engine::isTemporalRelationExisting(TimeProcessId boxId1, TimeEventIndex con
     // Look into the interval map to retreive an interval with the same events
     for (it = m_intervalMap.begin(); it != m_intervalMap.end(); ++it) {
         
-        timeProcess = TimeProcessPtr(TTObjectBasePtr(it->second[0]));
+        timeProcess = TimeProcessPtr(TTObjectBasePtr(it->second->object));
         
         timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
         
@@ -420,7 +456,7 @@ TimeProcessId Engine::getRelationFirstBoxId(IntervalId relationId)
     // Look into the automation map to retreive an automation with the same event
     for (it = m_timeProcessMap.begin(); it != m_timeProcessMap.end(); ++it) {
         
-        timeProcess = TimeProcessPtr(TTObjectBasePtr(it->second[0]));
+        timeProcess = TimeProcessPtr(TTObjectBasePtr(it->second->object));
         
         timeProcess->getAttributeValue(TTSymbol("startEvent"), vt);
         
@@ -460,7 +496,7 @@ TimeProcessId Engine::getRelationSecondBoxId(IntervalId relationId)
     // Look into the automation map to retreive an automation with the same event
     for (it = m_timeProcessMap.begin(); it != m_timeProcessMap.end(); ++it) {
         
-        timeProcess = TimeProcessPtr(TTObjectBasePtr(it->second[0]));
+        timeProcess = TimeProcessPtr(TTObjectBasePtr(it->second->object));
         
         timeProcess->getAttributeValue(TTSymbol("startEvent"), vt);
         

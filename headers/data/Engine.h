@@ -43,15 +43,27 @@ typedef unsigned int IntervalId;
 /** a temporary type dedicated to retreive an Interactive TimeEvent (this is related to TriggerPoint notion) */
 typedef unsigned int InteractiveEventId;
 
-/** a temporary type that contains an id and a cached value */
-typedef std::pair<unsigned int, TTValue&> EngineCacheKey;
+/** a class used to cache TTObject and some observers */
+class EngineCacheElement {
+
+public:
+    TTObjectBasePtr object;
+    
+    EngineCacheElement();
+    ~EngineCacheElement();
+    
+};
+typedef EngineCacheElement* EngineCacheElementPtr;
+
+/** a temporary type that contains an id and a cached element */
+typedef std::pair<unsigned int, EngineCacheElementPtr> EngineCacheKey;
 typedef	EngineCacheKey*	EngineCacheKeyPtr;
 
-/** a temporary type to define a map to store and retreive a cached value relative to an id */
-typedef std::map<unsigned int, TTValue&> EngineCacheMap;
+/** a temporary type to define a map to store and retreive a cached element relative to an id */
+typedef std::map<unsigned int, EngineCacheElementPtr> EngineCacheMap;
 typedef	EngineCacheMap*	EngineCacheMapPtr;
 
-typedef std::map<unsigned int, TTValue&>::iterator EngineCacheMapIterator;
+typedef std::map<unsigned int, EngineCacheElementPtr>::iterator EngineCacheMapIterator;
 
 #define NO_BOUND -1
 
@@ -97,9 +109,9 @@ enum BinaryRelationType { EQ_RELATION = 0, NQ_RELATION = 1, LQ_RELATION = 2, LE_
 /// The three temporal relations in Boxes
 enum RelationType {ALLEN = 0, ANTPOST = 1, INTERVAL = 2, BOUNDING = 3};
 
-#define getTimeProcess(boxId) TimeProcessPtr(TTObjectBasePtr(m_timeProcessMap[boxId][0]));
+#define getTimeProcess(boxId) TimeProcessPtr(TTObjectBasePtr(m_timeProcessMap[boxId]->object));
 
-#define getInterval(relationId) TimeProcessPtr(TTObjectBasePtr(m_intervalMap[relationId][0]));
+#define getInterval(relationId) TimeProcessPtr(TTObjectBasePtr(m_intervalMap[relationId]->object));
 
 /*!
  * \class Engine
@@ -120,7 +132,7 @@ private:
 	TimeProcessPtr      m_mainScenario;                                 /// The top scenario
     
     EngineCacheMap      m_timeProcessMap;                               /// All automation or scenario time process and some observers stored using an unique id
-    EngineCacheMap      m_intervalMap;                                 /// All interval time process and some observers stored using an unique id
+    EngineCacheMap      m_intervalMap;                                  /// All interval time process and some observers stored using an unique id
     
     TTObjectBasePtr     m_dataPlay;                                     /// A Modular TTData to expose Play transport service
     TTObjectBasePtr     m_dataStop;                                     /// A Modular TTData to expose Stop transport service
@@ -145,6 +157,12 @@ public:
     void dumpAddressBelow(TTNodePtr aNode);
     
     ~Engine();
+    
+    // Id management //////////////////////////////////////////////////////////////////
+    
+    TimeProcessId cacheTimeProcess(TimeProcessPtr timeProcess);
+    
+    IntervalId cacheInterval(TimeProcessPtr timeProcess);
     
 	// Edition ////////////////////////////////////////////////////////////////////////
     
