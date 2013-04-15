@@ -88,7 +88,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
   : QGraphicsScene(rect)
 {
   _editor = editor;
-  _copyPalette = _editor->getPalette();
+//  _copyPalette = _editor->getPalette();
   _clicked = false;
   _playing = false;
   _paused = false;

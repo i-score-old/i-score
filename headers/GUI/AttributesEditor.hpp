@@ -184,91 +184,91 @@ class AttributesEditor : public QDockWidget
      **/
     void languageChanged();
 
-    /*!
-     * \brief Notifies that the shape is changed.
-     **/
-    void shapeChanged();
+//    /*!
+//     * \brief Notifies that the shape is changed.
+//     **/
+//    void shapeChanged();
 
-    /*!
-     * \brief Notifies that the impulsive state is changed.
-     */
-    void impulsiveChanged();
+//    /*!
+//     * \brief Notifies that the impulsive state is changed.
+//     */
+//    void impulsiveChanged();
 
-    /*!
-     * \brief Notifies that the speed attribute is changed.
-     **/
-    void speedHeldChanged();
+//    /*!
+//     * \brief Notifies that the speed attribute is changed.
+//     **/
+//    void speedHeldChanged();
 
-    /*!
-     * \brief Notifies that the speed variation attribute is changed.
-     **/
-    void speedVariationChanged();
+//    /*!
+//     * \brief Notifies that the speed variation attribute is changed.
+//     **/
+//    void speedVariationChanged();
 
-    /*!
-     * \brief Notifies that the grain attribute is changed.
-     **/
-    void grainChanged();
+//    /*!
+//     * \brief Notifies that the grain attribute is changed.
+//     **/
+//    void grainChanged();
 
-    /*!
-     * \brief Notifies that the ending pitch activation is switched.
-     *
-     * \param state : the new ending pitch activation state
-     **/
-    void pitchEndChecked(int state);
+//    /*!
+//     * \brief Notifies that the ending pitch activation is switched.
+//     *
+//     * \param state : the new ending pitch activation state
+//     **/
+//    void pitchEndChecked(int state);
 
-    /*!
-     * \brief Notifies that the pitch random attribute is switched.
-     *
-     * \param state : the new pitch random state
-     **/
-    void pitchRandomChecked(int state);
+//    /*!
+//     * \brief Notifies that the pitch random attribute is switched.
+//     *
+//     * \param state : the new pitch random state
+//     **/
+//    void pitchRandomChecked(int state);
 
-    /*!
-     * \brief Notifies that the pitch vibrato attribute is switched.
-     *
-     * \param state : the new pitch vibrato state
-     **/
-    void pitchVibratoChecked(int state);
+//    /*!
+//     * \brief Notifies that the pitch vibrato attribute is switched.
+//     *
+//     * \param state : the new pitch vibrato state
+//     **/
+//    void pitchVibratoChecked(int state);
 
-    /*!
-     * \brief Notifies that a new starting pitch is selected.
-     **/
-    void pitchStartChanged();
+//    /*!
+//     * \brief Notifies that a new starting pitch is selected.
+//     **/
+//    void pitchStartChanged();
 
-    /*!
-     * \brief Notifies that a new ending pitch is selected.
-     **/
-    void pitchEndChanged();
+//    /*!
+//     * \brief Notifies that a new ending pitch is selected.
+//     **/
+//    void pitchEndChanged();
 
-    /*!
-     * \brief Notifies that a new pitch amplitude is selected.
-     **/
-    void pitchAmplitudeChanged();
+//    /*!
+//     * \brief Notifies that a new pitch amplitude is selected.
+//     **/
+//    void pitchAmplitudeChanged();
 
-    /*!
-     * \brief Notifies that a new pitch grade is selected.
-     **/
-    void pitchGradeChanged();
+//    /*!
+//     * \brief Notifies that a new pitch grade is selected.
+//     **/
+//    void pitchGradeChanged();
 
-    /*!
-     * \brief Notifies that a new harmonicity is selected.
-     **/
-    void harmoHeldChanged();
+//    /*!
+//     * \brief Notifies that a new harmonicity is selected.
+//     **/
+//    void harmoHeldChanged();
 
-    /*!
-     * \brief Notifies that a new harmonicity variation is selected.
-     **/
-    void harmoVariationChanged();
+//    /*!
+//     * \brief Notifies that a new harmonicity variation is selected.
+//     **/
+//    void harmoVariationChanged();
 
     /*!
      * \brief Selecs a new color for PreviewArea and palette.
      **/
     void changeColor();
 
-    /*!
-     * \brief Resets the whole palette attributes to their default values.
-     */
-    void resetProfiles();
+//    /*!
+//     * \brief Resets the whole palette attributes to their default values.
+//     */
+//    void resetProfiles();
 
     void startMessageChanged(QTreeWidgetItem *item);
     void endMessageChanged(QTreeWidgetItem *item);
@@ -290,10 +290,10 @@ class AttributesEditor : public QDockWidget
      */
     void endMessagesChanged(bool forceUpdate = false);
 
-    /*!
-     * \brief Called when profiles are modified.
-     */
-    void profilesChanged();
+//    /*!
+//     * \brief Called when profiles are modified.
+//     */
+//    void profilesChanged();
 
     /*!
      * \brief Called when general attributes are modified.
@@ -332,13 +332,13 @@ class AttributesEditor : public QDockWidget
     QTabWidget * _tabWidget;    //!< Widget handling tabs
     QWidget * _generalTab;      //!< Tab handling general information
     int _generalTabIndex;       //!< Index of tab handling general information
-    QWidget * _profilesTab;     //!< Tab handling profiles
-    int _profilesTabIndex;      //!< Index of tab handling profiles
-    QTabWidget * _profilesTabs; //!< Widget handling internal profiles tabs.
-    int _shapeTabIndex;
-    int _rythmTabIndex;
-    int _melodyTabIndex;
-    int _harmonyTabIndex;
+//    QWidget * _profilesTab;     //!< Tab handling profiles
+//    int _profilesTabIndex;      //!< Index of tab handling profiles
+//    QTabWidget * _profilesTabs; //!< Widget handling internal profiles tabs.
+//    int _shapeTabIndex;
+//    int _rythmTabIndex;
+//    int _melodyTabIndex;
+//    int _harmonyTabIndex;
 
     QTabWidget * _networkTabWidget;
     int _networkTabIndex;
@@ -356,12 +356,12 @@ class AttributesEditor : public QDockWidget
     QWidget * _curvesTab;              //!< Tab handling curves
     int _curvesTabIndex;               //!< Index of tab handling curves
 
-    QGridLayout * _paletteLayout;      //!< Global layout
+//    QGridLayout * _paletteLayout;      //!< Global layout
 
-    QGridLayout * _profilesTopLayout;  //!< Layout handling preview area and QButtons.
+//    QGridLayout * _profilesTopLayout;  //!< Layout handling preview area and QButtons.
     PreviewArea *_profilesPreviewArea; //!< Editor's preview area
-    QPushButton *_profilesColorButton; //!< Color button.
-    QPushButton *_profilesResetButton; //!< Reset button.
+//    QPushButton *_profilesColorButton; //!< Color button.
+//    QPushButton *_profilesResetButton; //!< Reset button.
 
     QGridLayout * _generalTopLayout;   //!< Layout handling preview area and QButtons.
     PreviewArea *_generalPreviewArea;  //!< Editor's preview area
@@ -383,53 +383,53 @@ class AttributesEditor : public QDockWidget
 
     // PROFILES
 
-    QGridLayout * _profilesLayout;       //!< Layout handling profile
+//    QGridLayout * _profilesLayout;       //!< Layout handling profile
 
-    QGridLayout * _shapeLayout;          //!< Layout handling shape attributes.
-    QGridLayout * _speedLayout;          //!< Layout handling speed attributes.
-    QGridLayout * _pitchLayout;          //!< Layout handling pitch attributes.
-    QGridLayout * _harmonyLayout;        //!< Layout handling harmony attributes.
+//    QGridLayout * _shapeLayout;          //!< Layout handling shape attributes.
+//    QGridLayout * _speedLayout;          //!< Layout handling speed attributes.
+//    QGridLayout * _pitchLayout;          //!< Layout handling pitch attributes.
+//    QGridLayout * _harmonyLayout;        //!< Layout handling harmony attributes.
 
-    QLabel *_profilesLabel;              //!< Profile label.
+//    QLabel *_profilesLabel;              //!< Profile label.
 
-    QLabel *_shapeLabel;                 //!< Shape label.
+//    QLabel *_shapeLabel;                 //!< Shape label.
 
-    QLabel * _rythmLabel;                //!< Rythm label.
-    QLabel * _speedHeldLabel;            //!< Speed label.
-    QLabel * _speedVariationLabel;       //!< Speed variation label.
-    QLabel * _grainLabel;                //!< Grain label.
+//    QLabel * _rythmLabel;                //!< Rythm label.
+//    QLabel * _speedHeldLabel;            //!< Speed label.
+//    QLabel * _speedVariationLabel;       //!< Speed variation label.
+//    QLabel * _grainLabel;                //!< Grain label.
 
-    QLabel * _melodyLabel;               //!< Melody label.
-    QLabel * _pitchStartLabel;           //!< Pitch start label.
-    QLabel * _amplitudeLabel;            //!< Pitch amplitude label.
-    QLabel * _gradeLabel;                //!< Pitch grade label.
+//    QLabel * _melodyLabel;               //!< Melody label.
+//    QLabel * _pitchStartLabel;           //!< Pitch start label.
+//    QLabel * _amplitudeLabel;            //!< Pitch amplitude label.
+//    QLabel * _gradeLabel;                //!< Pitch grade label.
 
-    QLabel * _harmonyLabel;              //!< Harmony main label.
-    QLabel * _harmonyHeldLabel;          //!< Harmony label.
-    QLabel * _harmonyVariationLabel;     //!< Harmony variation label.
+//    QLabel * _harmonyLabel;              //!< Harmony main label.
+//    QLabel * _harmonyHeldLabel;          //!< Harmony label.
+//    QLabel * _harmonyVariationLabel;     //!< Harmony variation label.
 
-    QComboBox * _shapeComboBox;          //!< Shape selection list.
+//    QComboBox * _shapeComboBox;          //!< Shape selection list.
 
-    QComboBox * _speedHeldComboBox;      //!< Speed selection list.
-    QComboBox * _speedVariationComboBox; //!< Speed variation selection list.
-    QComboBox * _grainComboBox;          //!< Grain selection list.
+//    QComboBox * _speedHeldComboBox;      //!< Speed selection list.
+//    QComboBox * _speedVariationComboBox; //!< Speed variation selection list.
+//    QComboBox * _grainComboBox;          //!< Grain selection list.
 
-    QComboBox * _pitchStartComboBox;     //!< Pitch start selection list.
-    QComboBox * _pitchEndComboBox;       //!< Pitch end selection list.
-    QComboBox * _pitchAmplitudeComboBox; //!< Pitch amplitude selection list.
-    QComboBox * _pitchGradeComboBox;     //!< Pitch grade selection list.
+//    QComboBox * _pitchStartComboBox;     //!< Pitch start selection list.
+//    QComboBox * _pitchEndComboBox;       //!< Pitch end selection list.
+//    QComboBox * _pitchAmplitudeComboBox; //!< Pitch amplitude selection list.
+//    QComboBox * _pitchGradeComboBox;     //!< Pitch grade selection list.
 
-    QComboBox * _harmoHeldComboBox;      //!< Harmony selection list.
-    QComboBox * _harmoVariationComboBox; //!< Harmony variation selection list.
+//    QComboBox * _harmoHeldComboBox;      //!< Harmony selection list.
+//    QComboBox * _harmoVariationComboBox; //!< Harmony variation selection list.
 
-    QCheckBox *_shapeOptionRandom;       //!< Shape random option.
-    QCheckBox *_shapeOptionImpulsive;    //!< Shape impulsive option.
+//    QCheckBox *_shapeOptionRandom;       //!< Shape random option.
+//    QCheckBox *_shapeOptionImpulsive;    //!< Shape impulsive option.
 
-    QCheckBox * _speedOptionRandom;      //!< Speed random option.
+//    QCheckBox * _speedOptionRandom;      //!< Speed random option.
 
-    QCheckBox *_pitchOptionRandom;       //!< Pitch random option.
-    QCheckBox *_pitchOptionVibrato;      //!< Pitch vibrato option.
-    QCheckBox * _pitchEnd;               //!< Pitch end attribute.
+//    QCheckBox *_pitchOptionRandom;       //!< Pitch random option.
+//    QCheckBox *_pitchOptionVibrato;      //!< Pitch vibrato option.
+//    QCheckBox * _pitchEnd;               //!< Pitch end attribute.
 
     // NETWORK
 
