@@ -111,13 +111,6 @@ class AttributesEditor : public QDockWidget
     void setAttributes(AbstractBox *abBox);
 
     /*!
-     * \brief Gets the current color used in PreviewArea.
-     *
-     * \return the current color used in PreviewArea
-     **/
-    QColor getColor() const;
-
-    /*!
      * \brief Gets current box edited in the editor.
      *
      * \return the box edited in the editor
@@ -159,7 +152,7 @@ class AttributesEditor : public QDockWidget
      **/
 
     // TODO : use QLocale instead
-    void nameWidgets(int language = 0);
+    void nameWidgets();
 
     /*!
      * \brief Allocates widgets.
@@ -180,96 +173,9 @@ class AttributesEditor : public QDockWidget
 
   private slots:
     /*!
-     * \brief Updates language.
-     **/
-    void languageChanged();
-
-//    /*!
-//     * \brief Notifies that the shape is changed.
-//     **/
-//    void shapeChanged();
-
-//    /*!
-//     * \brief Notifies that the impulsive state is changed.
-//     */
-//    void impulsiveChanged();
-
-//    /*!
-//     * \brief Notifies that the speed attribute is changed.
-//     **/
-//    void speedHeldChanged();
-
-//    /*!
-//     * \brief Notifies that the speed variation attribute is changed.
-//     **/
-//    void speedVariationChanged();
-
-//    /*!
-//     * \brief Notifies that the grain attribute is changed.
-//     **/
-//    void grainChanged();
-
-//    /*!
-//     * \brief Notifies that the ending pitch activation is switched.
-//     *
-//     * \param state : the new ending pitch activation state
-//     **/
-//    void pitchEndChecked(int state);
-
-//    /*!
-//     * \brief Notifies that the pitch random attribute is switched.
-//     *
-//     * \param state : the new pitch random state
-//     **/
-//    void pitchRandomChecked(int state);
-
-//    /*!
-//     * \brief Notifies that the pitch vibrato attribute is switched.
-//     *
-//     * \param state : the new pitch vibrato state
-//     **/
-//    void pitchVibratoChecked(int state);
-
-//    /*!
-//     * \brief Notifies that a new starting pitch is selected.
-//     **/
-//    void pitchStartChanged();
-
-//    /*!
-//     * \brief Notifies that a new ending pitch is selected.
-//     **/
-//    void pitchEndChanged();
-
-//    /*!
-//     * \brief Notifies that a new pitch amplitude is selected.
-//     **/
-//    void pitchAmplitudeChanged();
-
-//    /*!
-//     * \brief Notifies that a new pitch grade is selected.
-//     **/
-//    void pitchGradeChanged();
-
-//    /*!
-//     * \brief Notifies that a new harmonicity is selected.
-//     **/
-//    void harmoHeldChanged();
-
-//    /*!
-//     * \brief Notifies that a new harmonicity variation is selected.
-//     **/
-//    void harmoVariationChanged();
-
-    /*!
      * \brief Selecs a new color for PreviewArea and palette.
      **/
     void changeColor();
-
-//    /*!
-//     * \brief Resets the whole palette attributes to their default values.
-//     */
-//    void resetProfiles();
-
     void startMessageChanged(QTreeWidgetItem *item);
     void endMessageChanged(QTreeWidgetItem *item);
     void startMessageRemoved(const std::string &address);
@@ -289,17 +195,6 @@ class AttributesEditor : public QDockWidget
      * \brief Updates box end message
      */
     void endMessagesChanged(bool forceUpdate = false);
-
-//    /*!
-//     * \brief Called when profiles are modified.
-//     */
-//    void profilesChanged();
-
-    /*!
-     * \brief Called when general attributes are modified.
-     */
-    void generalChanged();
-
     /*!
      * \brief Called when the start of the box is changed.
      */
@@ -315,176 +210,28 @@ class AttributesEditor : public QDockWidget
      */
     void nameChanged();
 
-
-    void treeMapStartAssignment();
-    void treeMapEndAssignment();
-    void reloadTreeMap();
-    void upTreeMap();
-
   private:
-    MaquetteScene * _scene;
-
     QWidget * _centralWidget;   //!< Central widget.
+    QGridLayout * _centralLayout; //!< Central layout
+
+    QHBoxLayout *_boxSettingsLayout; //!< Layout handling box settings (name, color, assignation...).
+    NetworkTree *_networkTree; //!< NetworkTree (inspector).
 
     Palette *_palette;          //!< Palette storing attributes
-    unsigned int _boxEdited;    //!< ID of box being edited
-
-    QTabWidget * _tabWidget;    //!< Widget handling tabs
-    QWidget * _generalTab;      //!< Tab handling general information
-    int _generalTabIndex;       //!< Index of tab handling general information
-//    QWidget * _profilesTab;     //!< Tab handling profiles
-//    int _profilesTabIndex;      //!< Index of tab handling profiles
-//    QTabWidget * _profilesTabs; //!< Widget handling internal profiles tabs.
-//    int _shapeTabIndex;
-//    int _rythmTabIndex;
-//    int _melodyTabIndex;
-//    int _harmonyTabIndex;
-
-    QTabWidget * _networkTabWidget;
-    int _networkTabIndex;
-    QWidget * _messagesTab;    //!< Tab handling messages
-    int _messagesTabIndex;     //!< Index of tab handling network
-    QTabWidget * _messagesTabs;
-    int _startMsgsIndex;
-    int _endMsgsIndex;
-    QTabWidget * _explorationTab;
-    int _explorationTabIndex;
-    QWidget * _snapshotTab;    //!< Tab handling snapshot
-    int _snapshotTabIndex;     //!< Index of tab handling snapshot
-    QWidget * _treeMapTab;
-    int _treeMapTabIndex;
-    QWidget * _curvesTab;              //!< Tab handling curves
-    int _curvesTabIndex;               //!< Index of tab handling curves
-
-//    QGridLayout * _paletteLayout;      //!< Global layout
-
-//    QGridLayout * _profilesTopLayout;  //!< Layout handling preview area and QButtons.
-    PreviewArea *_profilesPreviewArea; //!< Editor's preview area
-//    QPushButton *_profilesColorButton; //!< Color button.
-//    QPushButton *_profilesResetButton; //!< Reset button.
-
-    QGridLayout * _generalTopLayout;   //!< Layout handling preview area and QButtons.
     PreviewArea *_generalPreviewArea;  //!< Editor's preview area
-    QPushButton *_generalColorButton;  //!< Color button.
-    QPixmap *_colorButtonPixmap;
-    QComboBox * _languageComboBox;     //!< Language selection list.
 
-    // GENERAL
-
-    QGridLayout * _generalLayout; //!< Layout handling general properties.
-
-    QLabel * _startLabel;
-    QLabel * _endLabel;
-    QLabel * _lengthLabel;
-    QLabel * _nameLabel;
+    // TODO
     QDoubleSpinBox * _boxStartValue;
-    QDoubleSpinBox * _boxLengthValue;
-    QLineEdit * _boxName;
+    QDoubleSpinBox * _boxLengthValue;    
 
-    // PROFILES
+    // boxEditLayout items
+    QLineEdit * _boxName; //!< Color button.
+    QPixmap *_colorButtonPixmap; //!< Color button.
+    QPushButton *_generalColorButton;  //!< Color button.
+    QPushButton *_snapshotAssignStart; //!< Start assignation button.
+    QPushButton *_snapshotAssignEnd; //!< End assignation button.
 
-//    QGridLayout * _profilesLayout;       //!< Layout handling profile
-
-//    QGridLayout * _shapeLayout;          //!< Layout handling shape attributes.
-//    QGridLayout * _speedLayout;          //!< Layout handling speed attributes.
-//    QGridLayout * _pitchLayout;          //!< Layout handling pitch attributes.
-//    QGridLayout * _harmonyLayout;        //!< Layout handling harmony attributes.
-
-//    QLabel *_profilesLabel;              //!< Profile label.
-
-//    QLabel *_shapeLabel;                 //!< Shape label.
-
-//    QLabel * _rythmLabel;                //!< Rythm label.
-//    QLabel * _speedHeldLabel;            //!< Speed label.
-//    QLabel * _speedVariationLabel;       //!< Speed variation label.
-//    QLabel * _grainLabel;                //!< Grain label.
-
-//    QLabel * _melodyLabel;               //!< Melody label.
-//    QLabel * _pitchStartLabel;           //!< Pitch start label.
-//    QLabel * _amplitudeLabel;            //!< Pitch amplitude label.
-//    QLabel * _gradeLabel;                //!< Pitch grade label.
-
-//    QLabel * _harmonyLabel;              //!< Harmony main label.
-//    QLabel * _harmonyHeldLabel;          //!< Harmony label.
-//    QLabel * _harmonyVariationLabel;     //!< Harmony variation label.
-
-//    QComboBox * _shapeComboBox;          //!< Shape selection list.
-
-//    QComboBox * _speedHeldComboBox;      //!< Speed selection list.
-//    QComboBox * _speedVariationComboBox; //!< Speed variation selection list.
-//    QComboBox * _grainComboBox;          //!< Grain selection list.
-
-//    QComboBox * _pitchStartComboBox;     //!< Pitch start selection list.
-//    QComboBox * _pitchEndComboBox;       //!< Pitch end selection list.
-//    QComboBox * _pitchAmplitudeComboBox; //!< Pitch amplitude selection list.
-//    QComboBox * _pitchGradeComboBox;     //!< Pitch grade selection list.
-
-//    QComboBox * _harmoHeldComboBox;      //!< Harmony selection list.
-//    QComboBox * _harmoVariationComboBox; //!< Harmony variation selection list.
-
-//    QCheckBox *_shapeOptionRandom;       //!< Shape random option.
-//    QCheckBox *_shapeOptionImpulsive;    //!< Shape impulsive option.
-
-//    QCheckBox * _speedOptionRandom;      //!< Speed random option.
-
-//    QCheckBox *_pitchOptionRandom;       //!< Pitch random option.
-//    QCheckBox *_pitchOptionVibrato;      //!< Pitch vibrato option.
-//    QCheckBox * _pitchEnd;               //!< Pitch end attribute.
-
-    // NETWORK
-
-    QGridLayout * _messagesLayout;            //!< Layout handling network
-
-    QGridLayout * _msgStartTopLayout;         //!< Layout handling start message top
-    QVBoxLayout * _msgStartLayout;            //!< Layout handling start message
-    QGridLayout * _msgEndTopLayout;           //!< Layout handling end message top
-    QVBoxLayout * _msgEndLayout;              //!< Layout handling end message
-
-    QLabel * _messagesLabel;                  //!< Process messages label.
-    QLabel * _startMsgLabel;                  //!< Start message label
-    QLabel * _endMsgLabel;                    //!< End message label
-    NetworkMessagesEditor * _startMsgsEditor; //!< Start message editor
-    NetworkMessagesEditor * _endMsgsEditor;   //!< End message editor
-    QScrollArea * _startMsgScrollArea;        //!< Start message editor scroll area
-    QScrollArea * _endMsgScrollArea;          //!< End message editor scroll area
-    QPushButton *_startMsgsAddButton;         //!< Start message add button
-    QPushButton *_endMsgsAddButton;           //!< End message add button
-    QPushButton *_startMsgCopyButton;         //!< Button used to copy.
-    QPushButton *_startMsgPasteButton;        //!< Button used to paste.
-    QPushButton *_startMsgDeleteButton;       //!< Button used to delete lines.
-    QPushButton *_startMsgApplyButton;        //!< Button used to confirme.
-    QPushButton *_startMsgCancelButton;       //!< Button used to cancel.
-    QPushButton *_startMsgClearButton;        //!< Button used to clear messages.
-    QPushButton *_endMsgApplyButton;          //!< Button used to confirme.
-    QPushButton *_endMsgCancelButton;         //!< Button used to cancel.
-    QPushButton *_endMsgClearButton;          //!< Button used to clear.
-    QPushButton *_endMsgCopyButton;           //!< Button used to copy.
-    QPushButton *_endMsgPasteButton;          //!< Button used to paste.
-    QPushButton *_endMsgDeleteButton;         //!< Button used to delete lines.
-
-    QString _startMsgText;                    //!< Start message contained text
-    QString _endMsgText;                      //!< End message contained text
-
-    //QGridLayout * _snapshotTopLayout; //!< Layout handling network assign buttons
-    QGridLayout * _snapshotLayout; //!< Layout handling snapshot
-    QHBoxLayout *_boxEditLayout;
-
-    QLabel *_snapshotAssignLabel;
-    QPushButton *_snapshotAssignStart;
-    QPushButton *_snapshotAssignEnd;
-    NetworkTree *_networkTree;
-
-    QLabel *_treeMapAssignLabel;
-    QGridLayout * _treeMapLayout;
-    QComboBox *_treeMapDevicesBox;
-    QPushButton *_treeMapLoad;
-    QPushButton *_treeMapUp;
-    QPushButton *_treeMapAssignStart;
-    QPushButton *_treeMapAssignEnd;
-    TreeMap *_treeMap;
-
-    QGridLayout *_curvesLayout;
-
-    CurvesWidget *_curvesWidget;
+    unsigned int _boxEdited;    //!< ID of box being edited
+    MaquetteScene * _scene; //!< The maquetteScene related with.
 };
 #endif
