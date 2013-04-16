@@ -75,6 +75,7 @@ static const std::string PAUSE_ENGINES_MESSAGE = "/Transport/Pause";
 static const std::string REWIND_ENGINES_MESSAGE = "/Transport/Rewind";
 static const std::string STARTPOINT_ENGINES_MESSAGE = "/Transport/StartPoint";
 static const std::string SPEED_ENGINES_MESSAGE = "/Transport/Speed";
+static const std::string NEXT_TRIGGER_MESSAGE = "/Transport/Next";
 
 #define NETWORK_PORT_STR "7000"
 
