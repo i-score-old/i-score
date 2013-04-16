@@ -41,15 +41,14 @@
 #define ATTRIBUTES_EDITOR
 
 /*!
- * \file AttributesEditor.h
+ * \file AttributesEditor.hpp
  * \author Luc Vercellin
  * \date 30 september 2009
  */
 
-#include "EnumPalette.hpp"
 #include <QDockWidget>
+#include <QString>
 
-class QComboBox;
 class QButtonGroup;
 class QRadioButton;
 class QGridLayout;
@@ -64,16 +63,12 @@ class QDoubleSpinBox;
 class QLineEdit;
 class QTreeWidget;
 class QTreeWidgetItem;
-class CurvesWidget;
-class Interpolation;
 
-class PreviewArea;
 class Palette;
 class NetworkMessagesEditor;
 class AbstractBox;
 class MaquetteScene;
 class NetworkTree;
-class TreeMap;
 class NetworkMessages;
 
 /*!
@@ -218,7 +213,6 @@ class AttributesEditor : public QDockWidget
     NetworkTree *_networkTree; //!< NetworkTree (inspector).
 
     Palette *_palette;          //!< Palette storing attributes
-    PreviewArea *_generalPreviewArea;  //!< Editor's preview area
 
     // TODO
     QDoubleSpinBox * _boxStartValue;

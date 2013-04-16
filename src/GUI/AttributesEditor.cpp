@@ -37,47 +37,13 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-#include <iostream>
-#include <algorithm>
-#include "SoundBox.hpp"
+
+#include "MaquetteScene.hpp"
+#include "BasicBox.hpp"
 #include "Palette.hpp"
 #include "AttributesEditor.hpp"
-#include "PreviewArea.hpp"
-#include "BasicBox.hpp"
-#include "Maquette.hpp"
-#include "MaquetteScene.hpp"
-#include "Maquette.hpp"
-#include "TreeMap.hpp"
-
-#include <map>
-#include <string>
-#include <vector>
-using std::string;
-using std::vector;
-using std::map;
-
-#include <QString>
-#include <QFont>
-#include <QComboBox>
-#include <QButtonGroup>
-#include <QRadioButton>
-#include <QGridLayout>
-#include <QLabel>
-#include <QPushButton>
-#include <QCheckBox>
 #include <QColorDialog>
-#include <QScrollArea>
-#include <QApplication>
-#include <QVBoxLayout>
-#include <QDoubleSpinBox>
-#include <QLineEdit>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
-#include <QSizePolicy>
-#include <QTreeView>
-#include "NetworkMessagesEditor.hpp"
 #include "NetworkMessages.hpp"
-#include "Interpolation.hpp"
 #include "NetworkTree.hpp"
 
 /* La palette hérite de QDockWidget, a pour parent la fenetre principale*/

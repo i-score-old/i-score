@@ -1414,7 +1414,6 @@ MaquetteScene::addSoundBox()
           QMessageBox::warning(_view, tr("Warning"), tr("Please Enter a Name"));
         }
     }
-
   return addSoundBox(_pressPoint, _releasePoint, name.toStdString(), _editor->getPalette());
 }
 
