@@ -90,7 +90,7 @@ MainWindow::MainWindow()
 {
   readSettings();
 
-  // Creation of Graphic Palette
+  // Creation of Editor
   _editor = new AttributesEditor(this);
   _editor->hide();
   addDockWidget(Qt::LeftDockWidgetArea, _editor);
@@ -122,7 +122,7 @@ MainWindow::MainWindow()
   _networkConfig = new NetworkConfig(_scene, this);
   setCentralWidget(_maquetteWidget);
 
-  // Creating widgets
+  // Creation of widgets
   createActions();
   createMenus();
   createStatusBar();
@@ -130,7 +130,6 @@ MainWindow::MainWindow()
   setCurrentFile("");
   setAcceptDrops(false);
 
-  connect(_maquetteWidget, SIGNAL(accelerationValueChanged(int)), this, SLOT(accelerationChanged(int)));
   connect(_view->verticalScrollBar(), SIGNAL(valueChanged(int)), _scene, SLOT(verticalScroll(int)));
   connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, std::string)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, std::string)));
   connect(_editor->networkTree(), SIGNAL(cmdKeyStateChanged(bool)), this, SLOT(updateCmdKeyState(bool)));
@@ -148,7 +147,6 @@ MainWindow::~MainWindow()
   delete _editMenu;
   delete _viewMenu;
   delete _helpMenu;
-  delete _fileToolBar;
   delete _newAct;
   delete _openAct;
   delete _saveAct;
@@ -164,25 +162,14 @@ MainWindow::~MainWindow()
   delete _networkAct;
   delete _editorAct;
 
-  //delete _viewTrackAct;
   delete _cutAct;
   delete _copyAct;
   delete _pasteAct;
-  delete _playAct;
-  delete _stopAct;
   delete _selectAllAct;
   delete _modeAct;
-  delete _relationModeAct;
   delete _selectModeAct;
-  delete _SBModeAct;
-  delete _CBModeAct;
   delete _PBModeAct;
   delete _commentModeAct;
-  delete _triggerModeAct;
-  delete _playModeAct;
-  delete _directPlayAct;
-  delete _synthPlayAct;
-  delete _freePlayAct;
 
   delete _helpDialog;
   delete _networkConfig;
@@ -395,22 +382,6 @@ MainWindow::updateEditor()
 }
 
 void
-MainWindow::viewTrack()
-{
-/*  if (_viewTrackAct->isChecked()==false)
- *  {
- *    _scene->setTracksView(false);
- *    _view->resetCachedContent();
- *    _scene->update();
- *  }
- * else
- *  {
- *    _scene->setTracksView(true);
- *    _view->resetCachedContent();
- *  }*/
-}
-
-void
 MainWindow::cutSelection()
 {
   _scene->cutBoxes();
@@ -427,115 +398,6 @@ MainWindow::pasteSelection()
 {
   _scene->pasteBoxes();
 }
-
-void
-MainWindow::accelerationChanged(int value)
-{
-  double newValue = _accelerationSlider->accelerationValue(value);
-
-  if (_accelerationDisplay->value() != newValue) {
-      _accelerationDisplay->setValue(newValue);
-    }
-}
-
-void
-MainWindow::accelerationValueEntered(double value)
-{
-  int newValue = _accelerationSlider->valueForAcceleration(value);
-
-  Maquette::getInstance()->setAccelerationFactor(value);
-
-  _accelerationSlider->setValue(newValue);
-}
-
-void
-MainWindow::gotoChanged()
-{
-  double newValue = _gotoSlider->value();
-
-  Maquette::getInstance()->setGotoValue(newValue);
-  _view->setGotoValue(newValue);
-  _gotoDisplay->setValue(newValue / S_TO_MS);
-  _view->repaint();
-}
-
-void
-MainWindow::gotoValueEntered(double value)
-{
-  Maquette::getInstance()->setGotoValue(value * S_TO_MS);
-  _gotoSlider->setTracking(false);
-  _gotoSlider->setValue(value * S_TO_MS);
-  _gotoSlider->setTracking(true);
-  _view->setGotoValue(value * S_TO_MS);
-}
-
-/*
- * void
- * MainWindow::PressEvent(QKeyEvent *keyEvent) {
- * QMainWindow::keyPressEvent(keyEvent);
- *
- * switch (keyEvent->key()) {
- * case Qt::Key_Delete :
- * case Qt::Key_Backspace :
- *  deleteKeyPressed();
- *  break;
- * case Qt::Key_Space :
- *  spaceKeyPressed();
- *  break;
- * case Qt::Key_Escape :
- *  escapeKeyPressed();
- *  break;
- * case Qt::Key_Return :
- *  returnKeyPressed();
- *  break;
- * }
- * }
- *
- * void
- * MainWindow::returnKeyPressed()
- * {
- * if (_scene->playing()) {
- *  std::stringstream msg;
- *  msg << tr("Triggering with message : '").toStdString() << MaquetteScene::DEFAULT_TRIGGER_MSG << "'";
- *  displayMessage(QString::fromStdString(msg.str()),INDICATION_LEVEL);
- *  _scene->trigger(MaquetteScene::DEFAULT_TRIGGER_MSG);
- * }
- * }
- *
- * void
- * MainWindow::deleteKeyPressed() {
- * //   if (!(_scene->selectedItems().empty())) {
- * //     int ret = QMessageBox::question(_view, tr("Maquette"),
- * //                               tr("Do you really want to delete selected items?"),
- * //                               QMessageBox::Yes | QMessageBox::No,
- * //                               QMessageBox::No);
- *
- * //     if (ret == QMessageBox::Yes) {
- *    _scene->removeSelectedItems();
- * //     }
- * //   }
- * }
- *
- * void
- * MainWindow::spacessed() {
- * if (_scene->paused()) {
- *  play();
- * }
- * else if (_scene->playing()) {
- *  pause();
- * }
- * else {
- *  play();
- * }
- * }
- *
- * void
- * MainWindow::escapeKeyPressed() {
- * if (_scene->paused() || _scene->playing()) {
- *  stop();
- * }
- * }
- */
 
 void
 MainWindow::keyPressEvent(QKeyEvent *event)
@@ -560,52 +422,6 @@ MainWindow::commandKey()
   return _commandKey;
 }
 
-void
-MainWindow::timeEndReached()
-{
-  _accelerationSlider->setEnabled(true);
-  _accelerationDisplay->setEnabled(true);
-  _playAct->setChecked(false);
-}
-
-void
-MainWindow::play()
-{
-  //_accelerationSlider->setDisabled(true);
-  _playAct->setChecked(true);
-  _scene->play();
-}
-
-void
-MainWindow::pause()
-{
-  //_accelerationSlider->setDisabled(true);
-  _scene->pause();
-}
-
-void
-MainWindow::stop()
-{
-  _scene->stop();
-  _stopAct->setChecked(false);
-  _playAct->setChecked(false);
-
-  //_accelerationSlider->setEnabled(true);
-}
-
-void
-MainWindow::playModeChanged()
-{
-  if (_playModeAct->checkedAction()->text() == tr("Direct")) {
-      _scene->setPlayingMode(FileMode);
-    }
-  else if (_playModeAct->checkedAction()->text() == tr("Synth")) {
-      _scene->setPlayingMode(SynthMode);
-    }
-  else {
-      _scene->setPlayingMode(SpecificMode);
-    }
-}
 
 void
 MainWindow::selectAll()
@@ -620,75 +436,55 @@ MainWindow::selectMode()
   if (_modeAct->checkedAction()->text() == tr("Select")) {
       _scene->setCurrentMode(SELECTION_MODE);
     }
-  else if (_modeAct->checkedAction()->text() == tr("Sound Box")) {
-      _scene->setCurrentMode(CREATION_MODE, SB_MODE);
-    }
-  else if (_modeAct->checkedAction()->text() == tr("Control Box")) {
-      _scene->setCurrentMode(CREATION_MODE, CB_MODE);
-    }
   else if (_modeAct->checkedAction()->text() == tr("Parent Box")) {
       _scene->setCurrentMode(CREATION_MODE, PB_MODE);
     }
-  else if (_modeAct->checkedAction()->text() == tr("Relation")) {
-      _scene->setCurrentMode(RELATION_MODE);
-    }
   else if (_modeAct->checkedAction()->text() == tr("Comment")) {
       _scene->setCurrentMode(TEXT_MODE);
-    }
-  else if (_modeAct->checkedAction()->text() == tr("Trigger")) {
-      _scene->setCurrentMode(TRIGGER_MODE);
     }
 }
 
 void
 MainWindow::selectMode(const InteractionMode &mode, const BoxCreationMode &boxMode)
 {
-  switch (mode) {
-      case SELECTION_MODE:
+    switch (mode) {
+    case SELECTION_MODE:
         _selectModeAct->setChecked(true);
         break;
 
-      case CREATION_MODE:
-      {
+    case CREATION_MODE:
+    {
         switch (boxMode) {
-            case NB_MODE:
-              _selectModeAct->setChecked(true);
-              break;
+        case NB_MODE:
+            _selectModeAct->setChecked(true);
+            break;
 
-            case SB_MODE:
-              _SBModeAct->setChecked(true);
-              break;
+        case PB_MODE:
+            _PBModeAct->setChecked(true);
+            break;
 
-            default:
-              std::cerr << "MainWindow::selectMode : Box Creation Mode Unknown" << std::endl;
-              break;
-          }
+        default:
+            std::cerr << "MainWindow::selectMode : Box Creation Mode Unknown" << std::endl;
+            break;
+        }
         break;
-      }
+    }
 
-      case RELATION_MODE:
-        _relationModeAct->setChecked(true);
-        break;
-
-      case TEXT_MODE:
+    case TEXT_MODE:
         _commentModeAct->setChecked(true);
         break;
 
-      case TRIGGER_MODE:
-        _triggerModeAct->setChecked(true);
-        break;
 
-      default:
+    default:
         std::cerr << "MainWindow::selectMode : Interaction Mode Unknown" << std::endl;
         break;
     }
-  selectMode();
+    selectMode();
 }
 
 void
 MainWindow::networkConfig()
 {
-//  _networkConfig = new NetworkConfig(_scene, this);
   _networkConfig->exec();
 }
 
@@ -701,20 +497,17 @@ MainWindow::documentModified() const
 void
 MainWindow::createActions()
 {
-  _newAct = new QAction( //QApplication::style()->standardIcon(QStyle::SP_FileIcon),
-    tr("&New"), this);
+  _newAct = new QAction(tr("&New"), this);
   _newAct->setShortcut(QKeySequence::New);
   _newAct->setStatusTip(tr("Create a new file"));
   connect(_newAct, SIGNAL(triggered()), this, SLOT(newFile()));
 
-  _openAct = new QAction( //QApplication::style()->standardIcon(QStyle::SP_DirOpenIcon),
-    tr("&Open..."), this);
+  _openAct = new QAction( tr("&Open..."), this);
   _openAct->setShortcut(QKeySequence::Open);
   _openAct->setStatusTip(tr("Open an existing file"));
   connect(_openAct, SIGNAL(triggered()), this, SLOT(open()));
 
-  _saveAct = new QAction( //QApplication::style()->standardIcon(QStyle::SP_DialogSaveButton),
-    tr("&Save"), this);
+  _saveAct = new QAction(tr("&Save"), this);
   _saveAct->setShortcut(QKeySequence::Save);
   _saveAct->setStatusTip(tr("Save the document to disk"));
   connect(_saveAct, SIGNAL(triggered()), this, SLOT(save()));
@@ -754,12 +547,12 @@ MainWindow::createActions()
   _networkAct->setStatusTip(tr("Configure network preferences"));
   connect(_networkAct, SIGNAL(triggered()), this, SLOT(networkConfig()));
 
-  _zoomInAct = new QAction(QIcon(":/images/zoomin.svg"), tr("Zoom in"), this);
+  _zoomInAct = new QAction(tr("Zoom in"), this);
   _zoomInAct->setShortcut(QKeySequence::ZoomIn);
   _zoomInAct->setStatusTip(tr("Zoom in"));
   connect(_zoomInAct, SIGNAL(triggered()), _view, SLOT(zoomIn()));
 
-  _zoomOutAct = new QAction(QIcon(":/images/zoomout.svg"), tr("Zoom out"), this);
+  _zoomOutAct = new QAction(tr("Zoom out"), this);
   _zoomOutAct->setShortcut(QKeySequence::ZoomOut);
   _zoomOutAct->setStatusTip(tr("Zoom out"));
   connect(_zoomOutAct, SIGNAL(triggered()), _view, SLOT(zoomOut()));
@@ -771,31 +564,24 @@ MainWindow::createActions()
   _editorAct->setChecked(true);
   connect(_editorAct, SIGNAL(triggered()), this, SLOT(updateEditor()));
 
-  _cutAct = new QAction(QIcon(":/images/cut.svg"), tr("Cut"), this);
+  _cutAct = new QAction(tr("Cut"), this);
   _cutAct->setStatusTip(tr("Cut boxes selection"));
   connect(_cutAct, SIGNAL(triggered()), this, SLOT(cutSelection()));
 
-  _copyAct = new QAction(QIcon(":/images/copy.svg"), tr("Copy"), this);
+  _copyAct = new QAction(tr("Copy"), this);
+  _copyAct->setShortcut(QKeySequence::Copy);
   _copyAct->setStatusTip(tr("Copy boxes selection"));
   connect(_copyAct, SIGNAL(triggered()), this, SLOT(copySelection()));
 
-  _pasteAct = new QAction(QIcon(":/images/paste.svg"), tr("Paste"), this);
+  _pasteAct = new QAction(tr("Paste"), this);
+  _pasteAct->setShortcut(QKeySequence::Paste);
   _pasteAct->setStatusTip(tr("Paste boxes selection"));
   connect(_pasteAct, SIGNAL(triggered()), this, SLOT(pasteSelection()));
 
   _selectAllAct = new QAction(tr("Select All"), this);
+  _selectAllAct->setShortcut(QKeySequence::SelectAll);
   _selectAllAct->setStatusTip(tr("Select every item"));
   connect(_selectAllAct, SIGNAL(triggered()), this, SLOT(selectAll()));
-
-  _playAct = new QAction(QIcon(":/images/play.svg"), tr("Play"), this);
-  _playAct->setStatusTip(tr("Play composition audio preview"));
-  _playAct->setCheckable(true);
-  connect(_playAct, SIGNAL(triggered()), this, SLOT(play()));
-
-  _stopAct = new QAction(QIcon(":/images/stop.svg"), tr("Stop"), this);
-  _stopAct->setStatusTip(tr("Stop composition audio preview"));
-  _stopAct->setCheckable(true);
-  connect(_stopAct, SIGNAL(triggered()), this, SLOT(stop()));
 
   _selectModeAct = new QAction(QIcon(":/images/select.svg"), tr("Select"), this);
   _selectModeAct->setStatusTip(tr("Switch mode to selection"));
@@ -804,33 +590,12 @@ MainWindow::createActions()
   _selectModeAct->setChecked(false);
   connect(_selectModeAct, SIGNAL(triggered()), this, SLOT(selectMode()));
 
-  _SBModeAct = new QAction(QIcon(":/images/soundBox.svg"), tr("Sound Box"), this);
-  _SBModeAct->setStatusTip(tr("Switch mode to Sound Box creation"));
-  _SBModeAct->setShortcut(QString("Ctrl+Shift+S"));
-  _SBModeAct->setCheckable(true);
-  _SBModeAct->setChecked(false);
-  connect(_SBModeAct, SIGNAL(triggered()), this, SLOT(selectMode()));
-
-  _CBModeAct = new QAction(QIcon(":/images/controlBox.svg"), tr("Control Box"), this);
-  _CBModeAct->setStatusTip(tr("Switch mode to Control Box creation"));
-  _CBModeAct->setShortcut(QString("Ctrl+Shift+C"));
-  _CBModeAct->setCheckable(true);
-  _CBModeAct->setChecked(false);
-  connect(_CBModeAct, SIGNAL(triggered()), this, SLOT(selectMode()));
-
-  _PBModeAct = new QAction(QIcon(":/images/parentBox.svg"), tr("Parent Box"), this);
+  _PBModeAct = new QAction(QIcon(":/images/parentBox.svg"), tr("Box"), this);
   _PBModeAct->setStatusTip(tr("Switch mode to Parent Box creation"));
   _PBModeAct->setShortcut(QString("Ctrl+Shift+P"));
   _PBModeAct->setCheckable(true);
   _PBModeAct->setChecked(true);
   connect(_PBModeAct, SIGNAL(triggered()), this, SLOT(selectMode()));
-
-  _relationModeAct = new QAction(QIcon(":/images/relation.svg"), tr("Relation"), this);
-  _relationModeAct->setStatusTip(tr("Adds a Relation"));
-  _relationModeAct->setShortcut(tr("Ctrl+Shift+R"));
-  _relationModeAct->setCheckable(true);
-  _relationModeAct->setChecked(false);
-  connect(_relationModeAct, SIGNAL(triggered()), this, SLOT(selectMode()));
 
   _commentModeAct = new QAction(QIcon(":/images/comment.svg"), tr("Comment"), this);
   _commentModeAct->setStatusTip(tr("Adds a Comment"));
@@ -840,82 +605,12 @@ MainWindow::createActions()
   _commentModeAct->setEnabled(false);
   connect(_commentModeAct, SIGNAL(triggered()), this, SLOT(selectMode()));
 
-  _triggerModeAct = new QAction(QIcon(":/images/trigger.svg"), tr("Trigger"), this);
-  _triggerModeAct->setStatusTip(tr("Adds a Trigger Point"));
-  _triggerModeAct->setCheckable(true);
-  _triggerModeAct->setChecked(false);
-  connect(_triggerModeAct, SIGNAL(triggered()), this, SLOT(selectMode()));
-
   _modeAct = new QActionGroup(this);
   _modeAct->addAction(_selectModeAct);
-  _modeAct->addAction(_SBModeAct);
-  _modeAct->addAction(_CBModeAct);
   _modeAct->addAction(_PBModeAct);
-  _modeAct->addAction(_relationModeAct);
   _modeAct->addAction(_commentModeAct);
-  _modeAct->addAction(_triggerModeAct);
   _modeAct->setExclusive(true);
   selectMode();
-
-  _freePlayAct = new QAction(QIcon(":/images/freePlay.svg"), tr("Box specific"), this);
-  _freePlayAct->setStatusTip(tr("Sounds will be played in specific modes selected for each box"));
-  _freePlayAct->setCheckable(true);
-  _freePlayAct->setChecked(true);
-  connect(_freePlayAct, SIGNAL(triggered()), this, SLOT(playModeChanged()));
-
-  _directPlayAct = new QAction(QIcon(":/images/filePlay.svg"), tr("Sound files"), this);
-  _directPlayAct->setStatusTip(tr("Sound files linked to boxes will be played"));
-  _directPlayAct->setCheckable(true);
-  _directPlayAct->setChecked(false);
-  connect(_directPlayAct, SIGNAL(triggered()), this, SLOT(playModeChanged()));
-
-  _synthPlayAct = new QAction(QIcon(":/images/synth.svg"), tr("Synthesis"), this);
-  _synthPlayAct->setStatusTip(tr("Sound synthetised from sound boxes attributes will be played"));
-  _synthPlayAct->setCheckable(true);
-  _synthPlayAct->setChecked(false);
-  connect(_synthPlayAct, SIGNAL(triggered()), this, SLOT(playModeChanged()));
-
-  _playModeAct = new QActionGroup(this);
-  _playModeAct->addAction(_freePlayAct);
-  _playModeAct->addAction(_directPlayAct);
-  _playModeAct->addAction(_synthPlayAct);
-  _playModeAct->setExclusive(true);
-
-  _accelerationSlider = new LogarithmicSlider(Qt::Horizontal, 0);
-  _accelerationSlider->setStatusTip(tr("Acceleration"));
-  _accelerationSlider->setFixedWidth(100);
-  connect(_accelerationSlider, SIGNAL(valueChanged(int)), this, SLOT(accelerationChanged(int)));
-
-  _accelerationDisplay = new QDoubleSpinBox;
-  _accelerationDisplay->setStatusTip(tr("Acceleration"));
-  _accelerationDisplay->setRange(0., 5);
-  _accelerationDisplay->setDecimals(1);
-  _accelerationDisplay->setKeyboardTracking(false);
-  connect(_accelerationDisplay, SIGNAL(valueChanged(double)), this, SLOT(accelerationValueEntered(double)));
-
-  _accelerationSlider->setSliderPosition(50);
-
-  _gotoSlider = new QSlider;
-  _gotoSlider->setStatusTip(tr("Goto"));
-  _gotoSlider->setOrientation(Qt::Horizontal);
-
-  //_gotoSlider->setTickPosition(QSlider::TicksBelow);
-  _gotoSlider->setRange(0, _view->sceneRect().width() * MaquetteScene::MS_PER_PIXEL);
-  _gotoSlider->setSingleStep(1);
-  _gotoSlider->setPageStep(10);
-  _gotoSlider->setStyleSheet("QSlider::handle:horizontal { background: white; width: 3px; "
-                             "border-left: 3px solid black; border-right : 3px solid black;  border-top: 0px; border-bottom: 0px;}");
-
-  connect(_gotoSlider, SIGNAL(valueChanged(int)), this, SLOT(gotoChanged()));
-
-  static const unsigned int GOTO_PRECISION = 3;
-  static const float S_TO_MS = 1000.;
-  _gotoDisplay = new QDoubleSpinBox;
-  _gotoDisplay->setStatusTip(tr("Goto"));
-  _gotoDisplay->setRange(0., MaquetteScene::MAX_SCENE_WIDTH * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
-  _gotoDisplay->setDecimals(GOTO_PRECISION);
-  _gotoDisplay->setKeyboardTracking(false);
-  connect(_gotoDisplay, SIGNAL(valueChanged(double)), this, SLOT(gotoValueEntered(double)));
 }
 
 void
@@ -940,13 +635,9 @@ MainWindow::createMenus()
   _editMenu->addAction(_pasteAct);
   _editMenu->addSeparator();
   _editMenu->addAction(_networkAct);
-  _editMenu->addAction(_relationModeAct);
   _editMenu->addAction(_selectModeAct);
-  _editMenu->addAction(_SBModeAct);
-  _editMenu->addAction(_CBModeAct);
   _editMenu->addAction(_PBModeAct);
   _editMenu->addAction(_commentModeAct);
-  _editMenu->addAction(_triggerModeAct);
   _editMenu->addSeparator();
   _editMenu->addAction(_selectAllAct);
 
@@ -959,59 +650,6 @@ MainWindow::createMenus()
   _helpMenu->addAction(_aboutAct);
   _helpMenu->addSeparator();
   _helpMenu->addAction(_helpAct);
-}
-
-void
-MainWindow::createToolBars()
-{
-  _fileToolBar = addToolBar(tr("File"));
-
-  _fileToolBar->addAction(_PBModeAct);
-  _fileToolBar->addAction(_CBModeAct);
-  _fileToolBar->addAction(_SBModeAct);
-
-  _fileToolBar->addSeparator();
-
-  _fileToolBar->addAction(_copyAct);
-  _fileToolBar->addAction(_cutAct);
-  _fileToolBar->addAction(_pasteAct);
-
-  _fileToolBar->addSeparator();
-
-  _fileToolBar->addAction(_zoomOutAct);
-  _fileToolBar->addAction(_zoomInAct);
-
-  _fileToolBar->addSeparator();
-
-  _fileToolBar->addAction(_editorAct);
-
-  _fileToolBar->addSeparator();
-
-  _fileToolBar->addAction(_freePlayAct);
-  _fileToolBar->addAction(_synthPlayAct);
-  _fileToolBar->addAction(_directPlayAct);
-  _fileToolBar->addAction(_playAct);
-  _fileToolBar->addAction(_stopAct);
-
-  _fileToolBar->addSeparator();
-  _fileToolBar->addAction(_networkAct);
-  _fileToolBar->addSeparator();
-
-  _fileToolBar->addAction(_helpAct);
-
-  QAction *noAction = new QAction(this);
-  _fileToolBar->insertWidget(noAction, _accelerationDisplay);
-  _fileToolBar->insertWidget(noAction, _accelerationSlider);
-
-  _gotoBar = addToolBar(tr("Goto"));
-  _gotoBar->insertWidget(noAction, _gotoDisplay);
-  _gotoBar->insertWidget(noAction, _gotoSlider);
-}
-
-int
-MainWindow::gotoValue()
-{
-  return _gotoSlider->value();
 }
 
 void

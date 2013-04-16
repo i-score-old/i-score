@@ -88,7 +88,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
   : QGraphicsScene(rect)
 {
   _editor = editor;
-  _copyPalette = _editor->getPalette();
+//  _copyPalette = _editor->getPalette();
   _clicked = false;
   _playing = false;
   _paused = false;
@@ -125,7 +125,7 @@ MaquetteScene::init()
 {
   _currentInteractionMode = SELECTION_MODE;
   setCurrentMode(SELECTION_MODE);
-  _currentBoxMode = NB_MODE;
+  _currentBoxMode = PB_MODE;
   _savedInteractionMode = _currentInteractionMode;
   _savedBoxMode = _currentBoxMode;
   _resizeMode = NO_RESIZE;
@@ -1414,7 +1414,6 @@ MaquetteScene::addSoundBox()
           QMessageBox::warning(_view, tr("Warning"), tr("Please Enter a Name"));
         }
     }
-
   return addSoundBox(_pressPoint, _releasePoint, name.toStdString(), _editor->getPalette());
 }
 
@@ -2018,7 +2017,6 @@ MaquetteScene::removeSelectedItems()
 void
 MaquetteScene::timeEndReached()
 {
-  static_cast<MaquetteView*>(views().first())->mainWindow()->timeEndReached();
   _playing = false;
   emit(playModeChanged());
   update();

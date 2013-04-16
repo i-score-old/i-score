@@ -103,6 +103,8 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 void
 NetworkTree::init()
 {
+   setSelectionMode(QAbstractItemView:: MultiSelection);
+
   _deviceEdit = new DeviceEdit(topLevelWidget());
 
   _startMessages = new NetworkMessages;
