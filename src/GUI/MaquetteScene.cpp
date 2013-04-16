@@ -125,7 +125,7 @@ MaquetteScene::init()
 {
   _currentInteractionMode = SELECTION_MODE;
   setCurrentMode(SELECTION_MODE);
-  _currentBoxMode = NB_MODE;
+  _currentBoxMode = PB_MODE;
   _savedInteractionMode = _currentInteractionMode;
   _savedBoxMode = _currentBoxMode;
   _resizeMode = NO_RESIZE;
@@ -2017,7 +2017,6 @@ MaquetteScene::removeSelectedItems()
 void
 MaquetteScene::timeEndReached()
 {
-  static_cast<MaquetteView*>(views().first())->mainWindow()->timeEndReached();
   _playing = false;
   emit(playModeChanged());
   update();
