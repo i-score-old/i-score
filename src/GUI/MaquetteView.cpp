@@ -252,24 +252,19 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
     }
   else if ((event->key() == Qt::Key_Space || event->key() == Qt::Key_Comma || event->key() == Qt::Key_Period) && !_scene->playing()) {
       _scene->play();
-      emit(playModeChanged());
     }
   else if ((event->key() == Qt::Key_Comma || event->key() == Qt::Key_Period) && _scene->playing()) {
       _scene->pause();
-      emit(playModeChanged());
     }
   else if (event->key() == Qt::Key_Space && _scene->playing()) {
       _scene->stopWithGoto();
-      emit(playModeChanged());
     }
   else if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
       _scene->stopGotoStart();
-      emit(playModeChanged());
     }
   else if (event->key() == Qt::Key_0) {
       if (!_scene->playing()) {
           _scene->play();
-          emit(playModeChanged());
         }
       else {
           triggerShortcut(Qt::Key_0);

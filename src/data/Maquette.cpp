@@ -1360,6 +1360,7 @@ Maquette::addRelation(const AbstractRelation &abstract)
 bool
 Maquette::addInterval(unsigned int /*ID1*/, unsigned int /*ID2*/, int /*value*/, int /*tolerance*/)
 {
+    //TODO
   return false;
 }
 

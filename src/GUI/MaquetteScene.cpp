@@ -1930,7 +1930,8 @@ MaquetteScene::play()
       _maquette->startPlaying();
       _playThread->start();
       _startingValue = _view->gotoValue();
-    }
+    }  
+  emit(playModeChanged());
 }
 
 void
@@ -1944,6 +1945,7 @@ MaquetteScene::pause()
   _accelerationFactorSave = _maquette->accelerationFactor();
   _maquette->setAccelerationFactor(0.);
   update();
+  emit(playModeChanged());
 }
 
 
@@ -1955,6 +1957,7 @@ MaquetteScene::stop()
   _playThread->quit();
   _playingBoxes.clear();
   update();
+  emit(playModeChanged());
 }
 
 void
@@ -1966,6 +1969,7 @@ MaquetteScene::stopWithGoto()
   _playThread->quit();
   _playingBoxes.clear();
   update();
+  emit(playModeChanged());
 }
 
 void
@@ -1994,6 +1998,7 @@ MaquetteScene::stopGotoStart()
   _playThread->quit();
   _playingBoxes.clear();
   update();
+  emit(playModeChanged());
 }
 
 void
