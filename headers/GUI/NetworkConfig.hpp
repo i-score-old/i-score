@@ -116,4 +116,5 @@ class NetworkConfig : public QDialog
 
     bool _changed;                            //!< Handling if a value was changed.
 };
+
 #endif
