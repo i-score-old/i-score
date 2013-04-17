@@ -75,11 +75,6 @@ class AbstractCurve;
 class QObject;
 
 /*!
- * \brief Enum used to define Basic Box's item type.
- */
-enum { BASIC_BOX_TYPE = QGraphicsItem::UserType + 1 };
-
-/*!
  * \brief Enum used to manage various box extremities.
  */
 enum BoxExtremity { NO_EXTREMITY = -1, BOX_START = BEGIN_CONTROL_POINT_INDEX,
@@ -100,6 +95,11 @@ class BasicBox : public QObject, public QGraphicsItem
     virtual void updateDisplay(QString displayMode);
     virtual
     ~BasicBox();
+
+    /*!
+     * \brief Enum used to define Basic Box's item type.
+     */
+    enum { BASIC_BOX_TYPE = QGraphicsItem::UserType + 1 };
 
     /*!
      * \brief Redefinition of QGraphicsItem::type(). Used for Item casting.
