@@ -477,6 +477,7 @@ class MaquetteScene : public QGraphicsScene
      * \param message : the message to send for triggering
      */
     void trigger(TriggerPoint *triggerPoint);
+    void triggerNext();
 
     /*!
      * \brief Set trigger point 's message.

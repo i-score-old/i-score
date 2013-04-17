@@ -2571,12 +2571,18 @@ enginesNetworkUpdateCallback(unsigned int boxID, string m1, string m2)
   if (scene != NULL) {
       if (m1 == PLAY_ENGINES_MESSAGE) {
           scene->play();
+          scene->view()->emitPlayModeChanged();
         }
       else if (m1 == STOP_ENGINES_MESSAGE) {
           scene->stopWithGoto();
+          scene->view()->emitPlayModeChanged();
         }
       else if (m1 == STARTPOINT_ENGINES_MESSAGE) {
           if (!m2.empty()) {
+              if(scene->playing()){
+                  scene->stopWithGoto();
+                  scene->view()->emitPlayModeChanged();
+              }
               std::istringstream iss(m2);
               unsigned int value;
               iss >> value;
@@ -2585,6 +2591,7 @@ enginesNetworkUpdateCallback(unsigned int boxID, string m1, string m2)
         }
       else if (m1 == REWIND_ENGINES_MESSAGE) {
           scene->stopGotoStart();
+          scene->view()->emitPlayModeChanged();
         }
       else if (m1 == SPEED_ENGINES_MESSAGE) {
           if (!m2.empty()) {
@@ -2594,7 +2601,10 @@ enginesNetworkUpdateCallback(unsigned int boxID, string m1, string m2)
               scene->speedChanged(value);
             }
         }
-      scene->view()->emitPlayModeChanged();
+      else if (m1 == NEXT_TRIGGER_MESSAGE) {
+          scene->triggerNext();
+      }
+
     }
 #ifdef DEBUG
   else {

@@ -1266,6 +1266,15 @@ MaquetteScene::trigger(TriggerPoint *triggerPoint)
   triggerPoint->setSelected(false);
 }
 
+void
+MaquetteScene::triggerNext()
+{
+   TriggerPoint *triggerPoint = triggersQueueList().first();
+  _maquette->simulateTriggeringMessage(static_cast<AbstractTriggerPoint *>(triggerPoint->abstract())->message());
+  removeFromTriggerQueue(triggerPoint);
+  triggerPoint->setSelected(false);
+}
+
 bool
 MaquetteScene::setTriggerPointMessage(unsigned int trgID, const string &message)
 {
@@ -2077,29 +2086,6 @@ MaquetteScene::addToTriggerQueue(TriggerPoint *trigger)
         }
       _triggersQueueList.insert(i, trigger);
     }
-
-  /*
-   * if(_triggersQueueList.isEmpty())
-   *  _triggersQueueList<<trigger;
-   *
-   * else{
-   *  if(!_triggersQueueList.contains(trigger)){
-   *      //QList<TriggerPoint *>::iterator it = _triggersQueueList.begin();
-   *      int it=0;
-   *      qreal trgPosition = trigger->pos().x();
-   *      TriggerPoint *curTrg=_triggersQueueList.at(it);
-   *      qreal itPosition=curTrg->pos().x();
-   *
-   *      while(trgPosition > itPosition && it<_triggersQueueList.size()-1){
-   *          it++;
-   *          curTrg=_triggersQueueList.at(it);
-   *          itPosition=curTrg->pos().x();
-   *
-   *      }
-   *
-   *      _triggersQueueList.insert(it,trigger);
-   *  }
-   * }*/
 }
 
 void
