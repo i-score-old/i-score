@@ -47,7 +47,7 @@ macx-g++ {
     #QMAKE_CXXFLAGS += -std=c++11  #have to update g++ to v2.4
 
     QMAKE_LFLAGS += -L/System/Library/Frameworks/ -L/Library/Frameworks/
-    QMAKE_CXXFLAGS_X86_64 = -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
+    QMAKE_CXXFLAGS = -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
 
     LIBS += -lIscore -lDeviceManager -framework gecode -lxml2
 }
@@ -57,7 +57,7 @@ macx-clang {
     QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
 
     QMAKE_LFLAGS += -L/System/Library/Frameworks/ -L/Library/Frameworks/
-    QMAKE_CXXFLAGS_X86_64 = -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
+    QMAKE_CXXFLAGS = -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
 
     LIBS += -lIscore -lDeviceManager -framework gecode -lxml2
 }
