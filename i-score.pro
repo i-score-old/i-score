@@ -65,9 +65,7 @@ macx-clang {
     QMAKE_CXXFLAGS += -stdlib=libc++
     QMAKE_CXXFLAGS += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
 
-    QMAKE_LFLAGS += -std=c++11
     QMAKE_LFLAGS += -stdlib=libc++
-    QMAKE_LFLAGS += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
     QMAKE_LFLAGS += -L/usr/local/lib/ -L/usr/local/jamoma/lib -L/System/Library/Frameworks/ -L/Library/Frameworks/
 
     INCLUDEPATH += .
