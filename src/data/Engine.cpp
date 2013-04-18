@@ -570,8 +570,10 @@ bool Engine::performBoxEditing(TimeProcessId boxId, TimeValue start, TimeValue e
     
     err = m_mainScenario->sendMessage(TTSymbol("TimeProcessMove"), v, kTTValNONE);
     
-    // return the entire timeProcessMap !!! (this is bad but it is like former engine)
-    for (it = m_timeProcessMap.begin(); it != m_timeProcessMap.end(); ++it)
+    // return the entire timeProcessMap exept the first process !!! (this is bad but it is like former engine)
+    it = m_timeProcessMap.begin();
+    it++;
+    for (; it != m_timeProcessMap.end(); ++it)
         movedBoxes.push_back(it->first);
     
     return !err;
