@@ -328,7 +328,8 @@ void Engine::removeBox(TimeProcessId boxId)
     // TODO : delete TTCallback used to observe each time process scheduler running attribute
     // getTimeProcess(boxId)->removeObserver() ?
     
-    // TODO : remove the time process from the cache
+    // Demove the time process from the cache
+    m_timeProcessMap.erase(boxId);
     
     // Delete the time process (the process is removed from the scenario during the destruction)
     TTObjectBaseRelease(TTObjectBaseHandle(&timeProcess));
@@ -341,9 +342,11 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
                                        TemporalRelationType type,
                                        vector<TimeProcessId>& movedBoxes)
 {
-    TimeProcessPtr  timeProcess, tp1, tp2;
-    IntervalId      relationId;
-    TTValue         v;
+    TimeProcessPtr          timeProcess, tp1, tp2;
+    IntervalId              relationId;
+    TTValue                 v;
+    EngineCacheMapIterator  it;
+    TTErr                   err;
     
     // Create a new interval time process
     timeProcess = NULL;
@@ -372,23 +375,38 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
     
     // Add the time process to the main scenario
     v = TTValue(TTObjectBasePtr(timeProcess));
-    m_mainScenario->sendMessage(TTSymbol("TimeProcessAdd"), v, kTTValNONE);
+    err = m_mainScenario->sendMessage(TTSymbol("TimeProcessAdd"), v, kTTValNONE);
     
-    // TODO : how to fill the movedBoxes ? return the entire timeProcessMap
+    if (!err) {
     
-	return relationId;
+        // return the entire timeProcessMap except the first process !!! (this is bad but it is like former engine)
+        it = m_timeProcessMap.begin();
+        it++;
+        for (; it != m_timeProcessMap.end(); ++it)
+            movedBoxes.push_back(it->first);
+    
+        return relationId;
+    }
+    else {
+        
+        // Remove the interval from the cache
+        removeTemporalRelation(relationId);
+        
+        return NO_ID;
+    }
 }
 
 void Engine::removeTemporalRelation(IntervalId relationId)
 {
     TimeProcessPtr  timeProcess;
     
-    // Retreive the time process using the relationId
+    // Retreive the interval using the relationId
     timeProcess = getInterval(relationId);
     
-    // TODO : remove the time process from the cache
+    // Remove the interval from the cache
+    m_intervalMap.erase(relationId);
     
-    // Delete the time process (the process is removed from the scenario during the destruction)
+    // Delete the interval (the process is removed from the scenario during the destruction)
     TTObjectBaseRelease(TTObjectBaseHandle(&timeProcess));
 }
 
@@ -570,7 +588,7 @@ bool Engine::performBoxEditing(TimeProcessId boxId, TimeValue start, TimeValue e
     
     err = m_mainScenario->sendMessage(TTSymbol("TimeProcessMove"), v, kTTValNONE);
     
-    // return the entire timeProcessMap exept the first process !!! (this is bad but it is like former engine)
+    // return the entire timeProcessMap except the first process !!! (this is bad but it is like former engine)
     it = m_timeProcessMap.begin();
     it++;
     for (; it != m_timeProcessMap.end(); ++it)
