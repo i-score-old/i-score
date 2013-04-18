@@ -205,7 +205,7 @@ void Engine::initModular()
     ////////////
     
     // you can create an OSC receive on the 9998 port to see that a namespace request is sent by i-score (using Pure Data for example)
-    anApplication->sendMessage(TTSymbol("DirectoryBuild"));
+    //anApplication->sendMessage(TTSymbol("DirectoryBuild"));
 }
 
 void Engine::initScore()
@@ -218,6 +218,10 @@ void Engine::initScore()
     // Create the main scenario
     m_mainScenario = NULL;
     TTObjectBaseInstantiate(TTSymbol("Scenario"), TTObjectBaseHandle(&m_mainScenario), args);
+    
+    // Set the start and end event dates
+    m_mainScenario->setAttributeValue(TTSymbol("startDate"), TTUInt32(0));
+    m_mainScenario->setAttributeValue(TTSymbol("endDate"), TTUInt32(SCENARIO_SIZE));  // the size can be changed afterward
     
     // TODO : create a TTCallback to observe each time process scheduler running attribute (using TimeProcessSchedulerRunningAttributeCallback)
     
@@ -293,17 +297,17 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, TimePro
     timeProcess = NULL;
     TTObjectBaseInstantiate(TTSymbol("Automation"), TTObjectBaseHandle(&timeProcess), kTTValNONE);
     
-    // Add the time process to the main scenario
-    // TODO : get the parent process using motherID and add the time process to this parent process
-    v = TTValue(TTObjectBasePtr(timeProcess));
-    // CRASH_ENGINE  m_mainScenario->sendMessage(TTSymbol("TimeProcessAdd"), v, kTTValNONE);
-    
-    // Cache it and get an unique id for this process
-    boxId = cacheTimeProcess(timeProcess);
-    
     // Set the start and end event dates
     timeProcess->setAttributeValue(TTSymbol("startDate"), boxBeginPos);
     timeProcess->setAttributeValue(TTSymbol("endDate"), boxBeginPos+boxLength);
+    
+    // Add the time process to the main scenario
+    // TODO : get the parent process using motherID and add the time process to this parent process
+    v = TTValue(TTObjectBasePtr(timeProcess));
+    m_mainScenario->sendMessage(TTSymbol("TimeProcessAdd"), v, kTTValNONE);
+    
+    // Cache it and get an unique id for this process
+    boxId = cacheTimeProcess(timeProcess);
     
     // TODO : create a TTCallback to observe each time process event active attribute (using InteractiveEventActiveAttributeCallback)
     // getTimeProcess(boxId)->appendObserver() ?
@@ -323,6 +327,8 @@ void Engine::removeBox(TimeProcessId boxId)
     
     // TODO : delete TTCallback used to observe each time process scheduler running attribute
     // getTimeProcess(boxId)->removeObserver() ?
+    
+    // TODO : remove the time process from the cache
     
     // Delete the time process (the process is removed from the scenario during the destruction)
     TTObjectBaseRelease(TTObjectBaseHandle(&timeProcess));
@@ -379,6 +385,8 @@ void Engine::removeTemporalRelation(IntervalId relationId)
     
     // Retreive the time process using the relationId
     timeProcess = getInterval(relationId);
+    
+    // TODO : remove the time process from the cache
     
     // Delete the time process (the process is removed from the scenario during the destruction)
     TTObjectBaseRelease(TTObjectBaseHandle(&timeProcess));
@@ -549,14 +557,24 @@ TimeValue Engine::getRelationMaxBound(IntervalId relationId)
     return v[0];
 }
 
-bool Engine::performBoxEditing(TimeProcessId boxId, TimeValue start, TimeValue end, vector<TimeProcessId>& movedBoxes, TimeValue maxModification)
+bool Engine::performBoxEditing(TimeProcessId boxId, TimeValue start, TimeValue end, vector<TimeProcessId>& movedBoxes)
 {
-    TimeProcessPtr  timeProcess = getTimeProcess(boxId);
+    TimeProcessPtr          timeProcess = getTimeProcess(boxId);
+    TTValue                 v;
+    EngineCacheMapIterator  it;
+    TTErr                   err;
     
-	timeProcess->setAttributeValue(TTSymbol("startDate"), start);
-    timeProcess->setAttributeValue(TTSymbol("endDate"), end);
+    v = TTValue(TTObjectBasePtr(timeProcess));
+    v.append(start);
+    v.append(end);
     
-    // TODO : how to fill the movedBoxes ? return the entire timeProcessMap
+    err = m_mainScenario->sendMessage(TTSymbol("TimeProcessMove"), v, kTTValNONE);
+    
+    // return the entire timeProcessMap !!! (this is bad but it is like former engine)
+    for (it = m_timeProcessMap.begin(); it != m_timeProcessMap.end(); ++it)
+        movedBoxes.push_back(it->first);
+    
+    return !err;
 }
 
 TimeValue Engine::getBoxBeginTime(TimeProcessId boxId)

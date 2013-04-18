@@ -280,11 +280,10 @@ public:
 	 * \param y : new end value of the box
 	 * \param maxSceneWidth : the max scene width
 	 * \param movedBoxes : empty vector, will be filled with the ID of the boxes moved by this resolution
-	 * \param maxModification : (optional) if provided, the system will refuse modification (in length or date) greater than this value.
 	 *
 	 * \return true if the move is allowed or false if the move is forbidden
 	 */
-	bool performBoxEditing(TimeProcessId boxId, TimeValue start, TimeValue end, std::vector<TimeProcessId>& movedBoxes, TimeValue maxModification = NO_MAX_MODIFICATION);
+	bool performBoxEditing(TimeProcessId boxId, TimeValue start, TimeValue end, std::vector<TimeProcessId>& movedBoxes);
     
 	/*!
 	 * Gets the begin value of the box matching the given ID
