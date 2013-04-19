@@ -498,7 +498,6 @@ Maquette::addParentBox(unsigned int ID, const unsigned int date, const unsigned 
                 }
             }
         }
-
       newBox->setFirstMessagesToSend(firstMsgs);
       newBox->setLastMessagesToSend(lastMsgs);
     }

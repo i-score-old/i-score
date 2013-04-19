@@ -88,7 +88,6 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
   : QGraphicsScene(rect)
 {
   _editor = editor;
-//  _copyPalette = _editor->getPalette();
   _clicked = false;
   _playing = false;
   _paused = false;
@@ -101,7 +100,6 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 
   _timeBar = new TimeBarWidget(0, this);
 
-//    _progressLine = new QGraphicsLineItem(QLineF(50,sceneRect().topLeft().y(),50,sceneRect().bottomLeft().y()));
   _progressLine = new QGraphicsLineItem(QLineF(sceneRect().topLeft().x(), sceneRect().topLeft().y(), sceneRect().bottomLeft().x(), MAX_SCENE_HEIGHT));
 
   _progressLine->setZValue(2);
@@ -150,8 +148,6 @@ MaquetteScene::init()
 void
 MaquetteScene::updateProgressBar()
 {
-//    update(QRectF(QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL-4, 0), QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL+4, height())));
-
   if (_playing) {
       _progressLine->setPos(_maquette->getCurrentTime() / MS_PER_PIXEL, sceneRect().topLeft().y());
       invalidate(QRectF(), ItemLayer);
@@ -225,7 +221,6 @@ MaquetteScene::changeNetworkDevice(std::string deviceName, std::string pluginNam
 void
 MaquetteScene::setNetworDeviceConfig(string deviceName, string pluginName, string IP, string port)
 {
-//    _maquette->changeNetworkDevice(deviceName,pluginName,IP,port);
   emit(networkConfigChanged(deviceName, pluginName, IP, port));
 }
 
@@ -290,22 +285,7 @@ MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[]
   QGraphicsScene::drawItems(painter, numItems, items, options, widget);
   qreal xmax = width(), ymax = height();
 
-/*	static int NUM_ITEMS = -1;
- *      if (numItems != NUM_ITEMS) {
- *              NUM_ITEMS = numItems;
- *              // std::cerr << "DEBUG : MaquetteScene::drawItems : Nombre d'items : " << NUM_ITEMS << std::endl;
- *      }*/
   for (int i = 0; i < numItems; i++) {
-/*		painter->save();
- *              painter->setMatrix(items[i]->sceneMatrix(), true);
- *              items[i]->paint(painter, &options[i], widget);
- *              if (items[i]->type() == SOUND_BOX_TYPE || items[i]->type() == CONTROL_BOX_TYPE
- || items[i]->type() == PARENT_BOX_TYPE) {
- ||                     if (static_cast<BasicBox*>(items[i])->playing()) {
- ||                             items[i]->update();
- ||                     }
- ||             }
- ||             painter->restore();*/
 
       // Look if the scene rectangle has to be updated
       if (xmax < items[i]->mapToScene(items[i]->boundingRect().bottomRight()).x()) {
@@ -315,8 +295,6 @@ MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[]
           ymax = items[i]->mapToScene(items[i]->boundingRect().bottomRight()).y();
         }
     }
-
-  //_view->setSceneRect(QRectF(0, 0, xmax, ymax));
 }
 
 void
@@ -324,12 +302,6 @@ MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
 {
   Q_UNUSED(rect);
   if (!_playing) {
-      //drawGotoBar
-      QPen reSavedPen = painter->pen();
-      QPen pen3(Qt::black);
-      pen3.setWidth(3);
-      painter->setPen(pen3);
-      painter->setPen(reSavedPen);
 
       if (_currentInteractionMode == RELATION_MODE) {
           if (_clicked) {
@@ -415,6 +387,7 @@ MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
                           painterPath.quadTo((startX + endX) / 2., endY, endX, endY);
                         }
 
+                      //Relation
                       painter->save();
                       QPen localPen;
                       localPen.setWidth(BasicBox::LINE_WIDTH);
@@ -677,7 +650,6 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
               }
           }
 
-//                else if (itemAt(mouseEvent->scenePos())->type() == PARENT_BOX_TYPE) {
         else if (getSelectedItem() != NULL ? getSelectedItem()->type() == PARENT_BOX_TYPE : false && subScenarioMode(mouseEvent)) {
             // TODO : see why creation is possible in a parent box during resize mode
             if (resizeMode() == NO_RESIZE) {
@@ -919,83 +891,90 @@ MaquetteScene::cutBoxes()
 void
 MaquetteScene::copyBoxes(bool erasing)
 {
-  QPointF topLeft(FLT_MAX, FLT_MAX);
-  QPointF bottomRight(FLT_MIN, FLT_MIN);
+    QPointF topLeft(FLT_MAX, FLT_MAX);
+    QPointF bottomRight(FLT_MIN, FLT_MIN);
 
-  _toCopy.clear();
-  _boxesToCopy.clear();
+    _toCopy.clear();
+    _boxesToCopy.clear();
 
-  QList<QGraphicsItem *> selected = selectedItems();
-  QList<QGraphicsItem *>::iterator it;
-  for (it = selected.begin(); it != selected.end(); it++) {
-      switch ((*it)->type()) {
-          case SOUND_BOX_TYPE:
-          {
+    QList<QGraphicsItem *> selected = selectedItems();
+    QList<QGraphicsItem *>::iterator it;
+    for (it = selected.begin(); it != selected.end(); it++) {
+        switch ((*it)->type()) {
+        case SOUND_BOX_TYPE:
+        {
             _boxesToCopy[static_cast<SoundBox*>(*it)->ID()] = new AbstractSoundBox(*static_cast<AbstractSoundBox*>(static_cast<SoundBox*>(*it)->abstract()));
             if (erasing) {
                 removeBox(static_cast<SoundBox*>(*it)->ID());
-              }
+            }
             break;
-          }
+        }
 
-          case CONTROL_BOX_TYPE:
-          {
+        case CONTROL_BOX_TYPE:
+        {
             _boxesToCopy[static_cast<ControlBox*>(*it)->ID()] = new AbstractControlBox(*static_cast<AbstractControlBox*>(static_cast<ControlBox*>(*it)->abstract()));
             if (erasing) {
                 removeBox(static_cast<SoundBox*>(*it)->ID());
-              }
+            }
             break;
-          }
+        }
 
-          case PARENT_BOX_TYPE:
-            _boxesToCopy[static_cast<ParentBox*>(*it)->ID()] = new AbstractParentBox(*static_cast<AbstractParentBox*>(static_cast<ParentBox*>(*it)->abstract()));
+        case PARENT_BOX_TYPE:
+        {
+            AbstractParentBox *curBox = static_cast<AbstractParentBox*>(static_cast<ParentBox*>(*it)->abstract());
+
+            AbstractParentBox *boxToCopy =new AbstractParentBox(*curBox);
+
+            _boxesToCopy[static_cast<ParentBox*>(*it)->ID()] = boxToCopy;
             if (erasing) {
                 removeBox(static_cast<SoundBox*>(*it)->ID());
-              }
+            }
             break;
+        }
 
-          case RELATION_TYPE:
+        case RELATION_TYPE:
             _toCopy.push_back(new AbstractRelation(*static_cast<AbstractRelation*>(static_cast<Relation*>(*it)->abstract())));
             if (erasing) {
                 removeRelation(static_cast<Relation*>(*it)->ID());
-              }
+            }
             break;
 
-          case COMMENT_TYPE:
+        case COMMENT_TYPE:
             _toCopy.push_back(new AbstractComment(*static_cast<AbstractComment*>(static_cast<Comment*>(*it)->abstract())));
             if (erasing) {
                 removeComment(static_cast<Comment*>(*it));
-              }
+            }
             break;
 
-          case TRIGGER_POINT_TYPE:
+        case TRIGGER_POINT_TYPE:
             _toCopy.push_back(new AbstractTriggerPoint(*static_cast<AbstractTriggerPoint*>(static_cast<TriggerPoint*>(*it)->abstract())));
             if (erasing) {
                 removeTriggerPoint(static_cast<TriggerPoint*>(*it)->ID());
-              }
+            }
             break;
 
-          default:
+        default:
             std::cerr << "MaquetteScene::copyBoxes : Unhandled item during copy" << std::endl;
             break;
         }
-      if (!erasing) {
-          topLeft = QPointF(std::min((*it)->mapToScene((*it)->boundingRect().topLeft()).x(), topLeft.x()),
-                            std::min((*it)->mapToScene((*it)->boundingRect().topLeft()).y(), topLeft.y()));
-          bottomRight = QPointF(std::max((*it)->mapToScene((*it)->boundingRect().bottomRight()).x(), bottomRight.x()),
-                                std::max((*it)->mapToScene((*it)->boundingRect().bottomRight()).y(), bottomRight.y()));
+        if (!erasing) {
+            topLeft = QPointF(std::min((*it)->mapToScene((*it)->boundingRect().topLeft()).x(), topLeft.x()),
+                              std::min((*it)->mapToScene((*it)->boundingRect().topLeft()).y(), topLeft.y()));
+            bottomRight = QPointF(std::max((*it)->mapToScene((*it)->boundingRect().bottomRight()).x(), bottomRight.x()),
+                                  std::max((*it)->mapToScene((*it)->boundingRect().bottomRight()).y(), bottomRight.y()));
         }
     }
-  if (topLeft.x() != FLT_MAX && topLeft.y() != FLT_MAX &&
-      bottomRight.x() != FLT_MIN && bottomRight.y() != FLT_MIN) {
-      _copySize = bottomRight - topLeft;
+    if (topLeft.x() != FLT_MAX && topLeft.y() != FLT_MAX &&
+            bottomRight.x() != FLT_MIN && bottomRight.y() != FLT_MIN) {
+        _copySize = bottomRight - topLeft;
     }
-  else {
-      if (!erasing) {
-          std::cerr << "MaquetteScene::copyBoxes : the size of the copy could not be determined" << std::endl;
+    else {
+        if (!erasing) {
+            std::cerr << "MaquetteScene::copyBoxes : the size of the copy could not be determined" << std::endl;
         }
-      _copySize = QPointF(0., 0.);
+        _copySize = QPointF(0., 0.);
     }
+
 }
 
 void
@@ -1011,9 +990,7 @@ void
 MaquetteScene::pasteBoxes()
 {
   BasicBox* newBox;
-  QPointF topLeft, bottomRight;
   string name = "";
-  QColor color;
 
   map<unsigned int, unsigned int> IDMap;
 
@@ -1021,13 +998,15 @@ MaquetteScene::pasteBoxes()
 
   for (boxIt = _boxesToCopy.begin(); boxIt != _boxesToCopy.end(); ++boxIt) {
       int type = boxIt->second->type();
+      AbstractBox *boxToCopy = boxIt->second;
       unsigned int newID = NO_ID;
       AbstractBox *absCopyBox = NULL;
       switch (type) {
           case ABSTRACT_PARENT_BOX_TYPE:
           {
-            AbstractParentBox *abParentBox = static_cast<AbstractParentBox*>(boxIt->second);
-            abParentBox->setTopLeft(QPointF(abParentBox->topLeft().x(), abParentBox->topLeft().y()) + _copySize);
+            AbstractParentBox *abParentBox = static_cast<AbstractParentBox*>(boxToCopy);
+            abParentBox->setTopLeft(QPointF(abParentBox->topLeft().x(), abParentBox->topLeft().y()) + _copySize);            
+
             if (abParentBox->mother() != ROOT_BOX_ID) {
                 map<unsigned int, unsigned int>::iterator it;
                 if ((it = IDMap.find(abParentBox->mother())) != IDMap.end()) {
@@ -1086,10 +1065,13 @@ MaquetteScene::pasteBoxes()
           if ((name.find(tr("- Copy").toStdString())) == std::string::npos) {
               name += tr(" - Copy").toStdString();
             }
-          newBox->setName(QString::fromStdString(name));
+          newBox->setName(QString::fromStdString(name));          
           newBox->setPos(newBox->getCenter());
+          newBox->setStartMessages(absCopyBox->startMessages());
+          newBox->setEndMessages(absCopyBox->endMessages());
           newBox->setSelected(true);
           newBox->update();
+          std::cout<<"> "<<newBox->startMessages()->computeMessages().size()<<std::endl;
         }
       else {
           std::cerr << "MaquetteScene::pasteBoxes : Unvalid assigned box ID" << std::endl;

@@ -50,13 +50,15 @@ AbstractParentBox::AbstractParentBox(const QPointF &newTopLeft, const float &new
 }
 
 AbstractParentBox::AbstractParentBox(const AbstractParentBox &other) :
-  AbstractBox::AbstractBox(other._topLeft, other._width, other._height, other._name, other._color, other._ID, other._motherID)
+  AbstractBox::AbstractBox(other._topLeft, other._width, other._height, other._name, other._color, other._ID, other._motherID,
+                           other._startMessages, other._endMessages)
 {
 }
 
 AbstractParentBox::AbstractParentBox(const AbstractBox &other) :
   AbstractBox::AbstractBox(other.topLeft(), other.width(), other.height(), other.name(),
-                           other.color(), other.ID(), other.mother())
+                           other.color(), other.ID(), other.mother(),
+                           other.startMessages(), other.endMessages())
 {
 }
 
