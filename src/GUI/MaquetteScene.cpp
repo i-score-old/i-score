@@ -148,13 +148,13 @@ MaquetteScene::init()
 void
 MaquetteScene::updateProgressBar()
 {
-  if (_playing) {
-      _timeBarProxy->blockSignals(false);
+  if (_playing) {      
       _progressLine->setPos(_maquette->getCurrentTime() / MS_PER_PIXEL, sceneRect().topLeft().y());
+      invalidate();
     }
-  else {
-      _timeBarProxy->blockSignals(false);
+  else {      
       _progressLine->setPos(_view->gotoValue() / MS_PER_PIXEL, sceneRect().topLeft().y());
+      invalidate();
     }
 }
 
