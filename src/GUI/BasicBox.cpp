@@ -1835,8 +1835,3 @@ BasicBox::displayCurveEditWindow()
   editWindow->setGeometry(QRect(_scene->sceneRect().toRect()));
   editWindow->show();
 }
-
-void
-BasicBox::refresh()
-{
-}

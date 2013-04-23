@@ -1074,8 +1074,7 @@ MaquetteScene::pasteBoxes()
           newBox->setLastMessagesToSend(absCopyBox->endMessages()->computeMessages());
 
           newBox->setSelected(true);
-//          newBox->centerWidget();
-          newBox->refresh();
+          newBox->centerWidget();
           newBox->update();
         }
       else {
