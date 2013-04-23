@@ -763,6 +763,7 @@ class MaquetteScene : public QGraphicsScene
   public slots:
     void verticalScroll(int value);
     void gotoChanged(double value);
+    void zoomChanged(float value);
     void speedChanged(double value);
 
     /*!

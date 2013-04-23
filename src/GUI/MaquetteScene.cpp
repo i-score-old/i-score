@@ -157,6 +157,10 @@ MaquetteScene::updateProgressBar()
       invalidate();
     }
 }
+void
+MaquetteScene::zoomChanged(float value){
+  _timeBar->updateZoom(value);
+}
 
 void
 MaquetteScene::gotoChanged(double value)
