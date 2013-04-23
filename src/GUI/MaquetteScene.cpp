@@ -178,6 +178,7 @@ MaquetteScene::updateView()
   _view = static_cast<MaquetteView*>(views().front());
 }
 
+/// \todo Vérifier l'utilité de faire une surcouche d'appels de méthodes de AttributesEditor (_editor)
 Palette
 MaquetteScene::getPalette() const
 {

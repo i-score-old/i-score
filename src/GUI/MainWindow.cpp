@@ -109,10 +109,10 @@ MainWindow::MainWindow()
   _view->setCacheMode(QGraphicsView::CacheBackground);
 
   _scene->updateView();
-  _scene->init();
+  _scene->init(); /// \todo Les méthodes init() sont à bannir, il y a des constructeurs pour ça !!!
 
   _editor->setScene(_scene);
-  _editor->init();
+  _editor->init(); /// \todo Les méthodes init() sont à bannir, il y a des constructeurs pour ça !!!
   _editor->show();
 
   _commandKey = false;
@@ -381,6 +381,7 @@ MainWindow::updateEditor()
     }
 }
 
+/// \todo Vérifier que la surcouche d'appels a du sens.
 void
 MainWindow::cutSelection()
 {
