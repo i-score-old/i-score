@@ -672,26 +672,6 @@ public:
 	bool isRunning();
     
 	/*!
-	 * Compiles the editor to set the ECOMachine.
-	 * Play() must be preferably called except if
-	 * the compilation and the run must be separate.
-	 *
-	 * \param gotoInformation : (optional) time to start the compilation.
-	 */
-	void compile();
-    
-	/*!
-	 * Runs the ECOMachine.
-	 * Must be called after a call of the compile() function. Play() must be preferably called except if
-	 * the compilation and the run must be separate.
-	 *
-	 * \param gotoInformation : (optional) time to start the run.
-	 *
-	 * \return true if the ECOMachine is now running.
-	 */
-	bool run();
-    
-	/*!
 	 * Gets the ECOMachine current execution time in milliseconds.
 	 *
 	 * \return the execution time in milliseconds.

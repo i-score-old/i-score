@@ -210,7 +210,7 @@ void Engine::initModular()
 
 void Engine::initScore()
 {
-    TTValue args;
+    TTValue args, v;
     
     // this initializes the Score framework
     TTScoreInit();
@@ -219,9 +219,15 @@ void Engine::initScore()
     m_mainScenario = NULL;
     TTObjectBaseInstantiate(TTSymbol("Scenario"), TTObjectBaseHandle(&m_mainScenario), args);
     
-    // Set the start and end event dates
-    m_mainScenario->setAttributeValue(TTSymbol("startDate"), TTUInt32(0));
-    m_mainScenario->setAttributeValue(TTSymbol("endDate"), TTUInt32(SCENARIO_SIZE));  // the size can be changed afterward
+    // Create a static time event for the start and set his date in the mean time
+    v = TTValue(TTSymbol("StaticEvent"));
+    v.append(TTUInt32(0));
+    m_mainScenario->sendMessage(TTSymbol("CreateStartEvent"), v, kTTValNONE);
+    
+    // Create a static time event for the end and set his date in the mean time
+    v = TTValue(TTSymbol("StaticEvent"));
+    v.append(TTUInt32(SCENARIO_SIZE));
+    m_mainScenario->sendMessage(TTSymbol("CreateEndEvent"), v, kTTValNONE);
     
     // TODO : create a TTCallback to observe each time process scheduler running attribute (using TimeProcessSchedulerRunningAttributeCallback)
     
@@ -951,6 +957,8 @@ bool Engine::getCurveValues(TimeProcessId boxId, const std::string & address, un
 
 InteractiveEventId Engine::addTriggerPoint(TimeProcessId containingBoxId)
 {
+    TimeProcessPtr timeProcess = getTimeProcess(containingBoxId);
+    
 #ifdef TODO_ENGINE
 	return m_editor->addTriggerPoint(containingBoxId);
 #endif
@@ -962,6 +970,7 @@ void Engine::removeTriggerPoint(InteractiveEventId triggerId)
 #ifdef TODO_ENGINE
 	m_editor->removeTriggerPoint(triggerId);
 #endif
+    return;
 }
 
 bool Engine::assignCtrlPointToTriggerPoint(InteractiveEventId triggerId, TimeProcessId boxId, TimeEventIndex controlPointIndex)
@@ -978,6 +987,7 @@ void Engine::setTriggerPointMessage(InteractiveEventId triggerId, std::string tr
 #ifdef TODO_ENGINE
 	m_editor->setTriggerPointMessage(triggerId, triggerMessage);
 #endif
+    return;
 }
 
 std::string Engine::getTriggerPointMessage(InteractiveEventId triggerId)
@@ -1046,50 +1056,89 @@ TimeValue Engine::getGotoValue()
 
 bool Engine::play()
 {
-	if (!isRunning()) {
-		compile();
-		return run();
-        
-	} else {
-		return false;
-	}
+    TTValue         v;
+    TTObjectBasePtr aScheduler;
+    TTFloat64       duration;
+    TTErr           err;
+    
+    // TODO : compile the PetriNet ?
+    
+    // get the scheduler object of the main scenario
+    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
+    aScheduler = TTObjectBasePtr(v[0]);
+    
+    // set scheduler duration equal to the scenario duration
+    m_mainScenario->getAttributeValue(TTSymbol("duration"), v);
+    
+    duration = TTUInt32(v[0]);
+    aScheduler->setAttributeValue(TTSymbol("duration"), duration);
+    
+    err = aScheduler->sendMessage(TTSymbol("Go"));
+    
+    return !err;
 }
 
 void Engine::pause(bool pauseValue)
 {
-#ifdef TODO_ENGINE
-	m_executionMachine->pause(pauseValue);
-#endif
+    TTValue         v;
+    TTObjectBasePtr aScheduler;
+    
+    // get the scheduler object of the main scenario
+    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
+    aScheduler = TTObjectBasePtr(v[0]);
+    
+    if (pauseValue)
+        aScheduler->sendMessage(TTSymbol("Pause"));
+    else
+        aScheduler->sendMessage(TTSymbol("Resume"));
 }
 
 bool Engine::isPaused()
 {
-#ifdef TODO_ENGINE    
-	return m_executionMachine->isPaused();
-#endif
+    TTValue         v;
+    TTObjectBasePtr aScheduler;
     
-    return NO;
+    // get the scheduler object of the main scenario
+    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
+    aScheduler = TTObjectBasePtr(v[0]);
+    
+    aScheduler->getAttributeValue(TTSymbol("running"), v);
+    
+    return TTBoolean(v[0]);
 }
 
 bool Engine::stop()
 {
-#ifdef TODO_ENGINE    
-	return m_executionMachine->stop();
-#endif
+    TTValue         v;
+    TTObjectBasePtr aScheduler;
+    TTErr           err;
     
-    return NO;
+    // get the scheduler object of the main scenario
+    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
+    aScheduler = TTObjectBasePtr(v[0]);
+
+    err = aScheduler->sendMessage(TTSymbol("Stop"));
+    
+    return !err;
 }
 
 bool Engine::isRunning()
 {
-#ifdef TODO_ENGINE
-	return m_executionMachine->isRunning();
-#endif
+    TTValue         v;
+    TTObjectBasePtr aScheduler;
+    
+    // get the scheduler object of the main scenario
+    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
+    aScheduler = TTObjectBasePtr(v[0]);
+    
+    aScheduler->getAttributeValue(TTSymbol("running"), v);
+    
+    return TTBoolean(v[0]);
 }
 
+#ifdef TODO_ENGINE 
 void Engine::compile()
 {
-#ifdef TODO_ENGINE    
 	m_executionMachine->reset();
     
 	std::map<unsigned int, StoryLine> hierarchyStoryLine;
@@ -1101,56 +1150,66 @@ void Engine::compile()
 	if (hierarchyStoryLine[ROOT_BOX_ID].m_constrainedBoxes.size() >= 1) {
 		m_executionMachine->compileECO(hierarchyStoryLine, m_executionMachine->getGotoInformation());
 	}
-#endif
 }
-
-bool Engine::run()
-{
-#ifdef TODO_ENGINE    
-	bool runIsOk = m_executionMachine->run();
-    
-	return runIsOk;
 #endif
-    
-    return NO;
-}
 
 TimeValue Engine::getCurrentExecutionTime()
 {
-#ifdef TODO_ENGINE    
-	return m_executionMachine->getTimeInMs();
-#endif
+    TTValue         v;
+    TTUInt32        time;
+    TTObjectBasePtr aScheduler;
     
-    return 0;
+    // get the scheduler object of the main scenario
+    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
+    aScheduler = TTObjectBasePtr(v[0]);
+    
+    aScheduler->getAttributeValue(TTSymbol("realTime"), v);
+    time = TTFloat64(v[0]);
+    
+    return time;
 }
 
 void Engine::setExecutionSpeedFactor(float factor)
 {
-#ifdef TODO_ENGINE
-	m_executionMachine->setSpeedFactor(factor);
-#endif
+    TTValue         v;
+    TTObjectBasePtr aScheduler;
+
+    // get the scheduler object of the main scenario
+    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
+    aScheduler = TTObjectBasePtr(v[0]);
+    
+    aScheduler->setAttributeValue(TTSymbol("speed"), TTFloat64(factor));
 }
 
 float Engine::getExecutionSpeedFactor()
 {
-#ifdef TODO_ENGINE    
-	return m_executionMachine->getSpeedFactor();
-#endif
+    TTValue         v;
+    TTObjectBasePtr aScheduler;
     
-    return 1.;
+    // get the scheduler object of the main scenario
+    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
+    aScheduler = TTObjectBasePtr(v[0]);
+    
+    aScheduler->getAttributeValue(TTSymbol("speed"), v);
+    
+    return TTFloat64(v[0]);
 }
 
 float Engine::getProcessProgression(TimeProcessId processId)
 {
- #ifdef TODO_ENGINE   
-	if (m_executionMachine->isRunning()) {
-		return m_executionMachine->getProcessProgressionPercent(processId);
-	} else {
-		return 0;
-	}
-#endif
+    TTValue         v;
+    TTUInt32        time;
+    TimeProcessPtr  timeProcess = getTimeProcess(processId);
+    TTObjectBasePtr aScheduler;
     
-    return 0.;
+    // get the scheduler object of the time process
+    timeProcess->getAttributeValue(TTSymbol("scheduler"), v);
+    aScheduler = TTObjectBasePtr(v[0]);
+    
+    aScheduler->getAttributeValue(TTSymbol("realTime"), v);
+    time = TTFloat64(v[0]);
+    
+    return time;
 }
 
 bool Engine::receiveNetworkMessage(std::string netMessage)
