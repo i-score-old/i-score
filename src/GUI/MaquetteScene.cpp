@@ -1067,11 +1067,16 @@ MaquetteScene::pasteBoxes()
             }
           newBox->setName(QString::fromStdString(name));          
           newBox->setPos(newBox->getCenter());
+
           newBox->setStartMessages(absCopyBox->startMessages());
           newBox->setEndMessages(absCopyBox->endMessages());
+          newBox->setFirstMessagesToSend(absCopyBox->startMessages()->computeMessages());
+          newBox->setLastMessagesToSend(absCopyBox->endMessages()->computeMessages());
+
           newBox->setSelected(true);
+//          newBox->centerWidget();
+          newBox->refresh();
           newBox->update();
-          std::cout<<"> "<<newBox->startMessages()->computeMessages().size()<<std::endl;
         }
       else {
           std::cerr << "MaquetteScene::pasteBoxes : Unvalid assigned box ID" << std::endl;
