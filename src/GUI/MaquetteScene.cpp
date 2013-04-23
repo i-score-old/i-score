@@ -81,6 +81,7 @@ using std::string;
 const string MaquetteScene::DEFAULT_TRIGGER_MSG = "/trigger";
 float MaquetteScene::MS_PER_PIXEL = 16;
 const float MaquetteScene::MS_PRECISION = 10;
+const float LINE_WIDTH = 1.1;
 
 using namespace SndBoxProp;
 
@@ -91,25 +92,17 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
   _clicked = false;
   _playing = false;
   _paused = false;
-
   _modified = false;
 
   _relation = new AbstractRelation;
-
   _playThread = new PlayingThread(this);
-
-  _timeBar = new TimeBarWidget(0, this);
+  _timeBar = new TimeBarWidget(0, this);  
+  _timeBarProxy = addWidget(_timeBar);
 
   _progressLine = new QGraphicsLineItem(QLineF(sceneRect().topLeft().x(), sceneRect().topLeft().y(), sceneRect().bottomLeft().x(), MAX_SCENE_HEIGHT));
 
-  _progressLine->setZValue(2);
-
   addItem(_progressLine);
 
-  addWidget(_timeBar);
-
-  connect(_timeBar, SIGNAL(gotoValueEntered(double)), this, SLOT(gotoChanged(double)));
-  connect(this, SIGNAL(stopPlaying()), this, SLOT(stop()));
 }
 
 MaquetteScene::~MaquetteScene()
@@ -121,6 +114,10 @@ MaquetteScene::~MaquetteScene()
 void
 MaquetteScene::init()
 {
+  _progressLine->setZValue(2);
+  _timeBarProxy->setZValue(3);
+  _timeBarProxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+
   _currentInteractionMode = SELECTION_MODE;
   setCurrentMode(SELECTION_MODE);
   _currentBoxMode = PB_MODE;
@@ -143,18 +140,21 @@ MaquetteScene::init()
   _relationBoxFound = false;
 
   _mousePos = QPointF(0., 0.);
+
+  connect(_timeBar, SIGNAL(gotoValueEntered(double)), this, SLOT(gotoChanged(double)));
+  connect(this, SIGNAL(stopPlaying()), this, SLOT(stop()));
 }
 
 void
 MaquetteScene::updateProgressBar()
 {
   if (_playing) {
+      _timeBarProxy->blockSignals(false);
       _progressLine->setPos(_maquette->getCurrentTime() / MS_PER_PIXEL, sceneRect().topLeft().y());
-      invalidate(QRectF(), ItemLayer);
     }
   else {
+      _timeBarProxy->blockSignals(false);
       _progressLine->setPos(_view->gotoValue() / MS_PER_PIXEL, sceneRect().topLeft().y());
-      invalidate(QRectF(), ItemLayer);
     }
 }
 

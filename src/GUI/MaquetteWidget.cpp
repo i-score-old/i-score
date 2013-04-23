@@ -81,6 +81,7 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
   createHeader();
 
   _maquetteLayout->addWidget(_header);
+//  _maquetteLayout->addWidget(_timeBar);
   _maquetteLayout->addWidget(_view);
 
   _maquetteLayout->setContentsMargins(0, 0, 0, 0);
@@ -91,6 +92,7 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
   connect(_view, SIGNAL(zoomChanged(float)), this, SLOT(changeZoom(float)));
   connect(_view, SIGNAL(playModeChanged()), this, SLOT(updateHeader()));
   connect(_scene, SIGNAL(playModeChanged()), this, SLOT(updateHeader()));
+  connect(_timeBar, SIGNAL(gotoValueEntered(double)), _scene, SLOT(gotoChanged(double)));
 }
 
 void

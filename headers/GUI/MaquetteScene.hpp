@@ -918,10 +918,10 @@ class MaquetteScene : public QGraphicsScene
 
     std::map<unsigned int, BasicBox*> _playingBoxes; //!< Handles the whole set of currently playing boxes
 
-//  QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
     PlayingThread *_playThread; //!< The thread handling playing.
 
     TimeBarWidget *_timeBar;
+    QGraphicsProxyWidget *_timeBarProxy;
     QGraphicsLineItem *_progressLine;
     double _accelerationFactorSave;
     double _accelerationFactor;

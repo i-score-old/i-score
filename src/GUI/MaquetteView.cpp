@@ -67,7 +67,6 @@ MaquetteView::MaquetteView(MainWindow *mw)
   _mainWindow = mw;
   setRenderHint(QPainter::Antialiasing);
 
-//  setBackgroundBrush(QColor(140,176,140));
   setBackgroundBrush(QColor(160, 160, 160));
   setCacheMode(QGraphicsView::CacheBackground);
 
@@ -76,7 +75,7 @@ MaquetteView::MaquetteView(MainWindow *mw)
   setAlignment(Qt::AlignLeft | Qt::AlignTop);
   centerOn(0, 0);
   _zoom = 1;
-  _gotoValue = 0;
+  _gotoValue = 0;  
 }
 
 MaquetteView::~MaquetteView()
@@ -86,22 +85,26 @@ MaquetteView::~MaquetteView()
 void
 MaquetteView::wheelEvent(QWheelEvent *event)
 {
-  if (event->orientation() == Qt::Horizontal) {
-      if (event->delta() < 0) { //up
-          horizontalScrollBar()->setValue(horizontalScrollBar()->value() + SCROLL_BAR_INCREMENT);
+    int newValue = 0;
+    if (event->orientation() == Qt::Horizontal) {
+
+        if (event->delta() < 0) { //up
+            newValue = horizontalScrollBar()->value() + SCROLL_BAR_INCREMENT;
         }
-      else {  //down
-          horizontalScrollBar()->setValue(horizontalScrollBar()->value() - SCROLL_BAR_INCREMENT);
+        else {  //down
+            newValue = horizontalScrollBar()->value() - SCROLL_BAR_INCREMENT;
         }
+        horizontalScrollBar()->setValue(newValue);
     }
 
-  if (event->orientation() == Qt::Vertical) {
-      if (event->delta() < 0) { //up
-          verticalScrollBar()->setValue(verticalScrollBar()->value() + SCROLL_BAR_INCREMENT);
+    if (event->orientation() == Qt::Vertical) {
+        if (event->delta() < 0) { //up
+            newValue = verticalScrollBar()->value() + SCROLL_BAR_INCREMENT;
         }
-      else {  //down
-          verticalScrollBar()->setValue(verticalScrollBar()->value() - SCROLL_BAR_INCREMENT);
+        else {  //down
+            newValue = verticalScrollBar()->value() - SCROLL_BAR_INCREMENT;
         }
+        verticalScrollBar()->setValue(newValue);
     }
 }
 

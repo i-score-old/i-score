@@ -130,9 +130,9 @@ MainWindow::MainWindow()
   setCurrentFile("");
   setAcceptDrops(false);
 
-  connect(_view->verticalScrollBar(), SIGNAL(valueChanged(int)), _scene, SLOT(verticalScroll(int)));
   connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, std::string)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, std::string)));
   connect(_editor->networkTree(), SIGNAL(cmdKeyStateChanged(bool)), this, SLOT(updateCmdKeyState(bool)));
+  connect(_view->verticalScrollBar(), SIGNAL(valueChanged(int)), _scene, SLOT(verticalScroll(int)));  //TimeBar is painted on MaquetteScene, so a vertical scroll has to move the timeBar.
 }
 
 MainWindow::~MainWindow()
