@@ -431,9 +431,19 @@ void Engine::changeTemporalRelationBounds(IntervalId relationId, TimeValue minBo
     EngineCacheMapIterator  it;
     TTValue                 v;
     
-    v = TTValue(TTUInt32(minBound));
-    v.append(TTUInt32(maxBound));
+    // filtering -1 because we use unsigned int
+    // and sending 0 0 means the relation is not rigid
+    if (minBound != NO_BOUND)
+        v = TTValue(TTUInt32(minBound));
+    else
+        v = TTValue(TTUInt32(0));
     
+    if (maxBound != NO_BOUND)
+        v.append(TTUInt32(maxBound));
+    else
+        v.append(TTUInt32(0));
+    
+    // NOTE : it is also possible to use the "rigid" attribute to swicth between those two states
     timeProcess->sendMessage(TTSymbol("Limit"), v, kTTValNONE);
     
     // return the entire timeProcessMap except the first process !!! (this is bad but it is like former engine)
