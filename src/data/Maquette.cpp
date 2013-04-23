@@ -504,31 +504,7 @@ Maquette::changeNetworkDevice(const string &deviceName, const string &pluginName
 void
 Maquette::getNetworkDeviceNames(vector<string> &deviceName, vector<bool> &namespaceRequestable)
 {
-  TTValue applicationNames, protocolNames;
-  TTSymbol name;
-
-  // get all application name
-  TTModularApplications->getAttributeValue(TTSymbol("applicationNames"), applicationNames);
-
-  for (TTUInt8 i = 0; i < applicationNames.size(); i++) {
-      // don't return the local application
-      name = applicationNames[i];
-      if (name == getLocalApplicationName) {
-          continue;
-        }
-
-      deviceName.push_back(name.c_str());
-
-      // get all protocol names used by this application
-      protocolNames = getApplicationProtocols(name);
-
-      // if there is at least one protocol,
-      if (protocolNames.size()) {
-          // look if it provides namespace exploration
-          name = protocolNames[0];
-          namespaceRequestable.push_back(getProtocol(name)->mDiscover);
-        }
-    }
+    _engines->getNetworkDevicesName(deviceName, namespaceRequestable);
 }
 
 vector<string> Maquette::requestNetworkSnapShot(const string &address)

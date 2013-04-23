@@ -293,13 +293,19 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, TimePro
     TimeProcessId   boxId;
     TTValue         v;
     
-    // Create a new automation time process (2 static events are automatically created during creation)
+    // Create a new automation time process
     timeProcess = NULL;
     TTObjectBaseInstantiate(TTSymbol("Automation"), TTObjectBaseHandle(&timeProcess), kTTValNONE);
     
-    // Set the start and end event dates
-    timeProcess->setAttributeValue(TTSymbol("startDate"), boxBeginPos);
-    timeProcess->setAttributeValue(TTSymbol("endDate"), boxBeginPos+boxLength);
+    // Create a static time event for the start and set his date in the mean time
+    v = TTValue(TTSymbol("StaticEvent"));
+    v.append(TTUInt32(boxBeginPos));
+    timeProcess->sendMessage(TTSymbol("CreateStartEvent"), v, kTTValNONE);
+    
+    // Create a static time event for the end and set his date in the mean time
+    v = TTValue(TTSymbol("StaticEvent"));
+    v.append(TTUInt32(boxBeginPos+boxLength));
+    timeProcess->sendMessage(TTSymbol("CreateEndEvent"), v, kTTValNONE);
     
     // Add the time process to the main scenario
     // TODO : get the parent process using motherID and add the time process to this parent process
@@ -321,6 +327,7 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, TimePro
 void Engine::removeBox(TimeProcessId boxId)
 {
     TimeProcessPtr  timeProcess;
+    TTValue         v;
     
     // Retreive the time process using the boxId
     timeProcess = getTimeProcess(boxId);
@@ -328,8 +335,12 @@ void Engine::removeBox(TimeProcessId boxId)
     // TODO : delete TTCallback used to observe each time process scheduler running attribute
     // getTimeProcess(boxId)->removeObserver() ?
     
-    // Demove the time process from the cache
+    // Remove the time process from the cache
     m_timeProcessMap.erase(boxId);
+    
+    // Release start and end events
+    timeProcess->sendMessage(TTSymbol("ReleaseStartEvent"));
+    timeProcess->sendMessage(TTSymbol("ReleaseEndEvent"));
     
     // Delete the time process (the process is removed from the scenario during the destruction)
     TTObjectBaseRelease(TTObjectBaseHandle(&timeProcess));
@@ -373,6 +384,10 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
     
     timeProcess->setAttributeValue(TTSymbol("endEvent"), v);
     
+    // Set the time process rigid
+    v = TTBoolean(YES);
+    timeProcess->setAttributeValue(TTSymbol("rigid"), v);
+    
     // Add the time process to the main scenario
     v = TTValue(TTObjectBasePtr(timeProcess));
     err = m_mainScenario->sendMessage(TTSymbol("TimeProcessAdd"), v, kTTValNONE);
@@ -412,17 +427,20 @@ void Engine::removeTemporalRelation(IntervalId relationId)
 
 void Engine::changeTemporalRelationBounds(IntervalId relationId, TimeValue minBound, TimeValue maxBound, vector<TimeProcessId>& movedBoxes)
 {
-    TimeProcessPtr  timeProcess = getInterval(relationId);
-    TimeEventPtr    event;
-    TTValue         v;
+    TimeProcessPtr          timeProcess = getInterval(relationId);
+    EngineCacheMapIterator  it;
+    TTValue                 v;
     
-	timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-    event = TimeEventPtr(TTObjectBasePtr(v[0]));
+    v = TTValue(TTUInt32(minBound));
+    v.append(TTUInt32(maxBound));
     
-    event->setAttributeValue(TTSymbol("dateMin"), minBound);
-    event->setAttributeValue(TTSymbol("dateMax"), maxBound);
+    timeProcess->sendMessage(TTSymbol("Limit"), v, kTTValNONE);
     
-    // TODO : how to fill the movedBoxes ? return the entire timeProcessMap
+    // return the entire timeProcessMap except the first process !!! (this is bad but it is like former engine)
+    it = m_timeProcessMap.begin();
+    it++;
+    for (; it != m_timeProcessMap.end(); ++it)
+        movedBoxes.push_back(it->first);
 }
 
 bool Engine::isTemporalRelationExisting(TimeProcessId boxId1, TimeEventIndex controlPoint1, TimeProcessId boxId2, TimeEventIndex controlPoint2)
@@ -1173,20 +1191,31 @@ void Engine::sendNetworkMessage(const std::string & stringToSend)
 
 void Engine::getNetworkDevicesName(std::vector<std::string>& devicesName, std::vector<bool>& couldSendNamespaceRequest)
 {
-#ifdef TODO_ENGINE    
-	std::map<std::string, Device*> mapDevices = *(m_networkController->deviceGetCurrent());
+    TTValue applicationNames, protocolNames;
+    TTSymbol name;
     
-	map<string, Device*>::iterator it = mapDevices.begin();
+    // get all application name
+    TTModularApplications->getAttributeValue(TTSymbol("applicationNames"), applicationNames);
     
-	while (it != mapDevices.end()) {
-		if (m_networkController->deviceIsVisible(it->first)) {
-			devicesName.push_back(it->first);
-			couldSendNamespaceRequest.push_back(m_networkController->deviceUnderstandDiscoverRequest(it->first));
-		}
+    for (TTUInt8 i = 0; i < applicationNames.size(); i++) {
+        // don't return the local application
+        name = applicationNames[i];
+        if (name == getLocalApplicationName) {
+            continue;
+        }
         
-		++it;
-	}
-#endif
+        devicesName.push_back(name.c_str());
+        
+        // get all protocol names used by this application
+        protocolNames = getApplicationProtocols(name);
+        
+        // if there is at least one protocol,
+        if (protocolNames.size()) {
+            // look if it provides namespace exploration
+            name = protocolNames[0];
+            couldSendNamespaceRequest.push_back(getProtocol(name)->mDiscover);
+        }
+    }
 }
 
 std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & address)
