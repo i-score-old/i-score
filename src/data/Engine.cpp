@@ -309,8 +309,8 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, TimePro
     
     // Add the time process to the main scenario
     // TODO : get the parent process using motherID and add the time process to this parent process
-    v = TTValue(TTObjectBasePtr(timeProcess));
-    m_mainScenario->sendMessage(TTSymbol("TimeProcessAdd"), v, kTTValNONE);
+    v = TTObjectBasePtr(m_mainScenario);
+    timeProcess->setAttributeValue(TTSymbol("scenario"), v);
     
     // Cache it and get an unique id for this process
     boxId = cacheTimeProcess(timeProcess);
@@ -342,7 +342,10 @@ void Engine::removeBox(TimeProcessId boxId)
     timeProcess->sendMessage(TTSymbol("ReleaseStartEvent"));
     timeProcess->sendMessage(TTSymbol("ReleaseEndEvent"));
     
-    // Delete the time process (the process is removed from the scenario during the destruction)
+    // Remove the time process from the scenario
+    timeProcess->setAttributeValue(TTSymbol("scenario"), kTTValNONE);
+    
+    // Delete the time process
     TTObjectBaseRelease(TTObjectBaseHandle(&timeProcess));
 }
 
@@ -389,8 +392,8 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
     timeProcess->setAttributeValue(TTSymbol("rigid"), v);
     
     // Add the time process to the main scenario
-    v = TTValue(TTObjectBasePtr(timeProcess));
-    err = m_mainScenario->sendMessage(TTSymbol("TimeProcessAdd"), v, kTTValNONE);
+    v = TTObjectBasePtr(m_mainScenario);
+    err = timeProcess->setAttributeValue(TTSymbol("scenario"), v);
     
     if (!err) {
     
@@ -421,7 +424,10 @@ void Engine::removeTemporalRelation(IntervalId relationId)
     // Remove the interval from the cache
     m_intervalMap.erase(relationId);
     
-    // Delete the interval (the process is removed from the scenario during the destruction)
+    // Remove the time process from the scenario
+    timeProcess->setAttributeValue(TTSymbol("scenario"), kTTValNONE);
+    
+    // Delete the interval
     TTObjectBaseRelease(TTObjectBaseHandle(&timeProcess));
 }
 
@@ -610,11 +616,10 @@ bool Engine::performBoxEditing(TimeProcessId boxId, TimeValue start, TimeValue e
     EngineCacheMapIterator  it;
     TTErr                   err;
     
-    v = TTValue(TTObjectBasePtr(timeProcess));
-    v.append(start);
+    v = TTValue(start);
     v.append(end);
     
-    err = m_mainScenario->sendMessage(TTSymbol("TimeProcessMove"), v, kTTValNONE);
+    err = timeProcess->sendMessage(TTSymbol("Move"), v, kTTValNONE);
     
     // return the entire timeProcessMap except the first process !!! (this is bad but it is like former engine)
     it = m_timeProcessMap.begin();
