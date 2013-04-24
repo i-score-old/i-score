@@ -42,7 +42,6 @@
 #include "ParentBox.hpp"
 #include "ParentBoxContextMenu.hpp"
 #include "MaquetteScene.hpp"
-#include "Palette.hpp"
 #include "Maquette.hpp"
 #include "AbstractParentBox.hpp"
 #include "TriggerPoint.hpp"
@@ -65,7 +64,6 @@ using std::vector;
 using std::map;
 using std::string;
 using std::stringstream;
-using namespace SndBoxProp;
 
 ParentBox::ParentBox(const QPointF &corner1, const QPointF &corner2, MaquetteScene *parent)
   : BasicBox(corner1, corner2, parent)

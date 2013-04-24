@@ -42,7 +42,6 @@
 #include "ControlBox.hpp"
 #include "ControlBoxContextMenu.hpp"
 #include "MaquetteScene.hpp"
-#include "Palette.hpp"
 #include "Maquette.hpp"
 #include "AbstractControlBox.hpp"
 #include "TriggerPoint.hpp"

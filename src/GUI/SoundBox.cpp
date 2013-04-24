@@ -80,7 +80,6 @@ SoundBox::SoundBox(const QPointF &corner1, const QPointF &corner2, MaquetteScene
 
   ((AbstractSoundBox*)_abstract)->_pal.setContainer(this);
 
-  _importPalette = _scene->getPalette();
   importPalette();
 
   init();
@@ -278,20 +277,17 @@ SoundBox::editAspect()
 void
 SoundBox::importAspect()
 {
-  setPalette(_scene->getPalette());
   update();
 }
 
 void
 SoundBox::copyAspect()
 {
-  _scene->setCopyAspect(((AbstractSoundBox*)_abstract)->pal());
 }
 
 void
 SoundBox::pasteAspect()
 {
-  setPalette(_scene->getCopyAspect());
   update();
 }
 

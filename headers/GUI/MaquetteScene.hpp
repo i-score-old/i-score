@@ -343,31 +343,11 @@ class MaquetteScene : public QGraphicsScene
     void boxResized();
 
     /*!
-     * \brief Gets the palette contained in AttributesEditor.
-     *
-     * \return the palette contained in AttributesEditor
-     */
-    Palette getPalette() const;
-
-    /*!
      * \brief Sets the abstractBox of AttributesEditor.
      *
      * \param abBox : the new abstract box to be set
      */
     void setAttributes(AbstractBox *abBox);
-
-    /*!
-     * \brief Sets the aspect to store during a box-to-box aspect copying.
-     * \param palette : the palette to be stored
-     */
-    void setCopyAspect(const Palette &palette);
-
-    /*!
-     * \bief Gets the aspect to paste during a box-to-box aspect copying.
-     *
-     * \return the palette to paste
-     */
-    Palette getCopyAspect() const;
 
     /*!
      * \brief Gets a set of the available network devices.
@@ -780,8 +760,6 @@ class MaquetteScene : public QGraphicsScene
     MaquetteView *_view;               //!< The QGraphicsView related.
     AttributesEditor *_editor;         //!< The logical representation of the Editor.
     Maquette *_maquette;               //!< The logical representation of the Maquette.
-
-    Palette _copyPalette;              //!< Used to store sound box aspect beeing copied from one box to another.
 
     std::vector<Abstract*> _toCopy;    //!< Used to store items beeing copied.
     std::map<unsigned int, AbstractBox*> _boxesToCopy;

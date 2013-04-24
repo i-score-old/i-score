@@ -40,13 +40,10 @@
 
 #include "MaquetteScene.hpp"
 #include "BasicBox.hpp"
-#include "Palette.hpp"
 #include "AttributesEditor.hpp"
 #include <QColorDialog>
 #include "NetworkMessages.hpp"
 #include "NetworkTree.hpp"
-
-/* La palette hérite de QDockWidget, a pour parent la fenetre principale*/
 
 static const int ENGLISH = 0;
 static const int FRENCH = 1;
@@ -87,7 +84,6 @@ AttributesEditor::~AttributesEditor()
 {
   delete _centralWidget;
   delete _centralLayout;
-  delete _palette;
 }
 
 void
@@ -294,12 +290,6 @@ AttributesEditor::updateWidgets(bool boxModified)
   }
 
   update();
-}
-
-Palette
-AttributesEditor::getPalette() const
-{
-  return *_palette;
 }
 
 void

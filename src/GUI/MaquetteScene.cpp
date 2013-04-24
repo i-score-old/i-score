@@ -175,12 +175,6 @@ MaquetteScene::updateView()
   _view = static_cast<MaquetteView*>(views().front());
 }
 
-Palette
-MaquetteScene::getPalette() const
-{
-  return _editor->getPalette();
-}
-
 void
 MaquetteScene::updateWidgets()
 {
@@ -191,19 +185,6 @@ void
 MaquetteScene::setAttributes(AbstractBox *abstract)
 {
   _editor->setAttributes(abstract);
-}
-
-Palette
-MaquetteScene::getCopyAspect() const
-{
-  return _copyPalette;
-}
-
-void
-MaquetteScene::setCopyAspect(const Palette &palette)
-{
-  _copyPalette = palette;
-  _copyPalette.setContainer(NULL);
 }
 
 map<string, MyDevice>

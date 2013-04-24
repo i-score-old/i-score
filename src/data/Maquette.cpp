@@ -48,7 +48,6 @@
 #include "MaquetteView.hpp"
 #include <QDomDocument>
 #include "ParentBox.hpp"
-#include "Palette.hpp"
 #include "Engines.hpp"
 #include "AbstractRelation.hpp"
 #include "Relation.hpp"
@@ -72,8 +71,6 @@ using std::pair;
 typedef map<unsigned int, BasicBox*> BoxesMap;
 typedef map<unsigned int, Relation*> RelationsMap;
 typedef map<unsigned int, TriggerPoint*> TrgPntMap;
-
-using namespace SndBoxProp;
 
 #define SCENARIO_DURATION 1800000
 
@@ -1667,7 +1664,6 @@ Maquette::loadOLD(const string &fileName)
   QPointF topLeft, size, bottomRight;
   QString name, boxType, relType;
   QColor color(1., 1., 1.);
-  Palette pal;
   int boxID, motherID;
   QMap<int, unsigned int> hashMap;
   QDomNode mainNode = root.firstChild();      // Boxes
@@ -1689,7 +1685,6 @@ Maquette::loadOLD(const string &fileName)
                       if (elt2.tagName() == "color") {
                           color = QColor(elt2.attribute("red", "1").toFloat() * 255, elt2.attribute("green", "1").toFloat() * 255,
                                          elt2.attribute("blue", "1").toFloat() * 255);
-                          pal.setColor(color);
                         }
                       QDomNode node3 = node2.firstChild();
                       while (!node3.isNull()) {
@@ -1903,7 +1898,6 @@ Maquette::load(const string &fileName)
   unsigned int begin, duration, topLeftY, sizeY;
   QString name, boxType;
   QColor color(1., 1., 1.);
-  Palette pal;
   int boxID, motherID;
   float zoom;
   QPointF centerCoordinates;
@@ -1933,7 +1927,6 @@ Maquette::load(const string &fileName)
                       if (elt2.tagName() == "color") {
                           color = QColor(elt2.attribute("red", "1").toInt(), elt2.attribute("green", "1").toInt(),
                                          elt2.attribute("blue", "1").toInt());
-                          pal.setColor(color);
                         }
                       QDomNode node3 = node2.firstChild();
                       while (!node3.isNull()) {

@@ -212,8 +212,6 @@ class AttributesEditor : public QDockWidget
     QHBoxLayout *_boxSettingsLayout; //!< Layout handling box settings (name, color, assignation...).
     NetworkTree *_networkTree; //!< NetworkTree (inspector).
 
-    Palette *_palette;          //!< Palette storing attributes
-
     // TODO
     QDoubleSpinBox * _boxStartValue;
     QDoubleSpinBox * _boxLengthValue;    

@@ -46,7 +46,6 @@
 #include "MaquetteScene.hpp"
 #include "MaquetteView.hpp"
 #include "NetworkConfig.hpp"
-#include "SoundBox.hpp"
 #include "ViewRelations.hpp"
 #include "MaquetteWidget.hpp"
 #include "NetworkTree.hpp"
