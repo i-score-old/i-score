@@ -218,17 +218,13 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
   if (boxModified || (_boxEdited == NO_ID)) {
       _networkTree->resetNetworkTree();
       if (_boxEdited != NO_ID) {
-      std::cout<<"____"<<std::endl;
           if (abBox->networkTreeItems().isEmpty() && abBox->networkTreeExpandedItems().isEmpty()) {
               //LOAD FILE
-              std::cout<<"networkTreeItems empty"<<std::endl;
-              std::cout<<"> "<<abBox->startMessages()->computeMessages().size()<<std::endl;
               _networkTree->loadNetworkTree(abBox);
               startMessagesChanged();
               endMessagesChanged();
             }
           else {
-              std::cout<<"networkTreeItems NOT empty"<<std::endl;
               _networkTree->setAssignedItems(abBox->networkTreeItems());
               _networkTree->expandItems(abBox->networkTreeExpandedItems());
             }
@@ -239,12 +235,12 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 //            QList<QTreeWidgetItem *> items = _networkTree->assignedItems().keys();
 //            QList<QTreeWidgetItem *>::iterator i;
 //            QTreeWidgetItem *curIt;
-            std::cout<<"\nsetattribute::AFFICHAGE START box \n";
-            vector<string> startMessages = _scene->getBox(_boxEdited)->startMessages()->computeMessages();
-////            vector<string> startMessages = _networkTree->startMessages()->computeMessages();
-            for(int i=0; i<startMessages.size(); i++){
-                std::cout<<startMessages[i]<<std::endl;
-            }
+//            std::cout<<"\nsetattribute::AFFICHAGE START box \n";
+//            vector<string> startMessages = _scene->getBox(_boxEdited)->startMessages()->computeMessages();
+//            vector<string> startMessages = _networkTree->startMessages()->computeMessages();
+//            for(unsigned int i=0; i<startMessages.size(); i++){
+//                std::cout<<startMessages[i]<<std::endl;
+//            }
 //            std::cout<<"setattribute::AFFICHAGE END\n";
 //            vector<string> endMessages = _scene->getBox(_boxEdited)->endMessages()->computeMessages();
 ////            vector<string> endMessages = _networkTree->endMessages()->computeMessages();
@@ -364,7 +360,6 @@ AttributesEditor::startMessagesChanged(bool forceUpdate)
       box->updateCurves();
     }
   else{
-      std::cout<<"zaza"<<std::endl;
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
   }
 }
@@ -387,7 +382,6 @@ AttributesEditor::endMessagesChanged(bool forceUpdate)
       box->updateCurves();
     }
   else {
-      std::cout<<"zozo"<<std::endl;
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
     }
 }
@@ -412,7 +406,6 @@ AttributesEditor::startMessageChanged(QTreeWidgetItem *item)
       box->updateCurve(_networkTree->getAbsoluteAddress(item).toStdString(), true);
     }
   else {
-      std::cout<<"yuyu"<<std::endl;
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
       item->setText(NetworkTree::START_COLUMN, "");
     }
@@ -437,7 +430,6 @@ AttributesEditor::endMessageChanged(QTreeWidgetItem *item)
       box->updateCurve(_networkTree->getAbsoluteAddress(item).toStdString(), true);
     }
   else {
-      std::cout<<"yaya"<<std::endl;
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
       item->setText(NetworkTree::END_COLUMN, "");
     }
