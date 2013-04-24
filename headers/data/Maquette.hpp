@@ -55,7 +55,6 @@
 #include <list>
 #include <utility>
 #include <sstream>
-#include "Palette.hpp"
 #include "NetworkMessages.hpp"
 #include "CSPTypes.hpp"
 #include "BasicBox.hpp"

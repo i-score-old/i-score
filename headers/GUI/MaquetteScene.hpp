@@ -52,7 +52,6 @@
 #include <QToolBar>
 
 #include "Maquette.hpp"
-#include "Palette.hpp"
 #include "Abstract.hpp"
 #include "AbstractRelation.hpp"
 #include "AbstractParentBox.hpp"
@@ -467,20 +466,6 @@ class MaquetteScene : public QGraphicsScene
     float getProgression(unsigned int boxID);
 
     /*!
-     * \brief Gets the current playing mode.
-     *
-     * \return the current playing mode
-     */
-    SndBoxProp::PlayingMode playingMode() const;
-
-    /*!
-     * \brief Sets the current playing mode.
-     *
-     * \param mode the playing mode to be set
-     */
-    void setPlayingMode(unsigned int mode);
-
-    /*!
      * \brief Gets a set of temporal relations involving a particular entity.
      *
      * \param entityID : the entity to get relations from
@@ -779,7 +764,6 @@ class MaquetteScene : public QGraphicsScene
     int _currentBoxMode;               //!< Current box creation mode.
     int _savedInteractionMode;         //!< Saved interation mode.
     int _savedBoxMode;                 //!< Saved box interation mode.
-    SndBoxProp::PlayingMode _playMode; //!< Current playing mode.
 
     unsigned int _resizeBox;           //!< During a resizing operation, the concerned box
     bool _clicked;                     //!< Handles if a click just occured.

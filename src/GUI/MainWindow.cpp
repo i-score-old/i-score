@@ -81,8 +81,6 @@ using std::string;
 #include <sstream>
 using std::stringstream;
 
-using namespace SndBoxProp;
-
 static const float S_TO_MS = 1000.;
 
 MainWindow::MainWindow()
@@ -96,7 +94,6 @@ MainWindow::MainWindow()
 
   // Creation of Scene and View
   _scene = new MaquetteScene(QRectF(0, 0, width(), height()), _editor);
-  _scene->setPlayingMode(SpecificMode);
 
   _view = new MaquetteView(this);
 

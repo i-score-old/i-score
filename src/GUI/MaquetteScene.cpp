@@ -79,8 +79,6 @@ float MaquetteScene::MS_PER_PIXEL = 16;
 const float MaquetteScene::MS_PRECISION = 10;
 const float LINE_WIDTH = 1.1;
 
-using namespace SndBoxProp;
-
 MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
   : QGraphicsScene(rect)
 {
@@ -1496,18 +1494,6 @@ MaquetteScene::removeBox(unsigned int boxID)
     }
 
   update();
-}
-
-SndBoxProp::PlayingMode
-MaquetteScene::playingMode() const
-{
-  return _playMode;
-}
-
-void
-MaquetteScene::setPlayingMode(unsigned int mode)
-{
-  _playMode = SndBoxProp::PlayingMode(mode);
 }
 
 bool
