@@ -60,7 +60,6 @@
 #include "AbstractRelation.hpp"
 #include "AbstractComment.hpp"
 #include "TextEdit.hpp"
-#include "PreviewArea.hpp"
 #include "PlayingThread.hpp"
 #include "CurvesWidget.hpp"
 #include "TimeBarWidget.hpp"
