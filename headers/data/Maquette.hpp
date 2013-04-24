@@ -81,15 +81,12 @@ static const std::string NEXT_TRIGGER_MESSAGE = "/Transport/Next";
 
 class PaletteActor;
 
-class SoundBox;
 class BasicBox;
 class ParentBox;
 class BoundingBox;
 class MaquetteScene;
 class QDomDocument;
 class Engines;
-class AbstractSoundBox;
-class AbstractControlBox;
 class AbstractParentBox;
 class AbstractRelation;
 class Relation;
@@ -481,44 +478,6 @@ class Maquette : public QObject
     bool sendMessage(const std::string &message);
 
     /*!
-     * \brief Adds a sound box to the maquette.
-     *
-     * \param corner1 : a first corner of the box's bounding rectangle
-     * \param corner2 : the second corner of the box's bounding rectangle
-     * \param name : the name given to the box
-     * \param mother : the mother of the box
-     * \return the ID of created sound box
-     */
-    unsigned int addSoundBox(const QPointF & corner1, const QPointF & corner2, const std::string & name, unsigned int mother);
-
-    /*!
-     * \brief Adds a new sound box to the maquette with specific information.
-     *
-     * \param abstract : the abstract sound box containing information about the box
-     * \return the ID of box created
-     */
-    unsigned int addSoundBox(const AbstractSoundBox &abstract);
-
-    /*!
-     * \brief Adds a control box to the maquette.
-     *
-     * \param corner1 : a first corner of the box's bounding rectangle
-     * \param corner2 : the second corner of the box's bounding rectangle
-     * \param name : the name given to the box
-     * \param mother : the mother of the box
-     * \return the ID of created control box
-     */
-    unsigned int addControlBox(const QPointF & corner1, const QPointF & corner2, const std::string & name, unsigned int mother);
-
-    /*!
-     * \brief Adds a new control box to the maquette with specific information.
-     *
-     * \param abstract : the abstract control box containing information about the box
-     * \return the ID of box created
-     */
-    unsigned int addControlBox(const AbstractControlBox &abstract);
-
-    /*!
      * \brief Adds a parent box to the maquette.
      *
      * \param corner1 : a first corner of the box's bounding rectangle
@@ -812,20 +771,6 @@ class Maquette : public QObject
     Maquette();
 
     /*!
-     * \brief Adds a sound box existing in Engines to the maquette with given ID and palette.
-     *
-     * \param ID : the ID to assign to the box
-     * \param corner1 : a first corner of the box's bounding rectangle
-     * \param corner2 : the second corner of the box's bounding rectangle
-     * \param name : the name given to the box
-     * \param pal : the palette to assign to the box
-     * \param mother : the mother to assign to the box
-     * \return the ID of created sound box
-     */
-    unsigned int addSoundBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const std::string &name,
-                             const Palette &pal, unsigned int mother);
-
-    /*!
      * \brief Adds a box existing in Engines to the maquette with given ID.
      *
      * \param ID : the ID to assign to the box
@@ -833,20 +778,7 @@ class Maquette : public QObject
      * \param corner2 : the second corner of the box's bounding rectangle
      * \param name : the name given to the box
      * \param mother : the mother to assign to the box
-     * \return the ID of created sound box
-     */
-    unsigned int addControlBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const std::string &name,
-                               unsigned int mother);
-
-    /*!
-     * \brief Adds a box existing in Engines to the maquette with given ID.
-     *
-     * \param ID : the ID to assign to the box
-     * \param corner1 : a first corner of the box's bounding rectangle
-     * \param corner2 : the second corner of the box's bounding rectangle
-     * \param name : the name given to the box
-     * \param mother : the mother to assign to the box
-     * \return the ID of created sound box
+     * \return the ID of created parent box
      */
     unsigned int addParentBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const std::string &name,
                               unsigned int mother);

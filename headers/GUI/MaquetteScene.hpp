@@ -55,8 +55,6 @@
 #include "Palette.hpp"
 #include "Abstract.hpp"
 #include "AbstractRelation.hpp"
-#include "AbstractSoundBox.hpp"
-#include "AbstractControlBox.hpp"
 #include "AbstractParentBox.hpp"
 #include "BasicBox.hpp"
 #include "TimeBarWidget.hpp"
@@ -243,59 +241,6 @@ class MaquetteScene : public QGraphicsScene
     removeFromTriggerQueue(TriggerPoint *trigger){ _triggersQueueList.removeAll(trigger); }
 
     /*!
-     * \brief Adds a new sound box to the maquette with specific coordinates.
-     *
-     * \param topLeft : the top left coordinate
-     * \param bottomRight : the bottom right coordinate
-     * \param name : the name of the box
-     * \param palette : the palette to assign to the box
-     * \return the ID of box created
-     */
-    unsigned int addSoundBox(const QPointF &topLeft, const QPointF &bottomRight, const std::string &name, const Palette &palette);
-
-    /*!
-     * \brief Adds a new sound box containing specific information.
-     *
-     * \param abstract : the abstract sound box containing information about the box
-     * \return the ID of box created
-     */
-    unsigned int addSoundBox(const AbstractSoundBox &abstract);
-
-    /*!
-     * \brief Adds an existing sound box as an item to the scene.
-     *
-     * \param ID : the ID to be set
-     * \return the ID of box created
-     */
-    unsigned int addSoundBox(unsigned int ID);
-
-    /*!
-     * \brief Adds a new control box to the maquette with specific coordinates.
-     *
-     * \param topLeft : the top left coordinate
-     * \param bottomRight : the bottom right coordinate
-     * \param name : the name of the box
-     * \return the ID of box created
-     */
-    unsigned int addControlBox(const QPointF &topLeft, const QPointF &bottomRight, const std::string &name);
-
-    /*!
-     * \brief Adds a new control box to the maquette with specific information.
-     *
-     * \param abstract : the abstract sound box containing information about the box
-     * \return the ID of box created
-     */
-    unsigned int addControlBox(const AbstractControlBox &abstract);
-
-    /*!
-     * \brief Adds an existing control box as an item to the maquette with a specific ID.
-     *
-     * \param ID : the ID to be set
-     * \return the ID of box created
-     */
-    unsigned int addControlBox(unsigned int ID);
-
-    /*!
      * \brief Adds a new parent box to the maquette with specific coordinates.
      *
      * \param topLeft : the top left coordinate
@@ -308,7 +253,7 @@ class MaquetteScene : public QGraphicsScene
     /*!
      * \brief Adds a new parent box to the maquette with specific information.
      *
-     * \param abstract : the abstract sound box containing information about the box
+     * \param abstract : the abstract parent box containing information about the box
      * \return the ID of box created
      */
     unsigned int addParentBox(const AbstractParentBox &abstract);
@@ -722,38 +667,6 @@ class MaquetteScene : public QGraphicsScene
      */
     virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
 
-    /*!
-     * \brief Redefinition of QGraphicsScene dragEnter method.
-     * Raised a drag&drop object enters in the scene.
-     *
-     * \param event : the information about the event
-     */
-    virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
-
-    /*!
-     * \brief Redefinition of QGraphicsScene dragMove method.
-     * Raised when a drag&drop object moves in the scene.
-     *
-     * \param event : the information about the event
-     */
-    virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
-
-    /*!
-     * \brief Redefinition of QGraphicsScene dragLeave method.
-     * Raised a drag&drop object leaves the scene.
-     *
-     * \param event : the information about the event
-     */
-    virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
-
-    /*!
-     * \brief Redefinition of QGraphicsScene dropEvent method.
-     * Raised when a drag&drop object is dropped on the scene.
-     *
-     * \param event : the information about the event
-     */
-    virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
-
   signals:
     void stopPlaying();
     void accelerationValueChanged(double value);
@@ -836,20 +749,6 @@ class MaquetteScene : public QGraphicsScene
      * \param box : the box creation mode
      */
     void addBox(BoxCreationMode box);
-
-    /*!
-     * \brief Adds a new sound box using internal stored coordinates.
-     *
-     * \return the new box ID
-     */
-    unsigned int addSoundBox();
-
-    /*!
-     * \brief Adds a new control box using internal stored coordinates.
-     *
-     * \return the new box ID
-     */
-    unsigned int addControlBox();
 
     /*!
      * \brief Adds a new parent box using internal stored coordinates.

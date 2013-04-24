@@ -48,8 +48,6 @@
 #include <float.h>
 #include <limits>
 #include "BasicBox.hpp"
-#include "SoundBox.hpp"
-#include "ControlBox.hpp"
 #include "ParentBox.hpp"
 #include "ChooseTemporalRelation.hpp"
 #include "MaquetteView.hpp"
@@ -59,7 +57,6 @@
 #include "TriggerPoint.hpp"
 #include "ViewRelations.hpp"
 #include "AttributesEditor.hpp"
-#include "AbstractSoundBox.hpp"
 #include "AbstractRelation.hpp"
 #include "AbstractComment.hpp"
 #include "TextEdit.hpp"
@@ -335,7 +332,7 @@ MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
                       BasicBox *box = NULL;
                       if (itemAt(_mousePos) != 0) {
                           int type = itemAt(_mousePos)->type();
-                          if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+                          if (type == PARENT_BOX_TYPE) {
                               box = static_cast<BasicBox*>(itemAt(_mousePos));
                               if (_mousePos.x() < (box->mapToScene(box->boundingRect().topLeft()).x()
                                                    + BasicBox::RESIZE_TOLERANCE)) {
@@ -458,104 +455,6 @@ int
 MaquetteScene::currentBoxMode()
 {
   return _currentBoxMode;
-}
-
-
-void
-MaquetteScene::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
-{
-  if (itemAt(event->scenePos())) {
-      // TODO : handle other boxes drag&drop
-      if (itemAt(event->scenePos())->type() == SOUND_BOX_TYPE) {
-          QGraphicsScene::dragEnterEvent(event);
-        }
-    }
-  else if (event->mimeData()->hasFormat("text/csv")) {
-      event->acceptProposedAction();
-    }
-}
-
-void
-MaquetteScene::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
-{
-  if (event->mimeData()->hasFormat("text/csv")) {
-      event->acceptProposedAction();
-    }
-}
-
-void
-MaquetteScene::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
-{
-  if (itemAt(event->scenePos())) {
-      // TODO : handle other boxes drag&drop
-
-      if (itemAt(event->scenePos())->type() == SOUND_BOX_TYPE) {
-          QGraphicsScene::dragMoveEvent(event);
-        }
-    }
-  else {
-      if (event->mimeData()->hasFormat("text/csv")) {
-          event->acceptProposedAction();
-        }
-    }
-}
-
-void
-MaquetteScene::dropEvent(QGraphicsSceneDragDropEvent *event)
-{
-  if (itemAt(event->scenePos())) {
-      // TODO : handle other boxes drag&drop
-      if (itemAt(event->scenePos())->type() == SOUND_BOX_TYPE) {
-          QGraphicsScene::dropEvent(event);
-        }
-    }
-  else {
-      if (event->mimeData()->hasFormat("text/csv")) {
-          event->acceptProposedAction();
-          const QMimeData *mimeData = event->mimeData();
-          QByteArray input = mimeData->data("text/csv");
-          QBuffer inputBuffer(&input);
-          inputBuffer.open(QIODevice::ReadOnly);
-
-          QDataStream in(&inputBuffer);
-
-          int shape, speed, speedVariation, pitchStart, pitchEnd, pitchAmp,
-              pitchGrade, harmo, harmoVariation, grain, playingMode;
-          bool impulsive, pitchRandom, pitchVibrato;
-          QString comment, soundFile;
-          QColor color;
-
-          in >> shape >> impulsive >> speed >> speedVariation >> pitchStart >> pitchRandom
-          >> pitchVibrato >> pitchEnd >> pitchAmp >> pitchGrade >> harmo >> harmoVariation
-          >> grain >> color >> playingMode >> comment >> soundFile;
-
-          SoundBox *soundBox = NULL;
-          Palette pal(SndBoxProp::Shape(shape), Pitch(pitchStart), Pitch(pitchEnd), pitchRandom, pitchVibrato,
-                      PitchVariation(pitchAmp), PitchVariation(pitchGrade), Harmo(harmo),
-                      HarmoVariation(harmoVariation), Grain(grain), Speed(speed), SpeedVariation(speedVariation),
-                      color,
-                      comment,
-                      impulsive,
-                      PlayingMode(playingMode),
-                      soundFile,
-                      soundBox);
-          pal.setColor(color);
-
-          _pressPoint = QPointF(std::max(event->scenePos().x(), 0.), std::max(event->scenePos().y() - PreviewArea::HEIGHT, 0.));
-          _releasePoint = _pressPoint + QPointF(PreviewArea::WIDTH, PreviewArea::HEIGHT);
-          unsigned int newBoxID = addSoundBox();
-          if (newBoxID != NO_ID) {
-              BasicBox *box = NULL;
-              if ((box = getBox(newBoxID)) != NULL) {
-                  if (box->type() == SOUND_BOX_TYPE) {
-                      static_cast<SoundBox*>(box)->setPalette(pal);
-                    }
-                }
-            }
-
-          update();
-        }
-    }
 }
 
 bool
@@ -689,7 +588,7 @@ MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
                   }
                 if (itemAt(mouseEvent->scenePos()) != 0) {
                     int type = itemAt(mouseEvent->scenePos())->type();
-                    if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+                    if (type == PARENT_BOX_TYPE) {
                         BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
                         if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE) ||
                             mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
@@ -761,7 +660,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
 
         if (itemAt(mouseEvent->scenePos()) != 0) {
             int type = itemAt(mouseEvent->scenePos())->type();
-            if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+            if (type == PARENT_BOX_TYPE) {
                 BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
 
                 BasicBox *firstBox = getBox(_relation->firstBox());
@@ -905,23 +804,6 @@ MaquetteScene::copyBoxes(bool erasing)
     QList<QGraphicsItem *>::iterator it;
     for (it = selected.begin(); it != selected.end(); it++) {
         switch ((*it)->type()) {
-        case SOUND_BOX_TYPE:
-        {
-            _boxesToCopy[static_cast<SoundBox*>(*it)->ID()] = new AbstractSoundBox(*static_cast<AbstractSoundBox*>(static_cast<SoundBox*>(*it)->abstract()));
-            if (erasing) {
-                removeBox(static_cast<SoundBox*>(*it)->ID());
-            }
-            break;
-        }
-
-        case CONTROL_BOX_TYPE:
-        {
-            _boxesToCopy[static_cast<ControlBox*>(*it)->ID()] = new AbstractControlBox(*static_cast<AbstractControlBox*>(static_cast<ControlBox*>(*it)->abstract()));
-            if (erasing) {
-                removeBox(static_cast<SoundBox*>(*it)->ID());
-            }
-            break;
-        }
 
         case PARENT_BOX_TYPE:
         {
@@ -931,7 +813,7 @@ MaquetteScene::copyBoxes(bool erasing)
 
             _boxesToCopy[static_cast<ParentBox*>(*it)->ID()] = boxToCopy;
             if (erasing) {
-                removeBox(static_cast<SoundBox*>(*it)->ID());
+                removeBox(static_cast<ParentBox*>(*it)->ID());
             }
             break;
         }
@@ -1019,36 +901,6 @@ MaquetteScene::pasteBoxes()
               }
             newID = addParentBox(*abParentBox);
             absCopyBox = abParentBox;
-            break;
-          }
-
-          case ABSTRACT_SOUND_BOX_TYPE:
-          {
-            AbstractSoundBox *abSoundBox = static_cast<AbstractSoundBox*>(boxIt->second);
-            abSoundBox->setTopLeft(QPointF(abSoundBox->topLeft().x(), abSoundBox->topLeft().y()) + _copySize);
-            if (abSoundBox->mother() != ROOT_BOX_ID) {
-                map<unsigned int, unsigned int>::iterator it;
-                if ((it = IDMap.find(abSoundBox->mother())) != IDMap.end()) {
-                    abSoundBox->setMother(IDMap[abSoundBox->mother()]);
-                  }
-              }
-            newID = addSoundBox(*abSoundBox);
-            absCopyBox = abSoundBox;
-            break;
-          }
-
-          case ABSTRACT_CONTROL_BOX_TYPE:
-          {
-            AbstractControlBox *abCtrlBox = static_cast<AbstractControlBox*>(boxIt->second);
-            abCtrlBox->setTopLeft(QPointF(abCtrlBox->topLeft().x(), abCtrlBox->topLeft().y()) + _copySize);
-            if (abCtrlBox->mother() != ROOT_BOX_ID) {
-                map<unsigned int, unsigned int>::iterator it;
-                if ((it = IDMap.find(abCtrlBox->mother())) != IDMap.end()) {
-                    abCtrlBox->setMother(IDMap[abCtrlBox->mother()]);
-                  }
-              }
-            newID = addControlBox(*abCtrlBox);
-            absCopyBox = abCtrlBox;
             break;
           }
 
@@ -1309,16 +1161,6 @@ MaquetteScene::addBox(BoxCreationMode mode)
   unsigned int boxID = NO_ID;
   if (abs(_pressPoint.x() - _releasePoint.x()) > (MS_PRECISION / MS_PER_PIXEL)) {
       switch (mode) {
-          case SB_MODE:
-            boxID = addSoundBox();
-            update();
-            break;
-
-          case CB_MODE:
-            boxID = addControlBox();
-            update();
-            break;
-
           case PB_MODE:
             boxID = addParentBox();
             update();
@@ -1336,168 +1178,6 @@ MaquetteScene::addBox(BoxCreationMode mode)
   if (boxID != NO_ID) {
       setAttributes(static_cast<AbstractBox*>(getBox(boxID)->abstract()));
     }
-}
-
-unsigned int
-MaquetteScene::addSoundBox(unsigned int ID)
-{
-  if (_maquette->getBox(ID)->type() == SOUND_BOX_TYPE) {
-      SoundBox *soundBox = static_cast<SoundBox*>(_maquette->getBox(ID));
-      soundBox->setPos(soundBox->getCenter());
-      soundBox->update();
-      addItem(soundBox);
-
-      _currentZValue++;
-
-      setModified(true);
-
-      return ID;
-    }
-  return NO_ID;
-}
-
-unsigned int
-MaquetteScene::addSoundBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name, const Palette &palette)
-{
-  unsigned int motherID = findMother(topLeft, QPointF(std::fabs(bottomRight.x() - topLeft.x()),
-                                                      std::fabs(bottomRight.y() - topLeft.y())));
-  ParentBox *parentBox = NULL;
-  if (motherID != ROOT_BOX_ID && motherID != NO_ID) {
-      parentBox = static_cast<ParentBox*>(getBox(motherID));
-    }
-  else {
-      motherID = ROOT_BOX_ID;
-    }
-
-  unsigned int newBoxID = _maquette->addSoundBox(topLeft, bottomRight, name, motherID);
-
-  SoundBox *newBox = static_cast<SoundBox*>(getBox(newBoxID));
-
-  if (newBox != NULL && parentBox != NULL) {
-      if (newBox->mother() != motherID) {           // Not yet assigned
-          parentBox->addChild(newBoxID);
-          newBox->setMother(motherID);
-        }
-    }
-
-  newBox->setPalette(palette);
-  newBox->setPos(newBox->getCenter());
-  newBox->update();
-  addItem(newBox);
-
-  //NICO TEST
-//    QWidget *widget = new QWidget();
-//    CurvesWidget *curves = new CurvesWidget(widget);
-//    addWidget(widget);
-  //NICO TEST end
-
-  _currentZValue++;
-
-  setModified(true);
-
-  return newBoxID;
-}
-
-unsigned int
-MaquetteScene::addSoundBox()
-{
-  bool ok;
-  QString name;
-  while (name.isEmpty()) {
-      name = QString::fromStdString(sequentialName(tr("Sound_Box").toStdString()));
-      ok = true;
-      if (!ok) {
-          return NO_ID;
-        }
-      if (name.isEmpty()) {
-          QMessageBox::warning(_view, tr("Warning"), tr("Please Enter a Name"));
-        }
-    }
-  return addSoundBox(_pressPoint, _releasePoint, name.toStdString(), _editor->getPalette());
-}
-
-unsigned int
-MaquetteScene::addSoundBox(const AbstractSoundBox &box)
-{
-  return addSoundBox(box.topLeft(), box.bottomRight(), box.name(), box.pal());
-}
-
-unsigned int
-MaquetteScene::addControlBox(unsigned int ID)
-{
-  if (_maquette->getBox(ID)->type() == CONTROL_BOX_TYPE) {
-      ControlBox *ctrlBox = static_cast<ControlBox*>(_maquette->getBox(ID));
-      ctrlBox->setPos(ctrlBox->getCenter());
-      ctrlBox->update();
-      addItem(ctrlBox);
-
-      _currentZValue++;
-
-      setModified(true);
-
-      return ID;
-    }
-  return NO_ID;
-}
-
-unsigned int
-MaquetteScene::addControlBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name)
-{
-  unsigned int motherID = findMother(topLeft, QPointF(std::fabs(bottomRight.x() - topLeft.x()),
-                                                      std::fabs(bottomRight.y() - topLeft.y())));
-  ParentBox *parentBox = NULL;
-  if (motherID != ROOT_BOX_ID && motherID != NO_ID) {
-      parentBox = static_cast<ParentBox*>(getBox(motherID));
-    }
-  else {
-      motherID = ROOT_BOX_ID;
-    }
-
-  unsigned int newBoxID = _maquette->addControlBox(topLeft, bottomRight, name, motherID);
-
-  ControlBox *newBox = static_cast<ControlBox*>(getBox(newBoxID));
-
-  if (newBox != NULL && parentBox != NULL) {
-      if (newBox->mother() != motherID) {           // Not yet assigned
-          parentBox->addChild(newBoxID);
-          newBox->setMother(motherID);
-        }
-    }
-  if (newBoxID != NO_ID) {
-      newBox->setPos(newBox->getCenter());
-      newBox->update();
-      addItem(newBox);
-
-      _currentZValue++;
-    }
-
-  setModified(true);
-
-  return newBoxID;
-}
-
-unsigned int
-MaquetteScene::addControlBox(const AbstractControlBox &box)
-{
-  return addControlBox(box.topLeft(), box.bottomRight(), box.name());
-}
-
-unsigned int
-MaquetteScene::addControlBox()
-{
-  bool ok;
-  QString name;
-  while (name.isEmpty()) {
-      name = QString::fromStdString(sequentialName(tr("Control_Box").toStdString()));
-      ok = true;
-      if (!ok) {
-          return NO_ID;
-        }
-      if (name.isEmpty()) {
-          QMessageBox::warning(_view, tr("Warning"), tr("Please Enter a Name"));
-        }
-    }
-  return addControlBox(_pressPoint, _releasePoint, name.toStdString());
 }
 
 unsigned int
@@ -1742,7 +1422,7 @@ MaquetteScene::selectionMoved()
   for (int i = 0; i < selectedItems().size(); i++) {
       QGraphicsItem *curItem = selectedItems().at(i);
       int type = curItem->type();
-      if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+      if (type == PARENT_BOX_TYPE) {
           BasicBox *curBox = static_cast<BasicBox*>(curItem);
           boxMoved(curBox->ID());
         }
@@ -1998,7 +1678,7 @@ MaquetteScene::removeSelectedItems()
   map<unsigned int, BasicBox*> boxesToRemove;
   for (QList<QGraphicsItem *>::iterator it = toRemove.begin(); it != toRemove.end(); it++) {
       int type = (*it)->type();
-      if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+      if (type == PARENT_BOX_TYPE) {
           boxesToRemove[static_cast<BasicBox*>(*it)->ID()] = static_cast<BasicBox*>(*it);
         }
       else if ((*it)->type() == RELATION_TYPE) {
