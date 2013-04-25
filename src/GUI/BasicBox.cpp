@@ -270,9 +270,9 @@ BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
 {
   _scene = parent;
 
-  _abstract = new AbstractBox(*abstract);
+  _abstract = new AbstractBox(*abstract); /// \todo Pourquoi recevoir un argument *abstract et le ré-instancier ????
 
-  init();
+  init(); /// \todo Un constructeur !
 
   update();
 }
@@ -298,6 +298,7 @@ BasicBox::updateFlexibility()
   _flexible = hasTriggerPoint(BOX_END);
 }
 
+/// \todo Une méthode init() ne devrait pas être utilisée. surtout en public !!! Elle peut laisser l'invariant de classe instable à tout moment.
 void
 BasicBox::init()
 {

@@ -71,7 +71,7 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
   _header = new QWidget(NULL);
   _readingSpeedWidget = new QWidget;
   _sliderMoved = false;
-  _timeBar = new TimeBarWidget(this, _scene);
+  _timeBar = new TimeBarWidget(this, _scene); /// \todo Ce membre n'est pas utilisé. Doublon avec TimeBarWidget dans MaquetteScene
   _zoom = 1.;
 
   createReadingSpeedWidget();

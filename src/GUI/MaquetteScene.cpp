@@ -108,7 +108,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 
   addItem(_progressLine);
 
-  addWidget(_timeBar);
+  addWidget(_timeBar); /// \todo Vérifier ajout si classe TimeBarWidget hérite de GraphicsProxyWidget ou GraphicsObject. Notamment pour lier avec background.
 
   connect(_timeBar, SIGNAL(gotoValueEntered(double)), this, SLOT(gotoChanged(double)));
   connect(this, SIGNAL(stopPlaying()), this, SLOT(stop()));
@@ -1289,14 +1289,14 @@ MaquetteScene::findMother(const QPointF &topLeft, const QPointF &size)
   std::cerr << "MaquetteScene::findMother : child coords : [" << topLeft.x() << ";" << topLeft.y()
             << "] / [" << size.x() << ";" << size.y() << "]" << std::endl;
 #endif
-  map<unsigned int, ParentBox*> parentBoxes = _maquette->parentBoxes();
+  map<unsigned int, ParentBox*> parentBoxes = _maquette->parentBoxes(); /// \todo Mieux vaut parcourir les ParentBoxes contenus dans la scene, pas aller les chercher dans Maquette car on perd l'intérêt d'utiliser le Graphics View Framework
 #ifdef DEBUG
   std::cerr << "MaquetteScene::findMother : parentBoxes size : " << parentBoxes.size() << std::endl;
 #endif
   map<unsigned int, ParentBox*>::iterator it;
   unsigned int motherID = ROOT_BOX_ID;
   float motherZValue = std::numeric_limits<float>::min();
-  QRectF childRect = QRectF(topLeft, QSize(size.x(), size.y()));
+  QRectF childRect = QRectF(topLeft, QSize(size.x(), size.y())); /// \todo
   for (it = parentBoxes.begin(); it != parentBoxes.end(); ++it) {
       QRectF mRect = QRectF(it->second->getTopLeft(), QSize(it->second->getSize().x(), it->second->getSize().y()));
 #ifdef DEBUG
@@ -1320,12 +1320,12 @@ MaquetteScene::addBox(BoxCreationMode mode)
   unsigned int boxID = NO_ID;
   if (abs(_pressPoint.x() - _releasePoint.x()) > (MS_PRECISION / MS_PER_PIXEL)) {
       switch (mode) {
-          case SB_MODE:
+          case SB_MODE: /// \todo SoundBox
             boxID = addSoundBox();
             update();
             break;
 
-          case CB_MODE:
+          case CB_MODE: /// \todo ControBox
             boxID = addControlBox();
             update();
             break;
@@ -1515,7 +1515,7 @@ unsigned int
 MaquetteScene::addParentBox(unsigned int ID)
 {
   if (ID != NO_ID) {
-      if (_maquette->getBox(ID)->type() == PARENT_BOX_TYPE) {
+      if (_maquette->getBox(ID)->type() == PARENT_BOX_TYPE) { /// \todo Le type des GraphicsItem est mal utilisé !! Voir http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var
           ParentBox *parentBox = static_cast<ParentBox*>(_maquette->getBox(ID));
           parentBox->setPos(parentBox->getCenter());
           parentBox->update();
@@ -1534,8 +1534,11 @@ MaquetteScene::addParentBox(unsigned int ID)
 unsigned int
 MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name)
 {
+ /// \todo verify if GraphicsScene provide this method
   unsigned int motherID = findMother(topLeft, QPointF(std::fabs(bottomRight.x() - topLeft.x()),
                                                       std::fabs(bottomRight.y() - topLeft.y())));
+
+  /// Searching the mother of parentBox
   ParentBox *parentBox = NULL;
   if (motherID != ROOT_BOX_ID && motherID != NO_ID) {
       parentBox = static_cast<ParentBox*>(getBox(motherID));

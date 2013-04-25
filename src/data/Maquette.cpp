@@ -188,6 +188,7 @@ Maquette::init()
   _engines->addEnginesNetworkUpdateCallback(&enginesNetworkUpdateCallback);
 }
 
+
 Maquette::Maquette()
 {
   //init();
@@ -286,7 +287,7 @@ Maquette::addSoundBox(unsigned int ID, const QPointF & corner1, const QPointF & 
       if (mother != NO_ID && mother != ROOT_BOX_ID) {
           BoxesMap::iterator it;
           if ((it = _boxes.find(mother)) != _boxes.end()) {
-              if (it->second->type() == PARENT_BOX_TYPE) {
+              if (it->second->type() == PARENT_BOX_TYPE) { /// \todo Le type des GraphicsItem est mal utilisé !! Voir http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var
                   newBox->setMother(mother);
                   static_cast<ParentBox*>(it->second)->addChild(ID);
                 }
@@ -316,7 +317,7 @@ Maquette::addSoundBox(const QPointF & corner1, const QPointF & corner2, const st
   else {
       BoxesMap::iterator it;
       if ((it = _boxes.find(mother)) != _boxes.end()) {
-          if (it->second->type() == PARENT_BOX_TYPE) {
+          if (it->second->type() == PARENT_BOX_TYPE) { /// \todo Le type des GraphicsItem est mal utilisé !! Voir http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var
               motherBox = static_cast<ParentBox*>(it->second);
               firstCorner.rx() -= motherBox->beginPos();
               secondCorner.rx() -= motherBox->beginPos();
@@ -368,7 +369,7 @@ Maquette::addControlBox(unsigned int ID, const QPointF & corner1, const QPointF 
       if (mother != NO_ID && mother != ROOT_BOX_ID) {
           BoxesMap::iterator it;
           if ((it = _boxes.find(mother)) != _boxes.end()) {
-              if (it->second->type() == PARENT_BOX_TYPE) {
+              if (it->second->type() == PARENT_BOX_TYPE) { /// \todo Le type des GraphicsItem est mal utilisé !! Voir http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var
                   newBox->setMother(mother);
                   static_cast<ParentBox*>(it->second)->addChild(ID);
                 }
@@ -398,7 +399,7 @@ Maquette::addControlBox(const QPointF & corner1, const QPointF & corner2, const 
   else {
       BoxesMap::iterator it;
       if ((it = _boxes.find(mother)) != _boxes.end()) {
-          if (it->second->type() == PARENT_BOX_TYPE) {
+          if (it->second->type() == PARENT_BOX_TYPE) { /// \todo Le type des GraphicsItem est mal utilisé !! Voir http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var
               motherBox = static_cast<ParentBox*>(it->second);
               firstCorner.rx() -= motherBox->beginPos();
               secondCorner.rx() -= motherBox->beginPos();
@@ -506,9 +507,11 @@ Maquette::addParentBox(unsigned int ID, const unsigned int date, const unsigned 
   return ID;
 }
 
+/// \todo change arguments named corner. this is not comprehensible.
 unsigned int
 Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
 {
+  /// \todo called by MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name) with topLeft and bottomRight arguments. No need to recalculate
   QPointF firstCorner(std::min(corner1.x(), corner2.x()), std::min(corner1.y(), corner2.y()));
   QPointF secondCorner(std::max(corner1.x(), corner2.x()), std::max(corner1.y(), corner2.y()));
 
