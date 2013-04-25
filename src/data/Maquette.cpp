@@ -47,13 +47,9 @@
 #include "MainWindow.hpp"
 #include "MaquetteView.hpp"
 #include <QDomDocument>
-#include "SoundBox.hpp"
-#include "ControlBox.hpp"
 #include "ParentBox.hpp"
-#include "Palette.hpp"
 #include "Engines.hpp"
 #include "AbstractRelation.hpp"
-#include "AbstractSoundBox.hpp"
 #include "Relation.hpp"
 #include "TriggerPoint.hpp"
 #include <algorithm>
@@ -75,8 +71,6 @@ using std::pair;
 typedef map<unsigned int, BasicBox*> BoxesMap;
 typedef map<unsigned int, Relation*> RelationsMap;
 typedef map<unsigned int, TriggerPoint*> TrgPntMap;
-
-using namespace SndBoxProp;
 
 #define SCENARIO_DURATION 1800000
 
@@ -268,171 +262,6 @@ Maquette::sequentialID()
 }
 
 unsigned int
-Maquette::addSoundBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const string & name,
-                      const Palette &pal, unsigned int mother)
-{
-  if (ID != NO_ID) {
-      vector<string> firstMsgs;
-      vector<string> lastMsgs;
-      _engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-      _engines->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
-
-      SoundBox *newBox = new SoundBox(corner1, corner2, _scene);
-
-      newBox->setName(QString::fromStdString(name));
-
-      _boxes[ID] = newBox;
-      newBox->setID(ID);
-      newBox->setPalette(pal);
-      if (mother != NO_ID && mother != ROOT_BOX_ID) {
-          BoxesMap::iterator it;
-          if ((it = _boxes.find(mother)) != _boxes.end()) {
-              if (it->second->type() == PARENT_BOX_TYPE) { /// \todo Le type des GraphicsItem est mal utilisé !! Voir http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var
-                  newBox->setMother(mother);
-                  static_cast<ParentBox*>(it->second)->addChild(ID);
-                }
-            }
-        }
-
-      newBox->setFirstMessagesToSend(firstMsgs);
-      newBox->setLastMessagesToSend(lastMsgs);
-    }
-
-  return ID;
-}
-
-unsigned int
-Maquette::addSoundBox(const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
-{
-  QPointF firstCorner(std::min(corner1.x(), corner2.x()), std::min(corner1.y(), corner2.y()));
-  QPointF secondCorner(std::max(corner1.x(), corner2.x()), std::max(corner1.y(), corner2.y()));
-
-  SoundBox *newBox = new SoundBox(firstCorner, secondCorner, _scene);
-
-  ParentBox *motherBox = NULL;
-  int motherID = mother;
-  if (_boxes.find(mother) == _boxes.end()) {
-      motherID = ROOT_BOX_ID;
-    }
-  else {
-      BoxesMap::iterator it;
-      if ((it = _boxes.find(mother)) != _boxes.end()) {
-          if (it->second->type() == PARENT_BOX_TYPE) { /// \todo Le type des GraphicsItem est mal utilisé !! Voir http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var
-              motherBox = static_cast<ParentBox*>(it->second);
-              firstCorner.rx() -= motherBox->beginPos();
-              secondCorner.rx() -= motherBox->beginPos();
-            }
-        }
-    }
-  unsigned int newBoxID = _engines->addBox(firstCorner.x() * MaquetteScene::MS_PER_PIXEL,
-                                           (secondCorner.x() - firstCorner.x()) * MaquetteScene::MS_PER_PIXEL, motherID);
-
-  if (newBoxID != NO_ID) {
-      newBox->setName(QString::fromStdString(name));
-
-      _boxes[newBoxID] = newBox;
-      newBox->setID(newBoxID);
-      if (motherBox != NULL) {
-          newBox->setMother(motherID);
-          motherBox->addChild(newBoxID);
-        }
-      _engines->setCtrlPointMessagesToSend(newBoxID, BEGIN_CONTROL_POINT_INDEX, newBox->firstMessagesToSend());
-      _engines->setCtrlPointMessagesToSend(newBoxID, END_CONTROL_POINT_INDEX, newBox->lastMessagesToSend());
-    }
-
-  return newBoxID;
-}
-
-unsigned int
-Maquette::addSoundBox(const AbstractSoundBox &abstract)
-{
-  return addSoundBox(abstract.topLeft(), QPointF(abstract.topLeft().x() + abstract.width(),
-                                                 abstract.topLeft().y() + abstract.height()),
-                     abstract.name(), abstract.mother());
-}
-
-unsigned int
-Maquette::addControlBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
-{
-  vector<string> firstMsgs;
-  vector<string> lastMsgs;
-  _engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-  _engines->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
-
-  ControlBox *newBox = new ControlBox(corner1, corner2, _scene);
-
-  if (ID != NO_ID) {
-      newBox->setName(QString::fromStdString(name));
-
-      _boxes[ID] = newBox;
-      newBox->setID(ID);
-      if (mother != NO_ID && mother != ROOT_BOX_ID) {
-          BoxesMap::iterator it;
-          if ((it = _boxes.find(mother)) != _boxes.end()) {
-              if (it->second->type() == PARENT_BOX_TYPE) { /// \todo Le type des GraphicsItem est mal utilisé !! Voir http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var
-                  newBox->setMother(mother);
-                  static_cast<ParentBox*>(it->second)->addChild(ID);
-                }
-            }
-        }
-
-      newBox->setFirstMessagesToSend(firstMsgs);
-      newBox->setLastMessagesToSend(lastMsgs);
-    }
-
-  return ID;
-}
-
-unsigned int
-Maquette::addControlBox(const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
-{
-  QPointF firstCorner(std::min(corner1.x(), corner2.x()), std::min(corner1.y(), corner2.y()));
-  QPointF secondCorner(std::max(corner1.x(), corner2.x()), std::max(corner1.y(), corner2.y()));
-
-  ControlBox *newBox = new ControlBox(firstCorner, secondCorner, _scene);
-
-  ParentBox *motherBox = NULL;
-  int motherID = mother;
-  if (_boxes.find(mother) == _boxes.end()) {
-      motherID = ROOT_BOX_ID;
-    }
-  else {
-      BoxesMap::iterator it;
-      if ((it = _boxes.find(mother)) != _boxes.end()) {
-          if (it->second->type() == PARENT_BOX_TYPE) { /// \todo Le type des GraphicsItem est mal utilisé !! Voir http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var
-              motherBox = static_cast<ParentBox*>(it->second);
-              firstCorner.rx() -= motherBox->beginPos();
-              secondCorner.rx() -= motherBox->beginPos();
-            }
-        }
-    }
-  unsigned int newBoxID = _engines->addBox(firstCorner.x() * MaquetteScene::MS_PER_PIXEL,
-                                           (secondCorner.x() - firstCorner.x()) * MaquetteScene::MS_PER_PIXEL, motherID);
-
-  if (newBoxID != NO_ID) {
-      newBox->setName(QString::fromStdString(name));
-
-      _boxes[newBoxID] = newBox;
-      newBox->setID(newBoxID);
-      if (motherBox != NULL) {
-          newBox->setMother(motherID);
-          motherBox->addChild(newBoxID);
-        }
-      _engines->setCtrlPointMessagesToSend(newBoxID, BEGIN_CONTROL_POINT_INDEX, newBox->firstMessagesToSend());
-      _engines->setCtrlPointMessagesToSend(newBoxID, END_CONTROL_POINT_INDEX, newBox->lastMessagesToSend());
-    }
-
-  return newBoxID;
-}
-
-unsigned int
-Maquette::addControlBox(const AbstractControlBox &abstract)
-{
-  return addControlBox(abstract.topLeft(), QPointF(abstract.topLeft().x() + abstract.width(),
-                                                   abstract.topLeft().y() + abstract.height()), abstract.name(), abstract.mother());
-}
-
-unsigned int
 Maquette::addParentBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
 {
   vector<string> firstMsgs;
@@ -499,7 +328,6 @@ Maquette::addParentBox(unsigned int ID, const unsigned int date, const unsigned 
                 }
             }
         }
-
       newBox->setFirstMessagesToSend(firstMsgs);
       newBox->setLastMessagesToSend(lastMsgs);
     }
@@ -620,8 +448,8 @@ bool
 Maquette::updateMessagesToSend(unsigned int boxID)
 {
   if (boxID != NO_ID) {
-      _engines->setCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, static_cast<SoundBox*>(_boxes[boxID])->firstMessagesToSend());
-      _engines->setCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, static_cast<SoundBox*>(_boxes[boxID])->lastMessagesToSend());
+      _engines->setCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, static_cast<ParentBox*>(_boxes[boxID])->firstMessagesToSend());
+      _engines->setCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, static_cast<ParentBox*>(_boxes[boxID])->lastMessagesToSend());
       return true;
     }
   return false;
@@ -1363,6 +1191,7 @@ Maquette::addRelation(const AbstractRelation &abstract)
 bool
 Maquette::addInterval(unsigned int /*ID1*/, unsigned int /*ID2*/, int /*value*/, int /*tolerance*/)
 {
+    //TODO
   return false;
 }
 
@@ -1562,11 +1391,6 @@ Maquette::startPlaying()
 
   for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
       it->second->lock();
-      if (it->second->type() == SOUND_BOX_TYPE) {
-          if (it->second->date() >= _engines->getGotoValue()) {
-              sendMessage(static_cast<SoundBox*>(it->second)->getPalette().toString());
-            }
-        }
     }
   _engines->play();
 }
@@ -1583,7 +1407,7 @@ Maquette::stopPlayingGotoStart()
   BoxesMap::iterator it;
   for (it = _boxes.begin(); it != _boxes.end(); it++) {
       int type = it->second->type();
-      if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+      if (type == PARENT_BOX_TYPE) {
           static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
         }
     }
@@ -1603,7 +1427,7 @@ Maquette::stopPlaying()
   BoxesMap::iterator it;
   for (it = _boxes.begin(); it != _boxes.end(); it++) {
       int type = it->second->type();
-      if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+      if (type == PARENT_BOX_TYPE) {
           static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
         }
     }
@@ -1622,7 +1446,7 @@ Maquette::stopPlayingWithGoto()
   BoxesMap::iterator it;
   for (it = _boxes.begin(); it != _boxes.end(); it++) {
       int type = it->second->type();
-      if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+      if (type == PARENT_BOX_TYPE) {
           static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
         }
     }
@@ -1635,13 +1459,7 @@ Maquette::saveBox(unsigned int boxID)
 {
   // TODO : handle others boxes further attributes during save
   QString boxType = "unknown";
-  if (_boxes[boxID]->type() == SOUND_BOX_TYPE) {
-      boxType = QString("sound");
-    }
-  else if (_boxes[boxID]->type() == CONTROL_BOX_TYPE) {
-      boxType = QString("control");
-    }
-  else if (_boxes[boxID]->type() == PARENT_BOX_TYPE) {
+  if (_boxes[boxID]->type() == PARENT_BOX_TYPE) {
       boxType = QString("parent");
     }
   else {
@@ -1696,42 +1514,6 @@ Maquette::saveBox(unsigned int boxID)
   colorNode.setAttribute("red", color.red());
   colorNode.setAttribute("green", color.green());
   colorNode.setAttribute("blue", color.blue());
-
-  if (boxType == "sound") {
-      Palette pal = static_cast<SoundBox*>(box)->getPalette();
-      QString soundFile = static_cast<SoundBox*>(box)->soundSelected();
-      QDomElement attributesNode = _doc->createElement("attributes");
-      QDomElement dynamicNode = _doc->createElement("dynamic");
-      dynamicNode.setAttribute("shape", pal.shape());
-      attributesNode.appendChild(dynamicNode);
-      QDomElement rythmNode = _doc->createElement("rythm");
-      rythmNode.setAttribute("speed", pal.speed());
-      rythmNode.setAttribute("speed-variation", pal.speedVariation());
-      rythmNode.setAttribute("grain", pal.grain());
-      attributesNode.appendChild(rythmNode);
-      QDomElement melodicNode = _doc->createElement("melodic");
-      melodicNode.setAttribute("pitch-start", pal.pitchStart());
-      melodicNode.setAttribute("pitch-random", pal.pitchRandom());
-      melodicNode.setAttribute("pitch-vibrato", pal.pitchVibrato());
-      melodicNode.setAttribute("pitch-end", pal.pitchEnd());
-      melodicNode.setAttribute("pitch-amplitude", pal.pitchAmplitude());
-      melodicNode.setAttribute("pitch-grade", pal.pitchGrade());
-      attributesNode.appendChild(melodicNode);
-      QDomElement harmonicNode = _doc->createElement("harmonic");
-      harmonicNode.setAttribute("harmony", pal.harmo());
-      harmonicNode.setAttribute("harmony-variation", pal.harmoVariation());
-      attributesNode.appendChild(harmonicNode);
-      QDomElement impulsiveNode = _doc->createElement("impulsive");
-      impulsiveNode.setAttribute("state", pal.impulsive());
-      attributesNode.appendChild(impulsiveNode);
-      QDomElement soundNode = _doc->createElement("sound");
-      soundNode.setAttribute("mode", pal.playingMode());
-      soundNode.setAttribute("file", soundFile);
-      attributesNode.appendChild(soundNode);
-      boxNode.appendChild(attributesNode);
-    }
-
-  //return true;
 }
 
 std::string
@@ -1885,7 +1667,6 @@ Maquette::loadOLD(const string &fileName)
   QPointF topLeft, size, bottomRight;
   QString name, boxType, relType;
   QColor color(1., 1., 1.);
-  Palette pal;
   int boxID, motherID;
   QMap<int, unsigned int> hashMap;
   QDomNode mainNode = root.firstChild();      // Boxes
@@ -1907,7 +1688,6 @@ Maquette::loadOLD(const string &fileName)
                       if (elt2.tagName() == "color") {
                           color = QColor(elt2.attribute("red", "1").toFloat() * 255, elt2.attribute("green", "1").toFloat() * 255,
                                          elt2.attribute("blue", "1").toFloat() * 255);
-                          pal.setColor(color);
                         }
                       QDomNode node3 = node2.firstChild();
                       while (!node3.isNull()) {
@@ -1921,47 +1701,6 @@ Maquette::loadOLD(const string &fileName)
                                   size = tmp;
                                 }
                             }
-                          else if (elt2.tagName() == "attributes") {
-                              if (elt3.tagName() == "dynamic") {
-                                  pal.setShape(Shape(elt3.attribute("shape", "0").toInt()));
-                                }
-                              else if (elt3.tagName() == "rythm") {
-                                  pal.setSpeed(Speed(elt3.attribute("speed", "0").toInt()));
-                                  pal.setSpeedVariation(SpeedVariation(elt3.attribute("speed-variation", "0").toInt()));
-                                  pal.setGrain(Grain(elt3.attribute("grain", "0").toInt()));
-                                }
-                              else if (elt3.tagName() == "melodic") {
-                                  pal.setPitchStart(Pitch(elt3.attribute("pitch-start", "0").toInt()));
-                                  pal.setPitchRandom(elt3.attribute("pitch-random", "0").toInt() == 1);
-                                  pal.setPitchVibrato(elt3.attribute("pitch-vibrato", "0").toInt() == 1);
-                                  pal.setPitchEnd(Pitch(elt3.attribute("pitch-end", "0").toInt()));
-                                  pal.setPitchAmplitude(PitchVariation(elt3.attribute("pitch-amplitude", "0").toInt()));
-                                  pal.setPitchGrade(PitchVariation(elt3.attribute("pitch-grade", "0").toInt()));
-                                }
-                              else if (elt3.tagName() == "harmonic") {
-                                  pal.setHarmo(Harmo(elt3.attribute("harmony", "0").toInt()));
-                                  pal.setHarmoVariation(HarmoVariation(elt3.attribute("harmony-variation", "0").toInt()));
-                                }
-                              else if (elt3.tagName() == "impulsive") {
-                                  pal.setImpulsive(elt3.attribute("state", "0").toInt() == 1);
-                                }
-                              else if (elt3.tagName() == "sound") {
-                                  pal.setPlayingMode((PlayingMode)(elt3.attribute("mode", "0").toInt()));
-                                  QString file = elt3.attribute("file", "");
-                                  if (pal.playingMode() == FileMode) {
-                                      if (QFile(file).exists()) {
-                                          pal.setSoundFile(file);
-                                        }
-                                      else {
-                                          pal.setSoundFile("");
-                                          _scene->displayMessage((QString("Unvalid sound directory \"%1\" in box \"%2\"").
-                                                                  arg(file).arg(name)).toStdString(), WARNING_LEVEL);
-                                        }
-                                    }
-                                }
-
-                              // TODO : handle other boxes' attributes
-                            }
                           node3 = node3.nextSibling();
                         }
                     }
@@ -1973,19 +1712,7 @@ Maquette::loadOLD(const string &fileName)
                   if (boxType != "unknown") {
                       bottomRight = topLeft + size;
                       unsigned int ID = NO_ID;
-                      if (boxType == "sound") {
-                          pal.setColor(color);
-                          ID = addSoundBox((unsigned int)boxID, topLeft, bottomRight, name.toStdString(), pal, motherID);
-                          _scene->addSoundBox(ID);
-                        }
-                      else if (boxType == "control") {
-                          ID = addControlBox((unsigned int)boxID, topLeft, bottomRight, name.toStdString(), motherID);
-                          _scene->addControlBox(ID);
-                          _scene->getBox(ID)->updateWidgets();
-
-                          //OPEN FILE
-                        }
-                      else if (boxType == "parent") {
+                      if (boxType == "parent") {
                           ID = addParentBox((unsigned int)boxID, topLeft, bottomRight, name.toStdString(), motherID);
                           _scene->addParentBox(ID);
                         }
@@ -2174,7 +1901,6 @@ Maquette::load(const string &fileName)
   unsigned int begin, duration, topLeftY, sizeY;
   QString name, boxType;
   QColor color(1., 1., 1.);
-  Palette pal;
   int boxID, motherID;
   float zoom;
   QPointF centerCoordinates;
@@ -2204,7 +1930,6 @@ Maquette::load(const string &fileName)
                       if (elt2.tagName() == "color") {
                           color = QColor(elt2.attribute("red", "1").toInt(), elt2.attribute("green", "1").toInt(),
                                          elt2.attribute("blue", "1").toInt());
-                          pal.setColor(color);
                         }
                       QDomNode node3 = node2.firstChild();
                       while (!node3.isNull()) {
@@ -2221,47 +1946,6 @@ Maquette::load(const string &fileName)
                                   sizeY = elt3.attribute("y", "0").toInt();
                                 }
                             }
-                          else if (elt2.tagName() == "attributes") {
-                              if (elt3.tagName() == "dynamic") {
-                                  pal.setShape(Shape(elt3.attribute("shape", "0").toInt()));
-                                }
-                              else if (elt3.tagName() == "rythm") {
-                                  pal.setSpeed(Speed(elt3.attribute("speed", "0").toInt()));
-                                  pal.setSpeedVariation(SpeedVariation(elt3.attribute("speed-variation", "0").toInt()));
-                                  pal.setGrain(Grain(elt3.attribute("grain", "0").toInt()));
-                                }
-                              else if (elt3.tagName() == "melodic") {
-                                  pal.setPitchStart(Pitch(elt3.attribute("pitch-start", "0").toInt()));
-                                  pal.setPitchRandom(elt3.attribute("pitch-random", "0").toInt() == 1);
-                                  pal.setPitchVibrato(elt3.attribute("pitch-vibrato", "0").toInt() == 1);
-                                  pal.setPitchEnd(Pitch(elt3.attribute("pitch-end", "0").toInt()));
-                                  pal.setPitchAmplitude(PitchVariation(elt3.attribute("pitch-amplitude", "0").toInt()));
-                                  pal.setPitchGrade(PitchVariation(elt3.attribute("pitch-grade", "0").toInt()));
-                                }
-                              else if (elt3.tagName() == "harmonic") {
-                                  pal.setHarmo(Harmo(elt3.attribute("harmony", "0").toInt()));
-                                  pal.setHarmoVariation(HarmoVariation(elt3.attribute("harmony-variation", "0").toInt()));
-                                }
-                              else if (elt3.tagName() == "impulsive") {
-                                  pal.setImpulsive(elt3.attribute("state", "0").toInt() == 1);
-                                }
-                              else if (elt3.tagName() == "sound") {
-                                  pal.setPlayingMode((PlayingMode)(elt3.attribute("mode", "0").toInt()));
-                                  QString file = elt3.attribute("file", "");
-                                  if (pal.playingMode() == FileMode) {
-                                      if (QFile(file).exists()) {
-                                          pal.setSoundFile(file);
-                                        }
-                                      else {
-                                          pal.setSoundFile("");
-                                          _scene->displayMessage((QString("Unvalid sound directory \"%1\" in box \"%2\"").
-                                                                  arg(file).arg(name)).toStdString(), WARNING_LEVEL);
-                                        }
-                                    }
-                                }
-
-                              // TODO : handle other boxes' attributes
-                            }
                           node3 = node3.nextSibling();
                         }
                     }
@@ -2273,20 +1957,7 @@ Maquette::load(const string &fileName)
                   if (boxType != "unknown") {
                       bottomRight = topLeft + size;
                       unsigned int ID = NO_ID;
-                      if (boxType == "sound") {
-                          pal.setColor(color);
-                          ID = addSoundBox((unsigned int)boxID, topLeft, bottomRight, name.toStdString(), pal, motherID);
-                          _scene->addSoundBox(ID);
-                        }
-                      else if (boxType == "control") {
-                          ID = addControlBox((unsigned int)boxID, topLeft, bottomRight, name.toStdString(), motherID);
-                          _scene->addControlBox(ID);
-                          _scene->getBox(ID)->updateWidgets();
-
-                          //OPEN FILE
-                        }
-                      else if (boxType == "parent") {
-//                            ID = addParentBox((unsigned int)boxID,topLeft,bottomRight,name.toStdString(),motherID);
+                      if (boxType == "parent") {
                           ID = addParentBox((unsigned int)boxID, (unsigned int)begin, (unsigned int)topLeftY, (unsigned int)sizeY, (unsigned int)duration, name.toStdString(), motherID, color);
                           _scene->addParentBox(ID);
                         }
@@ -2513,7 +2184,7 @@ void
 Maquette::crossedTransition(unsigned int boxID, unsigned int CPIndex)
 {
   int type = getBox(boxID)->type();
-  if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+  if (type == PARENT_BOX_TYPE) {
       if (CPIndex == BEGIN_CONTROL_POINT_INDEX) {
           static_cast<BasicBox*>(_boxes[boxID])->setCrossedExtremity(BOX_START);
         }

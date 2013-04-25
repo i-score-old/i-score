@@ -49,7 +49,6 @@ using std::string;
 using std::stringstream;
 using std::istringstream;
 
-
 #include <iostream>
 #include <sstream>
 
@@ -502,6 +501,7 @@ NetworkMessages::setValue(QTreeWidgetItem *item, QString newValue)
 void
 NetworkMessages::setDeviceMessages(QString deviceName, QMap<QTreeWidgetItem *, Message> *messages)
 {
+  Q_UNUSED(messages);
   QMap<QTreeWidgetItem *, Message>::iterator it;
   Message curMsg;
 

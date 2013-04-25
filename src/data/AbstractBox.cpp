@@ -43,21 +43,28 @@
 #include <string>
 using std::string;
 
+//AbstractBox::AbstractBox(const QPointF &newTopLeft, const float &newWidth, const float &newHeight,
+//                         const string &newName, const QColor &newColor, unsigned int newID, unsigned int motherID) :
+//  _topLeft(newTopLeft), _width(newWidth), _height(newHeight), _name(newName), _color(newColor),
+//  _ID(newID), _motherID(motherID)
+//{
+//  _startMessages = new NetworkMessages;
+//  _endMessages = new NetworkMessages;
+//}
+
 AbstractBox::AbstractBox(const QPointF &newTopLeft, const float &newWidth, const float &newHeight,
-                         const string &newName, const QColor &newColor, unsigned int newID, unsigned int motherID) :
+                         const string &newName, const QColor &newColor, unsigned int newID, unsigned int motherID,
+                         NetworkMessages *startMessages, NetworkMessages *endMessages) :
   _topLeft(newTopLeft), _width(newWidth), _height(newHeight), _name(newName), _color(newColor),
-  _ID(newID), _motherID(motherID)
+  _ID(newID), _motherID(motherID), _startMessages(startMessages),_endMessages(endMessages)
 {
-  _startMessages = new NetworkMessages;
-  _endMessages = new NetworkMessages;
 }
 
 AbstractBox::AbstractBox(const AbstractBox &other) :
   Abstract(), _topLeft(other._topLeft), _width(other._width), _height(other._height),
-  _name(other._name), _color(other._color), _ID(other._ID), _motherID(other._motherID)
+  _name(other._name), _color(other._color), _ID(other._ID), _motherID(other._motherID),
+  _startMessages(other._startMessages),_endMessages(other._endMessages)
 {
-  _startMessages = new NetworkMessages;
-  _endMessages = new NetworkMessages;
 }
 
 void

@@ -51,7 +51,6 @@
 #include <QDialog>
 #include <QSlider>
 
-#include "Palette.hpp"
 #include "MaquetteScene.hpp"
 #include "MaquetteWidget.hpp"
 

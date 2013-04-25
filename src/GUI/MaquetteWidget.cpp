@@ -71,8 +71,6 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
   _header = new QWidget(NULL);
   _readingSpeedWidget = new QWidget;
   _sliderMoved = false;
-  _timeBar = new TimeBarWidget(this, _scene); /// \todo Ce membre n'est pas utilisé. Doublon avec TimeBarWidget dans MaquetteScene
-  _zoom = 1.;
 
   createReadingSpeedWidget();
   createActions();
@@ -87,17 +85,9 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
   _maquetteLayout->setVerticalSpacing(0);
   setLayout(_maquetteLayout);
 
-  connect(_scene, SIGNAL(stopPlaying()), this, SLOT(stop()));
-  connect(_view, SIGNAL(zoomChanged(float)), this, SLOT(changeZoom(float)));
+  connect(_scene, SIGNAL(stopPlaying()), this, SLOT(stop())); 
   connect(_view, SIGNAL(playModeChanged()), this, SLOT(updateHeader()));
   connect(_scene, SIGNAL(playModeChanged()), this, SLOT(updateHeader()));
-}
-
-void
-MaquetteWidget::changeZoom(float value)
-{
-  _zoom = value;
-  _timeBar->setZoomValue(value);
 }
 
 MaquetteWidget::~MaquetteWidget()
@@ -118,7 +108,6 @@ MaquetteWidget::~MaquetteWidget()
   delete _accelerationSlider;
   delete _accelerationDisplay;
   delete _readingSpeedWidget;
-  delete _timeBar;
 }
 
 void

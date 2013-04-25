@@ -59,24 +59,18 @@ TimeBarWidget::TimeBarWidget(QWidget *parent, MaquetteScene *scene)
 {
   _scene = scene;
   _rect = QRect(LEFT_MARGIN, 0, MaquetteScene::MAX_SCENE_WIDTH, TIME_BAR_HEIGHT);
-
   setGeometry(_rect);
-  setFixedHeight(height());
+  setFixedHeight(height());  
   init();
 }
 
 void
 TimeBarWidget::init()
-{
+{   
   _zoom = 1.;
 }
 
 TimeBarWidget::~TimeBarWidget()
-{
-}
-
-void
-TimeBarWidget::paintEngine()
 {
 }
 
@@ -147,5 +141,6 @@ TimeBarWidget::paintEvent(QPaintEvent *event)
 
   painter->drawRect(_rect);
   drawBackground(painter, _rect);
+
   delete painter;
 }

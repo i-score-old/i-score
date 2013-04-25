@@ -40,13 +40,10 @@
 
 #include "MaquetteScene.hpp"
 #include "BasicBox.hpp"
-#include "Palette.hpp"
 #include "AttributesEditor.hpp"
 #include <QColorDialog>
 #include "NetworkMessages.hpp"
 #include "NetworkTree.hpp"
-
-/* La palette hérite de QDockWidget, a pour parent la fenetre principale*/
 
 static const int ENGLISH = 0;
 static const int FRENCH = 1;
@@ -87,7 +84,6 @@ AttributesEditor::~AttributesEditor()
 {
   delete _centralWidget;
   delete _centralLayout;
-  delete _palette;
 }
 
 void
@@ -221,9 +217,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 
   if (boxModified || (_boxEdited == NO_ID)) {
       _networkTree->resetNetworkTree();
-
       if (_boxEdited != NO_ID) {
-
           if (abBox->networkTreeItems().isEmpty() && abBox->networkTreeExpandedItems().isEmpty()) {
               //LOAD FILE
               _networkTree->loadNetworkTree(abBox);
@@ -241,10 +235,10 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 //            QList<QTreeWidgetItem *> items = _networkTree->assignedItems().keys();
 //            QList<QTreeWidgetItem *>::iterator i;
 //            QTreeWidgetItem *curIt;
-//            std::cout<<"\nsetattribute::AFFICHAGE START\n";
+//            std::cout<<"\nsetattribute::AFFICHAGE START box \n";
 //            vector<string> startMessages = _scene->getBox(_boxEdited)->startMessages()->computeMessages();
-////            vector<string> startMessages = _networkTree->startMessages()->computeMessages();
-//            for(int i=0; i<startMessages.size(); i++){
+//            vector<string> startMessages = _networkTree->startMessages()->computeMessages();
+//            for(unsigned int i=0; i<startMessages.size(); i++){
 //                std::cout<<startMessages[i]<<std::endl;
 //            }
 //            std::cout<<"setattribute::AFFICHAGE END\n";
@@ -292,12 +286,6 @@ AttributesEditor::updateWidgets(bool boxModified)
   }
 
   update();
-}
-
-Palette
-AttributesEditor::getPalette() const
-{
-  return *_palette;
 }
 
 void
@@ -371,7 +359,9 @@ AttributesEditor::startMessagesChanged(bool forceUpdate)
       _networkTree->updateCurves(_boxEdited, forceUpdate);
       box->updateCurves();
     }
-  _scene->displayMessage("No box selected", INDICATION_LEVEL);
+  else{
+      _scene->displayMessage("No box selected", INDICATION_LEVEL);
+  }
 }
 
 void
@@ -385,9 +375,6 @@ AttributesEditor::endMessagesChanged(bool forceUpdate)
 
       QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
       Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
-
-      vector<string> networkMsgs = _networkTree->endMessages()->computeMessages();
-
       Maquette::getInstance()->setEndMessagesToSend(_boxEdited, _networkTree->endMessages());
       _networkTree->updateEndMsgsDisplay();
       _networkTree->updateCurves(_boxEdited, forceUpdate);

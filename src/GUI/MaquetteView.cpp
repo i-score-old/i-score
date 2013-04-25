@@ -56,9 +56,6 @@
 #include <QScrollBar>
 #include <QPushButton>
 
-
-using namespace SndBoxProp;
-
 static const int SCROLL_BAR_INCREMENT = 1000 / MaquetteScene::MS_PER_PIXEL;
 
 MaquetteView::MaquetteView(MainWindow *mw)
@@ -67,7 +64,6 @@ MaquetteView::MaquetteView(MainWindow *mw)
   _mainWindow = mw;
   setRenderHint(QPainter::Antialiasing);
 
-//  setBackgroundBrush(QColor(140,176,140));
   setBackgroundBrush(QColor(160, 160, 160));
   setCacheMode(QGraphicsView::CacheBackground);
 
@@ -76,7 +72,7 @@ MaquetteView::MaquetteView(MainWindow *mw)
   setAlignment(Qt::AlignLeft | Qt::AlignTop);
   centerOn(0, 0);
   _zoom = 1;
-  _gotoValue = 0;
+  _gotoValue = 0;  
 }
 
 MaquetteView::~MaquetteView()
@@ -86,22 +82,26 @@ MaquetteView::~MaquetteView()
 void
 MaquetteView::wheelEvent(QWheelEvent *event)
 {
-  if (event->orientation() == Qt::Horizontal) {
-      if (event->delta() < 0) { //up
-          horizontalScrollBar()->setValue(horizontalScrollBar()->value() + SCROLL_BAR_INCREMENT);
+    int newValue = 0;
+    if (event->orientation() == Qt::Horizontal) {
+
+        if (event->delta() < 0) { //up
+            newValue = horizontalScrollBar()->value() + SCROLL_BAR_INCREMENT;
         }
-      else {  //down
-          horizontalScrollBar()->setValue(horizontalScrollBar()->value() - SCROLL_BAR_INCREMENT);
+        else {  //down
+            newValue = horizontalScrollBar()->value() - SCROLL_BAR_INCREMENT;
         }
+        horizontalScrollBar()->setValue(newValue);
     }
 
-  if (event->orientation() == Qt::Vertical) {
-      if (event->delta() < 0) { //up
-          verticalScrollBar()->setValue(verticalScrollBar()->value() + SCROLL_BAR_INCREMENT);
+    if (event->orientation() == Qt::Vertical) {
+        if (event->delta() < 0) { //up
+            newValue = verticalScrollBar()->value() + SCROLL_BAR_INCREMENT;
         }
-      else {  //down
-          verticalScrollBar()->setValue(verticalScrollBar()->value() - SCROLL_BAR_INCREMENT);
+        else {  //down
+            newValue = verticalScrollBar()->value() - SCROLL_BAR_INCREMENT;
         }
+        verticalScrollBar()->setValue(newValue);
     }
 }
 
@@ -252,24 +252,19 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
     }
   else if ((event->key() == Qt::Key_Space || event->key() == Qt::Key_Comma || event->key() == Qt::Key_Period) && !_scene->playing()) {
       _scene->play();
-      emit(playModeChanged());
     }
   else if ((event->key() == Qt::Key_Comma || event->key() == Qt::Key_Period) && _scene->playing()) {
       _scene->pause();
-      emit(playModeChanged());
     }
   else if (event->key() == Qt::Key_Space && _scene->playing()) {
       _scene->stopWithGoto();
-      emit(playModeChanged());
     }
   else if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
       _scene->stopGotoStart();
-      emit(playModeChanged());
     }
   else if (event->key() == Qt::Key_0) {
       if (!_scene->playing()) {
           _scene->play();
-          emit(playModeChanged());
         }
       else {
           triggerShortcut(Qt::Key_0);
@@ -316,6 +311,7 @@ MaquetteView::zoomIn()
       QPointF newCenter(2 * getCenterCoordinates().x(), 2 * getCenterCoordinates().y());
       centerOn(newCenter);
       _scene->updateProgressBar();
+      _scene->zoomChanged(_zoom);
     }
 }
 
@@ -358,7 +354,8 @@ MaquetteView::setZoom(float value)
   resetCachedContent();
 
 // TODO check if can be comment
-  _scene->update();
+  _scene->update();  
+  _scene->zoomChanged(_zoom);
 
   Maquette::getInstance()->updateBoxesFromEngines();
 }
@@ -379,4 +376,5 @@ MaquetteView::zoomOut()
   QPointF newCenter(getCenterCoordinates().x() / 2, getCenterCoordinates().y() / 2);
   centerOn(newCenter);
   _scene->updateProgressBar();
+  _scene->zoomChanged(_zoom);
 }

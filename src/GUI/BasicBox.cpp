@@ -868,8 +868,6 @@ BasicBox::setTriggerPointMessage(BoxExtremity extremity, const string &message)
 string
 BasicBox::triggerPointMessage(BoxExtremity extremity)
 {
-//    QMap<BoxExtremity,TriggerPoint*>::iterator it;
-//	if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
   if (_triggerPoints->contains(extremity)) {
       return _triggerPoints->value(extremity)->message();
     }
@@ -1837,9 +1835,4 @@ BasicBox::displayCurveEditWindow()
   editWindow->setLayout(layout);
   editWindow->setGeometry(QRect(_scene->sceneRect().toRect()));
   editWindow->show();
-}
-
-void
-BasicBox::refresh()
-{
 }

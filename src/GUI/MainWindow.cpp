@@ -46,7 +46,6 @@
 #include "MaquetteScene.hpp"
 #include "MaquetteView.hpp"
 #include "NetworkConfig.hpp"
-#include "SoundBox.hpp"
 #include "ViewRelations.hpp"
 #include "MaquetteWidget.hpp"
 #include "NetworkTree.hpp"
@@ -82,8 +81,6 @@ using std::string;
 #include <sstream>
 using std::stringstream;
 
-using namespace SndBoxProp;
-
 static const float S_TO_MS = 1000.;
 
 MainWindow::MainWindow()
@@ -97,7 +94,6 @@ MainWindow::MainWindow()
 
   // Creation of Scene and View
   _scene = new MaquetteScene(QRectF(0, 0, width(), height()), _editor);
-  _scene->setPlayingMode(SpecificMode);
 
   _view = new MaquetteView(this);
 
@@ -130,9 +126,9 @@ MainWindow::MainWindow()
   setCurrentFile("");
   setAcceptDrops(false);
 
-  connect(_view->verticalScrollBar(), SIGNAL(valueChanged(int)), _scene, SLOT(verticalScroll(int)));
   connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, std::string)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, std::string)));
   connect(_editor->networkTree(), SIGNAL(cmdKeyStateChanged(bool)), this, SLOT(updateCmdKeyState(bool)));
+  connect(_view->verticalScrollBar(), SIGNAL(valueChanged(int)), _scene, SLOT(verticalScroll(int)));  //TimeBar is painted on MaquetteScene, so a vertical scroll has to move the timeBar.
 }
 
 MainWindow::~MainWindow()

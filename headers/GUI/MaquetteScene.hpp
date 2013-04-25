@@ -52,11 +52,8 @@
 #include <QToolBar>
 
 #include "Maquette.hpp"
-#include "Palette.hpp"
 #include "Abstract.hpp"
 #include "AbstractRelation.hpp"
-#include "AbstractSoundBox.hpp"
-#include "AbstractControlBox.hpp"
 #include "AbstractParentBox.hpp"
 #include "BasicBox.hpp"
 #include "TimeBarWidget.hpp"
@@ -243,59 +240,6 @@ class MaquetteScene : public QGraphicsScene
     removeFromTriggerQueue(TriggerPoint *trigger){ _triggersQueueList.removeAll(trigger); }
 
     /*!
-     * \brief Adds a new sound box to the maquette with specific coordinates.
-     *
-     * \param topLeft : the top left coordinate
-     * \param bottomRight : the bottom right coordinate
-     * \param name : the name of the box
-     * \param palette : the palette to assign to the box
-     * \return the ID of box created
-     */
-    unsigned int addSoundBox(const QPointF &topLeft, const QPointF &bottomRight, const std::string &name, const Palette &palette);
-
-    /*!
-     * \brief Adds a new sound box containing specific information.
-     *
-     * \param abstract : the abstract sound box containing information about the box
-     * \return the ID of box created
-     */
-    unsigned int addSoundBox(const AbstractSoundBox &abstract);
-
-    /*!
-     * \brief Adds an existing sound box as an item to the scene.
-     *
-     * \param ID : the ID to be set
-     * \return the ID of box created
-     */
-    unsigned int addSoundBox(unsigned int ID);
-
-    /*!
-     * \brief Adds a new control box to the maquette with specific coordinates.
-     *
-     * \param topLeft : the top left coordinate
-     * \param bottomRight : the bottom right coordinate
-     * \param name : the name of the box
-     * \return the ID of box created
-     */
-    unsigned int addControlBox(const QPointF &topLeft, const QPointF &bottomRight, const std::string &name);
-
-    /*!
-     * \brief Adds a new control box to the maquette with specific information.
-     *
-     * \param abstract : the abstract sound box containing information about the box
-     * \return the ID of box created
-     */
-    unsigned int addControlBox(const AbstractControlBox &abstract);
-
-    /*!
-     * \brief Adds an existing control box as an item to the maquette with a specific ID.
-     *
-     * \param ID : the ID to be set
-     * \return the ID of box created
-     */
-    unsigned int addControlBox(unsigned int ID);
-
-    /*!
      * \brief Adds a new parent box to the maquette with specific coordinates.
      *
      * \param topLeft : the top left coordinate
@@ -308,7 +252,7 @@ class MaquetteScene : public QGraphicsScene
     /*!
      * \brief Adds a new parent box to the maquette with specific information.
      *
-     * \param abstract : the abstract sound box containing information about the box
+     * \param abstract : the abstract parent box containing information about the box
      * \return the ID of box created
      */
     unsigned int addParentBox(const AbstractParentBox &abstract);
@@ -398,31 +342,11 @@ class MaquetteScene : public QGraphicsScene
     void boxResized();
 
     /*!
-     * \brief Gets the palette contained in AttributesEditor.
-     *
-     * \return the palette contained in AttributesEditor
-     */
-    Palette getPalette() const;
-
-    /*!
      * \brief Sets the abstractBox of AttributesEditor.
      *
      * \param abBox : the new abstract box to be set
      */
     void setAttributes(AbstractBox *abBox);
-
-    /*!
-     * \brief Sets the aspect to store during a box-to-box aspect copying.
-     * \param palette : the palette to be stored
-     */
-    void setCopyAspect(const Palette &palette);
-
-    /*!
-     * \bief Gets the aspect to paste during a box-to-box aspect copying.
-     *
-     * \return the palette to paste
-     */
-    Palette getCopyAspect() const;
 
     /*!
      * \brief Gets a set of the available network devices.
@@ -540,20 +464,6 @@ class MaquetteScene : public QGraphicsScene
      * \return the box progress ratio.
      */
     float getProgression(unsigned int boxID);
-
-    /*!
-     * \brief Gets the current playing mode.
-     *
-     * \return the current playing mode
-     */
-    SndBoxProp::PlayingMode playingMode() const;
-
-    /*!
-     * \brief Sets the current playing mode.
-     *
-     * \param mode the playing mode to be set
-     */
-    void setPlayingMode(unsigned int mode);
 
     /*!
      * \brief Gets a set of temporal relations involving a particular entity.
@@ -722,38 +632,6 @@ class MaquetteScene : public QGraphicsScene
      */
     virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
 
-    /*!
-     * \brief Redefinition of QGraphicsScene dragEnter method.
-     * Raised a drag&drop object enters in the scene.
-     *
-     * \param event : the information about the event
-     */
-    virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
-
-    /*!
-     * \brief Redefinition of QGraphicsScene dragMove method.
-     * Raised when a drag&drop object moves in the scene.
-     *
-     * \param event : the information about the event
-     */
-    virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
-
-    /*!
-     * \brief Redefinition of QGraphicsScene dragLeave method.
-     * Raised a drag&drop object leaves the scene.
-     *
-     * \param event : the information about the event
-     */
-    virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
-
-    /*!
-     * \brief Redefinition of QGraphicsScene dropEvent method.
-     * Raised when a drag&drop object is dropped on the scene.
-     *
-     * \param event : the information about the event
-     */
-    virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
-
   signals:
     void stopPlaying();
     void accelerationValueChanged(double value);
@@ -763,6 +641,7 @@ class MaquetteScene : public QGraphicsScene
   public slots:
     void verticalScroll(int value);
     void gotoChanged(double value);
+    void zoomChanged(float value);
     void speedChanged(double value);
 
     /*!
@@ -837,20 +716,6 @@ class MaquetteScene : public QGraphicsScene
     void addBox(BoxCreationMode box);
 
     /*!
-     * \brief Adds a new sound box using internal stored coordinates.
-     *
-     * \return the new box ID
-     */
-    unsigned int addSoundBox();
-
-    /*!
-     * \brief Adds a new control box using internal stored coordinates.
-     *
-     * \return the new box ID
-     */
-    unsigned int addControlBox();
-
-    /*!
      * \brief Adds a new parent box using internal stored coordinates.
      *
      * \return the new box ID
@@ -881,8 +746,6 @@ class MaquetteScene : public QGraphicsScene
     AttributesEditor *_editor;         //!< The logical representation of the Editor.
     Maquette *_maquette;               //!< The logical representation of the Maquette.
 
-    Palette _copyPalette;              //!< Used to store sound box aspect beeing copied from one box to another.
-
     std::vector<Abstract*> _toCopy;    //!< Used to store items beeing copied.
     std::map<unsigned int, AbstractBox*> _boxesToCopy;
     QPointF _copyPos;                  //!< Used to store position to copy from.
@@ -901,7 +764,6 @@ class MaquetteScene : public QGraphicsScene
     int _currentBoxMode;               //!< Current box creation mode.
     int _savedInteractionMode;         //!< Saved interation mode.
     int _savedBoxMode;                 //!< Saved box interation mode.
-    SndBoxProp::PlayingMode _playMode; //!< Current playing mode.
 
     unsigned int _resizeBox;           //!< During a resizing operation, the concerned box
     bool _clicked;                     //!< Handles if a click just occured.
@@ -918,10 +780,10 @@ class MaquetteScene : public QGraphicsScene
 
     std::map<unsigned int, BasicBox*> _playingBoxes; //!< Handles the whole set of currently playing boxes
 
-//  QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
     PlayingThread *_playThread; //!< The thread handling playing.
 
     TimeBarWidget *_timeBar;
+    QGraphicsProxyWidget *_timeBarProxy;
     QGraphicsLineItem *_progressLine;
     double _accelerationFactorSave;
     double _accelerationFactor;

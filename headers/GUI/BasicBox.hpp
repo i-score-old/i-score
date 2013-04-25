@@ -671,7 +671,6 @@ class BasicBox : public QObject, public QGraphicsItem
     setStackedLayout(QStackedLayout *slayout){ boxContentWidget()->setStackedLayout(slayout); }
     inline bool
     hasCurve(string address){ return _curvesAddresses.contains(address); }
-    void refresh();
 
     QPointF getLeftGripPoint();
     QPointF getRightGripPoint();
@@ -711,7 +710,6 @@ class BasicBox : public QObject, public QGraphicsItem
      * \param event : the variable containing information about the event
      */
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
-
     virtual void keyPressEvent(QKeyEvent *event);
     virtual void keyReleaseEvent(QKeyEvent *event);
 
