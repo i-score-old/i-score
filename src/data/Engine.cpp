@@ -397,15 +397,15 @@ void Engine::removeBox(TimeProcessId boxId)
     // Retreive the time process using the boxId
     timeProcess = getTimeProcess(boxId);
     
+    // Remove the time process from the scenario
+    timeProcess->setAttributeValue(TTSymbol("scenario"), kTTValNONE);
+    
     // TODO : delete TTCallback used to observe each time process scheduler running attribute
     // getTimeProcess(boxId)->removeObserver() ?
     
     // Release start and end events
     timeProcess->sendMessage(TTSymbol("StartEventRelease"));
     timeProcess->sendMessage(TTSymbol("EndEventRelease"));
-    
-    // Remove the time process from the scenario
-    timeProcess->setAttributeValue(TTSymbol("scenario"), kTTValNONE);
     
     // Is it an interactiveProcess ?
     // note : it can be registered 2 times for a start and end interactive event
