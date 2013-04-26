@@ -60,7 +60,7 @@ class QSpinBox;
 class QCheckBox;
 
 /*!
- * \struct InerpolationLine
+ * \struct InterpolationLine
  * \brief Used to store several composants of an interpolation line.
  */
 struct InterpolationLine {
@@ -107,6 +107,7 @@ class Interpolation : public QTableWidget {
     void sampleRateChanged(const QString &address, int value);
 
   public slots:
+    /// \todo renommage : un slot devrait plutôt s'appeler "changeActivation" que "activationChanged". Notamment pour éviter la confusion avec les signals qui portent le même nom. Idem pour les quatres slots !
     void activationChanged(bool state);
     void showChanged(bool state);
     void redundancyChanged(bool state);

@@ -100,6 +100,7 @@ typedef enum { SUCCESS = 1, NO_MODIFICATION = 0, RETURN_ERROR = -1,
 
 typedef enum { INDICATION_LEVEL, WARNING_LEVEL, ERROR_LEVEL } ErrorLevel;
 
+/// \todo les objets graphiques Qt maintiennent eux-même leurs tailles et positions
 /*!
  * \brief Structure used to contain boxes position or size.
  * Used for interaction with MaquetteScene.

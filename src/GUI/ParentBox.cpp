@@ -375,7 +375,7 @@ ParentBox::dropEvent(QGraphicsSceneDragDropEvent *event)
 void
 ParentBox::play()
 {
-  // TODO : parent box play function
+  /// \todo parent box play function
 }
 
 void

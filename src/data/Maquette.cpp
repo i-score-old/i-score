@@ -795,6 +795,8 @@ Maquette::updateRelations()
   //   }
 }
 
+
+/// \todo Duplication de code avec la méthode homonyme (surcharge)
 bool
 Maquette::updateBox(unsigned int boxID, const Coords &coord)
 {

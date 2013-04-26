@@ -176,6 +176,7 @@ Interpolation::clear()
   _currentLine = 0;
 }
 
+/// \todo Duplication de code entre les quatres slots
 void
 Interpolation::activationChanged(bool state)
 {
