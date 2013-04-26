@@ -1036,40 +1036,39 @@ Maquette::addTriggerPoint(const AbstractTriggerPoint &abstract)
 int
 Maquette::addTriggerPoint(unsigned int boxID, BoxExtremity extremity, const string &message)
 {
-  if (boxID == NO_ID) {
-      return ARGS_ERROR;
+    if (boxID == NO_ID) {
+        return ARGS_ERROR;
     }
-
-  unsigned int triggerID = _engines->addTriggerPoint(_boxes[boxID]->mother());
-
-  unsigned int controlPointID = NO_ID;
-  if (extremity == BOX_START) {
-      controlPointID = BEGIN_CONTROL_POINT_INDEX;
+    
+    unsigned int controlPointID = NO_ID;
+    if (extremity == BOX_START) {
+        controlPointID = BEGIN_CONTROL_POINT_INDEX;
     }
-  else if (extremity == BOX_END) {
-      controlPointID = END_CONTROL_POINT_INDEX;
+    else if (extremity == BOX_END) {
+        controlPointID = END_CONTROL_POINT_INDEX;
     }
-  if (controlPointID == NO_ID) {
-      return RETURN_ERROR;
+    if (controlPointID == NO_ID) {
+        return RETURN_ERROR;
     }
+    
+    unsigned int triggerID = _engines->addTriggerPoint(boxID, controlPointID);
 
-
-  if (!_engines->assignCtrlPointToTriggerPoint(triggerID, boxID, controlPointID)) {
-      _scene->displayMessage(tr("Trigger point already linked to a control point.").toStdString(), INDICATION_LEVEL);
-      return NO_MODIFICATION;
+    if (triggerID == NO_ID) {
+        _scene->displayMessage(tr("Trigger point already linked to a control point.").toStdString(), INDICATION_LEVEL);
+        return NO_MODIFICATION;
     }
-  else {
-      _scene->displayMessage(tr("Trigger point succesfully added").toStdString(), INDICATION_LEVEL);
-      _engines->setTriggerPointMessage(triggerID, message);
-      TriggerPoint * newTP = new TriggerPoint(boxID, extremity, message, triggerID, _scene);
-      _scene->addItem(newTP);
-      _triggerPoints[triggerID] = newTP;
-      _boxes[boxID]->addTriggerPoint(extremity, _triggerPoints[triggerID]);
-
-      return triggerID;
+    else {
+        _scene->displayMessage(tr("Trigger point succesfully added").toStdString(), INDICATION_LEVEL);
+        _engines->setTriggerPointMessage(triggerID, message);
+        TriggerPoint * newTP = new TriggerPoint(boxID, extremity, message, triggerID, _scene);
+        _scene->addItem(newTP);
+        _triggerPoints[triggerID] = newTP;
+        _boxes[boxID]->addTriggerPoint(extremity, _triggerPoints[triggerID]);
+        
+        return triggerID;
     }
-
-  return RETURN_ERROR;
+    
+    return RETURN_ERROR;
 }
 
 void

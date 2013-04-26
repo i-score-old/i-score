@@ -40,14 +40,15 @@ typedef unsigned int TimeEventIndex;
 /** a temporary type dedicated to retreive an Interval TimeProcess (this is related to Relation notion) */
 typedef unsigned int IntervalId;
 
-/** a temporary type dedicated to retreive an Interactive TimeEvent (this is related to TriggerPoint notion) */
-typedef unsigned int InteractiveEventId;
+/** a temporary type dedicated to retreive a process with an Interactive TimeEvent inside (this is related to TriggerPoint notion) */
+typedef unsigned int InteractiveProcessId;
 
 /** a class used to cache TTObject and some observers */
 class EngineCacheElement {
 
 public:
     TTObjectBasePtr object;
+    unsigned int    index;
     
     EngineCacheElement();
     ~EngineCacheElement();
@@ -109,10 +110,6 @@ enum BinaryRelationType { EQ_RELATION = 0, NQ_RELATION = 1, LQ_RELATION = 2, LE_
 /// The three temporal relations in Boxes
 enum RelationType {ALLEN = 0, ANTPOST = 1, INTERVAL = 2, BOUNDING = 3};
 
-#define getTimeProcess(boxId) TimeProcessPtr(TTObjectBasePtr(m_timeProcessMap[boxId]->object));
-
-#define getInterval(relationId) TimeProcessPtr(TTObjectBasePtr(m_intervalMap[relationId]->object));
-
 /*!
  * \class Engine
  *
@@ -133,6 +130,7 @@ private:
     
     EngineCacheMap      m_timeProcessMap;                               /// All automation or scenario time process and some observers stored using an unique id
     EngineCacheMap      m_intervalMap;                                  /// All interval time process and some observers stored using an unique id
+    EngineCacheMap      m_interactiveProcessMap;                        /// All interactive time process with an interactive event stored using an unique id
     
     TTObjectBasePtr     m_dataPlay;                                     /// A Modular TTData to expose Play transport service
     TTObjectBasePtr     m_dataStop;                                     /// A Modular TTData to expose Stop transport service
@@ -141,13 +139,13 @@ private:
     TTObjectBasePtr     m_dataStartPoint;                               /// A Modular TTData to expose StartPoint transport service
     TTObjectBasePtr     m_dataSpeed;                                    /// A Modular TTData to expose Speed transport service
     
-	void (*m_InteractiveEventActiveAttributeCallback)(InteractiveEventId, bool);
+	void (*m_InteractiveEventActiveAttributeCallback)(InteractiveProcessId, bool);
     void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);
     void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);
 
 public:
 
-    Engine(void(*interactiveEventActiveAttributeCallback)(InteractiveEventId, bool),
+    Engine(void(*interactiveEventActiveAttributeCallback)(InteractiveProcessId, bool),
            void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
            void(*transportDataValueCallback)(TTSymbol&, const TTValue&));
     
@@ -160,9 +158,17 @@ public:
     
     // Id management //////////////////////////////////////////////////////////////////
     
-    TimeProcessId cacheTimeProcess(TimeProcessPtr timeProcess);
+    TimeProcessId       cacheTimeProcess(TimeProcessPtr timeProcess);
+    TimeProcessPtr      getTimeProcess(TimeProcessId boxId);
+    void                uncacheTimeProcess(TimeProcessId boxId);
     
-    IntervalId cacheInterval(TimeProcessPtr timeProcess);
+    IntervalId          cacheInterval(TimeProcessPtr timeProcess);
+    TimeProcessPtr      getInterval(IntervalId relationId);
+    void                uncacheInterval(IntervalId relationId);
+    
+    InteractiveProcessId  cacheInteractiveProcess(TimeProcessPtr timeProcess, TimeEventIndex controlPointId);
+    TimeProcessPtr      getInteractiveProcess(InteractiveProcessId triggerId, TimeEventIndex& controlPointId);
+    void                uncacheInteractiveProcess(InteractiveProcessId triggerId);
     
 	// Edition ////////////////////////////////////////////////////////////////////////
     
@@ -547,7 +553,7 @@ public:
 	 *
 	 * \return the created trigger ID
 	 */
-	InteractiveEventId addTriggerPoint(TimeProcessId containingBoxId);
+	InteractiveProcessId addTriggerPoint(TimeProcessId containingBoxId, TimeEventIndex controlPointIndex);
     
 	/*!
 	 * Removes the triggerPoint from the CSP.
@@ -556,20 +562,7 @@ public:
 	 *
 	 * \param triggerId : the ID of the trigger to be removed.
 	 */
-	void removeTriggerPoint(InteractiveEventId triggerId);
-    
-	/*!
-	 * Sets the controlPoint to link with triggerPoint (given by ID).
-	 *
-	 * Throws OutOfBoundException if the ID is not matching any triggerPoint.
-	 *
-	 * \param triggerId : the ID of the trigger to be linked with the controlPoint.
-	 * \param boxId : the ID of the box containing the controlPoint to link.
-	 * \param controlPointIndex : the controlPoint index in the box.
-	 *
-	 * \return false if the controlPoint is already linked to another triggerPoint.
-	 */
-	bool assignCtrlPointToTriggerPoint(InteractiveEventId triggerId, TimeProcessId boxId, TimeEventIndex controlPointIndex);
+	void removeTriggerPoint(InteractiveProcessId triggerId);
     
 	/*!
 	 * Sets the triggerPoint (given by ID) message.
@@ -579,7 +572,7 @@ public:
 	 * \param triggerId : the ID of the trigger.
 	 * \param triggerMessage : the trigger message
 	 */
-	void setTriggerPointMessage(InteractiveEventId triggerId, std::string triggerMessage);
+	void setTriggerPointMessage(InteractiveProcessId triggerId, std::string triggerMessage);
     
 	/*!
 	 * Gets the triggerPoint (given by ID) message.
@@ -590,7 +583,7 @@ public:
 	 *
 	 * \return the trigger message
 	 */
-	std::string getTriggerPointMessage(InteractiveEventId triggerId);
+	std::string getTriggerPointMessage(InteractiveProcessId triggerId);
     
 	/*!
 	 * Gets the id of the box linked to the given trigger point.
@@ -600,7 +593,7 @@ public:
 	 * \return the id of the box linked to the trigger point,
 	 * NO_ID if the trigger point is not linked to a box.
 	 */
-	TimeProcessId getTriggerPointRelatedBoxId(InteractiveEventId triggerId);
+	TimeProcessId getTriggerPointRelatedBoxId(InteractiveProcessId triggerId);
     
 	/*!
 	 * Gets the index of the control point linked to the given trigger point.
@@ -610,7 +603,7 @@ public:
 	 * \return the index of the control point linked to the trigger point,
 	 * NO_ID if the trigger point is not linked to a control point.
 	 */
-	TimeProcessId getTriggerPointRelatedCtrlPointIndex(InteractiveEventId triggerId);
+	TimeProcessId getTriggerPointRelatedCtrlPointIndex(InteractiveProcessId triggerId);
     
 	/*!
 	 * Fills the given vector with all the boxes ID used in the editor.
@@ -634,7 +627,7 @@ public:
 	 *
 	 * \param triggersID : the vector to fill with all triggers ID used.
 	 */
-	void getTriggersPointId(std::vector<InteractiveEventId>& triggersID);
+	void getTriggersPointId(std::vector<InteractiveProcessId>& triggersID);
     
     
     
@@ -818,7 +811,7 @@ public:
 typedef Engine* EnginePtr;
 
 /** Any interactive event active attribute callback
- @param	baton			a TTValuePtr containing an EnginePtr and an InteractiveEventId
+ @param	baton			a TTValuePtr containing an EnginePtr and an InteractiveProcessId
  @param	data			the time event active state
  @return                an error code */
 void InteractiveEventActiveAttributeCallback(TTPtr baton, const TTValue& value);
