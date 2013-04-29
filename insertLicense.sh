@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Licence File
-LICENCE=/Users/luc/Documents/workspace/Acousmoscribe/LicenceCecill.txt
+LICENCE=./LicenceCecill.txt
 
 # For each code file in the directory 
 for FILE in $(ls *.hpp *.cpp)
