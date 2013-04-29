@@ -37,6 +37,10 @@ Engine::Engine(void(*interactiveEventActiveAttributeCallback)(InteractiveProcess
     m_TimeProcessSchedulerRunningAttributeCallback = timeProcessSchedulerRunningAttributeCallback;
     m_TransportDataValueCallback = transportDataValueCallback;
     
+    m_nextTimeProcessId = 1;
+    m_nextIntervalId = 1;
+    m_nextInteractiveProcessId = 1;
+    
     initModular();
     initScore();
 }
@@ -271,8 +275,9 @@ TimeProcessId Engine::cacheTimeProcess(TimeProcessPtr timeProcess)
     e = new EngineCacheElement();
     e->object = TTObjectBasePtr(timeProcess);
     
-    id = m_timeProcessMap.size() + 1;
+    id = m_nextTimeProcessId;
     m_timeProcessMap[id] = e;
+    m_nextTimeProcessId++;
     
     return id;
 }
@@ -298,8 +303,9 @@ IntervalId Engine::cacheInterval(TimeProcessPtr timeProcess)
     e = new EngineCacheElement();
     e->object = TTObjectBasePtr(timeProcess);
     
-    id = m_intervalMap.size() + 1;
+    id = m_nextIntervalId;
     m_intervalMap[id] = e;
+    m_nextIntervalId++;
     
     return id;
 }
@@ -326,8 +332,9 @@ InteractiveProcessId Engine::cacheInteractiveProcess(TimeProcessPtr timeProcess,
     e->object = timeProcess;
     e->index = controlPointId;
     
-    id = m_interactiveProcessMap.size() + 1;
+    id = m_nextInteractiveProcessId;
     m_interactiveProcessMap[id] = e;
+    m_nextInteractiveProcessId++;
     
     return id;
 }
@@ -510,24 +517,28 @@ void Engine::removeTemporalRelation(IntervalId relationId)
     uncacheInterval(relationId);
 }
 
-void Engine::changeTemporalRelationBounds(IntervalId relationId, TimeValue minBound, TimeValue maxBound, vector<TimeProcessId>& movedBoxes)
+void Engine::changeTemporalRelationBounds(IntervalId relationId, BoundValue minBound, BoundValue maxBound, vector<TimeProcessId>& movedBoxes)
 {
     TimeProcessPtr          timeProcess = getInterval(relationId);
     EngineCacheMapIterator  it;
     TTValue                 v;
     
-    // filtering -1 because we use unsigned int
-    // and sending 0 0 means the relation is not rigid
-    if (minBound != NO_BOUND)
-        v = TTValue(TTUInt32(minBound));
-    else
+    // filtering NO_BOUND (-1) and negative value because we use unsigned int
+    if (minBound == NO_BOUND)
         v = TTValue(TTUInt32(0));
-    
-    if (maxBound != NO_BOUND)
-        v.append(TTUInt32(maxBound));
+    else if (minBound < 0)
+        v = TTValue(TTUInt32(abs(minBound)));
     else
-        v.append(TTUInt32(0));
+        v = TTValue(TTUInt32(minBound));
     
+    if (maxBound == NO_BOUND)
+        v.append(TTUInt32(0));
+    else if (maxBound < 0)
+        v = TTValue(TTUInt32(abs(maxBound)));
+    else
+        v.append(TTUInt32(maxBound));
+    
+    // NOTE : sending 0 0 means the relation is not rigid
     // NOTE : it is also possible to use the "rigid" attribute to swicth between those two states
     timeProcess->sendMessage(TTSymbol("Limit"), v, kTTValNONE);
     
@@ -660,7 +671,7 @@ TimeEventIndex Engine::getRelationSecondCtrlPointIndex(IntervalId relationId)
 	return END_CONTROL_POINT_INDEX;
 }
 
-TimeValue Engine::getRelationMinBound(IntervalId relationId)
+BoundValue Engine::getRelationMinBound(IntervalId relationId)
 {
 	TimeProcessPtr  timeProcess = getInterval(relationId);
     TimeEventPtr    event;
@@ -674,7 +685,7 @@ TimeValue Engine::getRelationMinBound(IntervalId relationId)
     return v[0];
 }
 
-TimeValue Engine::getRelationMaxBound(IntervalId relationId)
+BoundValue Engine::getRelationMaxBound(IntervalId relationId)
 {
     TimeProcessPtr  timeProcess = getInterval(relationId);
     TimeEventPtr    event;

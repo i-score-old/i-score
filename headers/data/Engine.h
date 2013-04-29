@@ -25,8 +25,11 @@
 #include <map>
 #include <vector>
 
-/** a temporary type dedicated to pass time value (date, duration, bound, ...) */
+/** a temporary type dedicated to pass time value (date, duration, ...) */
 typedef unsigned int TimeValue;
+
+/** a temporary type dedicated to pass bound value */
+typedef int BoundValue;
 
 /** a temporary type dedicated to retreive a TimeProcess (this is related to Box notion) */
 typedef unsigned int TimeProcessId;
@@ -128,6 +131,10 @@ private:
     
 	TimeProcessPtr      m_mainScenario;                                 /// The top scenario
     
+    unsigned int        m_nextTimeProcessId;                            /// the next Id to give to any created time process
+    unsigned int        m_nextIntervalId;                               /// the next Id to give to any created interval
+    unsigned int        m_nextInteractiveProcessId;                     /// the next Id to give to any created time process
+    
     EngineCacheMap      m_timeProcessMap;                               /// All automation or scenario time process and some observers stored using an unique id
     EngineCacheMap      m_intervalMap;                                  /// All interval time process and some observers stored using an unique id
     EngineCacheMap      m_interactiveProcessMap;                        /// All interactive time process with an interactive event stored using an unique id
@@ -223,7 +230,7 @@ public:
 	 * \param maxBound : the max bound for the box relation in ms. NO_BOUND if the max bound is not used (+infinity).
 	 * \param movedBoxes : empty vector, will be filled with the ID of the boxes moved by this new relation.
 	 */
-	void changeTemporalRelationBounds(IntervalId relationId, TimeValue minBound, TimeValue maxBound, std::vector<TimeProcessId>& movedBoxes);
+	void changeTemporalRelationBounds(IntervalId relationId, BoundValue minBound, BoundValue maxBound, std::vector<TimeProcessId>& movedBoxes);
     
 	/*!
 	 * Checks if a relation exists between the two given control points.
@@ -273,8 +280,8 @@ public:
 	 */
 	TimeEventIndex getRelationSecondCtrlPointIndex(IntervalId relationId);
     
-	TimeValue getRelationMinBound(IntervalId relationId);
-	TimeValue getRelationMaxBound(IntervalId relationId);
+	BoundValue getRelationMinBound(IntervalId relationId);
+	BoundValue getRelationMaxBound(IntervalId relationId);
     
 	/*!
 	 * Calculates the optimal system after an editing operation
