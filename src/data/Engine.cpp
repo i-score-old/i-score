@@ -473,6 +473,8 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
     
     timeProcess->setAttributeValue(TTSymbol("endEvent"), v);
     
+    // TODO : order the events
+    
     // Set the time process rigid
     v = TTBoolean(YES);
     timeProcess->setAttributeValue(TTSymbol("rigid"), v);
@@ -481,6 +483,7 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
     v = TTObjectBasePtr(m_mainScenario);
     err = timeProcess->setAttributeValue(TTSymbol("scenario"), v);
     
+    // an error can append if the start is after the end
     if (!err) {
     
         // return the entire timeProcessMap except the first process !!! (this is bad but it is like former engine)
