@@ -115,7 +115,7 @@ class MaquetteScene : public QGraphicsScene
     /*!
      * \brief Initialises scene parameters.
      */
-    void init();
+    void init(); /// \éviter init() publique
 
     /*!
      * \brief Updates current view.

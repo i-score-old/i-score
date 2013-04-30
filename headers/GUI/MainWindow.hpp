@@ -137,7 +137,7 @@ class MainWindow : public QMainWindow
      *
      * \param event : the QT closing event
      */
-    virtual void closeEvent(QCloseEvent *event);
+    virtual void closeEvent(QCloseEvent *event); /// \todo virtual seulement si on a besoin d'hériter de MainWindow, ce qui n'est pas le cas.
     virtual void keyPressEvent(QKeyEvent *event);
     virtual void keyReleaseEvent(QKeyEvent *event);
 
@@ -304,11 +304,12 @@ class MainWindow : public QMainWindow
     QAction *_cutAct;                       //!< Cuting boxes action.
     QAction *_copyAct;                      //!< Copying boxes action.
     QAction *_pasteAct;                     //!< Pasting boxes action.
-    QAction *_selectAllAct;                 //!< Selecting the whole set of boxes action.
-    QActionGroup * _modeAct;                //!< Containing various interaction modes.
     QAction *_selectModeAct;                //!< Selection mode action.
     QAction *_PBModeAct;                    //!< Selecting parent boxes creation mode action.
     QAction *_commentModeAct;               //!< Selecting comment creation action.
+    QAction *_selectAllAct;                 //!< Selecting the whole set of boxes action.
+
+    QActionGroup * _modeAct;                //!< Containing various interaction modes.
 
     Help *_helpDialog;                      //!< Help dialog.
 

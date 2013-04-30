@@ -88,7 +88,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
   _paused = false;
   _modified = false;
 
-  _relation = new AbstractRelation;
+  _relation = new AbstractRelation; /// \todo pourquoi instancier une AbstractRelation ici ?
   _playThread = new PlayingThread(this);
   _timeBar = new TimeBarWidget(0, this);  
   _timeBarProxy = addWidget(_timeBar);/// \todo Vérifier ajout si classe TimeBarWidget hérite de GraphicsProxyWidget ou GraphicsObject. Notamment pour lier avec background.
@@ -121,6 +121,7 @@ MaquetteScene::init()
   _accelerationFactorSave = 1.;
   _accelerationFactor = 1.;
 
+  /// \todo MainWindow appelle init() de MaquetteScene, qui instancie lui même Maquette puis l'init.
   _maquette = Maquette::getInstance();
   _maquette->setScene(this);
   _maquette->init();
@@ -1521,7 +1522,7 @@ MaquetteScene::updateStartingTime(int value)
 void
 MaquetteScene::setPlaying(unsigned int boxID, bool playing)
 {
-  BasicBox *box = getBox(boxID);
+  BasicBox *box = getBox(boxID); /// \todo Besoin d'un cast qt explicite !
   map<unsigned int, BasicBox*>::iterator it;
   if ((it = _playingBoxes.find(boxID)) != _playingBoxes.end()) {
       it->second = box;

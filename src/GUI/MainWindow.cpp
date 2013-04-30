@@ -102,7 +102,7 @@ MainWindow::MainWindow()
   _view->updateScene();
 
   // Store background to increase speed
-  _view->setCacheMode(QGraphicsView::CacheBackground);
+  _view->setCacheMode(QGraphicsView::CacheBackground); /// \todo devrait être fait dans le constructeur de MaquetteView
 
   _scene->updateView();
   _scene->init(); /// \todo Les méthodes init() sont à bannir, il y a des constructeurs pour ça !!!
