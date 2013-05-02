@@ -363,7 +363,7 @@ ParentBox::dropEvent(QGraphicsSceneDragDropEvent *event)
 
   QDataStream in(&inputBuffer);
 
-  // TODO : use pasting STUFF
+  /// \todo Old TODO updated (by jC) : use pasting STUFF
 
   event->acceptProposedAction();
 
@@ -375,7 +375,7 @@ ParentBox::dropEvent(QGraphicsSceneDragDropEvent *event)
 void
 ParentBox::play()
 {
-  /// \todo parent box play function
+  /// \todo old TODO updated (by jC) : parent box play function
 }
 
 void

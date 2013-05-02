@@ -15,7 +15,8 @@ class TimeBarWidget : public QWidget {
     static const float LEFT_MARGIN;
     static const float NUMBERS_POINT_SIZE;
     void init();
-    void setZoomValue(float value);
+    void setZoomValue(float value); /// \todo setZoomValue() fait la même chose que le slot updateZoom(), et n'ai jamais appelée. (par jaime Chao)
+
 
   signals:
     void gotoValueEntered(double value);

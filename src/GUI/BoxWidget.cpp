@@ -67,7 +67,7 @@ using std::string;
 #include "AttributesEditor.hpp"
 #include "MainWindow.hpp"
 
-#define COMBOBOX_WIDTH 500 /// \todo Ne pas mettre des tailles en dur
+#define COMBOBOX_WIDTH 500 /// \todo Ne pas mettre des tailles en dur et utiliser des const en C++. (par jaime Chao)
 
 BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
   : QWidget(parent)

@@ -79,7 +79,7 @@ using std::string;
 using std::vector;
 using std::map;
 
-/// \todo On pourrait les instancier directement dans le header avec leurs définitions.
+/// \todo On pourrait les instancier directement dans le header avec leurs définitions. (par jaime Chao)
 const int BasicBox::COMBOBOX_HEIGHT = 25;
 const int BasicBox::COMBOBOX_WIDTH = 120;
 const float BasicBox::TRIGGER_ZONE_WIDTH = 18.;
@@ -271,9 +271,9 @@ BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
 {
   _scene = parent;
 
-  _abstract = new AbstractBox(*abstract); /// \todo Pourquoi recevoir un argument *abstract et le ré-instancier ????
+  _abstract = new AbstractBox(*abstract); /// \todo Pourquoi recevoir un argument *abstract et le ré-instancier ? (par jaime Chao)
 
-  init(); /// \todo Un constructeur !
+  init(); /// \todo Un constructeur ! (par jaime Chao)
 
   update();
 }

@@ -107,7 +107,7 @@ class Interpolation : public QTableWidget {
     void sampleRateChanged(const QString &address, int value);
 
   public slots:
-    /// \todo renommage : un slot devrait plutôt s'appeler "changeActivation" que "activationChanged". Notamment pour éviter la confusion avec les signals qui portent le même nom. Idem pour les quatres slots !
+    /// \todo renommage : un slot devrait plutôt s'appeler "changeActivation" que "activationChanged". Notamment pour éviter la confusion avec les signals qui portent le même nom. Idem pour les quatres slots ! (par jaime Chao)
     void activationChanged(bool state);
     void showChanged(bool state);
     void redundancyChanged(bool state);

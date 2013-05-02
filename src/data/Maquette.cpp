@@ -335,11 +335,11 @@ Maquette::addParentBox(unsigned int ID, const unsigned int date, const unsigned 
   return ID;
 }
 
-/// \todo change arguments named corner. this is not comprehensible.
+/// \todo change arguments named corner. this is not comprehensible. (par jaime Chao)
 unsigned int
 Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
 {
-  /// \todo called by MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name) with topLeft and bottomRight arguments. No need to recalculate
+  /// \todo called by MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name) with topLeft and bottomRight arguments. No need to recalculate. (par jaime Chao)
   QPointF firstCorner(std::min(corner1.x(), corner2.x()), std::min(corner1.y(), corner2.y()));
   QPointF secondCorner(std::max(corner1.x(), corner2.x()), std::max(corner1.y(), corner2.y()));
 
@@ -796,7 +796,7 @@ Maquette::updateRelations()
 }
 
 
-/// \todo Duplication de code avec la méthode homonyme (surcharge)
+/// \todo Duplication de code avec la méthode homonyme (surcharge). (par jaime Chao)
 bool
 Maquette::updateBox(unsigned int boxID, const Coords &coord)
 {
@@ -1161,7 +1161,7 @@ Maquette::addRelation(unsigned int ID1, BoxExtremity firstExtremum, unsigned int
       _scene->addItem(newRel);
       updateBoxesFromEngines(movedBoxes);
 
-      //TODO : Check if can be comment
+      /// \todo Old TODO updated (by jC) : Check if can be comment
 //        _scene->boxesMoved(movedBoxes);
 
       return (int)relationID;
@@ -1193,7 +1193,7 @@ Maquette::addRelation(const AbstractRelation &abstract)
 bool
 Maquette::addInterval(unsigned int /*ID1*/, unsigned int /*ID2*/, int /*value*/, int /*tolerance*/)
 {
-    //TODO
+    /// \todo Old TODO updated (by jC)
   return false;
 }
 
@@ -1459,7 +1459,7 @@ Maquette::stopPlayingWithGoto()
 void
 Maquette::saveBox(unsigned int boxID)
 {
-  // TODO : handle others boxes further attributes during save
+  /// \todo Old TODO updated (by jC) : handle others boxes further attributes during save
   QString boxType = "unknown";
   if (_boxes[boxID]->type() == PARENT_BOX_TYPE) {
       boxType = QString("parent");

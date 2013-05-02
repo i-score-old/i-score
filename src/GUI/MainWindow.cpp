@@ -102,13 +102,13 @@ MainWindow::MainWindow()
   _view->updateScene();
 
   // Store background to increase speed
-  _view->setCacheMode(QGraphicsView::CacheBackground); /// \todo devrait être fait dans le constructeur de MaquetteView
+  _view->setCacheMode(QGraphicsView::CacheBackground); /// \todo devrait être fait dans le constructeur de MaquetteView. (par jaime Chao)
 
   _scene->updateView();
-  _scene->init(); /// \todo Les méthodes init() sont à bannir, il y a des constructeurs pour ça !!!
+  _scene->init(); /// \todo Les méthodes init() sont à bannir, il y a des constructeurs pour ça !!! (par jaime Chao)
 
   _editor->setScene(_scene);
-  _editor->init(); /// \todo Les méthodes init() sont à bannir, il y a des constructeurs pour ça !!!
+  _editor->init(); /// \todo Les méthodes init() sont à bannir, il y a des constructeurs pour ça !!! (par jaime Chao)
   _editor->show();
 
   _commandKey = false;
@@ -377,7 +377,7 @@ MainWindow::updateEditor()
     }
 }
 
-/// \todo Vérifier que la surcouche d'appels a du sens.
+/// \todo Vérifier que la surcouche d'appels a du sens. (par jaime Chao)
 void
 MainWindow::cutSelection()
 {

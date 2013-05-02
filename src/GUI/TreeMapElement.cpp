@@ -171,7 +171,7 @@ TreeMapElement::childAdded()
 {
   increaseDescendance();
 
-  // TODO : Parents should resize too
+  /// \todo Old TODO updated (by jC) : Parents should resize too
   map<string, TreeMapElement*>::iterator it;
   const float CHILD_WIDTH = (float)_children.size() / (float)width();
   const float CHILD_HEIGHT = height();

@@ -63,7 +63,7 @@ enum { ABSTRACT_TRIGGER_POINT_TYPE = 5 };
 class AbstractTriggerPoint : public Abstract
 {
   public:
-    friend class TriggerPoint;
+    friend class TriggerPoint; /// \todo vérifier l'implication de friend class. (par jaime Chao)
 
     AbstractTriggerPoint(unsigned int boxID = NO_ID, BoxExtremity extremity = NO_EXTREMITY,
                          const std::string &message = "", unsigned int trgID = NO_ID);

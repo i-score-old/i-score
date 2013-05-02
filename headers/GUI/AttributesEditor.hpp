@@ -146,7 +146,7 @@ class AttributesEditor : public QDockWidget
      * \param language : the language to used for filling widgets' names
      **/
 
-    // TODO : use QLocale instead
+    /// \todo Old TODO updated (by jC) : use QLocale instead
     void nameWidgets();
 
     /*!
@@ -212,7 +212,7 @@ class AttributesEditor : public QDockWidget
     QHBoxLayout *_boxSettingsLayout; //!< Layout handling box settings (name, color, assignation...).
     NetworkTree *_networkTree; //!< NetworkTree (inspector).
 
-    // TODO
+    /// \todo Old TODO updated (by jC)
     QDoubleSpinBox * _boxStartValue;
     QDoubleSpinBox * _boxLengthValue;    
 

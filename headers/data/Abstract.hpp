@@ -69,6 +69,6 @@ class Abstract
      *
      * \return the type of the abstract item.
      */
-    virtual int type() const = 0;
+    virtual int type() const = 0; /// \todo changer de nom la méthode pour tester l'utilité d'un virtuel pur. (par jaime Chao)
 };
 #endif

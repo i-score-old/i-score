@@ -115,7 +115,7 @@ Comment::type() const
 void
 Comment::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-  // TODO : solve position BUG
+  /// \todo Old TODO updated (by jC): solve position BUG
   QRectF comRect = boundingRect();
   painter->save();
   QPen pen = QPen(Qt::darkYellow, BasicBox::LINE_WIDTH);
