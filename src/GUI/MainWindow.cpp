@@ -142,7 +142,7 @@ MainWindow::~MainWindow()
   delete _fileMenu;
   delete _editMenu;
   delete _viewMenu;
-  delete _helpMenu;
+//  delete _helpMenu;
   delete _newAct;
   delete _openAct;
   delete _saveAct;
@@ -642,10 +642,10 @@ MainWindow::createMenus()
   _viewMenu->addAction(_zoomInAct);
   _viewMenu->addAction(_editorAct);
 
-  _helpMenu = _menuBar->addMenu(tr("&Help"));
-  _helpMenu->addAction(_aboutAct);
-  _helpMenu->addSeparator();
-  _helpMenu->addAction(_helpAct);
+//  _helpMenu = _menuBar->addMenu(tr("&Help"));
+//  _helpMenu->addAction(_aboutAct);
+//  _helpMenu->addSeparator();
+//  _helpMenu->addAction(_helpAct);
 }
 
 void
