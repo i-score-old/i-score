@@ -52,7 +52,6 @@ void Engine::initModular()
     TTString        applicationName = "i-score";                  // TODO : declare as global variable
     TTObjectBasePtr iscore;                                       // TODO : declare as global variable
     TTString        configFile = "/usr/local/include/IScore/i-scoreConfiguration.xml";
-    TTString        pluginsDir = "/usr/local/lib/IScore";
     TTHash          hashParameters;
     
     // this initializes the Modular framework and loads protocol plugins (in /usr/local/jamoma/extensions folder)
@@ -133,13 +132,15 @@ void Engine::initModular()
     // Example : Create a distant application
     ////////////
     TTObjectBasePtr anApplication = NULL;
+    TTSymbol        MinuitApplicationName;
     
-    // create an application called myApplication
-    args = TTValue(TTSymbol("myApplication"));
+    // create an application called MinuitDevice1
+    MinuitApplicationName = TTSymbol("MinuitDevice1");
+    args = TTValue(MinuitApplicationName);
     TTObjectBaseInstantiate(kTTSym_Application, TTObjectBaseHandle(&anApplication), args);
     
     ////////////
-    // Example : Register i-score and myApplication to the Minuit protocol
+    // Example : Register i-score and MinuitDevice1 to the Minuit protocol
     ////////////
     
     // check if the Minuit protocol has been loaded
@@ -159,7 +160,7 @@ void Engine::initModular()
         getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
         
         // register this application to the Minuit protocol
-        v = TTValue(TTSymbol("myApplication"));
+        v = TTValue(MinuitApplicationName);
         getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), v, kTTValNONE);
         
         // set the Minuit parameters for the distant application
@@ -167,23 +168,30 @@ void Engine::initModular()
         hashParameters.append(TTSymbol("port"), 9998);
         hashParameters.append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
         
-        v = TTValue(TTSymbol("myApplication"));
+        v = TTValue(MinuitApplicationName);
         v.append(TTPtr(&hashParameters));
         getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
         
         // run the Minuit protocol
         TTModularApplications->sendMessage(TTSymbol("ProtocolRun"), TTSymbol("Minuit"), kTTValNONE);
+        
+        ////////////
+        // Example : Build the namespace of MinuitDevice1 using discovery feature (if the protocol provides it)
+        ////////////
+        
+        // you can create an OSC receive on the 9998 port to see that a namespace request is sent by i-score (using Pure Data for example)
+        anApplication->sendMessage(TTSymbol("DirectoryBuild"));
     }
-    
+/*
     ////////////
-    // Example : Read the namespace of myApplication from a namespace file
+    // Example : Read the namespace of MinuitDevice1 from a namespace file
     ////////////
     
     // create a TTXmlHandler class to parse a xml namespace file
     TTXmlHandlerPtr myXmlHandler = NULL;
     TTObjectBaseInstantiate(kTTSym_XmlHandler, TTObjectBaseHandle(&myXmlHandler), kTTValNONE);
     
-    // prepare the TTXmlHandler to pass the result of the parsing to myApplication
+    // prepare the TTXmlHandler to pass the result of the parsing to MinuitDevice1
     v = TTValue(anApplication);
     myXmlHandler->setAttributeValue(TTSymbol("object"), v);
     
@@ -191,25 +199,19 @@ void Engine::initModular()
     err = myXmlHandler->sendMessage(TTSymbol("Read"), TTSymbol("/Users/WALL-E/Documents/Jamoma/Modules/Modular/implementations/MaxMSP/jcom.modular/remoteApp - namespace.xml"), kTTValNONE);
     
     if (!err) {
-        // get the root of the TNodeDirectory of myApplication
+        // get the root of the TNodeDirectory of MinuitDevice1
         // note : the TTNodeDirectory is a tree structure used to registered and retrieve TTObjects using TTAddress
-        TTNodeDirectoryPtr anApplicationDirectory = getApplicationDirectory(TTSymbol("myApplication"));
+        TTNodeDirectoryPtr anApplicationDirectory = getApplicationDirectory(TTSymbol("MinuitDevice1"));
         
         // return all addresses of the TTNodeDirectory
-        std::cout << "__ Dump myApplication directory __" << std::endl;
+        std::cout << "__ Dump MinuitDevice1 directory __" << std::endl;
         
         // start to dump addresses recursilvely from the root of the directory
         dumpAddressBelow(anApplicationDirectory->getRoot());
         
         std::cout << "__________________________________" << std::endl;
     }
-    
-    ////////////
-    // Example : Build the namespace of myApplication using discovery feature (if the protocol provides it)
-    ////////////
-    
-    // you can create an OSC receive on the 9998 port to see that a namespace request is sent by i-score (using Pure Data for example)
-    //anApplication->sendMessage(TTSymbol("DirectoryBuild"));
+*/    
 }
 
 void Engine::initScore()
@@ -677,13 +679,9 @@ TimeEventIndex Engine::getRelationSecondCtrlPointIndex(IntervalId relationId)
 BoundValue Engine::getRelationMinBound(IntervalId relationId)
 {
 	TimeProcessPtr  timeProcess = getInterval(relationId);
-    TimeEventPtr    event;
     TTValue         v;
     
-	timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-    event = TimeEventPtr(TTObjectBasePtr(v[0]));
-    
-    event->getAttributeValue(TTSymbol("dateMin"), v);
+    timeProcess->getAttributeValue(TTSymbol("durationMin"), v);
     
     return v[0];
 }
@@ -691,13 +689,9 @@ BoundValue Engine::getRelationMinBound(IntervalId relationId)
 BoundValue Engine::getRelationMaxBound(IntervalId relationId)
 {
     TimeProcessPtr  timeProcess = getInterval(relationId);
-    TimeEventPtr    event;
     TTValue         v;
-    
-	timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-    event = TimeEventPtr(TTObjectBasePtr(v[0]));
-    
-    event->getAttributeValue(TTSymbol("dateMax"), v);
+
+    timeProcess->getAttributeValue(TTSymbol("durationMax"), v);
     
     return v[0];
 }
@@ -760,7 +754,7 @@ int Engine::getBoxNbCtrlPoints(TimeProcessId boxId)
     
 	timeProcess->getAttributeValue(TTSymbol("intermediateEvents"), v);
     
-    return v.size() + 2; // becasue there is always a start and an end event too
+    return v.size() + 2; // because there is always a start and an end event too
 }
 
 TimeEventIndex Engine::getBoxFirstCtrlPointIndex(TimeProcessId boxId)
@@ -1156,41 +1150,18 @@ TimeValue Engine::getGotoValue()
 
 bool Engine::play()
 {
-    TTValue         v;
-    TTObjectBasePtr aScheduler;
-    TTFloat64       duration;
-    TTErr           err;
+    // compile the main scenario
+    m_mainScenario->sendMessage(TTSymbol("Compile"));
     
-    // TODO : compile the PetriNet ?
-    
-    // get the scheduler object of the main scenario
-    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
-    aScheduler = TTObjectBasePtr(v[0]);
-    
-    // set scheduler duration equal to the scenario duration
-    m_mainScenario->getAttributeValue(TTSymbol("duration"), v);
-    
-    duration = TTUInt32(v[0]);
-    aScheduler->setAttributeValue(TTSymbol("duration"), duration);
-    
-    err = aScheduler->sendMessage(TTSymbol("Go"));
-    
-    return !err;
+    return !m_mainScenario->sendMessage(TTSymbol("Play"));
 }
 
 void Engine::pause(bool pauseValue)
 {
-    TTValue         v;
-    TTObjectBasePtr aScheduler;
-    
-    // get the scheduler object of the main scenario
-    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
-    aScheduler = TTObjectBasePtr(v[0]);
-    
     if (pauseValue)
-        aScheduler->sendMessage(TTSymbol("Pause"));
+        m_mainScenario->sendMessage(TTSymbol("Pause"));
     else
-        aScheduler->sendMessage(TTSymbol("Resume"));
+        m_mainScenario->sendMessage(TTSymbol("resume"));;
 }
 
 bool Engine::isPaused()
@@ -1209,17 +1180,7 @@ bool Engine::isPaused()
 
 bool Engine::stop()
 {
-    TTValue         v;
-    TTObjectBasePtr aScheduler;
-    TTErr           err;
-    
-    // get the scheduler object of the main scenario
-    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
-    aScheduler = TTObjectBasePtr(v[0]);
-
-    err = aScheduler->sendMessage(TTSymbol("Stop"));
-    
-    return !err;
+    return !m_mainScenario->sendMessage(TTSymbol("Stop"));
 }
 
 bool Engine::isRunning()
@@ -1235,23 +1196,6 @@ bool Engine::isRunning()
     
     return TTBoolean(v[0]);
 }
-
-#ifdef TODO_ENGINE 
-void Engine::compile()
-{
-	m_executionMachine->reset();
-    
-	std::map<unsigned int, StoryLine> hierarchyStoryLine;
-    
-	computeHierarchyStoryLine(ROOT_BOX_ID, m_editor->getCSP(), hierarchyStoryLine);
-    
-    //	StoryLine storyLine(m_editor->getCSP());
-    
-	if (hierarchyStoryLine[ROOT_BOX_ID].m_constrainedBoxes.size() >= 1) {
-		m_executionMachine->compileECO(hierarchyStoryLine, m_executionMachine->getGotoInformation());
-	}
-}
-#endif
 
 TimeValue Engine::getCurrentExecutionTime()
 {
@@ -1336,24 +1280,49 @@ void Engine::simulateNetworkMessageReception(const std::string & netMessage)
 
 void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const std::string & DevicePort)
 {
-#ifdef TODO_ENGINE    
-	//m_networkController->addDevice(deviceName, pluginToUse, DeviceIp, DevicePort);
-	std::map<std::string, std::string>* commParameters = new std::map<std::string, std::string>();
+    TTValue         v;
+    TTSymbol        applicationName(deviceName);
+    TTSymbol        protocolName(pluginToUse);
+    TTObjectBasePtr anApplication = NULL;
     
-	(*commParameters)["ip"] = DeviceIp;
-	(*commParameters)["port"] = DevicePort;
-    
-	m_networkController->deviceAdd(deviceName, pluginToUse, commParameters);
-    
-	delete commParameters;
-#endif
+    // if the application doesn't already exist
+    if (!getApplication(applicationName)) {
+        
+        // create the application
+        v = TTValue(applicationName);
+        TTObjectBaseInstantiate(kTTSym_Application, TTObjectBaseHandle(&anApplication), v);
+        
+        // check if the protocol has been loaded
+		if (getProtocol(protocolName)) {
+            
+            // register the application to the protocol
+            v = TTValue(applicationName);
+            getProtocol(protocolName)->sendMessage(TTSymbol("registerApplication"), v, kTTValNONE);
+        }
+    }
 }
 
 void Engine::removeNetworkDevice(const std::string & deviceName)
 {
-#ifdef TODO_ENGINE    
-	m_networkController->deviceRemove(deviceName);
-#endif
+    TTValue         v;
+    TTSymbol        applicationName(deviceName);
+    TTSymbol        protocolName;
+    TTObjectBasePtr anApplication = getApplication(applicationName);
+    
+    // if the application exists
+    if (anApplication) {
+        
+        // get the protocols of the application
+        v = getApplicationProtocols(applicationName);
+        protocolName = v[0]; // we register application to 1 protocol only
+        
+        // unregister the application to the protocol
+        v = TTValue(applicationName);
+        getProtocol(protocolName)->sendMessage(TTSymbol("unregisterApplication"), v, kTTValNONE);
+        
+        // delete the application
+        TTObjectBaseRelease(TTObjectBaseHandle(&anApplication));
+    }
 }
 
 void Engine::sendNetworkMessage(const std::string & stringToSend)
@@ -1404,9 +1373,89 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
 
 int Engine::requestNetworkNamespace(const std::string & address, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)
 {
-#ifdef TODO_ENGINE
-	return m_networkController->deviceSendDiscoverRequest(address, &nodes, &leaves, &attributs, &attributsValue);
-#endif
+    TTSymbol            type, temp(address);
+    TTAddress           networktreeAddress(temp);
+    TTAddress           applicationName, anAddress;
+    TTNodeDirectoryPtr  aDirectory;
+    TTNodePtr           aNode, childNode;
+    TTMirrorPtr         aMirror;
+    TTList              nodeList;
+    TTString            s;
+    TTValue             v;
+    
+    // split the address to get application name and then an address
+    networktreeAddress.splitAt(0, applicationName, anAddress);
+    
+    // get the application directory
+    aDirectory = getApplicationDirectory(TTSymbol(applicationName.string()));
+    
+    if (!aDirectory)
+        return 0;
+    
+    if (anAddress == kTTAdrsEmpty)
+        anAddress = kTTAdrsRoot;
+    else
+        anAddress = kTTAdrsRoot.appendAddress(anAddress);
+    
+    // explore the directory at this address
+    // notice the tree is already built (see in initModular)
+    if (!aDirectory->getTTNode(anAddress, &aNode)) {
+        
+        // get object attributes
+        aMirror = TTMirrorPtr(aNode->getObject());
+        if (aMirror) {
+            
+            type = aMirror->getName();
+            
+            if (type == TTSymbol("Data")) {
+                
+                // append an unique value attribute
+                attributs.push_back("value");
+                
+                // get the value attribute
+               /* 
+                aMirror->getAttributeValue(TTSymbol("value"), v);
+                v.toString();
+                s = TTString(v[0]);
+                attributsValue.push_back(s.c_str());
+                */
+            }
+        
+        }
+        
+        // TODO : get attributes value
+        
+        // get children
+        aNode->getChildren(S_WILDCARD, S_WILDCARD, nodeList);
+        
+        // sort children in leaves and nodes
+        for (nodeList.begin(); nodeList.end(); nodeList.next()) {
+            
+            childNode = TTNodePtr(TTPtr(nodeList.current()[0]));
+            
+            // prepare name.instance to store
+            s = childNode->getName().string();
+            if (childNode->getInstance() != kTTSymEmpty) {
+                s += ".";
+                s += childNode->getInstance().string();
+            }
+            
+            // depending on the mirror object type
+            aMirror = TTMirrorPtr(childNode->getObject());
+            if (aMirror) {
+                
+                type = aMirror->getName();
+                
+                if (type == TTSymbol("Data"))
+                    leaves.push_back(s.c_str());
+                else
+                    nodes.push_back(s.c_str());
+                    
+            }
+        }
+        
+        return 1;
+    }
     
     return 0;
 }
