@@ -56,11 +56,16 @@ DeviceEdit::init()
 
   _deviceNameLabel = new QLabel(tr("DeviceName"));
   _pluginsLabel = new QLabel(tr("Plugins"));
-  _portLabel = new QLabel(tr("Port (output)"));
+  _portOutputLabel = new QLabel(tr("Port (output)"));
+  _portInputLabel = new QLabel(tr("Port (input)"));
   _IPLabel = new QLabel(tr("IP"));
 
-  _portBox = new QSpinBox;
-  _portBox->setRange(0, 10000);
+  _portOutputBox = new QSpinBox;
+  _portOutputBox->setRange(0, 10000);
+  _portInputBox = new QSpinBox;
+  _portInputBox->setRange(0, 10000);
+  _portInputBox->setValue(7002);
+  _portInputBox->setEnabled(false);
 
   _IPBox = new QLineEdit;
   _nameEdit = new QLineEdit;
@@ -72,19 +77,21 @@ DeviceEdit::init()
   _layout->addWidget(_nameEdit, 0, 1, 1, 1);
   _layout->addWidget(_pluginsLabel, 1, 0, 1, 1);
   _layout->addWidget(_pluginsComboBox, 1, 1, 1, 1);
-  _layout->addWidget(_portLabel, 2, 0, 1, 1);
-  _layout->addWidget(_portBox, 2, 1, 1, 1);
-  _layout->addWidget(_IPLabel, 3, 0, 1, 1);
-  _layout->addWidget(_IPBox, 3, 1, 1, 1);
+  _layout->addWidget(_portOutputLabel, 2, 0, 1, 1);
+  _layout->addWidget(_portOutputBox, 2, 1, 1, 1);
+  _layout->addWidget(_portInputLabel, 3, 0, 1, 1);
+  _layout->addWidget(_portInputBox, 3, 1, 1, 1);
+  _layout->addWidget(_IPLabel, 4, 0, 1, 1);
+  _layout->addWidget(_IPBox, 4, 1, 1, 1);
 
   _okButton = new QPushButton(tr("OK"), this);
-  _layout->addWidget(_okButton, 3, 2, 1, 1);
+  _layout->addWidget(_okButton, 4, 2, 1, 1);
   _cancelButton = new QPushButton(tr("Cancel"), this);
-  _layout->addWidget(_cancelButton, 3, 3, 1, 1);
+  _layout->addWidget(_cancelButton, 4, 3, 1, 1);
 
   connect(_nameEdit, SIGNAL(editingFinished()), this, SLOT(deviceNameChanged()));
   connect(_pluginsComboBox, SIGNAL(activated(int)), this, SLOT(setPluginChanged()));
-  connect(_portBox, SIGNAL(valueChanged(int)), this, SLOT(setChanged()));
+  connect(_portOutputBox, SIGNAL(valueChanged(int)), this, SLOT(setChanged()));
   connect(_IPBox, SIGNAL(textChanged(const QString &)), this, SLOT(setChanged()));
 
   connect(_okButton, SIGNAL(clicked()), this, SLOT(updateNetworkConfiguration()));
@@ -106,7 +113,7 @@ DeviceEdit::edit(QString name)
       return;
     }
 
-  _portBox->setValue(_currentDevice.networkPort);
+  _portOutputBox->setValue(_currentDevice.networkPort);
   _IPBox->setText(QString::fromStdString(_currentDevice.networkHost));
 
   _nameEdit->setText(QString::fromStdString(_currentDevice.name));
@@ -156,7 +163,7 @@ DeviceEdit::updateNetworkConfiguration()
       QHostAddress hostAddress(_IPBox->text());
       if (!hostAddress.isNull()) {
           Maquette::getInstance()->changeNetworkDevice(_nameEdit->text().toStdString(), _pluginsComboBox->currentText().toStdString(),
-                                                       _IPBox->text().toStdString(), _portBox->text().toStdString());
+                                                       _IPBox->text().toStdString(), _portOutputBox->text().toStdString());
           if (_pluginChanged) {
               emit(devicePluginChanged(_pluginsComboBox->currentText()));
             }

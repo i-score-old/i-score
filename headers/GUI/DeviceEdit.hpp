@@ -53,11 +53,13 @@ class DeviceEdit : public QDialog
 
     QLabel *_devicesLabel;       //!< QLabel for devices.
     QLabel *_pluginsLabel;       //!< QLabel for plugins.
-    QLabel *_portLabel;          //!< QLabel for ports.
+    QLabel *_portOutputLabel;          //!< QLabel for output ports.
+    QLabel *_portInputLabel;          //!< QLabel for intput ports.
     QLabel *_IPLabel;            //!< QLabel for network adress.
 
     QComboBox *_pluginsComboBox; //!< QComboBox handling various plug-ins available.
-    QSpinBox *_portBox;          //!< QSpinBox managing port value.
+    QSpinBox *_portOutputBox;          //!< QSpinBox managing output port value.
+    QSpinBox *_portInputBox;          //!< QSpinBox managing input port value.
     QLineEdit *_IPBox;           //!< QLineEdit
 
     QPushButton *_okButton;      //!< Button used to confirme.
