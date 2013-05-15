@@ -280,7 +280,6 @@ MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[]
 void
 MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
 {
-  std::cout<<"Foreground"<<std::endl;
   Q_UNUSED(rect);
   if (!_playing) {
 
