@@ -352,7 +352,7 @@ NetworkTree::createItemFromMessage(QString message)
 
 void
 NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
-{
+{  
   rootNode->setCheckState(START_COLUMN, Qt::Unchecked);
   rootNode->setCheckState(END_COLUMN, Qt::Unchecked);
 
@@ -382,7 +382,6 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode, QString message)
   newItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
   newItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
   newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
-
 
   rootNode->insertChild(rootNode->childCount() - 1, newItem);
   _OSCMessages.insert(newItem, getAbsoluteAddress(newItem));
@@ -451,6 +450,7 @@ NetworkTree::createOCSBranch(QTreeWidgetItem *curItem)
   addANodeItem->setFlags(Qt::ItemIsEnabled);
   addANodeItem->setIcon(0, QIcon(":/images/addANode.png"));
   curItem->addChild(addANodeItem);
+  curItem->setFlags(Qt::ItemIsEnabled);
 }
 
 QString
@@ -1413,9 +1413,11 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
   else if (currentItem()->type() == addOSCNode) {
       ;
     }
-  else if (currentItem()->type() == NodeNamespaceType && currentColumn() == NAME_COLUMN) {
-      QString deviceName = currentItem()->text(NAME_COLUMN);
-      _deviceEdit->edit(deviceName);
+  else if (currentItem()->type() == NodeNamespaceType) {
+      if(currentColumn() == NAME_COLUMN){
+          QString deviceName = currentItem()->text(NAME_COLUMN);
+          _deviceEdit->edit(deviceName);
+        }
     }
   else {
       if (currentColumn() == START_COLUMN || currentColumn() == END_COLUMN || currentColumn() == SR_COLUMN) {

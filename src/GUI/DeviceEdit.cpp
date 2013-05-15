@@ -56,9 +56,8 @@ DeviceEdit::init()
 
   _deviceNameLabel = new QLabel(tr("DeviceName"));
   _pluginsLabel = new QLabel(tr("Plugins"));
-  _portLabel = new QLabel(tr("Port"));
+  _portLabel = new QLabel(tr("Port (output)"));
   _IPLabel = new QLabel(tr("IP"));
-
 
   _portBox = new QSpinBox;
   _portBox->setRange(0, 10000);
