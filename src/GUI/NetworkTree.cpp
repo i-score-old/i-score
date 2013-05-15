@@ -363,7 +363,7 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
   QTreeWidgetItem *newItem = new QTreeWidgetItem(OSCname, OSCNode);
   newItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
   newItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
-  newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled);
+  newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
 
   rootNode->insertChild(rootNode->childCount() - 1, newItem);
   QString address = getAbsoluteAddress(newItem);
@@ -1396,8 +1396,6 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
   Q_UNUSED(event);
 
   if (currentItem()->type() == OSCNode) {
-      QTreeWidgetItem *item = currentItem();
-      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
       editItem(currentItem(), currentColumn());
       if (currentColumn() == NAME_COLUMN) {
           NAME_MODIFIED = true;
@@ -1546,26 +1544,26 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
   if (item->type() == OSCNode && column == NAME_COLUMN && NAME_MODIFIED) {
       NAME_MODIFIED = FALSE;
       changeNameValue(item, item->text(NAME_COLUMN));
-      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable);
+      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
   if (item->type() == OSCNode && column == START_COLUMN && VALUE_MODIFIED) {
       VALUE_MODIFIED = FALSE;
       assignItem(item, data);
       emit(startValueChanged(item, item->text(START_COLUMN)));
-      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable);
+      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
 
   if (item->type() == OSCNode && column == END_COLUMN && VALUE_MODIFIED) {
       VALUE_MODIFIED = FALSE;
       assignItem(item, data);
       emit(endValueChanged(item, item->text(END_COLUMN)));
-      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable);
+      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
     }
 
   if (item->type() == OSCNode && column == SR_COLUMN && SR_MODIFIED) {
       SR_MODIFIED = FALSE;
       emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
-      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable);
+      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
 }
 
