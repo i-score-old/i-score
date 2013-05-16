@@ -1074,8 +1074,9 @@ MaquetteScene::removeTriggerPoint(unsigned int trgID)
       if (box != NULL) {
           box->removeTriggerPoint(trgPnt->boxExtremity());
         }
+      _triggersQueueList.removeAll(trgPnt);
       removeItem(trgPnt);
-      _maquette->removeTriggerPoint(trgID);
+      _maquette->removeTriggerPoint(trgID);      
     }
 }
 
@@ -1489,9 +1490,8 @@ MaquetteScene::removeBox(unsigned int boxID)
         }
 
       box->removeComment();
-
-//        box->removeTriggerPoint(BOX_START);
-//        box->removeTriggerPoint(BOX_END);
+      box->removeTriggerPoint(BOX_START);
+      box->removeTriggerPoint(BOX_END);
 
       delete box;
       setModified(true);
@@ -1638,6 +1638,12 @@ MaquetteScene::stopGotoStart()
   _playingBoxes.clear();
   update();
   emit(playModeChanged());
+}
+
+void
+MaquetteScene::removeFromTriggerQueue(TriggerPoint *trigger)
+{
+  _triggersQueueList.removeAll(trigger);
 }
 
 void

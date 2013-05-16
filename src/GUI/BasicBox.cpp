@@ -668,6 +668,8 @@ BasicBox::updateStuff()
 }
 
 
+
+
 void
 BasicBox::addRelation(BoxExtremity extremity, Relation *rel)
 {
@@ -847,12 +849,18 @@ BasicBox::addTriggerPoint(BoxExtremity extremity, TriggerPoint *tp)
 void
 BasicBox::removeTriggerPoint(BoxExtremity extremity)
 {
-  _triggerPoints->remove(extremity);
-  updateFlexibility();
+  if(_triggerPoints->contains(extremity)){
 
-  updateRelations(extremity);
-  _scene->update();
-  update();
+      TriggerPoint *trgPoint = _triggerPoints->value(extremity);
+      _triggerPoints->remove(extremity);
+      Maquette::getInstance()->removeTriggerPoint(trgPoint->ID());
+      _scene->removeFromTriggerQueue(trgPoint);
+
+      updateFlexibility();
+      updateRelations(extremity);
+      _scene->update();
+      update();
+    }
 }
 
 void
