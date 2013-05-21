@@ -352,7 +352,7 @@ NetworkTree::createItemFromMessage(QString message)
 
 void
 NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
-{
+{  
   rootNode->setCheckState(START_COLUMN, Qt::Unchecked);
   rootNode->setCheckState(END_COLUMN, Qt::Unchecked);
 
@@ -363,7 +363,7 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
   QTreeWidgetItem *newItem = new QTreeWidgetItem(OSCname, OSCNode);
   newItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
   newItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
-  newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled);
+  newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
 
   rootNode->insertChild(rootNode->childCount() - 1, newItem);
   QString address = getAbsoluteAddress(newItem);
@@ -382,7 +382,6 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode, QString message)
   newItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
   newItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
   newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
-
 
   rootNode->insertChild(rootNode->childCount() - 1, newItem);
   _OSCMessages.insert(newItem, getAbsoluteAddress(newItem));
@@ -451,6 +450,7 @@ NetworkTree::createOCSBranch(QTreeWidgetItem *curItem)
   addANodeItem->setFlags(Qt::ItemIsEnabled);
   addANodeItem->setIcon(0, QIcon(":/images/addANode.png"));
   curItem->addChild(addANodeItem);
+  curItem->setFlags(Qt::ItemIsEnabled);
 }
 
 QString
@@ -1396,8 +1396,6 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
   Q_UNUSED(event);
 
   if (currentItem()->type() == OSCNode) {
-      QTreeWidgetItem *item = currentItem();
-      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
       editItem(currentItem(), currentColumn());
       if (currentColumn() == NAME_COLUMN) {
           NAME_MODIFIED = true;
@@ -1415,9 +1413,11 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
   else if (currentItem()->type() == addOSCNode) {
       ;
     }
-  else if (currentItem()->type() == NodeNamespaceType && currentColumn() == NAME_COLUMN) {
-      QString deviceName = currentItem()->text(NAME_COLUMN);
-      _deviceEdit->edit(deviceName);
+  else if (currentItem()->type() == NodeNamespaceType) {
+      if(currentColumn() == NAME_COLUMN){
+          QString deviceName = currentItem()->text(NAME_COLUMN);
+          _deviceEdit->edit(deviceName);
+        }
     }
   else {
       if (currentColumn() == START_COLUMN || currentColumn() == END_COLUMN || currentColumn() == SR_COLUMN) {
@@ -1546,26 +1546,26 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
   if (item->type() == OSCNode && column == NAME_COLUMN && NAME_MODIFIED) {
       NAME_MODIFIED = FALSE;
       changeNameValue(item, item->text(NAME_COLUMN));
-      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable);
+      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
   if (item->type() == OSCNode && column == START_COLUMN && VALUE_MODIFIED) {
       VALUE_MODIFIED = FALSE;
       assignItem(item, data);
       emit(startValueChanged(item, item->text(START_COLUMN)));
-      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable);
+      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
 
   if (item->type() == OSCNode && column == END_COLUMN && VALUE_MODIFIED) {
       VALUE_MODIFIED = FALSE;
       assignItem(item, data);
       emit(endValueChanged(item, item->text(END_COLUMN)));
-      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable);
+      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
     }
 
   if (item->type() == OSCNode && column == SR_COLUMN && SR_MODIFIED) {
       SR_MODIFIED = FALSE;
       emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
-      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable);
+      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
 }
 

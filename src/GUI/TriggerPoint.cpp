@@ -339,8 +339,8 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
                       this->setFocus();
                     }
                   else {
-                      brush.setColor(QColor("orange"));
-                      painter->setBrush(brush);
+//                      brush.setColor(QColor("orange"));
+//                      painter->setBrush(brush);
                       drawFlag(painter, QColor("orange"));
                     }
                 }

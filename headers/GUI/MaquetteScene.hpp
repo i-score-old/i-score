@@ -236,8 +236,7 @@ class MaquetteScene : public QGraphicsScene
      *
      * \param trgID : trigger point to remove.
      */
-    inline void
-    removeFromTriggerQueue(TriggerPoint *trigger){ _triggersQueueList.removeAll(trigger); }
+    void removeFromTriggerQueue(TriggerPoint *trigger);
 
     /*!
      * \brief Adds a new parent box to the maquette with specific coordinates.

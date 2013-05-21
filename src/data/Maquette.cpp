@@ -969,8 +969,8 @@ Maquette::removeTriggerPoint(unsigned int ID)
   TrgPntMap::iterator it;
   if ((it = _triggerPoints.find(ID)) != _triggerPoints.end()) {
       _engines->removeTriggerPoint(ID);
-      delete it->second;
       _triggerPoints.erase(it);
+      delete it->second;
     }
 }
 
