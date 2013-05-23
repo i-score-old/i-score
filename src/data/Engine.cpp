@@ -52,7 +52,7 @@ void Engine::initModular()
     TTString        applicationName = "i-score";                  // TODO : declare as global variable
     TTObjectBasePtr iscore;                                       // TODO : declare as global variable
     TTString        configFile = "/usr/local/include/IScore/i-scoreConfiguration.xml";
-    TTHash          hashParameters;
+    TTHashPtr       hashParameters;
     
     // this initializes the Modular framework and loads protocol plugins (in /usr/local/jamoma/extensions folder)
     TTModularInit();
@@ -139,6 +139,9 @@ void Engine::initModular()
     args = TTValue(MinuitApplicationName);
     TTObjectBaseInstantiate(kTTSym_Application, TTObjectBaseHandle(&anApplication), args);
     
+    // set application type : here 'mirror' because it use Minuit protocol
+    anApplication->setAttributeValue(kTTSym_type, TTSymbol("mirror"));
+    
     ////////////
     // Example : Register i-score and MinuitDevice1 to the Minuit protocol
     ////////////
@@ -147,30 +150,50 @@ void Engine::initModular()
     if (getProtocol(TTSymbol("Minuit"))) {
         
         // register the local application to the Minuit protocol
-        v = TTValue(TTSymbol(applicationName));
-        getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), v, kTTValNONE);
+        getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), TTSymbol(applicationName), kTTValNONE);
         
-        // set the Minuit parameters for the local application
-        hashParameters.clear();
-        hashParameters.append(TTSymbol("port"), 8002);
-        hashParameters.append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
+        // get parameter's table
+        v = TTSymbol(applicationName);
+        err = getProtocol(TTSymbol("Minuit"))->getAttributeValue(TTSymbol("applicationParameters"), v);
         
-        v = TTValue(TTSymbol(applicationName));
-        v.append(TTPtr(&hashParameters));
-        getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
+        if (!err) {
+            
+            hashParameters = TTHashPtr((TTPtr)v[0]);
+        
+            // replace the Minuit parameters for the local application
+            hashParameters->remove(TTSymbol("port"));
+            hashParameters->append(TTSymbol("port"), 8002);
+            
+            hashParameters->remove(TTSymbol("ip"));
+            hashParameters->append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
+        
+            v = TTSymbol(applicationName);
+            v.append((TTPtr)hashParameters);
+            getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
+        }
         
         // register this application to the Minuit protocol
-        v = TTValue(MinuitApplicationName);
-        getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), v, kTTValNONE);
+        getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), MinuitApplicationName, kTTValNONE);
         
-        // set the Minuit parameters for the distant application
-        hashParameters.clear();
-        hashParameters.append(TTSymbol("port"), 9998);
-        hashParameters.append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
+        // get parameter's table
+        v = TTSymbol(MinuitApplicationName);
+        err = getProtocol(TTSymbol("Minuit"))->getAttributeValue(TTSymbol("applicationParameters"), v);
         
-        v = TTValue(MinuitApplicationName);
-        v.append(TTPtr(&hashParameters));
-        getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
+        if (!err) {
+            
+            hashParameters = TTHashPtr((TTPtr)v[0]);
+        
+            // replace the Minuit parameters for the distant application
+            hashParameters->remove(TTSymbol("port"));
+            hashParameters->append(TTSymbol("port"), 9998);
+            
+            hashParameters->remove(TTSymbol("ip"));
+            hashParameters->append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
+        
+            v = TTValue(MinuitApplicationName);
+            v.append((TTPtr)hashParameters);
+            getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
+        }
         
         // run the Minuit protocol
         TTModularApplications->sendMessage(TTSymbol("ProtocolRun"), TTSymbol("Minuit"), kTTValNONE);
@@ -769,28 +792,95 @@ TimeEventIndex Engine::getBoxLastCtrlPointIndex(TimeProcessId boxId)
 
 void Engine::setCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex controlPointIndex, std::vector<std::string> messageToSend, bool muteState)
 {
+    TTValue         v;
     TimeProcessPtr  timeProcess = getTimeProcess(boxId);
- #ifdef TODO_ENGINE   
-	if ((currentProcess->getType() == PROCESS_TYPE_NETWORK_MESSAGE_TO_SEND)) {
-		SendNetworkMessageProcess* currentSendOSCProcess = (SendNetworkMessageProcess*) currentProcess;
-		ControlPoint* currentControlPoint = m_editor->getBoxById(boxId)->getControlPoint(controlPointIndex);
-		currentSendOSCProcess->addMessages(messageToSend, currentControlPoint->getProcessStepId(), muteState);
-	}
-#endif
+    TimeEventPtr    event;
+    TTObjectBasePtr state;
+    TTUInt32        i;
+
+    // Get the start or end event
+    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+    else
+        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
+    
+    event = TimeEventPtr(TTObjectBasePtr(v[0]));
+    
+    // get the state of the event
+    event->getAttributeValue(TTSymbol("state"), v);
+    state = v[0];
+    
+    // clear the state
+    state->sendMessage(TTSymbol("Clear"));
+    
+    // parse each incoming string into < directory:/address, value >
+    for (i = 0; i < messageToSend.size(); i++) {
+        
+        TTValue v = TTString(messageToSend[i]);
+        v.fromString();
+        
+        TTSymbol aSymbol = v[0];
+		TTAddress anAddress = toTTAddress(aSymbol.string().data());
+        v[0] = anAddress;
+        
+        // append a line to the state
+        state->sendMessage(TTSymbol("Append"), v, kTTValNONE);
+    }
+    
+    // Flatten the state to increase the recall
+    state->sendMessage(TTSymbol("Flatten"));
 }
 
 void Engine::getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex controlPointIndex, std::vector<std::string>& messages)
 {
-#ifdef TODO_ENGINE
-	ECOProcess* currentProcess = m_executionMachine->getProcess(boxId);
+    TTValue         v;
+    TimeProcessPtr  timeProcess = getTimeProcess(boxId);
+    TimeEventPtr    event;
+    TTObjectBasePtr state;
+    TTListPtr       lines = NULL;
+    TTDictionaryPtr aLine;
+    TTAddress       address;
+    std::string     s;
     
-	if ((currentProcess->getType() == PROCESS_TYPE_NETWORK_MESSAGE_TO_SEND)) {
-		SendNetworkMessageProcess* currentSendOSCProcess = (SendNetworkMessageProcess*) currentProcess;
-		ControlPoint* currentControlPoint = m_editor->getBoxById(boxId)->getControlPoint(controlPointIndex);
+    // Get the start or end event
+    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+    else
+        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
+    
+    event = TimeEventPtr(TTObjectBasePtr(v[0]));
+    
+    // get the state of the event
+    event->getAttributeValue(TTSymbol("state"), v);
+    state = v[0];
+    
+    // get the state lines
+    state->getAttributeValue(TTSymbol("flattenedLines"), v);
+    lines = TTListPtr((TTPtr)v[0]);
+    
+    if (lines) {
         
-		currentSendOSCProcess->getMessages(messages, currentControlPoint->getProcessStepId());
-	}
-#endif
+        // edit each line address into a "directory/address value" string
+        for (lines->begin(); lines->end(); lines->next()) {
+            
+            aLine = TTDictionaryPtr((TTPtr)lines->current()[0]);
+            
+            // get the target address
+            aLine->lookup(kTTSym_target, v);
+            address = v[0];
+            
+            // get value
+            aLine->getValue(v);
+            v.toString();
+            
+            // edit string
+            s = toNetworkTreeAddress(address);
+            s += " ";
+            s += TTString(v[0]).c_str();
+            
+            messages.push_back(s);
+        }
+    }
 }
 
 void Engine::setCtrlPointMutingState(TimeProcessId boxId, TimeEventIndex controlPointIndex, bool mute)
@@ -810,64 +900,43 @@ void Engine::setCtrlPointMutingState(TimeProcessId boxId, TimeEventIndex control
 
 void Engine::addCurve(TimeProcessId boxId, const std::string & address)
 {
-#ifdef TODO_ENGINE
-	ECOProcess* currentProcess = m_executionMachine->getProcess(boxId);
+    TimeProcessPtr  timeProcess = getTimeProcess(boxId);
     
-	if ((currentProcess->getType() == PROCESS_TYPE_NETWORK_MESSAGE_TO_SEND)) {
-		SendNetworkMessageProcess* currentSendOSCProcess = (SendNetworkMessageProcess*) currentProcess;
-        
-		currentSendOSCProcess->addCurves(address);
-        
-	}
-#endif
+    // remove the curve addresses of the automation time process
+    timeProcess->sendMessage(TTSymbol("CurveAdd"), toTTAddress(address), kTTValNONE);
 }
 
 void Engine::removeCurve(TimeProcessId boxId, const std::string & address)
 {
-#ifdef TODO_ENGINE
-	ECOProcess* currentProcess = m_executionMachine->getProcess(boxId);
+    TimeProcessPtr  timeProcess = getTimeProcess(boxId);
     
-	if ((currentProcess->getType() == PROCESS_TYPE_NETWORK_MESSAGE_TO_SEND)) {
-		SendNetworkMessageProcess* currentSendOSCProcess = (SendNetworkMessageProcess*) currentProcess;
-        
-		currentSendOSCProcess->removeCurves(address);
-        
-	}
-#endif
+    // remove the curve addresses of the automation time process
+    timeProcess->sendMessage(TTSymbol("CurveRemove"), toTTAddress(address), kTTValNONE);
 }
 
 void Engine::clearCurves(TimeProcessId boxId)
 {
-#ifdef TODO_ENGINE
-	ECOProcess* currentProcess = m_executionMachine->getProcess(boxId);
+    TimeProcessPtr  timeProcess = getTimeProcess(boxId);
     
-	if ((currentProcess->getType() == PROCESS_TYPE_NETWORK_MESSAGE_TO_SEND)) {
-		SendNetworkMessageProcess* currentSendOSCProcess = (SendNetworkMessageProcess*) currentProcess;
-        
-		currentSendOSCProcess->removeAllCurves();
-	}
-#endif
+    // clear all the curves of the automation time process
+    timeProcess->sendMessage(TTSymbol("Clear"));
 }
 
 std::vector<std::string> Engine::getCurvesAddress(TimeProcessId boxId)
 {
-    std::vector<std::string> addressToReturn;
+    std::vector<std::string> curveAddresses;
     
-#ifdef TODO_ENGINE
-	ECOProcess* currentProcess = m_executionMachine->getProcess(boxId);
+    TimeProcessPtr  timeProcess = getTimeProcess(boxId);
+    TTValue         v;
     
-	
+    // get the curve addresses of the automation time process
+    timeProcess->getAttributeValue(TTSymbol("curveAddresses"), v);
     
-	if ((currentProcess->getType() == PROCESS_TYPE_NETWORK_MESSAGE_TO_SEND)) {
-		SendNetworkMessageProcess* currentSendOSCProcess = (SendNetworkMessageProcess*) currentProcess;
-        
-		addressToReturn = currentSendOSCProcess->getCurvesAdress();
-	} else {
-		//TODO : exception
-	}
-#endif
+    // copy the addresses into the vector
+    for (TTUInt32 i = 0; i < v.size(); i++)
+        curveAddresses.push_back(toNetworkTreeAddress(v[i]));
     
-	return addressToReturn;
+	return curveAddresses;
 }
 
 void Engine::setCurveSampleRate(TimeProcessId boxId, const std::string & address, unsigned int nbSamplesBySec)
@@ -989,6 +1058,8 @@ void Engine::getCurveArgTypes(std::string stringToParse, std::vector<std::string
 
 bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned int argNb, const std::vector<float> & percent, const std::vector<float> & y, const std::vector<short> & sectionType, const std::vector<float> & coeff)
 {
+    
+    
 #ifdef TODO_ENGINE
 	ECOProcess* currentProcess = m_executionMachine->getProcess(boxId);
     
@@ -1006,6 +1077,7 @@ bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned
 bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned int argNb,
                               std::vector<float> & percent,  std::vector<float> & y,  std::vector<short> & sectionType,  std::vector<float> & coeff)
 {
+    
 #ifdef TODO_ENGINE    
 	ECOProcess* currentProcess = m_executionMachine->getProcess(boxId);
     
@@ -1022,6 +1094,19 @@ bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned
 
 bool Engine::getCurveValues(TimeProcessId boxId, const std::string & address, unsigned int argNb, std::vector<float>& result)
 {
+    TimeProcessPtr  timeProcess = getTimeProcess(boxId);
+    TTValue         curveValues;
+    TTErr           err;
+    
+    // get the curve addresses of the automation time process
+    err = timeProcess->sendMessage(TTSymbol("CurveValues"), toTTAddress(address), curveValues);
+    
+    // copy the curveValues into the result vector
+    for (TTUInt32 i = 0; i < curveValues.size(); i++)
+        result.push_back(TTFloat64(curveValues[i]));
+    
+	return err == kTTErrNone;
+    
 #ifdef TODO_ENGINE
 	result.clear();
 	ECOProcess* currentProcess = m_executionMachine->getProcess(boxId);
@@ -1031,9 +1116,9 @@ bool Engine::getCurveValues(TimeProcessId boxId, const std::string & address, un
         
 		return currentSendOSCProcess->getCurves(address, argNb, getBoxEndTime(boxId) - getBoxBeginTime(boxId), BEGIN_CONTROL_POINT_INDEX, END_CONTROL_POINT_INDEX, result);
 	}
-#endif
     
     return false;
+#endif
 }
 
 InteractiveProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, TimeEventIndex controlPointIndex)
@@ -1284,20 +1369,35 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
     TTSymbol        applicationName(deviceName);
     TTSymbol        protocolName(pluginToUse);
     TTObjectBasePtr anApplication = NULL;
+    TTHash          hashParameters;
     
     // if the application doesn't already exist
     if (!getApplication(applicationName)) {
         
         // create the application
-        v = TTValue(applicationName);
+        v = applicationName;
         TTObjectBaseInstantiate(kTTSym_Application, TTObjectBaseHandle(&anApplication), v);
         
         // check if the protocol has been loaded
 		if (getProtocol(protocolName)) {
             
             // register the application to the protocol
-            v = TTValue(applicationName);
+            v = applicationName;
             getProtocol(protocolName)->sendMessage(TTSymbol("registerApplication"), v, kTTValNONE);
+            
+            // set plugin parameters (OSC or Minuit Plugin)
+            hashParameters.append(TTSymbol("ip"), TTSymbol(DeviceIp));
+            
+            v = TTSymbol(DevicePort);
+            v.fromString();
+            hashParameters.append(TTSymbol("port"), v);
+            
+            v = applicationName;
+            v.append(TTPtr(&hashParameters));
+            getProtocol(protocolName)->setAttributeValue(TTSymbol("applicationParameters"), v);
+            
+            // run the protocol for this application
+            getProtocol(protocolName)->sendMessage(TTSymbol("Run"), applicationName, kTTValNONE);
         }
     }
 }
@@ -1315,6 +1415,9 @@ void Engine::removeNetworkDevice(const std::string & deviceName)
         // get the protocols of the application
         v = getApplicationProtocols(applicationName);
         protocolName = v[0]; // we register application to 1 protocol only
+        
+        // stop the protocol for this application
+        getProtocol(protocolName)->sendMessage(TTSymbol("Stop"), applicationName, kTTValNONE);
         
         // unregister the application to the protocol
         v = TTValue(applicationName);
@@ -1341,11 +1444,12 @@ void Engine::getNetworkDevicesName(std::vector<std::string>& devicesName, std::v
     TTModularApplications->getAttributeValue(TTSymbol("applicationNames"), applicationNames);
     
     for (TTUInt8 i = 0; i < applicationNames.size(); i++) {
+        
         // don't return the local application
         name = applicationNames[i];
-        if (name == getLocalApplicationName) {
+        
+        if (name == getLocalApplicationName)
             continue;
-        }
         
         devicesName.push_back(name.c_str());
         
@@ -1354,6 +1458,7 @@ void Engine::getNetworkDevicesName(std::vector<std::string>& devicesName, std::v
         
         // if there is at least one protocol,
         if (protocolNames.size()) {
+            
             // look if it provides namespace exploration
             name = protocolNames[0];
             couldSendNamespaceRequest.push_back(getProtocol(name)->mDiscover);
@@ -1363,19 +1468,51 @@ void Engine::getNetworkDevicesName(std::vector<std::string>& devicesName, std::v
 
 std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & address)
 {
-#ifdef TODO_ENGINE
-	return m_networkController->deviceSnapshot(address);
-#endif
+    vector<string>      snapshot;
+    TTAddress           anAddress = toTTAddress(address);
+    TTSymbol            type;
+    TTNodeDirectoryPtr  aDirectory;
+    TTNodePtr           aNode;
+    TTMirrorPtr         aMirror;
+    TTList              nodeList;
+    TTString            s;
+    TTValue             v;
     
-    std::vector<std::string> empty;
-    return empty;
+    // get the application directory
+    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    
+    if (aDirectory) {
+    
+        // get the node
+        if (!aDirectory->getTTNode(anAddress, &aNode)) {
+            
+            // get object attributes
+            aMirror = TTMirrorPtr(aNode->getObject());
+            if (aMirror) {
+                
+                type = aMirror->getName();
+                
+                if (type == TTSymbol("Data")) {
+                    
+                    // get the value attribute
+                    aMirror->getAttributeValue(TTSymbol("value"), v);
+                    v.toString();
+                    s = TTString(v[0]);
+                    
+                    // append address value to the snapshot
+                    snapshot.push_back(address + " " + s.data());
+                }
+            }
+        }
+    }
+    
+    return snapshot;
 }
 
 int Engine::requestNetworkNamespace(const std::string & address, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)
 {
-    TTSymbol            type, temp(address);
-    TTAddress           networktreeAddress(temp);
-    TTAddress           applicationName, anAddress;
+    TTAddress           anAddress = toTTAddress(address);
+    TTSymbol            type;
     TTNodeDirectoryPtr  aDirectory;
     TTNodePtr           aNode, childNode;
     TTMirrorPtr         aMirror;
@@ -1383,19 +1520,11 @@ int Engine::requestNetworkNamespace(const std::string & address, vector<string>&
     TTString            s;
     TTValue             v;
     
-    // split the address to get application name and then an address
-    networktreeAddress.splitAt(0, applicationName, anAddress);
-    
     // get the application directory
-    aDirectory = getApplicationDirectory(TTSymbol(applicationName.string()));
+    aDirectory = getApplicationDirectory(anAddress.getDirectory());
     
     if (!aDirectory)
         return 0;
-    
-    if (anAddress == kTTAdrsEmpty)
-        anAddress = kTTAdrsRoot;
-    else
-        anAddress = kTTAdrsRoot.appendAddress(anAddress);
     
     // explore the directory at this address
     // notice the tree is already built (see in initModular)
@@ -1413,14 +1542,11 @@ int Engine::requestNetworkNamespace(const std::string & address, vector<string>&
                 attributs.push_back("value");
                 
                 // get the value attribute
-               /* 
                 aMirror->getAttributeValue(TTSymbol("value"), v);
                 v.toString();
                 s = TTString(v[0]);
                 attributsValue.push_back(s.c_str());
-                */
             }
-        
         }
         
         // TODO : get attributes value
@@ -1654,6 +1780,34 @@ void TransportDataValueCallback(TTPtr baton, const TTValue& value)
     }
     
     engine->m_TransportDataValueCallback(transport, value);
+}
+
+TTAddress Engine::toTTAddress(string networktreeAddress)
+{
+    TTSymbol            temp(networktreeAddress);
+    TTAddress           address(temp);
+    TTAddress           applicationName, anAddress;
+    TTString            s;
+    
+    // split the address to get application name and then an address
+    address.splitAt(0, applicationName, anAddress);
+    
+    // edit applicationName:/anAddress
+    s = applicationName.string();
+    s += S_DIRECTORY.string();
+    
+    if (anAddress != kTTAdrsEmpty)
+        s += anAddress.string();
+    
+    return TTAddress(s);
+}
+
+std::string Engine::toNetworkTreeAddress(TTAddress aTTAddress)
+{
+    std::string s = aTTAddress.getDirectory().string().c_str();
+    s += aTTAddress.normalize().string();
+    
+    return s;
 }
 
 #if 0

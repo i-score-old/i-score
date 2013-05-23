@@ -813,6 +813,24 @@ public:
 	friend void InteractiveEventActiveAttributeCallback(TTPtr baton, const TTValue& value);
     friend void TimeProcessSchedulerRunningAttributeCallback(TTPtr baton, const TTValue& value);
     friend void TransportDataValueCallback(TTPtr baton, const TTValue& value);
+    
+private:
+    
+    /*!
+     * Convert directory/address into directory:/address
+     *
+     * \param networktreeAddress : an address managed by i-score
+     * \return aTTAddress : an address managed by jamoma
+     */
+    TTAddress toTTAddress(std::string networktreeAddress);
+    
+    /*!
+     * Convert directory:/address into directory/address
+     *
+     * \param aTTAddress : an address managed by jamoma
+     * \return networktreeAddress : an address managed by i-score
+     */
+    std::string toNetworkTreeAddress(TTAddress aTTAddress);
 };
 
 typedef Engine* EnginePtr;
