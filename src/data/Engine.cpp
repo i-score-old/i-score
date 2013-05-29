@@ -1069,7 +1069,7 @@ bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned
         
         v[i] = TTFloat64(percent[i/3] / 100.);
         v[i+1] = TTFloat64(y[i/3]);
-        v[i+2] = TTFloat64(1); // TODO : convert the coeff into base : TTFloat64(coeff[i/3 + 1]);
+        v[i+2] = TTFloat64(coeff[i/3]); // TODO : convert the coeff into base : TTFloat64(coeff[i/3 + 1]);
     }
     
     // set a curve at address
@@ -1095,11 +1095,11 @@ bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned
         percent.push_back(TTFloat64(v[i]) * 100.);
         y.push_back(TTFloat64(v[i+1]));
         sectionType.push_back(1);
-        coeff.push_back(0); // TODO : convert the base into coeff : coeff.push_back(TTFloat64(v[i+2]));
+        coeff.push_back(TTFloat64(v[i+2])); // TODO : convert the base into coeff : coeff.push_back(TTFloat64(v[i+2]));
     }
     
     sectionType.push_back(1);
-    coeff.push_back(0);
+    coeff.push_back(1);
     
     return err == kTTErrNone;
 }
