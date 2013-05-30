@@ -941,94 +941,122 @@ std::vector<std::string> Engine::getCurvesAddress(TimeProcessId boxId)
 
 void Engine::setCurveSampleRate(TimeProcessId boxId, const std::string & address, unsigned int nbSamplesBySec)
 {
-#ifdef TODO_ENGINE
-	ECOProcess* currentProcess = m_executionMachine->getProcess(boxId);
+    TimeProcessPtr  timeProcess = getTimeProcess(boxId);
+    TTObjectBasePtr curve;
+    TTValue         v;
+    TTErr           err;
     
-	if ((currentProcess->getType() == PROCESS_TYPE_NETWORK_MESSAGE_TO_SEND)) {
-		SendNetworkMessageProcess* currentSendOSCProcess = (SendNetworkMessageProcess*) currentProcess;
+    // get curve object at address
+    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
+    
+    if (!err) {
         
-		currentSendOSCProcess->setNbSamplesBySec(address, nbSamplesBySec);
-	}
-#endif
+        curve = v[0];
+        
+        curve->setAttributeValue(TTSymbol("sampleRate"), TTUInt32(nbSamplesBySec));
+    }
 }
 
 unsigned int Engine::getCurveSampleRate(TimeProcessId boxId, const std::string & address)
 {
-    unsigned int sampleRate = 20;
+    TimeProcessPtr  timeProcess = getTimeProcess(boxId);
+    TTObjectBasePtr curve;
+    TTValue         v;
+    TTErr           err;
     
-#ifdef TODO_ENGINE
-	ECOProcess* currentProcess = m_executionMachine->getProcess(boxId);
+    // get curve object at address
+    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
     
-	if ((currentProcess->getType() == PROCESS_TYPE_NETWORK_MESSAGE_TO_SEND)) {
-		SendNetworkMessageProcess* currentSendOSCProcess = (SendNetworkMessageProcess*) currentProcess;
+    if (!err) {
         
-		sampleRate = currentSendOSCProcess->getNbSamplesBySec(address);
-	} else {
-		//TODO : exception
-	}
-#endif
+        curve = v[0];
+        
+        curve->getAttributeValue(TTSymbol("sampleRate"), v);
+        
+        return TTUInt32(v[0]);
+    }
     
-	return sampleRate;
+	return 0;
 }
 
-void Engine::setCurveRedundancy(TimeProcessId boxId, const std::string & address, bool redondancy)
+void Engine::setCurveRedundancy(TimeProcessId boxId, const std::string & address, bool redundancy)
 {
-#ifdef TODO_ENGINE
-	ECOProcess* currentProcess = m_executionMachine->getProcess(boxId);
+    TimeProcessPtr  timeProcess = getTimeProcess(boxId);
+    TTObjectBasePtr curve;
+    TTValue         v;
+    TTErr           err;
     
-	if ((currentProcess->getType() == PROCESS_TYPE_NETWORK_MESSAGE_TO_SEND)) {
-		SendNetworkMessageProcess* currentSendOSCProcess = (SendNetworkMessageProcess*) currentProcess;
-		currentSendOSCProcess->setAvoidRedondanceInformation(address, !redondancy);
-	}
-#endif
+    // get curve object at address
+    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
+    
+    if (!err) {
+        
+        curve = v[0];
+        
+        curve->setAttributeValue(TTSymbol("redundancy"), redundancy);
+    }
 }
 
 bool Engine::getCurveRedundancy(TimeProcessId boxId, const std::string & address)
 {
-	bool curveRedundancyInformation = false;
+    TimeProcessPtr  timeProcess = getTimeProcess(boxId);
+    TTObjectBasePtr curve;
+    TTValue         v;
+    TTErr           err;
     
-#ifdef TODO_ENGINE
-	ECOProcess* currentProcess = m_executionMachine->getProcess(boxId);
+    // get curve object at address
+    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
     
-	if ((currentProcess->getType() == PROCESS_TYPE_NETWORK_MESSAGE_TO_SEND)) {
-		SendNetworkMessageProcess* currentSendOSCProcess = (SendNetworkMessageProcess*) currentProcess;
-		curveRedundancyInformation = !currentSendOSCProcess->getAvoidRedondanceInformation(address);
-	} else {
-		//TODO : exception
-	}
-#endif
+    if (!err) {
+        
+        curve = v[0];
+        
+        curve->getAttributeValue(TTSymbol("redundancy"), v);
+        
+        return TTBoolean(v[0]);
+    }
     
-	return curveRedundancyInformation;
+	return false;
 }
 
 void Engine::setCurveMuteState(TimeProcessId boxId, const std::string & address, bool muteState)
 {
-#ifdef TODO_ENGINE
-	ECOProcess* currentProcess = m_executionMachine->getProcess(boxId);
+    TimeProcessPtr  timeProcess = getTimeProcess(boxId);
+    TTObjectBasePtr curve;
+    TTValue         v;
+    TTErr           err;
     
-	if ((currentProcess->getType() == PROCESS_TYPE_NETWORK_MESSAGE_TO_SEND)) {
-		SendNetworkMessageProcess* currentSendOSCProcess = (SendNetworkMessageProcess*) currentProcess;
-		currentSendOSCProcess->setCurveMuteStateInformation(address, muteState);
-	}
-#endif
+    // get curve object at address
+    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
+    
+    if (!err) {
+        
+        curve = v[0];
+        
+        curve->setAttributeValue(TTSymbol("active"), !muteState);
+    }
 }
 
 bool Engine::getCurveMuteState(TimeProcessId boxId, const std::string & address)
 {
-	bool curveMuteState = false;
+    TimeProcessPtr  timeProcess = getTimeProcess(boxId);
+    TTObjectBasePtr curve;
+    TTValue         v;
+    TTErr           err;
     
-#ifdef TODO_ENGINE
-	ECOProcess* currentProcess = m_executionMachine->getProcess(boxId);
-
-	if ((currentProcess->getType() == PROCESS_TYPE_NETWORK_MESSAGE_TO_SEND)) {
-		SendNetworkMessageProcess* currentSendOSCProcess = (SendNetworkMessageProcess*) currentProcess;
-		curveMuteState = currentSendOSCProcess->getCurveMuteStateInformation(address);
-	} else {
-		//TODO : exception
-	}
-#endif
+    // get curve object at address
+    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
     
-	return curveMuteState;
+    if (!err) {
+        
+        curve = v[0];
+        
+        curve->getAttributeValue(TTSymbol("active"), v);
+        
+        return !TTBoolean(v[0]);
+    }
+    
+	return false;
 }
 
 void Engine::getCurveArgTypes(std::string stringToParse, std::vector<std::string>& result)
@@ -1057,23 +1085,31 @@ void Engine::getCurveArgTypes(std::string stringToParse, std::vector<std::string
 bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned int argNb, const std::vector<float> & percent, const std::vector<float> & y, const std::vector<short> & sectionType, const std::vector<float> & coeff)
 {
     TimeProcessPtr  timeProcess = getTimeProcess(boxId);
+    TTObjectBasePtr curve;
     TTValue         v;
     TTUInt32        i, nbPoints = percent.size();
     TTErr           err;
     
-    // edit value as : address x1 y1 b1 x2 y2 b2
-    v.resize(nbPoints * 3 + 1);
+    // get curve object at address
+    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
     
-    v[0] = toTTAddress(address);
-    for (i = 1; i < v.size(); i = i+3) {
+    if (!err) {
         
-        v[i] = TTFloat64(percent[i/3] / 100.);
-        v[i+1] = TTFloat64(y[i/3]);
-        v[i+2] = TTFloat64(coeff[i/3]); // TODO : convert the coeff into base : TTFloat64(coeff[i/3 + 1]);
+        curve = v[0];
+        
+        // edit value as : x1 y1 b1 x2 y2 b2
+        v.resize(nbPoints * 3);
+        
+        for (i = 0; i < v.size(); i = i+3) {
+            
+            v[i] = TTFloat64(percent[i/3] / 100.);
+            v[i+1] = TTFloat64(y[i/3]);
+            v[i+2] = TTFloat64(coeff[i/3]);
+        }
+        
+        // set a curve parameters
+        err = curve->setAttributeValue(TTSymbol("parameters"), v);
     }
-    
-    // set a curve at address
-    err = timeProcess->sendMessage(TTSymbol("CurveSet"), v, kTTValNONE);
     
     return err == kTTErrNone;
 }
@@ -1082,24 +1118,36 @@ bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned
                               std::vector<float> & percent,  std::vector<float> & y,  std::vector<short> & sectionType,  std::vector<float> & coeff)
 {
     TimeProcessPtr  timeProcess = getTimeProcess(boxId);
+    TTObjectBasePtr curve;
     TTValue         v;
     TTUInt32        i;
     TTErr           err;
     
-    // get a curve at address
+    // get curve object at address
     err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
     
-    // edit percent, y, sectionType and coeff from v : x1 y1 b1 x2 y2 b2
-    for (i = 0; i < v.size(); i = i+3) {
+    if (!err) {
         
-        percent.push_back(TTFloat64(v[i]) * 100.);
-        y.push_back(TTFloat64(v[i+1]));
-        sectionType.push_back(1);
-        coeff.push_back(TTFloat64(v[i+2])); // TODO : convert the base into coeff : coeff.push_back(TTFloat64(v[i+2]));
+        curve = v[0];
+        
+        // get a curve parameters
+        err = curve->getAttributeValue(TTSymbol("parameters"), v);
+        
+        if (!err) {
+            
+            // edit percent, y, sectionType and coeff from v : x1 y1 b1 x2 y2 b2
+            for (i = 0; i < v.size(); i = i+3) {
+                
+                percent.push_back(TTFloat64(v[i]) * 100.);
+                y.push_back(TTFloat64(v[i+1]));
+                sectionType.push_back(1);
+                coeff.push_back(TTFloat64(v[i+2]));
+            }
+            
+            sectionType.push_back(1);
+            coeff.push_back(1);
+        }
     }
-    
-    sectionType.push_back(1);
-    coeff.push_back(1);
     
     return err == kTTErrNone;
 }
@@ -1107,15 +1155,27 @@ bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned
 bool Engine::getCurveValues(TimeProcessId boxId, const std::string & address, unsigned int argNb, std::vector<float>& result)
 {
     TimeProcessPtr  timeProcess = getTimeProcess(boxId);
-    TTValue         curveValues;
+    TTObjectBasePtr curve;
+    TTValue         v, curveValues;
     TTErr           err;
     
-    // get the curve addresses of the automation time process
-    err = timeProcess->sendMessage(TTSymbol("CurveSample"), toTTAddress(address), curveValues);
+    // get curve object at address
+    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
+
+    if (!err) {
+        
+        curve = v[0];
+        
+        // get time process duration
+        timeProcess->getAttributeValue(TTSymbol("duration"), v);
     
-    // copy the curveValues into the result vector
-    for (TTUInt32 i = 0; i < curveValues.size(); i++)
-        result.push_back(TTFloat64(curveValues[i]));
+        // sample the curve
+        err = curve->sendMessage(TTSymbol("Sample"), v, curveValues);
+    
+        // copy the curveValues into the result vector
+        for (TTUInt32 i = 0; i < curveValues.size(); i++)
+            result.push_back(TTFloat64(curveValues[i]));
+    }
     
 	return err == kTTErrNone;
 }
