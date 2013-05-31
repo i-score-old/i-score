@@ -48,6 +48,5 @@ main(int argc, char *argv[])
 
   MainWindow *win = new MainWindow();
   win->show();
-
   return app.exec();
 }

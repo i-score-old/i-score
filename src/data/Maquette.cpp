@@ -812,6 +812,31 @@ Maquette::updateBox(unsigned int boxID, const Coords &coord)
           box->setSize(QPoint(coord.sizeX, coord.sizeY));
           box->setPos(box->getCenter());
           box->update();
+
+//          std::cout<<"moved : ";
+//          if(!moved.empty()){
+//              for(int i=0; i<moved.size(); i++)
+//                std::cout<<moved[i]<<" ; ";
+//            }
+//          std::cout<<std::endl;
+
+//          std::cout<<"PerformBoxEditing "<<boxID<<std::endl;
+//          QList<Relation *> startRel = box->getStartBoxRelations();
+//          if(!startRel.isEmpty()){
+//              std::cout<<"StartRel : "<<std::endl;
+//              for(unsigned int i=0 ; i<startRel.size() ; i++){
+//                  std::cout<<"min : "<<static_cast<AbstractRelation *>(startRel[i]->abstract())->minBound()<<std::endl;
+//                  std::cout<<"max : "<<static_cast<AbstractRelation *>(startRel[i]->abstract())->maxBound()<<std::endl;
+//                }
+//            }
+//          QList<Relation *> endRel = box->getEndBoxRelations();
+//          if(!endRel.isEmpty()){
+//              std::cout<<"endRel : "<<std::endl;
+//              for(unsigned int i=0 ; i<endRel.size() ; i++){
+//                  std::cout<<"min : "<<static_cast<AbstractRelation *>(endRel[i]->abstract())->minBound()<<std::endl;
+//                  std::cout<<"max : "<<static_cast<AbstractRelation *>(endRel[i]->abstract())->maxBound()<<std::endl;
+//                }
+//            }
         }
       else {
           box->setRelativeTopLeft(QPoint(_engines->getBoxBeginTime(boxID) / MaquetteScene::MS_PER_PIXEL,
@@ -829,12 +854,21 @@ Maquette::updateBox(unsigned int boxID, const Coords &coord)
 
 
   if (moveAccepted) {
+//      std::cout<<"MOVE ACCEPTED"<<std::endl;
       for (it = moved.begin(); it != moved.end(); it++) {
 #ifdef DEBUG
           std::cerr << "Maquette::updateBoxes : box moved : " << *it << std::endl;
 #endif
           if ((_boxes[*it]->relativeBeginPos() != _engines->getBoxBeginTime(*it) / MaquetteScene::MS_PER_PIXEL ||
                (_engines->getBoxEndTime(*it) / MaquetteScene::MS_PER_PIXEL - _engines->getBoxBeginTime(*it) / MaquetteScene::MS_PER_PIXEL) != _boxes[*it]->width()) && _engines->getBoxBeginTime(*it)) {
+
+              //print
+//              if (_boxes[*it]->relativeBeginPos() != _engines->getBoxBeginTime(*it) / MaquetteScene::MS_PER_PIXEL)
+//                std::cout<<"Case1 > "<<_boxes[*it]->ID()<<std::endl;
+//              else
+//                std::cout<<"Case2 > "<<_boxes[*it]->ID()<<std::endl;
+              //eprint
+
               _boxes[*it]->setRelativeTopLeft(QPoint(_engines->getBoxBeginTime(*it) / MaquetteScene::MS_PER_PIXEL,
                                                      _boxes[*it]->getTopLeft().y()));
               _boxes[*it]->setSize(QPoint((_engines->getBoxEndTime(*it) / MaquetteScene::MS_PER_PIXEL -
@@ -842,10 +876,11 @@ Maquette::updateBox(unsigned int boxID, const Coords &coord)
                                           _boxes[*it]->getSize().y()));
               _boxes[*it]->setPos(_boxes[*it]->getCenter());
               _boxes[*it]->update();
+//              std::cout<<_boxes[*it]->ID()<<std::endl;
             }
         }
     }
-
+//  std::cout<<"-------"<<std::endl;
   return moveAccepted;
 }
 

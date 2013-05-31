@@ -16,16 +16,17 @@ OS=$1
 if [ "$OS" = "LINUX" ] || [ "$OS" = "LINUX64" ]
 then
     {
-	DEVICE_MANAGER_PATH='/Users/WALL-E/Documents/Iscore/Device-Manager'
-	LIB_ISCORE_PATH='/Users/WALL-E/Documents/Iscore/libIscore'
-	ISCORE_PATH='/Users/WALL-E/Documents/Iscore/i-score'
+	DEVICE_MANAGER_PATH='/Users/nicolashincker/Documents/workspace/i-score/dev/Device-Manager'
+	LIB_ISCORE_PATH='/Users/nicolashincker/Documents/workspace/i-score/dev/libIscore'
+	ISCORE_PATH='/Users/nicolashincker/Documents/workspace/i-score/dev/i-score'
     }
 elif [ "$OS" = "MACOS" ] || [ "$OS" = "MACOS64" ]
 then
     {
-	LIB_ISCORE_PATH='/Users/jaime/WorkSpace/libIscore'
-	ISCORE_PATH='/Users/jaime/WorkSpace/i-score'
-	DEVICE_MANAGER_PATH='/Users/jaime/WorkSpace/Device-Manager'
+    DEVICE_MANAGER_PATH='/Users/nicolashincker/Documents/workspace/i-score/dev/Device-Manager'
+    LIB_ISCORE_PATH='/Users/nicolashincker/Documents/workspace/i-score/dev/libIscore'
+    ISCORE_PATH='/Users/nicolashincker/Documents/workspace/i-score/dev/i-score'
+
     }
 fi
 
