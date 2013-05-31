@@ -829,6 +829,9 @@ void Engine::setCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex cont
     
     // Flatten the state to increase the recall
     state->sendMessage(TTSymbol("Flatten"));
+    
+    // Update all curves (for automation process only)
+    timeProcess->sendMessage(TTSymbol("CurveUpdate"));
 }
 
 void Engine::getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex controlPointIndex, std::vector<std::string>& messages)
