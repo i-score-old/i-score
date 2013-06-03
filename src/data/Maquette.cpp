@@ -1320,7 +1320,7 @@ Maquette::generateTriggerQueue()
 void
 Maquette::initSceneState()
 {
-  //Pour palier au bug du moteur (qui envoyait tous les messages début et fin de toutes les boîtes < Goto)
+  //Pour palier au bug du moteur (qui envoie tous les messages début et fin de toutes les boîtes < Goto)
 
   double gotoValue = (double)_engines->getGotoValue();
 
@@ -1393,6 +1393,7 @@ Maquette::initSceneState()
   QString message;
   for (QList<QString>::iterator it = addresses.begin(); it != addresses.end(); it++) {
       message = *it + " " + msgs.value(*it).first;
+//      std::cout<<"sendMessage : "<<message.toStdString()<<std::endl;
       sendMessage(message.toStdString());
     }
 }
