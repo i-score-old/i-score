@@ -794,26 +794,32 @@ Maquette::updateRelations()
 bool
 Maquette::updateBox(unsigned int boxID, const Coords &coord)
 {
+  std::cout<<"--- updateBox ---"<<std::endl;
   bool moveAccepted;
   vector<unsigned int> moved;
   vector<unsigned int>::iterator it;
   int boxBeginTime;
   if (boxID != NO_ID && boxID != ROOT_BOX_ID) {
       BasicBox *box = _boxes[boxID];
+
       if (moveAccepted = _engines->performBoxEditing(boxID, coord.topLeftX * MaquetteScene::MS_PER_PIXEL,
                                                      coord.topLeftX * MaquetteScene::MS_PER_PIXEL +
                                                      coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
-          box->setRelativeTopLeft(QPoint(coord.topLeftX, coord.topLeftY));
-          box->setSize(QPoint(coord.sizeX, coord.sizeY));
+          std::cout<<"i-score : BOX"<<boxID<<" "<<(int)coord.topLeftX* MaquetteScene::MS_PER_PIXEL<<" ------ OK"<<std::endl;
+//          std::cout<<boxID<<" move accepted "<<coord.topLeftX<<" ; "<<coord.topLeftY<<std::endl;
+          box->setRelativeTopLeft(QPoint((int)coord.topLeftX, (int)coord.topLeftY));
+          box->setSize(QPoint((int)coord.sizeX, (int)coord.sizeY));
           box->setPos(box->getCenter());
           box->update();
         }
-      else {
-          boxBeginTime = (int)(_engines->getBoxBeginTime(boxID) / MaquetteScene::MS_PER_PIXEL);
 
+      else {
+          boxBeginTime = (_engines->getBoxBeginTime(boxID) / (float)MaquetteScene::MS_PER_PIXEL);
+//          std::cout<<boxID<<" move NOT accepted : "<<_engines->getBoxBeginTime(boxID)<<" -> "<<boxBeginTime<<std::endl;
+          std::cout<<"i-score : BOX"<< boxID <<" "<<boxBeginTime<<" ------- NOT ACCEPTED"<<std::endl;
           box->setRelativeTopLeft(QPoint(boxBeginTime,
                                          box->getTopLeft().y()));
-          box->setSize(QPoint((_engines->getBoxEndTime(boxID) / MaquetteScene::MS_PER_PIXEL -
+          box->setSize(QPoint((_engines->getBoxEndTime(boxID) / (float)MaquetteScene::MS_PER_PIXEL -
                                boxBeginTime),
                               box->getSize().y()));
           box->setPos(box->getCenter());
@@ -830,19 +836,24 @@ Maquette::updateBox(unsigned int boxID, const Coords &coord)
 #ifdef DEBUG
           std::cerr << "Maquette::updateBoxes : box moved : " << *it << std::endl;
 #endif
+          if(_boxes[*it]->ID() != boxID){
           if ((_boxes[*it]->relativeBeginPos() != _engines->getBoxBeginTime(*it) / MaquetteScene::MS_PER_PIXEL ||
                (_engines->getBoxEndTime(*it) / MaquetteScene::MS_PER_PIXEL - _engines->getBoxBeginTime(*it) / MaquetteScene::MS_PER_PIXEL) != _boxes[*it]->width()) && _engines->getBoxBeginTime(*it)) {
 
-              boxBeginTime = (int)(_engines->getBoxBeginTime(*it) / MaquetteScene::MS_PER_PIXEL);
+              boxBeginTime = (_engines->getBoxBeginTime(*it) / MaquetteScene::MS_PER_PIXEL);
               _boxes[*it]->setRelativeTopLeft(QPoint(boxBeginTime , _boxes[*it]->getTopLeft().y()));
               _boxes[*it]->setSize(QPoint((_engines->getBoxEndTime(*it) / MaquetteScene::MS_PER_PIXEL -
                                            boxBeginTime),
                                           _boxes[*it]->getSize().y()));
               _boxes[*it]->setPos(_boxes[*it]->getCenter());
               _boxes[*it]->update();
+
+              std::cout<<"i-score : BOX"<< _boxes[*it]->ID()<<" "<<boxBeginTime<<" ------ OK"<<std::endl;
             }
         }
+}
     }
+  std::cout<<std::endl;
   return moveAccepted;
 }
 
@@ -1274,8 +1285,11 @@ Maquette::generateTriggerQueue()
 {
   _scene->triggersQueueList().clear();
   TrgPntMap::iterator it1;
+  TriggerPoint *curTrg;
   for (it1 = _triggerPoints.begin(); it1 != _triggerPoints.end(); ++it1) {
-      _scene->addToTriggerQueue(it1->second);
+      curTrg = it1->second;
+      if(curTrg->date()>=_engines->getGotoValue())
+        _scene->addToTriggerQueue(it1->second);
     }
 }
 
