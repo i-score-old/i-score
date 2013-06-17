@@ -88,7 +88,7 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
   _box = box;
   _comboBox = new QComboBox;
   _curveWidget = new CurveWidget(NULL);
-  _tabWidget = new QTabWidget;
+  _tabWidget = new QTabWidget; /// \todo _tabWidget seems to be unused, and replaced by _stackedLayout.
   _tabWidget->lower();
   _tabWidget->setAttribute(Qt::WA_TranslucentBackground, true);
   _stackedLayout = new QStackedLayout;

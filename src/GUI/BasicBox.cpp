@@ -693,6 +693,33 @@ BasicBox::removeRelation(BoxExtremity extremity, unsigned int relID)
     }
 }
 
+QList<Relation *>
+BasicBox::getStartBoxRelations()
+{
+  return getRelations(BOX_START);
+}
+
+QList<Relation *>
+BasicBox::getEndBoxRelations()
+{
+  return getRelations(BOX_END);
+}
+
+QList<Relation *>
+BasicBox::getRelations(BoxExtremity extremity)
+{
+  QList<Relation *>relations;
+  map<BoxExtremity, map<unsigned int, Relation*> >::iterator it;
+  map<unsigned int, Relation*>::iterator itMap;
+
+  if ((it = _relations.find(extremity)) != _relations.end()) {
+      for(itMap=(it->second).begin() ; itMap!=(it->second).end() ; ++itMap){
+        relations<<itMap->second;
+      }
+    }
+  return relations;
+}
+
 void
 BasicBox::removeRelations(BoxExtremity extremity)
 {

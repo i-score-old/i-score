@@ -195,7 +195,6 @@ class BasicBox : public QObject, public QGraphicsItem
      * \param relation : the relation to store
      */
     void addRelation(BoxExtremity extremity, Relation *relation);
-
     /*!
      * \brief Removes a relation from an extremity
      *
@@ -203,8 +202,21 @@ class BasicBox : public QObject, public QGraphicsItem
      * \param relID: the relation ID
      */
     void removeRelation(BoxExtremity extremity, unsigned int relID);
-
     void removeRelations(BoxExtremity extremity);
+    /*!
+     * \brief Returns Relations associated to the start box extremity.
+     */
+    QList<Relation *> getStartBoxRelations();
+    /*!
+     * \brief Returns Relations associated to the end box extremity.
+     */
+    QList<Relation *> getEndBoxRelations();
+    /*!
+     * \brief Gets relations from an extremity
+     *
+     * \param extremity : the extremity involved in the relation
+     */
+    QList<Relation *> getRelations(BoxExtremity extremity);
 
     /*!
      * \brief Adds a comment "Comment" to the box.
