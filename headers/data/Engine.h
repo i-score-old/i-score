@@ -113,6 +113,9 @@ enum BinaryRelationType { EQ_RELATION = 0, NQ_RELATION = 1, LQ_RELATION = 2, LE_
 /// The three temporal relations in Boxes
 enum RelationType {ALLEN = 0, ANTPOST = 1, INTERVAL = 2, BOUNDING = 3};
 
+/// define part dedicated for debugging
+#define iscoreEngineDebug if (getLocalApplicationDebug)
+
 /*!
  * \class Engine
  *
@@ -138,6 +141,8 @@ private:
     EngineCacheMap      m_timeProcessMap;                               /// All automation or scenario time process and some observers stored using an unique id
     EngineCacheMap      m_intervalMap;                                  /// All interval time process and some observers stored using an unique id
     EngineCacheMap      m_interactiveProcessMap;                        /// All interactive time process with an interactive event stored using an unique id
+    
+    EngineCacheMap      m_runningCallbackMap;                           /// All callback to observer time process running state stored using a time process id
     
     TTObjectBasePtr     m_dataPlay;                                     /// A Modular TTData to expose Play transport service
     TTObjectBasePtr     m_dataStop;                                     /// A Modular TTData to expose Stop transport service
@@ -176,6 +181,9 @@ public:
     InteractiveProcessId  cacheInteractiveProcess(TimeProcessPtr timeProcess, TimeEventIndex controlPointId);
     TimeProcessPtr      getInteractiveProcess(InteractiveProcessId triggerId, TimeEventIndex& controlPointId);
     void                uncacheInteractiveProcess(InteractiveProcessId triggerId);
+    
+    void                cacheRunningCallback(TimeProcessId boxId);
+    void                uncacheRunningCallback(TimeProcessId boxId);
     
 	// Edition ////////////////////////////////////////////////////////////////////////
     
@@ -841,9 +849,9 @@ typedef Engine* EnginePtr;
  @return                an error code */
 void InteractiveEventActiveAttributeCallback(TTPtr baton, const TTValue& value);
 
-/** Any time process scheduler running callback
+/** Any time process running state callback
  @param	baton			a TTValuePtr containing an EnginePtr and an TimeProcessId
- @param	data			the time process scheduler running state
+ @param	data			the time process running state
  @return                an error code */
 void TimeProcessSchedulerRunningAttributeCallback(TTPtr baton, const TTValue& value);
 
