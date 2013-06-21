@@ -74,6 +74,7 @@
 #include <QToolTip>
 #include <QAbstractItemView>
 #include <QStyleOptionViewItem>
+#include <cmath>
 
 using std::string;
 using std::vector;
@@ -102,12 +103,12 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
   _startMenuButton = NULL;
   _endMenuButton = NULL;
 
-  int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
+  float xmin = 0, xmax = 0, ymin = 0, ymax = 0;
 
-  xmin = (int)(std::min(press.x(), release.x()));
-  ymin = (int)(std::min(press.y(), release.y()));
-  xmax = (int)(std::max(press.x(), release.x()));
-  ymax = (int)(std::max(press.y(), release.y()));
+  xmin = std::floor(std::min(press.x(), release.x()));
+  ymin = std::floor(std::min(press.y(), release.y()));
+  xmax = std::floor(std::max(press.x(), release.x()));
+  ymax = std::floor(std::max(press.y(), release.y()));
 
   _abstract = new AbstractBox();
 
@@ -473,6 +474,7 @@ BasicBox::setSize(const QPointF & size)
 {
   _abstract->setWidth(std::max((float)size.x(), MaquetteScene::MS_PRECISION / MaquetteScene::MS_PER_PIXEL));
   _abstract->setHeight(size.y());
+//  std::cout<<"setSize ------> "<< _abstract->ID()<<" "<<_abstract->width()*MaquetteScene::MS_PER_PIXEL<<std::endl;
   updateStuff();
 }
 
@@ -647,6 +649,8 @@ BasicBox::updateRelations(BoxExtremity extremity)
 void
 BasicBox::updateStuff()
 {
+//  std::cout<<"--- updateStuff ---"<<std::endl;
+
   updateBoxSize();
   if (_comment != NULL) {
       _comment->updatePos();
@@ -880,6 +884,7 @@ BasicBox::removeTriggerPoint(BoxExtremity extremity)
 
       TriggerPoint *trgPoint = _triggerPoints->value(extremity);
       _triggerPoints->remove(extremity);
+
       Maquette::getInstance()->removeTriggerPoint(trgPoint->ID());
       _scene->removeFromTriggerQueue(trgPoint);
 

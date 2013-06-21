@@ -72,7 +72,9 @@ MaquetteView::MaquetteView(MainWindow *mw)
   setAlignment(Qt::AlignLeft | Qt::AlignTop);
   centerOn(0, 0);
   _zoom = 1;
-  _gotoValue = 0;  
+  _gotoValue = 0;      
+  setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+  setCacheMode(QGraphicsView::CacheBackground);
 }
 
 MaquetteView::~MaquetteView()
@@ -147,26 +149,27 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
   const int HEIGHT = sceneRect().height();
   for (int i = 0; i <= (WIDTH*MaquetteScene::MS_PER_PIXEL) / S_TO_MS; i++) {     // for each second
       int i_PXL = i * S_TO_MS / MaquetteScene::MS_PER_PIXEL;
+
       if (_zoom < 1 && ((i % (int)(1. / _zoom)) != 0)) {
           continue;
         }
       painter->drawLine(QPointF(i_PXL, 0), QPointF(i_PXL, HEIGHT));
 
-      if (_zoom > 1) {
-          QPen pen = painter->pen();
-          QPen savePen = pen;
-          painter->setPen(pen);
-          for (float j = i; j < i + 1; j += 1. / _zoom) {
-              if (i != j) {
-                  float j_PXL = 0; //=  j * S_TO_MS / (float)MaquetteScene::MS_PER_PIXEL;
-                  if (_zoom > 4 || QString("%1").arg(j - (int)j).length() < 5) {
-                      painter->drawText(QPointF(j_PXL - 10, 15), QString("%1").arg(round(j * 1000) / 1000.));
-                    }
-                  painter->drawLine(QPointF(j_PXL, 15), QPointF(j_PXL, HEIGHT));
-                }
-            }
-          painter->setPen(savePen);
-        }
+//      if (_zoom > 1) {
+//          QPen pen = painter->pen();
+//          QPen savePen = pen;
+//          painter->setPen(pen);
+//          for (float j = i; j < i + 1; j += 1. / _zoom) {
+//              if (i != j) {
+//                  float j_PXL = 0; //=  j * S_TO_MS / (float)MaquetteScene::MS_PER_PIXEL;
+//                  if (_zoom > 4 || QString("%1").arg(j - (int)j).length() < 5) {
+//                      painter->drawText(QPointF(j_PXL - 10, 15), QString("%1").arg(round(j * 1000) / 1000.));
+//                    }
+//                  painter->drawLine(QPointF(j_PXL, 15), QPointF(j_PXL, HEIGHT));
+//                }
+//            }
+//          painter->setPen(savePen);
+//        }
     }
 
   if (_scene->tracksView()) {

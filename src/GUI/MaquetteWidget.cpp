@@ -163,7 +163,7 @@ MaquetteWidget::createActions()
   _stopAction = new QAction(stopIcon, tr("Stop"), this);
   _stopAction->setStatusTip(tr("Stop scenario"));
 
-  QIcon rewindIcon(":/images/rewind.svg");
+  QIcon rewindIcon(":/images/boxStartMenu.svg");
   _rewindAction = new QAction(rewindIcon, tr("Rewind"), this);
   _rewindAction->setStatusTip(tr("Rewind scenario"));
 
@@ -187,10 +187,11 @@ MaquetteWidget::createToolBar()
                           "}"
                           );
 
+  _toolBar->addAction(_rewindAction);
   _toolBar->addAction(_playAction);
   _toolBar->addAction(_stopAction);
   _stopAction->setVisible(false);
-  _toolBar->addAction(_rewindAction);
+//  _toolBar->addAction(_rewindAction);
   _toolBar->raise();
 }
 
