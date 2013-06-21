@@ -337,10 +337,11 @@ Maquette::addParentBox(unsigned int ID, const unsigned int date, const unsigned 
 /// \todo change arguments named corner. this is not comprehensible.
 unsigned int
 Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
-{
+{  
+
   /// \todo called by MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name) with topLeft and bottomRight arguments. No need to recalculate
   QPointF firstCorner(std::min(corner1.x(), corner2.x()), std::min(corner1.y(), corner2.y()));
-  QPointF secondCorner(std::max(corner1.x(), corner2.x()), std::max(corner1.y(), corner2.y()));
+  QPointF secondCorner(std::max(corner1.x(), corner2.x()), std::max(corner1.y(), corner2.y()));    
 
   ParentBox *newBox = new ParentBox(firstCorner, secondCorner, _scene);
 

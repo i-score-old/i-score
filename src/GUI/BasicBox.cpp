@@ -103,12 +103,14 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
   _startMenuButton = NULL;
   _endMenuButton = NULL;
 
-  float xmin = 0, xmax = 0, ymin = 0, ymax = 0;
 
-  xmin = std::floor(std::min(press.x(), release.x()));
-  ymin = std::floor(std::min(press.y(), release.y()));
-  xmax = std::floor(std::max(press.x(), release.x()));
-  ymax = std::floor(std::max(press.y(), release.y()));
+  /// \todo : !! Problème d'arrondi, on cast en int des floats !! A étudier parce que crash (avec 0 notamment) si on remet en float. NH
+  int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
+
+  xmin = (int)(std::min(press.x(), release.x()));
+  ymin = (int)(std::min(press.y(), release.y()));
+  xmax = (int)(std::max(press.x(), release.x()));
+  ymax = (int)(std::max(press.y(), release.y()));
 
   _abstract = new AbstractBox();
 

@@ -1416,13 +1416,13 @@ MaquetteScene::selectionMoved()
 bool
 MaquetteScene::boxMoved(unsigned int boxID)
 {
-  std::cout<<"--- boxMoved ---"<<boxID<<std::endl;
+//  std::cout<<"--- boxMoved ---"<<boxID<<std::endl;
   Coords coord;
   BasicBox * box = _maquette->getBox(boxID);
   if (box != NULL) {
       if (!box->hasMother()) {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x();
-          std::cout<<"X = "<<coord.topLeftX* MaquetteScene::MS_PER_PIXEL<<std::endl;
+//          std::cout<<"X = "<<coord.topLeftX* MaquetteScene::MS_PER_PIXEL<<std::endl;
         }
       else {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x()
@@ -1430,7 +1430,7 @@ MaquetteScene::boxMoved(unsigned int boxID)
         }
       coord.topLeftY = box->mapToScene(box->boxRect().topLeft()).y();
       coord.sizeX = box->boxRect().size().width();
-      std::cout<<"Y = "<<coord.sizeX* MaquetteScene::MS_PER_PIXEL<<std::endl;
+//      std::cout<<"Y = "<<coord.sizeX* MaquetteScene::MS_PER_PIXEL<<std::endl;
       coord.sizeY = box->boxRect().size().height();
     }
   bool ret = _maquette->updateBox(boxID, coord);

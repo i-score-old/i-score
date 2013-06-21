@@ -291,7 +291,7 @@ AttributesEditor::updateWidgets(bool boxModified)
 void
 AttributesEditor::startChanged()
 {
-  std::cout<<"--- startChanged ---"<<std::endl;
+//  std::cout<<"--- startChanged ---"<<std::endl;
   BasicBox * box = _scene->getBox(_boxEdited);
   if (box != NULL) {
       box->moveBy(_boxStartValue->value() * S_TO_MS / MaquetteScene::MS_PER_PIXEL - box->getTopLeft().x(), 0);
@@ -302,7 +302,7 @@ AttributesEditor::startChanged()
 void
 AttributesEditor::lengthChanged()
 {
-  std::cout<<"--- length changed ---"<<std::endl;
+//  std::cout<<"--- length changed ---"<<std::endl;
   BasicBox * box = _scene->getBox(_boxEdited);
   if (box != NULL) {
       box->resizeWidthEdition(_boxLengthValue->value() * S_TO_MS / MaquetteScene::MS_PER_PIXEL);
