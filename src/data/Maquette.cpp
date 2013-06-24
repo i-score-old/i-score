@@ -48,7 +48,7 @@
 #include "MaquetteView.hpp"
 #include <QDomDocument>
 #include "ParentBox.hpp"
-#include "Engines.hpp"
+#include "Engine.h"
 #include "AbstractRelation.hpp"
 #include "Relation.hpp"
 #include "TriggerPoint.hpp"
@@ -247,6 +247,8 @@ Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const s
   /// \todo called by MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name) with topLeft and bottomRight arguments. No need to recalculate
   QPointF firstCorner(std::min(corner1.x(), corner2.x()), std::min(corner1.y(), corner2.y()));
   QPointF secondCorner(std::max(corner1.x(), corner2.x()), std::max(corner1.y(), corner2.y()));    
+
+  ParentBox *newBox = new ParentBox(firstCorner, secondCorner, _scene);
 
   ParentBox *motherBox = NULL;
   int motherID = mother;
@@ -858,38 +860,39 @@ Maquette::addTriggerPoint(const AbstractTriggerPoint &abstract)
 int
 Maquette::addTriggerPoint(unsigned int boxID, BoxExtremity extremity, const string &message)
 {
-  if (boxID == NO_ID) {
-      return ARGS_ERROR;
+    if (boxID == NO_ID) {
+        return ARGS_ERROR;
     }
 
-  unsigned int triggerID = _engines->addTriggerPoint(_boxes[boxID]->mother());
-
-  unsigned int controlPointID = NO_ID;
-  if (extremity == BOX_START) {
-      controlPointID = BEGIN_CONTROL_POINT_INDEX;
+    unsigned int controlPointID = NO_ID;
+    if (extremity == BOX_START) {
+        controlPointID = BEGIN_CONTROL_POINT_INDEX;
     }
-  else if (extremity == BOX_END) {
-      controlPointID = END_CONTROL_POINT_INDEX;
+    else if (extremity == BOX_END) {
+        controlPointID = END_CONTROL_POINT_INDEX;
     }
-  if (controlPointID == NO_ID) {
-      return RETURN_ERROR;
-    }
-  if (!_engines->assignCtrlPointToTriggerPoint(triggerID, boxID, controlPointID)) {
-      _scene->displayMessage(tr("Trigger point already linked to a control point.").toStdString(), INDICATION_LEVEL);
-      return NO_MODIFICATION;
-    }
-  else {
-      _scene->displayMessage(tr("Trigger point succesfully added").toStdString(), INDICATION_LEVEL);
-      _engines->setTriggerPointMessage(triggerID, message);
-      TriggerPoint * newTP = new TriggerPoint(boxID, extremity, message, triggerID, _scene);
-      _scene->addItem(newTP);
-      _triggerPoints[triggerID] = newTP;
-      _boxes[boxID]->addTriggerPoint(extremity, _triggerPoints[triggerID]);
-
-      return triggerID;
+    if (controlPointID == NO_ID) {
+        return RETURN_ERROR;
     }
 
-  return RETURN_ERROR;
+    unsigned int triggerID = _engines->addTriggerPoint(boxID, controlPointID);
+
+    if (triggerID == NO_ID) {
+        _scene->displayMessage(tr("Trigger point already linked to a control point.").toStdString(), INDICATION_LEVEL);
+        return NO_MODIFICATION;
+    }
+    else {
+        _scene->displayMessage(tr("Trigger point succesfully added").toStdString(), INDICATION_LEVEL);
+        _engines->setTriggerPointMessage(triggerID, message);
+        TriggerPoint * newTP = new TriggerPoint(boxID, extremity, message, triggerID, _scene);
+        _scene->addItem(newTP);
+        _triggerPoints[triggerID] = newTP;
+        _boxes[boxID]->addTriggerPoint(extremity, _triggerPoints[triggerID]);
+
+        return triggerID;
+    }
+
+    return RETURN_ERROR;
 }
 
 void
@@ -1781,8 +1784,6 @@ void
 Maquette::load(const string &fileName)
 {
   _engines->load(fileName + ".simone");
-  _engines->addCrossingCtrlPointCallback(&crossTransitionCallback);
-  _engines->addExecutionFinishedCallback(&executionFinishedCallback);
 
   QFile enginesFile(QString::fromStdString(fileName + ".simone"));
   QFile file(QString::fromStdString(fileName));
@@ -2110,12 +2111,6 @@ Maquette::addNetworkDevice(string deviceName, string plugin, string ip, string p
   _engines->addNetworkDevice(deviceName, plugin, ip, port);
 }
 
-void
-Maquette::removeNetworkDevice(string deviceName)
-{
-  ;
-}
-
 double
 Maquette::accelerationFactor()
 {
@@ -2158,7 +2153,7 @@ Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
 {
     int type = getBox(boxID)->type();
     
-    if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+    if (type == PARENT_BOX_TYPE) {
         
         if (running)
             static_cast<BasicBox*>(_boxes[boxID])->setCrossedExtremity(BOX_START);
