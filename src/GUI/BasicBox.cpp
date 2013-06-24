@@ -74,6 +74,7 @@
 #include <QToolTip>
 #include <QAbstractItemView>
 #include <QStyleOptionViewItem>
+#include <cmath>
 
 using std::string;
 using std::vector;
@@ -102,6 +103,8 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
   _startMenuButton = NULL;
   _endMenuButton = NULL;
 
+
+  /// \todo : !! Problème d'arrondi, on cast en int des floats !! A étudier parce que crash (avec 0 notamment) si on remet en float. NH
   int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
 
   xmin = (int)(std::min(press.x(), release.x()));
@@ -473,6 +476,7 @@ BasicBox::setSize(const QPointF & size)
 {
   _abstract->setWidth(std::max((float)size.x(), MaquetteScene::MS_PRECISION / MaquetteScene::MS_PER_PIXEL));
   _abstract->setHeight(size.y());
+//  std::cout<<"setSize ------> "<< _abstract->ID()<<" "<<_abstract->width()*MaquetteScene::MS_PER_PIXEL<<std::endl;
   updateStuff();
 }
 
@@ -647,6 +651,8 @@ BasicBox::updateRelations(BoxExtremity extremity)
 void
 BasicBox::updateStuff()
 {
+//  std::cout<<"--- updateStuff ---"<<std::endl;
+
   updateBoxSize();
   if (_comment != NULL) {
       _comment->updatePos();
@@ -880,6 +886,7 @@ BasicBox::removeTriggerPoint(BoxExtremity extremity)
 
       TriggerPoint *trgPoint = _triggerPoints->value(extremity);
       _triggerPoints->remove(extremity);
+
       Maquette::getInstance()->removeTriggerPoint(trgPoint->ID());
       _scene->removeFromTriggerQueue(trgPoint);
 

@@ -1075,7 +1075,7 @@ MaquetteScene::removeTriggerPoint(unsigned int trgID)
           box->removeTriggerPoint(trgPnt->boxExtremity());
         }
       _triggersQueueList.removeAll(trgPnt);
-      removeItem(trgPnt);
+//      removeItem(trgPnt);
       _maquette->removeTriggerPoint(trgID);      
     }
 }
@@ -1392,6 +1392,7 @@ MaquetteScene::boxResized()
   coord.topLeftX = resizeBox->relativeBeginPos();
   coord.topLeftY = resizeBox->getTopLeft().y();
   coord.sizeX = std::max((float)10., resizeBox->width());
+//  std::cout<<"boxResized "<<resizeBox->ID()<<" : "<<coord.sizeX*MS_PER_PIXEL<<std::endl;
   coord.sizeY = std::max((float)10., resizeBox->height());
   if (_maquette->updateBox(resizeBox->ID(), coord)) {
       update();
@@ -1415,11 +1416,13 @@ MaquetteScene::selectionMoved()
 bool
 MaquetteScene::boxMoved(unsigned int boxID)
 {
+//  std::cout<<"--- boxMoved ---"<<boxID<<std::endl;
   Coords coord;
   BasicBox * box = _maquette->getBox(boxID);
   if (box != NULL) {
       if (!box->hasMother()) {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x();
+//          std::cout<<"X = "<<coord.topLeftX* MaquetteScene::MS_PER_PIXEL<<std::endl;
         }
       else {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x()
@@ -1427,6 +1430,7 @@ MaquetteScene::boxMoved(unsigned int boxID)
         }
       coord.topLeftY = box->mapToScene(box->boxRect().topLeft()).y();
       coord.sizeX = box->boxRect().size().width();
+//      std::cout<<"Y = "<<coord.sizeX* MaquetteScene::MS_PER_PIXEL<<std::endl;
       coord.sizeY = box->boxRect().size().height();
     }
   bool ret = _maquette->updateBox(boxID, coord);

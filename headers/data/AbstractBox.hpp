@@ -80,10 +80,6 @@ class AbstractBox : public Abstract
                 NetworkMessages *startMessages = new NetworkMessages,
                 NetworkMessages *endMessages = new NetworkMessages);
 
-//    AbstractBox(const QPointF &newTopLeft = QPointF(0., 0.), const float &newWidth = 0., const float &newHeight = 0.,
-//                const std::string &newName = "", const QColor &newColor = Qt::black, unsigned int ID = NO_ID,
-//                unsigned int motherID = ROOT_BOX_ID);
-
     AbstractBox(const AbstractBox &other);
 
     virtual
@@ -204,7 +200,7 @@ class AbstractBox : public Abstract
      * \param width : the new width of the box
      */
     inline void
-    setWidth(const float &width) { _width = width; }
+    setWidth(const float &width) {_width = width; }
 
     /*!
      * \brief Sets the height of the box.

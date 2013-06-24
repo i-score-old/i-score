@@ -95,7 +95,7 @@ MainWindow::MainWindow()
   // Creation of Scene and View
   _scene = new MaquetteScene(QRectF(0, 0, width(), height()), _editor);
 
-  _view = new MaquetteView(this);
+  _view = new MaquetteView(this);  
 
   // Initialisation of Scene and View
   _view->setScene(_scene);

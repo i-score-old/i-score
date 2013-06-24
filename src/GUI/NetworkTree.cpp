@@ -987,7 +987,7 @@ NetworkTree::unassignItem(QTreeWidgetItem *item)
 void
 NetworkTree::assignTotally(QTreeWidgetItem *item)
 {
-  std::cout << getAbsoluteAddress(item).toStdString() << " > assignTotally" << std::endl;
+//  std::cout << getAbsoluteAddress(item).toStdString() << " > assignTotally" << std::endl;
   QFont font;
   if (item->type() != OSCNode) {
       item->setSelected(true);
@@ -1002,7 +1002,7 @@ NetworkTree::assignTotally(QTreeWidgetItem *item)
 void
 NetworkTree::assignPartially(QTreeWidgetItem *item)
 {
-  std::cout << getAbsoluteAddress(item).toStdString() << " > assignPartially" << std::endl;
+//  std::cout << getAbsoluteAddress(item).toStdString() << " > assignPartially" << std::endl;
 
   QFont font;
   item->setSelected(false);
@@ -1053,7 +1053,7 @@ NetworkTree::unassignTotally(QTreeWidgetItem *item)
 void
 NetworkTree::fathersAssignation(QTreeWidgetItem *item)
 {
-  std::cout << "------- fatherAssignation(" << getAbsoluteAddress(item).toStdString() << ") -------" << std::endl;
+//  std::cout << "------- fatherAssignation(" << getAbsoluteAddress(item).toStdString() << ") -------" << std::endl;
   QTreeWidgetItem *father;
 
   if (item->parent() != NULL) {
