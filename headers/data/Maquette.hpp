@@ -814,8 +814,8 @@ class Maquette : public QObject
     //! The MaquetteScene managing display and interaction.
     MaquetteScene *_scene;
 
-    //! The Engines object managing temporal constraints.
-    Engines *_engines;
+    //! The Engine object managing temporal constraints.
+    Engine *_engines;
 
     //! The map of boxes (identified by IDs) managed by the maquette.
     std::map<unsigned int, BasicBox*> _boxes;
