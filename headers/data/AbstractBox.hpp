@@ -57,7 +57,7 @@
 #include <QTreeWidgetItem>
 #include "NetworkMessages.hpp"
 
-#include <TTScore.h>
+#include "Engine.h"
 
 //! Defines abstract basic box type.
 enum { ABSTRACT_BOX_TYPE = 1 };
