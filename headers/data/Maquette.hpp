@@ -55,7 +55,6 @@
 #include <list>
 #include <utility>
 #include <sstream>
-#include "Palette.hpp"
 #include "NetworkMessages.hpp"
 #include "BasicBox.hpp"
 
@@ -75,20 +74,18 @@ static const std::string PAUSE_ENGINES_MESSAGE = "/Transport/Pause";
 static const std::string REWIND_ENGINES_MESSAGE = "/Transport/Rewind";
 static const std::string STARTPOINT_ENGINES_MESSAGE = "/Transport/StartPoint";
 static const std::string SPEED_ENGINES_MESSAGE = "/Transport/Speed";
+static const std::string NEXT_TRIGGER_MESSAGE = "/Transport/Next";
 
 #define NETWORK_PORT_STR "7000"
 
 class PaletteActor;
 
-class SoundBox;
 class BasicBox;
 class ParentBox;
 class BoundingBox;
 class MaquetteScene;
 class QDomDocument;
 class Engines;
-class AbstractSoundBox;
-class AbstractControlBox;
 class AbstractParentBox;
 class AbstractRelation;
 class Relation;
@@ -100,8 +97,10 @@ typedef enum { SUCCESS = 1, NO_MODIFICATION = 0, RETURN_ERROR = -1,
                ARGS_ERROR = -2 } ErrorMessage;
 
 //! Enum containing various warning levels.
+
 typedef enum { INDICATION_LEVEL, WARNING_LEVEL, ERROR_LEVEL } ErrorLevel;
 
+/// \todo les objets graphiques Qt maintiennent eux-même leurs tailles et positions
 /*!
  * \brief Structure used to contain boxes position or size.
  * Used for interaction with MaquetteScene.
@@ -479,44 +478,6 @@ class Maquette : public QObject
     bool sendMessage(const std::string &message);
 
     /*!
-     * \brief Adds a sound box to the maquette.
-     *
-     * \param corner1 : a first corner of the box's bounding rectangle
-     * \param corner2 : the second corner of the box's bounding rectangle
-     * \param name : the name given to the box
-     * \param mother : the mother of the box
-     * \return the ID of created sound box
-     */
-    unsigned int addSoundBox(const QPointF & corner1, const QPointF & corner2, const std::string & name, unsigned int mother);
-
-    /*!
-     * \brief Adds a new sound box to the maquette with specific information.
-     *
-     * \param abstract : the abstract sound box containing information about the box
-     * \return the ID of box created
-     */
-    unsigned int addSoundBox(const AbstractSoundBox &abstract);
-
-    /*!
-     * \brief Adds a control box to the maquette.
-     *
-     * \param corner1 : a first corner of the box's bounding rectangle
-     * \param corner2 : the second corner of the box's bounding rectangle
-     * \param name : the name given to the box
-     * \param mother : the mother of the box
-     * \return the ID of created control box
-     */
-    unsigned int addControlBox(const QPointF & corner1, const QPointF & corner2, const std::string & name, unsigned int mother);
-
-    /*!
-     * \brief Adds a new control box to the maquette with specific information.
-     *
-     * \param abstract : the abstract control box containing information about the box
-     * \return the ID of box created
-     */
-    unsigned int addControlBox(const AbstractControlBox &abstract);
-
-    /*!
      * \brief Adds a parent box to the maquette.
      *
      * \param corner1 : a first corner of the box's bounding rectangle
@@ -811,20 +772,6 @@ class Maquette : public QObject
     Maquette();
 
     /*!
-     * \brief Adds a sound box existing in Engines to the maquette with given ID and palette.
-     *
-     * \param ID : the ID to assign to the box
-     * \param corner1 : a first corner of the box's bounding rectangle
-     * \param corner2 : the second corner of the box's bounding rectangle
-     * \param name : the name given to the box
-     * \param pal : the palette to assign to the box
-     * \param mother : the mother to assign to the box
-     * \return the ID of created sound box
-     */
-    unsigned int addSoundBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const std::string &name,
-                             const Palette &pal, unsigned int mother);
-
-    /*!
      * \brief Adds a box existing in Engines to the maquette with given ID.
      *
      * \param ID : the ID to assign to the box
@@ -832,20 +779,7 @@ class Maquette : public QObject
      * \param corner2 : the second corner of the box's bounding rectangle
      * \param name : the name given to the box
      * \param mother : the mother to assign to the box
-     * \return the ID of created sound box
-     */
-    unsigned int addControlBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const std::string &name,
-                               unsigned int mother);
-
-    /*!
-     * \brief Adds a box existing in Engines to the maquette with given ID.
-     *
-     * \param ID : the ID to assign to the box
-     * \param corner1 : a first corner of the box's bounding rectangle
-     * \param corner2 : the second corner of the box's bounding rectangle
-     * \param name : the name given to the box
-     * \param mother : the mother to assign to the box
-     * \return the ID of created sound box
+     * \return the ID of created parent box
      */
     unsigned int addParentBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const std::string &name,
                               unsigned int mother);
@@ -881,7 +815,7 @@ class Maquette : public QObject
     MaquetteScene *_scene;
 
     //! The Engines object managing temporal constraints.
-    Engine *_engines;
+    Engines *_engines;
 
     //! The map of boxes (identified by IDs) managed by the maquette.
     std::map<unsigned int, BasicBox*> _boxes;

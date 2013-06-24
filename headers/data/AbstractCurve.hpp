@@ -61,7 +61,7 @@
 class QColor;
 
 //! Defines abstract parent box type.
-enum { ABSTRACT_CURVE_TYPE = 8 };
+enum { ABSTRACT_CURVE_TYPE = 8 }; /// \todo Jamais utilisé dans le projet! Et devrait être rangé dans la classe.
 
 /*!
  * \class AbstractCurve
@@ -80,7 +80,7 @@ class AbstractCurve : public Abstract
     virtual
     ~AbstractCurve(){}
 
-    virtual int type() const;
+    virtual int type() const; /// \todo les types sont utiles aux GraphicsItem
 
   private:
     unsigned int _boxID;      //!< Box ID.

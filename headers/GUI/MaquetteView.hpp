@@ -73,6 +73,7 @@ class MaquetteView : public QGraphicsView
      * \param value : the goto value in ms
      */
     void setGotoValue(int value);
+
     inline int
     gotoValue(){ return _gotoValue; }
     QList<TriggerPoint *> triggersQueueList();
@@ -112,6 +113,7 @@ class MaquetteView : public QGraphicsView
      * \param value : the zoom factor value
      */
     void setZoom(float value);
+
     inline float
     zoom(){ return _zoom; }
 
@@ -138,6 +140,7 @@ class MaquetteView : public QGraphicsView
      * \param event : the information about the event
      */
     virtual void keyPressEvent(QKeyEvent *event);
+
     virtual void keyReleaseEvent(QKeyEvent *event);
 
     /*!

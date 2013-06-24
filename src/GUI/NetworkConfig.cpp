@@ -74,11 +74,16 @@ NetworkConfig::NetworkConfig(MaquetteScene *scene, QWidget *parent)
 
   _devicesLabel = new QLabel(tr("Devices"));
   _pluginsLabel = new QLabel(tr("Plugins"));
-  _portLabel = new QLabel(tr("Port"));
+  _portOutputLabel = new QLabel(tr("Port (output)"));
+//  _portInputLabel = new QLabel(tr("Port (input)"));
   _IPLabel = new QLabel(tr("IP"));
 
-  _portBox = new QSpinBox;
-  _portBox->setRange(0, 10000);
+  _portOutputBox = new QSpinBox;
+  _portOutputBox->setRange(0, 10000);
+//  _portInputBox = new QSpinBox;
+//  _portInputBox->setRange(0, 10000);
+//  _portInputBox->setValue(7002);
+//  _portInputBox->setEnabled(false);
 
   _IPBox = new QLineEdit;
 
@@ -109,20 +114,22 @@ NetworkConfig::NetworkConfig(MaquetteScene *scene, QWidget *parent)
       QMessageBox::warning(this, "", tr("MinuitDevice plugin not found : default selected"));
       _pluginsComboBox->setCurrentIndex(0);
     }
-  _portBox->setValue(minuitDevice.networkPort);
+  _portOutputBox->setValue(minuitDevice.networkPort);
   _IPBox->setText(QString::fromStdString(minuitDevice.networkHost));
 
   connect(_devicesComboBox, SIGNAL(activated(int)), this, SLOT(deviceSelected(int)));
   connect(_pluginsComboBox, SIGNAL(activated(int)), this, SLOT(setChanged()));
-  connect(_portBox, SIGNAL(valueChanged(int)), this, SLOT(setChanged()));
+  connect(_portOutputBox, SIGNAL(valueChanged(int)), this, SLOT(setChanged()));
   connect(_IPBox, SIGNAL(textChanged(const QString &)), this, SLOT(setChanged()));
 
   _layout->addWidget(_devicesLabel, 0, 0, 1, 1);
   _layout->addWidget(_devicesComboBox, 0, 1, 1, 1);
   _layout->addWidget(_pluginsLabel, 1, 0, 1, 1);
   _layout->addWidget(_pluginsComboBox, 1, 1, 1, 1);
-  _layout->addWidget(_portLabel, 2, 0, 1, 1);
-  _layout->addWidget(_portBox, 2, 1, 1, 1);
+  _layout->addWidget(_portOutputLabel, 2, 0, 1, 1);
+  _layout->addWidget(_portOutputBox, 2, 1, 1, 1);
+//  _layout->addWidget(_portInputLabel, 2, 3, 0, 1);
+//  _layout->addWidget(_portInputBox, 3, 1, 1, 1);
   _layout->addWidget(_IPLabel, 3, 0, 1, 1);
   _layout->addWidget(_IPBox, 3, 1, 1, 1);
 
@@ -155,7 +162,7 @@ NetworkConfig::deviceSelected(int indexSelected)
               QMessageBox::warning(this, "", tr("Device plugin not found : default selected"));
               _pluginsComboBox->setCurrentIndex(0);
             }
-          _portBox->setValue(it->second.networkPort);
+          _portOutputBox->setValue(it->second.networkPort);
           _IPBox->setText(QString::fromStdString(it->second.networkHost));
         }
     }
@@ -180,7 +187,7 @@ NetworkConfig::updateNetworkConfiguration()
       QHostAddress hostAddress(_IPBox->text());
       if (!hostAddress.isNull()) {
           _scene->changeNetworkDevice(_devicesComboBox->currentText().toStdString(), _pluginsComboBox->currentText().toStdString(),
-                                      _IPBox->text().toStdString(), _portBox->text().toStdString());
+                                      _IPBox->text().toStdString(), _portOutputBox->text().toStdString());
           accept();
         }
       else {

@@ -361,7 +361,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
                         div = std::min(50., std::max(fabs(_maxY), fabs(_minY))) / 5;
                         pow = 1 + std::min(it->second.first - mousePosY, (float)50.) / div;
                       }
-                    it->second = std::make_pair(it->second.first, pow);
+                    it->second = std::make_pair<float, float>(it->second.first, pow);
                     _movingBreakpointY = -1;
                     curveChanged();
                   }
@@ -374,10 +374,10 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
             if (_movingBreakpointX != -1) {
                 map<float, pair<float, float> >::iterator it;
                 if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
-                    it->second = std::make_pair(relativePoint.y(), it->second.second);
+                    it->second = std::make_pair<float, float>(relativePoint.y(), it->second.second);
                   }
                 else {
-                    _abstract->_breakpoints[_movingBreakpointX] = std::make_pair(relativePoint.y(), 1.);
+                    _abstract->_breakpoints[_movingBreakpointX] = std::make_pair<float, float>(relativePoint.y(), 1.);
                   }
                 _movingBreakpointY = -1;
                 curveChanged();

@@ -76,15 +76,10 @@ class AbstractCurve;
 class QObject;
 
 /*!
- * \brief Enum used to define Basic Box's item type.
- */
-enum { BASIC_BOX_TYPE = QGraphicsItem::UserType + 1 };
-
-/*!
  * \brief Enum used to manage various box extremities.
  */
-enum BoxExtremity { NO_EXTREMITY = -1, BOX_START = 1,
-                    BOX_END = 2 };
+enum BoxExtremity { NO_EXTREMITY = -1, BOX_START = BEGIN_CONTROL_POINT_INDEX,
+                    BOX_END = END_CONTROL_POINT_INDEX };
 
 /*!
  * \class BasicBox
@@ -101,6 +96,11 @@ class BasicBox : public QObject, public QGraphicsItem
     virtual void updateDisplay(QString displayMode);
     virtual
     ~BasicBox();
+
+    /*!
+     * \brief Enum used to define Basic Box's item type.
+     */
+    enum { BASIC_BOX_TYPE = QGraphicsItem::UserType + 1 };
 
     /*!
      * \brief Redefinition of QGraphicsItem::type(). Used for Item casting.
@@ -186,6 +186,7 @@ class BasicBox : public QObject, public QGraphicsItem
      * \brief Updates stuff related to the box graphical attributes.
      */
     void updateStuff();
+
     void updateRelations(BoxExtremity extremity);
 
     /*!
@@ -195,7 +196,6 @@ class BasicBox : public QObject, public QGraphicsItem
      * \param relation : the relation to store
      */
     void addRelation(BoxExtremity extremity, Relation *relation);
-
     /*!
      * \brief Removes a relation from an extremity
      *
@@ -204,6 +204,20 @@ class BasicBox : public QObject, public QGraphicsItem
      */
     void removeRelation(BoxExtremity extremity, unsigned int relID);
     void removeRelations(BoxExtremity extremity);
+    /*!
+     * \brief Returns Relations associated to the start box extremity.
+     */
+    QList<Relation *> getStartBoxRelations();
+    /*!
+     * \brief Returns Relations associated to the end box extremity.
+     */
+    QList<Relation *> getEndBoxRelations();
+    /*!
+     * \brief Gets relations from an extremity
+     *
+     * \param extremity : the extremity involved in the relation
+     */
+    QList<Relation *> getRelations(BoxExtremity extremity);
 
     /*!
      * \brief Adds a comment "Comment" to the box.
@@ -554,6 +568,7 @@ class BasicBox : public QObject, public QGraphicsItem
      * \param messages : the messages to send at box's start
      */
     void setStartMessages(NetworkMessages *messages);
+
     NetworkMessages *startMessages();
     void setStartMessage(QTreeWidgetItem *item, QString address);
 
@@ -603,9 +618,9 @@ class BasicBox : public QObject, public QGraphicsItem
      * \param messages : the messages to send at box's end
      */
     void setEndMessages(NetworkMessages *messages);
+
     NetworkMessages *endMessages();
     void setEndMessage(QTreeWidgetItem *item, QString address);
-
     void updateWidgets();
 
     //! \brief Handles line width.
@@ -613,6 +628,7 @@ class BasicBox : public QObject, public QGraphicsItem
 
     //! \brief Handles resizing tolerance.
     static const unsigned int RESIZE_TOLERANCE = 25;
+
     static unsigned int BOX_MARGIN;
     static const float TRIGGER_ZONE_WIDTH;
     static const float TRIGGER_ZONE_HEIGHT;
@@ -633,8 +649,7 @@ class BasicBox : public QObject, public QGraphicsItem
      * \param options : array of options
      * \param widget : the widget that is being painting on
      */
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                       QWidget *widget = 0);
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
     /*!
      * \brief Binary operator to compare by starting positions.
@@ -643,6 +658,7 @@ class BasicBox : public QObject, public QGraphicsItem
      * \return true if this begins before box
      */
     bool operator<(BasicBox *box) const;
+
     void updateCurves();
     void updateCurve(string address, bool forceUpdate);
     void centerWidget();
@@ -668,7 +684,6 @@ class BasicBox : public QObject, public QGraphicsItem
     setStackedLayout(QStackedLayout *slayout){ boxContentWidget()->setStackedLayout(slayout); }
     inline bool
     hasCurve(string address){ return _curvesAddresses.contains(address); }
-    void refresh();
 
     QPointF getLeftGripPoint();
     QPointF getRightGripPoint();

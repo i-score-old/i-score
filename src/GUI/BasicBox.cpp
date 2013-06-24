@@ -74,11 +74,13 @@
 #include <QToolTip>
 #include <QAbstractItemView>
 #include <QStyleOptionViewItem>
+#include <cmath>
 
 using std::string;
 using std::vector;
 using std::map;
 
+/// \todo On pourrait les instancier directement dans le header avec leurs définitions.
 const int BasicBox::COMBOBOX_HEIGHT = 25;
 const int BasicBox::COMBOBOX_WIDTH = 120;
 const float BasicBox::TRIGGER_ZONE_WIDTH = 18.;
@@ -101,6 +103,8 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
   _startMenuButton = NULL;
   _endMenuButton = NULL;
 
+
+  /// \todo : !! Problème d'arrondi, on cast en int des floats !! A étudier parce que crash (avec 0 notamment) si on remet en float. NH
   int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
 
   xmin = (int)(std::min(press.x(), release.x()));
@@ -270,9 +274,9 @@ BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
 {
   _scene = parent;
 
-  _abstract = new AbstractBox(*abstract);
+  _abstract = new AbstractBox(*abstract); /// \todo Pourquoi recevoir un argument *abstract et le ré-instancier ????
 
-  init();
+  init(); /// \todo Un constructeur !
 
   update();
 }
@@ -298,6 +302,7 @@ BasicBox::updateFlexibility()
   _flexible = hasTriggerPoint(BOX_END);
 }
 
+/// \todo Une méthode init() ne devrait pas être utilisée. surtout en public !!! Elle peut laisser l'invariant de classe instable à tout moment.
 void
 BasicBox::init()
 {
@@ -471,6 +476,7 @@ BasicBox::setSize(const QPointF & size)
 {
   _abstract->setWidth(std::max((float)size.x(), MaquetteScene::MS_PRECISION / MaquetteScene::MS_PER_PIXEL));
   _abstract->setHeight(size.y());
+//  std::cout<<"setSize ------> "<< _abstract->ID()<<" "<<_abstract->width()*MaquetteScene::MS_PER_PIXEL<<std::endl;
   updateStuff();
 }
 
@@ -645,6 +651,8 @@ BasicBox::updateRelations(BoxExtremity extremity)
 void
 BasicBox::updateStuff()
 {
+//  std::cout<<"--- updateStuff ---"<<std::endl;
+
   updateBoxSize();
   if (_comment != NULL) {
       _comment->updatePos();
@@ -664,6 +672,8 @@ BasicBox::updateStuff()
     }
   setFlag(QGraphicsItem::ItemIsMovable, true);
 }
+
+
 
 
 void
@@ -687,6 +697,33 @@ BasicBox::removeRelation(BoxExtremity extremity, unsigned int relID)
             }
         }
     }
+}
+
+QList<Relation *>
+BasicBox::getStartBoxRelations()
+{
+  return getRelations(BOX_START);
+}
+
+QList<Relation *>
+BasicBox::getEndBoxRelations()
+{
+  return getRelations(BOX_END);
+}
+
+QList<Relation *>
+BasicBox::getRelations(BoxExtremity extremity)
+{
+  QList<Relation *>relations;
+  map<BoxExtremity, map<unsigned int, Relation*> >::iterator it;
+  map<unsigned int, Relation*>::iterator itMap;
+
+  if ((it = _relations.find(extremity)) != _relations.end()) {
+      for(itMap=(it->second).begin() ; itMap!=(it->second).end() ; ++itMap){
+        relations<<itMap->second;
+      }
+    }
+  return relations;
 }
 
 void
@@ -845,12 +882,19 @@ BasicBox::addTriggerPoint(BoxExtremity extremity, TriggerPoint *tp)
 void
 BasicBox::removeTriggerPoint(BoxExtremity extremity)
 {
-  _triggerPoints->remove(extremity);
-  updateFlexibility();
+  if(_triggerPoints->contains(extremity)){
 
-  updateRelations(extremity);
-  _scene->update();
-  update();
+      TriggerPoint *trgPoint = _triggerPoints->value(extremity);
+      _triggerPoints->remove(extremity);
+
+      Maquette::getInstance()->removeTriggerPoint(trgPoint->ID());
+      _scene->removeFromTriggerQueue(trgPoint);
+
+      updateFlexibility();
+      updateRelations(extremity);
+      _scene->update();
+      update();
+    }
 }
 
 void
@@ -867,8 +911,6 @@ BasicBox::setTriggerPointMessage(BoxExtremity extremity, const string &message)
 string
 BasicBox::triggerPointMessage(BoxExtremity extremity)
 {
-//    QMap<BoxExtremity,TriggerPoint*>::iterator it;
-//	if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
   if (_triggerPoints->contains(extremity)) {
       return _triggerPoints->value(extremity)->message();
     }
@@ -1836,9 +1878,4 @@ BasicBox::displayCurveEditWindow()
   editWindow->setLayout(layout);
   editWindow->setGeometry(QRect(_scene->sceneRect().toRect()));
   editWindow->show();
-}
-
-void
-BasicBox::refresh()
-{
 }

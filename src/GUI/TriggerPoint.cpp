@@ -322,22 +322,8 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
   BasicBox *box = NULL;
   if (_abstract->boxID() != NO_ID) {
       if ((box = _scene->getBox(_abstract->boxID())) != NULL) {
-          //draw bounding rect
-//            QPen penG(Qt::green);
-//            penG.setWidth(2);
-//            painter->setPen(penG);
-//            painter->drawRect(boundingRect());
-
-//
           QPen pen = painter->pen();
-
-//            pen.setColor(box->isSelected() ? Qt::yellow : Qt::white);
           QBrush brush = painter->brush();
-
-//            pen.setWidth(2);
-//            painter->setPen(pen);
-//            painter->drawPath(path);
-//            painter->fillPath(path,box->isSelected() ? Qt::yellow : Qt::white);
           pen.setColor(box->color().darker());
           pen.setWidth(isSelected() ? 1.5 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH / 2);
           painter->setPen(pen);
@@ -353,8 +339,8 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
                       this->setFocus();
                     }
                   else {
-                      brush.setColor(QColor("orange"));
-                      painter->setBrush(brush);
+//                      brush.setColor(QColor("orange"));
+//                      painter->setBrush(brush);
                       drawFlag(painter, QColor("orange"));
                     }
                 }

@@ -51,6 +51,7 @@
 #include "AbstractParentBox.hpp"
 #include <vector>
 
+/// \todo PARENT_BOX_TYPE need to be inserted in ParentBox. see http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var
 /*!
  * \brief Enum used to define Parent Box's item type.
  */

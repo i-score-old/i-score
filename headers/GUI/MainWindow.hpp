@@ -51,7 +51,6 @@
 #include <QDialog>
 #include <QSlider>
 
-#include "Palette.hpp"
 #include "MaquetteScene.hpp"
 #include "MaquetteWidget.hpp"
 
@@ -121,11 +120,6 @@ class MainWindow : public QMainWindow
     void timeEndReached();
 
     /*!
-     * \brief Returns goto value in ms.
-     */
-    int gotoValue();
-
-    /*!
      * \brief Get the Command Key state.
      *
      * \return True if pressed, false if not.
@@ -143,7 +137,7 @@ class MainWindow : public QMainWindow
      *
      * \param event : the QT closing event
      */
-    virtual void closeEvent(QCloseEvent *event);
+    virtual void closeEvent(QCloseEvent *event); /// \todo virtual seulement si on a besoin d'hériter de MainWindow, ce qui n'est pas le cas.
     virtual void keyPressEvent(QKeyEvent *event);
     virtual void keyReleaseEvent(QKeyEvent *event);
 
@@ -199,11 +193,6 @@ class MainWindow : public QMainWindow
     void updateEditor();
 
     /*!
-     * \brief Updates the tracks view.
-     */
-    void viewTrack();
-
-    /*!
      * \brief Cut the current selection of boxes.
      */
     void cutSelection();
@@ -217,40 +206,6 @@ class MainWindow : public QMainWindow
      * \brief Pastes the current selection of boxes.
      */
     void pasteSelection();
-
-    /*!
-     * \brief Starts playing the composition.
-     */
-    void play();
-
-    /*!
-     * \brief Pauses playing the composition.
-     */
-    void pause();
-
-    /*!
-     * \brief Stops playing the composition.
-     */
-    void stop();
-
-    /*!
-     * \brief Changes the current playing mode.
-     */
-    void playModeChanged();
-
-    /*!
-     * \brief Raised when the acceleration slider value is changed.
-     */
-    void accelerationChanged(int value);
-
-    void accelerationValueEntered(double value);
-
-    /*!
-     * \brief Raised when the goto slider value is changed.
-     */
-    void gotoChanged();
-
-    void gotoValueEntered(double value);
 
     /*!
      * \brief Switched current interaction mode.
@@ -274,11 +229,6 @@ class MainWindow : public QMainWindow
      * \brief Initializes menus.
      */
     void createMenus();
-
-    /*!
-     * \brief Initializes toolbars.
-     */
-    void createToolBars();
 
     /*!
      * \brief Creates a status bar.
@@ -333,8 +283,6 @@ class MainWindow : public QMainWindow
     QString _curFile;                       //!< The current file name.
 
     QMenuBar *_menuBar;                     //!< Main menu bar.
-    QToolBar *_fileToolBar;                 //!< Toolbar containing usual actions.
-    QToolBar *_gotoBar;                     //!< Toolbar handling goto slider.
     QMenu *_fileMenu;                       //!< File menu.
     QMenu *_editMenu;                       //!< Edit menu.
     QMenu *_viewMenu;                       //!< View menu.
@@ -353,32 +301,17 @@ class MainWindow : public QMainWindow
     QAction *_zoomOutAct;                   //!< Zooming out action.
     QAction *_networkAct;                   //!< Network configuration dialog action.
     QAction *_editorAct;                    //!< Showing/Hidding editor action.
-    QAction *_viewTrackAct;                 //!< Showing/Hidding tracks action.
     QAction *_cutAct;                       //!< Cuting boxes action.
     QAction *_copyAct;                      //!< Copying boxes action.
     QAction *_pasteAct;                     //!< Pasting boxes action.
-    QAction *_playAct;                      //!< Playing action.
-    QAction *_stopAct;                      //!< Stopping action.
-    QAction *_selectAllAct;                 //!< Selecting the whole set of boxes action.
-    QActionGroup * _modeAct;                //!< Containing various interaction modes.
-    QAction *_relationModeAct;              //!< Relation mode action.
     QAction *_selectModeAct;                //!< Selection mode action.
-    QAction *_SBModeAct;                    //!< Selecting sound boxes creation mode action.
-    QAction *_CBModeAct;                    //!< Selecting control boxes creation mode action.
     QAction *_PBModeAct;                    //!< Selecting parent boxes creation mode action.
     QAction *_commentModeAct;               //!< Selecting comment creation action.
-    QAction *_triggerModeAct;               //!< Selecting comment creation action.
-    QActionGroup * _playModeAct;            //!< Containing various playing modes.
-    QAction * _directPlayAct;               //!< File playing mode.
-    QAction * _synthPlayAct;                //!< Synthesis playing mode.
-    QAction * _freePlayAct;                 //!< Dual playing mode.
+    QAction *_selectAllAct;                 //!< Selecting the whole set of boxes action.
+
+    QActionGroup * _modeAct;                //!< Containing various interaction modes.
 
     Help *_helpDialog;                      //!< Help dialog.
-
-    LogarithmicSlider *_accelerationSlider; //!< Acceleration slider.
-    QDoubleSpinBox *_accelerationDisplay;   //!< Acceleration value.
-    QSlider *_gotoSlider;                   //!< Slider handling goto value.
-    QDoubleSpinBox *_gotoDisplay;           //!< Goto value.
 
     MaquetteWidget *_maquetteWidget;
     NetworkConfig *_networkConfig;

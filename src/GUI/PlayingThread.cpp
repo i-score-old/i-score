@@ -38,11 +38,8 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-/*
- * PlayingThread.cpp
- *
- *  Created on: 19 f.bŽévr. 2010
- *      Author: luc
+/*!
+ * \file PlayingThread.cpp
  */
 
 #include "PlayingThread.hpp"
@@ -61,7 +58,6 @@ PlayingThread::run()
       _scene->updatePlayingBoxes();
       _scene->updateProgressBar();
 
-//        std::cout<<_scene->getCurrentTime()<<std::endl;
       msleep(10);
     }
 }

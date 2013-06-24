@@ -19,7 +19,6 @@
 
 #include "MaquetteView.hpp"
 #include "LogarithmicSlider.hpp"
-#include "TimeBarWidget.hpp"
 
 class QGridLayout;
 class QString;
@@ -30,7 +29,7 @@ class MaquetteScene;
 /*!
  * \class MaquetteWidget
  *
- * \brief Widget handling the maquette, its header etc...
+ * \brief Widget handling the maquetteView and the header (ScenarioName, play/stop/rewind button, acceleration slider)
  */
 
 class MaquetteWidget : public QWidget
@@ -43,8 +42,6 @@ class MaquetteWidget : public QWidget
 
     void init();
     void setName(QString name);
-    inline TimeBarWidget *
-    timeBar(){ return _timeBar; }
     static const float HEADER_HEIGHT;
     static const float NAME_POINT_SIZE;
 
@@ -57,13 +54,10 @@ class MaquetteWidget : public QWidget
     void play();
     void stop();
     void pause();
+    void rewind();
     void accelerationValueModified(int value);
     void accelerationValueEntered(double value);
-    void changeZoom(float value);
     void updateHeader();
-
-  protected:
-    virtual void paintEvent(QPaintEvent *event);
 
   private:
     void createActions();
@@ -72,10 +66,6 @@ class MaquetteWidget : public QWidget
     void createHeader();
     void createMenuWidget();
     void createReadingSpeedWidget();
-
-    void setAvailableAction(QAction *action);
-    void setAvailableMenu(QWidget *widget);
-
 
     MaquetteView *_view;
     MaquetteScene *_scene;
@@ -87,14 +77,13 @@ class MaquetteWidget : public QWidget
 
     QAction *_playAction;
     QAction *_stopAction;
+    QAction *_rewindAction;
 
     QColor _color;
     QGridLayout *_maquetteLayout;
     LogarithmicSlider *_accelerationSlider;
     QDoubleSpinBox *_accelerationDisplay;
     QWidget *_readingSpeedWidget;
-    TimeBarWidget *_timeBar;
-    float _zoom;
 
     bool _sliderMoved;
     bool _valueEntered;

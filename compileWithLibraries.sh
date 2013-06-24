@@ -1,9 +1,18 @@
 #!/bin/bash
+
+## USAGE : 
+## ./compile.sh LINUX
+##         OR
+## ./compile.sh LINUX64
+##         OR
+## ./compile.sh MACOS
+##         OR
+## ./compile.sh MACOS64
+
 CURRENT_PATH=`pwd`
 
 OS=$1
 
-# TODO this test is useless, important for windows path. better to work with CURRENT_PATH !
 if [ "$OS" = "LINUX" ] || [ "$OS" = "LINUX64" ]
 then
     {
@@ -37,31 +46,31 @@ echo '-=[START]=-'
 #buildWithSupport.rb dev clean
 
 ## i-score Compilation
-cd $SCORE_PATH
+cd $ISCORE_PATH
 echo '-=[i-score]=- Cleaning ...'
 $MAKE_CLEAN
 if [ "$OS" = "LINUX" ]
 then
-{
-echo '-=[i-score]=- Generating makefile ...'
-$QMAKE_LINUX i-score.pro
-}
+    {
+	echo '-=[i-score]=- Generating makefile ...'
+	$QMAKE_LINUX i-score.pro
+    }
 elif [ "$OS" = "LINUX64" ]
 then
-{
-echo '-=[i-score]=- Generating makefile ...'
-$QMAKE_LINUX_64 i-score.pro
-}
+    {
+	echo '-=[i-score]=- Generating makefile ...'
+	$QMAKE_LINUX_64 i-score.pro
+    }
 elif [ "$OS" = "MACOS" ] || [ "$OS" = "MACOS64" ]
 then
-{
-echo '-=[i-score]=- Generating makefile ...'
-$QMAKE_MACOS i-score.pro
-}
+    {
+	echo '-=[i-score]=- Generating makefile ...'
+	$QMAKE_MACOS i-score.pro
+    }
 else
-{
-echo '-=[i-score]=- ERROR : Unhandled OS'
-}
+    {
+	echo '-=[i-score]=- ERROR : Unhandled OS'
+    }
 fi
 echo '-=[i-score]=- Compiling  ...'
 $MAKE

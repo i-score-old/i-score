@@ -67,7 +67,7 @@ using std::string;
 #include "AttributesEditor.hpp"
 #include "MainWindow.hpp"
 
-#define COMBOBOX_WIDTH 500
+#define COMBOBOX_WIDTH 500 /// \todo Ne pas mettre des tailles en dur
 
 BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
   : QWidget(parent)
@@ -298,6 +298,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
 {
   Q_UNUSED(forceUpdate);
   BasicBox *box = Maquette::getInstance()->getBox(_boxID);
+
   if (box != NULL) { // Box Found
       if (box->hasCurve(address)) {
           AbstractCurve *abCurve = box->getCurve(address);
@@ -314,6 +315,14 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
           vector<short> sectionType;
 
           bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID, address, 0, sampleRate, redundancy, interpolate, values, argTypes, xPercents, yValues, sectionType, coeff);
+
+          //--- PRINT ---
+//            std::cout<<"values : "<<std::endl;
+//            for (unsigned int i = 0; i < yValues.size() ; i++) {
+//                std::cout<<"  "<<yValues[i]<<std::endl;
+//            }
+//            std::cout<<std::endl;
+          //-------------
 
           if (getCurveSuccess) {
               /********** Abstract Curve found ***********/

@@ -48,8 +48,6 @@
 #include <float.h>
 #include <limits>
 #include "BasicBox.hpp"
-#include "SoundBox.hpp"
-#include "ControlBox.hpp"
 #include "ParentBox.hpp"
 #include "ChooseTemporalRelation.hpp"
 #include "MaquetteView.hpp"
@@ -59,11 +57,9 @@
 #include "TriggerPoint.hpp"
 #include "ViewRelations.hpp"
 #include "AttributesEditor.hpp"
-#include "AbstractSoundBox.hpp"
 #include "AbstractRelation.hpp"
 #include "AbstractComment.hpp"
 #include "TextEdit.hpp"
-#include "PreviewArea.hpp"
 #include "PlayingThread.hpp"
 #include "CurvesWidget.hpp"
 #include "TimeBarWidget.hpp"
@@ -81,37 +77,25 @@ using std::string;
 const string MaquetteScene::DEFAULT_TRIGGER_MSG = "/trigger";
 float MaquetteScene::MS_PER_PIXEL = 16;
 const float MaquetteScene::MS_PRECISION = 10;
-
-using namespace SndBoxProp;
+const float LINE_WIDTH = 1.1;
 
 MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
   : QGraphicsScene(rect)
 {
   _editor = editor;
-  _copyPalette = _editor->getPalette();
   _clicked = false;
   _playing = false;
   _paused = false;
-
   _modified = false;
 
-  _relation = new AbstractRelation;
-
+  _relation = new AbstractRelation; /// \todo pourquoi instancier une AbstractRelation ici ?
   _playThread = new PlayingThread(this);
+  _timeBar = new TimeBarWidget(0, this);  
+  _timeBarProxy = addWidget(_timeBar);/// \todo Vérifier ajout si classe TimeBarWidget hérite de GraphicsProxyWidget ou GraphicsObject. Notamment pour lier avec background.
 
-  _timeBar = new TimeBarWidget(0, this);
-
-//    _progressLine = new QGraphicsLineItem(QLineF(50,sceneRect().topLeft().y(),50,sceneRect().bottomLeft().y()));
   _progressLine = new QGraphicsLineItem(QLineF(sceneRect().topLeft().x(), sceneRect().topLeft().y(), sceneRect().bottomLeft().x(), MAX_SCENE_HEIGHT));
 
-  _progressLine->setZValue(2);
-
   addItem(_progressLine);
-
-  addWidget(_timeBar);
-
-  connect(_timeBar, SIGNAL(gotoValueEntered(double)), this, SLOT(gotoChanged(double)));
-  connect(this, SIGNAL(stopPlaying()), this, SLOT(stop()));
 }
 
 MaquetteScene::~MaquetteScene()
@@ -123,9 +107,13 @@ MaquetteScene::~MaquetteScene()
 void
 MaquetteScene::init()
 {
+  _progressLine->setZValue(2);
+  _timeBarProxy->setZValue(3);
+  _timeBarProxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+
   _currentInteractionMode = SELECTION_MODE;
   setCurrentMode(SELECTION_MODE);
-  _currentBoxMode = NB_MODE;
+  _currentBoxMode = PB_MODE;
   _savedInteractionMode = _currentInteractionMode;
   _savedBoxMode = _currentBoxMode;
   _resizeMode = NO_RESIZE;
@@ -133,6 +121,7 @@ MaquetteScene::init()
   _accelerationFactorSave = 1.;
   _accelerationFactor = 1.;
 
+  /// \todo MainWindow appelle init() de MaquetteScene, qui instancie lui même Maquette puis l'init.
   _maquette = Maquette::getInstance();
   _maquette->setScene(this);
   _maquette->init();
@@ -145,21 +134,26 @@ MaquetteScene::init()
   _relationBoxFound = false;
 
   _mousePos = QPointF(0., 0.);
+
+  connect(_timeBar, SIGNAL(gotoValueEntered(double)), this, SLOT(gotoChanged(double)));
+  connect(this, SIGNAL(stopPlaying()), this, SLOT(stop()));
 }
 
 void
 MaquetteScene::updateProgressBar()
 {
-//    update(QRectF(QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL-4, 0), QPointF((float)(_maquette->getCurrentTime())/MS_PER_PIXEL+4, height())));
-
-  if (_playing) {
+  if (_playing) {      
       _progressLine->setPos(_maquette->getCurrentTime() / MS_PER_PIXEL, sceneRect().topLeft().y());
-      invalidate(QRectF(), ItemLayer);
+      invalidate();
     }
-  else {
+  else {      
       _progressLine->setPos(_view->gotoValue() / MS_PER_PIXEL, sceneRect().topLeft().y());
-      invalidate(QRectF(), ItemLayer);
+      invalidate();
     }
+}
+void
+MaquetteScene::zoomChanged(float value){
+  _timeBar->updateZoom(value);
 }
 
 void
@@ -178,12 +172,7 @@ MaquetteScene::updateView()
   _view = static_cast<MaquetteView*>(views().front());
 }
 
-Palette
-MaquetteScene::getPalette() const
-{
-  return _editor->getPalette();
-}
-
+/// \todo Vérifier l'utilité de faire une surcouche d'appels de méthodes de AttributesEditor (_editor)
 void
 MaquetteScene::updateWidgets()
 {
@@ -194,19 +183,6 @@ void
 MaquetteScene::setAttributes(AbstractBox *abstract)
 {
   _editor->setAttributes(abstract);
-}
-
-Palette
-MaquetteScene::getCopyAspect() const
-{
-  return _copyPalette;
-}
-
-void
-MaquetteScene::setCopyAspect(const Palette &palette)
-{
-  _copyPalette = palette;
-  _copyPalette.setContainer(NULL);
 }
 
 map<string, MyDevice>
@@ -225,7 +201,6 @@ MaquetteScene::changeNetworkDevice(std::string deviceName, std::string pluginNam
 void
 MaquetteScene::setNetworDeviceConfig(string deviceName, string pluginName, string IP, string port)
 {
-//    _maquette->changeNetworkDevice(deviceName,pluginName,IP,port);
   emit(networkConfigChanged(deviceName, pluginName, IP, port));
 }
 
@@ -290,22 +265,7 @@ MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[]
   QGraphicsScene::drawItems(painter, numItems, items, options, widget);
   qreal xmax = width(), ymax = height();
 
-/*	static int NUM_ITEMS = -1;
- *      if (numItems != NUM_ITEMS) {
- *              NUM_ITEMS = numItems;
- *              // std::cerr << "DEBUG : MaquetteScene::drawItems : Nombre d'items : " << NUM_ITEMS << std::endl;
- *      }*/
   for (int i = 0; i < numItems; i++) {
-/*		painter->save();
- *              painter->setMatrix(items[i]->sceneMatrix(), true);
- *              items[i]->paint(painter, &options[i], widget);
- *              if (items[i]->type() == SOUND_BOX_TYPE || items[i]->type() == CONTROL_BOX_TYPE
- || items[i]->type() == PARENT_BOX_TYPE) {
- ||                     if (static_cast<BasicBox*>(items[i])->playing()) {
- ||                             items[i]->update();
- ||                     }
- ||             }
- ||             painter->restore();*/
 
       // Look if the scene rectangle has to be updated
       if (xmax < items[i]->mapToScene(items[i]->boundingRect().bottomRight()).x()) {
@@ -315,8 +275,6 @@ MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[]
           ymax = items[i]->mapToScene(items[i]->boundingRect().bottomRight()).y();
         }
     }
-
-  //_view->setSceneRect(QRectF(0, 0, xmax, ymax));
 }
 
 void
@@ -324,12 +282,6 @@ MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
 {
   Q_UNUSED(rect);
   if (!_playing) {
-      //drawGotoBar
-      QPen reSavedPen = painter->pen();
-      QPen pen3(Qt::black);
-      pen3.setWidth(3);
-      painter->setPen(pen3);
-      painter->setPen(reSavedPen);
 
       if (_currentInteractionMode == RELATION_MODE) {
           if (_clicked) {
@@ -359,7 +311,7 @@ MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
                       BasicBox *box = NULL;
                       if (itemAt(_mousePos) != 0) {
                           int type = itemAt(_mousePos)->type();
-                          if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+                          if (type == PARENT_BOX_TYPE) {
                               box = static_cast<BasicBox*>(itemAt(_mousePos));
                               if (_mousePos.x() < (box->mapToScene(box->boundingRect().topLeft()).x()
                                                    + BasicBox::RESIZE_TOLERANCE)) {
@@ -415,6 +367,7 @@ MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
                           painterPath.quadTo((startX + endX) / 2., endY, endX, endY);
                         }
 
+                      //Relation
                       painter->save();
                       QPen localPen;
                       localPen.setWidth(BasicBox::LINE_WIDTH);
@@ -481,104 +434,6 @@ int
 MaquetteScene::currentBoxMode()
 {
   return _currentBoxMode;
-}
-
-
-void
-MaquetteScene::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
-{
-  if (itemAt(event->scenePos())) {
-      // TODO : handle other boxes drag&drop
-      if (itemAt(event->scenePos())->type() == SOUND_BOX_TYPE) {
-          QGraphicsScene::dragEnterEvent(event);
-        }
-    }
-  else if (event->mimeData()->hasFormat("text/csv")) {
-      event->acceptProposedAction();
-    }
-}
-
-void
-MaquetteScene::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
-{
-  if (event->mimeData()->hasFormat("text/csv")) {
-      event->acceptProposedAction();
-    }
-}
-
-void
-MaquetteScene::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
-{
-  if (itemAt(event->scenePos())) {
-      // TODO : handle other boxes drag&drop
-
-      if (itemAt(event->scenePos())->type() == SOUND_BOX_TYPE) {
-          QGraphicsScene::dragMoveEvent(event);
-        }
-    }
-  else {
-      if (event->mimeData()->hasFormat("text/csv")) {
-          event->acceptProposedAction();
-        }
-    }
-}
-
-void
-MaquetteScene::dropEvent(QGraphicsSceneDragDropEvent *event)
-{
-  if (itemAt(event->scenePos())) {
-      // TODO : handle other boxes drag&drop
-      if (itemAt(event->scenePos())->type() == SOUND_BOX_TYPE) {
-          QGraphicsScene::dropEvent(event);
-        }
-    }
-  else {
-      if (event->mimeData()->hasFormat("text/csv")) {
-          event->acceptProposedAction();
-          const QMimeData *mimeData = event->mimeData();
-          QByteArray input = mimeData->data("text/csv");
-          QBuffer inputBuffer(&input);
-          inputBuffer.open(QIODevice::ReadOnly);
-
-          QDataStream in(&inputBuffer);
-
-          int shape, speed, speedVariation, pitchStart, pitchEnd, pitchAmp,
-              pitchGrade, harmo, harmoVariation, grain, playingMode;
-          bool impulsive, pitchRandom, pitchVibrato;
-          QString comment, soundFile;
-          QColor color;
-
-          in >> shape >> impulsive >> speed >> speedVariation >> pitchStart >> pitchRandom
-          >> pitchVibrato >> pitchEnd >> pitchAmp >> pitchGrade >> harmo >> harmoVariation
-          >> grain >> color >> playingMode >> comment >> soundFile;
-
-          SoundBox *soundBox = NULL;
-          Palette pal(SndBoxProp::Shape(shape), Pitch(pitchStart), Pitch(pitchEnd), pitchRandom, pitchVibrato,
-                      PitchVariation(pitchAmp), PitchVariation(pitchGrade), Harmo(harmo),
-                      HarmoVariation(harmoVariation), Grain(grain), Speed(speed), SpeedVariation(speedVariation),
-                      color,
-                      comment,
-                      impulsive,
-                      PlayingMode(playingMode),
-                      soundFile,
-                      soundBox);
-          pal.setColor(color);
-
-          _pressPoint = QPointF(std::max(event->scenePos().x(), 0.), std::max(event->scenePos().y() - PreviewArea::HEIGHT, 0.));
-          _releasePoint = _pressPoint + QPointF(PreviewArea::WIDTH, PreviewArea::HEIGHT);
-          unsigned int newBoxID = addSoundBox();
-          if (newBoxID != NO_ID) {
-              BasicBox *box = NULL;
-              if ((box = getBox(newBoxID)) != NULL) {
-                  if (box->type() == SOUND_BOX_TYPE) {
-                      static_cast<SoundBox*>(box)->setPalette(pal);
-                    }
-                }
-            }
-
-          update();
-        }
-    }
 }
 
 bool
@@ -677,7 +532,6 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
               }
           }
 
-//                else if (itemAt(mouseEvent->scenePos())->type() == PARENT_BOX_TYPE) {
         else if (getSelectedItem() != NULL ? getSelectedItem()->type() == PARENT_BOX_TYPE : false && subScenarioMode(mouseEvent)) {
             // TODO : see why creation is possible in a parent box during resize mode
             if (resizeMode() == NO_RESIZE) {
@@ -713,7 +567,7 @@ MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
                   }
                 if (itemAt(mouseEvent->scenePos()) != 0) {
                     int type = itemAt(mouseEvent->scenePos())->type();
-                    if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+                    if (type == PARENT_BOX_TYPE) {
                         BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
                         if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE) ||
                             mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
@@ -785,7 +639,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
 
         if (itemAt(mouseEvent->scenePos()) != 0) {
             int type = itemAt(mouseEvent->scenePos())->type();
-            if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+            if (type == PARENT_BOX_TYPE) {
                 BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
 
                 BasicBox *firstBox = getBox(_relation->firstBox());
@@ -919,83 +773,73 @@ MaquetteScene::cutBoxes()
 void
 MaquetteScene::copyBoxes(bool erasing)
 {
-  QPointF topLeft(FLT_MAX, FLT_MAX);
-  QPointF bottomRight(FLT_MIN, FLT_MIN);
+    QPointF topLeft(FLT_MAX, FLT_MAX);
+    QPointF bottomRight(FLT_MIN, FLT_MIN);
 
-  _toCopy.clear();
-  _boxesToCopy.clear();
+    _toCopy.clear();
+    _boxesToCopy.clear();
 
-  QList<QGraphicsItem *> selected = selectedItems();
-  QList<QGraphicsItem *>::iterator it;
-  for (it = selected.begin(); it != selected.end(); it++) {
-      switch ((*it)->type()) {
-          case SOUND_BOX_TYPE:
-          {
-            _boxesToCopy[static_cast<SoundBox*>(*it)->ID()] = new AbstractSoundBox(*static_cast<AbstractSoundBox*>(static_cast<SoundBox*>(*it)->abstract()));
+    QList<QGraphicsItem *> selected = selectedItems();
+    QList<QGraphicsItem *>::iterator it;
+    for (it = selected.begin(); it != selected.end(); it++) {
+        switch ((*it)->type()) {
+
+        case PARENT_BOX_TYPE:
+        {
+            AbstractParentBox *curBox = static_cast<AbstractParentBox*>(static_cast<ParentBox*>(*it)->abstract());
+
+            AbstractParentBox *boxToCopy =new AbstractParentBox(*curBox);
+
+            _boxesToCopy[static_cast<ParentBox*>(*it)->ID()] = boxToCopy;
             if (erasing) {
-                removeBox(static_cast<SoundBox*>(*it)->ID());
-              }
+                removeBox(static_cast<ParentBox*>(*it)->ID());
+            }
             break;
-          }
+        }
 
-          case CONTROL_BOX_TYPE:
-          {
-            _boxesToCopy[static_cast<ControlBox*>(*it)->ID()] = new AbstractControlBox(*static_cast<AbstractControlBox*>(static_cast<ControlBox*>(*it)->abstract()));
-            if (erasing) {
-                removeBox(static_cast<SoundBox*>(*it)->ID());
-              }
-            break;
-          }
-
-          case PARENT_BOX_TYPE:
-            _boxesToCopy[static_cast<ParentBox*>(*it)->ID()] = new AbstractParentBox(*static_cast<AbstractParentBox*>(static_cast<ParentBox*>(*it)->abstract()));
-            if (erasing) {
-                removeBox(static_cast<SoundBox*>(*it)->ID());
-              }
-            break;
-
-          case RELATION_TYPE:
+        case RELATION_TYPE:
             _toCopy.push_back(new AbstractRelation(*static_cast<AbstractRelation*>(static_cast<Relation*>(*it)->abstract())));
             if (erasing) {
                 removeRelation(static_cast<Relation*>(*it)->ID());
-              }
+            }
             break;
 
-          case COMMENT_TYPE:
+        case COMMENT_TYPE:
             _toCopy.push_back(new AbstractComment(*static_cast<AbstractComment*>(static_cast<Comment*>(*it)->abstract())));
             if (erasing) {
                 removeComment(static_cast<Comment*>(*it));
-              }
+            }
             break;
 
-          case TRIGGER_POINT_TYPE:
+        case TRIGGER_POINT_TYPE:
             _toCopy.push_back(new AbstractTriggerPoint(*static_cast<AbstractTriggerPoint*>(static_cast<TriggerPoint*>(*it)->abstract())));
             if (erasing) {
                 removeTriggerPoint(static_cast<TriggerPoint*>(*it)->ID());
-              }
+            }
             break;
 
-          default:
+        default:
             std::cerr << "MaquetteScene::copyBoxes : Unhandled item during copy" << std::endl;
             break;
         }
-      if (!erasing) {
-          topLeft = QPointF(std::min((*it)->mapToScene((*it)->boundingRect().topLeft()).x(), topLeft.x()),
-                            std::min((*it)->mapToScene((*it)->boundingRect().topLeft()).y(), topLeft.y()));
-          bottomRight = QPointF(std::max((*it)->mapToScene((*it)->boundingRect().bottomRight()).x(), bottomRight.x()),
-                                std::max((*it)->mapToScene((*it)->boundingRect().bottomRight()).y(), bottomRight.y()));
+        if (!erasing) {
+            topLeft = QPointF(std::min((*it)->mapToScene((*it)->boundingRect().topLeft()).x(), topLeft.x()),
+                              std::min((*it)->mapToScene((*it)->boundingRect().topLeft()).y(), topLeft.y()));
+            bottomRight = QPointF(std::max((*it)->mapToScene((*it)->boundingRect().bottomRight()).x(), bottomRight.x()),
+                                  std::max((*it)->mapToScene((*it)->boundingRect().bottomRight()).y(), bottomRight.y()));
         }
     }
-  if (topLeft.x() != FLT_MAX && topLeft.y() != FLT_MAX &&
-      bottomRight.x() != FLT_MIN && bottomRight.y() != FLT_MIN) {
-      _copySize = bottomRight - topLeft;
+    if (topLeft.x() != FLT_MAX && topLeft.y() != FLT_MAX &&
+            bottomRight.x() != FLT_MIN && bottomRight.y() != FLT_MIN) {
+        _copySize = bottomRight - topLeft;
     }
-  else {
-      if (!erasing) {
-          std::cerr << "MaquetteScene::copyBoxes : the size of the copy could not be determined" << std::endl;
+    else {
+        if (!erasing) {
+            std::cerr << "MaquetteScene::copyBoxes : the size of the copy could not be determined" << std::endl;
         }
-      _copySize = QPointF(0., 0.);
+        _copySize = QPointF(0., 0.);
     }
+
 }
 
 void
@@ -1011,9 +855,7 @@ void
 MaquetteScene::pasteBoxes()
 {
   BasicBox* newBox;
-  QPointF topLeft, bottomRight;
   string name = "";
-  QColor color;
 
   map<unsigned int, unsigned int> IDMap;
 
@@ -1021,13 +863,15 @@ MaquetteScene::pasteBoxes()
 
   for (boxIt = _boxesToCopy.begin(); boxIt != _boxesToCopy.end(); ++boxIt) {
       int type = boxIt->second->type();
+      AbstractBox *boxToCopy = boxIt->second;
       unsigned int newID = NO_ID;
       AbstractBox *absCopyBox = NULL;
       switch (type) {
           case ABSTRACT_PARENT_BOX_TYPE:
           {
-            AbstractParentBox *abParentBox = static_cast<AbstractParentBox*>(boxIt->second);
-            abParentBox->setTopLeft(QPointF(abParentBox->topLeft().x(), abParentBox->topLeft().y()) + _copySize);
+            AbstractParentBox *abParentBox = static_cast<AbstractParentBox*>(boxToCopy);
+            abParentBox->setTopLeft(QPointF(abParentBox->topLeft().x(), abParentBox->topLeft().y()) + _copySize);            
+
             if (abParentBox->mother() != ROOT_BOX_ID) {
                 map<unsigned int, unsigned int>::iterator it;
                 if ((it = IDMap.find(abParentBox->mother())) != IDMap.end()) {
@@ -1036,36 +880,6 @@ MaquetteScene::pasteBoxes()
               }
             newID = addParentBox(*abParentBox);
             absCopyBox = abParentBox;
-            break;
-          }
-
-          case ABSTRACT_SOUND_BOX_TYPE:
-          {
-            AbstractSoundBox *abSoundBox = static_cast<AbstractSoundBox*>(boxIt->second);
-            abSoundBox->setTopLeft(QPointF(abSoundBox->topLeft().x(), abSoundBox->topLeft().y()) + _copySize);
-            if (abSoundBox->mother() != ROOT_BOX_ID) {
-                map<unsigned int, unsigned int>::iterator it;
-                if ((it = IDMap.find(abSoundBox->mother())) != IDMap.end()) {
-                    abSoundBox->setMother(IDMap[abSoundBox->mother()]);
-                  }
-              }
-            newID = addSoundBox(*abSoundBox);
-            absCopyBox = abSoundBox;
-            break;
-          }
-
-          case ABSTRACT_CONTROL_BOX_TYPE:
-          {
-            AbstractControlBox *abCtrlBox = static_cast<AbstractControlBox*>(boxIt->second);
-            abCtrlBox->setTopLeft(QPointF(abCtrlBox->topLeft().x(), abCtrlBox->topLeft().y()) + _copySize);
-            if (abCtrlBox->mother() != ROOT_BOX_ID) {
-                map<unsigned int, unsigned int>::iterator it;
-                if ((it = IDMap.find(abCtrlBox->mother())) != IDMap.end()) {
-                    abCtrlBox->setMother(IDMap[abCtrlBox->mother()]);
-                  }
-              }
-            newID = addControlBox(*abCtrlBox);
-            absCopyBox = abCtrlBox;
             break;
           }
 
@@ -1086,9 +900,16 @@ MaquetteScene::pasteBoxes()
           if ((name.find(tr("- Copy").toStdString())) == std::string::npos) {
               name += tr(" - Copy").toStdString();
             }
-          newBox->setName(QString::fromStdString(name));
+          newBox->setName(QString::fromStdString(name));          
           newBox->setPos(newBox->getCenter());
+
+          newBox->setStartMessages(absCopyBox->startMessages());
+          newBox->setEndMessages(absCopyBox->endMessages());
+          newBox->setFirstMessagesToSend(absCopyBox->startMessages()->computeMessages());
+          newBox->setLastMessagesToSend(absCopyBox->endMessages()->computeMessages());
+
           newBox->setSelected(true);
+          newBox->centerWidget();
           newBox->update();
         }
       else {
@@ -1253,14 +1074,24 @@ MaquetteScene::removeTriggerPoint(unsigned int trgID)
       if (box != NULL) {
           box->removeTriggerPoint(trgPnt->boxExtremity());
         }
-      removeItem(trgPnt);
-      _maquette->removeTriggerPoint(trgID);
+      _triggersQueueList.removeAll(trgPnt);
+//      removeItem(trgPnt);
+      _maquette->removeTriggerPoint(trgID);      
     }
 }
 
 void
 MaquetteScene::trigger(TriggerPoint *triggerPoint)
 {
+  _maquette->simulateTriggeringMessage(static_cast<AbstractTriggerPoint *>(triggerPoint->abstract())->message());
+  removeFromTriggerQueue(triggerPoint);
+  triggerPoint->setSelected(false);
+}
+
+void
+MaquetteScene::triggerNext()
+{
+   TriggerPoint *triggerPoint = triggersQueueList().first();
   _maquette->simulateTriggeringMessage(static_cast<AbstractTriggerPoint *>(triggerPoint->abstract())->message());
   removeFromTriggerQueue(triggerPoint);
   triggerPoint->setSelected(false);
@@ -1279,14 +1110,14 @@ MaquetteScene::findMother(const QPointF &topLeft, const QPointF &size)
   std::cerr << "MaquetteScene::findMother : child coords : [" << topLeft.x() << ";" << topLeft.y()
             << "] / [" << size.x() << ";" << size.y() << "]" << std::endl;
 #endif
-  map<unsigned int, ParentBox*> parentBoxes = _maquette->parentBoxes();
+  map<unsigned int, ParentBox*> parentBoxes = _maquette->parentBoxes(); /// \todo Mieux vaut parcourir les ParentBoxes contenus dans la scene, pas aller les chercher dans Maquette car on perd l'intérêt d'utiliser le Graphics View Framework
 #ifdef DEBUG
   std::cerr << "MaquetteScene::findMother : parentBoxes size : " << parentBoxes.size() << std::endl;
 #endif
   map<unsigned int, ParentBox*>::iterator it;
   unsigned int motherID = ROOT_BOX_ID;
   float motherZValue = std::numeric_limits<float>::min();
-  QRectF childRect = QRectF(topLeft, QSize(size.x(), size.y()));
+  QRectF childRect = QRectF(topLeft, QSize(size.x(), size.y())); /// \todo
   for (it = parentBoxes.begin(); it != parentBoxes.end(); ++it) {
       QRectF mRect = QRectF(it->second->getTopLeft(), QSize(it->second->getSize().x(), it->second->getSize().y()));
 #ifdef DEBUG
@@ -1310,16 +1141,6 @@ MaquetteScene::addBox(BoxCreationMode mode)
   unsigned int boxID = NO_ID;
   if (abs(_pressPoint.x() - _releasePoint.x()) > (MS_PRECISION / MS_PER_PIXEL)) {
       switch (mode) {
-          case SB_MODE:
-            boxID = addSoundBox();
-            update();
-            break;
-
-          case CB_MODE:
-            boxID = addControlBox();
-            update();
-            break;
-
           case PB_MODE:
             boxID = addParentBox();
             update();
@@ -1340,173 +1161,10 @@ MaquetteScene::addBox(BoxCreationMode mode)
 }
 
 unsigned int
-MaquetteScene::addSoundBox(unsigned int ID)
-{
-  if (_maquette->getBox(ID)->type() == SOUND_BOX_TYPE) {
-      SoundBox *soundBox = static_cast<SoundBox*>(_maquette->getBox(ID));
-      soundBox->setPos(soundBox->getCenter());
-      soundBox->update();
-      addItem(soundBox);
-
-      _currentZValue++;
-
-      setModified(true);
-
-      return ID;
-    }
-  return NO_ID;
-}
-
-unsigned int
-MaquetteScene::addSoundBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name, const Palette &palette)
-{
-  unsigned int motherID = findMother(topLeft, QPointF(std::fabs(bottomRight.x() - topLeft.x()),
-                                                      std::fabs(bottomRight.y() - topLeft.y())));
-  ParentBox *parentBox = NULL;
-  if (motherID != ROOT_BOX_ID && motherID != NO_ID) {
-      parentBox = static_cast<ParentBox*>(getBox(motherID));
-    }
-  else {
-      motherID = ROOT_BOX_ID;
-    }
-
-  unsigned int newBoxID = _maquette->addSoundBox(topLeft, bottomRight, name, motherID);
-
-  SoundBox *newBox = static_cast<SoundBox*>(getBox(newBoxID));
-
-  if (newBox != NULL && parentBox != NULL) {
-      if (newBox->mother() != motherID) {           // Not yet assigned
-          parentBox->addChild(newBoxID);
-          newBox->setMother(motherID);
-        }
-    }
-
-  newBox->setPalette(palette);
-  newBox->setPos(newBox->getCenter());
-  newBox->update();
-  addItem(newBox);
-
-  //NICO TEST
-//    QWidget *widget = new QWidget();
-//    CurvesWidget *curves = new CurvesWidget(widget);
-//    addWidget(widget);
-  //NICO TEST end
-
-  _currentZValue++;
-
-  setModified(true);
-
-  return newBoxID;
-}
-
-unsigned int
-MaquetteScene::addSoundBox()
-{
-  bool ok;
-  QString name;
-  while (name.isEmpty()) {
-      name = QString::fromStdString(sequentialName(tr("Sound_Box").toStdString()));
-      ok = true;
-      if (!ok) {
-          return NO_ID;
-        }
-      if (name.isEmpty()) {
-          QMessageBox::warning(_view, tr("Warning"), tr("Please Enter a Name"));
-        }
-    }
-
-  return addSoundBox(_pressPoint, _releasePoint, name.toStdString(), _editor->getPalette());
-}
-
-unsigned int
-MaquetteScene::addSoundBox(const AbstractSoundBox &box)
-{
-  return addSoundBox(box.topLeft(), box.bottomRight(), box.name(), box.pal());
-}
-
-unsigned int
-MaquetteScene::addControlBox(unsigned int ID)
-{
-  if (_maquette->getBox(ID)->type() == CONTROL_BOX_TYPE) {
-      ControlBox *ctrlBox = static_cast<ControlBox*>(_maquette->getBox(ID));
-      ctrlBox->setPos(ctrlBox->getCenter());
-      ctrlBox->update();
-      addItem(ctrlBox);
-
-      _currentZValue++;
-
-      setModified(true);
-
-      return ID;
-    }
-  return NO_ID;
-}
-
-unsigned int
-MaquetteScene::addControlBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name)
-{
-  unsigned int motherID = findMother(topLeft, QPointF(std::fabs(bottomRight.x() - topLeft.x()),
-                                                      std::fabs(bottomRight.y() - topLeft.y())));
-  ParentBox *parentBox = NULL;
-  if (motherID != ROOT_BOX_ID && motherID != NO_ID) {
-      parentBox = static_cast<ParentBox*>(getBox(motherID));
-    }
-  else {
-      motherID = ROOT_BOX_ID;
-    }
-
-  unsigned int newBoxID = _maquette->addControlBox(topLeft, bottomRight, name, motherID);
-
-  ControlBox *newBox = static_cast<ControlBox*>(getBox(newBoxID));
-
-  if (newBox != NULL && parentBox != NULL) {
-      if (newBox->mother() != motherID) {           // Not yet assigned
-          parentBox->addChild(newBoxID);
-          newBox->setMother(motherID);
-        }
-    }
-  if (newBoxID != NO_ID) {
-      newBox->setPos(newBox->getCenter());
-      newBox->update();
-      addItem(newBox);
-
-      _currentZValue++;
-    }
-
-  setModified(true);
-
-  return newBoxID;
-}
-
-unsigned int
-MaquetteScene::addControlBox(const AbstractControlBox &box)
-{
-  return addControlBox(box.topLeft(), box.bottomRight(), box.name());
-}
-
-unsigned int
-MaquetteScene::addControlBox()
-{
-  bool ok;
-  QString name;
-  while (name.isEmpty()) {
-      name = QString::fromStdString(sequentialName(tr("Control_Box").toStdString()));
-      ok = true;
-      if (!ok) {
-          return NO_ID;
-        }
-      if (name.isEmpty()) {
-          QMessageBox::warning(_view, tr("Warning"), tr("Please Enter a Name"));
-        }
-    }
-  return addControlBox(_pressPoint, _releasePoint, name.toStdString());
-}
-
-unsigned int
 MaquetteScene::addParentBox(unsigned int ID)
 {
   if (ID != NO_ID) {
-      if (_maquette->getBox(ID)->type() == PARENT_BOX_TYPE) {
+      if (_maquette->getBox(ID)->type() == PARENT_BOX_TYPE) { /// \todo Le type des GraphicsItem est mal utilisé !! Voir http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var
           ParentBox *parentBox = static_cast<ParentBox*>(_maquette->getBox(ID));
           parentBox->setPos(parentBox->getCenter());
           parentBox->update();
@@ -1525,8 +1183,11 @@ MaquetteScene::addParentBox(unsigned int ID)
 unsigned int
 MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name)
 {
+ /// \todo verify if GraphicsScene provide this method
   unsigned int motherID = findMother(topLeft, QPointF(std::fabs(bottomRight.x() - topLeft.x()),
                                                       std::fabs(bottomRight.y() - topLeft.y())));
+
+  /// Searching the mother of parentBox
   ParentBox *parentBox = NULL;
   if (motherID != ROOT_BOX_ID && motherID != NO_ID) {
       parentBox = static_cast<ParentBox*>(getBox(motherID));
@@ -1731,6 +1392,7 @@ MaquetteScene::boxResized()
   coord.topLeftX = resizeBox->relativeBeginPos();
   coord.topLeftY = resizeBox->getTopLeft().y();
   coord.sizeX = std::max((float)10., resizeBox->width());
+//  std::cout<<"boxResized "<<resizeBox->ID()<<" : "<<coord.sizeX*MS_PER_PIXEL<<std::endl;
   coord.sizeY = std::max((float)10., resizeBox->height());
   if (_maquette->updateBox(resizeBox->ID(), coord)) {
       update();
@@ -1744,7 +1406,7 @@ MaquetteScene::selectionMoved()
   for (int i = 0; i < selectedItems().size(); i++) {
       QGraphicsItem *curItem = selectedItems().at(i);
       int type = curItem->type();
-      if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+      if (type == PARENT_BOX_TYPE) {
           BasicBox *curBox = static_cast<BasicBox*>(curItem);
           boxMoved(curBox->ID());
         }
@@ -1754,11 +1416,13 @@ MaquetteScene::selectionMoved()
 bool
 MaquetteScene::boxMoved(unsigned int boxID)
 {
+//  std::cout<<"--- boxMoved ---"<<boxID<<std::endl;
   Coords coord;
   BasicBox * box = _maquette->getBox(boxID);
   if (box != NULL) {
       if (!box->hasMother()) {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x();
+//          std::cout<<"X = "<<coord.topLeftX* MaquetteScene::MS_PER_PIXEL<<std::endl;
         }
       else {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x()
@@ -1766,6 +1430,7 @@ MaquetteScene::boxMoved(unsigned int boxID)
         }
       coord.topLeftY = box->mapToScene(box->boxRect().topLeft()).y();
       coord.sizeX = box->boxRect().size().width();
+//      std::cout<<"Y = "<<coord.sizeX* MaquetteScene::MS_PER_PIXEL<<std::endl;
       coord.sizeY = box->boxRect().size().height();
     }
   bool ret = _maquette->updateBox(boxID, coord);
@@ -1829,27 +1494,14 @@ MaquetteScene::removeBox(unsigned int boxID)
         }
 
       box->removeComment();
-
-//        box->removeTriggerPoint(BOX_START);
-//        box->removeTriggerPoint(BOX_END);
+      box->removeTriggerPoint(BOX_START);
+      box->removeTriggerPoint(BOX_END);
 
       delete box;
       setModified(true);
     }
 
   update();
-}
-
-SndBoxProp::PlayingMode
-MaquetteScene::playingMode() const
-{
-  return _playMode;
-}
-
-void
-MaquetteScene::setPlayingMode(unsigned int mode)
-{
-  _playMode = SndBoxProp::PlayingMode(mode);
 }
 
 bool
@@ -1873,7 +1525,7 @@ MaquetteScene::updateStartingTime(int value)
 void
 MaquetteScene::setPlaying(unsigned int boxID, bool playing)
 {
-  BasicBox *box = getBox(boxID);
+  BasicBox *box = getBox(boxID); /// \todo Besoin d'un cast qt explicite !
   map<unsigned int, BasicBox*>::iterator it;
   if ((it = _playingBoxes.find(boxID)) != _playingBoxes.end()) {
       it->second = box;
@@ -1903,7 +1555,6 @@ MaquetteScene::updatePlayingBoxes()
   for (it = _playingBoxes.begin(); it != _playingBoxes.end(); ++it) {
       it->second->update();
     }
-  _progressLine->update();
 }
 
 void
@@ -1922,7 +1573,8 @@ MaquetteScene::play()
       _maquette->startPlaying();
       _playThread->start();
       _startingValue = _view->gotoValue();
-    }
+    }  
+  emit(playModeChanged());
 }
 
 void
@@ -1936,6 +1588,7 @@ MaquetteScene::pause()
   _accelerationFactorSave = _maquette->accelerationFactor();
   _maquette->setAccelerationFactor(0.);
   update();
+  emit(playModeChanged());
 }
 
 
@@ -1947,6 +1600,7 @@ MaquetteScene::stop()
   _playThread->quit();
   _playingBoxes.clear();
   update();
+  emit(playModeChanged());
 }
 
 void
@@ -1958,6 +1612,7 @@ MaquetteScene::stopWithGoto()
   _playThread->quit();
   _playingBoxes.clear();
   update();
+  emit(playModeChanged());
 }
 
 void
@@ -1986,6 +1641,13 @@ MaquetteScene::stopGotoStart()
   _playThread->quit();
   _playingBoxes.clear();
   update();
+  emit(playModeChanged());
+}
+
+void
+MaquetteScene::removeFromTriggerQueue(TriggerPoint *trigger)
+{
+  _triggersQueueList.removeAll(trigger);
 }
 
 void
@@ -1995,7 +1657,7 @@ MaquetteScene::removeSelectedItems()
   map<unsigned int, BasicBox*> boxesToRemove;
   for (QList<QGraphicsItem *>::iterator it = toRemove.begin(); it != toRemove.end(); it++) {
       int type = (*it)->type();
-      if (type == SOUND_BOX_TYPE || type == CONTROL_BOX_TYPE || type == PARENT_BOX_TYPE) {
+      if (type == PARENT_BOX_TYPE) {
           boxesToRemove[static_cast<BasicBox*>(*it)->ID()] = static_cast<BasicBox*>(*it);
         }
       else if ((*it)->type() == RELATION_TYPE) {
@@ -2018,7 +1680,6 @@ MaquetteScene::removeSelectedItems()
 void
 MaquetteScene::timeEndReached()
 {
-  static_cast<MaquetteView*>(views().first())->mainWindow()->timeEndReached();
   _playing = false;
   emit(playModeChanged());
   update();
@@ -2079,29 +1740,6 @@ MaquetteScene::addToTriggerQueue(TriggerPoint *trigger)
         }
       _triggersQueueList.insert(i, trigger);
     }
-
-  /*
-   * if(_triggersQueueList.isEmpty())
-   *  _triggersQueueList<<trigger;
-   *
-   * else{
-   *  if(!_triggersQueueList.contains(trigger)){
-   *      //QList<TriggerPoint *>::iterator it = _triggersQueueList.begin();
-   *      int it=0;
-   *      qreal trgPosition = trigger->pos().x();
-   *      TriggerPoint *curTrg=_triggersQueueList.at(it);
-   *      qreal itPosition=curTrg->pos().x();
-   *
-   *      while(trgPosition > itPosition && it<_triggersQueueList.size()-1){
-   *          it++;
-   *          curTrg=_triggersQueueList.at(it);
-   *          itPosition=curTrg->pos().x();
-   *
-   *      }
-   *
-   *      _triggersQueueList.insert(it,trigger);
-   *  }
-   * }*/
 }
 
 void

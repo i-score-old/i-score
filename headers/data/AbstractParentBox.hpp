@@ -46,7 +46,6 @@
  * \author Luc Vercellin
  */
 
-#include "Palette.hpp"
 #include "AbstractBox.hpp"
 #include <string>
 #include "Engine.h"

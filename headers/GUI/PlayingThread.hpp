@@ -59,13 +59,15 @@ class MaquetteScene;
  */
 class PlayingThread : public QThread
 {
+
+  MaquetteScene *_scene;
+
   public:
     PlayingThread(MaquetteScene *scene);
 
   protected:
-    virtual void run();
+    void run();
 
-  private:
-    MaquetteScene *_scene;
 };
-#endif /* PLAYINGTHREAD_H_ */
+
+#endif

@@ -25,12 +25,11 @@ class TimeBarWidget : public QWidget {
 
   protected:
     virtual void paintEvent(QPaintEvent *event);
-    virtual void paintEngine();
     virtual void mousePressEvent(QMouseEvent *event);
+    virtual void drawBackground(QPainter *painter, QRect rect);
     float _zoom;
 
-  private:
-    void drawBackground(QPainter *painter, QRect rect);
+  private:    
 
     MaquetteScene *_scene;
     float _sceneHeight;

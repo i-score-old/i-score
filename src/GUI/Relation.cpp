@@ -214,6 +214,9 @@ Relation::updateCoordinates()
             break;
         }
     }
+//  std::cout<<"\t start = "<<_start.x()*MaquetteScene::MS_PER_PIXEL<<std::endl;
+//  std::cout<<"\t end = "<<_end.x()*MaquetteScene::MS_PER_PIXEL<<std::endl;
+  //  std::cout<<"\t Length = "<<_abstract->_length*MaquetteScene::MS_PER_PIXEL<<std::endl;
   _abstract->_length = _end.x() - _start.x();
   setPos(getCenter());
 }

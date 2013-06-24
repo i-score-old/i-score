@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = i-score
-CONFIG += debug x86_64
+CONFIG += x86_64
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8.3
 
 QMAKE_CXXFLAGS += -O0 -fPIC -msse3
@@ -92,12 +92,8 @@ headers/data/AbstractBox.hpp \
 headers/data/AbstractComment.hpp \
 headers/data/AbstractCurve.hpp \
 headers/data/AbstractRelation.hpp \
-headers/data/AbstractSoundBox.hpp \
-headers/data/AbstractControlBox.hpp \
 headers/data/AbstractParentBox.hpp \
 headers/data/AbstractTriggerPoint.hpp \
-headers/data/Engine.h \
-headers/data/EnumPalette.hpp \
 headers/data/Maquette.hpp \
 headers/data/NetworkMessages.hpp \
 headers/data/Palette.hpp \
@@ -106,8 +102,6 @@ headers/GUI/BasicBox.hpp \
 headers/GUI/BoxContextMenu.hpp \
 headers/GUI/ChooseTemporalRelation.hpp \
 headers/GUI/Comment.hpp \
-headers/GUI/ControlBox.hpp \
-headers/GUI/ControlBoxContextMenu.hpp \
 headers/GUI/CurveWidget.hpp \
 headers/GUI/CurvesWidget.hpp \
 headers/GUI/Help.hpp \
@@ -122,11 +116,8 @@ headers/GUI/NetworkTree.hpp \
 headers/GUI/ParentBox.hpp \
 headers/GUI/ParentBoxContextMenu.hpp \
 headers/GUI/PlayingThread.hpp \
-headers/GUI/PreviewArea.hpp \
 headers/GUI/Relation.hpp \
 headers/GUI/RelationEdit.hpp \
-headers/GUI/SoundBox.hpp \
-headers/GUI/SoundBoxContextMenu.hpp \
 headers/GUI/TextEdit.hpp \
 headers/GUI/TriggerPoint.hpp \
 headers/GUI/TreeMap.hpp \
@@ -142,11 +133,9 @@ SOURCES += src/main.cpp \
 src/data/Abstract.cpp \
 src/data/AbstractBox.cpp \
 src/data/AbstractComment.cpp \
-src/data/AbstractControlBox.cpp \
 src/data/AbstractCurve.cpp \
 src/data/AbstractParentBox.cpp \
 src/data/AbstractRelation.cpp \
-src/data/AbstractSoundBox.cpp \
 src/data/AbstractTriggerPoint.cpp \
 src/data/Engine.cpp \
 src/data/Maquette.cpp \
@@ -157,8 +146,6 @@ src/GUI/BasicBox.cpp \
 src/GUI/BoxContextMenu.cpp \
 src/GUI/ChooseTemporalRelation.cpp \
 src/GUI/Comment.cpp \
-src/GUI/ControlBox.cpp \
-src/GUI/ControlBoxContextMenu.cpp \
 src/GUI/CurveWidget.cpp \
 src/GUI/CurvesWidget.cpp \
 src/GUI/Help.cpp \
@@ -173,11 +160,8 @@ src/GUI/NetworkTree.cpp \
 src/GUI/ParentBox.cpp \
 src/GUI/ParentBoxContextMenu.cpp \
 src/GUI/PlayingThread.cpp \
-src/GUI/PreviewArea.cpp \
 src/GUI/Relation.cpp \
 src/GUI/RelationEdit.cpp \
-src/GUI/SoundBox.cpp \
-src/GUI/SoundBoxContextMenu.cpp \
 src/GUI/TextEdit.cpp \
 src/GUI/TriggerPoint.cpp \
 src/GUI/TreeMap.cpp \
@@ -188,4 +172,3 @@ src/GUI/BoxCurveEdit.cpp \
 src/GUI/MaquetteWidget.cpp \
 src/GUI/TimeBarWidget.cpp \
 src/GUI/DeviceEdit.cpp
-
