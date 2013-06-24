@@ -1490,6 +1490,8 @@ Maquette::saveBox(unsigned int boxID)
   QColor color = box->color();
   QString name = box->name();
   int mother = box->mother();
+  std::cout<<boxID<<" ISCORE begin : "<<date<<std::endl;
+
 
   // root node
   QDomElement root = _doc->documentElement();

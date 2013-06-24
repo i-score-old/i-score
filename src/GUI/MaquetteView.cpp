@@ -122,7 +122,7 @@ MaquetteView::updateSceneWithoutCenterOn()
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
-  setSceneRect(0, 0, MaquetteScene::MAX_SCENE_WIDTH, MaquetteScene::MAX_SCENE_HEIGHT);
+  setSceneRect(0, 0, _scene->getMaxSceneWidth(), MaquetteScene::MAX_SCENE_HEIGHT);
 }
 
 void
@@ -133,7 +133,7 @@ MaquetteView::updateScene()
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
-  setSceneRect(0, 0, MaquetteScene::MAX_SCENE_WIDTH, MaquetteScene::MAX_SCENE_HEIGHT);
+  setSceneRect(0, 0, _scene->getMaxSceneWidth(), MaquetteScene::MAX_SCENE_HEIGHT);
 }
 
 void
@@ -179,7 +179,7 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
       painter->setPen(pen2);
 
       for (int i = 0; i <= MaquetteScene::MAX_SCENE_HEIGHT; i = i + 150) {
-          painter->drawLine(QPointF(0, i), QPointF(MaquetteScene::MAX_SCENE_WIDTH, i));
+          painter->drawLine(QPointF(0, i), QPointF(_scene->getMaxSceneWidth(), i));
         }
     }
 }
@@ -301,10 +301,10 @@ MaquetteView::triggersQueueList()
  */
 void
 MaquetteView::zoomIn()
-{
+{  
   if (MaquetteScene::MS_PER_PIXEL > 0.125) {
-      MaquetteScene::MS_PER_PIXEL /= 2;
-      _zoom *= 2;
+      MaquetteScene::MS_PER_PIXEL /= 2.;
+      _zoom *= 2.;
 
       resetCachedContent();
       _scene->update();
@@ -313,7 +313,7 @@ MaquetteView::zoomIn()
 
       QPointF newCenter(2 * getCenterCoordinates().x(), 2 * getCenterCoordinates().y());
       centerOn(newCenter);
-      _scene->updateProgressBar();
+      std::cout<<"zoom = "<<_zoom<<" ; MS_PER_PIXEL = "<<MaquetteScene::MS_PER_PIXEL<<" ; newCenter = "<<newCenter.x()<<" ; "<<newCenter.y()<<std::endl;
       _scene->zoomChanged(_zoom);
     }
 }
@@ -344,12 +344,12 @@ MaquetteView::setZoom(float value)
       if (MaquetteScene::MS_PER_PIXEL > 0.125) {
           int c = 0;
           while (value < 1) {
-              value *= 2;
+              value *= 2.;
               c++;
             }
           nb_zoom = c;
           for (int i = 0; i < nb_zoom; i++) {
-              MaquetteScene::MS_PER_PIXEL *= 2;
+              MaquetteScene::MS_PER_PIXEL *= 2.;
             }
         }
     }
@@ -369,7 +369,7 @@ MaquetteView::setZoom(float value)
 void
 MaquetteView::zoomOut()
 {
-  MaquetteScene::MS_PER_PIXEL *= 2;
+  MaquetteScene::MS_PER_PIXEL *= 2.;
 
   _zoom /= 2.;
   resetCachedContent();

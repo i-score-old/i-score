@@ -90,11 +90,11 @@ RelationEdit::RelationEdit(MaquetteScene *scene, unsigned int relID, QWidget *pa
   _timeUnits = new QLabel("s");
 
   _timeBox = new QDoubleSpinBox;
-  _timeBox->setRange(0., MaquetteScene::MAX_SCENE_WIDTH * MaquetteScene::MS_PER_PIXEL / 1000.);
+  _timeBox->setRange(0., _scene->getMaxSceneWidth() * MaquetteScene::MS_PER_PIXEL / 1000.);
   _timeBox->setValue(abRel->length() * MaquetteScene::MS_PER_PIXEL / 1000.);
   _timeBox->setDecimals(2);
   _minBoundBox = new QDoubleSpinBox;
-  _minBoundBox->setRange(0., MaquetteScene::MAX_SCENE_WIDTH * MaquetteScene::MS_PER_PIXEL / 1000.);
+  _minBoundBox->setRange(0., _scene->getMaxSceneWidth() * MaquetteScene::MS_PER_PIXEL / 1000.);
   _minBoundBox->setValue(abRel->minBound() * MaquetteScene::MS_PER_PIXEL / 1000.);
   _minBoundBox->setDecimals(2);
   _minBoundCheckBox = new QCheckBox();
@@ -107,7 +107,7 @@ RelationEdit::RelationEdit(MaquetteScene *scene, unsigned int relID, QWidget *pa
     }
   minBoundChanged();
   _maxBoundBox = new QDoubleSpinBox;
-  _maxBoundBox->setRange(0., MaquetteScene::MAX_SCENE_WIDTH * MaquetteScene::MS_PER_PIXEL / 1000.);
+  _maxBoundBox->setRange(0., _scene->getMaxSceneWidth() * MaquetteScene::MS_PER_PIXEL / 1000.);
   _maxBoundBox->setValue(abRel->maxBound() * MaquetteScene::MS_PER_PIXEL / 1000.);
   _maxBoundBox->setDecimals(2);
   _maxBoundCheckBox = new QCheckBox();

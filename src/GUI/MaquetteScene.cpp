@@ -87,6 +87,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
   _playing = false;
   _paused = false;
   _modified = false;
+  _maxSceneWidth = 100000;
 
   _relation = new AbstractRelation; /// \todo pourquoi instancier une AbstractRelation ici ?
   _playThread = new PlayingThread(this);
@@ -95,7 +96,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 
   _progressLine = new QGraphicsLineItem(QLineF(sceneRect().topLeft().x(), sceneRect().topLeft().y(), sceneRect().bottomLeft().x(), MAX_SCENE_HEIGHT));
 
-  addItem(_progressLine);
+  addItem(_progressLine);  
 }
 
 MaquetteScene::~MaquetteScene()
@@ -151,8 +152,14 @@ MaquetteScene::updateProgressBar()
       invalidate();
     }
 }
+
 void
-MaquetteScene::zoomChanged(float value){
+MaquetteScene::zoomChanged(float value)
+{
+  setMaxSceneWidth(MaquetteScene::MAX_SCENE_WIDTH*value);
+  _view->setScene(this);
+  std::cout<<"NewMax = "<<_maxSceneWidth<<std::endl;
+  updateProgressBar();
   _timeBar->updateZoom(value);
 }
 
@@ -1747,4 +1754,14 @@ MaquetteScene::verticalScroll(int value)
 {
   _timeBar->move(0, value);
   _view->repaint();
+}
+
+void
+MaquetteScene::setMaxSceneWidth(float maxSceneWidth){
+  _maxSceneWidth = maxSceneWidth;
+}
+
+float
+MaquetteScene::getMaxSceneWidth(){
+  return _maxSceneWidth;
 }
