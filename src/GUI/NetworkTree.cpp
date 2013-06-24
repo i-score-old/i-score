@@ -1602,7 +1602,7 @@ NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue)
   else {
       if (!_startMessages->getMessages()->contains(item)) {
           QString Qaddress = getAbsoluteAddressWithValue(item, START_COLUMN);
-          _startMessages->addMessage(item, Qaddress);
+          _startMessages->addMessageSimple(item, Qaddress);
           Data data;
           assignItem(item, data);
           if (item->type() == OSCNode) {
@@ -1642,7 +1642,7 @@ NetworkTree::changeEndValue(QTreeWidgetItem *item, QString newValue)
   else {
       if (!_endMessages->getMessages()->contains(item)) {
           QString Qaddress = getAbsoluteAddressWithValue(item, END_COLUMN);
-          _endMessages->addMessage(item, Qaddress);
+          _endMessages->addMessageSimple(item, Qaddress);
           if (item->type() == OSCNode) {
               addOSCEndMessage(item, Qaddress);
             }
@@ -1770,13 +1770,13 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
 void
 NetworkTree::addOSCStartMessage(QTreeWidgetItem *item, QString msg)
 {
-  _OSCStartMessages->addMessage(item, msg);
+  _OSCStartMessages->addMessageSimple(item, msg);
 }
 
 void
 NetworkTree::addOSCEndMessage(QTreeWidgetItem *item, QString msg)
 {
-  _OSCEndMessages->addMessage(item, msg);
+  _OSCEndMessages->addMessageSimple(item, msg);
 }
 
 void
