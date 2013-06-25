@@ -108,6 +108,7 @@ MaquetteScene::~MaquetteScene()
 void
 MaquetteScene::init()
 {
+  _triggersQueueList = NULL;
   _progressLine->setZValue(2);
   _timeBarProxy->setZValue(3);
   _timeBarProxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
@@ -157,8 +158,7 @@ void
 MaquetteScene::zoomChanged(float value)
 {
   setMaxSceneWidth(MaquetteScene::MAX_SCENE_WIDTH*value);
-  _view->setScene(this);
-  std::cout<<"NewMax = "<<_maxSceneWidth<<std::endl;
+
   updateProgressBar();
   _timeBar->updateZoom(value);
 }
@@ -1399,7 +1399,7 @@ MaquetteScene::boxResized()
   coord.topLeftX = resizeBox->relativeBeginPos();
   coord.topLeftY = resizeBox->getTopLeft().y();
   coord.sizeX = std::max((float)10., resizeBox->width());
-//  std::cout<<"boxResized "<<resizeBox->ID()<<" : "<<coord.sizeX*MS_PER_PIXEL<<std::endl;
+
   coord.sizeY = std::max((float)10., resizeBox->height());
   if (_maquette->updateBox(resizeBox->ID(), coord)) {
       update();

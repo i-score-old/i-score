@@ -302,19 +302,23 @@ MaquetteView::triggersQueueList()
 void
 MaquetteView::zoomIn()
 {  
-  if (MaquetteScene::MS_PER_PIXEL > 0.125) {
-      MaquetteScene::MS_PER_PIXEL /= 2.;
-      _zoom *= 2.;
+  float newZoom = _zoom * 2.;
+  if(newZoom<=32){
+      if (MaquetteScene::MS_PER_PIXEL > 0.125) {
 
-      resetCachedContent();
-      _scene->update();
+          MaquetteScene::MS_PER_PIXEL /= 2.;
+          _zoom = newZoom;
 
-      Maquette::getInstance()->updateBoxesFromEngines();
+          resetCachedContent();
+          _scene->update();
 
-      QPointF newCenter(2 * getCenterCoordinates().x(), 2 * getCenterCoordinates().y());
-      centerOn(newCenter);
-      std::cout<<"zoom = "<<_zoom<<" ; MS_PER_PIXEL = "<<MaquetteScene::MS_PER_PIXEL<<" ; newCenter = "<<newCenter.x()<<" ; "<<newCenter.y()<<std::endl;
-      _scene->zoomChanged(_zoom);
+          Maquette::getInstance()->updateBoxesFromEngines();
+
+          QPointF newCenter(2 * getCenterCoordinates().x(), 2 * getCenterCoordinates().y());
+          centerOn(newCenter);
+          _scene->zoomChanged(_zoom);
+          setSceneRect((QRectF(0,0,_scene->getMaxSceneWidth(),_scene->height())));
+        }
     }
 }
 
@@ -380,4 +384,5 @@ MaquetteView::zoomOut()
   centerOn(newCenter);
   _scene->updateProgressBar();
   _scene->zoomChanged(_zoom);
+  setSceneRect((QRectF(0,0,_scene->getMaxSceneWidth(),_scene->height())));
 }
