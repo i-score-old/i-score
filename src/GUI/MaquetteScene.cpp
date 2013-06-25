@@ -108,7 +108,7 @@ MaquetteScene::~MaquetteScene()
 void
 MaquetteScene::init()
 {
-  _triggersQueueList = NULL;
+  _triggersQueueList = new QList<TriggerPoint *>();
   _progressLine->setZValue(2);
   _timeBarProxy->setZValue(3);
   _timeBarProxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
@@ -1081,7 +1081,7 @@ MaquetteScene::removeTriggerPoint(unsigned int trgID)
       if (box != NULL) {
           box->removeTriggerPoint(trgPnt->boxExtremity());
         }
-      _triggersQueueList.removeAll(trgPnt);
+      _triggersQueueList->removeAll(trgPnt);
 //      removeItem(trgPnt);
       _maquette->removeTriggerPoint(trgID);      
     }
@@ -1098,7 +1098,7 @@ MaquetteScene::trigger(TriggerPoint *triggerPoint)
 void
 MaquetteScene::triggerNext()
 {
-   TriggerPoint *triggerPoint = triggersQueueList().first();
+   TriggerPoint *triggerPoint = triggersQueueList()->first();
   _maquette->simulateTriggeringMessage(static_cast<AbstractTriggerPoint *>(triggerPoint->abstract())->message());
   removeFromTriggerQueue(triggerPoint);
   triggerPoint->setSelected(false);
@@ -1654,7 +1654,7 @@ MaquetteScene::stopGotoStart()
 void
 MaquetteScene::removeFromTriggerQueue(TriggerPoint *trigger)
 {
-  _triggersQueueList.removeAll(trigger);
+  _triggersQueueList->removeAll(trigger);
 }
 
 void
@@ -1735,17 +1735,17 @@ MaquetteScene::updateBoxesWidgets()
 void
 MaquetteScene::addToTriggerQueue(TriggerPoint *trigger)
 {
-  if (!_triggersQueueList.contains(trigger)) {
+  if (!_triggersQueueList->contains(trigger)) {
       int i;
       qreal trgPosition = trigger->pos().x();
 
-      for (i = 0; i < _triggersQueueList.size(); i++) {
-          qreal itPosition = _triggersQueueList.at(i)->pos().x();
+      for (i = 0; i < _triggersQueueList->size(); i++) {
+          qreal itPosition = _triggersQueueList->at(i)->pos().x();
           if (trgPosition <= itPosition) {
               break;
             }
         }
-      _triggersQueueList.insert(i, trigger);
+      _triggersQueueList->insert(i, trigger);
     }
 }
 

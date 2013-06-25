@@ -222,7 +222,7 @@ class MaquetteScene : public QGraphicsScene
      *
      * \return the triggersQueueList.
      */
-    inline QList<TriggerPoint *> triggersQueueList(){ return _triggersQueueList; }
+    inline QList<TriggerPoint *> *triggersQueueList(){ return _triggersQueueList; }
 
     /*!
      * \brief Adds a trigger to the queue list.
@@ -791,7 +791,7 @@ class MaquetteScene : public QGraphicsScene
     double _accelerationFactorSave;
     double _accelerationFactor;
 
-    QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
+    QList<TriggerPoint *> *_triggersQueueList; //Lists triggers waiting
     NetworkTree *_networkTreeAssociated;
 };
 #endif

@@ -1285,7 +1285,7 @@ Maquette::setGotoValue(int gotoValue)
 void
 Maquette::generateTriggerQueue()
 {
-  _scene->triggersQueueList().clear();
+  _scene->triggersQueueList()->clear();
   TrgPntMap::iterator it1;
   TriggerPoint *curTrg;
   for (it1 = _triggerPoints.begin(); it1 != _triggerPoints.end(); ++it1) {
@@ -1388,12 +1388,12 @@ Maquette::startPlaying()
   double gotoValue = (double)_engines->getGotoValue();
   initSceneState();
   generateTriggerQueue();
-  int nbTrg = _scene->triggersQueueList().size();
+  int nbTrg = _scene->triggersQueueList()->size();
 
   try{
       for (int i = 0; i < nbTrg; i++) {
-          if (gotoValue >= _scene->triggersQueueList().first()->date()) {
-              _scene->triggersQueueList().removeFirst();
+          if (gotoValue >= _scene->triggersQueueList()->first()->date()) {
+              _scene->triggersQueueList()->removeFirst();
             }
           else {
               break;
@@ -1426,7 +1426,7 @@ Maquette::stopPlayingGotoStart()
           static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
         }
     }
-  _scene->triggersQueueList().clear();
+  _scene->triggersQueueList()->clear();
 
   setGotoValue(0);
 }
@@ -1446,7 +1446,7 @@ Maquette::stopPlaying()
           static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
         }
     }
-  _scene->triggersQueueList().clear();
+  _scene->triggersQueueList()->clear();
 }
 
 void
@@ -1465,7 +1465,7 @@ Maquette::stopPlayingWithGoto()
           static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
         }
     }
-  _scene->triggersQueueList().clear();
+  _scene->triggersQueueList()->clear();
   setGotoValue(gotoValue);
 }
 
@@ -2222,17 +2222,17 @@ Maquette::crossedTriggerPoint(bool waiting, unsigned int trgID)
   if (trgPnt != NULL) {
       if (waiting) {
           trgPnt->setWaiting(waiting);
-          if (_scene->triggersQueueList().isEmpty()) {
+          if (_scene->triggersQueueList()->isEmpty()) {
               generateTriggerQueue();
             }
-          _scene->setFocusItem(_scene->triggersQueueList().first(), Qt::OtherFocusReason);
+          _scene->setFocusItem(_scene->triggersQueueList()->first(), Qt::OtherFocusReason);
         }
 
       else {
           trgPnt->setWaiting(waiting);
-          _scene->triggersQueueList().removeAll(trgPnt);
-          if (!_scene->triggersQueueList().isEmpty()) {
-              _scene->setFocusItem(_scene->triggersQueueList().first(), Qt::OtherFocusReason);
+          _scene->triggersQueueList()->removeAll(trgPnt);
+          if (!_scene->triggersQueueList()->isEmpty()) {
+              _scene->setFocusItem(_scene->triggersQueueList()->first(), Qt::OtherFocusReason);
             }
         }
     }
