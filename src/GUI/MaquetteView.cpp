@@ -187,7 +187,7 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
 void
 MaquetteView::triggerShortcut(int shorcut)
 {
-  QList<TriggerPoint *>::iterator it = triggersQueueList().begin();
+  QList<TriggerPoint *>::iterator it = triggersQueueList()->begin();
   TriggerPoint *currentTrigger;
   int waitingTriggers;
 
@@ -211,10 +211,10 @@ MaquetteView::triggerShortcut(int shorcut)
         break;
     }
 
-  if (triggersQueueList().size() >= triggerNumero) {
+  if (triggersQueueList()->size() >= triggerNumero) {
       waitingTriggers = 0;
 
-      while (it != triggersQueueList().end() && waitingTriggers < triggerNumero) {
+      while (it != triggersQueueList()->end() && waitingTriggers < triggerNumero) {
           currentTrigger = *it;
           if (currentTrigger->isWaiting()) {
               waitingTriggers++;
@@ -290,7 +290,7 @@ MaquetteView::keyReleaseEvent(QKeyEvent *event)
   QGraphicsView::keyReleaseEvent(event);
 }
 
-QList<TriggerPoint *>
+QList<TriggerPoint *> *
 MaquetteView::triggersQueueList()
 {
   return _scene->triggersQueueList();
