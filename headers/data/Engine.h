@@ -132,7 +132,7 @@ class Engine
     
 private:
     
-	TimeProcessPtr      m_mainScenario;                                 /// The top scenario
+    TTTimeProcessPtr    m_mainScenario;                                 /// The top scenario
     
     unsigned int        m_nextTimeProcessId;                            /// the next Id to give to any created time process
     unsigned int        m_nextIntervalId;                               /// the next Id to give to any created interval
@@ -170,16 +170,16 @@ public:
     
     // Id management //////////////////////////////////////////////////////////////////
     
-    TimeProcessId       cacheTimeProcess(TimeProcessPtr timeProcess);
-    TimeProcessPtr      getTimeProcess(TimeProcessId boxId);
+    TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess);
+    TTTimeProcessPtr      getTimeProcess(TimeProcessId boxId);
     void                uncacheTimeProcess(TimeProcessId boxId);
     
-    IntervalId          cacheInterval(TimeProcessPtr timeProcess);
-    TimeProcessPtr      getInterval(IntervalId relationId);
+    IntervalId          cacheInterval(TTTimeProcessPtr timeProcess);
+    TTTimeProcessPtr      getInterval(IntervalId relationId);
     void                uncacheInterval(IntervalId relationId);
     
-    InteractiveProcessId  cacheInteractiveProcess(TimeProcessPtr timeProcess, TimeEventIndex controlPointId);
-    TimeProcessPtr      getInteractiveProcess(InteractiveProcessId triggerId, TimeEventIndex& controlPointId);
+    InteractiveProcessId  cacheInteractiveProcess(TTTimeProcessPtr timeProcess, TimeEventIndex controlPointId);
+    TTTimeProcessPtr      getInteractiveProcess(InteractiveProcessId triggerId, TimeEventIndex& controlPointId);
     void                uncacheInteractiveProcess(InteractiveProcessId triggerId);
     
     void                cacheRunningCallback(TimeProcessId boxId);
