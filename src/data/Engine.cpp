@@ -1249,7 +1249,6 @@ bool Engine::getCurveValues(TimeProcessId boxId, const std::string & address, un
 InteractiveProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, TimeEventIndex controlPointIndex)
 {
     TimeProcessPtr          timeProcess = getTimeProcess(containingBoxId);
-    TimeEventPtr            timeEvent;
     InteractiveProcessId    triggerId;
     TTValue                 v;
     
@@ -1288,10 +1287,21 @@ void Engine::removeTriggerPoint(InteractiveProcessId triggerId)
 
 void Engine::setTriggerPointMessage(InteractiveProcessId triggerId, std::string triggerMessage)
 {
-#ifdef TODO_ENGINE
-	m_editor->setTriggerPointMessage(triggerId, triggerMessage);
-#endif
-    return;
+    TimeEventIndex  controlPointIndex;
+    TimeProcessPtr  timeProcess = getInteractiveProcess(triggerId, controlPointIndex);
+    TimeEventPtr    anInteractiveEvent;
+    TTValue         v;
+    
+    // Get interactive event
+    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+    else
+        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
+    
+    anInteractiveEvent = TimeEventPtr(TTObjectBasePtr(v[0]));
+    
+    // set address attribute
+    anInteractiveEvent->setAttributeValue(TTSymbol("address"), TTSymbol(triggerMessage));
 }
 
 std::string Engine::getTriggerPointMessage(InteractiveProcessId triggerId)
@@ -1368,10 +1378,13 @@ bool Engine::play()
 
 void Engine::pause(bool pauseValue)
 {
+    m_mainScenario->sendMessage(TTSymbol("Stop"));
+    /* TODO
     if (pauseValue)
         m_mainScenario->sendMessage(TTSymbol("Pause"));
     else
-        m_mainScenario->sendMessage(TTSymbol("resume"));;
+        m_mainScenario->sendMessage(TTSymbol("resume"));
+     */
 }
 
 bool Engine::isPaused()
