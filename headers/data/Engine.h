@@ -9,7 +9,7 @@
 #ifndef __SCORE_ENGINE_H__
 #define __SCORE_ENGINE_H__
 
-#include "TTScore.h"
+#include "TTScoreAPI.h"
 #include "TTModular.h"
 
 /*!
