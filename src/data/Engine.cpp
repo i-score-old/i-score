@@ -1362,7 +1362,7 @@ void Engine::removeTriggerPoint(InteractiveProcessId triggerId)
     // Uncache
     uncacheInteractiveProcess(triggerId);
     
-    cacheReadyCallback(triggerId, timeEvent);
+    uncacheReadyCallback(triggerId, timeEvent);
 }
 
 void Engine::setTriggerPointMessage(InteractiveProcessId triggerId, std::string triggerMessage)
