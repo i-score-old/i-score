@@ -267,7 +267,7 @@ Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const s
     }
 
   unsigned int newBoxID = _engines->addBox(firstCorner.x() * MaquetteScene::MS_PER_PIXEL,
-                                                (secondCorner.x() - firstCorner.x()) * MaquetteScene::MS_PER_PIXEL, motherID);
+                                           (secondCorner.x() - firstCorner.x()) * MaquetteScene::MS_PER_PIXEL, name, motherID);
 
   if (newBoxID != NO_ID) {
       newBox->setName(QString::fromStdString(name));

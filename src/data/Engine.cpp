@@ -265,7 +265,7 @@ void Engine::initScore()
     TTObjectBaseInstantiate(TTSymbol("Scenario"), TTObjectBaseHandle(&m_mainScenario), args);
     
     // Store the main scenario (so ROOT_BOX_ID is 1)
-    cacheTimeProcess(m_mainScenario);
+    cacheTimeProcess(m_mainScenario, "root");
 }
 
 void Engine::dumpAddressBelow(TTNodePtr aNode)
@@ -297,13 +297,14 @@ Engine::~Engine()
     TTObjectBaseRelease(TTObjectBaseHandle(&m_mainScenario));
 }
 
-TimeProcessId Engine::cacheTimeProcess(TTTimeProcessPtr timeProcess)
+TimeProcessId Engine::cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::string & name)
 {
     TimeProcessId id;
     EngineCacheElementPtr e;
     
     e = new EngineCacheElement();
     e->object = TTObjectBasePtr(timeProcess);
+    e->name = name;
     
     id = m_nextTimeProcessId;
     m_timeProcessMap[id] = e;
@@ -480,7 +481,7 @@ void Engine::cacheReadyCallback(InteractiveProcessId triggerId, TTTimeEventPtr t
 
 void Engine::uncacheReadyCallback(InteractiveProcessId triggerId, TTTimeEventPtr timeEvent)
 {
-    EngineCacheElementPtr   e = m_runningCallbackMap[triggerId];
+    EngineCacheElementPtr   e = m_readyCallbackMap[triggerId];
     TTValue                 v;
     TTAttributePtr          anAttribute;
     TTErr                   err;
@@ -500,9 +501,89 @@ void Engine::uncacheReadyCallback(InteractiveProcessId triggerId, TTTimeEventPtr
     m_readyCallbackMap.erase(triggerId);
 }
 
+void Engine::cacheTriggerDataCallback(InteractiveProcessId triggerId, TimeProcessId boxId)
+{
+    EngineCacheElementPtr   e;
+    TTValue                 v;
+    TTString                address;
+    TTSymbol                boxName = TTSymbol();
+    
+    e = new EngineCacheElement();
+    e->object = NULL;
+    e->index = boxId;
+    
+    // Create a TTData
+    TTModularCreateData(kTTSym_message, NULL, NULL, &e->object);
+    
+    e->object->setAttributeValue(kTTSym_type, kTTSym_none);
+    e->object->setAttributeValue(kTTSym_description, TTSymbol("trigger an event"));
+    
+    // register the TTData under /Box.n/start or /Box.n/end address
+    address = "/";
+    address += m_timeProcessMap[boxId]->name.c_str();
+
+    if (m_interactiveProcessMap[triggerId]->index == BEGIN_CONTROL_POINT_INDEX)
+        address += "/start";
+    else
+        address += "/end";
+    
+    TTModularRegisterObject(TTAddress(address), e->object);
+    
+    m_triggerDataMap[triggerId] = e;
+}
+
+void Engine::uncacheTriggerDataCallback(InteractiveProcessId triggerId)
+{
+    ; // TODO
+}
+
+void Engine::cacheTriggerReceiverCallback(InteractiveProcessId triggerId)
+{
+    EngineCacheElementPtr   e;
+    TTValue                 args, v;
+    TTObjectBasePtr         returnValueCallback;
+    TTValuePtr              returnValueBaton;
+    
+    e = new EngineCacheElement();
+    e->object = NULL;
+    e->index = triggerId;
+    
+    // Create a TTReceiver
+    
+    // we don't need the address back
+    args.append(NULL);
+    
+    // but we need the value back to trigger it (using the TriggerReceiverCallback function)
+    returnValueCallback = NULL;
+    TTObjectBaseInstantiate(TTSymbol("callback"), &returnValueCallback, kTTValNONE);
+    
+    returnValueBaton = new TTValue(TTPtr(this));
+    returnValueBaton->append(TTUInt32(triggerId));
+    
+    returnValueCallback->setAttributeValue(kTTSym_baton, TTPtr(returnValueBaton));
+    returnValueCallback->setAttributeValue(kTTSym_function, TTPtr(&TriggerReceiverValueCallback));
+    
+    args.append(returnValueCallback);
+    
+    TTObjectBaseInstantiate(kTTSym_Receiver, TTObjectBaseHandle(&e->object), args);
+    
+    m_triggerReceiverMap[triggerId] = e;
+}
+
+void Engine::uncacheTriggerReceiverCallback(InteractiveProcessId triggerId)
+{
+    EngineCacheElementPtr   e = m_runningCallbackMap[triggerId];
+    
+    // Delete TTReceiver
+    TTObjectBaseRelease(&e->object);
+    
+    delete e;
+    m_triggerReceiverMap.erase(triggerId);
+}
+
 // Edition ////////////////////////////////////////////////////////////////////////
 
-TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, TimeProcessId motherId)
+TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const std::string & name, TimeProcessId motherId)
 {
     TTTimeEventPtr      startEvent, endEvent;
     TTTimeProcessPtr    timeProcess;
@@ -527,7 +608,7 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, TimePro
     timeProcess = TTTimeProcessPtr(TTObjectBasePtr(v[0]));
     
     // Cache it and get an unique id for this process
-    boxId = cacheTimeProcess(timeProcess);
+    boxId = cacheTimeProcess(timeProcess, name);
     
     iscoreEngineDebug TTLogMessage("TimeProcess %ld created at %ld ms for a duration of %ld ms\n", boxId, boxBeginPos, boxLength);
     
@@ -1335,6 +1416,12 @@ InteractiveProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
     // We cache an observer on time event ready attribute
     cacheReadyCallback(triggerId, timeEvent);
     
+    // We cache a TTData to allow remote triggering
+    cacheTriggerDataCallback(triggerId, containingBoxId);
+    
+    // We cache a TTReceiver to observe any local or distant TTData
+    cacheTriggerReceiverCallback(triggerId);
+    
 	return triggerId;
 }
 
@@ -1363,25 +1450,18 @@ void Engine::removeTriggerPoint(InteractiveProcessId triggerId)
     uncacheInteractiveProcess(triggerId);
     
     uncacheReadyCallback(triggerId, timeEvent);
+    
+    uncacheTriggerDataCallback(triggerId);
+    
+    uncacheTriggerReceiverCallback(triggerId);
 }
 
 void Engine::setTriggerPointMessage(InteractiveProcessId triggerId, std::string triggerMessage)
 {
-    TimeEventIndex      controlPointIndex;
-    TTTimeProcessPtr    timeProcess = getInteractiveProcess(triggerId, controlPointIndex);
-    TTTimeEventPtr      timeEvent;
-    TTValue             v;
-    
-    // Get interactive event
-    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
-    else
-        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-    
-    timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+    TTObjectBasePtr receiver = m_triggerReceiverMap[triggerId]->object;
     
     // set address attribute
-    timeEvent->setAttributeValue(TTSymbol("address"), TTSymbol(triggerMessage));
+    receiver->setAttributeValue(TTSymbol("address"), TTSymbol(triggerMessage));
 }
 
 std::string Engine::getTriggerPointMessage(InteractiveProcessId triggerId)
@@ -2009,6 +2089,35 @@ void TransportDataValueCallback(TTPtr baton, const TTValue& value)
     }
     
     engine->m_TransportDataValueCallback(transport, value);
+}
+
+void TriggerReceiverValueCallback(TTPtr baton, const TTValue& value)
+{
+    TTValuePtr              b;
+    EnginePtr               engine;
+    InteractiveProcessId    triggerId;
+    TTTimeProcessPtr        timeProcess;
+    TTTimeEventPtr          timeEvent;
+    TTValue                 v;
+	
+	// unpack baton (engine, triggerId)
+	b = (TTValuePtr)baton;
+	engine = EnginePtr((TTPtr)(*b)[0]);
+    triggerId = InteractiveProcessId((*b)[1]);
+	
+	// TODO : is the value pass the condition ?
+    
+    timeProcess = TTTimeProcessPtr(engine->m_interactiveProcessMap[triggerId]->object);
+    
+    // Get start or end time event
+    if (engine->m_interactiveProcessMap[triggerId]->index == BEGIN_CONTROL_POINT_INDEX)
+        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+    else
+        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
+    
+    timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+    
+    timeEvent->sendMessage(TTSymbol("Trigger"));
 }
 
 TTAddress Engine::toTTAddress(string networktreeAddress)

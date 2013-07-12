@@ -52,6 +52,7 @@ class EngineCacheElement {
 public:
     TTObjectBasePtr object;
     unsigned int    index;
+    std::string     name;
     
     EngineCacheElement();
     ~EngineCacheElement();
@@ -144,8 +145,9 @@ private:
     
     EngineCacheMap      m_runningCallbackMap;                           /// All callback to observe time process running state stored using a time process id
     
-    EngineCacheMap      m_readyCallbackMap;                             /// All callback to observe time event ready state stored using using an unique id
-    EngineCacheMap      m_receiveMap;                                   /// All TTReceiver to observe a local or a distant application address stored using using an unique id
+    EngineCacheMap      m_readyCallbackMap;                             /// All callback to observe time event ready state stored using using a trigger id
+    EngineCacheMap      m_triggerDataMap;                               /// All TTData to expose interactive event on the network stored using using a trigger id
+    EngineCacheMap      m_triggerReceiverMap;                           /// All TTReceiver to observe a local or a distant application address stored using using a trigger id
     
     TTObjectBasePtr     m_dataPlay;                                     /// A Modular TTData to expose Play transport service
     TTObjectBasePtr     m_dataStop;                                     /// A Modular TTData to expose Stop transport service
@@ -173,7 +175,7 @@ public:
     
     // Id management //////////////////////////////////////////////////////////////////
     
-    TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess);
+    TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::string & name);
     TTTimeProcessPtr    getTimeProcess(TimeProcessId boxId);
     void                uncacheTimeProcess(TimeProcessId boxId);
     
@@ -191,6 +193,12 @@ public:
     void                cacheReadyCallback(InteractiveProcessId triggerId, TTTimeEventPtr timeEvent);
     void                uncacheReadyCallback(InteractiveProcessId triggerId, TTTimeEventPtr timeEvent);
     
+    void                cacheTriggerDataCallback(InteractiveProcessId triggerId, TimeProcessId boxId);
+    void                uncacheTriggerDataCallback(InteractiveProcessId triggerId);
+    
+    void                cacheTriggerReceiverCallback(InteractiveProcessId triggerId);
+    void                uncacheTriggerReceiverCallback(InteractiveProcessId triggerId);
+    
 	// Edition ////////////////////////////////////////////////////////////////////////
     
 	/*!
@@ -198,12 +206,12 @@ public:
 	 *
 	 * \param boxBeginPos : the begin value in ms.
 	 * \param boxLength : the length value in ms.
+     * \param name : the name of the box
 	 * \param motherId : mother box ID if any, NO_ID if the box to create has no mother.
-	 * \param maxSceneWidth : the max scene width.
 	 *
 	 * \return the newly created box ID.
 	 */
-	TimeProcessId addBox(TimeValue boxBeginPos, TimeValue boxLength, TimeProcessId motherId);
+	TimeProcessId addBox(TimeValue boxBeginPos, TimeValue boxLength, const std::string & name, TimeProcessId motherId);
     
 	/*!
 	 * Removes a box from the CSP : removes the relation implicating it and the
@@ -827,6 +835,7 @@ public:
 	friend void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value);
     friend void TimeProcessSchedulerRunningAttributeCallback(TTPtr baton, const TTValue& value);
     friend void TransportDataValueCallback(TTPtr baton, const TTValue& value);
+    friend void TriggerReceiverValueCallback(TTPtr baton, const TTValue& value);
     
 private:
     
@@ -851,21 +860,27 @@ typedef Engine* EnginePtr;
 
 /** Any time event ready attribute callback
  @param	baton			a TTValuePtr containing an EnginePtr and an InteractiveProcessId
- @param	data			the time event ready state
+ @param	value			the time event ready state
  @return                an error code */
 void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value);
 
 /** Any time process running state callback
  @param	baton			a TTValuePtr containing an EnginePtr and an TimeProcessId
- @param	data			the time process running state
+ @param	value			the time process running state
  @return                an error code */
 void TimeProcessSchedulerRunningAttributeCallback(TTPtr baton, const TTValue& value);
 
 /** Any transport data value callback
  @param	baton			a TTValuePtr containing an EnginePtr and a TTDataPtr
- @param	data			the value of the data
+ @param	value			the value of the data
  @return                an error code */
 void TransportDataValueCallback(TTPtr baton, const TTValue& value);
+
+/** Any trigger receiver value callback
+ @param	baton			a TTValuePtr containing an EnginePtr and an InteractiveProcessId
+ @param	value			a value
+ @return                an error code */
+void TriggerReceiverValueCallback(TTPtr baton, const TTValue& value);
 
 
 
