@@ -29,11 +29,11 @@ EngineCacheElement::~EngineCacheElement()
     ;
 }
 
-Engine::Engine(void(*interactiveEventActiveAttributeCallback)(InteractiveProcessId, bool),
+Engine::Engine(void(*timeEventReadyAttributeCallback)(InteractiveProcessId, bool),
                void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
                void(*transportDataValueCallback)(TTSymbol&, const TTValue&))
 {
-    m_InteractiveEventActiveAttributeCallback = interactiveEventActiveAttributeCallback;
+    m_TimeEventReadyAttributeCallback = timeEventReadyAttributeCallback;
     m_TimeProcessSchedulerRunningAttributeCallback = timeProcessSchedulerRunningAttributeCallback;
     m_TransportDataValueCallback = transportDataValueCallback;
     
@@ -434,7 +434,6 @@ void Engine::uncacheRunningCallback(TimeProcessId boxId)
     getTimeProcess(boxId)->getAttributeValue(TTSymbol("scheduler"), v);
     scheduler = v[0];
     
-    anAttribute = NULL;
     err = scheduler->findAttribute(TTSymbol("running"), &anAttribute);
     
     if (!err) {
@@ -447,6 +446,58 @@ void Engine::uncacheRunningCallback(TimeProcessId boxId)
     
     delete e;
     m_runningCallbackMap.erase(boxId);
+}
+
+void Engine::cacheReadyCallback(InteractiveProcessId triggerId, TTTimeEventPtr timeEvent)
+{
+    EngineCacheElementPtr   e;
+    TTValue                 v;
+    TTValuePtr              readyAttributeBaton;
+    TTAttributePtr          anAttribute;
+    TTErr                   err;
+    
+    e = new EngineCacheElement();
+    e->object = NULL;
+    e->index = triggerId;
+    
+    // Create a TTCallback to observe time event ready attribute (using TimeEventReadyAttributeCallback)
+    TTObjectBaseInstantiate(TTSymbol("callback"), &e->object, kTTValNONE);
+    
+    readyAttributeBaton = new TTValue(TTPtr(this)); // readyAttributeBaton will be deleted during the callback destruction
+    readyAttributeBaton->append(TTUInt32(triggerId));
+    
+    e->object->setAttributeValue(kTTSym_baton, TTPtr(readyAttributeBaton));
+    e->object->setAttributeValue(kTTSym_function, TTPtr(&TimeEventReadyAttributeCallback));
+    
+    // register for ready attribute observation
+    err = timeEvent->findAttribute(TTSymbol("ready"), &anAttribute);
+    
+    if (!err)
+        anAttribute->registerObserverForNotifications(*e->object);
+    
+    m_readyCallbackMap[triggerId] = e;
+}
+
+void Engine::uncacheReadyCallback(InteractiveProcessId triggerId, TTTimeEventPtr timeEvent)
+{
+    EngineCacheElementPtr   e = m_runningCallbackMap[triggerId];
+    TTValue                 v;
+    TTAttributePtr          anAttribute;
+    TTErr                   err;
+    
+    // unregister for scheduler running attribute observation    
+    err = timeEvent->findAttribute(TTSymbol("ready"), &anAttribute);
+    
+    if (!err) {
+        
+        err = anAttribute->unregisterObserverForNotifications(*e->object);
+        
+        if (!err)
+            TTObjectBaseRelease(&e->object);
+    }
+    
+    delete e;
+    m_readyCallbackMap.erase(triggerId);
 }
 
 // Edition ////////////////////////////////////////////////////////////////////////
@@ -489,7 +540,8 @@ void Engine::removeBox(TimeProcessId boxId)
     EngineCacheMapIterator  it;
     InteractiveProcessId    id1 = 0;
     InteractiveProcessId    id2 = 0;
-    TTValue                 v;
+    TTValue                 v, events;
+    TTErr                   err;
     
     // Retreive the time process using the boxId
     timeProcess = getTimeProcess(boxId);
@@ -511,20 +563,22 @@ void Engine::removeBox(TimeProcessId boxId)
     if (id1) uncacheInteractiveProcess(id1);
     if (id2) uncacheInteractiveProcess(id2);
     
-    // Release start event
-    timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
-    m_mainScenario->sendMessage(TTSymbol("TimeEventRelease"), v, kTTValNONE);
-    
-    // Release end event
-    timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-    m_mainScenario->sendMessage(TTSymbol("TimeEventRelease"), v, kTTValNONE);
+    // Remove the time process from the cache
+    uncacheTimeProcess(boxId);
     
     // Release the time process
     v = TTObjectBasePtr(timeProcess);
-    m_mainScenario->sendMessage(TTSymbol("TimeProcessRelease"), v, kTTValNONE);
+    m_mainScenario->sendMessage(TTSymbol("TimeProcessRelease"), v, events);
     
-    // Remove the time process from the cache
-    uncacheTimeProcess(boxId);
+    // Release start event
+    err = m_mainScenario->sendMessage(TTSymbol("TimeEventRelease"), events[0], kTTValNONE);
+    if (err)
+        iscoreEngineDebug TTLogMessage("Box %ld cannot release his start event\n", boxId);
+    
+    // Release end event
+    err = m_mainScenario->sendMessage(TTSymbol("TimeEventRelease"), events[1], kTTValNONE);
+    if (err)
+        iscoreEngineDebug TTLogMessage("Box %ld cannot release his end event\n", boxId);
 }
 
 IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
@@ -593,7 +647,8 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
 void Engine::removeTemporalRelation(IntervalId relationId)
 {
     TTTimeProcessPtr    timeProcess;
-    TTValue             v;
+    TTValue             v, events;
+    TTErr               err;
     
     // Retreive the interval using the relationId
     timeProcess = getInterval(relationId);
@@ -602,7 +657,17 @@ void Engine::removeTemporalRelation(IntervalId relationId)
     
     // Release the time process
     v = TTObjectBasePtr(timeProcess);
-    m_mainScenario->sendMessage(TTSymbol("TimeProcessRelease"), v, kTTValNONE);
+    m_mainScenario->sendMessage(TTSymbol("TimeProcessRelease"), v, events);
+    
+    // Release start event
+    err = m_mainScenario->sendMessage(TTSymbol("TimeEventRelease"), events[0], kTTValNONE);
+    if (err)
+        iscoreEngineDebug TTLogMessage("Relation %ld cannot release his start event\n", relationId);
+    
+    // Release end event
+    err = m_mainScenario->sendMessage(TTSymbol("TimeEventRelease"), events[1], kTTValNONE);
+    if (err)
+        iscoreEngineDebug TTLogMessage("Relation %ld cannot release his end event\n", relationId);
     
     // Remove the interval from the cache
     uncacheInterval(relationId);
@@ -1248,48 +1313,63 @@ bool Engine::getCurveValues(TimeProcessId boxId, const std::string & address, un
 
 InteractiveProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, TimeEventIndex controlPointIndex)
 {
-    TTTimeProcessPtr       timeProcess = getTimeProcess(containingBoxId);
-    InteractiveProcessId   triggerId;
-    TTValue                v;
+    TTTimeProcessPtr        timeProcess = getTimeProcess(containingBoxId);
+    TTTimeEventPtr          timeEvent;
+    InteractiveProcessId    triggerId;
+    TTValue                 v;
     
-    // Set interactive attribute of event
+    // Get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        timeProcess->setAttributeValue(TTSymbol("startInteractive"), kTTBoolYes);
+        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
     else
-        timeProcess->setAttributeValue(TTSymbol("endInteractive"), kTTBoolYes);
+        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
+    
+    timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+    
+    // Set interactive attribute of the time event
+    timeEvent->setAttributeValue(TTSymbol("interactive"), kTTBoolYes);
     
     // We cache the time process and the event index instead of the event itself
     triggerId = cacheInteractiveProcess(timeProcess, controlPointIndex);
     
-    // TODO : create a TTCallback to observe any time event attribute
-    // getInteractiveEvent(triggerId)->appendObserver() ?
+    // We cache an observer on time event ready attribute
+    cacheReadyCallback(triggerId, timeEvent);
     
 	return triggerId;
 }
 
 void Engine::removeTriggerPoint(InteractiveProcessId triggerId)
 {
-    TimeEventIndex controlPointIndex;
-    TTTimeProcessPtr timeProcess = getInteractiveProcess(triggerId, controlPointIndex);
+    TimeEventIndex      controlPointIndex;
+    TTTimeProcessPtr    timeProcess = getInteractiveProcess(triggerId, controlPointIndex);
+    TTTimeEventPtr      timeEvent;
+    TTValue             v;
     
     // TODO : remove observers on the interactive event
     // getInteractiveEvent(triggerId)->removeObserver() ?
     
-    // Set interactive attribute of event
+    // Get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        timeProcess->setAttributeValue(TTSymbol("startInteractive"), kTTBoolNo);
+        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
     else
-        timeProcess->setAttributeValue(TTSymbol("endInteractive"), kTTBoolNo);
+        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
     
-    // Cache it and get an unique id for this event
+    timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+    
+    // Set interactive attribute of the time event
+    timeEvent->setAttributeValue(TTSymbol("interactive"), kTTBoolNo);
+    
+    // Uncache
     uncacheInteractiveProcess(triggerId);
+    
+    cacheReadyCallback(triggerId, timeEvent);
 }
 
 void Engine::setTriggerPointMessage(InteractiveProcessId triggerId, std::string triggerMessage)
 {
     TimeEventIndex      controlPointIndex;
     TTTimeProcessPtr    timeProcess = getInteractiveProcess(triggerId, controlPointIndex);
-    TTTimeEventPtr      anInteractiveEvent;
+    TTTimeEventPtr      timeEvent;
     TTValue             v;
     
     // Get interactive event
@@ -1298,10 +1378,10 @@ void Engine::setTriggerPointMessage(InteractiveProcessId triggerId, std::string 
     else
         timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
     
-    anInteractiveEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+    timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
     
     // set address attribute
-    anInteractiveEvent->setAttributeValue(TTSymbol("address"), TTSymbol(triggerMessage));
+    timeEvent->setAttributeValue(TTSymbol("address"), TTSymbol(triggerMessage));
 }
 
 std::string Engine::getTriggerPointMessage(InteractiveProcessId triggerId)
@@ -1842,23 +1922,23 @@ void Engine::printExecutionInLinuxConsole()
 #pragma mark Callback Methods
 #endif
 
-void InteractiveEventActiveAttributeCallback(TTPtr baton, const TTValue& value)
+void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value)
 {
-    TTValuePtr          b;
-    EnginePtr           engine;
-    InteractiveProcessId  triggerId;
-    TTBoolean           active;
+    TTValuePtr              b;
+    EnginePtr               engine;
+    InteractiveProcessId    triggerId;
+    TTBoolean               isReady;
 	
 	// unpack baton (engine, triggerId)
 	b = (TTValuePtr)baton;
 	engine = EnginePtr((TTPtr)(*b)[0]);
-    triggerId = InteractiveProcessId((*b)[0]);
+    triggerId = InteractiveProcessId((*b)[1]);
 	
-	// Unpack data (active)
-	active = value[0];
+	// Unpack data (isReady)
+	isReady = value[0];
     
-	if (engine->m_InteractiveEventActiveAttributeCallback != NULL)
-		engine->m_InteractiveEventActiveAttributeCallback(triggerId, active);
+	if (engine->m_TimeEventReadyAttributeCallback != NULL)
+		engine->m_TimeEventReadyAttributeCallback(triggerId, isReady);
 }
 
 void TimeProcessSchedulerRunningAttributeCallback(TTPtr baton, const TTValue& value)

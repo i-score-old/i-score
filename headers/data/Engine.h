@@ -142,7 +142,10 @@ private:
     EngineCacheMap      m_intervalMap;                                  /// All interval time process and some observers stored using an unique id
     EngineCacheMap      m_interactiveProcessMap;                        /// All interactive time process with an interactive event stored using an unique id
     
-    EngineCacheMap      m_runningCallbackMap;                           /// All callback to observer time process running state stored using a time process id
+    EngineCacheMap      m_runningCallbackMap;                           /// All callback to observe time process running state stored using a time process id
+    
+    EngineCacheMap      m_readyCallbackMap;                             /// All callback to observe time event ready state stored using using an unique id
+    EngineCacheMap      m_receiveMap;                                   /// All TTReceiver to observe a local or a distant application address stored using using an unique id
     
     TTObjectBasePtr     m_dataPlay;                                     /// A Modular TTData to expose Play transport service
     TTObjectBasePtr     m_dataStop;                                     /// A Modular TTData to expose Stop transport service
@@ -151,13 +154,13 @@ private:
     TTObjectBasePtr     m_dataStartPoint;                               /// A Modular TTData to expose StartPoint transport service
     TTObjectBasePtr     m_dataSpeed;                                    /// A Modular TTData to expose Speed transport service
     
-	void (*m_InteractiveEventActiveAttributeCallback)(InteractiveProcessId, bool);
+	void (*m_TimeEventReadyAttributeCallback)(InteractiveProcessId, bool);
     void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);
     void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);
 
 public:
 
-    Engine(void(*interactiveEventActiveAttributeCallback)(InteractiveProcessId, bool),
+    Engine(void(*timeEventReadyAttributeCallback)(InteractiveProcessId, bool),
            void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
            void(*transportDataValueCallback)(TTSymbol&, const TTValue&));
     
@@ -171,19 +174,22 @@ public:
     // Id management //////////////////////////////////////////////////////////////////
     
     TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess);
-    TTTimeProcessPtr      getTimeProcess(TimeProcessId boxId);
+    TTTimeProcessPtr    getTimeProcess(TimeProcessId boxId);
     void                uncacheTimeProcess(TimeProcessId boxId);
     
     IntervalId          cacheInterval(TTTimeProcessPtr timeProcess);
-    TTTimeProcessPtr      getInterval(IntervalId relationId);
+    TTTimeProcessPtr    getInterval(IntervalId relationId);
     void                uncacheInterval(IntervalId relationId);
     
-    InteractiveProcessId  cacheInteractiveProcess(TTTimeProcessPtr timeProcess, TimeEventIndex controlPointId);
-    TTTimeProcessPtr      getInteractiveProcess(InteractiveProcessId triggerId, TimeEventIndex& controlPointId);
+    InteractiveProcessId cacheInteractiveProcess(TTTimeProcessPtr timeProcess, TimeEventIndex controlPointId);
+    TTTimeProcessPtr    getInteractiveProcess(InteractiveProcessId triggerId, TimeEventIndex& controlPointId);
     void                uncacheInteractiveProcess(InteractiveProcessId triggerId);
     
     void                cacheRunningCallback(TimeProcessId boxId);
     void                uncacheRunningCallback(TimeProcessId boxId);
+    
+    void                cacheReadyCallback(InteractiveProcessId triggerId, TTTimeEventPtr timeEvent);
+    void                uncacheReadyCallback(InteractiveProcessId triggerId, TTTimeEventPtr timeEvent);
     
 	// Edition ////////////////////////////////////////////////////////////////////////
     
@@ -818,7 +824,7 @@ public:
 	void print();
     void printExecutionInLinuxConsole();
     
-	friend void InteractiveEventActiveAttributeCallback(TTPtr baton, const TTValue& value);
+	friend void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value);
     friend void TimeProcessSchedulerRunningAttributeCallback(TTPtr baton, const TTValue& value);
     friend void TransportDataValueCallback(TTPtr baton, const TTValue& value);
     
@@ -843,11 +849,11 @@ private:
 
 typedef Engine* EnginePtr;
 
-/** Any interactive event active attribute callback
+/** Any time event ready attribute callback
  @param	baton			a TTValuePtr containing an EnginePtr and an InteractiveProcessId
- @param	data			the time event active state
+ @param	data			the time event ready state
  @return                an error code */
-void InteractiveEventActiveAttributeCallback(TTPtr baton, const TTValue& value);
+void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value);
 
 /** Any time process running state callback
  @param	baton			a TTValuePtr containing an EnginePtr and an TimeProcessId
