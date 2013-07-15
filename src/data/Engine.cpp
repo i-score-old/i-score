@@ -1891,61 +1891,32 @@ int Engine::requestNetworkNamespace(const std::string & address, vector<string>&
 
 void Engine::store(std::string fileName)
 {
-#ifdef TODO_ENGINE    
-	xmlDocPtr doc = NULL;
-	xmlNodePtr root_node = NULL;
+    TTValue none;
     
-	doc = xmlNewDoc(BAD_CAST "1.0");
-	root_node = xmlNewNode(NULL, BAD_CAST "ENGINES");
-	xmlSetProp(root_node, BAD_CAST "version", BAD_CAST ENGINE_VERSION);
-    
-	std::ostringstream oss;
-	oss << m_editor->scenarioSize();
-	xmlSetProp(root_node, BAD_CAST "scenarioSize", BAD_CAST oss.str().data());
-    
-	xmlDocSetRootElement(doc, root_node);
-    
-	m_editor->store(root_node);
-	m_executionMachine->store(root_node);
-    
-	xmlSaveFormatFileEnc(fileName.data(), doc, "UTF-8", 1);
-    
-	xmlFreeDoc(doc);
-#endif
+    // Create a TTXmlHandler
+    TTObject aXmlHandler(kTTSym_XmlHandler);
+   
+    // Pass the main scenario object
+    TTValue v = m_mainScenario;
+    aXmlHandler.set(kTTSym_object, v);
+
+    // Write
+    aXmlHandler.send(kTTSym_Write, TTSymbol(fileName), none);
 }
 
 void Engine::load(std::string fileName)
 {
-#ifdef TODO_ENGINE    
-	xmlNodePtr racine = NULL;
-	xmlNodePtr n = NULL;
-	xmlDocPtr doc = xmlReadFile(fileName.data(), "UTF-8", 0);
+    TTValue none;
     
-	racine = xmlDocGetRootElement(doc);
+    // Create a TTXmlHandler
+    TTObject aXmlHandler(kTTSym_XmlHandler);
     
-	xmlChar* version = xmlGetProp(racine, BAD_CAST "version");
-	xmlChar* xmlScenarioSize = xmlGetProp(racine, BAD_CAST "scenarioSize");
+    // Pass the main scenario object
+    TTValue v = m_mainScenario;
+    aXmlHandler.set(kTTSym_object, v);
     
-	(void) version;
-    
-	int scenarioSize = XMLConversion::xmlCharToInt(xmlScenarioSize);
-    
-	reset(scenarioSize);
-    
-	for (n = racine->children; n != NULL; n = n->next) {
-		if (n->type == XML_ELEMENT_NODE) {
-			if (xmlStrEqual(n->name, BAD_CAST "EDITOR")) {
-				std::cout << "LOAD: EDITOR" << std::endl;
-				m_editor->load(n);
-			} else if (xmlStrEqual(n->name, BAD_CAST "ECOMACHINE")) {
-				std::cout << "LOAD: ECO-MACHINE" << std::endl;
-				m_executionMachine->load(n, m_networkController);
-			}
-		}
-	}
-    
-	xmlFreeDoc(doc);
-#endif
+    // Read
+    aXmlHandler.send(kTTSym_Read, TTSymbol(fileName), none);
 }
 
 // NETWORK
