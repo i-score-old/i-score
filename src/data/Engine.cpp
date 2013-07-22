@@ -588,6 +588,7 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const s
     TTTimeEventPtr      startEvent, endEvent;
     TTTimeProcessPtr    timeProcess;
     TimeProcessId       boxId;
+    TTSymbol            boxName;
     TTValue             v, args;
     
     // Create a time event for the start
@@ -606,6 +607,9 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const s
     args.append(TTObjectBasePtr(endEvent));
     m_mainScenario->sendMessage(TTSymbol("TimeProcessCreate"), args, v);
     timeProcess = TTTimeProcessPtr(TTObjectBasePtr(v[0]));
+    
+    boxName = TTSymbol(name);
+    timeProcess->setAttributeValue(kTTSym_name, boxName);
     
     // Cache it and get an unique id for this process
     boxId = cacheTimeProcess(timeProcess, name);
