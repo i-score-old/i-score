@@ -16,14 +16,13 @@
 			neededFileNames = (
 				);
 			shellPath = "/bin/sh";
-			shellScript = "make\ -C\ /Users/nicolashincker/Documents/workspace/i-score/dev/i-score\ -f\ \'i-score.xcodeproj/qt_makeqmake.mak\'";
+			shellScript = "make\ -C\ /Users/margothincker/Documents/NicoinPerso/workspace/i-score\ -f\ \'i-score.xcodeproj/qt_makeqmake.mak\'";
 		};
 		7EC3C68A81EFFF79B6CA22AC = {
 			isa = PBXFileReference;
 			name = "main.cpp";
 			path = "src/main.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		FD1638E377D97C82BDB438FB = {
@@ -39,7 +38,6 @@
 			name = "Abstract.cpp";
 			path = "src/data/Abstract.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		30BD952836813052C2FB93AA = {
@@ -55,7 +53,6 @@
 			name = "AbstractBox.cpp";
 			path = "src/data/AbstractBox.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		FE9DA78552820F9D1F761861 = {
@@ -71,7 +68,6 @@
 			name = "AbstractComment.cpp";
 			path = "src/data/AbstractComment.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		CA1FEA1A9B5F8AC0EA4ED08F = {
@@ -87,7 +83,6 @@
 			name = "AbstractCurve.cpp";
 			path = "src/data/AbstractCurve.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		DEBDAEB3D16B77CA35FE1DDB = {
@@ -103,7 +98,6 @@
 			name = "AbstractParentBox.cpp";
 			path = "src/data/AbstractParentBox.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		6537B75310103EE00D349C2C = {
@@ -119,7 +113,6 @@
 			name = "AbstractRelation.cpp";
 			path = "src/data/AbstractRelation.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		BEA24E47C863E42428EEB9C4 = {
@@ -135,7 +128,6 @@
 			name = "AbstractTriggerPoint.cpp";
 			path = "src/data/AbstractTriggerPoint.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		E695FA00D191F013BAE08A30 = {
@@ -151,7 +143,6 @@
 			name = "Maquette.cpp";
 			path = "src/data/Maquette.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		66B2208B2743A278CA28212C = {
@@ -167,7 +158,6 @@
 			name = "AttributesEditor.cpp";
 			path = "src/GUI/AttributesEditor.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		05E9E321407A9F0F927BDFED = {
@@ -183,7 +173,6 @@
 			name = "BasicBox.cpp";
 			path = "src/GUI/BasicBox.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		FD98E57AA6B92FD73B35F96F = {
@@ -199,7 +188,6 @@
 			name = "BoxContextMenu.cpp";
 			path = "src/GUI/BoxContextMenu.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		8088A8E28E0ECF2CB2088261 = {
@@ -215,7 +203,6 @@
 			name = "ChooseTemporalRelation.cpp";
 			path = "src/GUI/ChooseTemporalRelation.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		333F7EAEC65AC6C5B13EC3EE = {
@@ -231,7 +218,6 @@
 			name = "Comment.cpp";
 			path = "src/GUI/Comment.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		A9082BB3B2B02A2DEBD522FA = {
@@ -247,7 +233,6 @@
 			name = "CurveWidget.cpp";
 			path = "src/GUI/CurveWidget.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		93793705D58956785946BA10 = {
@@ -263,7 +248,6 @@
 			name = "CurvesWidget.cpp";
 			path = "src/GUI/CurvesWidget.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		A046F87E7BF5C0D093C74A04 = {
@@ -279,7 +263,6 @@
 			name = "Help.cpp";
 			path = "src/GUI/Help.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		6A522B7E876B66F8FEC54227 = {
@@ -295,7 +278,6 @@
 			name = "Interpolation.cpp";
 			path = "src/GUI/Interpolation.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		EC04DE6DEA4318C8BA7366BC = {
@@ -311,7 +293,6 @@
 			name = "LogarithmicSlider.cpp";
 			path = "src/GUI/LogarithmicSlider.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		690ABD438ABAC16F97114BA6 = {
@@ -327,7 +308,6 @@
 			name = "MainWindow.cpp";
 			path = "src/GUI/MainWindow.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		12C25F4FC8BBCD5FDCFAA9B4 = {
@@ -343,7 +323,6 @@
 			name = "MaquetteScene.cpp";
 			path = "src/GUI/MaquetteScene.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		C11580E6BDA4890FB0FFB88C = {
@@ -359,7 +338,6 @@
 			name = "MaquetteView.cpp";
 			path = "src/GUI/MaquetteView.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		B97B38EB4D5E7DD520A641A8 = {
@@ -375,7 +353,6 @@
 			name = "NetworkConfig.cpp";
 			path = "src/GUI/NetworkConfig.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		C4A951ED6E9FFF45B3C26B96 = {
@@ -391,7 +368,6 @@
 			name = "NetworkMessagesEditor.cpp";
 			path = "src/GUI/NetworkMessagesEditor.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		1ABE9462AA2FEBE6C70A36E5 = {
@@ -407,7 +383,6 @@
 			name = "NetworkTree.cpp";
 			path = "src/GUI/NetworkTree.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		A5E53D29339164233BE9EDC1 = {
@@ -423,7 +398,6 @@
 			name = "ParentBox.cpp";
 			path = "src/GUI/ParentBox.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		D6C7DADABB4AAB1ACD6E5343 = {
@@ -439,7 +413,6 @@
 			name = "ParentBoxContextMenu.cpp";
 			path = "src/GUI/ParentBoxContextMenu.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		31BA9BBD57783BEDA512CEB5 = {
@@ -455,7 +428,6 @@
 			name = "PlayingThread.cpp";
 			path = "src/GUI/PlayingThread.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		8C1451F2E727DD5AE70CD7F1 = {
@@ -471,7 +443,6 @@
 			name = "Relation.cpp";
 			path = "src/GUI/Relation.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		D0B4DE3E4C4A004BB7497F72 = {
@@ -487,7 +458,6 @@
 			name = "RelationEdit.cpp";
 			path = "src/GUI/RelationEdit.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		FE40084783CD7971F8991BB1 = {
@@ -503,7 +473,6 @@
 			name = "TextEdit.cpp";
 			path = "src/GUI/TextEdit.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		49319E6F820E9E7418C29A92 = {
@@ -519,7 +488,6 @@
 			name = "TriggerPoint.cpp";
 			path = "src/GUI/TriggerPoint.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		BC2E039E04AF5BF81E1208D5 = {
@@ -535,7 +503,6 @@
 			name = "TreeMap.cpp";
 			path = "src/GUI/TreeMap.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		9F1B3C5EB84F015D6BF13AA4 = {
@@ -551,7 +518,6 @@
 			name = "TreeMapElement.cpp";
 			path = "src/GUI/TreeMapElement.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		92FBAE09E996E4167F55E078 = {
@@ -567,7 +533,6 @@
 			name = "ViewRelations.cpp";
 			path = "src/GUI/ViewRelations.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		F63D295A6F78E757652883FC = {
@@ -583,7 +548,6 @@
 			name = "NetworkMessages.cpp";
 			path = "src/data/NetworkMessages.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		3B68A266F1F9A1C3A56DD220 = {
@@ -599,7 +563,6 @@
 			name = "BoxWidget.cpp";
 			path = "src/GUI/BoxWidget.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		91C5ED25EB071BA6E10F2373 = {
@@ -615,7 +578,6 @@
 			name = "BoxCurveEdit.cpp";
 			path = "src/GUI/BoxCurveEdit.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		5D3015BF4027605BCE0456D6 = {
@@ -631,7 +593,6 @@
 			name = "MaquetteWidget.cpp";
 			path = "src/GUI/MaquetteWidget.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		A47C3E4E0F07119890974EDE = {
@@ -647,7 +608,6 @@
 			name = "TimeBarWidget.cpp";
 			path = "src/GUI/TimeBarWidget.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		3EEEFD562F282A4C7920667E = {
@@ -663,7 +623,6 @@
 			name = "DeviceEdit.cpp";
 			path = "src/GUI/DeviceEdit.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		F6F1F8996A4F093F521CA194 = {
@@ -679,7 +638,6 @@
 			name = "acousmoscribe.icns";
 			path = "images/acousmoscribe.icns";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		123AD197A42DC2DC0A268259 = {
 			fileRef = "B95006AEFE6773908F66D1C6";
@@ -694,7 +652,6 @@
 			name = "moc_Maquette.cpp";
 			path = "moc/moc_Maquette.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		0B2292BC85745A06F653071B = {
@@ -710,7 +667,6 @@
 			name = "moc_AttributesEditor.cpp";
 			path = "moc/moc_AttributesEditor.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		FD3B07BA4A94B84DBFB464E8 = {
@@ -726,7 +682,6 @@
 			name = "moc_BoxContextMenu.cpp";
 			path = "moc/moc_BoxContextMenu.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		86EB7F55602050556A3549AE = {
@@ -742,7 +697,6 @@
 			name = "moc_ChooseTemporalRelation.cpp";
 			path = "moc/moc_ChooseTemporalRelation.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		C9715E0A7B77E88322B76F95 = {
@@ -758,7 +712,6 @@
 			name = "moc_CurveWidget.cpp";
 			path = "moc/moc_CurveWidget.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		9BABA28569F2FCA9DC20BE7F = {
@@ -774,7 +727,6 @@
 			name = "moc_CurvesWidget.cpp";
 			path = "moc/moc_CurvesWidget.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		CC490A5C63517F0E52F1828D = {
@@ -790,7 +742,6 @@
 			name = "moc_Help.cpp";
 			path = "moc/moc_Help.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		5C1E9F1A35CCBD6766B53C5A = {
@@ -806,7 +757,6 @@
 			name = "moc_Interpolation.cpp";
 			path = "moc/moc_Interpolation.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		D9E8D6361F1A6B57F1B7D970 = {
@@ -822,7 +772,6 @@
 			name = "moc_MainWindow.cpp";
 			path = "moc/moc_MainWindow.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		747047D1F91135670FB978DE = {
@@ -838,7 +787,6 @@
 			name = "moc_MaquetteScene.cpp";
 			path = "moc/moc_MaquetteScene.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		163ECC3A1292E77A1589E65E = {
@@ -854,7 +802,6 @@
 			name = "moc_MaquetteView.cpp";
 			path = "moc/moc_MaquetteView.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		E4693E3DE7232196B56D9CE3 = {
@@ -870,7 +817,6 @@
 			name = "moc_NetworkConfig.cpp";
 			path = "moc/moc_NetworkConfig.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		023E9AF9276E96EB30837E95 = {
@@ -886,7 +832,6 @@
 			name = "moc_NetworkMessagesEditor.cpp";
 			path = "moc/moc_NetworkMessagesEditor.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		E553A5CF7578DCE2B42817FD = {
@@ -902,7 +847,6 @@
 			name = "moc_NetworkTree.cpp";
 			path = "moc/moc_NetworkTree.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		0CABF94CAAA15C6515A9D29A = {
@@ -918,7 +862,6 @@
 			name = "moc_ParentBoxContextMenu.cpp";
 			path = "moc/moc_ParentBoxContextMenu.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		4DC2863C91478B08996AB759 = {
@@ -934,7 +877,6 @@
 			name = "moc_RelationEdit.cpp";
 			path = "moc/moc_RelationEdit.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		D20950FEA85A4394AF90DD31 = {
@@ -950,7 +892,6 @@
 			name = "moc_TextEdit.cpp";
 			path = "moc/moc_TextEdit.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		A176C82B38F18523F9AC4C04 = {
@@ -966,7 +907,6 @@
 			name = "moc_TreeMap.cpp";
 			path = "moc/moc_TreeMap.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		316F838D1CBC283A68DFF508 = {
@@ -982,7 +922,6 @@
 			name = "moc_TreeMapElement.cpp";
 			path = "moc/moc_TreeMapElement.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		667B1851FD26DF407A4AB8B8 = {
@@ -998,7 +937,6 @@
 			name = "moc_ViewRelations.cpp";
 			path = "moc/moc_ViewRelations.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		EFFA5DC8C8B71AE488687F2C = {
@@ -1014,7 +952,6 @@
 			name = "moc_NetworkMessages.cpp";
 			path = "moc/moc_NetworkMessages.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		32647F8624F85C810672A0A0 = {
@@ -1030,7 +967,6 @@
 			name = "moc_BoxWidget.cpp";
 			path = "moc/moc_BoxWidget.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		7197277110A24D12276FD0B2 = {
@@ -1046,7 +982,6 @@
 			name = "moc_BoxCurveEdit.cpp";
 			path = "moc/moc_BoxCurveEdit.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		98FC9815077E79F2F65C77EB = {
@@ -1062,7 +997,6 @@
 			name = "moc_MaquetteWidget.cpp";
 			path = "moc/moc_MaquetteWidget.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		DCE00115E769ABE2329459C1 = {
@@ -1078,7 +1012,6 @@
 			name = "moc_TimeBarWidget.cpp";
 			path = "moc/moc_TimeBarWidget.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		2E94610D0FF6EBB39B408BF1 = {
@@ -1094,7 +1027,6 @@
 			name = "moc_DeviceEdit.cpp";
 			path = "moc/moc_DeviceEdit.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		C99A8FB6E40ADE861FF56DC2 = {
@@ -1110,7 +1042,6 @@
 			name = "qrc_i-score.cpp";
 			path = "qrc_i-score.cpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 			lastKnownFileType = "sourcecode.cpp.cpp";
 		};
 		7F3E602466E431ABBC2C3ACC = {
@@ -1126,294 +1057,252 @@
 			name = "Abstract.hpp";
 			path = "headers/data/Abstract.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		66AFF5D844E27A8788B8F930 = {
 			isa = PBXFileReference;
 			name = "AbstractBox.hpp";
 			path = "headers/data/AbstractBox.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		69CAECF919B49FD9683E5012 = {
 			isa = PBXFileReference;
 			name = "AbstractComment.hpp";
 			path = "headers/data/AbstractComment.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		6FFE2040EFA39EFB9A3A1E4D = {
 			isa = PBXFileReference;
 			name = "AbstractCurve.hpp";
 			path = "headers/data/AbstractCurve.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		27377E12EBCA386724DEC777 = {
 			isa = PBXFileReference;
 			name = "AbstractRelation.hpp";
 			path = "headers/data/AbstractRelation.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		FACC8238706C7F66D46EC48D = {
 			isa = PBXFileReference;
 			name = "AbstractParentBox.hpp";
 			path = "headers/data/AbstractParentBox.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		FBC80C9D8E7F29871F8BDDFB = {
 			isa = PBXFileReference;
 			name = "AbstractTriggerPoint.hpp";
 			path = "headers/data/AbstractTriggerPoint.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		DD87560EF807D48E17C297B1 = {
 			isa = PBXFileReference;
 			name = "Maquette.hpp";
 			path = "headers/data/Maquette.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		695B25E4D39509F24823E94E = {
 			isa = PBXFileReference;
 			name = "AttributesEditor.hpp";
 			path = "headers/GUI/AttributesEditor.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		91007B0722107246640768A6 = {
 			isa = PBXFileReference;
 			name = "BasicBox.hpp";
 			path = "headers/GUI/BasicBox.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		D70A3841183280776D2DC5EE = {
 			isa = PBXFileReference;
 			name = "BoxContextMenu.hpp";
 			path = "headers/GUI/BoxContextMenu.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		51FFFD395F5ED42FC6951111 = {
 			isa = PBXFileReference;
 			name = "ChooseTemporalRelation.hpp";
 			path = "headers/GUI/ChooseTemporalRelation.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		3CECD1B4D797E7F4BFE990D4 = {
 			isa = PBXFileReference;
 			name = "Comment.hpp";
 			path = "headers/GUI/Comment.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		6ADF48CC68C5AE7340D81FD3 = {
 			isa = PBXFileReference;
 			name = "CurveWidget.hpp";
 			path = "headers/GUI/CurveWidget.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		6A8C10D91C857CC31DE5986C = {
 			isa = PBXFileReference;
 			name = "CurvesWidget.hpp";
 			path = "headers/GUI/CurvesWidget.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		3780E185D8E45221012CEE3E = {
 			isa = PBXFileReference;
 			name = "Help.hpp";
 			path = "headers/GUI/Help.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		4F5E950B032314F821337A11 = {
 			isa = PBXFileReference;
 			name = "Interpolation.hpp";
 			path = "headers/GUI/Interpolation.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		CB6752A54C05D609FE54F3F4 = {
 			isa = PBXFileReference;
 			name = "LogarithmicSlider.hpp";
 			path = "headers/GUI/LogarithmicSlider.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		E0A597281CD80E93820AE557 = {
 			isa = PBXFileReference;
 			name = "MainWindow.hpp";
 			path = "headers/GUI/MainWindow.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		F1765C17F82D8B4279461F6C = {
 			isa = PBXFileReference;
 			name = "MaquetteScene.hpp";
 			path = "headers/GUI/MaquetteScene.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		55146B2E4B46D4818102DA5A = {
 			isa = PBXFileReference;
 			name = "MaquetteView.hpp";
 			path = "headers/GUI/MaquetteView.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		EBD03158EEBE99F2A3EC2466 = {
 			isa = PBXFileReference;
 			name = "NetworkConfig.hpp";
 			path = "headers/GUI/NetworkConfig.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		3858315F44376136BCD7A507 = {
 			isa = PBXFileReference;
 			name = "NetworkMessagesEditor.hpp";
 			path = "headers/GUI/NetworkMessagesEditor.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		668921F82335B2400B348370 = {
 			isa = PBXFileReference;
 			name = "NetworkTree.hpp";
 			path = "headers/GUI/NetworkTree.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		0C372A58B867D81AF215D66E = {
 			isa = PBXFileReference;
 			name = "ParentBox.hpp";
 			path = "headers/GUI/ParentBox.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		3C2257FA1465F3636C3BF200 = {
 			isa = PBXFileReference;
 			name = "ParentBoxContextMenu.hpp";
 			path = "headers/GUI/ParentBoxContextMenu.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		B9F79965FCA4F22D54649415 = {
 			isa = PBXFileReference;
 			name = "PlayingThread.hpp";
 			path = "headers/GUI/PlayingThread.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		D6786CEAF9CE08CF86C44CB1 = {
 			isa = PBXFileReference;
 			name = "Relation.hpp";
 			path = "headers/GUI/Relation.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		421832B91FA122C94DC60411 = {
 			isa = PBXFileReference;
 			name = "RelationEdit.hpp";
 			path = "headers/GUI/RelationEdit.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		723E42D189360A35130DF051 = {
 			isa = PBXFileReference;
 			name = "TextEdit.hpp";
 			path = "headers/GUI/TextEdit.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		19AFA86EF0EB67999E529D3B = {
 			isa = PBXFileReference;
 			name = "TriggerPoint.hpp";
 			path = "headers/GUI/TriggerPoint.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		A8FE477248686FE84C0AF1F3 = {
 			isa = PBXFileReference;
 			name = "TreeMap.hpp";
 			path = "headers/GUI/TreeMap.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		D6140660692472396459E6D4 = {
 			isa = PBXFileReference;
 			name = "TreeMapElement.hpp";
 			path = "headers/GUI/TreeMapElement.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		504A6F74BDF1390DE5F455D9 = {
 			isa = PBXFileReference;
 			name = "ViewRelations.hpp";
 			path = "headers/GUI/ViewRelations.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		66DC50BB2C34C1B811EBEFA4 = {
 			isa = PBXFileReference;
 			name = "NetworkMessages.hpp";
 			path = "headers/data/NetworkMessages.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		7D9FFD201504D7783386B2D5 = {
 			isa = PBXFileReference;
 			name = "BoxWidget.hpp";
 			path = "headers/GUI/BoxWidget.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		F46982B2688387B52E8ED692 = {
 			isa = PBXFileReference;
 			name = "BoxCurveEdit.hpp";
 			path = "headers/GUI/BoxCurveEdit.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		FB5D4873C9FF5F7BB38886E5 = {
 			isa = PBXFileReference;
 			name = "MaquetteWidget.hpp";
 			path = "headers/GUI/MaquetteWidget.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		A9EE3D73828716AB26E22349 = {
 			isa = PBXFileReference;
 			name = "TimeBarWidget.hpp";
 			path = "headers/GUI/TimeBarWidget.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		6A526CA82AF2E47E10846DB7 = {
 			isa = PBXFileReference;
 			name = "DeviceEdit.hpp";
 			path = "headers/GUI/DeviceEdit.hpp";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		71078BD4296B16D83E12B053 = {
 			isa = PBXFileReference;
 			name = "i-score.pro";
 			path = "i-score.pro";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		673E735F6D7DE0D77632778E = {
 			isa = PBXFileReference;
 			name = "i-score.qrc";
 			path = "i-score.qrc";
 			refType = 4;
-			sourceTree = "SOURCE_ROOT";
 		};
 		2A2FA5B7C6BAE231754E9ECF = {
 			fileRef = "673E735F6D7DE0D77632778E";
@@ -1429,7 +1318,6 @@
 				"D7E9DF150259911C06EDD9FD");
 			name = "Headers";
 			refType = 4;
-			sourceTree = "<Group>";
 		};
 		D7E9DF150259911C06EDD9FD = {
 			isa = PBXGroup;
@@ -1438,7 +1326,6 @@
 				"C5B4224BC5870EDE4DB64142");
 			name = "headers";
 			refType = 4;
-			sourceTree = "<Group>";
 		};
 		C5B4224BC5870EDE4DB64142 = {
 			isa = PBXGroup;
@@ -1476,7 +1363,6 @@
 				"6A526CA82AF2E47E10846DB7");
 			name = "GUI";
 			refType = 4;
-			sourceTree = "<Group>";
 		};
 		80D8EDCDD7389A58F6532691 = {
 			isa = PBXGroup;
@@ -1492,7 +1378,6 @@
 				"66DC50BB2C34C1B811EBEFA4");
 			name = "data";
 			refType = 4;
-			sourceTree = "<Group>";
 		};
 		1DDD228647F922E13FD1C581 = {
 			isa = PBXGroup;
@@ -1500,7 +1385,6 @@
 				"B95006AEFE6773908F66D1C6");
 			name = "images";
 			refType = 4;
-			sourceTree = "<Group>";
 		};
 		06674E1DE8D3EB6E763DFFDA = {
 			isa = PBXGroup;
@@ -1510,7 +1394,6 @@
 				"F6EF705DE99C97CBB1BED405");
 			name = "src";
 			refType = 4;
-			sourceTree = "<Group>";
 		};
 		F6EF705DE99C97CBB1BED405 = {
 			isa = PBXGroup;
@@ -1548,7 +1431,6 @@
 				"07D829721851FA908EE8737E");
 			name = "GUI";
 			refType = 4;
-			sourceTree = "<Group>";
 		};
 		B8CE95BC93CD239AC5022A7B = {
 			isa = PBXGroup;
@@ -1564,7 +1446,6 @@
 				"0F2BEE9DD5E102CACDE8B42D");
 			name = "data";
 			refType = 4;
-			sourceTree = "<Group>";
 		};
 		198F590C93BDB8DF52CC1017 = {
 			isa = PBXGroup;
@@ -1597,7 +1478,6 @@
 				"65CACA49A290408AE9AB82F6");
 			name = "moc";
 			refType = 4;
-			sourceTree = "<Group>";
 		};
 		FB61758D0F0FDA4BA867C3D5 = {
 			isa = PBXGroup;
@@ -1606,7 +1486,6 @@
 				"1DDD228647F922E13FD1C581");
 			name = "Sources";
 			refType = 4;
-			sourceTree = "<Group>";
 		};
 		52C235EBF1C9B07808119459 = {
 			isa = PBXGroup;
@@ -1614,7 +1493,6 @@
 				"673E735F6D7DE0D77632778E");
 			name = "Sources [RCC]";
 			refType = 4;
-			sourceTree = "<Group>";
 		};
 		7CABE3C80E79AD2B307756D2 = {
 			isa = PBXGroup;
@@ -1622,7 +1500,6 @@
 				"71078BD4296B16D83E12B053");
 			name = "Sources [qmake]";
 			refType = 4;
-			sourceTree = "<Group>";
 		};
 		46E892BBB6BB6952967E0561 = {
 			isa = PBXGroup;
@@ -1631,7 +1508,6 @@
 				"5A224ABC9D6D75C7D981C029");
 			name = "Temporary Sources";
 			refType = 4;
-			sourceTree = "<Group>";
 		};
 		A0A52A2ADF7A1E2A99738674 = {
 			buildActionMask = 2147483647;
@@ -1778,7 +1654,7 @@
 				"C99A8FB6E40ADE861FF56DC2",
 				"7F3E602466E431ABBC2C3ACC");
 			shellPath = "/bin/sh";
-			shellScript = "make\ -C\ /Users/nicolashincker/Documents/workspace/i-score/dev/i-score\ -f\ \'i-score.xcodeproj/qt_preprocess.mak\'";
+			shellScript = "make\ -C\ /Users/margothincker/Documents/NicoinPerso/workspace/i-score\ -f\ \'i-score.xcodeproj/qt_preprocess.mak\'";
 		};
 		C29B8785722055ED95EF7B57 = {
 			buildActionMask = 2147483647;
@@ -1859,7 +1735,6 @@
 			name = "QtSvg.framework";
 			path = "/Library/Frameworks/QtSvg.framework";
 			refType = 0;
-			sourceTree = "<absolute>";
 		};
 		08D8EC4D0C273BC5E194E43D = {
 			fileRef = "2D7FF9EBB69BCF2C19DC629B";
@@ -1872,7 +1747,6 @@
 			name = "QtGui.framework";
 			path = "/Library/Frameworks/QtGui.framework";
 			refType = 0;
-			sourceTree = "<absolute>";
 		};
 		501667F26B3C1FF6767A7C12 = {
 			fileRef = "9B36DA7E32F0304E780E7972";
@@ -1885,7 +1759,6 @@
 			name = "QtCore.framework";
 			path = "/Library/Frameworks/QtCore.framework";
 			refType = 0;
-			sourceTree = "<absolute>";
 		};
 		069D05B0128AE5DC7EE31738 = {
 			fileRef = "7BC2E65A5E699A5E5D834CA2";
@@ -1898,7 +1771,6 @@
 			name = "QtXml.framework";
 			path = "/Library/Frameworks/QtXml.framework";
 			refType = 0;
-			sourceTree = "<absolute>";
 		};
 		C2643FEB592DBFD1429BE4E1 = {
 			fileRef = "8EE92F8FA333C9E415C5B34E";
@@ -1911,7 +1783,6 @@
 			name = "QtNetwork.framework";
 			path = "/Library/Frameworks/QtNetwork.framework";
 			refType = 0;
-			sourceTree = "<absolute>";
 		};
 		3826A0833FCB54E86728C6EF = {
 			fileRef = "B6B9970B86A6C219B0869FE9";
@@ -1930,7 +1801,6 @@
 			name = "External Frameworks and Libraries";
 			path = "";
 			refType = 4;
-			sourceTree = "<Group>";
 		};
 		2A1043669E6E5A7426EA502A = {
 			buildActionMask = 2147483647;
@@ -1963,9 +1833,8 @@
 			name = "i-score";
 			path = "";
 			refType = 4;
-			sourceTree = "<Group>";
 		};
-		688826FA851EFB39F1587797 = {
+		265F24A539E11AB2DEE90434 = {
 			isa = PBXFileReference;
 			explicitFileType = "wrapper.application";
 			path = "i-score.app";
@@ -1974,12 +1843,12 @@
 		};
 		068F80C7519D0528FB08E821 = {
 			children = (
-				"688826FA851EFB39F1587797");
+				"265F24A539E11AB2DEE90434");
 			isa = PBXGroup;
 			name = "Products";
 			refType = 4;
 		};
-		FACD20F0B360FE7261F04F7A = {
+		4F23E59D4232DAFD21D80A55 = {
 			buildPhases = (
 				"D7BA7D76DAB5DD13389D6332",
 				"A0A52A2ADF7A1E2A99738674",
@@ -1996,7 +1865,7 @@
 				WARNING_CFLAGS = "";
 				PREBINDING = NO;
 				INFOPLIST_FILE = "Info.plist";
-				BUILD_ROOT = "/Users/nicolashincker/Documents/workspace/i-score/dev/i-score";
+				BUILD_ROOT = "/Users/margothincker/Documents/NicoinPerso/workspace/i-score";
 				OTHER_LDFLAGS = (
 						"-headerpad_max_install_names",
 						"-L/usr/local/lib/",
@@ -2004,7 +1873,7 @@
 						"-F/Library/Frameworks");
 				DYLIB_CURRENT_VERSION = "1.0.0";
 				DYLIB_COMPATIBILITY_VERSION = "1.0";
-				MACOSX_DEPLOYMENT_TARGET = "10.8.3";
+				MACOSX_DEPLOYMENT_TARGET = "10.7";
 				OBJROOT = "bin/";
 				PRODUCT_NAME = "i-score";
 			};
@@ -2012,7 +1881,7 @@
 			};
 			dependencies = (
 				);
-			productReference = "688826FA851EFB39F1587797";
+			productReference = "265F24A539E11AB2DEE90434";
 			shouldUseHeadermap = 1;
 			buildConfigurationList = 17B3380A4D6A7D415E7F2E1E;
 			isa = PBXNativeTarget;
@@ -2021,13 +1890,11 @@
 <!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">
 <plist version=\"0.9\">
 <dict>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
 	<key>CFBundleIconFile</key>
 	<string>acousmoscribe.icns</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
- 	<key>CFBundleGetInfoString</key>
+    <key>CFBundleGetInfoString</key>
 	<string>Created by Qt/QMake</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
@@ -2253,7 +2120,7 @@
 			buildConfigurationList = "CC82A9286117DFED018F418F";
 			projectDirPath = "";
 			targets = (
-				"FACD20F0B360FE7261F04F7A");
+				"4F23E59D4232DAFD21D80A55");
 		};
 	};
 	rootObject = "91B15E841AA80083484172DE";
