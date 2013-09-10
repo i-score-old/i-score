@@ -222,7 +222,7 @@ class MaquetteScene : public QGraphicsScene
      *
      * \return the triggersQueueList.
      */
-    inline QList<TriggerPoint *> triggersQueueList(){ return _triggersQueueList; }
+    inline QList<TriggerPoint *> *triggersQueueList(){ return _triggersQueueList; }
 
     /*!
      * \brief Adds a trigger to the queue list.
@@ -574,6 +574,9 @@ class MaquetteScene : public QGraphicsScene
     inline NetworkTree *
     networkTreeAssociated(){ return _networkTreeAssociated; }
 
+    float getMaxSceneWidth();
+    void setMaxSceneWidth(float maxSceneWidth);
+
   protected:
     /*!
      * \brief Redifinition of QGraphicsScene::drawItems().
@@ -744,6 +747,7 @@ class MaquetteScene : public QGraphicsScene
     MaquetteView *_view;               //!< The QGraphicsView related.
     AttributesEditor *_editor;         //!< The logical representation of the Editor.
     Maquette *_maquette;               //!< The logical representation of the Maquette.
+    float _maxSceneWidth;
 
     std::vector<Abstract*> _toCopy;    //!< Used to store items beeing copied.
     std::map<unsigned int, AbstractBox*> _boxesToCopy;
@@ -787,7 +791,7 @@ class MaquetteScene : public QGraphicsScene
     double _accelerationFactorSave;
     double _accelerationFactor;
 
-    QList<TriggerPoint *> _triggersQueueList; //Lists triggers waiting
+    QList<TriggerPoint *> *_triggersQueueList; //Lists triggers waiting
     NetworkTree *_networkTreeAssociated;
 };
 #endif

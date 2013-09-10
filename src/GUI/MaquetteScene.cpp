@@ -87,6 +87,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
   _playing = false;
   _paused = false;
   _modified = false;
+  _maxSceneWidth = 100000;
 
   _relation = new AbstractRelation; /// \todo pourquoi instancier une AbstractRelation ici ? (par jaime Chao)
   _playThread = new PlayingThread(this);
@@ -95,7 +96,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 
   _progressLine = new QGraphicsLineItem(QLineF(sceneRect().topLeft().x(), sceneRect().topLeft().y(), sceneRect().bottomLeft().x(), MAX_SCENE_HEIGHT));
 
-  addItem(_progressLine);
+  addItem(_progressLine);  
 }
 
 MaquetteScene::~MaquetteScene()
@@ -107,6 +108,7 @@ MaquetteScene::~MaquetteScene()
 void
 MaquetteScene::init()
 {
+  _triggersQueueList = new QList<TriggerPoint *>();
   _progressLine->setZValue(2);
   _timeBarProxy->setZValue(3);
   _timeBarProxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
@@ -151,8 +153,13 @@ MaquetteScene::updateProgressBar()
       invalidate();
     }
 }
+
 void
-MaquetteScene::zoomChanged(float value){
+MaquetteScene::zoomChanged(float value)
+{
+  setMaxSceneWidth(MaquetteScene::MAX_SCENE_WIDTH*value);
+
+  updateProgressBar();
   _timeBar->updateZoom(value);
 }
 
@@ -1074,7 +1081,7 @@ MaquetteScene::removeTriggerPoint(unsigned int trgID)
       if (box != NULL) {
           box->removeTriggerPoint(trgPnt->boxExtremity());
         }
-      _triggersQueueList.removeAll(trgPnt);
+      _triggersQueueList->removeAll(trgPnt);
 //      removeItem(trgPnt);
       _maquette->removeTriggerPoint(trgID);      
     }
@@ -1091,7 +1098,7 @@ MaquetteScene::trigger(TriggerPoint *triggerPoint)
 void
 MaquetteScene::triggerNext()
 {
-   TriggerPoint *triggerPoint = triggersQueueList().first();
+   TriggerPoint *triggerPoint = triggersQueueList()->first();
   _maquette->simulateTriggeringMessage(static_cast<AbstractTriggerPoint *>(triggerPoint->abstract())->message());
   removeFromTriggerQueue(triggerPoint);
   triggerPoint->setSelected(false);
@@ -1392,7 +1399,7 @@ MaquetteScene::boxResized()
   coord.topLeftX = resizeBox->relativeBeginPos();
   coord.topLeftY = resizeBox->getTopLeft().y();
   coord.sizeX = std::max((float)10., resizeBox->width());
-//  std::cout<<"boxResized "<<resizeBox->ID()<<" : "<<coord.sizeX*MS_PER_PIXEL<<std::endl;
+
   coord.sizeY = std::max((float)10., resizeBox->height());
   if (_maquette->updateBox(resizeBox->ID(), coord)) {
       update();
@@ -1647,7 +1654,7 @@ MaquetteScene::stopGotoStart()
 void
 MaquetteScene::removeFromTriggerQueue(TriggerPoint *trigger)
 {
-  _triggersQueueList.removeAll(trigger);
+  _triggersQueueList->removeAll(trigger);
 }
 
 void
@@ -1728,17 +1735,17 @@ MaquetteScene::updateBoxesWidgets()
 void
 MaquetteScene::addToTriggerQueue(TriggerPoint *trigger)
 {
-  if (!_triggersQueueList.contains(trigger)) {
+  if (!_triggersQueueList->contains(trigger)) {
       int i;
       qreal trgPosition = trigger->pos().x();
 
-      for (i = 0; i < _triggersQueueList.size(); i++) {
-          qreal itPosition = _triggersQueueList.at(i)->pos().x();
+      for (i = 0; i < _triggersQueueList->size(); i++) {
+          qreal itPosition = _triggersQueueList->at(i)->pos().x();
           if (trgPosition <= itPosition) {
               break;
             }
         }
-      _triggersQueueList.insert(i, trigger);
+      _triggersQueueList->insert(i, trigger);
     }
 }
 
@@ -1747,4 +1754,14 @@ MaquetteScene::verticalScroll(int value)
 {
   _timeBar->move(0, value);
   _view->repaint();
+}
+
+void
+MaquetteScene::setMaxSceneWidth(float maxSceneWidth){
+  _maxSceneWidth = maxSceneWidth;
+}
+
+float
+MaquetteScene::getMaxSceneWidth(){
+  return _maxSceneWidth;
 }
