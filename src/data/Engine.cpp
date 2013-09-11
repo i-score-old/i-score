@@ -1815,7 +1815,7 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
 int Engine::requestNetworkNamespace(const std::string & address, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)
 {
     TTAddress           anAddress = toTTAddress(address);
-    TTSymbol            type;
+    TTSymbol            type, service;
     TTNodeDirectoryPtr  aDirectory;
     TTNodePtr           aNode, childNode;
     TTMirrorPtr         aMirror;
@@ -1846,18 +1846,24 @@ int Engine::requestNetworkNamespace(const std::string & address, vector<string>&
                 
                 // get the value attribute
                 aMirror->getAttributeValue(TTSymbol("service"), v);
+                service = v[0];
+                
                 v.toString();
                 s = TTString(v[0]);
                 attributsValue.push_back(s.c_str());
                 
-                // append the value attribute
-                attributs.push_back("value");
+                // for parameter data : ask the value
+                if (service == kTTSym_parameter) {
                 
-                // get the value attribute
-                aMirror->getAttributeValue(TTSymbol("value"), v);
-                v.toString();
-                s = TTString(v[0]);
-                attributsValue.push_back(s.c_str());
+                    // append the value attribute
+                    attributs.push_back("value");
+                
+                    // get the value attribute
+                    aMirror->getAttributeValue(TTSymbol("value"), v);
+                    v.toString();
+                    s = TTString(v[0]);
+                    attributsValue.push_back(s.c_str());
+                }
             }
         }
         
