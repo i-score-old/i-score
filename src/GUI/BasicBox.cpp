@@ -578,13 +578,7 @@ BasicBox::resizeWidthEdition(float width)
             }
         }
     }
-
-  //Displays a ToolTip with box duration.
-  float duration = this->duration()/1000.;
-  QPoint position = _scene->views().first()->parentWidget()->pos();
-  QToolTip *boxDurationToolTip;
-  boxDurationToolTip->showText(QPoint(_abstract->topLeft().x()+position.x()+boundingRect().width()-30,_abstract->topLeft().y()+position.y()+boundingRect().height()-20),QString("%1").arg(duration));
-
+  displayToolTip();
   _abstract->setWidth(newWidth);
 
   centerWidget();
@@ -1427,7 +1421,7 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             resizeHeightEdition(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y());
             break;
 
-          case DIAGONAL_RESIZE:
+          case DIAGONAL_RESIZE:          
             resizeAllEdition(_abstract->width() + event->pos().x() - _boxRect.topRight().x(),
                              _abstract->height() + event->pos().y() - _boxRect.bottomRight().y());
             break;
@@ -1478,6 +1472,8 @@ BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 
   QRectF vertResize_bottom(_boxRect.bottomLeft() + QPointF(0, -RESIZE_ZONE_WIDTH), _boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, 0));
   QRectF diagResize_bottomRight(_boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, RESIZE_ZONE_WIDTH), _boxRect.bottomRight());
+//todo : horizontalResize_right
+
 
   //bandeau zone (text rect) - top
   if (textRect.contains(event->pos())) {
@@ -1512,6 +1508,7 @@ BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
   //Diag resize zone - Bottom right
   else if (diagResize_bottomRight.contains(event->pos())) {
       setCursor(Qt::SizeFDiagCursor);
+      displayToolTip();
     }
 
   else {
@@ -1578,6 +1575,7 @@ BasicBox::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 
   //Diag resize zone - Bottom right
   else if (diagResize_bottomRight.contains(event->pos())) {
+      displayToolTip();
       setCursor(Qt::SizeFDiagCursor);      
     }
 
@@ -1588,7 +1586,7 @@ BasicBox::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 
 void
 BasicBox::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
-{
+{ 
   QGraphicsItem::hoverLeaveEvent(event);
   setCursor(Qt::ArrowCursor);
   _hover = false;
@@ -1772,8 +1770,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
   Q_UNUSED(widget);
 
 //    QPen penR(Qt::lightGray,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
-  QPen penR(isSelected() ? _color : _colorUnselected, isSelected() ? 1.5 * LINE_WIDTH : LINE_WIDTH);
-
+  QPen penR(isSelected() ? _color : _colorUnselected, isSelected() ? 1.5 * LINE_WIDTH : LINE_WIDTH); 
 
   //************* pour afficher la shape *************
   QPen penG(Qt::blue);
@@ -1885,4 +1882,14 @@ BasicBox::displayCurveEditWindow()
   editWindow->setLayout(layout);
   editWindow->setGeometry(QRect(_scene->sceneRect().toRect()));
   editWindow->show();
+}
+
+void
+BasicBox::displayToolTip(){
+
+    //Displays a ToolTip with box duration.
+    float duration = this->duration()/1000.;
+    QPoint position = _scene->views().first()->parentWidget()->pos();
+    QToolTip *boxDurationToolTip;
+    boxDurationToolTip->showText(QPoint(_abstract->topLeft().x()+position.x()+boundingRect().width()-30,_abstract->topLeft().y()+position.y()+boundingRect().height()-20),QString("%1").arg(duration));
 }

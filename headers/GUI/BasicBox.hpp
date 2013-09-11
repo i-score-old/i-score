@@ -786,7 +786,10 @@ class BasicBox : public QObject, public QGraphicsItem
      * Occurs when a modification is done to the box.
      */
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value);
-
+    /*!
+     * \brief Display a toolTip near the bottomRight point, showing the current duration of the box.
+     */
+    void displayToolTip();
 
     //! Managing main information of the box.
     AbstractBox *_abstract;
