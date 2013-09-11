@@ -573,12 +573,20 @@ BasicBox::resizeWidthEdition(float width)
       if (motherBox != NULL) {
           if ((motherBox->getBottomRight().x() - width) <= _abstract->topLeft().x()) {
               if (_scene->resizeMode() == HORIZONTAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE) {   // Trying to escape by a resize to the right
-                  newWidth = motherBox->getBottomRight().x() - _abstract->topLeft().x();
+                  newWidth = motherBox->getBottomRight().x() - _abstract->topLeft().x();                  
                 }
             }
         }
     }
+  float duration = this->duration()/1000.;
+  QPoint position = _scene->views().first()->parentWidget()->pos();
+
+  //Displays a ToolTip with box duration.
+  QToolTip *boxDurationToolTip;
+  boxDurationToolTip->showText(QPoint(_abstract->topLeft().x()+position.x()+boundingRect().width()-30,_abstract->topLeft().y()+position.y()+boundingRect().height()-20),QString("%1").arg(duration));
+
   _abstract->setWidth(newWidth);
+
   centerWidget();
 }
 
@@ -1400,9 +1408,8 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
   QGraphicsItem::mouseMoveEvent(event);
 
   // Draw cursor coordinates as a tooltip
-//    CurveWidget *curve = (static_cast<CurveWidget *>(_boxContentWidget->_stackedLayout->currentWidget()));
+//    CurveWidget *curve = (static_cast<CurveWidget *>(_boxContentWidget->stackedLayout()->currentWidget()));
 //    QPointF mousePos = curve->relativeCoordinates(event->pos());
-//    QRect rect;
 //    QString posStr = QString("%1 ; %2").arg(mousePos.x(),0,'f',2).arg(mousePos.y(),0,'f',2);
 //    QPoint pos = this->getBottomRight().toPoint();
 //    QToolTip::showText(pos, posStr);
@@ -1413,7 +1420,7 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
   else if (_scene->resizeMode() != NO_RESIZE && (cursor().shape() == Qt::SizeVerCursor || cursor().shape() == Qt::SizeHorCursor || cursor().shape() == Qt::SizeFDiagCursor)) {
       switch (_scene->resizeMode()) {
           case HORIZONTAL_RESIZE:
-            resizeWidthEdition(_abstract->width() + event->pos().x() - _boxRect.topRight().x());
+            resizeWidthEdition(_abstract->width() + event->pos().x() - _boxRect.topRight().x());            
             break;
 
           case VERTICAL_RESIZE:
@@ -1571,7 +1578,7 @@ BasicBox::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 
   //Diag resize zone - Bottom right
   else if (diagResize_bottomRight.contains(event->pos())) {
-      setCursor(Qt::SizeFDiagCursor);
+      setCursor(Qt::SizeFDiagCursor);      
     }
 
   else {
