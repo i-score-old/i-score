@@ -578,10 +578,10 @@ BasicBox::resizeWidthEdition(float width)
             }
         }
     }
-  float duration = this->duration()/1000.;
-  QPoint position = _scene->views().first()->parentWidget()->pos();
 
   //Displays a ToolTip with box duration.
+  float duration = this->duration()/1000.;
+  QPoint position = _scene->views().first()->parentWidget()->pos();
   QToolTip *boxDurationToolTip;
   boxDurationToolTip->showText(QPoint(_abstract->topLeft().x()+position.x()+boundingRect().width()-30,_abstract->topLeft().y()+position.y()+boundingRect().height()-20),QString("%1").arg(duration));
 
