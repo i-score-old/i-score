@@ -1841,7 +1841,16 @@ int Engine::requestNetworkNamespace(const std::string & address, vector<string>&
             
             if (type == TTSymbol("Data")) {
                 
-                // append an unique value attribute
+                // append a service attribute
+                attributs.push_back("service");
+                
+                // get the value attribute
+                aMirror->getAttributeValue(TTSymbol("service"), v);
+                v.toString();
+                s = TTString(v[0]);
+                attributsValue.push_back(s.c_str());
+                
+                // append the value attribute
                 attributs.push_back("value");
                 
                 // get the value attribute
@@ -1895,28 +1904,30 @@ int Engine::requestNetworkNamespace(const std::string & address, vector<string>&
 
 void Engine::store(std::string fileName)
 {
-    TTValue none;
+    TTValue v, none;
     
     // Create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
-   
-    // Pass the main scenario object
-    TTValue v = m_mainScenario;
+    
+    // Pass the application manager and the main scenario object
+    v = TTObjectBasePtr(TTModularApplications);
+    v.append(m_mainScenario);
     aXmlHandler.set(kTTSym_object, v);
-
+    
     // Write
     aXmlHandler.send(kTTSym_Write, TTSymbol(fileName), none);
 }
 
 void Engine::load(std::string fileName)
 {
-    TTValue none;
+    TTValue v, none;
     
     // Create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
     
-    // Pass the main scenario object
-    TTValue v = m_mainScenario;
+    // Pass the application manager and the main scenario object
+    v = TTObjectBasePtr(TTModularApplications);
+    v.append(m_mainScenario);
     aXmlHandler.set(kTTSym_object, v);
     
     // Read
