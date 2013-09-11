@@ -43,23 +43,12 @@
 #include <string>
 using std::string;
 
-//AbstractBox::AbstractBox(const QPointF &newTopLeft, const float &newWidth, const float &newHeight,
-//                         const string &newName, const QColor &newColor, unsigned int newID, unsigned int motherID) :
-//  _topLeft(newTopLeft), _width(newWidth), _height(newHeight), _name(newName), _color(newColor),
-//  _ID(newID), _motherID(motherID)
-//{
-//  _startMessages = new NetworkMessages;
-//  _endMessages = new NetworkMessages;
-//}
-
 AbstractBox::AbstractBox(const QPointF &newTopLeft, const float &newWidth, const float &newHeight,
                          const string &newName, const QColor &newColor, unsigned int newID, unsigned int motherID,
                          NetworkMessages *startMessages, NetworkMessages *endMessages) :
   _topLeft(newTopLeft), _width(newWidth), _height(newHeight), _name(newName), _color(newColor),
   _ID(newID), _motherID(motherID), _startMessages(startMessages),_endMessages(endMessages)
 {
-//  std::cout<<"Begin "<<_topLeft.x()*16<<std::endl;
-//  std::cout<<"Width "<<newWidth*16<<std::endl;
 }
 
 AbstractBox::AbstractBox(const AbstractBox &other) :

@@ -58,10 +58,11 @@ TimeBarWidget::TimeBarWidget(QWidget *parent, MaquetteScene *scene)
   : QWidget(parent)
 {
   _scene = scene;
-  _rect = QRect(LEFT_MARGIN, 0, MaquetteScene::MAX_SCENE_WIDTH, TIME_BAR_HEIGHT);
+  _rect = QRect(LEFT_MARGIN, 0, _scene->getMaxSceneWidth(), TIME_BAR_HEIGHT);
   setGeometry(_rect);
   setFixedHeight(height());  
-  init();
+  init();    
+  setUpdatesEnabled(false);
 }
 
 void
@@ -91,13 +92,17 @@ TimeBarWidget::setZoomValue(float value)
 void
 TimeBarWidget::updateZoom(float newValue)
 {
+  std::cout<<"UDPATE ZOOM"<<std::endl;
   _zoom = newValue;
+  setUpdatesEnabled(true);
   update();
+  setUpdatesEnabled(false);
 }
 
 void
 TimeBarWidget::drawBackground(QPainter *painter, QRect rect)
 {
+
   Q_UNUSED(rect);
 
   painter->save();
@@ -110,8 +115,8 @@ TimeBarWidget::drawBackground(QPainter *painter, QRect rect)
   font->setPointSize(NUMBERS_POINT_SIZE);
   painter->setFont(*font);
 
-  float zoom = 16 / MaquetteScene::MS_PER_PIXEL;
-  float factor = ((float)1) / zoom;
+  float zoom = 16. / MaquetteScene::MS_PER_PIXEL;
+  float factor = ((float)1.) / zoom;
 
   for (float i = 0; i <= (WIDTH*MaquetteScene::MS_PER_PIXEL) / S_TO_MS; i += factor) {    // for each second
       i_PXL = i * S_TO_MS / MaquetteScene::MS_PER_PIXEL + LEFT_MARGIN;

@@ -334,10 +334,11 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
                 }
 
               else {
-                  if (_scene->triggersQueueList().first() == this) {
-                      drawFlag(painter, QColor("green"));
-                      this->setFocus();
-                    }
+                  if(!_scene->triggersQueueList()->isEmpty())
+                      if (_scene->triggersQueueList()->first() == this) {
+                          drawFlag(painter, QColor("green"));
+                          this->setFocus();
+                      }
                   else {
 //                      brush.setColor(QColor("orange"));
 //                      painter->setBrush(brush);
