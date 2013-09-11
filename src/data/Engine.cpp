@@ -1864,6 +1864,29 @@ int Engine::requestNetworkNamespace(const std::string & address, vector<string>&
                     s = TTString(v[0]);
                     attributsValue.push_back(s.c_str());
                 }
+                
+                // for any data : ask the range/bounds
+                // append the value attribute
+                attributs.push_back("rangeBounds");
+                
+                // get the value attribute
+                aMirror->getAttributeValue(TTSymbol("rangeBounds"), v);
+                v.toString();
+                s = TTString(v[0]);
+                attributsValue.push_back(s.c_str());
+            }
+            else if (type == TTSymbol("Container")) {
+                
+                // append a service attribute
+                attributs.push_back("service");
+                
+                // get the value attribute
+                aMirror->getAttributeValue(TTSymbol("service"), v);
+                service = v[0];
+                
+                v.toString();
+                s = TTString(v[0]);
+                attributsValue.push_back(s.c_str());
             }
         }
         
