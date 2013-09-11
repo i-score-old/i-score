@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		467C5CB017A178D000757DEE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = "<group>"; };
 		4699ECBD17160BF700E6526C /* Engine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Engine.h; sourceTree = "<group>"; };
 		4699ECBE17160C2D00E6526C /* Engine.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Engine.cpp; sourceTree = "<group>"; };
 		46B522F4170EB46200F6DF2A /* Abstract.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Abstract.hpp; sourceTree = "<group>"; };
@@ -95,6 +96,7 @@
 		46B522E7170EB42300F6DF2A = {
 			isa = PBXGroup;
 			children = (
+				467C5CB017A178D000757DEE /* main.cpp */,
 				46B522F2170EB46200F6DF2A /* headers */,
 				46B52326170EB47E00F6DF2A /* src */,
 			);
