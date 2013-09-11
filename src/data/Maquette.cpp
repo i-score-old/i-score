@@ -2103,8 +2103,8 @@ Maquette::updateTriggerPointActiveStatus(unsigned int trgID, bool active)
   TriggerPoint *trgPnt = getTriggerPoint(trgID);
 
   if (trgPnt != NULL) {
-      if (waiting) {
-          trgPnt->setWaiting(waiting);
+      if (active) {
+          trgPnt->setWaiting(active);
           if (_scene->triggersQueueList()->isEmpty()) {
               generateTriggerQueue();
             }
@@ -2112,7 +2112,7 @@ Maquette::updateTriggerPointActiveStatus(unsigned int trgID, bool active)
         }
 
       else {
-          trgPnt->setWaiting(waiting);
+          trgPnt->setWaiting(active);
           _scene->triggersQueueList()->removeAll(trgPnt);
           if (!_scene->triggersQueueList()->isEmpty()) {
               _scene->setFocusItem(_scene->triggersQueueList()->first(), Qt::OtherFocusReason);
