@@ -573,12 +573,14 @@ BasicBox::resizeWidthEdition(float width)
       if (motherBox != NULL) {
           if ((motherBox->getBottomRight().x() - width) <= _abstract->topLeft().x()) {
               if (_scene->resizeMode() == HORIZONTAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE) {   // Trying to escape by a resize to the right
-                  newWidth = motherBox->getBottomRight().x() - _abstract->topLeft().x();
+                  newWidth = motherBox->getBottomRight().x() - _abstract->topLeft().x();                  
                 }
             }
         }
     }
+  displayToolTip();
   _abstract->setWidth(newWidth);
+
   centerWidget();
 }
 
@@ -1400,9 +1402,8 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
   QGraphicsItem::mouseMoveEvent(event);
 
   // Draw cursor coordinates as a tooltip
-//    CurveWidget *curve = (static_cast<CurveWidget *>(_boxContentWidget->_stackedLayout->currentWidget()));
+//    CurveWidget *curve = (static_cast<CurveWidget *>(_boxContentWidget->stackedLayout()->currentWidget()));
 //    QPointF mousePos = curve->relativeCoordinates(event->pos());
-//    QRect rect;
 //    QString posStr = QString("%1 ; %2").arg(mousePos.x(),0,'f',2).arg(mousePos.y(),0,'f',2);
 //    QPoint pos = this->getBottomRight().toPoint();
 //    QToolTip::showText(pos, posStr);
@@ -1413,14 +1414,14 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
   else if (_scene->resizeMode() != NO_RESIZE && (cursor().shape() == Qt::SizeVerCursor || cursor().shape() == Qt::SizeHorCursor || cursor().shape() == Qt::SizeFDiagCursor)) {
       switch (_scene->resizeMode()) {
           case HORIZONTAL_RESIZE:
-            resizeWidthEdition(_abstract->width() + event->pos().x() - _boxRect.topRight().x());
+            resizeWidthEdition(_abstract->width() + event->pos().x() - _boxRect.topRight().x());            
             break;
 
           case VERTICAL_RESIZE:
             resizeHeightEdition(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y());
             break;
 
-          case DIAGONAL_RESIZE:
+          case DIAGONAL_RESIZE:          
             resizeAllEdition(_abstract->width() + event->pos().x() - _boxRect.topRight().x(),
                              _abstract->height() + event->pos().y() - _boxRect.bottomRight().y());
             break;
@@ -1471,6 +1472,8 @@ BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 
   QRectF vertResize_bottom(_boxRect.bottomLeft() + QPointF(0, -RESIZE_ZONE_WIDTH), _boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, 0));
   QRectF diagResize_bottomRight(_boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, RESIZE_ZONE_WIDTH), _boxRect.bottomRight());
+//todo : horizontalResize_right
+
 
   //bandeau zone (text rect) - top
   if (textRect.contains(event->pos())) {
@@ -1505,6 +1508,7 @@ BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
   //Diag resize zone - Bottom right
   else if (diagResize_bottomRight.contains(event->pos())) {
       setCursor(Qt::SizeFDiagCursor);
+      displayToolTip();
     }
 
   else {
@@ -1571,7 +1575,8 @@ BasicBox::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 
   //Diag resize zone - Bottom right
   else if (diagResize_bottomRight.contains(event->pos())) {
-      setCursor(Qt::SizeFDiagCursor);
+      displayToolTip();
+      setCursor(Qt::SizeFDiagCursor);      
     }
 
   else {
@@ -1581,7 +1586,7 @@ BasicBox::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 
 void
 BasicBox::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
-{
+{ 
   QGraphicsItem::hoverLeaveEvent(event);
   setCursor(Qt::ArrowCursor);
   _hover = false;
@@ -1765,8 +1770,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
   Q_UNUSED(widget);
 
 //    QPen penR(Qt::lightGray,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
-  QPen penR(isSelected() ? _color : _colorUnselected, isSelected() ? 1.5 * LINE_WIDTH : LINE_WIDTH);
-
+  QPen penR(isSelected() ? _color : _colorUnselected, isSelected() ? 1.5 * LINE_WIDTH : LINE_WIDTH); 
 
   //************* pour afficher la shape *************
   QPen penG(Qt::blue);
@@ -1787,7 +1791,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
   /************   Draw boxRect ************/
   painter->setPen(penR);
-  painter->setBrush(QBrush(Qt::white, Qt::Dense7Pattern));
+  painter->setBrush(QBrush(Qt::white, Qt::NoBrush));
   painter->drawRect(_boxRect);
 
   drawMsgsIndicators(painter);
@@ -1878,4 +1882,14 @@ BasicBox::displayCurveEditWindow()
   editWindow->setLayout(layout);
   editWindow->setGeometry(QRect(_scene->sceneRect().toRect()));
   editWindow->show();
+}
+
+void
+BasicBox::displayToolTip(){
+
+    //Displays a ToolTip with box duration.
+    float duration = this->duration()/1000.;
+    QPoint position = _scene->views().first()->parentWidget()->pos();
+    QToolTip *boxDurationToolTip;
+    boxDurationToolTip->showText(QPoint(_abstract->topLeft().x()+position.x()+boundingRect().width()-30,_abstract->topLeft().y()+position.y()+boundingRect().height()-20),QString("%1").arg(duration));
 }
