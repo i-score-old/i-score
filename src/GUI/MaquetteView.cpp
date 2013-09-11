@@ -122,7 +122,7 @@ MaquetteView::updateSceneWithoutCenterOn()
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
-  setSceneRect(0, 0, MaquetteScene::MAX_SCENE_WIDTH, MaquetteScene::MAX_SCENE_HEIGHT);
+  setSceneRect(0, 0, _scene->getMaxSceneWidth(), MaquetteScene::MAX_SCENE_HEIGHT);
 }
 
 void
@@ -133,14 +133,15 @@ MaquetteView::updateScene()
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
-  setSceneRect(0, 0, MaquetteScene::MAX_SCENE_WIDTH, MaquetteScene::MAX_SCENE_HEIGHT);
+  setSceneRect(0, 0, _scene->getMaxSceneWidth(), MaquetteScene::MAX_SCENE_HEIGHT);
 }
 
 void
 MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
 {
   QGraphicsView::drawBackground(painter, rect);
-  QPen pen(QColor(145, 145, 145));
+  QPen pen(QColor(160, 160, 160));
+  //was QPen pen(QColor(145, 145, 145));
 
   painter->setPen(pen);
 
@@ -179,7 +180,7 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
       painter->setPen(pen2);
 
       for (int i = 0; i <= MaquetteScene::MAX_SCENE_HEIGHT; i = i + 150) {
-          painter->drawLine(QPointF(0, i), QPointF(MaquetteScene::MAX_SCENE_WIDTH, i));
+          painter->drawLine(QPointF(0, i), QPointF(_scene->getMaxSceneWidth(), i));
         }
     }
 }
@@ -187,7 +188,7 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
 void
 MaquetteView::triggerShortcut(int shorcut)
 {
-  QList<TriggerPoint *>::iterator it = triggersQueueList().begin();
+  QList<TriggerPoint *>::iterator it = triggersQueueList()->begin();
   TriggerPoint *currentTrigger;
   int waitingTriggers;
 
@@ -211,10 +212,10 @@ MaquetteView::triggerShortcut(int shorcut)
         break;
     }
 
-  if (triggersQueueList().size() >= triggerNumero) {
+  if (triggersQueueList()->size() >= triggerNumero) {
       waitingTriggers = 0;
 
-      while (it != triggersQueueList().end() && waitingTriggers < triggerNumero) {
+      while (it != triggersQueueList()->end() && waitingTriggers < triggerNumero) {
           currentTrigger = *it;
           if (currentTrigger->isWaiting()) {
               waitingTriggers++;
@@ -290,7 +291,7 @@ MaquetteView::keyReleaseEvent(QKeyEvent *event)
   QGraphicsView::keyReleaseEvent(event);
 }
 
-QList<TriggerPoint *>
+QList<TriggerPoint *> *
 MaquetteView::triggersQueueList()
 {
   return _scene->triggersQueueList();
@@ -301,20 +302,24 @@ MaquetteView::triggersQueueList()
  */
 void
 MaquetteView::zoomIn()
-{
-  if (MaquetteScene::MS_PER_PIXEL > 0.125) {
-      MaquetteScene::MS_PER_PIXEL /= 2;
-      _zoom *= 2;
+{  
+  float newZoom = _zoom * 2.;
+  if(newZoom<=32){
+      if (MaquetteScene::MS_PER_PIXEL > 0.125) {
 
-      resetCachedContent();
-      _scene->update();
+          MaquetteScene::MS_PER_PIXEL /= 2.;
+          _zoom = newZoom;
 
-      Maquette::getInstance()->updateBoxesFromEngines();
+          resetCachedContent();
+          _scene->update();
 
-      QPointF newCenter(2 * getCenterCoordinates().x(), 2 * getCenterCoordinates().y());
-      centerOn(newCenter);
-      _scene->updateProgressBar();
-      _scene->zoomChanged(_zoom);
+          Maquette::getInstance()->updateBoxesFromEngines();
+
+          QPointF newCenter(2 * getCenterCoordinates().x(), 2 * getCenterCoordinates().y());
+          centerOn(newCenter);
+          _scene->zoomChanged(_zoom);
+          setSceneRect((QRectF(0,0,_scene->getMaxSceneWidth(),_scene->height())));
+        }
     }
 }
 
@@ -344,12 +349,12 @@ MaquetteView::setZoom(float value)
       if (MaquetteScene::MS_PER_PIXEL > 0.125) {
           int c = 0;
           while (value < 1) {
-              value *= 2;
+              value *= 2.;
               c++;
             }
           nb_zoom = c;
           for (int i = 0; i < nb_zoom; i++) {
-              MaquetteScene::MS_PER_PIXEL *= 2;
+              MaquetteScene::MS_PER_PIXEL *= 2.;
             }
         }
     }
@@ -369,7 +374,7 @@ MaquetteView::setZoom(float value)
 void
 MaquetteView::zoomOut()
 {
-  MaquetteScene::MS_PER_PIXEL *= 2;
+  MaquetteScene::MS_PER_PIXEL *= 2.;
 
   _zoom /= 2.;
   resetCachedContent();
@@ -380,4 +385,5 @@ MaquetteView::zoomOut()
   centerOn(newCenter);
   _scene->updateProgressBar();
   _scene->zoomChanged(_zoom);
+  setSceneRect((QRectF(0,0,_scene->getMaxSceneWidth(),_scene->height())));
 }

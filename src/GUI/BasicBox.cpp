@@ -1787,7 +1787,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
   /************   Draw boxRect ************/
   painter->setPen(penR);
-  painter->setBrush(QBrush(Qt::white, Qt::Dense7Pattern));
+  painter->setBrush(QBrush(Qt::white, Qt::NoBrush));
   painter->drawRect(_boxRect);
 
   drawMsgsIndicators(painter);

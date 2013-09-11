@@ -163,10 +163,10 @@ void
 AttributesEditor::addWidgetsToLayout()
 {
   static const unsigned int BOX_EXTREMITY_PRECISION = 3;
-  _boxStartValue->setRange(0., MaquetteScene::MAX_SCENE_WIDTH * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
+  _boxStartValue->setRange(0., _scene->getMaxSceneWidth() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
   _boxStartValue->setDecimals(BOX_EXTREMITY_PRECISION);
   _boxStartValue->setKeyboardTracking(false);
-  _boxLengthValue->setRange(0., MaquetteScene::MAX_SCENE_WIDTH * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
+  _boxLengthValue->setRange(0., _scene->getMaxSceneWidth() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
   _boxLengthValue->setDecimals(BOX_EXTREMITY_PRECISION);
   _boxLengthValue->setKeyboardTracking(false);
 
