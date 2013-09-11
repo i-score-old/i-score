@@ -1890,6 +1890,8 @@ int Engine::requestNetworkNamespace(const std::string & address, vector<string>&
                     nodes.push_back(s.c_str());
                     
             }
+            else
+                nodes.push_back(s.c_str());
         }
         
         return 1;
