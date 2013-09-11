@@ -1472,87 +1472,89 @@ Maquette::getNetworkHost()
 void
 Maquette::save(const string &fileName)
 {
-  _engines->store(fileName + ".simone");
-
-  QFile file(QString::fromStdString(fileName));
-
-  if (!file.open(QFile::WriteOnly | QFile::Text)) {
-      _scene->displayMessage(((QString("Cannot write file %1:\n%2.")).arg(QString::fromStdString(fileName)).
-                              arg(file.errorString())).toStdString(), WARNING_LEVEL);
-
-      //return false;
+  _engines->store(fileName);
+    
+    /* other stuff to write
+    
+    QFile file(QString::fromStdString(fileName));
+    
+    if (!file.open(QFile::WriteOnly | QFile::Text)) {
+        _scene->displayMessage(((QString("Cannot write file %1:\n%2.")).arg(QString::fromStdString(fileName)).
+                                arg(file.errorString())).toStdString(), WARNING_LEVEL);
+        
+        //return false;
     }
-
-  QDomImplementation impl = QDomDocument().implementation();
-
-  QString publicId = "i-score 2012";
-  QString systemId = "http://scrime.labri.fr";
-  QString typeId = "i-scoreSave";
-  _doc = new QDomDocument(impl.createDocumentType(typeId, publicId, systemId));
-
-  QDomElement root = _doc->createElement("GRAPHICS");
-  root.setAttribute("zoom", _scene->zoom());
-  root.setAttribute("centerX", _scene->view()->getCenterCoordinates().x());
-  root.setAttribute("centerY", _scene->view()->getCenterCoordinates().y());
-  _doc->appendChild(root);
-
-  QDomElement boxesNode = _doc->createElement("boxes");
-  root.appendChild(boxesNode);
-
-  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); ++it) {
-      saveBox(it->first);
+    
+    QDomImplementation impl = QDomDocument().implementation();
+    
+    QString publicId = "i-score 2012";
+    QString systemId = "http://scrime.labri.fr";
+    QString typeId = "i-scoreSave";
+    _doc = new QDomDocument(impl.createDocumentType(typeId, publicId, systemId));
+    
+    QDomElement root = _doc->createElement("GRAPHICS");
+    root.setAttribute("zoom", _scene->zoom());
+    root.setAttribute("centerX", _scene->view()->getCenterCoordinates().x());
+    root.setAttribute("centerY", _scene->view()->getCenterCoordinates().y());
+    _doc->appendChild(root);
+    
+    QDomElement boxesNode = _doc->createElement("boxes");
+    root.appendChild(boxesNode);
+    
+    for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); ++it) {
+        saveBox(it->first);
     }
-
-  //****************************  Devices ****************************
-  QDomElement devicesNode = _doc->createElement("Devices");
-  QDomElement deviceNode;
-
-  std::map<std::string, MyDevice>::iterator it;
-  string deviceName;
-  unsigned int networkPort;
-  string networkHost;
-  string plugin;
-  MyDevice curDevice;
-
-  for (it = _devices.begin(); it != _devices.end(); it++) {
-      curDevice = it->second;
-
-      deviceName = curDevice.name;
-      networkPort = curDevice.networkPort;
-      networkHost = curDevice.networkHost;
-      plugin = curDevice.plugin;
-
-      deviceNode = _doc->createElement("Device");
-      deviceNode.setAttribute("IP", QString::fromStdString(networkHost));
-      deviceNode.setAttribute("port", networkPort);
-      deviceNode.setAttribute("plugin", QString::fromStdString(plugin));
-      deviceNode.setAttribute("name", QString::fromStdString(deviceName));
-
-      devicesNode.appendChild(deviceNode);
+    
+    // Devices
+    QDomElement devicesNode = _doc->createElement("Devices");
+    QDomElement deviceNode;
+    
+    std::map<std::string, MyDevice>::iterator it;
+    string deviceName;
+    unsigned int networkPort;
+    string networkHost;
+    string plugin;
+    MyDevice curDevice;
+    
+    for (it = _devices.begin(); it != _devices.end(); it++) {
+        curDevice = it->second;
+        
+        deviceName = curDevice.name;
+        networkPort = curDevice.networkPort;
+        networkHost = curDevice.networkHost;
+        plugin = curDevice.plugin;
+        
+        deviceNode = _doc->createElement("Device");
+        deviceNode.setAttribute("IP", QString::fromStdString(networkHost));
+        deviceNode.setAttribute("port", networkPort);
+        deviceNode.setAttribute("plugin", QString::fromStdString(plugin));
+        deviceNode.setAttribute("name", QString::fromStdString(deviceName));
+        
+        devicesNode.appendChild(deviceNode);
     }
-
-  root.appendChild(devicesNode);
-
-  //OSC Messages
-  QList<QString> OSCMessages = _scene->editor()->networkTree()->getOSCMessages();
-
-  QDomElement OSCMessagesNode = _doc->createElement("OSCMessages");
-  QDomElement OSCMessageNode;
-
-  for (QList<QString>::iterator it = OSCMessages.begin(); it != OSCMessages.end(); it++) {
-      OSCMessageNode = _doc->createElement("OSC");
-      OSCMessageNode.setAttribute("message", *it);
-      OSCMessagesNode.appendChild(OSCMessageNode);
+    
+    root.appendChild(devicesNode);
+    
+    //OSC Messages
+    QList<QString> OSCMessages = _scene->editor()->networkTree()->getOSCMessages();
+    
+    QDomElement OSCMessagesNode = _doc->createElement("OSCMessages");
+    QDomElement OSCMessageNode;
+    
+    for (QList<QString>::iterator it = OSCMessages.begin(); it != OSCMessages.end(); it++) {
+        OSCMessageNode = _doc->createElement("OSC");
+        OSCMessageNode.setAttribute("message", *it);
+        OSCMessagesNode.appendChild(OSCMessageNode);
     }
-  root.appendChild(OSCMessagesNode);
-
-  //***************************************************************
-
-  QTextStream ts(&file);
-  ts << _doc->toString();
-  file.close();
-
-  delete _doc;
+    root.appendChild(OSCMessagesNode);
+    
+    QTextStream ts(&file);
+    ts << _doc->toString();
+    file.close();
+    
+    delete _doc;
+    
+    */
 }
 
 void
@@ -1783,45 +1785,13 @@ Maquette::loadOLD(const string &fileName)
 void
 Maquette::load(const string &fileName)
 {
-  _engines->load(fileName + ".simone");
+  _engines->load(fileName);
 
-  QFile enginesFile(QString::fromStdString(fileName + ".simone"));
+  /* other stuff to read
+   
   QFile file(QString::fromStdString(fileName));
 
   _doc = new QDomDocument;
-
-  if (enginesFile.open(QFile::ReadOnly)) {
-      if (!file.open(QFile::ReadOnly | QFile::Text)) {
-          _scene->displayMessage((tr("Cannot read file %1:\n%2.")
-                                  .arg(QString::fromStdString(fileName))
-                                  .arg(file.errorString())).toStdString(),
-                                 WARNING_LEVEL);
-          return;
-        }
-      else if (!_doc->setContent(&file)) {
-          _scene->displayMessage((tr("Cannot import xml document from %1:\n%2.")
-                                  .arg(QString::fromStdString(fileName))
-                                  .arg(file.errorString())).toStdString(),
-                                 WARNING_LEVEL);
-          file.close();
-          return;
-        }
-    }
-  else {
-      if (!file.open(QFile::ReadOnly | QFile::Text)) {
-          _scene->displayMessage((tr("Cannot read neither file %1 or %2 :\n%3.")
-                                  .arg(QString::fromStdString(fileName))
-                                  .arg(QString::fromStdString(fileName + ".simone"))
-                                  .arg(file.errorString())).toStdString(),
-                                 WARNING_LEVEL);
-        }
-      else {
-          _scene->displayMessage((tr("Cannot read file %1 :\n%2.")
-                                  .arg(QString::fromStdString(fileName + ".simone"))
-                                  .arg(file.errorString())).toStdString(),
-                                 WARNING_LEVEL);
-        }
-    }
 
   if (_doc->doctype().nodeName() != "i-scoreSave") {
       loadOLD(fileName);
@@ -1921,7 +1891,7 @@ Maquette::load(const string &fileName)
   _engines->getBoxesId(boxesID);
   vector<unsigned int>::iterator it;
 
-  /************************ TRIGGER ************************/
+  // TRIGGER
   vector<unsigned int> triggersID;
   _engines->getTriggersPointId(triggersID);
 
@@ -1971,7 +1941,7 @@ Maquette::load(const string &fileName)
         }
     }
 
-  /************************ RELATIONS ************************/
+  // RELATIONS
   vector<unsigned int> relationsID;
   _engines->getRelationsId(relationsID);
 
@@ -2020,7 +1990,7 @@ Maquette::load(const string &fileName)
     }
 
 
-  /************************ Devices ************************/
+  // Devices
   MyDevice OSCDevice;
   string OSCDevicePort;
 
@@ -2073,7 +2043,7 @@ Maquette::load(const string &fileName)
   //reload networkTree
   _scene->editor()->networkTree()->load();
 
-  /************************ OSC ************************/
+  // OSC
   if (root.childNodes().size() >= 2) {
       QDomElement OSC = root.childNodes().at(2).toElement();
 
@@ -2097,6 +2067,8 @@ Maquette::load(const string &fileName)
     }
 
   delete _doc;
+   
+   */
 }
 
 void
