@@ -105,6 +105,7 @@ NetworkTree::init()
 {
    setSelectionMode(QAbstractItemView:: MultiSelection);
 
+  _treeFilterActive = true;
   _deviceEdit = new DeviceEdit(topLevelWidget());
 
   _startMessages = new NetworkMessages;
@@ -602,12 +603,13 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                   curItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
                   curItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
                   
-                  if(leave_value == QString("return")){
+                  
+                  if(treeFilterActive() && leave_value == QString("return")){
                       curItem->setDisabled(true);
                           curItem->setToolTip(NAME_COLUMN, tr("Type return"));
                   }
                   else{
-                      if(leave_value == QString("message")){
+                      if(treeFilterActive() && leave_value == QString("message")){
                           curItem->setDisabled(true);
                           curItem->setToolTip(NAME_COLUMN, tr("Type message"));
                       }
