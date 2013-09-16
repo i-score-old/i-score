@@ -123,7 +123,11 @@ NetworkTree::init()
     "border-top-color: transparent;"
     "border-bottom-color: transparent;"
     "}"
-
+    
+    "QTreeView::item:disabled {"
+    "background: lightgray;"
+    "}"
+                
     "QTreeView::item:hover {"
     "background: qlineargradient(x1: -5, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);"
     "border: 1px solid #bfcde4;"
@@ -549,7 +553,8 @@ NetworkTree::hasStartEndMsg(QTreeWidgetItem *item)
 
 void
 NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
-{
+{    
+
   if (!curItem->isDisabled()) {
       vector<string> nodes, leaves, attributes, attributesValues;
       QString address = getAbsoluteAddress(curItem);
@@ -562,9 +567,13 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
           conflict = false;
           vector<string>::iterator it;
           vector<string>::iterator it2;
-          for (it = leaves.begin(); it != leaves.end(); ++it) {
+          for (it = leaves.begin(); it != leaves.end(); ++it) {              
               QStringList list;
               list << QString::fromStdString(*it);
+              
+              std::cout<<"-------------"<<std::endl;
+              std::cout<<"leave : "<<*it<<std::endl;
+
               QTreeWidgetItem *childItem = new QTreeWidgetItem(list, LeaveType);
               curItem->setCheckState(START_COLUMN, Qt::Unchecked);
               curItem->setCheckState(END_COLUMN, Qt::Unchecked);
@@ -576,22 +585,46 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
           for (it = attributes.begin(), it2 = attributesValues.begin(); it != attributes.end(), it2 != attributesValues.end(); ++it, ++it2) {
               QStringList list;
               list << QString::fromStdString(*it + " : " + *it2);
+
+              std::cout<<"attribute : "<<*it<<std::endl;
+
               list.clear();
 
               if (it2 == attributesValues.begin()) {
                   QString leave_value = QString::fromStdString(*it2);
+
+                  std::cout<<"attributeValue : "<<*it2<<std::endl;
+
                   QFont font;
                   font.setCapitalization(QFont::SmallCaps);
                   curItem->setText(VALUE_COLUMN, leave_value);
                   curItem->setFont(VALUE_COLUMN, font);
                   curItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
                   curItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
-                  curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
-                }
+                  
+                  if(leave_value == QString("return")){
+                      curItem->setDisabled(true);
+                          curItem->setToolTip(NAME_COLUMN, tr("Type return"));
+                  }
+                  else{
+                      if(leave_value == QString("message")){
+                          curItem->setDisabled(true);
+                          curItem->setToolTip(NAME_COLUMN, tr("Type message"));
+                      }
+                  
+                      else{
+                          curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
+                      }
+                  }
+              }
             }
           for (it = nodes.begin(); it != nodes.end(); ++it) {
               QStringList list;
               list << QString::fromStdString(*it);
+              
+              std::cout<<"-------------"<<std::endl;
+              std::cout<<"Node : "<<*it<<" "<<std::endl;
+
               QTreeWidgetItem *childItem = new QTreeWidgetItem(list, NodeNamespaceType);
               curItem->setCheckState(START_COLUMN, Qt::Unchecked);
               curItem->setCheckState(END_COLUMN, Qt::Unchecked);
@@ -1394,7 +1427,7 @@ void
 NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
 {
   Q_UNUSED(event);
-
+    if(!currentItem()->isDisabled()){
   if (currentItem()->type() == OSCNode) {
       editItem(currentItem(), currentColumn());
       if (currentColumn() == NAME_COLUMN) {
@@ -1437,6 +1470,7 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
           item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
           item->setSelected(true);
         }
+    }
     }
 }
 

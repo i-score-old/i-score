@@ -1855,7 +1855,7 @@ int Engine::requestNetworkNamespace(const std::string & address, vector<string>&
                 
                 // get the value attribute
                 aMirror->getAttributeValue(TTSymbol("value"), v);
-                v.toString();
+                v.toString();					
                 s = TTString(v[0]);
                 attributsValue.push_back(s.c_str());
             }
