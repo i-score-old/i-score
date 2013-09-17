@@ -1844,9 +1844,11 @@ int Engine::requestNetworkNamespace(const std::string & address, vector<string>&
                 // append a service attribute
                 attributs.push_back("service");
                 
-                // get the value attribute
-                aMirror->getAttributeValue(TTSymbol("service"), v);
-                service = v[0];
+                // get the value of the service attribute
+                if (!aMirror->getAttributeValue(TTSymbol("service"), v))
+                    service = v[0];
+                else
+                    service = TTSymbol("error");
                 
                 v.toString();
                 s = TTString(v[0]);
@@ -1865,12 +1867,13 @@ int Engine::requestNetworkNamespace(const std::string & address, vector<string>&
                     attributsValue.push_back(s.c_str());
                 }
                 
-                // for any data : ask the range/bounds
+                // for any data : ask the rangeBounds
                 // append the value attribute
                 attributs.push_back("rangeBounds");
                 
-                // get the value attribute
+                // get the value of the rangeBounds attribute
                 aMirror->getAttributeValue(TTSymbol("rangeBounds"), v);
+                    
                 v.toString();
                 s = TTString(v[0]);
                 attributsValue.push_back(s.c_str());
@@ -1880,9 +1883,11 @@ int Engine::requestNetworkNamespace(const std::string & address, vector<string>&
                 // append a service attribute
                 attributs.push_back("service");
                 
-                // get the value attribute
-                aMirror->getAttributeValue(TTSymbol("service"), v);
-                service = v[0];
+                // get the value of the service attribute
+                if (!aMirror->getAttributeValue(TTSymbol("service"), v))
+                    service = v[0];
+                else
+                    service = TTSymbol("error");
                 
                 v.toString();
                 s = TTString(v[0]);
