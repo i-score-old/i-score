@@ -111,7 +111,7 @@ NetworkConfig::NetworkConfig(MaquetteScene *scene, QWidget *parent)
       _pluginsComboBox->setCurrentIndex(found);
     }
   else {
-      QMessageBox::warning(this, "", tr("MinuitDevice plugin not found : default selected"));
+      //QMessageBox::warning(this, "", tr("MinuitDevice plugin not found : default selected"));
       _pluginsComboBox->setCurrentIndex(0);
     }
   _portOutputBox->setValue(minuitDevice.networkPort);
