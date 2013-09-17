@@ -180,7 +180,7 @@ class NetworkTree : public QTreeWidget
      * \return True if start and end messages are set.
      */
     bool hasStartEndMsg(QTreeWidgetItem *item);
-
+    
     /***********************************************************************
     *                       General display tools
     ***********************************************************************/
@@ -339,6 +339,8 @@ class NetworkTree : public QTreeWidget
     inline void
     removeAssignItem(QTreeWidgetItem* item){ _assignedItems.remove(item); }
 
+    inline bool
+    treeFilterActive(){return _treeFilterActive;}
     /*!
      * \brief Reset the display of assigned items (leaves) and clear the assigned items list.
      */
@@ -495,6 +497,7 @@ class NetworkTree : public QTreeWidget
     QMap<QTreeWidgetItem *, QString> _OSCMessages;
 
     int _OSCMessageCount;
+    bool _treeFilterActive;
 
     DeviceEdit *_deviceEdit;
 
