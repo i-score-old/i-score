@@ -380,11 +380,12 @@ class NetworkTree : public QTreeWidget
 
     static int NAME_COLUMN;
     static int VALUE_COLUMN;
-    static int START_COLUMN;
+    static int START_COLUMN;	
     static int END_COLUMN;
     static int INTERPOLATION_COLUMN;
     static int REDUNDANCY_COLUMN;
     static int SR_COLUMN;
+    static int TYPE_COLUMN;
     static QString OSC_ADD_NODE_TEXT;
     static unsigned int TEXT_POINT_SIZE;
 
