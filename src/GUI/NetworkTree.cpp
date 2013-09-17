@@ -57,6 +57,8 @@ int NetworkTree::END_COLUMN = 4;
 int NetworkTree::INTERPOLATION_COLUMN = 3;
 int NetworkTree::REDUNDANCY_COLUMN = 5;
 int NetworkTree::SR_COLUMN = 6;
+int NetworkTree::TYPE_COLUMN = 7;
+
 QString NetworkTree::OSC_ADD_NODE_TEXT = QString("Add a node");
 
 unsigned int NetworkTree::TEXT_POINT_SIZE = 10;
@@ -66,7 +68,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   init();
   setColumnCount(7);
   QStringList list;
-  list << "Address" << "Value" << "Start" << " ~ " << "End" << " = " << " % ";
+  list << "Address" << "Value" << "Start" << " ~ " << "End" << " = " << " % "<<" type ";
   setColumnWidth(NAME_COLUMN, 130);
   setColumnWidth(VALUE_COLUMN, 65);
   setColumnWidth(START_COLUMN, 65);
@@ -74,6 +76,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   setColumnWidth(INTERPOLATION_COLUMN, 25);
   setColumnWidth(REDUNDANCY_COLUMN, 25);
   setColumnWidth(SR_COLUMN, 32);
+  setColumnWidth(TYPE_COLUMN, 32);
   setIndentation(13);
   setHeaderLabels(list);
   list.clear();
@@ -607,6 +610,8 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                               if(treeFilterActive() && leave_value == QString("return")){
                                   std::cout<<"************************* TYPE RETURN *************************"<<std::endl;
                                   curItem->setDisabled(true);
+//                                  curItem->setText(NAME_COLUMN,curItem->text(NAME_COLUMN)+QString(" <-"));
+                                  curItem->setText(TYPE_COLUMN,QString("<-"));
                                   curItem->setToolTip(NAME_COLUMN, tr("Type return"));
                                   break;
                               }
@@ -615,11 +620,21 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                               if(treeFilterActive() && leave_value == QString("message")){
                                   std::cout<<"************************* TYPE message *************************"<<std::endl;
                                   curItem->setDisabled(true);
+//                                  curItem->setText(NAME_COLUMN,curItem->text(NAME_COLUMN)+QString(" ->"));
+                                  curItem->setText(TYPE_COLUMN,QString("->"));
                                   curItem->setToolTip(NAME_COLUMN, tr("Type message"));
                                   break;
                               }
                               
-                              //Case other type (allowed)
+                              //Case type parameter
+                              if(treeFilterActive() && leave_value == QString("parameter")){
+                                  std::cout<<"************************ TYPE parameter ************************"<<std::endl;
+//                                  curItem->setText(NAME_COLUMN,curItem->text(NAME_COLUMN)+QString(" <->"));
+                                  curItem->setText(TYPE_COLUMN,QString("<->"));
+                                  curItem->setToolTip(NAME_COLUMN, tr("Type parameter"));
+                              }
+
+                              //Case other type
                               curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
                           }
                         }
