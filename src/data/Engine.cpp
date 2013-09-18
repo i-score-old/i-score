@@ -1891,6 +1891,7 @@ int Engine::requestNetworkNamespace(const std::string & address, vector<string>&
                 
                 v.toString();
                 s = TTString(v[0]);
+                std::cout<<"engine > "<<s.c_str()<<std::endl;
                 attributsValue.push_back(s.c_str());
             }
         }
