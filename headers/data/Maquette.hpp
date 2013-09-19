@@ -692,12 +692,13 @@ class Maquette : public QObject
      * \brief Requests a snapshot of the network on a namespace.
      *
      * \param address : the address to take snapshot on
+     * \param nodeType : the object type under at the address
      * \param nodes : the nodes to be filled
      * \param leaves : the leaves to be filled
      * \param attributes : the attributes to be filled
      * \param attributesValue : the respective values of the attributes to be filled
      */
-    int requestNetworkNamespace(const std::string &address, std::vector<std::string>& nodes, std::vector<std::string>& leaves,
+    int requestNetworkNamespace(const std::string &address, std::string &nodeType, std::vector<std::string>& nodes, std::vector<std::string>& leaves,
                                 std::vector<std::string>& attributes, std::vector<std::string>& attributesValue);
 
     /*!

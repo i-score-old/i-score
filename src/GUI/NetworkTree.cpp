@@ -562,8 +562,9 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
       vector<string> nodes, leaves, attributes, attributesValues;
       QString address = getAbsoluteAddress(curItem);
       _addressMap.insert(curItem, address.toStdString());
-
-      int request = Maquette::getInstance()->requestNetworkNamespace(address.toStdString(), nodes, leaves, attributes, attributesValues);
+      
+      string nodeType;
+      int request = Maquette::getInstance()->requestNetworkNamespace(address.toStdString(), nodeType, nodes, leaves, attributes, attributesValues);
       bool requestSuccess = request > 0;
 
       if (requestSuccess) {

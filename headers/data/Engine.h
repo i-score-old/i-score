@@ -798,6 +798,7 @@ public:
 	 * The namespace information is given by filling matching vectors.
 	 *
 	 * \param address : information to where getting the namespace information.
+     * \param nodeType : information about the node object type.
 	 * \param nodes : will be filled with nodes information.
 	 * \param leaves : will be filled with leaves information.
 	 * \param attributs : will be filled with attributs information.
@@ -806,6 +807,7 @@ public:
 	 * \return the result of the namespace request. TIMEOUT_EXCEEDED (time out exceed), ANSWER_RECEIVED (answer received).
 	 */
 	int requestNetworkNamespace(const std::string & address,
+                                std::string & nodeType,
                                 std::vector<std::string>& nodes, std::vector<std::string>& leaves,
                                 std::vector<std::string>& attributs, std::vector<std::string>& attributsValue);
     
