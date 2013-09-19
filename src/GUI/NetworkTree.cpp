@@ -557,7 +557,7 @@ NetworkTree::hasStartEndMsg(QTreeWidgetItem *item)
 
 void
 NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
-{    
+{
   if (!curItem->isDisabled()) {
       vector<string> nodes, leaves, attributes, attributesValues;
       QString address = getAbsoluteAddress(curItem);
@@ -571,11 +571,23 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
           vector<string>::iterator it;
           vector<string>::iterator it2;
           
+          
           // ------------------
           // --- ATTRIBUTES ---
           // ------------------
+          
           if(!attributes.empty()){
+              
+              //---------- print ----------
               std::cout<<">"<<getAbsoluteAddress(curItem).toStdString()<<std::endl;
+              
+              for(it=attributes.begin(); it!=attributes.end(); it++)
+                  std::cout<<"attributes>> "<<*it<<std::endl;
+              
+              for(it2=attributesValues.begin(); it2!=attributesValues.end(); it2++)
+                  std::cout<<"attributesValues>> "<<*it2<<std::endl;
+              //---------------------------
+              
               if(attributes[0]=="service"){
                   
                   if(!attributesValues.empty()){
@@ -592,53 +604,43 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                       
                       //Case type view
                       if(treeFilterActive() && leave_value == QString("view")){
-                          std::cout<<"************************* TYPE view *************************"<<std::endl;
                           curItem->setDisabled(true);
                           curItem->setToolTip(NAME_COLUMN, tr("Type view"));
                           return;
                       }
                       
                       //Case type return
-                      if(treeFilterActive() && leave_value == QString("return")){
-                          std::cout<<"************************* TYPE RETURN *************************"<<std::endl;
-                          curItem->setDisabled(true);
-                          //                                  curItem->setText(NAME_COLUMN,curItem->text(NAME_COLUMN)+QString(" <-"));
+                      if(treeFilterActive() && leave_value == QString("return")){                          curItem->setDisabled(true);
                           curItem->setText(TYPE_COLUMN,QString("<-"));
                           curItem->setToolTip(NAME_COLUMN, tr("Type return"));
                           return;
                       }
                       
                       //Case type message
-                      if(treeFilterActive() && leave_value == QString("message")){
-                          std::cout<<"************************* TYPE message *************************"<<std::endl;
-                          curItem->setDisabled(true);
-                          //                                  curItem->setText(NAME_COLUMN,curItem->text(NAME_COLUMN)+QString(" ->"));
+                      if(treeFilterActive() && leave_value == QString("message")){                          curItem->setDisabled(true);                          
                           curItem->setText(TYPE_COLUMN,QString("->"));
                           curItem->setToolTip(NAME_COLUMN, tr("Type message"));
                           return;
                       }
                       
+                      
                       //Case type parameter
-                      if(treeFilterActive() && leave_value == QString("parameter")){
-                          std::cout<<"************************ TYPE parameter ************************"<<std::endl;
-                          //                                  curItem->setText(NAME_COLUMN,curItem->text(NAME_COLUMN)+QString(" <->"));
-                          curItem->setText(TYPE_COLUMN,QString("<->"));
+                      if(treeFilterActive() && leave_value == QString("parameter")){                          curItem->setText(TYPE_COLUMN,QString("<->"));
                           curItem->setToolTip(NAME_COLUMN, tr("Type parameter"));
                           return;
-                      }
-                      
-                      
+                      }                      
                       
                       //Case other type
                       curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
                   }
-              }
-          
+              }             
           }
           
+
           // ------------------
           // ----- LEAVES ----
           // ------------------
+          
           for (it = leaves.begin(); it != leaves.end(); ++it) {
               QStringList list;
               list << QString::fromStdString(*it);
@@ -654,6 +656,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
               list.clear();
               treeRecursiveExploration(childItem, conflict);
           }
+          
           
           // ------------------
           // ------ NODES -----
