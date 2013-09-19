@@ -120,6 +120,7 @@ NetworkTree::init()
   setStyleSheet(
     "QTreeView {"
     "show-decoration-selected: 1;"
+    "background-color: #5a5a5a;"
     "}"
 
     "QTreeView::item {"
@@ -129,7 +130,7 @@ NetworkTree::init()
     "}"
     
     "QTreeView::item:disabled {"
-    "background: lightgray;"
+    "background: transparent;"
     "}"
                 
     "QTreeView::item:hover {"

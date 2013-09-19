@@ -58,13 +58,14 @@ using std::string;
 
 const float MaquetteWidget::HEADER_HEIGHT = 42.;
 const float MaquetteWidget::NAME_POINT_SIZE = 20.;
+const QColor MaquetteWidget::TITLE_BAR_COLOR = QColor(90, 90, 90);
 
 MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScene *scene)
   : QWidget(parent)
 {
   _view = view;
   _scene = scene;
-  _color = QColor(Qt::white);
+  _color = QColor(TITLE_BAR_COLOR);
   _maquetteLayout = new QGridLayout();
   _nameLabel = new QLabel;
   _toolBar = new QToolBar;

@@ -78,6 +78,10 @@ AttributesEditor::init()
   setAcceptDrops(false);
 
   noBoxEdited();
+    
+  setStyleSheet(            "QDockWidget {"
+                "background-color: yellow;"
+                        "}");
 }
 
 AttributesEditor::~AttributesEditor()

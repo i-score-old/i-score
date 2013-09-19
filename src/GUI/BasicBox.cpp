@@ -93,6 +93,7 @@ const float BasicBox::EAR_HEIGHT = 30;
 const float BasicBox::GRIP_CIRCLE_SIZE = 5;
 unsigned int BasicBox::BOX_MARGIN = 25;
 const QString BasicBox::SUB_SCENARIO_MODE_TEXT = tr("Scenario");
+const QColor BasicBox::BOX_COLOR = QColor(60, 60, 60);
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
   : QGraphicsItem()
@@ -312,8 +313,8 @@ BasicBox::init()
   _low = false;
   _triggerPoints = new QMap<BoxExtremity, TriggerPoint*>();
   _comment = NULL;
-  _color = QColor(Qt::white);
-  _colorUnselected = QColor(Qt::white);
+  _color = QColor(BOX_COLOR);
+  _colorUnselected = QColor(40, 40, 40);
   _hover = false;
 
   updateBoxSize();
