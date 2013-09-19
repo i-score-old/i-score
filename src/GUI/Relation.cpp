@@ -673,11 +673,6 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
       if (_abstract->maxBound() != NO_BOUND) {
           drawRail(painter, startBound, endBound);
         }
-
-//        painter->drawLine(startBound,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX - GRIP_CIRCLE_SIZE, endY);
-
-//        painter->setPen(solidLine);
-//        painter->drawLine(endBound,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX - GRIP_CIRCLE_SIZE, endY);
     }
 
 
@@ -699,9 +694,7 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
           handlePen.setColor(isSelected() ? _color : Qt::black);
           painter->setPen(handlePen);
           painter->drawLine(startX + (endX - startX) / 2, endY - HANDLE_HEIGHT / 2, startX + (endX - startX) / 2, endY + HANDLE_HEIGHT / 2);
-
-//            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,(endX-startX)/_scene->zoom(),(endX-startX)/_scene->zoom()+RIGID_TOLERANCE);
-        }
+      }
       else {
           double handleZone = 10;
           painter->drawLine(startX, endY, startX + (endX - startX) / 2 - handleZone, endY);
@@ -709,8 +702,6 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
           painter->drawLine(startX + (endX - startX) / 2 - handleZone, endY, startX + (endX - startX) / 2 + handleZone, endY);
           painter->setPen(solidLine);
           painter->drawLine(startX + (endX - startX) / 2 + handleZone, endY, _abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE / 2 : endX - GRIP_CIRCLE_SIZE, endY);
-
-//            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,NO_BOUND,NO_BOUND);
         }
     }
 }

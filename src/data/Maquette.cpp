@@ -1990,8 +1990,8 @@ Maquette::load(const string &fileName)
           addRelation(abstractRel);
         }
     }
-
-
+*/
+/*
   // Devices
   MyDevice OSCDevice;
   string OSCDevicePort;
