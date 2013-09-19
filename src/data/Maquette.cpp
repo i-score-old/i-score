@@ -301,10 +301,10 @@ Maquette::getNetworkDevices()
 }
 
 int
-Maquette::requestNetworkNamespace(const string &address, vector<string>& nodes, vector<string>& leaves,
+Maquette::requestNetworkNamespace(const string &address, string &nodeType, vector<string>& nodes, vector<string>& leaves,
                                   vector<string>& attributes, vector<string>& attributesValue)
 {
-  return _engines->requestNetworkNamespace(address, nodes, leaves, attributes, attributesValue);
+  return _engines->requestNetworkNamespace(address, nodeType, nodes, leaves, attributes, attributesValue);
 }
 
 void

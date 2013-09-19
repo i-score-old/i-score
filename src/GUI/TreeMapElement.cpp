@@ -212,8 +212,9 @@ TreeMapElement::addChildren(const vector<string>& nodes, const vector<string>& l
       TreeMapElement *child = addChild(*it, Leave);
 
       vector<string> childNodes, childLeaves, childAttributes, childAttributesvalues;
+      string nodeType;
 
-      Maquette::getInstance()->requestNetworkNamespace(child->address(), childNodes, childLeaves, childAttributes, childAttributesvalues);
+      Maquette::getInstance()->requestNetworkNamespace(child->address(), nodeType, childNodes, childLeaves, childAttributes, childAttributesvalues);
       child->addChildren(childNodes, childLeaves, childAttributes, childAttributesvalues);
     }
   for (it = attributes.begin(), it2 = attributesValue.begin(); it != attributes.end(), it2 != attributesValue.end(); ++it, ++it2) {
@@ -224,8 +225,9 @@ TreeMapElement::addChildren(const vector<string>& nodes, const vector<string>& l
       TreeMapElement *child = addChild(*it, Node);
 
       vector<string> childNodes, childLeaves, childAttributes, childAttributesvalues;
+      string nodeType;
 
-      Maquette::getInstance()->requestNetworkNamespace(child->address(), childNodes, childLeaves, childAttributes, childAttributesvalues);
+      Maquette::getInstance()->requestNetworkNamespace(child->address(), nodeType, childNodes, childLeaves, childAttributes, childAttributesvalues);
       child->addChildren(childNodes, childLeaves, childAttributes, childAttributesvalues);
     }
   update();
