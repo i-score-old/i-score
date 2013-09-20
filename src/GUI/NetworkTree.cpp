@@ -572,6 +572,22 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
           vector<string>::iterator it;
           vector<string>::iterator it2;
           
+          // ------------------
+          // ---  NODETYPE  ---
+          // ------------------
+          std::cout<<"NodeType>> "<<nodeType<<std::endl;
+
+          if(treeFilterActive()){
+              
+              if(nodeType == "Model" ||
+                 nodeType == "Input.audio" ||
+                 nodeType == "Output.audio"){
+
+                  std::cout<<"** nodeType FILTERED **"<<std::endl;
+                  delete(curItem);
+                  return;
+              }              
+          }
           
           // ------------------
           // --- ATTRIBUTES ---
@@ -587,6 +603,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
               
               for(it2=attributesValues.begin(); it2!=attributesValues.end(); it2++)
                   std::cout<<"attributesValues>> "<<*it2<<std::endl;
+              
               //---------------------------
               
               if(attributes[0]=="service"){
@@ -605,8 +622,9 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                       
                       //Case type view
                       if(treeFilterActive() && leave_value == QString("view")){
-                          curItem->setDisabled(true);
-                          curItem->setToolTip(NAME_COLUMN, tr("Type view"));
+//                          curItem->setDisabled(true);
+                          curItem->setHidden(true);
+//                          curItem->setToolTip(NAME_COLUMN, tr("Type view"));
                           return;
                       }
                       
