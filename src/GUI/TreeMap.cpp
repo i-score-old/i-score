@@ -90,8 +90,9 @@ TreeMap::updateMessages(const string &address)
   _layout->addWidget(_deviceRoot);
 
   vector<string> nodes, leaves, attributes, attributesvalues;
+  string nodeType;
 
-  Maquette::getInstance()->requestNetworkNamespace(address, nodes, leaves, attributes, attributesvalues);
+  Maquette::getInstance()->requestNetworkNamespace(address, nodeType, nodes, leaves, attributes, attributesvalues);
   _deviceRoot->addChildren(nodes, leaves, attributes, attributesvalues);
 }
 

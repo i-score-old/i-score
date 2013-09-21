@@ -558,13 +558,14 @@ NetworkTree::hasStartEndMsg(QTreeWidgetItem *item)
 
 void
 NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
-{    
+{
   if (!curItem->isDisabled()) {
       vector<string> nodes, leaves, attributes, attributesValues;
       QString address = getAbsoluteAddress(curItem);
       _addressMap.insert(curItem, address.toStdString());
-
-      int request = Maquette::getInstance()->requestNetworkNamespace(address.toStdString(), nodes, leaves, attributes, attributesValues);
+      
+      string nodeType;
+      int request = Maquette::getInstance()->requestNetworkNamespace(address.toStdString(), nodeType, nodes, leaves, attributes, attributesValues);
       bool requestSuccess = request > 0;
 
       if (requestSuccess) {
@@ -573,10 +574,38 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
           vector<string>::iterator it2;
           
           // ------------------
+          // ---  NODETYPE  ---
+          // ------------------
+          std::cout<<"NodeType>> "<<nodeType<<std::endl;
+
+          if(treeFilterActive()){
+              
+              if(nodeType == "Model" ||
+                 nodeType == "Input.audio" ||
+                 nodeType == "Output.audio"){
+
+                  delete(curItem);
+                  return;
+              }              
+          }
+          
+          // ------------------
           // --- ATTRIBUTES ---
           // ------------------
+          
           if(!attributes.empty()){
+              
+              //---------- print ----------
               std::cout<<">"<<getAbsoluteAddress(curItem).toStdString()<<std::endl;
+              
+              for(it=attributes.begin(); it!=attributes.end(); it++)
+                  std::cout<<"attributes>> "<<*it<<std::endl;
+              
+              for(it2=attributesValues.begin(); it2!=attributesValues.end(); it2++)
+                  std::cout<<"attributesValues>> "<<*it2<<std::endl;
+              
+              //---------------------------
+              
               if(attributes[0]=="service"){
                   
                   if(!attributesValues.empty()){
@@ -593,53 +622,62 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                       
                       //Case type view
                       if(treeFilterActive() && leave_value == QString("view")){
-                          std::cout<<"************************* TYPE view *************************"<<std::endl;
-                          curItem->setDisabled(true);
-                          curItem->setToolTip(NAME_COLUMN, tr("Type view"));
+                          delete(curItem);
                           return;
                       }
                       
                       //Case type return
                       if(treeFilterActive() && leave_value == QString("return")){
-                          std::cout<<"************************* TYPE RETURN *************************"<<std::endl;
                           curItem->setDisabled(true);
-                          //                                  curItem->setText(NAME_COLUMN,curItem->text(NAME_COLUMN)+QString(" <-"));
+                          
+                          QFont curFont = curItem->font(NAME_COLUMN);
+                          curFont.setItalic(true);
+                          curItem->setFont(NAME_COLUMN,curFont);
+                          
+                          QBrush brush(Qt::lightGray);
+                          curItem->setForeground(NAME_COLUMN, brush);
+                          curItem->setForeground(VALUE_COLUMN, brush);                          
+                          
                           curItem->setText(TYPE_COLUMN,QString("<-"));
                           curItem->setToolTip(NAME_COLUMN, tr("Type return"));
                           return;
                       }
                       
                       //Case type message
-                      if(treeFilterActive() && leave_value == QString("message")){
-                          std::cout<<"************************* TYPE message *************************"<<std::endl;
+                      if(treeFilterActive() && leave_value == QString("message")){                       
                           curItem->setDisabled(true);
-                          //                                  curItem->setText(NAME_COLUMN,curItem->text(NAME_COLUMN)+QString(" ->"));
+
+                          QFont curFont = curItem->font(NAME_COLUMN);
+                          curFont.setItalic(true);
+                          curItem->setFont(NAME_COLUMN,curFont);
+                          
+                          QBrush brush(Qt::lightGray);
+                          curItem->setForeground(NAME_COLUMN, brush);
+                          curItem->setForeground(VALUE_COLUMN, brush);
+
                           curItem->setText(TYPE_COLUMN,QString("->"));
                           curItem->setToolTip(NAME_COLUMN, tr("Type message"));
                           return;
                       }
                       
+                      
                       //Case type parameter
-                      if(treeFilterActive() && leave_value == QString("parameter")){
-                          std::cout<<"************************ TYPE parameter ************************"<<std::endl;
-                          //                                  curItem->setText(NAME_COLUMN,curItem->text(NAME_COLUMN)+QString(" <->"));
-                          curItem->setText(TYPE_COLUMN,QString("<->"));
+                      if(treeFilterActive() && leave_value == QString("parameter")){                          curItem->setText(TYPE_COLUMN,QString("<->"));
                           curItem->setToolTip(NAME_COLUMN, tr("Type parameter"));
                           return;
-                      }
-                      
-                      
+                      }                      
                       
                       //Case other type
                       curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
                   }
-              }
-          
+              }             
           }
           
+
           // ------------------
           // ----- LEAVES ----
           // ------------------
+          
           for (it = leaves.begin(); it != leaves.end(); ++it) {
               QStringList list;
               list << QString::fromStdString(*it);
@@ -655,6 +693,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
               list.clear();
               treeRecursiveExploration(childItem, conflict);
           }
+          
           
           // ------------------
           // ------ NODES -----
@@ -995,7 +1034,7 @@ NetworkTree::resetNetworkTree()
 void
 NetworkTree::assignItem(QTreeWidgetItem *item, Data data)
 {
-  QFont font;
+  QFont font= item->font(NAME_COLUMN);
   font.setBold(true);
   if (item->type() == OSCNode) {
       item->setFont(NAME_COLUMN, font);
@@ -1050,7 +1089,7 @@ NetworkTree::assignItems(QMap<QTreeWidgetItem*, Data> selectedItems)
 void
 NetworkTree::unassignItem(QTreeWidgetItem *item)
 {
-  QFont font;
+  QFont font = item->font(NAME_COLUMN);
   font.setBold(false);
   item->setFont(NAME_COLUMN, font);
 
@@ -1064,7 +1103,7 @@ void
 NetworkTree::assignTotally(QTreeWidgetItem *item)
 {
 //  std::cout << getAbsoluteAddress(item).toStdString() << " > assignTotally" << std::endl;
-  QFont font;
+  QFont font = item->font(NAME_COLUMN);
   if (item->type() != OSCNode) {
       item->setSelected(true);
     }
@@ -1080,7 +1119,7 @@ NetworkTree::assignPartially(QTreeWidgetItem *item)
 {
 //  std::cout << getAbsoluteAddress(item).toStdString() << " > assignPartially" << std::endl;
 
-  QFont font;
+  QFont font = item->font(NAME_COLUMN);
   item->setSelected(false);
   font.setBold(true);
   item->setFont(0, font);
@@ -1096,7 +1135,7 @@ NetworkTree::assignPartially(QTreeWidgetItem *item)
 void
 NetworkTree::unassignPartially(QTreeWidgetItem *item)
 {
-  QFont font;
+  QFont font = item->font(NAME_COLUMN);
   font.setBold(false);
   item->setFont(NAME_COLUMN, font);
   for (int i = 0; i < columnCount(); i++) {
@@ -1112,7 +1151,7 @@ NetworkTree::unassignPartially(QTreeWidgetItem *item)
 void
 NetworkTree::unassignTotally(QTreeWidgetItem *item)
 {
-  QFont font;
+  QFont font = item->font(NAME_COLUMN);
   font.setBold(false);
   item->setFont(0, font);
   for (int i = 0; i < columnCount(); i++) {
@@ -1275,7 +1314,7 @@ NetworkTree::resetAssignedNodes()
 void
 NetworkTree::selectPartially(QTreeWidgetItem *item)
 {
-  QFont font;
+  QFont font = item->font(NAME_COLUMN);
   item->setSelected(false);
   font.setBold(true);
   item->setFont(0, font);
@@ -1288,9 +1327,9 @@ NetworkTree::selectPartially(QTreeWidgetItem *item)
 void
 NetworkTree::unselectPartially(QTreeWidgetItem *item)
 {
-  QFont font;
+  QFont font = item->font(NAME_COLUMN);
   font.setBold(false);
-  item->setFont(0, font);
+  item->setFont(NAME_COLUMN, font);
   for (int i = 0; i < columnCount(); i++) {
       item->setBackground(i, QBrush(Qt::NoBrush));
     }
@@ -1303,7 +1342,7 @@ NetworkTree::recursiveFatherSelection(QTreeWidgetItem *item, bool select)
   if (item->parent() != NULL) {
       QTreeWidgetItem *father;
       father = item->parent();
-      QFont font;
+      QFont font = item->font(NAME_COLUMN);
 
       if (select == true) {
           font.setBold(true);
@@ -1420,7 +1459,7 @@ NetworkTree::resetSelectedItems()
           curItem->setBackground(i, QBrush(Qt::NoBrush));
         }
 
-      curItem->setFont(0, font);
+//      curItem->setFont(0, font);
       curItem->setSelected(false);
 
 //        curItem->setCheckState(0,Qt::Unchecked);
@@ -1778,7 +1817,7 @@ NetworkTree::itemCollapsed()
 void
 NetworkTree::assignOCSMsg(QTreeWidgetItem *item)
 {
-  QFont font;
+  QFont font = item->font(NAME_COLUMN);
   font.setBold(true);
   item->setFont(NAME_COLUMN, font);
 }

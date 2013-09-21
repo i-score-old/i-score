@@ -1812,7 +1812,7 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
     return snapshot;
 }
 
-int Engine::requestNetworkNamespace(const std::string & address, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)
+int Engine::requestNetworkNamespace(const std::string & address, std::string & nodeType, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)
 {
     TTAddress           anAddress = toTTAddress(address);
     TTSymbol            type, service;
@@ -1838,6 +1838,11 @@ int Engine::requestNetworkNamespace(const std::string & address, vector<string>&
         if (aMirror) {
             
             type = aMirror->getName();
+            
+            if (type != kTTSymEmpty)
+                nodeType = type.c_str();
+            else
+                nodeType = "none";
             
             if (type == TTSymbol("Data")) {
                 
