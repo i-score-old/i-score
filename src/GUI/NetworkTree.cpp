@@ -127,11 +127,7 @@ NetworkTree::init()
     "border-top-color: transparent;"
     "border-bottom-color: transparent;"
     "}"
-    
-    "QTreeView::item:disabled {"
-    "background: lightgray;"
-    "}"
-                
+          
     "QTreeView::item:hover {"
     "background: qlineargradient(x1: -5, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);"
     "border: 1px solid #bfcde4;"
@@ -583,7 +579,6 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                  nodeType == "Input.audio" ||
                  nodeType == "Output.audio"){
 
-                  std::cout<<"** nodeType FILTERED **"<<std::endl;
                   delete(curItem);
                   return;
               }              
@@ -622,21 +617,39 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                       
                       //Case type view
                       if(treeFilterActive() && leave_value == QString("view")){
-//                          curItem->setDisabled(true);
-                          curItem->setHidden(true);
-//                          curItem->setToolTip(NAME_COLUMN, tr("Type view"));
+                          delete(curItem);
                           return;
                       }
                       
                       //Case type return
-                      if(treeFilterActive() && leave_value == QString("return")){                          curItem->setDisabled(true);
+                      if(treeFilterActive() && leave_value == QString("return")){
+                          curItem->setDisabled(true);
+                          
+                          QFont curFont = curItem->font(NAME_COLUMN);
+                          curFont.setItalic(true);
+                          curItem->setFont(NAME_COLUMN,curFont);
+                          
+                          QBrush brush(Qt::lightGray);
+                          curItem->setForeground(NAME_COLUMN, brush);
+                          curItem->setForeground(VALUE_COLUMN, brush);                          
+                          
                           curItem->setText(TYPE_COLUMN,QString("<-"));
                           curItem->setToolTip(NAME_COLUMN, tr("Type return"));
                           return;
                       }
                       
                       //Case type message
-                      if(treeFilterActive() && leave_value == QString("message")){                          curItem->setDisabled(true);                          
+                      if(treeFilterActive() && leave_value == QString("message")){                       
+                          curItem->setDisabled(true);
+
+                          QFont curFont = curItem->font(NAME_COLUMN);
+                          curFont.setItalic(true);
+                          curItem->setFont(NAME_COLUMN,curFont);
+                          
+                          QBrush brush(Qt::lightGray);
+                          curItem->setForeground(NAME_COLUMN, brush);
+                          curItem->setForeground(VALUE_COLUMN, brush);
+
                           curItem->setText(TYPE_COLUMN,QString("->"));
                           curItem->setToolTip(NAME_COLUMN, tr("Type message"));
                           return;
@@ -1016,7 +1029,7 @@ NetworkTree::resetNetworkTree()
 void
 NetworkTree::assignItem(QTreeWidgetItem *item, Data data)
 {
-  QFont font;
+  QFont font= item->font(NAME_COLUMN);
   font.setBold(true);
   if (item->type() == OSCNode) {
       item->setFont(NAME_COLUMN, font);
@@ -1071,7 +1084,7 @@ NetworkTree::assignItems(QMap<QTreeWidgetItem*, Data> selectedItems)
 void
 NetworkTree::unassignItem(QTreeWidgetItem *item)
 {
-  QFont font;
+  QFont font = item->font(NAME_COLUMN);
   font.setBold(false);
   item->setFont(NAME_COLUMN, font);
 
@@ -1085,7 +1098,7 @@ void
 NetworkTree::assignTotally(QTreeWidgetItem *item)
 {
 //  std::cout << getAbsoluteAddress(item).toStdString() << " > assignTotally" << std::endl;
-  QFont font;
+  QFont font = item->font(NAME_COLUMN);
   if (item->type() != OSCNode) {
       item->setSelected(true);
     }
@@ -1101,7 +1114,7 @@ NetworkTree::assignPartially(QTreeWidgetItem *item)
 {
 //  std::cout << getAbsoluteAddress(item).toStdString() << " > assignPartially" << std::endl;
 
-  QFont font;
+  QFont font = item->font(NAME_COLUMN);
   item->setSelected(false);
   font.setBold(true);
   item->setFont(0, font);
@@ -1117,7 +1130,7 @@ NetworkTree::assignPartially(QTreeWidgetItem *item)
 void
 NetworkTree::unassignPartially(QTreeWidgetItem *item)
 {
-  QFont font;
+  QFont font = item->font(NAME_COLUMN);
   font.setBold(false);
   item->setFont(NAME_COLUMN, font);
   for (int i = 0; i < columnCount(); i++) {
@@ -1133,7 +1146,7 @@ NetworkTree::unassignPartially(QTreeWidgetItem *item)
 void
 NetworkTree::unassignTotally(QTreeWidgetItem *item)
 {
-  QFont font;
+  QFont font = item->font(NAME_COLUMN);
   font.setBold(false);
   item->setFont(0, font);
   for (int i = 0; i < columnCount(); i++) {
@@ -1296,7 +1309,7 @@ NetworkTree::resetAssignedNodes()
 void
 NetworkTree::selectPartially(QTreeWidgetItem *item)
 {
-  QFont font;
+  QFont font = item->font(NAME_COLUMN);
   item->setSelected(false);
   font.setBold(true);
   item->setFont(0, font);
@@ -1309,9 +1322,9 @@ NetworkTree::selectPartially(QTreeWidgetItem *item)
 void
 NetworkTree::unselectPartially(QTreeWidgetItem *item)
 {
-  QFont font;
+  QFont font = item->font(NAME_COLUMN);
   font.setBold(false);
-  item->setFont(0, font);
+  item->setFont(NAME_COLUMN, font);
   for (int i = 0; i < columnCount(); i++) {
       item->setBackground(i, QBrush(Qt::NoBrush));
     }
@@ -1324,7 +1337,7 @@ NetworkTree::recursiveFatherSelection(QTreeWidgetItem *item, bool select)
   if (item->parent() != NULL) {
       QTreeWidgetItem *father;
       father = item->parent();
-      QFont font;
+      QFont font = item->font(NAME_COLUMN);
 
       if (select == true) {
           font.setBold(true);
@@ -1441,7 +1454,7 @@ NetworkTree::resetSelectedItems()
           curItem->setBackground(i, QBrush(Qt::NoBrush));
         }
 
-      curItem->setFont(0, font);
+//      curItem->setFont(0, font);
       curItem->setSelected(false);
 
 //        curItem->setCheckState(0,Qt::Unchecked);
@@ -1799,7 +1812,7 @@ NetworkTree::itemCollapsed()
 void
 NetworkTree::assignOCSMsg(QTreeWidgetItem *item)
 {
-  QFont font;
+  QFont font = item->font(NAME_COLUMN);
   font.setBold(true);
   item->setFont(NAME_COLUMN, font);
 }
