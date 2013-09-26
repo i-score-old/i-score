@@ -789,7 +789,7 @@ class BasicBox : public QObject, public QGraphicsItem
     /*!
      * \brief Display a toolTip near the bottomRight point, showing the current duration of the box.
      */
-    void displayToolTip();
+    void displayBoxDuration();
 
     //! Managing main information of the box.
     AbstractBox *_abstract;

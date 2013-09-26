@@ -23,9 +23,9 @@ then
 elif [ "$OS" = "MACOS" ] || [ "$OS" = "MACOS64" ]
 then
     {
-    DEVICE_MANAGER_PATH='/Users/nicolashincker/Documents/workspace/i-score/dev/Device-Manager'
-    LIB_ISCORE_PATH='/Users/nicolashincker/Documents/workspace/i-score/dev/libIscore'
-    ISCORE_PATH='/Users/nicolashincker/Documents/workspace/i-score/dev/i-score'
+    DEVICE_MANAGER_PATH='/Users/nicolashincker/Documents/workspace/i-score/Device-Manager'
+    LIB_ISCORE_PATH='/Users/nicolashincker/Documents/workspace/i-score/libIscore'
+    ISCORE_PATH='/Users/nicolashincker/Documents/workspace/i-score/i-score'
 
     }
 fi

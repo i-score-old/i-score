@@ -573,14 +573,14 @@ BasicBox::resizeWidthEdition(float width)
       if (motherBox != NULL) {
           if ((motherBox->getBottomRight().x() - width) <= _abstract->topLeft().x()) {
               if (_scene->resizeMode() == HORIZONTAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE) {   // Trying to escape by a resize to the right
-                  newWidth = motherBox->getBottomRight().x() - _abstract->topLeft().x();                  
+                  newWidth = motherBox->getBottomRight().x() - _abstract->topLeft().x();                                    
                 }
             }
         }
-    }
-  displayToolTip();
+    }  
   _abstract->setWidth(newWidth);
-
+  if (_scene->resizeMode() == HORIZONTAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE)
+      displayBoxDuration();
   centerWidget();
 }
 
@@ -1508,7 +1508,7 @@ BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
   //Diag resize zone - Bottom right
   else if (diagResize_bottomRight.contains(event->pos())) {
       setCursor(Qt::SizeFDiagCursor);
-      displayToolTip();
+      displayBoxDuration();
     }
 
   else {
@@ -1575,7 +1575,7 @@ BasicBox::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 
   //Diag resize zone - Bottom right
   else if (diagResize_bottomRight.contains(event->pos())) {
-      displayToolTip();
+      displayBoxDuration();
       setCursor(Qt::SizeFDiagCursor);      
     }
 
@@ -1885,11 +1885,17 @@ BasicBox::displayCurveEditWindow()
 }
 
 void
-BasicBox::displayToolTip(){
+BasicBox::displayBoxDuration(){
+    float duration = this->duration()/1000.;
 
     //Displays a ToolTip with box duration.
-    float duration = this->duration()/1000.;
+    int xShift = -30;
+    int yShift = -20;
     QPoint position = _scene->views().first()->parentWidget()->pos();
     QToolTip *boxDurationToolTip;
-    boxDurationToolTip->showText(QPoint(_abstract->topLeft().x()+position.x()+boundingRect().width()-30,_abstract->topLeft().y()+position.y()+boundingRect().height()-20),QString("%1").arg(duration));
+    boxDurationToolTip->showText(QPoint(_abstract->topLeft().x()+position.x()+boundingRect().width() + xShift,_abstract->topLeft().y()+position.y()+boundingRect().height() + yShift),QString("%1").arg(duration));
+
+    //Displays in the maquetteScene's bottom
+    QString durationMsg = QString("box duration : %1").arg(duration);
+    maquetteScene()->displayMessage(durationMsg.toStdString(),INDICATION_LEVEL);
 }
