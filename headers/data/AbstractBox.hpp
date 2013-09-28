@@ -72,8 +72,8 @@ class QColor;
 class AbstractBox : public Abstract
 {
   public:
-    friend class BasicBox;
-    friend class SoundBox;
+    friend class BasicBox; /// \todo vérifier l'implication de friend class. (par jaime Chao)
+    friend class SoundBox; /// \todo vérifier l'implication de friend class. en plus SoundBox n'existe plus. (par jaime Chao)
 
     AbstractBox(const QPointF &newTopLeft = QPointF(0., 0.), const float &newWidth = 0., const float &newHeight = 0.,
                 const std::string &newName = "", const QColor &newColor = Qt::black, unsigned int ID = NO_ID,
