@@ -687,10 +687,10 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
       if(_hover){
           painter->save();
           QFont textFont;
-          textFont.setPointSize(8.);
+          textFont.setPointSize(10.);
           painter->setFont(textFont);
           painter->setPen(solidLine);
-          painter->drawText(QPoint(startX + (endX - startX) - 30 ,endY - HANDLE_HEIGHT/2. -1), QString("%1").arg(duration()));
+          painter->drawText(QPoint(startX + (endX - startX) - 35 ,endY - HANDLE_HEIGHT/2. -1), QString("%1").arg(duration()));
           painter->restore();
       }
 
