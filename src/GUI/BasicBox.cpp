@@ -1775,24 +1775,32 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
   //************* pour afficher la shape *************
   QPen penG(Qt::blue);
   penG.setWidth(4);
-  if (isSelected()) {
+  if (isSelected() || _hover) {
       drawHoverShape(painter);
     }
-  else if (_hover) {
-      drawHoverShape(painter);
-    }
-
 
 //    painter->drawRect(_leftEar);
 //    painter->drawRect(_rightEar);
 //    painter->drawRect(_startTriggerGrip);
 //    painter->drawRect(_endTriggerGrip);
+//    painter->drawRect(boundingRect());
   //***************************************************/
 
   /************   Draw boxRect ************/
   painter->setPen(penR);
   painter->setBrush(QBrush(Qt::white, Qt::NoBrush));
   painter->drawRect(_boxRect);
+
+  //duration text
+  if(_hover){
+      painter->save();
+      QFont textFont;
+      textFont.setPointSize(10.);
+      painter->setPen(QPen(Qt::black));
+      painter->setFont(textFont);
+      painter->drawText(QPoint(_boxRect.bottomRight().x() -38, _boxRect.bottomRight().y()-2), QString("%1").arg(duration()/1000.));
+      painter->restore();
+  }
 
   drawMsgsIndicators(painter);
   drawInteractionGrips(painter);
@@ -1844,8 +1852,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
       static const float S_TO_MS = 1000.;
       painter->drawText(_boxRect.bottomRight() - QPoint(2 * RESIZE_TOLERANCE, 0), QString("%1s").arg((double)duration() / S_TO_MS));
     }
-
-  painter->translate(_boxRect.topLeft());
+  painter->translate(_boxRect.topLeft());  
 
   if (_playing) {
       QPen pen = painter->pen();
@@ -1889,11 +1896,11 @@ BasicBox::displayBoxDuration(){
     float duration = this->duration()/1000.;
 
     //Displays a ToolTip with box duration.
-    int xShift = -30;
-    int yShift = -20;
-    QPoint position = _scene->views().first()->parentWidget()->pos();
-    QToolTip *boxDurationToolTip;
-    boxDurationToolTip->showText(QPoint(_abstract->topLeft().x()+position.x()+boundingRect().width() + xShift,_abstract->topLeft().y()+position.y()+boundingRect().height() + yShift),QString("%1").arg(duration));
+//    int xShift = -30;
+//    int yShift = -20;
+//    QPoint position = _scene->views().first()->parentWidget()->pos();
+//    QToolTip *boxDurationToolTip;
+//    boxDurationToolTip->showText(QPoint(_abstract->topLeft().x()+position.x()+boundingRect().width() + xShift,_abstract->topLeft().y()+position.y()+boundingRect().height() + yShift),QString("%1").arg(duration));
 
     //Displays in the maquetteScene's bottom
     QString durationMsg = QString("box duration : %1").arg(duration);
