@@ -56,8 +56,9 @@
 #include <utility>
 #include <sstream>
 #include "NetworkMessages.hpp"
-#include "CSPTypes.hpp"
 #include "BasicBox.hpp"
+
+#include "Engine.h"
 
 //! Default network host.
 
@@ -66,7 +67,6 @@
 //! Default network port.
 static const int NETWORK_PORT = 7000;
 static const int OSC_NETWORK_PORT = 9999;
-
 
 static const std::string PLAY_ENGINES_MESSAGE = "/Transport/Play";
 static const std::string STOP_ENGINES_MESSAGE = "/Transport/Stop";
@@ -100,7 +100,7 @@ typedef enum { SUCCESS = 1, NO_MODIFICATION = 0, RETURN_ERROR = -1,
 
 typedef enum { INDICATION_LEVEL, WARNING_LEVEL, ERROR_LEVEL } ErrorLevel;
 
-/// \todo les objets graphiques Qt maintiennent eux-même leurs tailles et positions
+/// \todo les objets graphiques Qt maintiennent eux-même leurs tailles et positions. (par jaime Chao)
 /*!
  * \brief Structure used to contain boxes position or size.
  * Used for interaction with MaquetteScene.
@@ -157,8 +157,9 @@ class Maquette : public QObject
   Q_OBJECT
 
   public:
-    static Maquette *
-    getInstance()
+
+    /// \todo Quel est le rôle de getInstance() avec instanciantion en static ? Faire de Maquette une classe statique ! Est-ce la bonne manière ou plutôt mettre dans un namespace. (par jaime Chao)
+    static Maquette * getInstance()
     {
       static Maquette *instance = new Maquette();
       return instance;
@@ -169,7 +170,7 @@ class Maquette : public QObject
     /*!
      * \brief Initialise the maquette elements.
      */
-    void init();
+    void init(); /// \todo Une méthode init() ne devrait pas être utilisée. surtout en public !!! Elle peut laisser l'invariant de classe instable à tout moment. (par jaime Chao)
 
     /*!
      * \brief Sets a new scene.
@@ -692,12 +693,13 @@ class Maquette : public QObject
      * \brief Requests a snapshot of the network on a namespace.
      *
      * \param address : the address to take snapshot on
+     * \param nodeType : the object type under at the address
      * \param nodes : the nodes to be filled
      * \param leaves : the leaves to be filled
      * \param attributes : the attributes to be filled
      * \param attributesValue : the respective values of the attributes to be filled
      */
-    int requestNetworkNamespace(const std::string &address, std::vector<std::string>& nodes, std::vector<std::string>& leaves,
+    int requestNetworkNamespace(const std::string &address, std::string &nodeType, std::vector<std::string>& nodes, std::vector<std::string>& leaves,
                                 std::vector<std::string>& attributes, std::vector<std::string>& attributesValue);
 
     /*!
@@ -736,20 +738,21 @@ class Maquette : public QObject
     double accelerationFactor();
 
     /*!
-     * \brief Called by the callback when a transition is crossed.
+     * \brief Called by the callback when the running state of a box change
      *
-     * \param boxID : the box whose transition is crossed
-     * \param CPIndex : index of the box's control point crossed
+     * \param boxID : the box whose running state have cahnged
+     * \param runnging : the new running state
      */
-    void crossedTransition(unsigned int boxID, unsigned int CPIndex);
+    void updateBoxRunningStatus(unsigned int boxID, bool running);
 
     /*!
-     * \brief Called by the callback when a triggerPoint is triggered.
+     * \brief Called by the callback when the active state of a triggerPoint change.
      *
-     * \param waiting : new waiting state of the triggerPoint
+     * \param waiting : new active state of the triggerPoint
      * \param trgID : trigger point ID
      */
-    void crossedTriggerPoint(bool waiting, unsigned int trgID);
+    void updateTriggerPointActiveStatus(unsigned int trgID, bool active);
+    
     inline std::map<unsigned int, BasicBox*> getBoxes(){ return _boxes; }
 
     /*!
@@ -813,8 +816,8 @@ class Maquette : public QObject
     //! The MaquetteScene managing display and interaction.
     MaquetteScene *_scene;
 
-    //! The Engines object managing temporal constraints.
-    Engines *_engines;
+    //! The Engine object managing temporal constraints.
+    Engine *_engines;
 
     //! The map of boxes (identified by IDs) managed by the maquette.
     std::map<unsigned int, BasicBox*> _boxes;
@@ -851,24 +854,28 @@ class Maquette : public QObject
 };
 
 /*!
- * \brief Callback called when a transition is crossed.
+ * \brief Callback called when a Trigger Point active state change
  *
- * \param boxID : the box whose transition is crossed
- * \param CPIndex : index of the box's control point crossed
+ * \param trgID : index of the box's Trigger Point
+ * \param waiting : the active state of the Trigger Point
  */
-void crossTransitionCallback(unsigned int boxID, unsigned int CPIndex, std::vector<unsigned int> processesToStop);
-void enginesNetworkUpdateCallback(unsigned int boxID, string m1, string m2);
+void triggerPointIsActiveCallback(unsigned int trgID, bool active);
 
 /*!
- * \brief Callback called when a Trigger Point is triggered is crossed.
+ * \brief Callback called when the running state of a box change.
  *
- * \param waiting : the waiting state of the Trigger Point
- * \param trgID : index of the box's Trigger Point crossed
- * \param boxID : the box whose transition is crossed
- * \param CPIndex : index of the box's control point associated with trigger point
- * \param message : the message of the Trigger Point
+ * \param boxID : the box whose changing his running status
+ * \param running : the new running state of the box
  */
-void crossTriggerPointCallback(bool waiting, unsigned int trgID, unsigned int boxID, unsigned int CPIndex, std::string message);
+void boxIsRunningCallback(unsigned int boxID, bool running);
+
+/*!
+ * \brief Callback called when a transport feature is used
+ *
+ * \param transpport : a transport feature being used
+ * \param value : a value related to the transport
+ */
+void transportCallback(TTSymbol& transport, const TTValue& value);
 
 /*!
  * \brief Callback called when the execution is finished.

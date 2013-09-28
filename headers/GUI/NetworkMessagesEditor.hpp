@@ -96,7 +96,7 @@ class NetworkMessagesEditor : public QTableWidget {
      * \param device : the device to use
      * \param msg : the message to send
      */
-    void addMessage(const std::string &device, const std::string &msg, const std::string &value);
+    void addOneMessage(const std::string &device, const std::string &msg, const std::string &value);
 
     /*!
      * \brief Adds a list of messages.

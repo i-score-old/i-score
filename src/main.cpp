@@ -33,11 +33,34 @@
 #include <iostream>
 #include <QTranslator>
 
+
+// A wrapper class on QAppliation to catch exceptions and display them
+class SafeApplication : public QApplication
+{
+public :
+    SafeApplication(int &argc, char *argv[]) : QApplication(argc, argv) {};
+    ~SafeApplication(){};
+
+    bool notify(QObject *receiver_, QEvent *event_)
+    {
+        try
+          {
+            return QApplication::notify(receiver_, event_);
+          }
+          catch (std::exception &ex)
+          {
+            std::cerr << "std::exception was caught : " << ex.what() << std::endl;
+          }
+
+          return false;
+    }
+};
+
 int
 main(int argc, char *argv[])
 {
   Q_INIT_RESOURCE(i_score); //load i-score.qrc
-  QApplication app(argc, argv);
+  SafeApplication app(argc, argv);
 
   app.setOrganizationName("SCRIME");
   app.setApplicationName("i-score");

@@ -89,10 +89,10 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
   _modified = false;
   _maxSceneWidth = 100000;
 
-  _relation = new AbstractRelation; /// \todo pourquoi instancier une AbstractRelation ici ?
+  _relation = new AbstractRelation; /// \todo pourquoi instancier une AbstractRelation ici ? (par jaime Chao)
   _playThread = new PlayingThread(this);
   _timeBar = new TimeBarWidget(0, this);  
-  _timeBarProxy = addWidget(_timeBar);/// \todo Vérifier ajout si classe TimeBarWidget hérite de GraphicsProxyWidget ou GraphicsObject. Notamment pour lier avec background.
+  _timeBarProxy = addWidget(_timeBar);/// \todo Vérifier ajout si classe TimeBarWidget hérite de GraphicsProxyWidget ou GraphicsObject. Notamment pour lier avec background. (par jaime Chao)
 
   _progressLine = new QGraphicsLineItem(QLineF(sceneRect().topLeft().x(), sceneRect().topLeft().y(), sceneRect().bottomLeft().x(), MAX_SCENE_HEIGHT));
 
@@ -123,7 +123,7 @@ MaquetteScene::init()
   _accelerationFactorSave = 1.;
   _accelerationFactor = 1.;
 
-  /// \todo MainWindow appelle init() de MaquetteScene, qui instancie lui même Maquette puis l'init.
+  /// \todo MainWindow appelle init() de MaquetteScene, qui instancie lui même Maquette puis l'init. (par jaime Chao)
   _maquette = Maquette::getInstance();
   _maquette->setScene(this);
   _maquette->init();
@@ -179,11 +179,11 @@ MaquetteScene::updateView()
   _view = static_cast<MaquetteView*>(views().front());
 }
 
-/// \todo Vérifier l'utilité de faire une surcouche d'appels de méthodes de AttributesEditor (_editor)
+/// \todo Vérifier l'utilité de faire une surcouche d'appels de méthodes de AttributesEditor (_editor). (par jaime Chao)
 void
 MaquetteScene::updateWidgets()
 {
-  _editor->updateWidgets(true);
+  _editor->updateWidgets(true); /// \todo updateWidgets() est un public slot. mieux vaux faire appel au mécanisme d'auto-connexion des signaux dans Qt (QMetaObject) que de le garder en attribut de classe pour éviter le couplage. (par jaime Chao)
 }
 
 void
@@ -540,7 +540,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
           }
 
         else if (getSelectedItem() != NULL ? getSelectedItem()->type() == PARENT_BOX_TYPE : false && subScenarioMode(mouseEvent)) {
-            // TODO : see why creation is possible in a parent box during resize mode
+            /// \todo Old TODO updated (by jC) : see why creation is possible in a parent box during resize mode
             if (resizeMode() == NO_RESIZE) {
                 // Store the first pressed point
                 _pressPoint = mouseEvent->scenePos();
@@ -683,7 +683,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
 
       case SELECTION_MODE:
         if (selectedItems().isEmpty()) {
-            _editor->noBoxEdited();
+            _editor->noBoxEdited(); /// \todo noBoxEdited() est un public slot. mieux vaux faire appel au mécanisme d'auto-connexion des signaux dans Qt (QMetaObject) que de le garder en attribut de classe pour éviter le couplage. (par jaime Chao)
           }
 
         break;
@@ -708,7 +708,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
 
             else {
                 if (selectedItems().empty()) {
-                    _editor->noBoxEdited();
+                    _editor->noBoxEdited(); /// \todo noBoxEdited() est un public slot. mieux vaux faire appel au mécanisme d'auto-connexion des signaux dans Qt (QMetaObject) que de le garder en attribut de classe (couplage). (par jaime Chao)
                   }
               }
           }
@@ -1117,14 +1117,14 @@ MaquetteScene::findMother(const QPointF &topLeft, const QPointF &size)
   std::cerr << "MaquetteScene::findMother : child coords : [" << topLeft.x() << ";" << topLeft.y()
             << "] / [" << size.x() << ";" << size.y() << "]" << std::endl;
 #endif
-  map<unsigned int, ParentBox*> parentBoxes = _maquette->parentBoxes(); /// \todo Mieux vaut parcourir les ParentBoxes contenus dans la scene, pas aller les chercher dans Maquette car on perd l'intérêt d'utiliser le Graphics View Framework
+  map<unsigned int, ParentBox*> parentBoxes = _maquette->parentBoxes(); /// \todo Mieux vaut parcourir les ParentBoxes contenus dans la scene, pas aller les chercher dans Maquette car on perd l'intérêt d'utiliser le Graphics View Framework. (par jaime Chao)
 #ifdef DEBUG
   std::cerr << "MaquetteScene::findMother : parentBoxes size : " << parentBoxes.size() << std::endl;
 #endif
   map<unsigned int, ParentBox*>::iterator it;
   unsigned int motherID = ROOT_BOX_ID;
   float motherZValue = std::numeric_limits<float>::min();
-  QRectF childRect = QRectF(topLeft, QSize(size.x(), size.y())); /// \todo
+  QRectF childRect = QRectF(topLeft, QSize(size.x(), size.y())); /// \todo old TODO updated (by jC)
   for (it = parentBoxes.begin(); it != parentBoxes.end(); ++it) {
       QRectF mRect = QRectF(it->second->getTopLeft(), QSize(it->second->getSize().x(), it->second->getSize().y()));
 #ifdef DEBUG
@@ -1156,7 +1156,7 @@ MaquetteScene::addBox(BoxCreationMode mode)
           default:
             std::cerr << "MaquetteScene :: Unknown Box Creation Mode" << std::endl;
 
-            //TODO check this :
+            /// \todo Old TODO updated (by jC) : check this
             boxID = addParentBox();
             update();
             break;
@@ -1171,7 +1171,7 @@ unsigned int
 MaquetteScene::addParentBox(unsigned int ID)
 {
   if (ID != NO_ID) {
-      if (_maquette->getBox(ID)->type() == PARENT_BOX_TYPE) { /// \todo Le type des GraphicsItem est mal utilisé !! Voir http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var
+      if (_maquette->getBox(ID)->type() == PARENT_BOX_TYPE) { /// \todo Le type des GraphicsItem est mal utilisé !! Voir http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var (par jaime Chao)
           ParentBox *parentBox = static_cast<ParentBox*>(_maquette->getBox(ID));
           parentBox->setPos(parentBox->getCenter());
           parentBox->update();
@@ -1190,7 +1190,7 @@ MaquetteScene::addParentBox(unsigned int ID)
 unsigned int
 MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name)
 {
- /// \todo verify if GraphicsScene provide this method
+ /// \todo verify if GraphicsScene provide this method. (par jaime Chao)
   unsigned int motherID = findMother(topLeft, QPointF(std::fabs(bottomRight.x() - topLeft.x()),
                                                       std::fabs(bottomRight.y() - topLeft.y())));
 
@@ -1470,8 +1470,8 @@ MaquetteScene::removeBox(unsigned int boxID)
 {
   BasicBox *box = getBox(boxID);
   if (box != NULL) {
-      if (boxID == _editor->currentBox()) {
-          _editor->noBoxEdited();
+      if (boxID == _editor->currentBox()) { /// \todo Uniquement changer cette méthode publique en slot pour pouvoir découpler MaquetteScene et AttributesEditor. (c'est l'unique appel utile de _editor dans MaquetteScene). (par jaime Chao)
+          _editor->noBoxEdited(); /// \todo noBoxEdited() est un public slot. mieux vaux faire appel au mécanisme d'auto-connexion des signaux dans Qt (QMetaObject) que de le garder en attribut de classe (couplage). (par jaime Chao)
         }
       removeItem(box);
 
@@ -1532,7 +1532,7 @@ MaquetteScene::updateStartingTime(int value)
 void
 MaquetteScene::setPlaying(unsigned int boxID, bool playing)
 {
-  BasicBox *box = getBox(boxID); /// \todo Besoin d'un cast qt explicite !
+  BasicBox *box = getBox(boxID); /// \todo Besoin d'un cast qt explicite ! (par jaime Chao)
   map<unsigned int, BasicBox*>::iterator it;
   if ((it = _playingBoxes.find(boxID)) != _playingBoxes.end()) {
       it->second = box;

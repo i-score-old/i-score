@@ -259,7 +259,7 @@ NetworkMessages::changeDevice(QString oldName, QString newName)
 }
 
 void
-NetworkMessages::addMessage(QTreeWidgetItem *treeItem, const QString &device, const QString &message, const QString &value)
+NetworkMessages::addMessageLong(QTreeWidgetItem *treeItem, const QString &device, const QString &message, const QString &value)
 {
   Message msg = { device, message, value };
   _messages->insert(treeItem, msg);
@@ -278,7 +278,7 @@ NetworkMessages::setMessages(const QList < QPair<QTreeWidgetItem *, Message> > m
   QPair<QTreeWidgetItem *, Message> curPair;
   for (it = messagesList.begin(); it != messagesList.end(); it++) {
       curPair = *it;
-      addMessage(curPair.first, curPair.second.device, curPair.second.message, curPair.second.value);
+      addMessageLong(curPair.first, curPair.second.device, curPair.second.message, curPair.second.value);
     }
 }
 
@@ -309,7 +309,7 @@ NetworkMessages::setMessages(const QMap<QTreeWidgetItem *, Data> messagesList)
                           QString Qmsg = QString::fromStdString(msg);
                           QString Qdevice = QString::fromStdString(device);
                           QString Qvalue = QString::fromStdString(value);
-                          addMessage(item, Qdevice, Qmsg, Qvalue);
+                          addMessageLong(item, Qdevice, Qmsg, Qvalue);
                           msgsCount++;
                         }
                       else {
@@ -361,7 +361,7 @@ NetworkMessages::setMessages(const QList < QPair<QTreeWidgetItem *, QString> > m
                           QString Qmsg = QString::fromStdString(msg);
                           QString Qdevice = QString::fromStdString(device);
                           QString Qvalue = QString::fromStdString(value);
-                          addMessage(item, Qdevice, Qmsg, Qvalue);
+                          addMessageLong(item, Qdevice, Qmsg, Qvalue);
                           msgsCount++;
                         }
                       else {
@@ -386,7 +386,7 @@ NetworkMessages::setMessages(const QList < QPair<QTreeWidgetItem *, QString> > m
 }
 
 void
-NetworkMessages::addMessage(QTreeWidgetItem *item, QString address)
+NetworkMessages::addMessageSimple(QTreeWidgetItem *item, QString address)
 {
   unsigned int msgsCount = 0;
   string msg = address.toStdString();
@@ -405,7 +405,7 @@ NetworkMessages::addMessage(QTreeWidgetItem *item, QString address)
                       QString Qmsg = QString::fromStdString(msg);
                       QString Qdevice = QString::fromStdString(device);
                       QString Qvalue = QString::fromStdString(value);
-                      addMessage(item, Qdevice, Qmsg, Qvalue);
+                      addMessageLong(item, Qdevice, Qmsg, Qvalue);
                       msgsCount++;
                     }
                   else {
@@ -457,7 +457,7 @@ NetworkMessages::addMessages(const QList < QPair<QTreeWidgetItem *, QString> > m
                           QString Qmsg = QString::fromStdString(msg);
                           QString Qdevice = QString::fromStdString(device);
                           QString Qvalue = QString::fromStdString(value);
-                          addMessage(item, Qdevice, Qmsg, Qvalue);
+                          addMessageLong(item, Qdevice, Qmsg, Qvalue);
                           msgsCount++;
                         }
                       else {

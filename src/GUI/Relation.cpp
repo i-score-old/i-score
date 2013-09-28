@@ -55,6 +55,7 @@
 #include <QRectF>
 #include <QString>
 #include <QMenu>
+#include <QToolTip>
 
 const float Relation::ARROW_SIZE = 12.;
 const float Relation::TOLERANCE_X = 12.;
@@ -110,6 +111,7 @@ Relation::init()
   _lastMaxBound = -1;
   _elasticMode = false;
   _mouseClickPosSave = mapToScene(_start);
+  _hover = false;
   updateFlexibility();
 }
 
@@ -265,6 +267,7 @@ void
 Relation::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 {
   QGraphicsItem::hoverEnterEvent(event);
+  _hover = true;
   double startX = mapFromScene(_start).x() + BasicBox::EAR_WIDTH / 2;
   double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
 
@@ -359,6 +362,7 @@ void
 Relation::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
 {
   QGraphicsItem::hoverLeaveEvent(event);
+  _hover = false;
   setCursor(Qt::ArrowCursor);
 }
 
@@ -673,16 +677,23 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
       if (_abstract->maxBound() != NO_BOUND) {
           drawRail(painter, startBound, endBound);
         }
-
-//        painter->drawLine(startBound,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX - GRIP_CIRCLE_SIZE, endY);
-
-//        painter->setPen(solidLine);
-//        painter->drawLine(endBound,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX - GRIP_CIRCLE_SIZE, endY);
     }
 
 
   //-------------------------- Rigid relation --------------------------//
   else {
+
+      //Duration text
+      if(_hover){
+          painter->save();
+          QFont textFont;
+          textFont.setPointSize(10.);
+          painter->setFont(textFont);
+          painter->setPen(solidLine);
+          painter->drawText(QPoint(startX + (endX - startX) - 35 ,endY - HANDLE_HEIGHT/2. -1), QString("%1").arg(duration()));
+          painter->restore();
+      }
+
       //Vertical line
       painter->setPen(solidLine);
       painter->drawLine(_abstract->firstExtremity() == BOX_END ? startX : startX - GRIP_CIRCLE_SIZE / 2, startY, startX, startY);
@@ -699,9 +710,7 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
           handlePen.setColor(isSelected() ? _color : Qt::black);
           painter->setPen(handlePen);
           painter->drawLine(startX + (endX - startX) / 2, endY - HANDLE_HEIGHT / 2, startX + (endX - startX) / 2, endY + HANDLE_HEIGHT / 2);
-
-//            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,(endX-startX)/_scene->zoom(),(endX-startX)/_scene->zoom()+RIGID_TOLERANCE);
-        }
+      }
       else {
           double handleZone = 10;
           painter->drawLine(startX, endY, startX + (endX - startX) / 2 - handleZone, endY);
@@ -709,10 +718,11 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
           painter->drawLine(startX + (endX - startX) / 2 - handleZone, endY, startX + (endX - startX) / 2 + handleZone, endY);
           painter->setPen(solidLine);
           painter->drawLine(startX + (endX - startX) / 2 + handleZone, endY, _abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE / 2 : endX - GRIP_CIRCLE_SIZE, endY);
-
-//            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,NO_BOUND,NO_BOUND);
         }
     }
 }
 
-
+float
+Relation::duration(){
+    return (mapFromScene(_end).x() - mapFromScene(_start).x())*MaquetteScene::MS_PER_PIXEL / 1000;
+}

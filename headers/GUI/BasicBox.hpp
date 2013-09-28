@@ -54,7 +54,6 @@
 #include <string>
 #include <QInputDialog>
 #include "AbstractBox.hpp"
-#include "CSPTypes.hpp"
 #include "CurvesWidget.hpp"
 #include "BoxWidget.hpp"
 #include <QComboBox>
@@ -62,6 +61,8 @@
 #include <QObject>
 #include <QPushButton>
 #include <QMenu>
+
+#include "TTScore.h"
 
 class MaquetteScene;
 class QGraphicsTextItem;

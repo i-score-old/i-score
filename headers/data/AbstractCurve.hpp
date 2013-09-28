@@ -53,7 +53,7 @@
 #include <string>
 #include <map>
 #include "Abstract.hpp"
-#include "CSPTypes.hpp"
+#include "Engine.h"
 #include <QPoint>
 #include <QColor>
 #include <math.h>
@@ -61,7 +61,7 @@
 class QColor;
 
 //! Defines abstract parent box type.
-enum { ABSTRACT_CURVE_TYPE = 8 }; /// \todo Jamais utilisé dans le projet! Et devrait être rangé dans la classe.
+enum { ABSTRACT_CURVE_TYPE = 8 }; /// \todo Jamais utilisé dans le projet! Et devrait être rangé dans la classe.(par jaime Chao)
 
 /*!
  * \class AbstractCurve
@@ -80,7 +80,7 @@ class AbstractCurve : public Abstract
     virtual
     ~AbstractCurve(){}
 
-    virtual int type() const; /// \todo les types sont utiles aux GraphicsItem
+    virtual int type() const; /// \todo les types sont utiles aux GraphicsItem. (par jaime Chao)
 
   private:
     unsigned int _boxID;      //!< Box ID.
@@ -95,8 +95,8 @@ class AbstractCurve : public Abstract
     //! Map of breakpoints with their values and curving values.
     std::map<float, std::pair<float, float> > _breakpoints;
 
-    friend class CurveWidget;
-    friend class CurvesWidget;
-    friend class BoxWidget;
+    friend class CurveWidget; /// \todo vérifier l'implication de friend class. (par jaime Chao)
+    friend class CurvesWidget; /// \todo vérifier l'implication de friend class
+    friend class BoxWidget; /// \todo vérifier l'implication de friend class
 };
 #endif

@@ -180,7 +180,7 @@ class NetworkTree : public QTreeWidget
      * \return True if start and end messages are set.
      */
     bool hasStartEndMsg(QTreeWidgetItem *item);
-
+    
     /***********************************************************************
     *                       General display tools
     ***********************************************************************/
@@ -339,6 +339,8 @@ class NetworkTree : public QTreeWidget
     inline void
     removeAssignItem(QTreeWidgetItem* item){ _assignedItems.remove(item); }
 
+    inline bool
+    treeFilterActive(){return _treeFilterActive;}
     /*!
      * \brief Reset the display of assigned items (leaves) and clear the assigned items list.
      */
@@ -378,11 +380,12 @@ class NetworkTree : public QTreeWidget
 
     static int NAME_COLUMN;
     static int VALUE_COLUMN;
-    static int START_COLUMN;
+    static int START_COLUMN;	
     static int END_COLUMN;
     static int INTERPOLATION_COLUMN;
     static int REDUNDANCY_COLUMN;
     static int SR_COLUMN;
+    static int TYPE_COLUMN;
     static QString OSC_ADD_NODE_TEXT;
     static unsigned int TEXT_POINT_SIZE;
 
@@ -495,6 +498,7 @@ class NetworkTree : public QTreeWidget
     QMap<QTreeWidgetItem *, QString> _OSCMessages;
 
     int _OSCMessageCount;
+    bool _treeFilterActive;
 
     DeviceEdit *_deviceEdit;
 
