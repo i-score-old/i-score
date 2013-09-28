@@ -165,7 +165,7 @@ Interpolation::clear()
       if (index != -1 && index < rowCount()) {
           removeRow(index);
 
-          // TODO : delete widgets
+          /// \todo Old TODO updated (by jC) : delete widgets
         }
       else {
           std::cerr << "NetworkMessagesEditor::clear : index out of bounds" << std::endl;
@@ -176,7 +176,7 @@ Interpolation::clear()
   _currentLine = 0;
 }
 
-/// \todo Duplication de code entre les quatres slots
+/// \todo Duplication de code entre les quatres slots. (par jaime Chao)
 void
 Interpolation::activationChanged(bool state)
 {

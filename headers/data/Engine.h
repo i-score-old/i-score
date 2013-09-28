@@ -43,8 +43,8 @@ typedef unsigned int TimeEventIndex;
 /** a temporary type dedicated to retreive an Interval TimeProcess (this is related to Relation notion) */
 typedef unsigned int IntervalId;
 
-/** a temporary type dedicated to retreive a process with an Interactive TimeEvent inside (this is related to TriggerPoint notion) */
-typedef unsigned int InteractiveProcessId;
+/** a temporary type dedicated to retreive a process with an Conditioned TimeEvent inside (this is related to TriggerPoint notion) */
+typedef unsigned int ConditionedProcessId;
 
 /** a class used to cache TTObject and some observers */
 class EngineCacheElement {
@@ -137,18 +137,18 @@ private:
     
     unsigned int        m_nextTimeProcessId;                            /// the next Id to give to any created time process
     unsigned int        m_nextIntervalId;                               /// the next Id to give to any created interval
-    unsigned int        m_nextInteractiveProcessId;                     /// the next Id to give to any created time process
+    unsigned int        m_nextConditionedProcessId;                     /// the next Id to give to any created time process
     
     EngineCacheMap      m_timeProcessMap;                               /// All automation or scenario time process and some observers stored using an unique id
     EngineCacheMap      m_intervalMap;                                  /// All interval time process and some observers stored using an unique id
-    EngineCacheMap      m_interactiveProcessMap;                        /// All interactive time process with an interactive event stored using an unique id
+    EngineCacheMap      m_timeConditionMap;                             /// All condition stored using an unique id
+    EngineCacheMap      m_conditionedProcessMap;                        /// All conditioned time process with an conditioned event stored using an unique id
     
     EngineCacheMap      m_runningCallbackMap;                           /// All callback to observe time process running state stored using a time process id
     
     EngineCacheMap      m_readyCallbackMap;                             /// All callback to observe time event ready state stored using using a trigger id
-    EngineCacheMap      m_triggerDataMap;                               /// All TTData to expose interactive event on the network stored using using a trigger id
-    EngineCacheMap      m_triggerReceiverMap;                           /// All TTReceiver to observe a local or a distant application address stored using using a trigger id
-    
+    EngineCacheMap      m_triggerDataMap;                               /// All TTData to expose conditioned event on the network stored using using a trigger id
+
     TTObjectBasePtr     m_dataPlay;                                     /// A Modular TTData to expose Play transport service
     TTObjectBasePtr     m_dataStop;                                     /// A Modular TTData to expose Stop transport service
     TTObjectBasePtr     m_dataPause;                                    /// A Modular TTData to expose Pause transport service
@@ -156,13 +156,13 @@ private:
     TTObjectBasePtr     m_dataStartPoint;                               /// A Modular TTData to expose StartPoint transport service
     TTObjectBasePtr     m_dataSpeed;                                    /// A Modular TTData to expose Speed transport service
     
-	void (*m_TimeEventReadyAttributeCallback)(InteractiveProcessId, bool);
+	void (*m_TimeEventReadyAttributeCallback)(ConditionedProcessId, bool);
     void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);
     void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);
 
 public:
 
-    Engine(void(*timeEventReadyAttributeCallback)(InteractiveProcessId, bool),
+    Engine(void(*timeEventReadyAttributeCallback)(ConditionedProcessId, bool),
            void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
            void(*transportDataValueCallback)(TTSymbol&, const TTValue&));
     
@@ -183,22 +183,23 @@ public:
     TTTimeProcessPtr    getInterval(IntervalId relationId);
     void                uncacheInterval(IntervalId relationId);
     
-    InteractiveProcessId cacheInteractiveProcess(TTTimeProcessPtr timeProcess, TimeEventIndex controlPointId);
-    TTTimeProcessPtr    getInteractiveProcess(InteractiveProcessId triggerId, TimeEventIndex& controlPointId);
-    void                uncacheInteractiveProcess(InteractiveProcessId triggerId);
+    ConditionedProcessId cacheConditionedProcess(TTTimeProcessPtr timeProcess, TimeEventIndex controlPointId);
+    TTTimeProcessPtr    getConditionedProcess(ConditionedProcessId triggerId, TimeEventIndex& controlPointId);
+    void                uncacheConditionedProcess(ConditionedProcessId triggerId);
+    
+    void                cacheTimeCondition(ConditionedProcessId triggerId);
+    TTTimeConditionPtr  getTimeCondition(ConditionedProcessId triggerId);
+    void                uncacheTimeCondition(ConditionedProcessId triggerId);
     
     void                cacheRunningCallback(TimeProcessId boxId);
     void                uncacheRunningCallback(TimeProcessId boxId);
     
-    void                cacheReadyCallback(InteractiveProcessId triggerId, TTTimeEventPtr timeEvent);
-    void                uncacheReadyCallback(InteractiveProcessId triggerId, TTTimeEventPtr timeEvent);
+    void                cacheReadyCallback(ConditionedProcessId triggerId, TTTimeEventPtr timeEvent);
+    void                uncacheReadyCallback(ConditionedProcessId triggerId, TTTimeEventPtr timeEvent);
     
-    void                cacheTriggerDataCallback(InteractiveProcessId triggerId, TimeProcessId boxId);
-    void                uncacheTriggerDataCallback(InteractiveProcessId triggerId);
-    
-    void                cacheTriggerReceiverCallback(InteractiveProcessId triggerId);
-    void                uncacheTriggerReceiverCallback(InteractiveProcessId triggerId);
-    
+    void                cacheTriggerDataCallback(ConditionedProcessId triggerId, TimeProcessId boxId);
+    void                uncacheTriggerDataCallback(ConditionedProcessId triggerId);
+        
 	// Edition ////////////////////////////////////////////////////////////////////////
     
 	/*!
@@ -582,7 +583,7 @@ public:
 	 *
 	 * \return the created trigger ID
 	 */
-	InteractiveProcessId addTriggerPoint(TimeProcessId containingBoxId, TimeEventIndex controlPointIndex);
+	ConditionedProcessId addTriggerPoint(TimeProcessId containingBoxId, TimeEventIndex controlPointIndex);
     
 	/*!
 	 * Removes the triggerPoint from the CSP.
@@ -591,7 +592,7 @@ public:
 	 *
 	 * \param triggerId : the ID of the trigger to be removed.
 	 */
-	void removeTriggerPoint(InteractiveProcessId triggerId);
+	void removeTriggerPoint(ConditionedProcessId triggerId);
     
 	/*!
 	 * Sets the triggerPoint (given by ID) message.
@@ -601,7 +602,7 @@ public:
 	 * \param triggerId : the ID of the trigger.
 	 * \param triggerMessage : the trigger message
 	 */
-	void setTriggerPointMessage(InteractiveProcessId triggerId, std::string triggerMessage);
+	void setTriggerPointMessage(ConditionedProcessId triggerId, std::string triggerMessage);
     
 	/*!
 	 * Gets the triggerPoint (given by ID) message.
@@ -612,7 +613,7 @@ public:
 	 *
 	 * \return the trigger message
 	 */
-	std::string getTriggerPointMessage(InteractiveProcessId triggerId);
+	std::string getTriggerPointMessage(ConditionedProcessId triggerId);
     
 	/*!
 	 * Gets the id of the box linked to the given trigger point.
@@ -622,7 +623,7 @@ public:
 	 * \return the id of the box linked to the trigger point,
 	 * NO_ID if the trigger point is not linked to a box.
 	 */
-	TimeProcessId getTriggerPointRelatedBoxId(InteractiveProcessId triggerId);
+	TimeProcessId getTriggerPointRelatedBoxId(ConditionedProcessId triggerId);
     
 	/*!
 	 * Gets the index of the control point linked to the given trigger point.
@@ -632,7 +633,7 @@ public:
 	 * \return the index of the control point linked to the trigger point,
 	 * NO_ID if the trigger point is not linked to a control point.
 	 */
-	TimeProcessId getTriggerPointRelatedCtrlPointIndex(InteractiveProcessId triggerId);
+	TimeProcessId getTriggerPointRelatedCtrlPointIndex(ConditionedProcessId triggerId);
     
 	/*!
 	 * Fills the given vector with all the boxes ID used in the editor.
@@ -656,7 +657,7 @@ public:
 	 *
 	 * \param triggersID : the vector to fill with all triggers ID used.
 	 */
-	void getTriggersPointId(std::vector<InteractiveProcessId>& triggersID);
+	void getTriggersPointId(std::vector<ConditionedProcessId>& triggersID);
     
     
     
@@ -861,7 +862,7 @@ private:
 typedef Engine* EnginePtr;
 
 /** Any time event ready attribute callback
- @param	baton			a TTValuePtr containing an EnginePtr and an InteractiveProcessId
+ @param	baton			a TTValuePtr containing an EnginePtr and an ConditionedProcessId
  @param	value			the time event ready state
  @return                an error code */
 void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value);
@@ -877,16 +878,6 @@ void TimeProcessSchedulerRunningAttributeCallback(TTPtr baton, const TTValue& va
  @param	value			the value of the data
  @return                an error code */
 void TransportDataValueCallback(TTPtr baton, const TTValue& value);
-
-/** Any trigger receiver value callback
- @param	baton			a TTValuePtr containing an EnginePtr and an InteractiveProcessId
- @param	value			a value
- @return                an error code */
-void TriggerReceiverValueCallback(TTPtr baton, const TTValue& value);
-
-
-
-
 
 
 // TODO : this should move into a TTModularAPI file

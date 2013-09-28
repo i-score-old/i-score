@@ -361,7 +361,7 @@ MaquetteView::setZoom(float value)
   repaint();
   resetCachedContent();
 
-// TODO check if can be comment
+/// \todo Old TODO updated (by jC) : check if can be comment
   _scene->update();  
   _scene->zoomChanged(_zoom);
 
