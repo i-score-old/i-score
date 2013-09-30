@@ -644,8 +644,9 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                       }
                       
                       //Case type message
-                      if(treeFilterActive() && leave_value == QString("message")){                       
-                          curItem->setDisabled(true);
+                      if(treeFilterActive() && leave_value == QString("message")){
+//                          curItem->setDisabled(true);
+                          curItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
 
                           QFont curFont = curItem->font(NAME_COLUMN);
                           curFont.setItalic(true);
@@ -1510,7 +1511,9 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
     if(currentItem()!=NULL){
-        if (currentItem()->type() == OSCNode) {
+        
+        //TODO : engine->resquestType(itemAddress) instead of the comparaison with "->".            
+        if (currentItem()->type() == OSCNode || currentItem()->text(TYPE_COLUMN) == "->") {
             editItem(currentItem(), currentColumn());
             if (currentColumn() == NAME_COLUMN) {
                 NAME_MODIFIED = true;
@@ -1589,6 +1592,25 @@ void
 NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 {
   if (item != NULL) {
+
+      //Case message
+      if(item->isDisabled()){
+          if(item->text(TYPE_COLUMN) == "->"){
+              if(column==START_COLUMN || column==END_COLUMN){
+                  int curcolumn;
+                  if(column==START_COLUMN){
+                      curcolumn=START_COLUMN;
+                  }
+                  else{
+                      curcolumn=END_COLUMN;
+                  }
+                  item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+                  VALUE_MODIFIED = true;
+                  editItem(item, curcolumn);
+                  item->setDisabled(true);
+              }
+          }
+      }
       if (item->isSelected()) {
           recursiveChildrenSelection(item, true);
           recursiveFatherSelection(item, true);
@@ -1639,7 +1661,7 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 void
 NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
 {
-  Data data;
+    Data data;
   data.hasCurve = false;
   data.address = getAbsoluteAddress(item);
 
@@ -1682,6 +1704,29 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
       SR_MODIFIED = FALSE;
       emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
       item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+    }
+    
+    //Case message
+    //PROVISIONAL
+    //TODO : engine->requestType(address,type) and not to compare with "->" symbol. 
+    if (item->text(TYPE_COLUMN) == "->" && column == START_COLUMN && VALUE_MODIFIED) {
+        VALUE_MODIFIED = FALSE;
+        assignItem(item, data);
+        emit(startValueChanged(item, item->text(START_COLUMN)));
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+    }
+    
+    if (item->text(TYPE_COLUMN) == "->" && column == END_COLUMN && VALUE_MODIFIED) {
+        VALUE_MODIFIED = FALSE;
+        assignItem(item, data);
+        emit(endValueChanged(item, item->text(END_COLUMN)));
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
+    }
+    
+    if (item->text(TYPE_COLUMN) == "->" && column == SR_COLUMN && SR_MODIFIED) {
+        SR_MODIFIED = FALSE;
+        emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
 }
 

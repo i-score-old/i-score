@@ -134,7 +134,14 @@ class Relation : public QGraphicsItem
      * \param minBound : the new min bound to be set
      * \param maxBound : the new max bound to be set
      */
-    void changeBounds(const float &minBound, const float &maxBound);
+    void changeBounds(const float &minBound, const float &maxBound);  
+    /*!
+     * \brief Gets the duration of the relation (available for a rigid relation, equals maxBound)
+     *
+     * \return Rigid relation's duration (maxbound -
+     */
+    float duration();
+
     inline QRectF
     startBoundRect(){ return _startBoundRect; }
     inline QRectF
@@ -261,6 +268,8 @@ class Relation : public QGraphicsItem
 
     bool _leftBoundModified;
     bool _rightBoundModified;
+
+    bool _hover;
 
     static const float ARROW_SIZE;      //!< The size of the arrow.
     static const float HANDLE_HEIGHT;   //!< The height of a handle.

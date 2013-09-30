@@ -80,7 +80,7 @@ using std::string;
 using std::vector;
 using std::map;
 
-/// \todo On pourrait les instancier directement dans le header avec leurs définitions.
+/// \todo On pourrait les instancier directement dans le header avec leurs définitions. (par jaime Chao)
 const int BasicBox::COMBOBOX_HEIGHT = 25;
 const int BasicBox::COMBOBOX_WIDTH = 120;
 const float BasicBox::TRIGGER_ZONE_WIDTH = 18.;
@@ -275,9 +275,9 @@ BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
 {
   _scene = parent;
 
-  _abstract = new AbstractBox(*abstract); /// \todo Pourquoi recevoir un argument *abstract et le ré-instancier ????
+  _abstract = new AbstractBox(*abstract); /// \todo Pourquoi recevoir un argument *abstract et le ré-instancier ? (par jaime Chao)
 
-  init(); /// \todo Un constructeur !
+  init(); /// \todo Un constructeur ! (par jaime Chao)
 
   update();
 }
@@ -574,14 +574,14 @@ BasicBox::resizeWidthEdition(float width)
       if (motherBox != NULL) {
           if ((motherBox->getBottomRight().x() - width) <= _abstract->topLeft().x()) {
               if (_scene->resizeMode() == HORIZONTAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE) {   // Trying to escape by a resize to the right
-                  newWidth = motherBox->getBottomRight().x() - _abstract->topLeft().x();                  
+                  newWidth = motherBox->getBottomRight().x() - _abstract->topLeft().x();                                    
                 }
             }
         }
-    }
-  displayToolTip();
+    }  
   _abstract->setWidth(newWidth);
-
+  if (_scene->resizeMode() == HORIZONTAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE)
+      displayBoxDuration();
   centerWidget();
 }
 
@@ -1509,7 +1509,7 @@ BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
   //Diag resize zone - Bottom right
   else if (diagResize_bottomRight.contains(event->pos())) {
       setCursor(Qt::SizeFDiagCursor);
-      displayToolTip();
+      displayBoxDuration();
     }
 
   else {
@@ -1576,7 +1576,7 @@ BasicBox::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 
   //Diag resize zone - Bottom right
   else if (diagResize_bottomRight.contains(event->pos())) {
-      displayToolTip();
+      displayBoxDuration();
       setCursor(Qt::SizeFDiagCursor);      
     }
 
@@ -1776,24 +1776,32 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
   //************* pour afficher la shape *************
   QPen penG(Qt::blue);
   penG.setWidth(4);
-  if (isSelected()) {
+  if (isSelected() || _hover) {
       drawHoverShape(painter);
     }
-  else if (_hover) {
-      drawHoverShape(painter);
-    }
-
 
 //    painter->drawRect(_leftEar);
 //    painter->drawRect(_rightEar);
 //    painter->drawRect(_startTriggerGrip);
 //    painter->drawRect(_endTriggerGrip);
+//    painter->drawRect(boundingRect());
   //***************************************************/
 
   /************   Draw boxRect ************/
   painter->setPen(penR);
   painter->setBrush(QBrush(Qt::white, Qt::NoBrush));
   painter->drawRect(_boxRect);
+
+  //duration text
+  if(_hover){
+      painter->save();
+      QFont textFont;
+      textFont.setPointSize(10.);
+      painter->setPen(QPen(Qt::black));
+      painter->setFont(textFont);
+      painter->drawText(QPoint(_boxRect.bottomRight().x() -38, _boxRect.bottomRight().y()-2), QString("%1").arg(duration()/1000.));
+      painter->restore();
+  }
 
   drawMsgsIndicators(painter);
   drawInteractionGrips(painter);
@@ -1845,8 +1853,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
       static const float S_TO_MS = 1000.;
       painter->drawText(_boxRect.bottomRight() - QPoint(2 * RESIZE_TOLERANCE, 0), QString("%1s").arg((double)duration() / S_TO_MS));
     }
-
-  painter->translate(_boxRect.topLeft());
+  painter->translate(_boxRect.topLeft());  
 
   if (_playing) {
       QPen pen = painter->pen();
@@ -1886,11 +1893,17 @@ BasicBox::displayCurveEditWindow()
 }
 
 void
-BasicBox::displayToolTip(){
+BasicBox::displayBoxDuration(){
+    float duration = this->duration()/1000.;
 
     //Displays a ToolTip with box duration.
-    float duration = this->duration()/1000.;
-    QPoint position = _scene->views().first()->parentWidget()->pos();
-    QToolTip *boxDurationToolTip;
-    boxDurationToolTip->showText(QPoint(_abstract->topLeft().x()+position.x()+boundingRect().width()-30,_abstract->topLeft().y()+position.y()+boundingRect().height()-20),QString("%1").arg(duration));
+//    int xShift = -30;
+//    int yShift = -20;
+//    QPoint position = _scene->views().first()->parentWidget()->pos();
+//    QToolTip *boxDurationToolTip;
+//    boxDurationToolTip->showText(QPoint(_abstract->topLeft().x()+position.x()+boundingRect().width() + xShift,_abstract->topLeft().y()+position.y()+boundingRect().height() + yShift),QString("%1").arg(duration));
+
+    //Displays in the maquetteScene's bottom
+    QString durationMsg = QString("box duration : %1").arg(duration);
+    maquetteScene()->displayMessage(durationMsg.toStdString(),INDICATION_LEVEL);
 }

@@ -123,6 +123,6 @@ class TreeMapElement : public QWidget {
     void mouseDoubleClickEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 
-    friend class TreeMap;
+    friend class TreeMap; /// \todo vérifier l'implication de friend class (par jaime Chao)
 };
 #endif /* TREEMAPELEMENT_HPP_ */

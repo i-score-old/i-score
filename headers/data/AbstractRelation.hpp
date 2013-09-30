@@ -61,7 +61,8 @@ enum { ABSTRACT_RELATION_TYPE = 3 };
 class AbstractRelation : public Abstract
 {
   public:
-    friend class Relation;
+    friend class Relation; /// \todo vérifier l'implication de friend class. (par jaime Chao)
+
     AbstractRelation(unsigned int firstBoxID = NO_ID, BoxExtremity firstBoxExt = NO_EXTREMITY,
                      unsigned int secondBoxID = NO_ID, BoxExtremity secondBoxExt = NO_EXTREMITY,
                      const float &length = -1, const float &minBound = NO_BOUND, const float &maxBound = NO_BOUND,

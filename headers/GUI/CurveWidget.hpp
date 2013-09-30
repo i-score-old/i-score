@@ -76,7 +76,7 @@ class CurveWidget : public QWidget
 
     CurveWidget(QWidget *parent, AbstractCurve *abCurve);
 
-    void init(); /// \todo Eviter les init(), encore plus publique !
+    void init(); /// \todo Eviter les init(), encore plus publique ! (par jaime Chao)
 
     AbstractCurve * abstractCurve();
 

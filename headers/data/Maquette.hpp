@@ -100,7 +100,7 @@ typedef enum { SUCCESS = 1, NO_MODIFICATION = 0, RETURN_ERROR = -1,
 
 typedef enum { INDICATION_LEVEL, WARNING_LEVEL, ERROR_LEVEL } ErrorLevel;
 
-/// \todo les objets graphiques Qt maintiennent eux-même leurs tailles et positions
+/// \todo les objets graphiques Qt maintiennent eux-même leurs tailles et positions. (par jaime Chao)
 /*!
  * \brief Structure used to contain boxes position or size.
  * Used for interaction with MaquetteScene.
@@ -157,8 +157,9 @@ class Maquette : public QObject
   Q_OBJECT
 
   public:
-    static Maquette *
-    getInstance()
+
+    /// \todo Quel est le rôle de getInstance() avec instanciantion en static ? Faire de Maquette une classe statique ! Est-ce la bonne manière ou plutôt mettre dans un namespace. (par jaime Chao)
+    static Maquette * getInstance()
     {
       static Maquette *instance = new Maquette();
       return instance;
@@ -169,7 +170,7 @@ class Maquette : public QObject
     /*!
      * \brief Initialise the maquette elements.
      */
-    void init();
+    void init(); /// \todo Une méthode init() ne devrait pas être utilisée. surtout en public !!! Elle peut laisser l'invariant de classe instable à tout moment. (par jaime Chao)
 
     /*!
      * \brief Sets a new scene.
