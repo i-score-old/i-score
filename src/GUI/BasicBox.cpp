@@ -94,7 +94,7 @@ const float BasicBox::GRIP_CIRCLE_SIZE = 5;
 unsigned int BasicBox::BOX_MARGIN = 25;
 const QString BasicBox::SUB_SCENARIO_MODE_TEXT = tr("Scenario");
 const QColor BasicBox::BOX_COLOR = QColor(60, 60, 60);
-const QColor BasicBox::TEXT_COLOR = QColor(60, 120, 60);
+const QColor BasicBox::TEXT_COLOR = QColor(0, 0, 0);
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
   : QGraphicsItem()

@@ -388,6 +388,8 @@ class NetworkTree : public QTreeWidget
     static int TYPE_COLUMN;
     static QString OSC_ADD_NODE_TEXT;
     static unsigned int TEXT_POINT_SIZE;
+    static const QColor TEXT_COLOR;
+    static const QColor TEXT_DISABLED_COLOR;
 
     bool VALUE_MODIFIED;
     bool SR_MODIFIED;

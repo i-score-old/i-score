@@ -59,6 +59,9 @@ int NetworkTree::REDUNDANCY_COLUMN = 5;
 int NetworkTree::SR_COLUMN = 6;
 int NetworkTree::TYPE_COLUMN = 7;
 
+const QColor NetworkTree::TEXT_COLOR = QColor(0, 0, 0);
+const QColor NetworkTree::TEXT_DISABLED_COLOR = QColor(100, 100, 100);
+
 QString NetworkTree::OSC_ADD_NODE_TEXT = QString("Add a node");
 
 unsigned int NetworkTree::TEXT_POINT_SIZE = 10;
@@ -634,7 +637,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                           curFont.setItalic(true);
                           curItem->setFont(NAME_COLUMN,curFont);
                           
-                          QBrush brush(Qt::lightGray);
+                          QBrush brush(TEXT_DISABLED_COLOR);
                           curItem->setForeground(NAME_COLUMN, brush);
                           curItem->setForeground(VALUE_COLUMN, brush);                          
                           
@@ -652,7 +655,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                           curFont.setItalic(true);
                           curItem->setFont(NAME_COLUMN,curFont);
                           
-                          QBrush brush(Qt::lightGray);
+                          QBrush brush(TEXT_DISABLED_COLOR);
                           curItem->setForeground(NAME_COLUMN, brush);
                           curItem->setForeground(VALUE_COLUMN, brush);
 
