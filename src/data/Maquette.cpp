@@ -2211,3 +2211,38 @@ Maquette::setEndMessageToSend(unsigned int boxID, QTreeWidgetItem *item, QString
 {
   _boxes[boxID]->setEndMessage(item, address);
 }
+
+int
+Maquette::requestObjectAttribruteValue(const std::string &address, const std::string &attributeName, std::vector<std::string>& value){
+    return _engines->requestObjectAttributeValue(address,attributeName,value);
+}
+
+std::vector<float>
+Maquette::getRangeBounds(const std::string& address){
+    std::vector<std::string>    values;
+    std::vector<float>          ret;
+    float                       min, max;
+
+    if(Maquette::getInstance()->requestObjectAttribruteValue(address,"rangeBounds",values)>0){
+        std::cout<<address<<" > rangeBounds : "<<values[0]<<std::endl;
+
+
+        //parse string to vector<float>
+        QString qvalues = QString::fromStdString(values[0]);
+        QStringList valuesParsed = qvalues.split(" ");
+
+        //minBound
+        valuesParsed.at(0).toStdString();
+        std::istringstream issMin(valuesParsed.at(0).toStdString());
+        issMin >> min;
+        ret.push_back(min);
+
+        //maxBound
+        valuesParsed.at(1).toStdString();
+        std::istringstream issMax(valuesParsed.at(0).toStdString());
+        issMax >> max;
+        ret.push_back(max);
+    }
+
+    return ret;
+}

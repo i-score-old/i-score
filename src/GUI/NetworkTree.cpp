@@ -1565,25 +1565,6 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 {
   if (item != NULL) {
 
-//      //Case message
-//      if(item->isDisabled()){
-//          std::cout<<"OUI"<<std::endl;
-//          if(item->text(TYPE_COLUMN) == "->"){
-//              if(column==START_COLUMN || column==END_COLUMN){
-//                  int curcolumn;
-//                  if(column==START_COLUMN){
-//                      curcolumn=START_COLUMN;
-//                  }
-//                  else{
-//                      curcolumn=END_COLUMN;
-//                  }
-//                  item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
-//                  VALUE_MODIFIED = true;
-//                  editItem(item, curcolumn);
-//                  item->setDisabled(true);
-//              }
-//          }
-//      }
       if (item->isSelected()) {
           recursiveChildrenSelection(item, true);
           recursiveFatherSelection(item, true);

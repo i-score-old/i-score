@@ -130,11 +130,21 @@ CurveWidget::curveRepresentationOutdated()
     }
 
   _interspace = (width() - BORDER_WIDTH) / (float)(std::max((unsigned int)2, (unsigned int)(_abstract->_curve.size())) - 1);
-  _minY = minCurveElement;
+
 
 //    _maxY =  *(std::max_element(_abstract->_curve.begin(),_abstract->_curve.end()));
 
-  _maxY = std::max((float)1., maxCurveElement);
+
+
+  vector<float> rangeBounds = Maquette::getInstance()->getRangeBounds(_abstract->_address);
+  if(rangeBounds.size()>2){
+      _minY = rangeBounds[0];
+      _maxY = rangeBounds[1];
+  }
+  else{
+    _maxY = std::max((float)1., maxCurveElement);
+    _minY = minCurveElement;
+  }
 
   float halfSizeY = std::max(fabs(_maxY), fabs(_minY));
   _scaleY = 2 * (_xAxisPos - BORDER_WIDTH) / (2 * halfSizeY);

@@ -701,6 +701,17 @@ class Maquette : public QObject
      */
     int requestNetworkNamespace(const std::string &address, std::string &nodeType, std::vector<std::string>& nodes, std::vector<std::string>& leaves,
                                 std::vector<std::string>& attributes, std::vector<std::string>& attributesValue);
+    /*!
+     * \brief Requests a snapshot of the network on a namespace.
+     *
+     * \param address : the address to take snapshot on
+     * \param nodeType : the object type under at the address
+     * \param nodes : the nodes to be filled
+     * \param leaves : the leaves to be filled
+     * \param attributes : the attributes to be filled
+     * \param attributesValue : the respective values of the attributes to be filled
+     */
+    int requestObjectAttribruteValue(const std::string &address, const std::string &attributeName, std::vector<std::string>& value);
 
     /*!
      * \brief Update boxes from Engines.
@@ -764,6 +775,8 @@ class Maquette : public QObject
     void setEndMessageToSend(unsigned int boxID, QTreeWidgetItem *item, QString address);
     std::vector<std::string> getPlugins();
     void removeNetworkDevice(string deviceName);
+
+    std::vector<float> getRangeBounds(const std::string& address);
 
   private:
     /*!

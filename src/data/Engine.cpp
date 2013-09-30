@@ -1335,7 +1335,7 @@ bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned
     if (!err) {
         
         curve = v[0];
-        
+
         // get a curve parameters
         err = curve->getAttributeValue(TTSymbol("parameters"), v);
         
@@ -1814,6 +1814,37 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
     return snapshot;
 }
 
+int Engine::requestObjectAttributeValue(const std::string & address, const std::string & attribute, vector<string>& value){
+
+    TTAddress           anAddress = toTTAddress(address);
+    TTNodeDirectoryPtr  aDirectory;
+    TTNodePtr           aNode;
+    TTMirrorPtr         aMirror;
+    TTString            s;
+    TTValue             v;
+
+    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+
+    if (!aDirectory)
+        return 0;
+
+    if (!aDirectory->getTTNode(anAddress, &aNode)) {
+
+        // get object attributes
+        aMirror = TTMirrorPtr(aNode->getObject());
+
+        if (aMirror) {
+            if(!aMirror->getAttributeValue(TTSymbol(attribute), v)){
+                v.toString();
+                s = TTString(v[0]);
+                value.push_back(s.c_str());
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 int Engine::requestNetworkNamespace(const std::string & address, std::string & nodeType, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)
 {
     TTAddress           anAddress = toTTAddress(address);
@@ -1898,7 +1929,6 @@ int Engine::requestNetworkNamespace(const std::string & address, std::string & n
                 
                 v.toString();
                 s = TTString(v[0]);
-                std::cout<<"engine > "<<s.c_str()<<std::endl;
                 attributsValue.push_back(s.c_str());
             }
         }

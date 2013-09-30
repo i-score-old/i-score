@@ -811,7 +811,8 @@ public:
                                 std::string & nodeType,
                                 std::vector<std::string>& nodes, std::vector<std::string>& leaves,
                                 std::vector<std::string>& attributs, std::vector<std::string>& attributsValue);
-    
+
+    int requestObjectAttributeValue(const std::string & address, const std::string & attribute, std::vector<std::string>& value);
     
 	//Store and load ////////////////////////////////////////////////////////////////////////////////////
     
