@@ -94,6 +94,7 @@ const float BasicBox::GRIP_CIRCLE_SIZE = 5;
 unsigned int BasicBox::BOX_MARGIN = 25;
 const QString BasicBox::SUB_SCENARIO_MODE_TEXT = tr("Scenario");
 const QColor BasicBox::BOX_COLOR = QColor(60, 60, 60);
+const QColor BasicBox::TEXT_COLOR = QColor(60, 120, 60);
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
   : QGraphicsItem()
@@ -1836,8 +1837,9 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
   painter->fillRect(0, 0, textRect.width(), textRect.height(), isSelected() ? _color : _colorUnselected);
 
+  //Text
   painter->save();
-  painter->setPen(QPen(Qt::black));
+  painter->setPen(QPen(TEXT_COLOR));
   painter->drawText(QRectF(BOX_MARGIN, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
   painter->restore();
 

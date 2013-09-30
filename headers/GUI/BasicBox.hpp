@@ -103,6 +103,7 @@ class BasicBox : public QObject, public QGraphicsItem
     enum { BASIC_BOX_TYPE = QGraphicsItem::UserType + 1 };
     
     static const QColor BOX_COLOR;
+    static const QColor TEXT_COLOR;
 
     /*!
      * \brief Redefinition of QGraphicsItem::type(). Used for Item casting.
