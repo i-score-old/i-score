@@ -1791,6 +1791,12 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
   painter->setBrush(QBrush(Qt::white, Qt::NoBrush));
   painter->drawRect(_boxRect);
 
+
+
+  drawMsgsIndicators(painter);
+  drawInteractionGrips(painter);
+  drawTriggerGrips(painter);
+
   //duration text
   if(_hover){
       painter->save();
@@ -1801,10 +1807,6 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
       painter->drawText(QPoint(_boxRect.bottomRight().x() -38, _boxRect.bottomRight().y()-2), QString("%1").arg(duration()/1000.));
       painter->restore();
   }
-
-  drawMsgsIndicators(painter);
-  drawInteractionGrips(painter);
-  drawTriggerGrips(painter);
 
   _comboBoxProxy->setVisible(_abstract->height() > RESIZE_TOLERANCE + LINE_WIDTH);
   _curveProxy->setVisible(_abstract->height() > RESIZE_TOLERANCE + LINE_WIDTH);
