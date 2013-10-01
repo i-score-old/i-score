@@ -327,6 +327,56 @@ public:
 	 */
 	bool performBoxEditing(TimeProcessId boxId, TimeValue start, TimeValue end, std::vector<TimeProcessId>& movedBoxes);
     
+    /*!
+	 * Gets the name of the box matching the given ID
+	 *
+	 *
+	 * \param boxId : the ID of the box
+	 *
+	 * \return the name of the box matching the given ID
+	 */
+    std::string getBoxName(TimeProcessId boxId);
+    
+    /*!
+	 * Gets the vertical position of the box matching the given ID
+	 *
+	 *
+	 * \param boxId : the ID of the box
+	 *
+	 * \return the vertical position of the box matching the given ID
+	 */
+    unsigned int getBoxVerticalPosition(TimeProcessId boxId);
+    
+    /*!
+	 * Gets the vertical position of the box matching the given ID
+	 *
+	 *
+	 * \param boxId : the ID of the box
+	 *
+	 * \param newPosition : the new vertical position of the box matching the given ID
+	 */
+    void setBoxVerticalPosition(TimeProcessId boxId, unsigned int newPosition);
+    
+    /*!
+	 * Gets the vertical size of the box matching the given ID
+	 *
+	 *
+	 * \param boxId : the ID of the box
+	 *
+	 * \return the vertical size of the box matching the given ID
+	 */
+    unsigned int getBoxVerticalSize(TimeProcessId boxId);
+    
+    /*!
+	 * Sets the vertical size of the box matching the given ID
+	 *
+	 *
+	 * \param boxId : the ID of the box
+	 *
+	 * \param newSize : the new vertical size of the box matching the given ID
+	 */
+    void setBoxVerticalSize(TimeProcessId boxId, unsigned int newSize);
+    
 	/*!
 	 * Gets the begin value of the box matching the given ID
 	 *

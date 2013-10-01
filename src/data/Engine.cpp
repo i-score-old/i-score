@@ -1121,6 +1121,55 @@ bool Engine::performBoxEditing(TimeProcessId boxId, TimeValue start, TimeValue e
     return !err;
 }
 
+std::string Engine::getBoxName(TimeProcessId boxId)
+{
+    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
+    TTValue             v;
+    TTSymbol            name;
+    
+	timeProcess->getAttributeValue(TTSymbol("name"), v);
+    
+    name = v[0];
+    
+    return name.c_str();
+}
+
+unsigned int Engine::getBoxVerticalPosition(TimeProcessId boxId)
+{
+    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
+    TTValue             v;
+    
+	timeProcess->getAttributeValue(TTSymbol("verticalPosition"), v);
+    
+    return v[0];
+}
+
+void Engine::setBoxVerticalPosition(TimeProcessId boxId, unsigned int newPosition)
+{
+    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
+    TTValue             v = TTUInt32(newPosition);
+    
+	timeProcess->setAttributeValue(TTSymbol("verticalPosition"), v);
+}
+
+unsigned int Engine::getBoxVerticalSize(TimeProcessId boxId)
+{
+    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
+    TTValue             v;
+    
+	timeProcess->getAttributeValue(TTSymbol("verticalSize"), v);
+    
+    return v[0];
+}
+
+void Engine::setBoxVerticalSize(TimeProcessId boxId, unsigned int newSize)
+{
+    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
+    TTValue             v = TTUInt32(newSize);
+    
+	timeProcess->setAttributeValue(TTSymbol("verticalSize"), v);
+}
+
 TimeValue Engine::getBoxBeginTime(TimeProcessId boxId)
 {
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);

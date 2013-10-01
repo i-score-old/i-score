@@ -715,39 +715,40 @@ Maquette::updateRelations()
 bool
 Maquette::updateBox(unsigned int boxID, const Coords &coord)
 {
-//  std::cout<<"--- updateBox ---"<<std::endl;
-  bool moveAccepted;
-  vector<unsigned int> moved;
-  vector<unsigned int>::iterator it;
-  int boxBeginTime;
-  if (boxID != NO_ID && boxID != ROOT_BOX_ID) {
-      BasicBox *box = _boxes[boxID];
-
-      if (moveAccepted = _engines->performBoxEditing(boxID, coord.topLeftX * MaquetteScene::MS_PER_PIXEL,
-                                                     coord.topLeftX * MaquetteScene::MS_PER_PIXEL +
-                                                     coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
-//          std::cout<<"Maquette::updateBox("<<boxID<<" "<<coord.topLeftX * MaquetteScene::MS_PER_PIXEL<<" "<<coord.topLeftX * MaquetteScene::MS_PER_PIXEL +
-//                     coord.sizeX * MaquetteScene::MS_PER_PIXEL<<")"<<std::endl;
-//          std::cout<<boxID<<" move accepted "<<coord.topLeftX<<" ; "<<coord.topLeftY<<std::endl;
-          box->setRelativeTopLeft(QPoint((int)coord.topLeftX, (int)coord.topLeftY));
-          box->setSize(QPoint((int)coord.sizeX, (int)coord.sizeY));
-          box->setPos(box->getCenter());
-          box->update();
+    //  std::cout<<"--- updateBox ---"<<std::endl;
+    bool moveAccepted;
+    vector<unsigned int> moved;
+    vector<unsigned int>::iterator it;
+    int boxBeginTime;
+    if (boxID != NO_ID && boxID != ROOT_BOX_ID) {
+        BasicBox *box = _boxes[boxID];
+        
+        if (moveAccepted = _engines->performBoxEditing(boxID, coord.topLeftX * MaquetteScene::MS_PER_PIXEL,
+                                                       coord.topLeftX * MaquetteScene::MS_PER_PIXEL +
+                                                       coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
+            
+            _engines->setBoxVerticalPosition(boxID, coord.topLeftY);
+            _engines->setBoxVerticalSize(boxID, coord.sizeY);
+            
+            box->setRelativeTopLeft(QPoint((int)coord.topLeftX, (int)coord.topLeftY));
+            box->setSize(QPoint((int)coord.sizeX, (int)coord.sizeY));
+            box->setPos(box->getCenter());
+            box->update();
         }
-
-      else {
-          boxBeginTime = (_engines->getBoxBeginTime(boxID) / (float)MaquetteScene::MS_PER_PIXEL);
-//          std::cout<<boxID<<" move NOT accepted : "<<_engines->getBoxBeginTime(boxID)<<" -> "<<boxBeginTime<<std::endl;
-//          std::cout<<"i-score : BOX"<< boxID <<" "<<boxBeginTime<<" ------- NOT ACCEPTED"<<std::endl;
-          box->setRelativeTopLeft(QPoint(boxBeginTime,
-                                         box->getTopLeft().y()));
-          box->setSize(QPoint((_engines->getBoxEndTime(boxID) / (float)MaquetteScene::MS_PER_PIXEL -
-                               boxBeginTime),
-                              box->getSize().y()));
-          box->setPos(box->getCenter());
-          box->update();
+        
+        else {
+            
+            boxBeginTime = (_engines->getBoxBeginTime(boxID) / (float)MaquetteScene::MS_PER_PIXEL);
+            
+            _engines->setBoxVerticalPosition(boxID, box->getTopLeft().y());
+            _engines->setBoxVerticalSize(boxID, box->getSize().y());
+            
+            box->setRelativeTopLeft(QPoint(boxBeginTime, box->getTopLeft().y()));
+            box->setSize(QPoint((_engines->getBoxEndTime(boxID) / (float)MaquetteScene::MS_PER_PIXEL - boxBeginTime), box->getSize().y()));
+            box->setPos(box->getCenter());
+            box->update();
 #ifdef DEBUG
-          std::cerr << "Maquette::updateBox : Move refused by Engines" << std::endl;
+            std::cerr << "Maquette::updateBox : Move refused by Engines" << std::endl;
 #endif
         }
     }
@@ -1605,10 +1606,11 @@ Maquette::load(const string &fileName)
                 continue;
             
             // get name, date, duration, topLeftY and sizeY informations
+            name = _engines->getBoxName(boxID);
             date = _engines->getBoxBeginTime(boxID);
             duration = _engines->getBoxDuration(boxID);
-            topLeftY = 300;
-            sizeY = 300;
+            topLeftY = _engines->getBoxVerticalPosition(boxID);
+            sizeY = _engines->getBoxVerticalSize(boxID);
             
             QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
             QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);
