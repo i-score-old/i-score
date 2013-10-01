@@ -623,8 +623,8 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                       
                       //Case type return
                       if(treeFilterActive() && leave_value == QString("return")){
-                          curItem->setDisabled(true);
-                          
+
+                          curItem->setFlags(Qt::ItemIsDropEnabled);
                           QFont curFont = curItem->font(NAME_COLUMN);
                           curFont.setItalic(true);
                           curItem->setFont(NAME_COLUMN,curFont);
@@ -640,7 +640,6 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                       
                       //Case type message
                       if(treeFilterActive() && leave_value == QString("message")){
-//                          curItem->setDisabled(true);
                           curItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
 
                           QFont curFont = curItem->font(NAME_COLUMN);
@@ -658,7 +657,8 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                       
                       
                       //Case type parameter
-                      if(treeFilterActive() && leave_value == QString("parameter")){                          curItem->setText(TYPE_COLUMN,QString("<->"));
+                      if(treeFilterActive() && leave_value == QString("parameter")){
+                          curItem->setText(TYPE_COLUMN,QString("<->"));
                           curItem->setToolTip(NAME_COLUMN, tr("Type parameter"));
                           return;
                       }                      
@@ -735,23 +735,11 @@ NetworkTree::clearColumn(unsigned int column)
       for (it = assignedItems.begin(); it != assignedItems.end(); it++) {
           curIt = *it;
 
-//            std::cout<<"clear "<<curIt->text(0).toStdString()<<std::endl;
           if (curIt->checkState(column)) {
-//                std::cout<<"UNCHECK"<<std::endl;
               curIt->setCheckState(column, Qt::Unchecked);
             }
           curIt->setText(column, emptyString);
         }
-
-      //clear ça :
-//        std::cout<<"AllChihldren : "<<std::endl;
-//        for(int i=0; i<_nodesWithAllChildrenAssigned.size(); i++){
-//            std::cout<<_nodesWithAllChildrenAssigned.at(i)->text(0).toStdString()<<std::endl;
-//        }
-//        std::cout<<"SomeChihldren : "<<std::endl;
-//        for(int i=0; i<_nodesWithSomeChildrenAssigned.size(); i++){
-//            std::cout<<_nodesWithSomeChildrenAssigned.at(i)->text(0).toStdString()<<std::endl;
-//        }
     }
 }
 
@@ -853,26 +841,16 @@ NetworkTree::fatherColumnCheck(QTreeWidgetItem *item, int column)
       QTreeWidgetItem *father = item->parent();
 
       if (allBrothersChecked(item, column)) {
-//            std::cout<<getAbsoluteAddress(item).toStdString()<<" > allbothers"<<std::endl;
-//            std::cout<<"check "<< getAbsoluteAddress(father).toStdString()<<std::endl;
           father->setCheckState(column, Qt::Checked); //Check box OK
         }
       else {
           if (brothersPartiallyChecked(item, column)) { //PartialCheck
-//                std::cout<<getAbsoluteAddress(item).toStdString()<<"> partial"<<std::endl;
               father->setCheckState(column, Qt::PartiallyChecked);
-
-//                std::cout<<"partialcheck "<< getAbsoluteAddress(father).toStdString()<<std::endl;
             }
           else { //No check
-//                std::cout<<getAbsoluteAddress(item).toStdString()<<"> nobothers"<<std::endl;
               father->setCheckState(column, Qt::Unchecked);
-
-//                std::cout<<"uncheck "<< getAbsoluteAddress(father).toStdString()<<std::endl;
             }
         }
-
-//        std::cout<<std::endl;
       fatherColumnCheck(father, column);
     }
 }
@@ -932,7 +910,6 @@ NetworkTree::expandItems(QList<QTreeWidgetItem*> expandedItems)
   QList<QTreeWidgetItem *>::iterator it;
   QTreeWidgetItem *curItem;
 
-//    collapseAll();
   for (it = expandedItems.begin(); it != expandedItems.end(); ++it) {
       curItem = *it;
       expandItem(curItem);
@@ -1588,24 +1565,25 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 {
   if (item != NULL) {
 
-      //Case message
-      if(item->isDisabled()){
-          if(item->text(TYPE_COLUMN) == "->"){
-              if(column==START_COLUMN || column==END_COLUMN){
-                  int curcolumn;
-                  if(column==START_COLUMN){
-                      curcolumn=START_COLUMN;
-                  }
-                  else{
-                      curcolumn=END_COLUMN;
-                  }
-                  item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
-                  VALUE_MODIFIED = true;
-                  editItem(item, curcolumn);
-                  item->setDisabled(true);
-              }
-          }
-      }
+//      //Case message
+//      if(item->isDisabled()){
+//          std::cout<<"OUI"<<std::endl;
+//          if(item->text(TYPE_COLUMN) == "->"){
+//              if(column==START_COLUMN || column==END_COLUMN){
+//                  int curcolumn;
+//                  if(column==START_COLUMN){
+//                      curcolumn=START_COLUMN;
+//                  }
+//                  else{
+//                      curcolumn=END_COLUMN;
+//                  }
+//                  item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+//                  VALUE_MODIFIED = true;
+//                  editItem(item, curcolumn);
+//                  item->setDisabled(true);
+//              }
+//          }
+//      }
       if (item->isSelected()) {
           recursiveChildrenSelection(item, true);
           recursiveFatherSelection(item, true);
