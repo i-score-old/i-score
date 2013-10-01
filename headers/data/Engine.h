@@ -812,8 +812,36 @@ public:
                                 std::vector<std::string>& nodes, std::vector<std::string>& leaves,
                                 std::vector<std::string>& attributs, std::vector<std::string>& attributsValue);
 
+    /*!
+     * Sends a request to get an attribute value.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param attribute : the attribute's name we request. ex : "service", "rangeBounds"...etc
+     * \param attributeValue : will be filled with the matching attribute values.
+     *
+     * \return True(1) or false(0) if the request failed or not.
+     */
     int requestObjectAttributeValue(const std::string & address, const std::string & attribute, std::vector<std::string>& value);
-    
+
+    /*!
+     * Sends a request to get the type of an object.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param nodeType : will be filled with the matching attribute values.
+     *
+     * \return True(1) or false(0) if the request failed or not.
+     */
+    int requestObjectType(const std::string & address, std::string & nodeType);
+
+    /*!
+     * Sends a request to get the children nodes of an object.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param children : will be filled with the children' addresses.
+     *
+     * \return True(1) or false(0) if the request failed or not.
+     */
+    int requestObjectChildren(const std::string & address, std::vector<std::string>& children);
 	//Store and load ////////////////////////////////////////////////////////////////////////////////////
     
 	/*!

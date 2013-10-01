@@ -1845,6 +1845,72 @@ int Engine::requestObjectAttributeValue(const std::string & address, const std::
     return 0;
 }
 
+int
+Engine::requestObjectType(const std::string & address, std::string & nodeType){
+    TTNodeDirectoryPtr  aDirectory;
+    TTAddress           anAddress = toTTAddress(address);
+    TTSymbol            type;
+    TTMirrorPtr         aMirror;
+    TTNodePtr           aNode;
+
+    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+
+    if (!aDirectory)
+        return 0;
+
+    if (!aDirectory->getTTNode(anAddress, &aNode)) {
+
+        aMirror = TTMirrorPtr(aNode->getObject());
+        if (aMirror) {
+
+            type = aMirror->getName();
+
+            if (type != kTTSymEmpty)
+                nodeType = type.c_str();
+            else
+                nodeType = "none";
+
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int
+Engine::requestObjectChildren(const std::string & address, vector<string>& children)
+{
+    TTNodeDirectoryPtr  aDirectory;
+    TTAddress           anAddress = toTTAddress(address);
+    TTNodePtr           aNode, childNode;
+    TTList              nodeList;
+    TTString            s;
+
+    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+
+    if (!aDirectory)
+        return 0;
+
+    if (!aDirectory->getTTNode(anAddress, &aNode)) {
+
+        aNode->getChildren(S_WILDCARD, S_WILDCARD, nodeList);
+        nodeList.sort(&TTModularCompareNodePriority);
+
+        for (nodeList.begin(); nodeList.end(); nodeList.next()) {
+
+            childNode = TTNodePtr(TTPtr(nodeList.current()[0]));
+
+            s = childNode->getName().string();
+            if (childNode->getInstance() != kTTSymEmpty) {
+                s += ".";
+                s += childNode->getInstance().string();
+            }
+            children.push_back(s.c_str());
+        }
+        return 1;
+    }
+    return 0;
+}
+
 int Engine::requestNetworkNamespace(const std::string & address, std::string & nodeType, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)
 {
     TTAddress           anAddress = toTTAddress(address);
