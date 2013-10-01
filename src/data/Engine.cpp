@@ -1826,7 +1826,7 @@ int Engine::requestObjectAttributeValue(const std::string & address, const std::
     aDirectory = getApplicationDirectory(anAddress.getDirectory());
 
     if (!aDirectory)
-        return 0;
+        return 1;
 
     if (!aDirectory->getTTNode(anAddress, &aNode)) {
 

@@ -58,6 +58,8 @@ int NetworkTree::INTERPOLATION_COLUMN = 3;
 int NetworkTree::REDUNDANCY_COLUMN = 5;
 int NetworkTree::SR_COLUMN = 6;
 int NetworkTree::TYPE_COLUMN = 7;
+int NetworkTree::MIN_COLUMN = 8;
+int NetworkTree::MAX_COLUMN = 9;
 
 QString NetworkTree::OSC_ADD_NODE_TEXT = QString("Add a node");
 
@@ -66,9 +68,9 @@ unsigned int NetworkTree::TEXT_POINT_SIZE = 10;
 NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 {
   init();
-  setColumnCount(7);
+  setColumnCount(9);
   QStringList list;
-  list << "Address" << "Value" << "Start" << " ~ " << "End" << " = " << " % "<<" type ";
+  list << "Address" << "Value" << "Start" << " ~ " << "End" << " = " << " % "<<" type "<<" min "<<" max ";
   setColumnWidth(NAME_COLUMN, 130);
   setColumnWidth(VALUE_COLUMN, 65);
   setColumnWidth(START_COLUMN, 65);
@@ -76,7 +78,10 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   setColumnWidth(INTERPOLATION_COLUMN, 25);
   setColumnWidth(REDUNDANCY_COLUMN, 25);
   setColumnWidth(SR_COLUMN, 32);
-  setColumnWidth(TYPE_COLUMN, 32);
+  setColumnWidth(TYPE_COLUMN, 40);
+  setColumnWidth(MIN_COLUMN, 32);
+  setColumnWidth(MAX_COLUMN, 32);
+
   setIndentation(13);
   setHeaderLabels(list);
   list.clear();
@@ -195,7 +200,7 @@ NetworkTree::load()
         }
     }
   addTopLevelItems(itemsList);
-  addTopLevelItem(OSCRootNode);
+//  addTopLevelItem(OSCRootNode);
 }
 
 /*
@@ -600,27 +605,28 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                   std::cout<<"attributesValues>> "<<*it2<<std::endl;
               
               //---------------------------
-              
+
+
               if(attributes[0]=="service"){
-                  
+
                   if(!attributesValues.empty()){
                       it2=attributesValues.begin();
                       QString leave_value = QString::fromStdString(*it2);
                       std::cout<<"attributeValue : "<<*it2<<std::endl;
-                      
+
                       QFont font;
                       font.setCapitalization(QFont::SmallCaps);
                       curItem->setText(VALUE_COLUMN, leave_value);
                       curItem->setFont(VALUE_COLUMN, font);
                       curItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
                       curItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
-                      
+
                       //Case type view
                       if(treeFilterActive() && leave_value == QString("view")){
                           delete(curItem);
                           return;
                       }
-                      
+
                       //Case type return
                       if(treeFilterActive() && leave_value == QString("return")){
 
@@ -628,16 +634,16 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                           QFont curFont = curItem->font(NAME_COLUMN);
                           curFont.setItalic(true);
                           curItem->setFont(NAME_COLUMN,curFont);
-                          
+
                           QBrush brush(Qt::lightGray);
                           curItem->setForeground(NAME_COLUMN, brush);
-                          curItem->setForeground(VALUE_COLUMN, brush);                          
-                          
+                          curItem->setForeground(VALUE_COLUMN, brush);
+
                           curItem->setText(TYPE_COLUMN,QString("<-"));
                           curItem->setToolTip(NAME_COLUMN, tr("Type return"));
                           return;
                       }
-                      
+
                       //Case type message
                       if(treeFilterActive() && leave_value == QString("message")){
                           curItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
@@ -645,7 +651,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                           QFont curFont = curItem->font(NAME_COLUMN);
                           curFont.setItalic(true);
                           curItem->setFont(NAME_COLUMN,curFont);
-                          
+
                           QBrush brush(Qt::lightGray);
                           curItem->setForeground(NAME_COLUMN, brush);
                           curItem->setForeground(VALUE_COLUMN, brush);
@@ -654,21 +660,23 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                           curItem->setToolTip(NAME_COLUMN, tr("Type message"));
                           return;
                       }
-                      
-                      
+
+
                       //Case type parameter
                       if(treeFilterActive() && leave_value == QString("parameter")){
                           curItem->setText(TYPE_COLUMN,QString("<->"));
                           curItem->setToolTip(NAME_COLUMN, tr("Type parameter"));
                           return;
-                      }                      
-                      
+                      }
+
                       //Case other type
                       curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
                   }
-              }             
+              }
+
+
           }
-          
+
 
           // ------------------
           // ----- LEAVES ----

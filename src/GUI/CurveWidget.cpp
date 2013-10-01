@@ -135,9 +135,8 @@ CurveWidget::curveRepresentationOutdated()
 //    _maxY =  *(std::max_element(_abstract->_curve.begin(),_abstract->_curve.end()));
 
 
-
-  vector<float> rangeBounds = Maquette::getInstance()->getRangeBounds(_abstract->_address);
-  if(rangeBounds.size()>2){
+  vector<float> rangeBounds;
+  if(Maquette::getInstance()->getRangeBounds(_abstract->_address, rangeBounds) > 0){
       _minY = rangeBounds[0];
       _maxY = rangeBounds[1];
   }

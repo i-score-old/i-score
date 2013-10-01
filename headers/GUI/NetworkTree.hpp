@@ -386,6 +386,8 @@ class NetworkTree : public QTreeWidget
     static int REDUNDANCY_COLUMN;
     static int SR_COLUMN;
     static int TYPE_COLUMN;
+    static int MIN_COLUMN;
+    static int MAX_COLUMN;
     static QString OSC_ADD_NODE_TEXT;
     static unsigned int TEXT_POINT_SIZE;
 

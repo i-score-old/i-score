@@ -776,7 +776,13 @@ class Maquette : public QObject
     std::vector<std::string> getPlugins();
     void removeNetworkDevice(string deviceName);
 
-    std::vector<float> getRangeBounds(const std::string& address);
+    /*!
+     * \brief Requests the rangeBounds of an object to the Engines.
+     *
+     * \param address : the address to be snapped.
+     * \param rangeBounds : Result to be field.
+     */
+    int getRangeBounds(const std::string& address, std::vector<float>& rangeBounds);
 
   private:
     /*!
