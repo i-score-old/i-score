@@ -784,6 +784,26 @@ class Maquette : public QObject
      */
     int getRangeBounds(const std::string& address, std::vector<float>& rangeBounds);
 
+    /*!
+     * Gets the type of an object.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param nodeType : will be filled with the type.
+     *
+     * \return True(1) or false(0) if the request failed or not.
+     */
+    int getObjectType(const std::string & address, std::string & nodeType);
+
+    /*!
+     * Gets the children nodes of an object.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param children : will be filled with the children' addresses.
+     *
+     * \return True(1) or false(0) if the request failed or not.
+     */
+    int getObjectChildren(const std::string & address, std::vector<std::string>& children);
+
   private:
     /*!
      * \brief Generates the triggerQueueList.

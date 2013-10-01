@@ -2244,3 +2244,15 @@ Maquette::getRangeBounds(const std::string& address, std::vector<float>& rangeBo
 
     return 0;
 }
+
+int
+Maquette::getObjectType(const std::string & address, std::string & nodeType)
+{
+    return _engines->requestObjectType(address,nodeType);
+}
+
+int
+Maquette::getObjectChildren(const std::string & address, std::vector<std::string>& children)
+{
+    return _engines->requestObjectChildren(address,children);
+}

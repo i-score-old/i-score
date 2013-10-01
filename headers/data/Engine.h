@@ -827,7 +827,7 @@ public:
      * Sends a request to get the type of an object.
      *
      * \param address : the object's address. ex : /deviceName/address1/address2/
-     * \param nodeType : will be filled with the matching attribute values.
+     * \param nodeType : will be filled with the type.
      *
      * \return True(1) or false(0) if the request failed or not.
      */
@@ -842,6 +842,7 @@ public:
      * \return True(1) or false(0) if the request failed or not.
      */
     int requestObjectChildren(const std::string & address, std::vector<std::string>& children);
+
 	//Store and load ////////////////////////////////////////////////////////////////////////////////////
     
 	/*!
