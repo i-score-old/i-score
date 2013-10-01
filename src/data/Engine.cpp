@@ -1853,6 +1853,7 @@ Engine::requestObjectType(const std::string & address, std::string & nodeType){
     TTMirrorPtr         aMirror;
     TTNodePtr           aNode;
 
+    nodeType = "none";
     aDirectory = getApplicationDirectory(anAddress.getDirectory());
 
     if (!aDirectory)
@@ -1867,11 +1868,9 @@ Engine::requestObjectType(const std::string & address, std::string & nodeType){
 
             if (type != kTTSymEmpty)
                 nodeType = type.c_str();
-            else
-                nodeType = "none";
-
-            return 1;
+            
         }
+        return 1;
     }
     return 0;
 }

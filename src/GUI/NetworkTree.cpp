@@ -514,7 +514,7 @@ NetworkTree::treeSnapshot(unsigned int boxID)
       QTreeWidgetItem *curItem;
       for (it = selection.begin(); it != selection.end(); ++it) {
           curItem = *it;
-          if (!curItem->text(VALUE_COLUMN).isEmpty()) { // >type() != NodeNamespaceType && curItem->type() != NodeNoNamespaceType){
+          if (curItem->type() != NodeNamespaceType && curItem->type() != NodeNoNamespaceType){
               QString address = getAbsoluteAddress(*it);
 
               //get device concerned
@@ -556,178 +556,302 @@ NetworkTree::hasStartEndMsg(QTreeWidgetItem *item)
 *                          General display tools
 ****************************************************************************/
 
+//void
+//NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
+//{
+//  if (!curItem->isDisabled()) {
+//      vector<string> nodes, leaves, attributes, attributesValues;
+//      QString address = getAbsoluteAddress(curItem);
+//      _addressMap.insert(curItem, address.toStdString());
+      
+//      string nodeType;
+//      int request = Maquette::getInstance()->requestNetworkNamespace(address.toStdString(), nodeType, nodes, leaves, attributes, attributesValues);
+//      bool requestSuccess = request > 0;
+
+//      if (requestSuccess) {
+//          conflict = false;
+//          vector<string>::iterator it;
+//          vector<string>::iterator it2;
+          
+//          // ------------------
+//          // ---  NODETYPE  ---
+//          // ------------------
+//          std::cout<<"NodeType>> "<<nodeType<<std::endl;
+
+//          if(treeFilterActive()){
+              
+//              if(nodeType == "Model" ||
+//                 nodeType == "Input.audio" ||
+//                 nodeType == "Output.audio"){
+
+//                  delete(curItem);
+//                  return;
+//              }
+//          }
+          
+//          // ------------------
+//          // --- ATTRIBUTES ---
+//          // ------------------
+          
+//          if(!attributes.empty()){
+              
+//              //---------- print ----------
+//              std::cout<<">"<<getAbsoluteAddress(curItem).toStdString()<<std::endl;
+              
+//              for(it=attributes.begin(); it!=attributes.end(); it++)
+//                  std::cout<<"attributes>> "<<*it<<std::endl;
+              
+//              for(it2=attributesValues.begin(); it2!=attributesValues.end(); it2++)
+//                  std::cout<<"attributesValues>> "<<*it2<<std::endl;
+              
+//              //---------------------------
+
+
+//              if(attributes[0]=="service"){
+
+//                  if(!attributesValues.empty()){
+//                      it2=attributesValues.begin();
+//                      QString leave_value = QString::fromStdString(*it2);
+//                      std::cout<<"attributeValue : "<<*it2<<std::endl;
+
+//                      QFont font;
+//                      font.setCapitalization(QFont::SmallCaps);
+//                      curItem->setText(VALUE_COLUMN, leave_value);
+//                      curItem->setFont(VALUE_COLUMN, font);
+//                      curItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
+//                      curItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
+
+//                      //Case type view
+//                      if(treeFilterActive() && leave_value == QString("view")){
+//                          delete(curItem);
+//                          return;
+//                      }
+
+//                      //Case type return
+//                      if(treeFilterActive() && leave_value == QString("return")){
+
+//                          curItem->setFlags(Qt::ItemIsDropEnabled);
+//                          QFont curFont = curItem->font(NAME_COLUMN);
+//                          curFont.setItalic(true);
+//                          curItem->setFont(NAME_COLUMN,curFont);
+
+//                          QBrush brush(Qt::lightGray);
+//                          curItem->setForeground(NAME_COLUMN, brush);
+//                          curItem->setForeground(VALUE_COLUMN, brush);
+
+//                          curItem->setText(TYPE_COLUMN,QString("<-"));
+//                          curItem->setToolTip(NAME_COLUMN, tr("Type return"));
+//                          return;
+//                      }
+
+//                      //Case type message
+//                      if(treeFilterActive() && leave_value == QString("message")){
+//                          curItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
+
+//                          QFont curFont = curItem->font(NAME_COLUMN);
+//                          curFont.setItalic(true);
+//                          curItem->setFont(NAME_COLUMN,curFont);
+
+//                          QBrush brush(Qt::lightGray);
+//                          curItem->setForeground(NAME_COLUMN, brush);
+//                          curItem->setForeground(VALUE_COLUMN, brush);
+
+//                          curItem->setText(TYPE_COLUMN,QString("->"));
+//                          curItem->setToolTip(NAME_COLUMN, tr("Type message"));
+//                          return;
+//                      }
+
+
+//                      //Case type parameter
+//                      if(treeFilterActive() && leave_value == QString("parameter")){
+//                          curItem->setText(TYPE_COLUMN,QString("<->"));
+//                          curItem->setToolTip(NAME_COLUMN, tr("Type parameter"));
+//                          return;
+//                      }
+
+//                      //Case other type
+//                      curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
+//                  }
+//              }
+
+
+//          }
+
+
+//          // ------------------
+//          // ----- LEAVES ----
+//          // ------------------
+          
+//          for (it = leaves.begin(); it != leaves.end(); ++it) {
+//              QStringList list;
+//              list << QString::fromStdString(*it);
+              
+//              std::cout<<"-------------"<<std::endl;
+//              std::cout<<"leave : "<<*it<<std::endl;
+              
+//              QTreeWidgetItem *childItem = new QTreeWidgetItem(list, LeaveType);
+//              curItem->setCheckState(START_COLUMN, Qt::Unchecked);
+//              curItem->setCheckState(END_COLUMN, Qt::Unchecked);
+//              curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+//              curItem->addChild(childItem);
+//              list.clear();
+//              treeRecursiveExploration(childItem, conflict);
+//          }
+          
+          
+//          // ------------------
+//          // ------ NODES -----
+//          // ------------------
+          
+//          for (it = nodes.begin(); it != nodes.end(); ++it) {
+//              QStringList list;
+//              list << QString::fromStdString(*it);
+              
+//              std::cout<<"-------------"<<std::endl;
+//              std::cout<<"Node : "<<*it<<" "<<std::endl;
+              
+//              QTreeWidgetItem *childItem = new QTreeWidgetItem(list, NodeNamespaceType);
+//              curItem->setCheckState(START_COLUMN, Qt::Unchecked);
+//              curItem->setCheckState(END_COLUMN, Qt::Unchecked);
+//              curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+//              curItem->addChild(childItem);
+//              list.clear();
+//              treeRecursiveExploration(childItem, conflict);
+//          }
+//      }
+      
+//      else {
+//          if (conflict) {
+//              curItem->setIcon(NAME_COLUMN, QIcon(":/images/error-icon.png"));
+//              curItem->setToolTip(NAME_COLUMN, tr("Network connection failed : Please check if your remote application is running or if another i-score instance is not already working"));
+//              curItem->setFlags(Qt::ItemIsEnabled);
+//          }
+//      }
+//  }
+//}
+
 void
 NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
 {
-  if (!curItem->isDisabled()) {
-      vector<string> nodes, leaves, attributes, attributesValues;
-      QString address = getAbsoluteAddress(curItem);
-      _addressMap.insert(curItem, address.toStdString());
-      
-      string nodeType;
-      int request = Maquette::getInstance()->requestNetworkNamespace(address.toStdString(), nodeType, nodes, leaves, attributes, attributesValues);
-      bool requestSuccess = request > 0;
+    if (!curItem->isDisabled()) {
 
-      if (requestSuccess) {
-          conflict = false;
-          vector<string>::iterator it;
-          vector<string>::iterator it2;
-          
-          // ------------------
-          // ---  NODETYPE  ---
-          // ------------------
-          std::cout<<"NodeType>> "<<nodeType<<std::endl;
+        vector<string>            children,
+                                  attributesValues;
+        string                    nodeType,
+                                  address = (getAbsoluteAddress(curItem)).toStdString();
+        bool                      requestSuccess;
+        int                       requestResult;
+        vector<string>::iterator  it;
 
-          if(treeFilterActive()){
-              
-              if(nodeType == "Model" ||
-                 nodeType == "Input.audio" ||
-                 nodeType == "Output.audio"){
+        //TOTO : check if necessary (unused for the moment) NH.
+        _addressMap.insert(curItem, address);
 
-                  delete(curItem);
-                  return;
-              }              
-          }
-          
-          // ------------------
-          // --- ATTRIBUTES ---
-          // ------------------
-          
-          if(!attributes.empty()){
-              
-              //---------- print ----------
-              std::cout<<">"<<getAbsoluteAddress(curItem).toStdString()<<std::endl;
-              
-              for(it=attributes.begin(); it!=attributes.end(); it++)
-                  std::cout<<"attributes>> "<<*it<<std::endl;
-              
-              for(it2=attributesValues.begin(); it2!=attributesValues.end(); it2++)
-                  std::cout<<"attributesValues>> "<<*it2<<std::endl;
-              
-              //---------------------------
+        //Gets object's type
+        requestResult = Maquette::getInstance()->getObjectType(address,nodeType);
+        requestSuccess = requestResult > 0;
 
+        if (requestSuccess) {
+            conflict = false;
 
-              if(attributes[0]=="service"){
+            if(treeFilterActive()){
+                if(nodeType == "Model" || nodeType == "Input.audio" ||nodeType == "Output.audio"){
+                    delete(curItem);
+                    return;
+                }
 
-                  if(!attributesValues.empty()){
-                      it2=attributesValues.begin();
-                      QString leave_value = QString::fromStdString(*it2);
-                      std::cout<<"attributeValue : "<<*it2<<std::endl;
+            }
 
-                      QFont font;
-                      font.setCapitalization(QFont::SmallCaps);
-                      curItem->setText(VALUE_COLUMN, leave_value);
-                      curItem->setFont(VALUE_COLUMN, font);
-                      curItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
-                      curItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
+            if(Maquette::getInstance()->requestObjectAttribruteValue(address,"service",attributesValues) > 0){
+                if(nodeType == "Container"){
+                    //Case type view
+                    if(treeFilterActive() && attributesValues[0] == "view"){
+                        delete(curItem);
+                        return;
+                    }
+                }
+                else{
+                    curItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
+                    curItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
 
-                      //Case type view
-                      if(treeFilterActive() && leave_value == QString("view")){
-                          delete(curItem);
-                          return;
-                      }
+                    //Case type return
+                    if(attributesValues[0] == "return"){
 
-                      //Case type return
-                      if(treeFilterActive() && leave_value == QString("return")){
+                        curItem->setFlags(Qt::ItemIsDropEnabled);
+                        QFont curFont = curItem->font(NAME_COLUMN);
+                        curFont.setItalic(true);
+                        curItem->setFont(NAME_COLUMN,curFont);
 
-                          curItem->setFlags(Qt::ItemIsDropEnabled);
-                          QFont curFont = curItem->font(NAME_COLUMN);
-                          curFont.setItalic(true);
-                          curItem->setFont(NAME_COLUMN,curFont);
+                        QBrush brush(Qt::lightGray);
+                        curItem->setForeground(NAME_COLUMN, brush);
+                        curItem->setForeground(VALUE_COLUMN, brush);
 
-                          QBrush brush(Qt::lightGray);
-                          curItem->setForeground(NAME_COLUMN, brush);
-                          curItem->setForeground(VALUE_COLUMN, brush);
+                        curItem->setText(TYPE_COLUMN,QString("<-"));
+                        curItem->setToolTip(NAME_COLUMN, tr("Type return"));
+                        return;
+                    }
 
-                          curItem->setText(TYPE_COLUMN,QString("<-"));
-                          curItem->setToolTip(NAME_COLUMN, tr("Type return"));
-                          return;
-                      }
+                    //Case type message
+                    if(attributesValues[0] == "message"){
+                        curItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
 
-                      //Case type message
-                      if(treeFilterActive() && leave_value == QString("message")){
-                          curItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
+                        QFont curFont = curItem->font(NAME_COLUMN);
+                        curFont.setItalic(true);
+                        curItem->setFont(NAME_COLUMN,curFont);
 
-                          QFont curFont = curItem->font(NAME_COLUMN);
-                          curFont.setItalic(true);
-                          curItem->setFont(NAME_COLUMN,curFont);
+                        QBrush brush(Qt::lightGray);
+                        curItem->setForeground(NAME_COLUMN, brush);
+                        curItem->setForeground(VALUE_COLUMN, brush);
 
-                          QBrush brush(Qt::lightGray);
-                          curItem->setForeground(NAME_COLUMN, brush);
-                          curItem->setForeground(VALUE_COLUMN, brush);
+                        curItem->setText(TYPE_COLUMN,QString("->"));
+                        curItem->setToolTip(NAME_COLUMN, tr("Type message"));
+                        return;
+                    }
 
-                          curItem->setText(TYPE_COLUMN,QString("->"));
-                          curItem->setToolTip(NAME_COLUMN, tr("Type message"));
-                          return;
-                      }
+                    //Case type parameter
+                    if(attributesValues[0] == "parameter"){
+                        curItem->setText(TYPE_COLUMN,QString("<->"));
+                        curItem->setToolTip(NAME_COLUMN, tr("Type parameter"));
+                    }
+                    curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
+                }
+            }
 
 
-                      //Case type parameter
-                      if(treeFilterActive() && leave_value == QString("parameter")){
-                          curItem->setText(TYPE_COLUMN,QString("<->"));
-                          curItem->setToolTip(NAME_COLUMN, tr("Type parameter"));
-                          return;
-                      }
+            //Get object's chidren
+            if(Maquette::getInstance()->getObjectChildren(address,children) > 0){
 
-                      //Case other type
-                      curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
-                  }
-              }
+                for(it = children.begin() ; it != children.end() ; ++it){
+                    QStringList name;
+                    name << QString::fromStdString(*it);
+                    QTreeWidgetItem *childItem;
+                    string childAbsoluteAddress = address;
+                    childAbsoluteAddress.append("/");
+                    childAbsoluteAddress.append(*it);
 
-
-          }
-
-
-          // ------------------
-          // ----- LEAVES ----
-          // ------------------
-          
-          for (it = leaves.begin(); it != leaves.end(); ++it) {
-              QStringList list;
-              list << QString::fromStdString(*it);
-              
-              std::cout<<"-------------"<<std::endl;
-              std::cout<<"leave : "<<*it<<std::endl;
-              
-              QTreeWidgetItem *childItem = new QTreeWidgetItem(list, LeaveType);
-              curItem->setCheckState(START_COLUMN, Qt::Unchecked);
-              curItem->setCheckState(END_COLUMN, Qt::Unchecked);
-              curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-              curItem->addChild(childItem);
-              list.clear();
-              treeRecursiveExploration(childItem, conflict);
-          }
-          
-          
-          // ------------------
-          // ------ NODES -----
-          // ------------------
-          
-          for (it = nodes.begin(); it != nodes.end(); ++it) {
-              QStringList list;
-              list << QString::fromStdString(*it);
-              
-              std::cout<<"-------------"<<std::endl;
-              std::cout<<"Node : "<<*it<<" "<<std::endl;
-              
-              QTreeWidgetItem *childItem = new QTreeWidgetItem(list, NodeNamespaceType);
-              curItem->setCheckState(START_COLUMN, Qt::Unchecked);
-              curItem->setCheckState(END_COLUMN, Qt::Unchecked);
-              curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-              curItem->addChild(childItem);
-              list.clear();
-              treeRecursiveExploration(childItem, conflict);
-          }
-      }
-      
-      else {
-          if (conflict) {
-              curItem->setIcon(NAME_COLUMN, QIcon(":/images/error-icon.png"));
-              curItem->setToolTip(NAME_COLUMN, tr("Network connection failed : Please check if your remote application is running or if another i-score instance is not already working"));
-              curItem->setFlags(Qt::ItemIsEnabled);
-          }
-      }
-  }
+                    if(Maquette::getInstance()->getObjectType(childAbsoluteAddress,nodeType)){
+                        if(nodeType == "Data"){
+                            childItem = new QTreeWidgetItem(name, LeaveType);
+                        }
+                        else{
+                            childItem = new QTreeWidgetItem(name, NodeNamespaceType);
+                        }
+                        name.clear();
+                        curItem->addChild(childItem);
+                        curItem->setCheckState(START_COLUMN, Qt::Unchecked);
+                        curItem->setCheckState(END_COLUMN, Qt::Unchecked);
+                        treeRecursiveExploration(childItem, conflict);
+                    }
+                }
+            }
+        }
+        else {
+            if (conflict) {
+                curItem->setIcon(NAME_COLUMN, QIcon(":/images/error-icon.png"));
+                curItem->setToolTip(NAME_COLUMN, tr("Network connection failed : Please check if your remote application is running or if another i-score instance is not already working"));
+                curItem->setFlags(Qt::ItemIsEnabled);
+            }
+        }
+    }
 }
 
 void
