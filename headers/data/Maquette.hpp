@@ -783,6 +783,7 @@ class Maquette : public QObject
      * \param rangeBounds : Result to be field.
      */
     int getRangeBounds(const std::string& address, std::vector<float>& rangeBounds);
+    int getRangeBounds(const std::string& address, std::vector<string>& rangeBoundsAsString);
 
     /*!
      * Gets the type of an object.

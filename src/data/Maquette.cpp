@@ -2223,7 +2223,6 @@ Maquette::getRangeBounds(const std::string& address, std::vector<float>& rangeBo
     double                      min, max;
 
     if(Maquette::getInstance()->requestObjectAttribruteValue(address,"rangeBounds",values)>0){
-        std::cout<<address<<" > rangeBounds : "<<values[0]<<std::endl;
 
         //parse string to vector<float>
         QString qvalues = QString::fromStdString(values[0]);
@@ -2238,6 +2237,27 @@ Maquette::getRangeBounds(const std::string& address, std::vector<float>& rangeBo
         std::istringstream issMax(valuesParsed.at(1).toStdString());
         issMax >> max;
         rangeBounds.push_back(max);
+
+        return 1;
+    }
+    return 0;
+}
+
+int
+Maquette::getRangeBounds(const std::string& address, std::vector<string>& rangeBoundsAsString){
+    std::vector<std::string>    values;
+
+    if(Maquette::getInstance()->requestObjectAttribruteValue(address,"rangeBounds",values)>0){
+
+        //parse string to vector<string>
+        QString qvalues = QString::fromStdString(values[0]);
+        QStringList valuesParsed = qvalues.split(" ");
+
+        //minBound
+        rangeBoundsAsString.push_back(valuesParsed.at(0).toStdString());
+
+        //maxBound
+        rangeBoundsAsString.push_back(valuesParsed.at(1).toStdString());
 
         return 1;
     }

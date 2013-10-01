@@ -758,7 +758,6 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                     delete(curItem);
                     return;
                 }
-
             }
 
             if(Maquette::getInstance()->requestObjectAttribruteValue(address,"service",attributesValues) > 0){
@@ -786,7 +785,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                         curItem->setForeground(VALUE_COLUMN, brush);
 
                         curItem->setText(TYPE_COLUMN,QString("<-"));
-                        curItem->setToolTip(NAME_COLUMN, tr("Type return"));
+                        curItem->setToolTip(TYPE_COLUMN, tr("Type return"));
                         return;
                     }
 
@@ -803,14 +802,21 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                         curItem->setForeground(VALUE_COLUMN, brush);
 
                         curItem->setText(TYPE_COLUMN,QString("->"));
-                        curItem->setToolTip(NAME_COLUMN, tr("Type message"));
+                        curItem->setToolTip(TYPE_COLUMN, tr("Type message"));
                         return;
                     }
 
                     //Case type parameter
                     if(attributesValues[0] == "parameter"){
+                        vector<string> rangeBounds;
+                        if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0){
+                            curItem->setText(MIN_COLUMN,QString::fromStdString(rangeBounds[0]));
+                            curItem->setToolTip(MIN_COLUMN, curItem->text(MIN_COLUMN));
+                            curItem->setText(MAX_COLUMN,QString::fromStdString(rangeBounds[1]));
+                            curItem->setToolTip(MAX_COLUMN, curItem->text(MAX_COLUMN));
+                        }
                         curItem->setText(TYPE_COLUMN,QString("<->"));
-                        curItem->setToolTip(NAME_COLUMN, tr("Type parameter"));
+                        curItem->setToolTip(TYPE_COLUMN, tr("Type parameter"));
                     }
                     curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
                 }
