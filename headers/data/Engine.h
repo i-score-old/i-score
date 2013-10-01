@@ -156,6 +156,8 @@ private:
     TTObjectBasePtr     m_dataStartPoint;                               /// A Modular TTData to expose StartPoint transport service
     TTObjectBasePtr     m_dataSpeed;                                    /// A Modular TTData to expose Speed transport service
     
+    TTBoolean           m_loading;                                      /// a flag to know if the engine is loading
+    
 	void (*m_TimeEventReadyAttributeCallback)(ConditionedProcessId, bool);
     void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);
     void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);
@@ -178,24 +180,28 @@ public:
     TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::string & name);
     TTTimeProcessPtr    getTimeProcess(TimeProcessId boxId);
     void                uncacheTimeProcess(TimeProcessId boxId);
+    void                clearTimeProcess();
     
     IntervalId          cacheInterval(TTTimeProcessPtr timeProcess);
     TTTimeProcessPtr    getInterval(IntervalId relationId);
     void                uncacheInterval(IntervalId relationId);
+    void                clearInterval();
     
-    ConditionedProcessId cacheConditionedProcess(TTTimeProcessPtr timeProcess, TimeEventIndex controlPointId);
+    ConditionedProcessId cacheConditionedProcess(TimeProcessId timeProcessId, TimeEventIndex controlPointId);
     TTTimeProcessPtr    getConditionedProcess(ConditionedProcessId triggerId, TimeEventIndex& controlPointId);
     void                uncacheConditionedProcess(ConditionedProcessId triggerId);
+    void                clearConditionedProcess();
     
-    void                cacheTimeCondition(ConditionedProcessId triggerId);
+    void                cacheTimeCondition(ConditionedProcessId triggerId, TTTimeConditionPtr timeCondition);
     TTTimeConditionPtr  getTimeCondition(ConditionedProcessId triggerId);
     void                uncacheTimeCondition(ConditionedProcessId triggerId);
+    void                clearTimeCondition();
     
     void                cacheRunningCallback(TimeProcessId boxId);
     void                uncacheRunningCallback(TimeProcessId boxId);
     
-    void                cacheReadyCallback(ConditionedProcessId triggerId, TTTimeEventPtr timeEvent);
-    void                uncacheReadyCallback(ConditionedProcessId triggerId, TTTimeEventPtr timeEvent);
+    void                cacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId);
+    void                uncacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId);
     
     void                cacheTriggerDataCallback(ConditionedProcessId triggerId, TimeProcessId boxId);
     void                uncacheTriggerDataCallback(ConditionedProcessId triggerId);
