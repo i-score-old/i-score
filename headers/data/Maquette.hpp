@@ -673,7 +673,6 @@ class Maquette : public QObject
      * \param fileName : the file to load composition from
      */
     void load(const std::string &fileName);
-    void loadOLD(const std::string &fileName);
 
     /*!
      * \brief Gets the current execution time in ms.

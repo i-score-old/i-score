@@ -715,39 +715,40 @@ Maquette::updateRelations()
 bool
 Maquette::updateBox(unsigned int boxID, const Coords &coord)
 {
-//  std::cout<<"--- updateBox ---"<<std::endl;
-  bool moveAccepted;
-  vector<unsigned int> moved;
-  vector<unsigned int>::iterator it;
-  int boxBeginTime;
-  if (boxID != NO_ID && boxID != ROOT_BOX_ID) {
-      BasicBox *box = _boxes[boxID];
-
-      if (moveAccepted = _engines->performBoxEditing(boxID, coord.topLeftX * MaquetteScene::MS_PER_PIXEL,
-                                                     coord.topLeftX * MaquetteScene::MS_PER_PIXEL +
-                                                     coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
-//          std::cout<<"Maquette::updateBox("<<boxID<<" "<<coord.topLeftX * MaquetteScene::MS_PER_PIXEL<<" "<<coord.topLeftX * MaquetteScene::MS_PER_PIXEL +
-//                     coord.sizeX * MaquetteScene::MS_PER_PIXEL<<")"<<std::endl;
-//          std::cout<<boxID<<" move accepted "<<coord.topLeftX<<" ; "<<coord.topLeftY<<std::endl;
-          box->setRelativeTopLeft(QPoint((int)coord.topLeftX, (int)coord.topLeftY));
-          box->setSize(QPoint((int)coord.sizeX, (int)coord.sizeY));
-          box->setPos(box->getCenter());
-          box->update();
+    //  std::cout<<"--- updateBox ---"<<std::endl;
+    bool moveAccepted;
+    vector<unsigned int> moved;
+    vector<unsigned int>::iterator it;
+    int boxBeginTime;
+    if (boxID != NO_ID && boxID != ROOT_BOX_ID) {
+        BasicBox *box = _boxes[boxID];
+        
+        if (moveAccepted = _engines->performBoxEditing(boxID, coord.topLeftX * MaquetteScene::MS_PER_PIXEL,
+                                                       coord.topLeftX * MaquetteScene::MS_PER_PIXEL +
+                                                       coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
+            
+            _engines->setBoxVerticalPosition(boxID, coord.topLeftY);
+            _engines->setBoxVerticalSize(boxID, coord.sizeY);
+            
+            box->setRelativeTopLeft(QPoint((int)coord.topLeftX, (int)coord.topLeftY));
+            box->setSize(QPoint((int)coord.sizeX, (int)coord.sizeY));
+            box->setPos(box->getCenter());
+            box->update();
         }
-
-      else {
-          boxBeginTime = (_engines->getBoxBeginTime(boxID) / (float)MaquetteScene::MS_PER_PIXEL);
-//          std::cout<<boxID<<" move NOT accepted : "<<_engines->getBoxBeginTime(boxID)<<" -> "<<boxBeginTime<<std::endl;
-//          std::cout<<"i-score : BOX"<< boxID <<" "<<boxBeginTime<<" ------- NOT ACCEPTED"<<std::endl;
-          box->setRelativeTopLeft(QPoint(boxBeginTime,
-                                         box->getTopLeft().y()));
-          box->setSize(QPoint((_engines->getBoxEndTime(boxID) / (float)MaquetteScene::MS_PER_PIXEL -
-                               boxBeginTime),
-                              box->getSize().y()));
-          box->setPos(box->getCenter());
-          box->update();
+        
+        else {
+            
+            boxBeginTime = (_engines->getBoxBeginTime(boxID) / (float)MaquetteScene::MS_PER_PIXEL);
+            
+            _engines->setBoxVerticalPosition(boxID, box->getTopLeft().y());
+            _engines->setBoxVerticalSize(boxID, box->getSize().y());
+            
+            box->setRelativeTopLeft(QPoint(boxBeginTime, box->getTopLeft().y()));
+            box->setSize(QPoint((_engines->getBoxEndTime(boxID) / (float)MaquetteScene::MS_PER_PIXEL - boxBeginTime), box->getSize().y()));
+            box->setPos(box->getCenter());
+            box->update();
 #ifdef DEBUG
-          std::cerr << "Maquette::updateBox : Move refused by Engines" << std::endl;
+            std::cerr << "Maquette::updateBox : Move refused by Engines" << std::endl;
 #endif
         }
     }
@@ -1560,517 +1561,207 @@ Maquette::save(const string &fileName)
 }
 
 void
-Maquette::loadOLD(const string &fileName)
-{
-  _engines->load(fileName + ".simone");
-
-  QFile enginesFile(QString::fromStdString(fileName + ".simone"));
-  QFile file(QString::fromStdString(fileName));
-
-  _doc = new QDomDocument;
-
-  if (enginesFile.open(QFile::ReadOnly)) {
-      if (!file.open(QFile::ReadOnly | QFile::Text)) {
-          _scene->displayMessage((tr("Cannot read file %1:\n%2.")
-                                  .arg(QString::fromStdString(fileName))
-                                  .arg(file.errorString())).toStdString(),
-                                 WARNING_LEVEL);
-          return;
-        }
-      else if (!_doc->setContent(&file)) {
-          _scene->displayMessage((tr("Cannot import xml document from %1:\n%2.")
-                                  .arg(QString::fromStdString(fileName))
-                                  .arg(file.errorString())).toStdString(),
-                                 WARNING_LEVEL);
-          file.close();
-          return;
-        }
-    }
-  else {
-      if (!file.open(QFile::ReadOnly | QFile::Text)) {
-          _scene->displayMessage((tr("Cannot read neither file %1 or %2 :\n%3.")
-                                  .arg(QString::fromStdString(fileName))
-                                  .arg(QString::fromStdString(fileName + ".simone"))
-                                  .arg(file.errorString())).toStdString(),
-                                 WARNING_LEVEL);
-        }
-      else {
-          _scene->displayMessage((tr("Cannot read file %1 :\n%2.")
-                                  .arg(QString::fromStdString(fileName + ".simone"))
-                                  .arg(file.errorString())).toStdString(),
-                                 WARNING_LEVEL);
-        }
-    }
-
-  QDomElement root = _doc->documentElement();
-  if (root.tagName() != "GRAPHICS") {
-      _scene->displayMessage((tr("Unvailable xml document %1").
-                              arg(QString::fromStdString(fileName))).toStdString(),
-                             WARNING_LEVEL);
-      file.close();
-      return;
-    }
-
-  _scene->clear();
-
-  QPointF topLeft, size, bottomRight;
-  QString name, boxType, relType;
-  QColor color(1., 1., 1.);
-  int boxID, motherID;
-  QMap<int, unsigned int> hashMap;
-  QDomNode mainNode = root.firstChild();      // Boxes
-  while (!mainNode.isNull()) {
-      QDomNode node1 = mainNode.firstChild(); // Box
-      while (!node1.isNull()) {
-          QDomElement elt1 = node1.toElement();
-          if (!elt1.isNull()) {
-              if (elt1.tagName() == "box") {
-                  boxID = elt1.attribute("ID", QString("%1").arg(NO_ID)).toInt();
-                  boxType = elt1.attribute("type", "unknown");
-                  name = elt1.attribute("name", "unknown");
-                  motherID = elt1.attribute("mother", QString("%1").arg(ROOT_BOX_ID)).toInt();
-                }
-              QDomNode node2 = node1.firstChild();
-              while (!node2.isNull()) {
-                  QDomElement elt2 = node2.toElement();
-                  if (!elt2.isNull()) {
-                      if (elt2.tagName() == "color") {
-                          color = QColor(elt2.attribute("red", "1").toFloat() * 255, elt2.attribute("green", "1").toFloat() * 255,
-                                         elt2.attribute("blue", "1").toFloat() * 255);
-                        }
-                      QDomNode node3 = node2.firstChild();
-                      while (!node3.isNull()) {
-                          QDomElement elt3 = node3.toElement();
-                          if (elt2.tagName() == "position") {
-                              QPointF tmp(elt3.attribute("x", "0").toInt(), elt3.attribute("y", "0").toInt());
-                              if (elt3.tagName() == "top-left") {
-                                  topLeft = tmp;
-                                }
-                              else if (elt3.tagName() == "size") {
-                                  size = tmp;
-                                }
-                            }
-                          node3 = node3.nextSibling();
-                        }
-                    }
-                  node2 = node2.nextSibling();
-                }
-            }
-          if (!elt1.isNull()) {
-              if (elt1.tagName() == "box") {
-                  if (boxType != "unknown") {
-                      bottomRight = topLeft + size;
-                      unsigned int ID = NO_ID;
-                      if (boxType == "parent") {
-                          ID = addParentBox((unsigned int)boxID, topLeft, bottomRight, name.toStdString(), motherID);
-                          _scene->addParentBox(ID);
-                        }
-                      else {
-                          _scene->displayMessage((QString("Unavailable box type through loading %1")
-                                                  .arg(QString::fromStdString(fileName))).toStdString(),
-                                                 WARNING_LEVEL);
-                        }
-                    }
-                }
-            }
-          node1 = node1.nextSibling();   // next Box
-        }
-      mainNode = mainNode.nextSibling();
-    }
-
-  vector<unsigned int> boxesID;
-  _engines->getBoxesId(boxesID);
-  vector<unsigned int>::iterator it;
-
-  /************************ TRIGGER ************************/
-  vector<unsigned int> triggersID;
-  _engines->getTriggersPointId(triggersID);
-
-  for (it = triggersID.begin(); it != triggersID.end(); it++) {
-      AbstractTriggerPoint abstractTrgPnt;
-      abstractTrgPnt.setID(*it);
-      unsigned int tpBoxID = _engines->getTriggerPointRelatedBoxId(*it);
-      if (tpBoxID != NO_ID) {
-          BasicBox *tpBox = getBox(tpBoxID);
-          if (tpBox != NULL) {
-              abstractTrgPnt.setBoxID(tpBoxID);
-              switch (_engines->getTriggerPointRelatedCtrlPointIndex(*it)) {
-                  case BEGIN_CONTROL_POINT_INDEX:
-                    abstractTrgPnt.setBoxExtremity(BOX_START);
-                    break;
-
-                  case END_CONTROL_POINT_INDEX:
-                    abstractTrgPnt.setBoxExtremity(BOX_END);
-                    break;
-
-                  default:
-                    std::cerr << "Maquette::load : unrecognized box extremity for Trigger Point " << *it << std::endl;
-                    abstractTrgPnt.setBoxExtremity(BOX_START);
-                    break;
-                }
-              std::string tpMsg = _engines->getTriggerPointMessage(*it);
-              if (tpMsg != "") {
-                  abstractTrgPnt.setMessage(tpMsg);
-                }
-              else {
-#ifdef DEBUG
-                  std::cerr << "Maquette::load : empty message found for Trigger Point " << *it << std::endl;
-#endif
-                }
-              addTriggerPoint(abstractTrgPnt);
-            }
-          else {
-#ifdef DEBUG
-              std::cerr << "Maquette::load : NULL box found for trigger point " << *it << std::endl;
-#endif
-            }
-        }
-      else {
-#ifdef DEBUG
-          std::cerr << "Maquette::load : box with NO_ID found for trigger point " << *it << std::endl;
-#endif
-        }
-    }
-
-  /************************ RELATIONS ************************/
-  vector<unsigned int> relationsID;
-  _engines->getRelationsId(relationsID);
-
-
-  for (it = relationsID.begin(); it != relationsID.end(); it++) {
-      AbstractRelation abstractRel;
-      unsigned int firstBoxID = _engines->getRelationFirstBoxId(*it);
-      unsigned int secondBoxID = _engines->getRelationSecondBoxId(*it);
-      if (firstBoxID != NO_ID && firstBoxID != ROOT_BOX_ID && secondBoxID != NO_ID
-          && secondBoxID != ROOT_BOX_ID && firstBoxID != secondBoxID) {
-          abstractRel.setFirstBox(firstBoxID);
-          abstractRel.setSecondBox(secondBoxID);
-          switch (_engines->getRelationFirstCtrlPointIndex(*it)) {
-              case BEGIN_CONTROL_POINT_INDEX:
-                abstractRel.setFirstExtremity(BOX_START);
-                break;
-
-              case END_CONTROL_POINT_INDEX:
-                abstractRel.setFirstExtremity(BOX_END);
-                break;
-            }
-          switch (_engines->getRelationSecondCtrlPointIndex(*it)) {
-              case BEGIN_CONTROL_POINT_INDEX:
-                abstractRel.setSecondExtremity(BOX_START);
-                break;
-
-              case END_CONTROL_POINT_INDEX:
-                abstractRel.setSecondExtremity(BOX_END);
-                break;
-            }
-          int minBoundMS = _engines->getRelationMinBound(*it);
-          float minBoundPXL = NO_BOUND;
-          if (minBoundMS != NO_BOUND) {
-              minBoundPXL = (float)minBoundMS / MaquetteScene::MS_PER_PIXEL;
-            }
-          int maxBoundMS = _engines->getRelationMaxBound(*it);
-          float maxBoundPXL = NO_BOUND;
-          if (maxBoundMS != NO_BOUND) {
-              maxBoundPXL = (float)maxBoundMS / MaquetteScene::MS_PER_PIXEL;
-            }
-          abstractRel.setMinBound(minBoundPXL);
-          abstractRel.setMaxBound(maxBoundPXL);
-          abstractRel.setID(*it);
-          addRelation(abstractRel);
-        }
-    }
-
-
-  delete _doc;
-}
-
-void
 Maquette::load(const string &fileName)
 {
-  _engines->load(fileName);
+    QPointF topLeft, size, bottomRight;
+    QString name, boxType;
+    QColor color(1., 1., 1.);
+    unsigned int motherID;
+    
+    float   zoom;
+    QPointF centerCoordinates;
+    vector<unsigned int>::iterator it;
 
-  /* other stuff to read
-   
-  QFile file(QString::fromStdString(fileName));
-
-  _doc = new QDomDocument;
-
-  if (_doc->doctype().nodeName() != "i-scoreSave") {
-      loadOLD(fileName);
-      return;
-    }
-
-  QDomElement root = _doc->documentElement();
-
-  if (root.tagName() != "GRAPHICS") {
-      _scene->displayMessage((tr("Unvailable xml document %1").
-                              arg(QString::fromStdString(fileName))).toStdString(),
-                             WARNING_LEVEL);
-      file.close();
-      return;
-    }
-
-  _scene->clear();
-
-  QPointF topLeft, size, bottomRight;
-  unsigned int begin, duration, topLeftY, sizeY;
-  QString name, boxType;
-  QColor color(1., 1., 1.);
-  int boxID, motherID;
-  float zoom;
-  QPointF centerCoordinates;
-
-  zoom = root.attribute("zoom", "1").toFloat();
-  centerCoordinates = QPointF(root.attribute("centerX", "0.").toFloat(), root.attribute("centerY", "0.").toFloat());
-
-  _scene->view()->setZoom(zoom);
-  _scene->view()->centerOn(centerCoordinates);
-
-  QDomNode mainNode = root.firstChild();      // Boxes
-  while (!mainNode.isNull()) {
-      QDomNode node1 = mainNode.firstChild(); // Box
-      while (!node1.isNull()) {
-          QDomElement elt1 = node1.toElement();
-          if (!elt1.isNull()) {
-              if (elt1.tagName() == "box") {
-                  boxID = elt1.attribute("ID", QString("%1").arg(NO_ID)).toInt();
-                  boxType = elt1.attribute("type", "unknown");
-                  name = elt1.attribute("name", "unknown");
-                  motherID = elt1.attribute("mother", QString("%1").arg(ROOT_BOX_ID)).toInt();
-                }
-              QDomNode node2 = node1.firstChild();
-              while (!node2.isNull()) {
-                  QDomElement elt2 = node2.toElement();
-                  if (!elt2.isNull()) {
-                      if (elt2.tagName() == "color") {
-                          color = QColor(elt2.attribute("red", "1").toInt(), elt2.attribute("green", "1").toInt(),
-                                         elt2.attribute("blue", "1").toInt());
-                        }
-                      QDomNode node3 = node2.firstChild();
-                      while (!node3.isNull()) {
-                          QDomElement elt3 = node3.toElement();
-                          if (elt2.tagName() == "position") {
-                              if (elt3.tagName() == "date") {
-                                  begin = elt3.attribute("begin", "0").toInt();
-                                  duration = elt3.attribute("duration", "0").toInt();
-                                }
-                              else if (elt3.tagName() == "top-left") {
-                                  topLeftY = sizeY = elt3.attribute("y", "0").toInt();
-                                }
-                              else if (elt3.tagName() == "size") {
-                                  sizeY = elt3.attribute("y", "0").toInt();
-                                }
-                            }
-                          node3 = node3.nextSibling();
-                        }
-                    }
-                  node2 = node2.nextSibling();
-                }
-            }
-          if (!elt1.isNull()) {
-              if (elt1.tagName() == "box") {
-                  if (boxType != "unknown") {
-                      bottomRight = topLeft + size;
-                      unsigned int ID = NO_ID;
-                      if (boxType == "parent") {
-                          ID = addParentBox((unsigned int)boxID, (unsigned int)begin, (unsigned int)topLeftY, (unsigned int)sizeY, (unsigned int)duration, name.toStdString(), motherID, color);
-                          _scene->addParentBox(ID);
-                        }
-                      else {
-                          _scene->displayMessage((QString("Unavailable box type through loading %1")
-                                                  .arg(QString::fromStdString(fileName))).toStdString(),
-                                                 WARNING_LEVEL);
-                        }
-                    }
-                }
-            }
-          node1 = node1.nextSibling();   // next Box
+    // Clear the maquette
+    _scene->clear();
+    
+    // Build the engine structure from the Xml file
+    _engines->load(fileName);
+    
+    // Reload networkTree
+    _scene->editor()->networkTree()->load();
+    
+    // Set zoom to 1 and view center coordinates to (0., 0.)
+    zoom = 1.;
+    centerCoordinates = QPointF(0., 0.);
+    
+    _scene->view()->setZoom(1.);
+    _scene->view()->centerOn(centerCoordinates);
+    
+    // BOXES
+    {
+        vector<unsigned int>    boxesID;
+        unsigned int            boxID;
+        string                  name;
+        unsigned int            date, duration, topLeftY, sizeY;
+        
+        // get all boxes ID
+        _engines->getBoxesId(boxesID);
+        
+        for (it = boxesID.begin(); it != boxesID.end(); it++) {
+            
+            boxID = *it;
+            
+            if (boxID == ROOT_BOX_ID)
+                continue;
+            
+            // get name, date, duration, topLeftY and sizeY informations
+            name = _engines->getBoxName(boxID);
+            date = _engines->getBoxBeginTime(boxID);
+            duration = _engines->getBoxDuration(boxID);
+            topLeftY = _engines->getBoxVerticalPosition(boxID);
+            sizeY = _engines->getBoxVerticalSize(boxID);
+            
+            QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
+            QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);
+            vector<string> firstMsgs;
+            vector<string> lastMsgs;
+            
+            _engines->getCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
+            _engines->getCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, lastMsgs);
+            
+            ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
+            
+            newBox->setName(QString::fromStdString(name));
+            newBox->setID(boxID);
+            newBox->setFirstMessagesToSend(firstMsgs);
+            newBox->setLastMessagesToSend(lastMsgs);
+            
+            _boxes[boxID] = newBox;
+            _parentBoxes[boxID] = newBox;
+            
+            _scene->addParentBox(boxID);
         }
-      mainNode = mainNode.nextSibling();
     }
 
-  vector<unsigned int> boxesID;
-  _engines->getBoxesId(boxesID);
-  vector<unsigned int>::iterator it;
-
-  // TRIGGER
-  vector<unsigned int> triggersID;
-  _engines->getTriggersPointId(triggersID);
-
-  for (it = triggersID.begin(); it != triggersID.end(); it++) {
-      AbstractTriggerPoint abstractTrgPnt;
-      abstractTrgPnt.setID(*it);
-      unsigned int tpBoxID = _engines->getTriggerPointRelatedBoxId(*it);
-      if (tpBoxID != NO_ID) {
-          BasicBox *tpBox = getBox(tpBoxID);
-          if (tpBox != NULL) {
-              abstractTrgPnt.setBoxID(tpBoxID);
-              switch (_engines->getTriggerPointRelatedCtrlPointIndex(*it)) {
-                  case BEGIN_CONTROL_POINT_INDEX:
-                    abstractTrgPnt.setBoxExtremity(BOX_START);
-                    break;
-
-                  case END_CONTROL_POINT_INDEX:
-                    abstractTrgPnt.setBoxExtremity(BOX_END);
-                    break;
-
-                  default:
-                    std::cerr << "Maquette::load : unrecognized box extremity for Trigger Point " << *it << std::endl;
-                    abstractTrgPnt.setBoxExtremity(BOX_START);
-                    break;
-                }
-              std::string tpMsg = _engines->getTriggerPointMessage(*it);
-              if (tpMsg != "") {
-                  abstractTrgPnt.setMessage(tpMsg);
-                }
-              else {
+    // TRIGGER
+    {
+        vector<unsigned int> triggersID;
+        
+        // get all triggers ID
+        _engines->getTriggersPointId(triggersID);
+        
+        for (it = triggersID.begin(); it != triggersID.end(); it++) {
+            
+            AbstractTriggerPoint abstractTrgPnt;
+            
+            abstractTrgPnt.setID(*it);
+            unsigned int tpBoxID = _engines->getTriggerPointRelatedBoxId(*it);
+            
+            if (tpBoxID != NO_ID) {
+                
+                BasicBox *tpBox = getBox(tpBoxID);
+                
+                if (tpBox != NULL) {
+                    
+                    abstractTrgPnt.setBoxID(tpBoxID);
+                    
+                    switch (_engines->getTriggerPointRelatedCtrlPointIndex(*it)) {
+                            
+                        case BEGIN_CONTROL_POINT_INDEX:
+                            abstractTrgPnt.setBoxExtremity(BOX_START);
+                            break;
+                            
+                        case END_CONTROL_POINT_INDEX:
+                            abstractTrgPnt.setBoxExtremity(BOX_END);
+                            break;
+                            
+                        default:
+                            std::cerr << "Maquette::load : unrecognized box extremity for Trigger Point " << *it << std::endl;
+                            abstractTrgPnt.setBoxExtremity(BOX_START);
+                            break;
+                    }
+                    
+                    std::string tpMsg = _engines->getTriggerPointMessage(*it);
+                    if (tpMsg != "") {
+                        abstractTrgPnt.setMessage(tpMsg);
+                    }
+                    else {
 #ifdef DEBUG
-                  std::cerr << "Maquette::load : empty message found for Trigger Point " << *it << std::endl;
+                        std::cerr << "Maquette::load : empty message found for Trigger Point " << *it << std::endl;
+#endif
+                    }
+                    
+                    addTriggerPoint(abstractTrgPnt);
+                }
+                else {
+#ifdef DEBUG
+                    std::cerr << "Maquette::load : NULL box found for trigger point " << *it << std::endl;
 #endif
                 }
-              addTriggerPoint(abstractTrgPnt);
             }
-          else {
+            else {
 #ifdef DEBUG
-              std::cerr << "Maquette::load : NULL box found for trigger point " << *it << std::endl;
+                std::cerr << "Maquette::load : box with NO_ID found for trigger point " << *it << std::endl;
 #endif
             }
         }
-      else {
-#ifdef DEBUG
-          std::cerr << "Maquette::load : box with NO_ID found for trigger point " << *it << std::endl;
-#endif
-        }
     }
 
-  // RELATIONS
-  vector<unsigned int> relationsID;
-  _engines->getRelationsId(relationsID);
-
-
-  for (it = relationsID.begin(); it != relationsID.end(); it++) {
-      AbstractRelation abstractRel;
-      unsigned int firstBoxID = _engines->getRelationFirstBoxId(*it);
-      unsigned int secondBoxID = _engines->getRelationSecondBoxId(*it);
-      if (firstBoxID != NO_ID && firstBoxID != ROOT_BOX_ID && secondBoxID != NO_ID
-          && secondBoxID != ROOT_BOX_ID && firstBoxID != secondBoxID) {
-          abstractRel.setFirstBox(firstBoxID);
-          abstractRel.setSecondBox(secondBoxID);
-          switch (_engines->getRelationFirstCtrlPointIndex(*it)) {
-              case BEGIN_CONTROL_POINT_INDEX:
-                abstractRel.setFirstExtremity(BOX_START);
-                break;
-
-              case END_CONTROL_POINT_INDEX:
-                abstractRel.setFirstExtremity(BOX_END);
-                break;
-            }
-          switch (_engines->getRelationSecondCtrlPointIndex(*it)) {
-              case BEGIN_CONTROL_POINT_INDEX:
-                abstractRel.setSecondExtremity(BOX_START);
-                break;
-
-              case END_CONTROL_POINT_INDEX:
-                abstractRel.setSecondExtremity(BOX_END);
-                break;
-            }
-          int minBoundMS = _engines->getRelationMinBound(*it);
-          float minBoundPXL = NO_BOUND;
-          if (minBoundMS != NO_BOUND) {
-              minBoundPXL = (float)minBoundMS / (MaquetteScene::MS_PER_PIXEL * zoom);
-            }
-          int maxBoundMS = _engines->getRelationMaxBound(*it);
-          float maxBoundPXL = NO_BOUND;
-          if (maxBoundMS != NO_BOUND) {
-              maxBoundPXL = (float)maxBoundMS / (MaquetteScene::MS_PER_PIXEL * zoom);
-            }
-          abstractRel.setMinBound(minBoundPXL);
-          abstractRel.setMaxBound(maxBoundPXL);
-          abstractRel.setID(*it);
-          addRelation(abstractRel);
-        }
-    }
-*/
-/*
-  // Devices
-  MyDevice OSCDevice;
-  string OSCDevicePort;
-
-  //clean
-  vector<string> deviceNames;
-  vector<bool> deviceRequestable;
-  _engines->getNetworkDevicesName(deviceNames, deviceRequestable);
-  for (unsigned int i = 0; i < deviceNames.size(); i++) {
-      _engines->removeNetworkDevice(deviceNames[i]);
-    }
-  _devices.clear();
-
-  //read from xml
-  if (root.childNodes().size() >= 2) { //Devices
-      QDomElement devices = root.childNodes().at(1).toElement();
-      if (devices.tagName() != "Devices") {
-          _scene->displayMessage((tr("Unvailable xml document %1 - Devices problem").
-                                  arg(QString::fromStdString(fileName))).toStdString(),
-                                 WARNING_LEVEL);
-          file.close();
-          return;
-        }
-      else {  //get device infos
-          QString deviceName;
-          QString ip;
-          QString port;
-          QString plugin;
-
-          for (int i = 0; i < devices.childNodes().size(); i++) { //Device
-              if (devices.childNodes().at(i).toElement().tagName() == "Device") {
-                  deviceName = devices.childNodes().at(i).toElement().attribute("name");
-                  ip = devices.childNodes().at(i).toElement().attribute("IP");
-                  port = devices.childNodes().at(i).toElement().attribute("port");
-                  plugin = devices.childNodes().at(i).toElement().attribute("plugin");
-
-                  addNetworkDevice(deviceName.toStdString(), plugin.toStdString(), ip.toStdString(), port.toStdString());
-
-                  //save OSC device (for OSCMessages)
-                  if (plugin == "OSC") {
-                      OSCDevice.name = deviceName.toStdString();
-                      OSCDevice.networkHost = ip.toStdString();
-                      OSCDevicePort = port.toStdString();
-                      OSCDevice.plugin = plugin.toStdString();
-                    }
+    // RELATIONS
+    {
+        vector<unsigned int> relationsID;
+        
+        // get all relations ID
+        _engines->getRelationsId(relationsID);
+        
+        for (it = relationsID.begin(); it != relationsID.end(); it++) {
+            
+            AbstractRelation abstractRel;
+            unsigned int firstBoxID = _engines->getRelationFirstBoxId(*it);
+            unsigned int secondBoxID = _engines->getRelationSecondBoxId(*it);
+            
+            if (firstBoxID != NO_ID         &&
+                firstBoxID != ROOT_BOX_ID   &&
+                secondBoxID != NO_ID        &&
+                secondBoxID != ROOT_BOX_ID  &&
+                firstBoxID != secondBoxID) {
+                
+                abstractRel.setFirstBox(firstBoxID);
+                abstractRel.setSecondBox(secondBoxID);
+                
+                switch (_engines->getRelationFirstCtrlPointIndex(*it)) {
+                        
+                    case BEGIN_CONTROL_POINT_INDEX:
+                        abstractRel.setFirstExtremity(BOX_START);
+                        break;
+                        
+                    case END_CONTROL_POINT_INDEX:
+                        abstractRel.setFirstExtremity(BOX_END);
+                        break;
                 }
+                
+                switch (_engines->getRelationSecondCtrlPointIndex(*it)) {
+                        
+                    case BEGIN_CONTROL_POINT_INDEX:
+                        abstractRel.setSecondExtremity(BOX_START);
+                        break;
+                        
+                    case END_CONTROL_POINT_INDEX:
+                        abstractRel.setSecondExtremity(BOX_END);
+                        break;
+                }
+                
+                int minBoundMS = _engines->getRelationMinBound(*it);
+                float minBoundPXL = NO_BOUND;
+                
+                if (minBoundMS != NO_BOUND)
+                    minBoundPXL = (float)minBoundMS / (MaquetteScene::MS_PER_PIXEL * zoom);
+                
+                int maxBoundMS = _engines->getRelationMaxBound(*it);
+                float maxBoundPXL = NO_BOUND;
+                
+                if (maxBoundMS != NO_BOUND)
+                    maxBoundPXL = (float)maxBoundMS / (MaquetteScene::MS_PER_PIXEL * zoom);
+                
+                abstractRel.setMinBound(minBoundPXL);
+                abstractRel.setMaxBound(maxBoundPXL);
+                abstractRel.setID(*it);
+                
+                addRelation(abstractRel);
             }
         }
     }
-
-  //reload networkTree
-  _scene->editor()->networkTree()->load();
-
-  // OSC
-  if (root.childNodes().size() >= 2) {
-      QDomElement OSC = root.childNodes().at(2).toElement();
-
-      if (OSC.tagName() != "OSCMessages") {
-          _scene->displayMessage((tr("Unvailable xml document %1 - OSC Messages problem").
-                                  arg(QString::fromStdString(fileName))).toStdString(),
-                                 WARNING_LEVEL);
-          file.close();
-          return;
-        }
-
-      QList<QString> OSCMessagesList;
-      for (int i = 0; i < OSC.childNodes().size(); i++) {
-          if (OSC.childNodes().at(i).toElement().tagName() == "OSC") {
-              OSCMessagesList << OSC.childNodes().at(i).toElement().attribute("message");
-            }
-        }
-
-      _scene->setNetworDeviceConfig(OSCDevice.name, OSCDevice.plugin, OSCDevice.networkHost, OSCDevicePort);
-      _scene->editor()->networkTree()->createItemsFromMessages(OSCMessagesList);
-    }
-
-  delete _doc;
-   
-   */
 }
 
 void
