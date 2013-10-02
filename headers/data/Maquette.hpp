@@ -754,6 +754,20 @@ class Maquette : public QObject
      */
     void setAccelerationFactor(const float &factor);
     double accelerationFactor();
+    
+    /*!
+     * \brief Sets a new zoom factor into the engine
+     *
+     * \param zoom : the new zoom factor value
+     */
+    void setViewZoom(const QPointF zoom);
+    
+    /*!
+     * \brief Sets a new center position into the engine
+     *
+     * \param zoom : the new zoom factor value
+     */
+    void setViewPosition(const QPointF position);
 
     /*!
      * \brief Called by the callback when the running state of a box change

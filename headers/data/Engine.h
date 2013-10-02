@@ -26,6 +26,7 @@
 #include <vector>
 
 #include <QColor>
+#include <QPointF>
 
 /** a temporary type dedicated to pass time value (date, duration, ...) */
 typedef unsigned int TimeValue;
@@ -736,7 +737,33 @@ public:
 	 */
 	void getTriggersPointId(std::vector<ConditionedProcessId>& triggersID);
     
+    /*!
+	 * Set the zoom factor of the view of the main scenario
+	 * 
+	 * \param zoom : the zoom factor as QPointF variable
+	 */
+	void setViewZoom(QPointF zoom);
     
+    /*!
+	 * Get the zoom factor of the view of the main scenario
+	 *
+	 * \return the zoom factor as a QPointF variable
+	 */
+	QPointF getViewZoom();
+    
+    /*!
+	 * Set the position of the view of the main scenario
+	 *
+	 * \param zoom : the zoom factor as QPointF variable
+	 */
+	void setViewPosition(QPointF position);
+    
+    /*!
+	 * Get the position of the view of the main scenario
+	 *
+	 * \return the position as a QPointF variable
+	 */
+	QPointF getViewPosition();
     
     
 	//Execution ///////////////////////////////////////////////////////////////////////

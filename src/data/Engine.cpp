@@ -264,6 +264,8 @@ void Engine::initScore()
     args.append(TTObjectBasePtr(endEvent));
     TTObjectBaseInstantiate(TTSymbol("Scenario"), TTObjectBaseHandle(&m_mainScenario), args);
     
+    m_mainScenario->setAttributeValue(kTTSym_name, TTSymbol("root"));
+    
     // Store the main scenario (so ROOT_BOX_ID is 1)
     cacheTimeProcess(m_mainScenario, "root");
 }
@@ -1790,6 +1792,50 @@ void Engine::getTriggersPointId(vector<ConditionedProcessId>& triggersID)
     
     for (it = m_conditionedProcessMap.begin(); it != m_conditionedProcessMap.end(); ++it)
         triggersID.push_back(it->first);
+}
+
+void Engine::setViewZoom(QPointF zoom)
+{
+    TTValue v;
+    
+    v.append(zoom.x());
+    v.append(zoom.y());
+    
+    m_mainScenario->setAttributeValue(TTSymbol("viewZoom"), v);
+}
+
+QPointF Engine::getViewZoom()
+{
+    QPointF zoom;
+    TTValue v;
+    
+    m_mainScenario->getAttributeValue(TTSymbol("viewZoom"), v);
+    
+    zoom = QPointF(v[0], v[1]);
+    
+    return zoom;
+}
+
+void Engine::setViewPosition(QPointF position)
+{
+    TTValue v;
+    
+    v.append(position.x());
+    v.append(position.y());
+    
+    m_mainScenario->setAttributeValue(TTSymbol("viewPosition"), v);
+}
+
+QPointF Engine::getViewPosition()
+{
+    QPointF position;
+    TTValue v;
+    
+    m_mainScenario->getAttributeValue(TTSymbol("viewPosition"), v);
+    
+    position = QPointF(v[0], v[1]);
+    
+    return position;
 }
 
 //Execution ///////////////////////////////////////////////////////////

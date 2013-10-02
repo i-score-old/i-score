@@ -317,6 +317,7 @@ MaquetteView::zoomIn()
 
           QPointF newCenter(2 * getCenterCoordinates().x(), 2 * getCenterCoordinates().y());
           centerOn(newCenter);
+          Maquette::getInstance()->setViewPosition(newCenter);
           _scene->zoomChanged(_zoom);
           setSceneRect((QRectF(0,0,_scene->getMaxSceneWidth(),_scene->height())));
         }
@@ -383,6 +384,7 @@ MaquetteView::zoomOut()
 
   QPointF newCenter(getCenterCoordinates().x() / 2, getCenterCoordinates().y() / 2);
   centerOn(newCenter);
+  Maquette::getInstance()->setViewPosition(newCenter);
   _scene->updateProgressBar();
   _scene->zoomChanged(_zoom);
   setSceneRect((QRectF(0,0,_scene->getMaxSceneWidth(),_scene->height())));

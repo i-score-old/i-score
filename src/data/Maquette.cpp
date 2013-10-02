@@ -1568,14 +1568,8 @@ Maquette::save(const string &fileName)
 void
 Maquette::load(const string &fileName)
 {
-    QPointF topLeft, size, bottomRight;
-    QString name, boxType;
-    
-    unsigned int motherID;
-    
-    float   zoom;
-    QPointF centerCoordinates;
     vector<unsigned int>::iterator it;
+    float zoom;
 
     // Clear the maquette
     _scene->clear();
@@ -1586,12 +1580,10 @@ Maquette::load(const string &fileName)
     // Reload networkTree
     _scene->editor()->networkTree()->load();
     
-    // Set zoom to 1 and view center coordinates to (0., 0.)
-    zoom = 1.;
-    centerCoordinates = QPointF(0., 0.);
-    
-    _scene->view()->setZoom(1.);
-    _scene->view()->centerOn(centerCoordinates);
+    // Set zoom (for x axe only) and view center coordinates
+    zoom = _engines->getViewZoom().x();
+    _scene->view()->setZoom(zoom);
+    _scene->view()->centerOn(_engines->getViewPosition());
     
     // BOXES
     {
@@ -1818,6 +1810,16 @@ Maquette::updateTriggerPointActiveStatus(unsigned int trgID, bool active)
             }
         }
     }
+}
+
+void Maquette::setViewZoom(const QPointF zoom)
+{
+    _engines->setViewZoom(zoom);
+}
+
+void Maquette::setViewPosition(const QPointF position)
+{
+    _engines->setViewPosition(position);
 }
 
 void
