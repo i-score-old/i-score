@@ -106,6 +106,8 @@ class CurveWidget : public QWidget
 
     void setAttributes(AbstractCurve *abCurve);
     void setLowerStyle(bool state);
+    void setMaxY(float value);
+    void setMinY(float value);
 
     /*!
      * \brief Gets local coordinates of a point.

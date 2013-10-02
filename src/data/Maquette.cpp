@@ -1967,3 +1967,13 @@ Maquette::getObjectChildren(const std::string & address, std::vector<std::string
 {
     return _engines->requestObjectChildren(address,children);
 }
+
+void
+Maquette::setRangeBoundMin(unsigned int boxID, const string &address, float value){
+    std::cout<<"Maquette::setRangeBoundMin"<<std::endl;
+}
+
+void
+Maquette::setRangeBoundMax(unsigned int boxID, const string &address, float value){
+    std::cout<<"Maquette::setRangeBoundMax"<<std::endl;
+}

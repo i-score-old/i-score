@@ -293,6 +293,15 @@ BoxWidget::addToComboBox(const QString address)
     }
 }
 
+CurveWidget *
+BoxWidget::getCurveWidget(std::string address){
+    CurveWidget *curve = NULL;
+    QMap<string, CurveWidget *>::iterator curveIt = _curveMap->find(address);
+    bool curveFound = (curveIt != _curveMap->end());
+    curve = curveIt.value();
+    return curve;
+}
+
 bool
 BoxWidget::updateCurve(const string &address, bool forceUpdate)
 {
@@ -510,5 +519,22 @@ BoxWidget::displayEndMenu(QPoint pos)
 {
   if (_endMenu != NULL) {
       _endMenu->exec(pos);
+    }
+}
+
+void
+BoxWidget::updateCurveRangeBoundMin(string address, float value){
+    CurveWidget *curve = getCurveWidget(address);
+    if(curve != NULL){
+        curve->setMinY(value);
+    }
+}
+
+void
+BoxWidget::updateCurveRangeBoundMax(string address, float value){
+    CurveWidget *curve = getCurveWidget(address);
+    std::cout<<"BW::updateMAX"<<std::endl;
+    if(curve != NULL){
+        curve->setMaxY(value);
     }
 }
