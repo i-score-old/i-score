@@ -43,8 +43,6 @@ Engine::Engine(void(*timeEventReadyAttributeCallback)(ConditionedProcessId, bool
     
     m_mainScenario = NULL;
     
-    m_loading = NO;
-    
     initModular();
     initScore();
 }
@@ -691,10 +689,6 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const s
     TTSymbol            boxName;
     TTValue             v, args;
     
-    // return the previous id because it is the one being loaded
-    if (m_loading)
-        return m_nextTimeProcessId - 1;
-    
     // Create a time event for the start
     args = TTUInt32(boxBeginPos);
     m_mainScenario->sendMessage(TTSymbol("TimeEventCreate"), args, v);
@@ -784,10 +778,6 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
     TTValue                 v, args;
     EngineCacheMapIterator  it;
     TTErr                   err;
-    
-    // return the previous id because it is the one being loaded
-    if (m_loading)
-        return m_nextIntervalId - 1;
     
     // Get the events from the given box ids and pass them to the time process
     tp1 = getTimeProcess(boxId1);
@@ -1168,6 +1158,31 @@ void Engine::setBoxVerticalSize(TimeProcessId boxId, unsigned int newSize)
     TTValue             v = TTUInt32(newSize);
     
 	timeProcess->setAttributeValue(TTSymbol("verticalSize"), v);
+}
+
+QColor Engine::getBoxColor(TimeProcessId boxId)
+{
+    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
+    TTValue             v;
+    QColor              color;
+    
+	timeProcess->getAttributeValue(TTSymbol("color"), v);
+    
+    color = QColor(v[0], v[1], v[2]);
+    
+    return color;
+}
+
+void Engine::setBoxColor(TimeProcessId boxId, QColor newColor)
+{
+    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
+    TTValue             v;
+    
+    v = newColor.red();
+    v.append(newColor.green());
+    v.append(newColor.blue());
+    
+	timeProcess->setAttributeValue(TTSymbol("color"), v);
 }
 
 TimeValue Engine::getBoxBeginTime(TimeProcessId boxId)
@@ -1628,10 +1643,6 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
     TTTimeConditionPtr      timeCondition;
     ConditionedProcessId    triggerId;
     TTValue                 v, args, out;
-    
-    // return the previous id because it is the one being loaded
-    if (m_loading)
-        return m_nextConditionedProcessId - 1;
     
     // Get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
@@ -2330,8 +2341,6 @@ void Engine::load(std::string fileName)
     IntervalId          relationId;
     ConditionedProcessId triggerId;
     
-    m_loading = YES;
-    
     // Clear all the EngineCacheMaps
     // note : this should be useless because all elements are removed by the maquette
     clearTimeProcess();
@@ -2409,8 +2418,6 @@ void Engine::load(std::string fileName)
             relationId = cacheInterval((TTTimeProcessPtr)timeProcess);
         }
     }
-    
-    m_loading = NO;
 }
 
 // NETWORK

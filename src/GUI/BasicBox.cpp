@@ -628,6 +628,8 @@ BasicBox::setColor(const QColor & color)
   _abstract->setColor(color);
   _colorUnselected = color;
   _color = color;
+    
+  Maquette::getInstance()->setBoxColor(ID(), color);
 }
 
 void

@@ -150,6 +150,11 @@ Maquette::getBox(unsigned int ID)
   return NULL;
 }
 
+void Maquette::setBoxColor(unsigned int ID, QColor newColor)
+{
+    _engines->setBoxColor(ID, newColor);
+}
+
 map<unsigned int, ParentBox*>
 Maquette::parentBoxes()
 {
@@ -1565,7 +1570,7 @@ Maquette::load(const string &fileName)
 {
     QPointF topLeft, size, bottomRight;
     QString name, boxType;
-    QColor color(1., 1., 1.);
+    
     unsigned int motherID;
     
     float   zoom;
@@ -1593,6 +1598,7 @@ Maquette::load(const string &fileName)
         vector<unsigned int>    boxesID;
         unsigned int            boxID;
         string                  name;
+        QColor                  color;
         unsigned int            date, duration, topLeftY, sizeY;
         
         // get all boxes ID
@@ -1605,12 +1611,13 @@ Maquette::load(const string &fileName)
             if (boxID == ROOT_BOX_ID)
                 continue;
             
-            // get name, date, duration, topLeftY and sizeY informations
+            // get name, date, duration, topLeftY, sizeY and color informations
             name = _engines->getBoxName(boxID);
             date = _engines->getBoxBeginTime(boxID);
             duration = _engines->getBoxDuration(boxID);
             topLeftY = _engines->getBoxVerticalPosition(boxID);
             sizeY = _engines->getBoxVerticalSize(boxID);
+            color = _engines->getBoxColor(boxID);
             
             QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
             QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);
@@ -1624,6 +1631,7 @@ Maquette::load(const string &fileName)
             
             newBox->setName(QString::fromStdString(name));
             newBox->setID(boxID);
+            newBox->setColor(color);
             newBox->setFirstMessagesToSend(firstMsgs);
             newBox->setLastMessagesToSend(lastMsgs);
             

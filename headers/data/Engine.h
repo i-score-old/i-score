@@ -25,6 +25,8 @@
 #include <map>
 #include <vector>
 
+#include <QColor>
+
 /** a temporary type dedicated to pass time value (date, duration, ...) */
 typedef unsigned int TimeValue;
 
@@ -155,8 +157,6 @@ private:
     TTObjectBasePtr     m_dataRewind;                                   /// A Modular TTData to expose Rewind transport service
     TTObjectBasePtr     m_dataStartPoint;                               /// A Modular TTData to expose StartPoint transport service
     TTObjectBasePtr     m_dataSpeed;                                    /// A Modular TTData to expose Speed transport service
-    
-    TTBoolean           m_loading;                                      /// a flag to know if the engine is loading
     
 	void (*m_TimeEventReadyAttributeCallback)(ConditionedProcessId, bool);
     void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);
@@ -366,7 +366,7 @@ public:
 	 * \return the vertical size of the box matching the given ID
 	 */
     unsigned int getBoxVerticalSize(TimeProcessId boxId);
-    
+
     /*!
 	 * Sets the vertical size of the box matching the given ID
 	 *
@@ -376,6 +376,27 @@ public:
 	 * \param newSize : the new vertical size of the box matching the given ID
 	 */
     void setBoxVerticalSize(TimeProcessId boxId, unsigned int newSize);
+    
+    /*!
+	 * Gets the color of the box matching the given ID
+	 *
+	 *
+	 * \param boxId : the ID of the box
+	 *
+	 * \return the color of the box matching the given ID
+	 */
+    QColor getBoxColor(TimeProcessId boxId);
+    
+    /*!
+	 * Sets the color of the box matching the given ID
+	 *
+	 *
+	 * \param boxId : the ID of the box
+	 *
+	 * \param newColor : the color of the box matching the given ID
+	 */
+    void setBoxColor(TimeProcessId boxId, QColor newColor);
+    
     
 	/*!
 	 * Gets the begin value of the box matching the given ID

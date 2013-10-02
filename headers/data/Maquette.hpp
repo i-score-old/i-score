@@ -644,6 +644,14 @@ class Maquette : public QObject
      * \return the box specified by the ID
      */
     BasicBox* getBox(unsigned int ID);
+    
+    /*!
+     * \brief Set the color of a specific box.
+     *
+     * \param ID : the ID of the box wanted
+     * \param newColor : the box specified by the ID
+     */
+    void setBoxColor(unsigned int ID, QColor newColor);
 
     /*!
      * \brief Gets a specific relation.
