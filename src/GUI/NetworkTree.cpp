@@ -824,7 +824,6 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                 }
             }
 
-
             //Get object's chidren
             if(Maquette::getInstance()->getObjectChildren(address,children) > 0){
 
@@ -1656,7 +1655,7 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
             }
         }
         else {
-            if (currentColumn() == START_COLUMN || currentColumn() == END_COLUMN || currentColumn() == SR_COLUMN || currentColumn() == MIN_COLUMN || currentColumn() == MAX_COLUMN ) {
+            if (currentColumn() == START_COLUMN || currentColumn() == END_COLUMN || currentColumn() == SR_COLUMN /*|| currentColumn() == MIN_COLUMN || currentColumn() == MAX_COLUMN*/ ) {
                 QTreeWidgetItem *item = currentItem();
                 item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
                 editItem(item, currentColumn());
@@ -1670,12 +1669,12 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
                 if (currentColumn() == SR_COLUMN) {
                     SR_MODIFIED = true;
                 }
-                if (currentColumn() == MIN_COLUMN) {
-                    MIN_MODIFIED = true;
-                }
-                if (currentColumn() == MAX_COLUMN) {
-                    MAX_MODIFIED = true;
-                }
+//                if (currentColumn() == MIN_COLUMN) {
+//                    MIN_MODIFIED = true;
+//                }
+//                if (currentColumn() == MAX_COLUMN) {
+//                    MAX_MODIFIED = true;
+//                }
                 item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
                 item->setSelected(true);
             }
@@ -1791,13 +1790,11 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
   if (item->type() == LeaveType && column == MIN_COLUMN && MIN_MODIFIED){
       MIN_MODIFIED = false;
       emit(rangeBoundMinChanged(item,item->text(MIN_COLUMN).toFloat()));
-      ;
   }
 
   if (item->type() == LeaveType && column == MAX_COLUMN && MAX_MODIFIED){
       MAX_MODIFIED = false;
       emit(rangeBoundMaxChanged(item,item->text(MAX_COLUMN).toFloat()));
-      ;
   }
   if (item->type() == OSCNode && column == NAME_COLUMN && NAME_MODIFIED) {
       NAME_MODIFIED = FALSE;
@@ -2032,7 +2029,6 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
                           else {
                               ;
                             }
-
 //                                std::cout<<"networkTree -> interpolate devient false"<<std::endl;
                         }
                     }

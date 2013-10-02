@@ -116,12 +116,16 @@ CurveWidget::abstractCurve()
 
 void
 CurveWidget::curveRepresentationOutdated()
-{
+{   
   float maxCurveElement = *(std::max_element(_abstract->_curve.begin(), _abstract->_curve.end()));
   float minCurveElement = *(std::min_element(_abstract->_curve.begin(), _abstract->_curve.end()));
 
+  if(maxCurveElement > _maxY)
+      _maxY = maxCurveElement;
+  if(minCurveElement < _minY)
+      _minY = minCurveElement;
   //abscissa at the box middle only if the curve contains negative elements
-  if (minCurveElement >= 0.) {
+  if (_minY >= 0.) {
       _xAxisPos = height() - BORDER_WIDTH;
     }
   else {
@@ -130,21 +134,8 @@ CurveWidget::curveRepresentationOutdated()
 
   _interspace = (width() - BORDER_WIDTH) / (float)(std::max((unsigned int)2, (unsigned int)(_abstract->_curve.size())) - 1);
 
-
-//    _maxY =  *(std::max_element(_abstract->_curve.begin(),_abstract->_curve.end()));
-
-
-  vector<float> rangeBounds;
-  if(Maquette::getInstance()->getRangeBounds(_abstract->_address, rangeBounds) > 0){
-      _minY = rangeBounds[0];
-      _maxY = rangeBounds[1];
-  }
-  else{
-    _maxY = std::max((float)1., maxCurveElement);
-    _minY = minCurveElement;
-  }
-
   float halfSizeY = std::max(fabs(_maxY), fabs(_minY));
+  std::cout<<"max("<<fabs(_maxY)<<" ; "<<fabs(_minY)<<")"<<std::endl;
   _scaleY = 2 * (_xAxisPos - BORDER_WIDTH) / (2 * halfSizeY);
 
   update();
@@ -159,7 +150,7 @@ CurveWidget::setAttributes(unsigned int boxID,
                            bool redundancy,
                            bool show,
                            bool interpolate,
-                           const vector<string> &,
+                           const vector<string> &argType,
                            const vector<float> &xPercents,
                            const vector<float> &yValues,
                            const vector<short> &sectionType,
@@ -179,8 +170,6 @@ CurveWidget::setAttributes(unsigned int boxID,
   _abstract->_address = address;
 
   vector<float>::const_iterator it;
-  vector<float>::const_iterator it2;
-  vector<float>::const_iterator it3;
   for (it = values.begin(); it != values.end(); ++it) {
       _abstract->_curve.push_back(*it);
     }
@@ -192,6 +181,28 @@ CurveWidget::setAttributes(unsigned int boxID,
   _abstract->_lastPointCoeff = coeff.back();
 
   curveRepresentationOutdated();
+}
+
+void
+CurveWidget::setAttributes(unsigned int boxID,
+                           const std::string &address,
+                           unsigned int argPosition,
+                           const vector<float> &values,
+                           unsigned int sampleRate,
+                           bool redundancy,
+                           bool show,
+                           bool interpolate,
+                           const vector<string> &argType,
+                           const vector<float> &xPercents,
+                           const vector<float> &yValues,
+                           const vector<short> &sectionType,
+                           const vector<float> &coeff,
+                           const float minY,
+                           const float maxY)
+{
+    _minY = minY;
+    _maxY = maxY;
+    setAttributes(boxID, address, 0, values, sampleRate, redundancy, show, interpolate, argType, xPercents, yValues, sectionType, coeff);
 }
 
 void
@@ -391,6 +402,17 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
               else {
                   _abstract->_breakpoints[_movingBreakpointX] = std::make_pair<float, float>(relativePoint.y(), 1.);
               }
+
+              //TODO : if(_clipmode == none ...)
+              if(relativePoint.y() > _maxY){
+                  _maxY = relativePoint.y();
+                  std::cout<<"new max : "<<_maxY<<std::endl;
+              }
+              if(relativePoint.y() < _minY){
+                  _minY = relativePoint.y();
+                  std::cout<<"new min : "<<_minY<<std::endl;
+              }
+
               _movingBreakpointY = -1;
               curveChanged();
           }
@@ -611,12 +633,11 @@ CurveWidget::setLowerStyle(bool state)
 void
 CurveWidget::setMinY(float value){
     _minY = value;
-    update();
+    curveRepresentationOutdated();
 }
 
 void
 CurveWidget::setMaxY(float value){
-    std::cout<<"CW::updateMAX"<<value<<std::endl;
     _maxY = value;
-    update();
+    curveRepresentationOutdated();
 }
