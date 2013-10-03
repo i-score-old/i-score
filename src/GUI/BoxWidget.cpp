@@ -362,7 +362,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
                           min = rangeBounds[0];
                           max = rangeBounds[1];
                       }
-                      std::cout<<"Range bounds : "<<min<<" ; "<<max<<std::endl;
+
                       //Set attributes
                       curveTab->setAttributes(_boxID, address, 0, values, sampleRate, redundancy, abCurve->_show, interpolate, argTypes, xPercents, yValues, sectionType, coeff, min, max);
                       bool muteState = Maquette::getInstance()->getCurveMuteState(_boxID, address);
@@ -401,7 +401,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
                       min = rangeBounds[0];
                       max = rangeBounds[1];
                   }
-                  std::cout<<"Range bounds : "<<min<<" ; "<<max<<std::endl;
+
                   curveTab->setAttributes(_boxID, address, 0, values, sampleRate, redundancy, show, interpolate, argTypes, xPercents, yValues, sectionType, coeff, min, max);
                   if (interpolate) {
                       addCurve(curveAddressStr, curveTab);

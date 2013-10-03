@@ -120,6 +120,8 @@ class CurveWidget : public QWidget
      */
     QPointF relativeCoordinates(const QPointF &point);
 
+    void updateRangeClipMode();
+
   protected:
     /*!
      * \brief Redefinition of QWidget::paintEvent(QPaintEvent *event).
@@ -199,6 +201,9 @@ class CurveWidget : public QWidget
     float _xAxisPos;    
     QRectF *_minYTextRect;
     QRectF *_maxYTextRect;
+
+    bool _maxRangeBoundLocked;
+    bool _minRangeBoundLocked;
 
     bool _lastPointSelected;     //!< Last point selected.
 };

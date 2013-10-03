@@ -2111,7 +2111,8 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
     return snapshot;
 }
 
-int Engine::requestObjectAttributeValue(const std::string & address, const std::string & attribute, vector<string>& value){
+int
+Engine::requestObjectAttributeValue(const std::string & address, const std::string & attribute, vector<string>& value){
 
     TTAddress           anAddress = toTTAddress(address);
     TTNodeDirectoryPtr  aDirectory;
