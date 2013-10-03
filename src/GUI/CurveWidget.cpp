@@ -99,6 +99,8 @@ CurveWidget::init()
 
   _clicked = false;
   _unactive = false;
+  _minYModified = false;
+  _maxYModified = false;
 
   _movingBreakpointX = -1;
   _movingBreakpointY = -1;
@@ -106,6 +108,8 @@ CurveWidget::init()
   _lastPointSelected = false;
   setLayout(_layout);
   _xAxisPos = height() / 2.;
+  _minYTextRect = new QRectF(0.,_xAxisPos + 10.,40.,10.);
+  _maxYTextRect = new QRectF(0.,0.,40.,10.);
 }
 
 AbstractCurve *
@@ -134,8 +138,7 @@ CurveWidget::curveRepresentationOutdated()
 
   _interspace = (width() - BORDER_WIDTH) / (float)(std::max((unsigned int)2, (unsigned int)(_abstract->_curve.size())) - 1);
 
-  float halfSizeY = std::max(fabs(_maxY), fabs(_minY));
-  std::cout<<"max("<<fabs(_maxY)<<" ; "<<fabs(_minY)<<")"<<std::endl;
+  float halfSizeY = std::max(fabs(_maxY), fabs(_minY));  
   _scaleY = 2 * (_xAxisPos - BORDER_WIDTH) / (2 * halfSizeY);
 
   update();
@@ -395,6 +398,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
       case Qt::ControlModifier: // VERTICAL SLIDE
       {
           if (_movingBreakpointX != -1) {
+
               map<float, pair<float, float> >::iterator it;
               if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
                   it->second = std::make_pair(relativePoint.y(), it->second.second);
@@ -406,11 +410,11 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
               //TODO : if(_clipmode == none ...)
               if(relativePoint.y() > _maxY){
                   _maxY = relativePoint.y();
-                  std::cout<<"new max : "<<_maxY<<std::endl;
+                  _maxYModified = true;
               }
               if(relativePoint.y() < _minY){
                   _minY = relativePoint.y();
-                  std::cout<<"new min : "<<_minY<<std::endl;
+                  _minYModified = true;
               }
 
               _movingBreakpointY = -1;
@@ -424,6 +428,16 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
           map<float, pair<float, float> >::iterator it;
           if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
             _abstract->_breakpoints.erase(it);
+          }
+
+          //TODO : if(_clipmode == none ...)
+          if(relativePoint.y() > _maxY){
+              _maxY = relativePoint.y();
+              _maxYModified = true;
+          }
+          if(relativePoint.y() < _minY){
+              _minY = relativePoint.y();
+              _minYModified = true;
           }
 
           _movingBreakpointX = relativePoint.x();
@@ -450,9 +464,8 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
           break;
       }
       }
-  }
-
-  update();
+  }  
+  update();  
 }
 
 void
@@ -544,7 +557,7 @@ CurveWidget::paintEngine()
 
 void
 CurveWidget::paintEvent(QPaintEvent * /* event */)
-{
+{    
   QPainter *painter = new QPainter(this);
 
   QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect;
@@ -568,7 +581,7 @@ CurveWidget::paintEvent(QPaintEvent * /* event */)
   // Abcisses line
   QPen penXAxis(_unactive ? UNACTIVE_COLOR : AXE_COLOR);
   painter->setPen(penXAxis);
-  painter->drawLine(0, _xAxisPos, width(), _xAxisPos);
+  painter->drawLine(0, _xAxisPos, width(), _xAxisPos);  
 
   painter->setPen(BASE_COLOR);
 
@@ -620,6 +633,25 @@ CurveWidget::paintEvent(QPaintEvent * /* event */)
           painter->fillRect(QRectF(cursor - QPointF(pointSizeX / 2., pointSizeY / 2.), QSizeF(pointSizeX, pointSizeY)), _abstract->_interpolate ? MOVING_BREAKPOINT_COLOR : UNACTIVE_COLOR);
         }
     }
+
+  //text : minY, maxY
+  if(_minYModified || _maxYModified){
+      painter->save();
+      QFont textFont;
+      textFont.setPointSize(9.);
+      painter->setFont(textFont);
+      painter->setPen(QPen(Qt::black));
+      if(_minYModified){
+          painter->drawText(*_minYTextRect,QString("%1").arg(_minY));
+          _minYModified = false;
+      }
+      else if(_maxYModified){
+          painter->drawText(*_maxYTextRect,QString("%1").arg(_maxY));
+          _maxYModified = false;
+      }
+      painter->restore();
+  }
+
   delete painter;
 }
 

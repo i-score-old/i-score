@@ -185,6 +185,8 @@ class CurveWidget : public QWidget
 
     bool _clicked;            //!< Clicked state.
     bool _unactive;
+    bool _minYModified;
+    bool _maxYModified;
 
     QGridLayout *_layout; //!< Layout for widget.
 
@@ -194,7 +196,9 @@ class CurveWidget : public QWidget
     float _scaleMaxY;     //!< Value for maximum vertical scaling.
     float _minY;
     float _maxY;
-    float _xAxisPos;
+    float _xAxisPos;    
+    QRectF *_minYTextRect;
+    QRectF *_maxYTextRect;
 
     bool _lastPointSelected;     //!< Last point selected.
 };
