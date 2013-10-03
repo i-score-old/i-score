@@ -1278,7 +1278,8 @@ void Engine::setCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex cont
     state->sendMessage(TTSymbol("Flatten"));
     
     // Update all curves (for automation process only)
-    timeProcess->sendMessage(TTSymbol("CurveUpdate"));
+    TTValue empty; // théo : this is to pass thru a Foundation bug which will disapear in a next version
+    timeProcess->sendMessage(TTSymbol("CurveUpdate"), empty, empty);
 }
 
 void Engine::getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex controlPointIndex, std::vector<std::string>& messages)
@@ -1360,7 +1361,7 @@ void Engine::addCurve(TimeProcessId boxId, const std::string & address)
 {
     TTTimeProcessPtr  timeProcess = getTimeProcess(boxId);
     
-    // remove the curve addresses of the automation time process
+    // add the curve addresses into the automation time process
     timeProcess->sendMessage(TTSymbol("CurveAdd"), toTTAddress(address), kTTValNONE);
 }
 
@@ -1515,29 +1516,6 @@ bool Engine::getCurveMuteState(TimeProcessId boxId, const std::string & address)
     }
     
 	return false;
-}
-
-void Engine::getCurveArgTypes(std::string stringToParse, std::vector<std::string>& result)
-{
-    TTSymbol    address;
-    TTValue     v = TTString(stringToParse);
-    TTUInt32    i;
-    
-    v.fromString();
-    address = v[0];
-    
-    result.clear();
-    result.push_back(address.string().c_str());
-    
-    for (i = 1; i < v.size(); i++) {
-		
-		if (v[i].type() == kTypeFloat32 || v[i].type() == kTypeFloat64)
-			result.push_back("FLOAT");
-		else if (v[i].type() == kTypeInt32 || v[i].type() == kTypeInt64)
-			result.push_back("INT");
-		else
-			result.push_back("SYMBOL");
-	}
 }
 
 bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned int argNb, const std::vector<float> & percent, const std::vector<float> & y, const std::vector<short> & sectionType, const std::vector<float> & coeff)
