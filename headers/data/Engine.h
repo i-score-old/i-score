@@ -812,13 +812,6 @@ public:
     
 	//Network //////////////////////////////////////////////////////////////////////////////////////////////
     
-    /*!
-     * Tells the Engine that a network message was received and need to be handled.
-	 *
-	 * \param netMessage : the network message received.
-	 */
-	bool receiveNetworkMessage(std::string netMessage);
-    
 	/*!
 	 * Same behavior as receiveNetworkMessage function, but must be used by a user to simulate a network message reception.
 	 * For example to trigger a trigger point manually.
