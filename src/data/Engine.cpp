@@ -1841,13 +1841,10 @@ bool Engine::play()
 
 void Engine::pause(bool pauseValue)
 {
-    m_mainScenario->sendMessage(TTSymbol("Stop"));
-    /* TODO
     if (pauseValue)
         m_mainScenario->sendMessage(TTSymbol("Pause"));
     else
-        m_mainScenario->sendMessage(TTSymbol("resume"));
-     */
+        m_mainScenario->sendMessage(TTSymbol("Resume"));
 }
 
 bool Engine::isPaused()
