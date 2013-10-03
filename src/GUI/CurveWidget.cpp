@@ -99,6 +99,8 @@ CurveWidget::init()
 
   _clicked = false;
   _unactive = false;
+  _minYModified = false;
+  _maxYModified = false;
 
   _movingBreakpointX = -1;
   _movingBreakpointY = -1;
@@ -106,6 +108,12 @@ CurveWidget::init()
   _lastPointSelected = false;
   setLayout(_layout);
   _xAxisPos = height() / 2.;
+
+  _minYTextRect = new QRectF(0.,_xAxisPos + 10.,40.,10.);
+  _maxYTextRect = new QRectF(0.,0.,40.,10.);
+
+  _minRangeBoundLocked = false;
+  _maxRangeBoundLocked = false;
 }
 
 AbstractCurve *
@@ -116,7 +124,7 @@ CurveWidget::abstractCurve()
 
 void
 CurveWidget::curveRepresentationOutdated()
-{   
+{
   float maxCurveElement = *(std::max_element(_abstract->_curve.begin(), _abstract->_curve.end()));
   float minCurveElement = *(std::min_element(_abstract->_curve.begin(), _abstract->_curve.end()));
 
@@ -134,8 +142,7 @@ CurveWidget::curveRepresentationOutdated()
 
   _interspace = (width() - BORDER_WIDTH) / (float)(std::max((unsigned int)2, (unsigned int)(_abstract->_curve.size())) - 1);
 
-  float halfSizeY = std::max(fabs(_maxY), fabs(_minY));
-  std::cout<<"max("<<fabs(_maxY)<<" ; "<<fabs(_minY)<<")"<<std::endl;
+  float halfSizeY = std::max(fabs(_maxY), fabs(_minY));  
   _scaleY = 2 * (_xAxisPos - BORDER_WIDTH) / (2 * halfSizeY);
 
   update();
@@ -157,7 +164,7 @@ CurveWidget::setAttributes(unsigned int boxID,
                            const vector<float> &coeff)
 {
   Q_UNUSED(argPosition);
-  Q_UNUSED(sectionType);
+  Q_UNUSED(sectionType);   
 
   _abstract->_boxID = boxID;
   _abstract->_curve.clear();
@@ -199,15 +206,16 @@ CurveWidget::setAttributes(unsigned int boxID,
                            const vector<float> &coeff,
                            const float minY,
                            const float maxY)
-{
+{    
     _minY = minY;
-    _maxY = maxY;
+    _maxY = maxY;    
     setAttributes(boxID, address, 0, values, sampleRate, redundancy, show, interpolate, argType, xPercents, yValues, sectionType, coeff);
+    updateRangeClipMode();
 }
 
 void
 CurveWidget::setAttributes(AbstractCurve *abCurve)
-{
+{    
   _abstract = abCurve;
   curveRepresentationOutdated();
 }
@@ -395,6 +403,12 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
       case Qt::ControlModifier: // VERTICAL SLIDE
       {
           if (_movingBreakpointX != -1) {
+
+              if(relativePoint.y() > _maxY && _maxRangeBoundLocked)
+                  break;
+              if(relativePoint.y() < _minY && _minRangeBoundLocked)
+                  break;
+
               map<float, pair<float, float> >::iterator it;
               if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
                   it->second = std::make_pair(relativePoint.y(), it->second.second);
@@ -403,14 +417,13 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
                   _abstract->_breakpoints[_movingBreakpointX] = std::make_pair<float, float>(relativePoint.y(), 1.);
               }
 
-              //TODO : if(_clipmode == none ...)
               if(relativePoint.y() > _maxY){
                   _maxY = relativePoint.y();
-                  std::cout<<"new max : "<<_maxY<<std::endl;
+                  _maxYModified = true;
               }
               if(relativePoint.y() < _minY){
                   _minY = relativePoint.y();
-                  std::cout<<"new min : "<<_minY<<std::endl;
+                  _minYModified = true;
               }
 
               _movingBreakpointY = -1;
@@ -423,7 +436,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
       {
           map<float, pair<float, float> >::iterator it;
           if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
-            _abstract->_breakpoints.erase(it);
+              _abstract->_breakpoints.erase(it);
           }
 
           _movingBreakpointX = relativePoint.x();
@@ -431,6 +444,26 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
           curveChanged();
           update();
           break;
+
+//          map<float, pair<float, float> >::iterator it;
+//          if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
+//            _abstract->_breakpoints.erase(it);
+//          }
+
+//          if(relativePoint.y() > _maxY && !_maxRangeBoundLocked){
+//              _maxY = relativePoint.y();
+//              _maxYModified = true;
+//          }
+//          if(relativePoint.y() < _minY && !_minRangeBoundLocked){
+//              _minY = relativePoint.y();
+//              _minYModified = true;
+//          }
+
+//          _movingBreakpointX = relativePoint.x();
+//          _movingBreakpointY = relativePoint.y();
+//          curveChanged();
+//          update();
+//          break;
       }
 
 //      case Qt::AltModifier: // draw
@@ -450,9 +483,8 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
           break;
       }
       }
-  }
-
-  update();
+  }  
+  update();  
 }
 
 void
@@ -463,15 +495,32 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event)
   if (_clicked) {
       if (event->modifiers() == Qt::NoModifier) {
           QPointF relativePoint = relativeCoordinates(event->pos());
+
+          if(relativePoint.y() > _maxY && _maxRangeBoundLocked){
+              _movingBreakpointX = relativePoint.x();
+              _movingBreakpointY = _maxY;
+
+              curveChanged();
+              update();
+          }
+          else
+              if(relativePoint.y() < _minY && _minRangeBoundLocked){
+                  _movingBreakpointX = relativePoint.x();
+                  _movingBreakpointY = _minY;
+                  curveChanged();
+                  update();
+              }
+
           map<float, pair<float, float> >::iterator it;
           if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
               _abstract->_breakpoints.erase(it);
-            }
-          _abstract->_breakpoints[relativePoint.x()] = std::make_pair<float, float>(relativePoint.y(), 1.);
+          }
+          _abstract->_breakpoints[static_cast<qreal>(relativePoint.x())] = std::make_pair<float, float>(static_cast<qreal>(_movingBreakpointY), 1.);
           curveChanged();
           update();
-        }
-    }
+
+      }
+  }
 
   _clicked = false;
   _movingBreakpointX = -1.;
@@ -544,7 +593,7 @@ CurveWidget::paintEngine()
 
 void
 CurveWidget::paintEvent(QPaintEvent * /* event */)
-{
+{    
   QPainter *painter = new QPainter(this);
 
   QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect;
@@ -568,7 +617,7 @@ CurveWidget::paintEvent(QPaintEvent * /* event */)
   // Abcisses line
   QPen penXAxis(_unactive ? UNACTIVE_COLOR : AXE_COLOR);
   painter->setPen(penXAxis);
-  painter->drawLine(0, _xAxisPos, width(), _xAxisPos);
+  painter->drawLine(0, _xAxisPos, width(), _xAxisPos);  
 
   painter->setPen(BASE_COLOR);
 
@@ -620,6 +669,25 @@ CurveWidget::paintEvent(QPaintEvent * /* event */)
           painter->fillRect(QRectF(cursor - QPointF(pointSizeX / 2., pointSizeY / 2.), QSizeF(pointSizeX, pointSizeY)), _abstract->_interpolate ? MOVING_BREAKPOINT_COLOR : UNACTIVE_COLOR);
         }
     }
+
+  //text : minY, maxY
+  if(_minYModified || _maxYModified){
+      painter->save();
+      QFont textFont;
+      textFont.setPointSize(9.);
+      painter->setFont(textFont);
+      painter->setPen(QPen(Qt::black));
+      if(_minYModified){
+          painter->drawText(*_minYTextRect,QString("%1").arg(_minY));
+          _minYModified = false;
+      }
+      else if(_maxYModified){
+          painter->drawText(*_maxYTextRect,QString("%1").arg(_maxY));
+          _maxYModified = false;
+      }
+      painter->restore();
+  }
+
   delete painter;
 }
 
@@ -640,4 +708,34 @@ void
 CurveWidget::setMaxY(float value){
     _maxY = value;
     curveRepresentationOutdated();
+}
+
+void
+CurveWidget::updateRangeClipMode(){
+    vector<string> attributesValues;
+
+    if(Maquette::getInstance()->requestObjectAttribruteValue(_abstract->_address,"rangeClipmode",attributesValues) > 0){
+        string rangeClipMode = attributesValues[0];
+
+        if(rangeClipMode == "none"){
+            _maxRangeBoundLocked = false;
+            _minRangeBoundLocked = false;
+            return;
+        }
+        if(rangeClipMode == "low"){
+            _maxRangeBoundLocked = false;
+            _minRangeBoundLocked = true;
+            return;
+        }
+        if(rangeClipMode == "high"){
+            _maxRangeBoundLocked = true;
+            _minRangeBoundLocked = false;
+            return;
+        }
+        if(rangeClipMode == "both"){
+            _maxRangeBoundLocked = true;
+            _minRangeBoundLocked = true;
+            return;
+        }
+    }
 }
