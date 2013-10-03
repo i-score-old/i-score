@@ -358,6 +358,20 @@ BasicBox::updateCurve(string address, bool forceUpdate)
   update();
 }
 
+void
+BasicBox::updateCurveRangeBoundMin(string address, float value)
+{
+    _boxContentWidget->updateCurveRangeBoundMin(address, value);
+  update();
+}
+
+void
+BasicBox::updateCurveRangeBoundMax(string address, float value)
+{
+  _boxContentWidget->updateCurveRangeBoundMax(address, value);
+  update();
+}
+
 int
 BasicBox::type() const
 {

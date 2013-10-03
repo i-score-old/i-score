@@ -206,6 +206,9 @@ AttributesEditor::connectSlots()
   connect(_networkTree, SIGNAL(curveSampleRateChanged(QTreeWidgetItem*, int)), this, SLOT(curveSampleRateChanged(QTreeWidgetItem*, int)));
   connect(_networkTree, SIGNAL(messageChanged(QTreeWidgetItem*, QString)), this, SLOT(deployMessageChanged(QTreeWidgetItem*, QString)));
   connect(_networkTree, SIGNAL(deviceChanged(QString, QString)), this, SLOT(deployDeviceChanged(QString, QString)));
+
+  connect(_networkTree, SIGNAL(rangeBoundMinChanged(QTreeWidgetItem*,float)), this, SLOT(changeRangeBoundMin(QTreeWidgetItem*, float)));
+  connect(_networkTree, SIGNAL(rangeBoundMaxChanged(QTreeWidgetItem*,float)), this, SLOT(changeRangeBoundMax(QTreeWidgetItem*, float)));
 }
 
 void
@@ -640,3 +643,25 @@ AttributesEditor::curveSampleRateChanged(QTreeWidgetItem *item, int value)
       _networkTree->updateCurve(item, _boxEdited);
     }
 }
+
+void
+AttributesEditor::changeRangeBoundMin(QTreeWidgetItem *item, float value){
+    string address = _networkTree->getAbsoluteAddress(item).toStdString();
+    if (_boxEdited != NO_ID) {
+
+          BasicBox * box = _scene->getBox(_boxEdited);
+          box->updateCurveRangeBoundMin(address,value);
+//        Maquette::getInstance()->setRangeBoundMin(_boxEdited, address, value);
+      }
+}
+
+void
+AttributesEditor::changeRangeBoundMax(QTreeWidgetItem *item, float value){
+
+    string address = _networkTree->getAbsoluteAddress(item).toStdString();
+    if (_boxEdited != NO_ID) {
+        BasicBox * box = _scene->getBox(_boxEdited);
+       box->updateCurveRangeBoundMax(address,value);
+      }
+}
+

@@ -394,6 +394,8 @@ class NetworkTree : public QTreeWidget
     bool VALUE_MODIFIED;
     bool SR_MODIFIED;
     bool NAME_MODIFIED;
+    bool MIN_MODIFIED;
+    bool MAX_MODIFIED;
 
   signals:
     void startValueChanged(QTreeWidgetItem *, QString newValue);
@@ -413,6 +415,8 @@ class NetworkTree : public QTreeWidget
     void deviceChanged(QString oldName, QString newName);
     void pluginChanged(QString deviceName);
     void cmdKeyStateChanged(bool);
+    void rangeBoundMinChanged(QTreeWidgetItem *item, float newValue);
+    void rangeBoundMaxChanged(QTreeWidgetItem *item, float newValue);
 
   private:
     void treeRecursiveExploration(QTreeWidgetItem *curItem, bool onflict);

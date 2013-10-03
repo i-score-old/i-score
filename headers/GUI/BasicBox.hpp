@@ -622,6 +622,8 @@ class BasicBox : public QObject, public QGraphicsItem
     NetworkMessages *endMessages();
     void setEndMessage(QTreeWidgetItem *item, QString address);
     void updateWidgets();
+    void updateCurveRangeBoundMin(string address, float value);
+    void updateCurveRangeBoundMax(string address, float value);
 
     //! \brief Handles line width.
     static const unsigned int LINE_WIDTH = 2;

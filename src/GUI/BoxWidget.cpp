@@ -293,6 +293,15 @@ BoxWidget::addToComboBox(const QString address)
     }
 }
 
+CurveWidget *
+BoxWidget::getCurveWidget(std::string address){
+    CurveWidget *curve = NULL;
+    QMap<string, CurveWidget *>::iterator curveIt = _curveMap->find(address);
+    bool curveFound = (curveIt != _curveMap->end());
+    curve = curveIt.value();
+    return curve;
+}
+
 bool
 BoxWidget::updateCurve(const string &address, bool forceUpdate)
 {
@@ -346,7 +355,16 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
                       //Create
                       curveTab = new CurveWidget(NULL);
 
-                      curveTab->setAttributes(_boxID, address, 0, values, sampleRate, redundancy, abCurve->_show, interpolate, argTypes, xPercents, yValues, sectionType, coeff);
+                      //get range bounds
+                      vector<float> rangeBounds;
+                      float min = -100., max = 100.;
+                      if(Maquette::getInstance()->getRangeBounds(address, rangeBounds) > 0){
+                          min = rangeBounds[0];
+                          max = rangeBounds[1];
+                      }
+                      std::cout<<"Range bounds : "<<min<<" ; "<<max<<std::endl;
+                      //Set attributes
+                      curveTab->setAttributes(_boxID, address, 0, values, sampleRate, redundancy, abCurve->_show, interpolate, argTypes, xPercents, yValues, sectionType, coeff, min, max);
                       bool muteState = Maquette::getInstance()->getCurveMuteState(_boxID, address);
                       if (!muteState) {
                           addCurve(curveAddressStr, curveTab);
@@ -375,7 +393,16 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
                   //Set attributes
                   curveTab = new CurveWidget(NULL);
                   QString curveAddressStr = QString::fromStdString(address);
-                  curveTab->setAttributes(_boxID, address, 0, values, sampleRate, redundancy, show, interpolate, argTypes, xPercents, yValues, sectionType, coeff);
+
+                  //get range bounds
+                  vector<float> rangeBounds;
+                  float min = -100., max = 100.;
+                  if(Maquette::getInstance()->getRangeBounds(address, rangeBounds) > 0){
+                      min = rangeBounds[0];
+                      max = rangeBounds[1];
+                  }
+                  std::cout<<"Range bounds : "<<min<<" ; "<<max<<std::endl;
+                  curveTab->setAttributes(_boxID, address, 0, values, sampleRate, redundancy, show, interpolate, argTypes, xPercents, yValues, sectionType, coeff, min, max);
                   if (interpolate) {
                       addCurve(curveAddressStr, curveTab);
                       box->setCurve(address, curveTab->abstractCurve());
@@ -510,5 +537,22 @@ BoxWidget::displayEndMenu(QPoint pos)
 {
   if (_endMenu != NULL) {
       _endMenu->exec(pos);
+    }
+}
+
+void
+BoxWidget::updateCurveRangeBoundMin(string address, float value){
+    CurveWidget *curve = getCurveWidget(address);
+    if(curve != NULL){
+        curve->setMinY(value);
+    }
+}
+
+void
+BoxWidget::updateCurveRangeBoundMax(string address, float value){
+    CurveWidget *curve = getCurveWidget(address);
+    std::cout<<"BW::updateMAX"<<std::endl;
+    if(curve != NULL){
+        curve->setMaxY(value);
     }
 }

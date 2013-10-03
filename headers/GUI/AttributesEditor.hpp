@@ -135,6 +135,10 @@ class AttributesEditor : public QDockWidget
      * \brief Assigns the snapshot to the end of the box.
      */
     void snapshotEndAssignment();
+
+    void changeRangeBoundMin(QTreeWidgetItem* item, float value);
+    void changeRangeBoundMax(QTreeWidgetItem* item, float value);
+
     inline NetworkTree *
     networkTree(){ return _networkTree; }
     virtual void clear();

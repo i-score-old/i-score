@@ -105,7 +105,13 @@ class CurveWidget : public QWidget
                        const std::vector<short> &sectionType, const std::vector<float> &coeff);
 
     void setAttributes(AbstractCurve *abCurve);
+    void setAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition, const std::vector<float> &values, unsigned int sampleRate,
+                       bool redundancy, bool show, bool interpolate, const std::vector<std::string> &argType, const std::vector<float> &xPercents, const std::vector<float> &yValues,
+                       const std::vector<short> &sectionType, const std::vector<float> &coeff,const float minY,
+                       const float maxY);
     void setLowerStyle(bool state);
+    void setMaxY(float value);
+    void setMinY(float value);
 
     /*!
      * \brief Gets local coordinates of a point.

@@ -72,6 +72,9 @@ class BoxWidget : public QWidget
     setStartMenu(QMenu *menu){ _startMenu = menu; }
     inline void
     setEndMenu(QMenu *menu){ _endMenu = menu; }
+    CurveWidget * getCurveWidget(std::string address);
+    void updateCurveRangeBoundMin(std::string address, float value);
+    void updateCurveRangeBoundMax(std::string address, float value);
 
   public slots:
     void updateDisplay(const QString &address);
@@ -83,7 +86,7 @@ class BoxWidget : public QWidget
     void execEndAction();
     void displayStartMenu(QPoint pos);
     void displayEndMenu(QPoint pos);
-    bool updateCurve(const std::string &address, bool forceUpdate);
+    bool updateCurve(const std::string &address, bool forceUpdate);    
 
   signals:
     void currentIndexChanged(QString address);

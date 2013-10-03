@@ -94,6 +94,8 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   VALUE_MODIFIED = false;
   SR_MODIFIED = false;
   NAME_MODIFIED = false;
+  MIN_MODIFIED = false;
+  MAX_MODIFIED = false;
   hideColumn(VALUE_COLUMN);
 
   connect(this, SIGNAL(itemClicked(QTreeWidgetItem *, int)), this, SLOT(clickInNetworkTree(QTreeWidgetItem *, int)));
@@ -821,7 +823,6 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                     curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
                 }
             }
-
 
             //Get object's chidren
             if(Maquette::getInstance()->getObjectChildren(address,children) > 0){
@@ -1637,6 +1638,12 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
             if (currentColumn() == SR_COLUMN) {
                 SR_MODIFIED = true;
             }
+            if (currentColumn() == MIN_COLUMN) {
+                MIN_MODIFIED = true;
+            }
+            if (currentColumn() == MAX_COLUMN) {
+                MAX_MODIFIED = true;
+            }
         }
         else if (currentItem()->type() == addOSCNode) {
             ;
@@ -1648,7 +1655,7 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
             }
         }
         else {
-            if (currentColumn() == START_COLUMN || currentColumn() == END_COLUMN || currentColumn() == SR_COLUMN) {
+            if (currentColumn() == START_COLUMN || currentColumn() == END_COLUMN || currentColumn() == SR_COLUMN /*|| currentColumn() == MIN_COLUMN || currentColumn() == MAX_COLUMN*/ ) {
                 QTreeWidgetItem *item = currentItem();
                 item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
                 editItem(item, currentColumn());
@@ -1662,6 +1669,12 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
                 if (currentColumn() == SR_COLUMN) {
                     SR_MODIFIED = true;
                 }
+//                if (currentColumn() == MIN_COLUMN) {
+//                    MIN_MODIFIED = true;
+//                }
+//                if (currentColumn() == MAX_COLUMN) {
+//                    MAX_MODIFIED = true;
+//                }
                 item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
                 item->setSelected(true);
             }
@@ -1773,6 +1786,16 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
       SR_MODIFIED = FALSE;
       emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
     }
+
+  if (item->type() == LeaveType && column == MIN_COLUMN && MIN_MODIFIED){
+      MIN_MODIFIED = false;
+      emit(rangeBoundMinChanged(item,item->text(MIN_COLUMN).toFloat()));
+  }
+
+  if (item->type() == LeaveType && column == MAX_COLUMN && MAX_MODIFIED){
+      MAX_MODIFIED = false;
+      emit(rangeBoundMaxChanged(item,item->text(MAX_COLUMN).toFloat()));
+  }
   if (item->type() == OSCNode && column == NAME_COLUMN && NAME_MODIFIED) {
       NAME_MODIFIED = FALSE;
       changeNameValue(item, item->text(NAME_COLUMN));
@@ -1801,25 +1824,27 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
     //Case message
     //PROVISIONAL
     //TODO : engine->requestType(address,type) and not to compare with "->" symbol. 
-    if (item->text(TYPE_COLUMN) == "->" && column == START_COLUMN && VALUE_MODIFIED) {
-        VALUE_MODIFIED = FALSE;
-        assignItem(item, data);
-        emit(startValueChanged(item, item->text(START_COLUMN)));
-        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
-    }
-    
-    if (item->text(TYPE_COLUMN) == "->" && column == END_COLUMN && VALUE_MODIFIED) {
-        VALUE_MODIFIED = FALSE;
-        assignItem(item, data);
-        emit(endValueChanged(item, item->text(END_COLUMN)));
-        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
-    }
-    
-    if (item->text(TYPE_COLUMN) == "->" && column == SR_COLUMN && SR_MODIFIED) {
-        SR_MODIFIED = FALSE;
-        emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
-        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
-    }
+  if (item->text(TYPE_COLUMN) == "->"){
+      if (column == START_COLUMN && VALUE_MODIFIED) {
+          VALUE_MODIFIED = FALSE;
+          assignItem(item, data);
+          emit(startValueChanged(item, item->text(START_COLUMN)));
+          item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+      }
+
+      else if (column == END_COLUMN && VALUE_MODIFIED) {
+          VALUE_MODIFIED = FALSE;
+          assignItem(item, data);
+          emit(endValueChanged(item, item->text(END_COLUMN)));
+          item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
+      }
+
+      else if (column == SR_COLUMN && SR_MODIFIED) {
+          SR_MODIFIED = FALSE;
+          emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
+          item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+      }      
+  }
 }
 
 QString
@@ -2004,7 +2029,6 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
                           else {
                               ;
                             }
-
 //                                std::cout<<"networkTree -> interpolate devient false"<<std::endl;
                         }
                     }

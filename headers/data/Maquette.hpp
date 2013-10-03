@@ -720,6 +720,9 @@ class Maquette : public QObject
      */
     int requestObjectAttribruteValue(const std::string &address, const std::string &attributeName, std::vector<std::string>& value);
 
+    void setRangeBoundMin(unsigned int boxID, const string &address, float value);
+    void setRangeBoundMax(unsigned int boxID, const string &address, float value);
+
     /*!
      * \brief Update boxes from Engines.
      */
