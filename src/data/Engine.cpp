@@ -2101,6 +2101,7 @@ Engine::requestObjectAttributeValue(const std::string & address, const std::stri
     TTValue             v;
 
     aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    value.clear();
 
     if (!aDirectory)
         return 1;
@@ -2111,7 +2112,7 @@ Engine::requestObjectAttributeValue(const std::string & address, const std::stri
         aMirror = TTMirrorPtr(aNode->getObject());
 
         if (aMirror) {
-            if(!aMirror->getAttributeValue(TTSymbol(attribute), v)){
+            if(!aMirror->getAttributeValue(TTSymbol(attribute), v)){               
                 v.toString();
                 s = TTString(v[0]);
                 value.push_back(s.c_str());
@@ -2162,6 +2163,7 @@ Engine::requestObjectChildren(const std::string & address, vector<string>& child
     TTString            s;
 
     aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    children.clear();
 
     if (!aDirectory)
         return 0;
