@@ -455,7 +455,8 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
           if (std::find(curvesAddresses.begin(), curvesAddresses.end(), address) == curvesAddresses.end() && startMessages.value(address) != endMessages.value(address)) {
 
               _engines->addCurve(boxID, address);
-
+              _engines->setCurveSampleRate(boxID, address, 40);
+              
               getBox(boxID)->addCurve(address);
             }
         }
