@@ -1856,7 +1856,7 @@ bool Engine::isPaused()
     m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
     aScheduler = TTObjectBasePtr(v[0]);
     
-    aScheduler->getAttributeValue(TTSymbol("running"), v);
+    aScheduler->getAttributeValue(TTSymbol("paused"), v);
     
     return TTBoolean(v[0]);
 }
