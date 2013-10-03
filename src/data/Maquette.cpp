@@ -1017,7 +1017,6 @@ Maquette::getCurveAttributes(unsigned int boxID, const std::string &address, uns
           sampleRate = _engines->getCurveSampleRate(boxID, address);
           redundancy = _engines->getCurveRedundancy(boxID, address);
           interpolate = !_engines->getCurveMuteState(boxID, address);
-          _engines->getCurveArgTypes(address, argTypes);
           return true;
         }
     }

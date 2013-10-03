@@ -586,19 +586,6 @@ public:
 	void setCurveMuteState(TimeProcessId boxId, const std::string & address, bool muteState);
 	bool getCurveMuteState(TimeProcessId boxId, const std::string & address);
     
-    
-	/*!
-	 * Gets all arguments type of a given string. Useful too for getting the address information of a message.
-	 *
-	 * For example : "/deviceName/freq 100 200." will be cut into :
-	 *
-	 * </deviceName/freq INT FLOAT>
-	 *
-	 * \param stringToParse : the string to parse.
-	 * \param result : the result vector.
-	 */
-	void getCurveArgTypes(std::string stringToParse, std::vector<std::string>& result);
-    
 	/*!
 	 * Sets sections informations for sending more complicated curves.
 	 *
