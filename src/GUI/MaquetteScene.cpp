@@ -161,6 +161,8 @@ MaquetteScene::zoomChanged(float value)
 
   updateProgressBar();
   _timeBar->updateZoom(value);
+    
+  Maquette::getInstance()->setViewZoom(QPointF(value, 1.));
 }
 
 void

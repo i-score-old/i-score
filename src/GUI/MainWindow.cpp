@@ -293,7 +293,7 @@ MainWindow::open()
             break;
         }
     }
-  QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("XML Files (*.xml)"));
+  QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("XML Files (*.score)"));
   if (!fileName.isEmpty()) {
       loadFile(fileName);
     }
@@ -313,7 +313,7 @@ MainWindow::save()
 bool
 MainWindow::saveAs()
 {
-  QString fileName = QFileDialog::getSaveFileName(this, tr("Save File As"), "", tr("XML Files (*.xml)"));
+  QString fileName = QFileDialog::getSaveFileName(this, tr("Save File As"), "", tr("XML Files (*.score)"));
   if (fileName.isEmpty()) {
       return false;
     }
@@ -710,27 +710,23 @@ MainWindow::saveFile(const QString &fileName)
     QString concat(tr("(")+QString("%1-%2-%3").arg(date.day()).arg(date.month()).arg(date.year())+tr("-")+timeString+tr(")"));
 
     QString backupName = fileName;
-    int i = fileName.indexOf(".xml");
+    int i = fileName.indexOf(".score");
     backupName.insert(i,concat);
 
     QProcess process;
-    QStringList XMLargs, SIMONEargs;
+    QStringList XMLargs;
 
     XMLargs<< fileName;
     XMLargs<< backupName;
 
-    SIMONEargs<< QString(fileName+tr(".simone"));
-    SIMONEargs<< QString(backupName+tr(".simone"));
-
     process.start("cp", XMLargs);
-    process.execute("cp", SIMONEargs);
     process.close();
 
   /*******************************************/
 
   QString fileN;
-  if (!fileName.endsWith(".xml")) {
-      fileN = fileName + ".xml";
+  if (!fileName.endsWith(".score")) {
+      fileN = fileName + ".score";
     }
   else {
       fileN = fileName;
@@ -767,7 +763,7 @@ MainWindow::setCurrentFile(const QString &fileName)
 void
 MainWindow::setMaquetteSceneTitle(QString name)
 {
-  name.remove(".xml");
+  name.remove(".score");
   _maquetteWidget->setName(name);
 }
 

@@ -150,6 +150,11 @@ Maquette::getBox(unsigned int ID)
   return NULL;
 }
 
+void Maquette::setBoxColor(unsigned int ID, QColor newColor)
+{
+    _engines->setBoxColor(ID, newColor);
+}
+
 map<unsigned int, ParentBox*>
 Maquette::parentBoxes()
 {
@@ -450,7 +455,8 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
           if (std::find(curvesAddresses.begin(), curvesAddresses.end(), address) == curvesAddresses.end() && startMessages.value(address) != endMessages.value(address)) {
 
               _engines->addCurve(boxID, address);
-
+              _engines->setCurveSampleRate(boxID, address, 40);
+              
               getBox(boxID)->addCurve(address);
             }
         }
@@ -1563,14 +1569,8 @@ Maquette::save(const string &fileName)
 void
 Maquette::load(const string &fileName)
 {
-    QPointF topLeft, size, bottomRight;
-    QString name, boxType;
-    QColor color(1., 1., 1.);
-    unsigned int motherID;
-    
-    float   zoom;
-    QPointF centerCoordinates;
     vector<unsigned int>::iterator it;
+    float zoom;
 
     // Clear the maquette
     _scene->clear();
@@ -1581,18 +1581,17 @@ Maquette::load(const string &fileName)
     // Reload networkTree
     _scene->editor()->networkTree()->load();
     
-    // Set zoom to 1 and view center coordinates to (0., 0.)
-    zoom = 1.;
-    centerCoordinates = QPointF(0., 0.);
-    
-    _scene->view()->setZoom(1.);
-    _scene->view()->centerOn(centerCoordinates);
+    // Set zoom (for x axe only) and view center coordinates
+    zoom = _engines->getViewZoom().x();
+    _scene->view()->setZoom(zoom);
+    _scene->view()->centerOn(_engines->getViewPosition());
     
     // BOXES
     {
         vector<unsigned int>    boxesID;
         unsigned int            boxID;
         string                  name;
+        QColor                  color;
         unsigned int            date, duration, topLeftY, sizeY;
         
         // get all boxes ID
@@ -1605,12 +1604,13 @@ Maquette::load(const string &fileName)
             if (boxID == ROOT_BOX_ID)
                 continue;
             
-            // get name, date, duration, topLeftY and sizeY informations
+            // get name, date, duration, topLeftY, sizeY and color informations
             name = _engines->getBoxName(boxID);
             date = _engines->getBoxBeginTime(boxID);
             duration = _engines->getBoxDuration(boxID);
             topLeftY = _engines->getBoxVerticalPosition(boxID);
             sizeY = _engines->getBoxVerticalSize(boxID);
+            color = _engines->getBoxColor(boxID);
             
             QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
             QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);
@@ -1624,6 +1624,7 @@ Maquette::load(const string &fileName)
             
             newBox->setName(QString::fromStdString(name));
             newBox->setID(boxID);
+            newBox->setColor(color);
             newBox->setFirstMessagesToSend(firstMsgs);
             newBox->setLastMessagesToSend(lastMsgs);
             
@@ -1810,6 +1811,16 @@ Maquette::updateTriggerPointActiveStatus(unsigned int trgID, bool active)
             }
         }
     }
+}
+
+void Maquette::setViewZoom(const QPointF zoom)
+{
+    _engines->setViewZoom(zoom);
+}
+
+void Maquette::setViewPosition(const QPointF position)
+{
+    _engines->setViewPosition(position);
 }
 
 void
