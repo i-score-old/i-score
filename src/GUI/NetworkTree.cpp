@@ -78,9 +78,9 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   setColumnWidth(INTERPOLATION_COLUMN, 25);
   setColumnWidth(REDUNDANCY_COLUMN, 25);
   setColumnWidth(SR_COLUMN, 32);
-  setColumnWidth(TYPE_COLUMN, 40);
-  setColumnWidth(MIN_COLUMN, 32);
-  setColumnWidth(MAX_COLUMN, 32);
+  setColumnWidth(TYPE_COLUMN, 33);
+  setColumnWidth(MIN_COLUMN, 40);
+  setColumnWidth(MAX_COLUMN, 40);
 
   setIndentation(13);
   setHeaderLabels(list);
@@ -809,16 +809,17 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                     }
 
                     //Case type parameter
-                    if(attributesValues[0] == "parameter"){
-                        vector<string> rangeBounds;
-                        if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0){
-                            curItem->setText(MIN_COLUMN,QString::fromStdString(rangeBounds[0]));
-                            curItem->setToolTip(MIN_COLUMN, curItem->text(MIN_COLUMN));
-                            curItem->setText(MAX_COLUMN,QString::fromStdString(rangeBounds[1]));
-                            curItem->setToolTip(MAX_COLUMN, curItem->text(MAX_COLUMN));
-                        }
+                    if(attributesValues[0] == "parameter"){                        
                         curItem->setText(TYPE_COLUMN,QString("<->"));
                         curItem->setToolTip(TYPE_COLUMN, tr("Type parameter"));
+                    }
+
+                    vector<string> rangeBounds;
+                    if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0){
+                        curItem->setText(MIN_COLUMN,QString::fromStdString(rangeBounds[0]));
+                        curItem->setToolTip(MIN_COLUMN, curItem->text(MIN_COLUMN));
+                        curItem->setText(MAX_COLUMN,QString::fromStdString(rangeBounds[1]));
+                        curItem->setToolTip(MAX_COLUMN, curItem->text(MAX_COLUMN));
                     }
                     curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
                 }
