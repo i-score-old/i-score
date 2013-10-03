@@ -1939,27 +1939,9 @@ float Engine::getProcessProgression(TimeProcessId processId)
     return time;
 }
 
-bool Engine::receiveNetworkMessage(std::string netMessage)
-{
-#ifdef TODO_ENGINE    
-	if (m_executionMachine->isRunning()) {
-		return m_executionMachine->receiveNetworkMessage(netMessage);
-	} else {
-		return false;
-	}
-#endif
-}
-
 void Engine::simulateNetworkMessageReception(const std::string & netMessage)
 {
     return;
-#ifdef TODO_ENGINE    
-	std::string value("");
-	receiveNetworkMessageCallBack(this, netMessage, "", value);
-    //	if (m_executionMachine->isRunning()) {
-    //		m_executionMachine->receiveNetworkMessage(netMessage);
-    //	}
-#endif
 }
 
 void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const std::string & DevicePort)
