@@ -1278,7 +1278,8 @@ void Engine::setCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex cont
     state->sendMessage(TTSymbol("Flatten"));
     
     // Update all curves (for automation process only)
-    timeProcess->sendMessage(TTSymbol("CurveUpdate"));
+    TTValue empty; // théo : this is to pass thru a Foundation bug which will disapear in a next version
+    timeProcess->sendMessage(TTSymbol("CurveUpdate"), empty, empty);
 }
 
 void Engine::getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex controlPointIndex, std::vector<std::string>& messages)
