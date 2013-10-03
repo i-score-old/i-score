@@ -759,13 +759,19 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                 if(nodeType == "Model" || nodeType == "Input.audio" ||nodeType == "Output.audio"){
                     delete(curItem);
                     return;
+                }                
+                if(Maquette::getInstance()->requestObjectAttribruteValue(address,"tag",attributesValues) > 0){
+                    if(attributesValues[0] == "setup"){
+                        delete(curItem);
+                        return;
+                    }
                 }
             }
 
             if(Maquette::getInstance()->requestObjectAttribruteValue(address,"service",attributesValues) > 0){
                 if(nodeType == "Container"){
                     //Case type view
-                    if(treeFilterActive() && attributesValues[0] == "view"){
+                    if(treeFilterActive() && attributesValues[0] == "view"){                        
                         delete(curItem);
                         return;
                     }
@@ -812,17 +818,18 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                     if(attributesValues[0] == "parameter"){                        
                         curItem->setText(TYPE_COLUMN,QString("<->"));
                         curItem->setToolTip(TYPE_COLUMN, tr("Type parameter"));
-                    }
-
-                    vector<string> rangeBounds;
-                    if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0){
-                        curItem->setText(MIN_COLUMN,QString::fromStdString(rangeBounds[0]));
-                        curItem->setToolTip(MIN_COLUMN, curItem->text(MIN_COLUMN));
-                        curItem->setText(MAX_COLUMN,QString::fromStdString(rangeBounds[1]));
-                        curItem->setToolTip(MAX_COLUMN, curItem->text(MAX_COLUMN));
-                    }
+                    }                    
                     curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
                 }
+            }
+
+            //Get range bounds
+            vector<string> rangeBounds;
+            if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0){
+                curItem->setText(MIN_COLUMN,QString::fromStdString(rangeBounds[0]));
+                curItem->setToolTip(MIN_COLUMN, curItem->text(MIN_COLUMN));
+                curItem->setText(MAX_COLUMN,QString::fromStdString(rangeBounds[1]));
+                curItem->setToolTip(MAX_COLUMN, curItem->text(MAX_COLUMN));
             }
 
             //Get object's chidren
