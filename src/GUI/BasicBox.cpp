@@ -1488,7 +1488,7 @@ BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 
   QRectF vertResize_bottom(_boxRect.bottomLeft() + QPointF(0, -RESIZE_ZONE_WIDTH), _boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, 0));
   QRectF diagResize_bottomRight(_boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, RESIZE_ZONE_WIDTH), _boxRect.bottomRight());
-//todo : horizontalResize_right
+  /// \todo : horizontalResize_right
 
 
   //bandeau zone (text rect) - top

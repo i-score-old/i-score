@@ -1631,7 +1631,7 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
     Q_UNUSED(event);
     if(currentItem()!=NULL){
         
-        //TODO : engine->resquestType(itemAddress) instead of the comparaison with "->".            
+        /// \todo : engine->resquestType(itemAddress) instead of the comparaison with "->".
         if (currentItem()->type() == OSCNode || currentItem()->text(TYPE_COLUMN) == "->") {
             editItem(currentItem(), currentColumn());
             if (currentColumn() == NAME_COLUMN) {
@@ -1831,7 +1831,7 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
     
     //Case message
     //PROVISIONAL
-    //TODO : engine->requestType(address,type) and not to compare with "->" symbol. 
+    /// \todo : engine->requestType(address,type) and not to compare with "->" symbol.
   if (item->text(TYPE_COLUMN) == "->"){
       if (column == START_COLUMN && VALUE_MODIFIED) {
           VALUE_MODIFIED = FALSE;
