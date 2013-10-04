@@ -1940,9 +1940,22 @@ float Engine::getProcessProgression(TimeProcessId processId)
     return time;
 }
 
-void Engine::simulateNetworkMessageReception(const std::string & netMessage)
+void Engine::trigger(ConditionedProcessId triggerId)
 {
-    return;
+    TimeEventIndex      controlPointIndex;
+    TTTimeProcessPtr    timeProcess = getConditionedProcess(triggerId, controlPointIndex);
+    TTTimeEventPtr      timeEvent;
+    TTValue             v, out;
+    
+    // Get start or end time event
+    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+    else
+        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
+            
+    timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+            
+    timeEvent->sendMessage(kTTSym_Trigger);
 }
 
 void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const std::string & DevicePort)

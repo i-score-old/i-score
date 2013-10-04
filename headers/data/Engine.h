@@ -813,14 +813,13 @@ public:
 	//Network //////////////////////////////////////////////////////////////////////////////////////////////
     
 	/*!
-	 * Same behavior as receiveNetworkMessage function, but must be used by a user to simulate a network message reception.
-	 * For example to trigger a trigger point manually.
+	 * Trigger a trigger point manually.
 	 *
-	 * Tells the ECOMachine that a network message was received and need to be handled.
+	 * Tells the ECOMachine that a trigger point is trggered.
 	 *
-	 * \param netMessage : the network message received.
+	 * \param triggerId : the id of the trigger point to trigger.
 	 */
-	void simulateNetworkMessageReception(const std::string & netMessage);
+	void trigger(ConditionedProcessId triggerId);
     
 	/*!
 	 * Adds a network device.

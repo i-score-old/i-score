@@ -793,9 +793,9 @@ Maquette::updateBoxes(const map<unsigned int, Coords> &boxes)
 }
 
 void
-Maquette::simulateTriggeringMessage(const string &message)
+Maquette::trigger(TriggerPoint *triggerPoint)
 {
-  _engines->simulateNetworkMessageReception(message);
+  _engines->trigger(triggerPoint->ID());
 }
 
 int
