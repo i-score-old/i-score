@@ -1947,28 +1947,6 @@ Maquette::getRangeBounds(const std::string& address, std::vector<float>& rangeBo
 }
 
 int
-Maquette::getRangeBounds(const std::string& address, std::vector<string>& rangeBoundsAsString){
-    std::vector<std::string>    values;
-
-    if(Maquette::getInstance()->requestObjectAttribruteValue(address,"rangeBounds",values)>0){
-
-        //parse string to vector<string>
-        QString qvalues = QString::fromStdString(values[0]);
-        QStringList valuesParsed = qvalues.split(" ");
-
-        //minBound
-        rangeBoundsAsString.push_back(valuesParsed.at(0).toStdString());
-
-        //maxBound
-        rangeBoundsAsString.push_back(valuesParsed.at(1).toStdString());
-
-        return 1;
-    }
-
-    return 0;
-}
-
-int
 Maquette::getObjectType(const std::string & address, std::string & nodeType)
 {
     return _engines->requestObjectType(address,nodeType);
