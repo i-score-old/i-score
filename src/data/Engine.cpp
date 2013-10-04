@@ -1829,6 +1829,7 @@ TimeValue Engine::getGotoValue()
 #ifdef TODO_ENGINE    
 	return m_executionMachine->getGotoInformation();
 #endif
+    return 0;
 }
 
 bool Engine::play()
