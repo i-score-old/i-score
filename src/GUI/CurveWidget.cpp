@@ -49,6 +49,7 @@
 #include <QBrush>
 #include <QToolTip>
 #include <QGraphicsOpacityEffect>
+#include <MaquetteScene.hpp>
 
 using std::map;
 using std::string;
@@ -109,7 +110,7 @@ CurveWidget::init()
   setLayout(_layout);
   _xAxisPos = height() / 2.;
 
-  _minYTextRect = new QRectF(0.,_xAxisPos + 10.,40.,10.);
+  _minYTextRect = new QRectF(0.,_xAxisPos,40.,10.);
   _maxYTextRect = new QRectF(0.,0.,40.,10.);
 
   _minRangeBoundLocked = false;
@@ -404,10 +405,14 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
       {
           if (_movingBreakpointX != -1) {
 
-              if(relativePoint.y() > _maxY && _maxRangeBoundLocked)
+              if(relativePoint.y() > _maxY && _maxRangeBoundLocked){
+                  Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (high range clipMode)").toStdString(), INDICATION_LEVEL);
                   break;
-              if(relativePoint.y() < _minY && _minRangeBoundLocked)
+              }
+              if(relativePoint.y() < _minY && _minRangeBoundLocked){
+                  Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (low range clipMode)").toStdString(), INDICATION_LEVEL);
                   break;
+              }
 
               map<float, pair<float, float> >::iterator it;
               if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
@@ -496,19 +501,30 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event)
       if (event->modifiers() == Qt::NoModifier) {
           QPointF relativePoint = relativeCoordinates(event->pos());
 
-          if(relativePoint.y() > _maxY && _maxRangeBoundLocked){
-              _movingBreakpointX = relativePoint.x();
-              _movingBreakpointY = _maxY;
-
-              curveChanged();
-              update();
-          }
-          else
-              if(relativePoint.y() < _minY && _minRangeBoundLocked){
+          if(relativePoint.y() > _maxY){
+              if(_maxRangeBoundLocked){
                   _movingBreakpointX = relativePoint.x();
-                  _movingBreakpointY = _minY;
+                  _movingBreakpointY = _maxY;
+
                   curveChanged();
                   update();
+              }
+              else{
+                  Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (high range clipMode)").toStdString(), INDICATION_LEVEL);
+              }
+
+          }
+          else
+              if(relativePoint.y() < _minY){
+                  if(_minRangeBoundLocked){
+                      _movingBreakpointX = relativePoint.x();
+                      _movingBreakpointY = _minY;
+                      curveChanged();
+                      update();
+                  }
+                  else{
+                      Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (low range clipMode)").toStdString(), INDICATION_LEVEL);
+                  }
               }
 
           map<float, pair<float, float> >::iterator it;

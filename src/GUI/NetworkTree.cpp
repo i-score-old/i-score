@@ -824,11 +824,11 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
             }
 
             //Get range bounds
-            vector<string> rangeBounds;
+            vector<float> rangeBounds;
             if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0){
-                curItem->setText(MIN_COLUMN,QString::fromStdString(rangeBounds[0]));
+                curItem->setText(MIN_COLUMN,QString("%1").arg(rangeBounds[0]));
                 curItem->setToolTip(MIN_COLUMN, curItem->text(MIN_COLUMN));
-                curItem->setText(MAX_COLUMN,QString::fromStdString(rangeBounds[1]));
+                curItem->setText(MAX_COLUMN,QString("%1").arg(rangeBounds[1]));
                 curItem->setToolTip(MAX_COLUMN, curItem->text(MAX_COLUMN));
             }
 
@@ -1631,7 +1631,7 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
     Q_UNUSED(event);
     if(currentItem()!=NULL){
         
-        //TODO : engine->resquestType(itemAddress) instead of the comparaison with "->".            
+        /// \todo : engine->resquestType(itemAddress) instead of the comparaison with "->".
         if (currentItem()->type() == OSCNode || currentItem()->text(TYPE_COLUMN) == "->") {
             editItem(currentItem(), currentColumn());
             if (currentColumn() == NAME_COLUMN) {
@@ -1831,7 +1831,7 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
     
     //Case message
     //PROVISIONAL
-    //TODO : engine->requestType(address,type) and not to compare with "->" symbol. 
+    /// \todo : engine->requestType(address,type) and not to compare with "->" symbol.
   if (item->text(TYPE_COLUMN) == "->"){
       if (column == START_COLUMN && VALUE_MODIFIED) {
           VALUE_MODIFIED = FALSE;

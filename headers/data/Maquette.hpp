@@ -806,8 +806,7 @@ class Maquette : public QObject
      * \param address : the address to be snapped.
      * \param rangeBounds : Result to be field.
      */
-    int getRangeBounds(const std::string& address, std::vector<float>& rangeBounds);
-    int getRangeBounds(const std::string& address, std::vector<string>& rangeBoundsAsString);
+    int getRangeBounds(const std::string& address, std::vector<float>& rangeBounds);    
 
     /*!
      * Gets the type of an object.
