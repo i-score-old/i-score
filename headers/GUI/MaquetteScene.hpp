@@ -366,14 +366,6 @@ class MaquetteScene : public QGraphicsScene
     void setNetworDeviceConfig(string deviceName, string pluginName, string IP, string port);
 
     /*!
-     * \brief Updates messages to send for a specific box.
-     *
-     * \param boxID : the box to modify messages sent from
-     * \return true if messages could be modified
-     */
-    bool updateMessagesToSend(unsigned int boxID);
-
-    /*!
      * \brief Sends a specific message with current device.
      *
      * \param message : the message to send

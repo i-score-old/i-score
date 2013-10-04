@@ -214,13 +214,6 @@ MaquetteScene::setNetworDeviceConfig(string deviceName, string pluginName, strin
 }
 
 bool
-MaquetteScene::updateMessagesToSend(unsigned int boxID)
-{
-  setModified(true);
-  return _maquette->updateMessagesToSend(boxID);
-}
-
-bool
 MaquetteScene::sendMessage(const string &message)
 {
   return _maquette->sendMessage(message);
@@ -914,8 +907,6 @@ MaquetteScene::pasteBoxes()
 
           newBox->setStartMessages(absCopyBox->startMessages());
           newBox->setEndMessages(absCopyBox->endMessages());
-          newBox->setFirstMessagesToSend(absCopyBox->startMessages()->computeMessages());
-          newBox->setLastMessagesToSend(absCopyBox->endMessages()->computeMessages());
 
           newBox->setSelected(true);
           newBox->centerWidget();

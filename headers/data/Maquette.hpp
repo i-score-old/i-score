@@ -341,14 +341,6 @@ class Maquette : public QObject
     void executionFinished();
 
     /*!
-     * \brief Updates messages to send for a specific box.
-     *
-     * \param boxID : the box to modify messages sent from
-     * \return true if messages could be modified
-     */
-    bool updateMessagesToSend(unsigned int boxID);
-
-    /*!
      * \brief Gets the set of messages to send for the beginning of a box.
      *
      * \param boxID : the box to get messages set from
@@ -365,16 +357,6 @@ class Maquette : public QObject
      * \return a set of the messages to send for the end of a box
      */
     std::vector<std::string> lastMessagesToSend(unsigned int boxID);
-
-    /*!
-     * \brief Sets the set of messages to send for the beginning of a box.
-     *
-     * \param boxID : the box to get messages set from
-     * \param messages : the new set of the messages
-     *
-     * \return if messages could be set
-     */
-    bool setFirstMessagesToSend(unsigned int boxID, const std::vector<std::string> &messages);
 
     /*!
      * \brief Sets the set of messages to send for the end of a box.
@@ -396,7 +378,6 @@ class Maquette : public QObject
      * \return if itemsSelected could be set
      */
 
-//  bool setSelectedItemsToSend(unsigned int boxID,  QList<QTreeWidgetItem*> itemsSelected);
     bool setSelectedItemsToSend(unsigned int boxID, QMap<QTreeWidgetItem*, Data> itemsSelected);
 
     /*!
@@ -449,16 +430,6 @@ class Maquette : public QObject
      * \return if itemsExtanded could be removed
      */
     bool removeFromExpandedItemsList(unsigned int boxID, QTreeWidgetItem* item);
-
-    /*!
-     * \brief Sets the set of messages to send for the end of a box.
-     *
-     * \param boxID : the box to get messages set from
-     * \param messages : the new set of the messages
-     *
-     * \return if messages could be set
-     */
-    bool setLastMessagesToSend(unsigned int boxID, const std::vector<std::string> &messages);
 
     /*!
      * \brief Sets the set of messages to send for the end of a box.

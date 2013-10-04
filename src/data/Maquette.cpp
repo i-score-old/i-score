@@ -196,9 +196,6 @@ Maquette::addParentBox(unsigned int ID, const QPointF & corner1, const QPointF &
                 }
             }
         }
-
-      newBox->setFirstMessagesToSend(firstMsgs);
-      newBox->setLastMessagesToSend(lastMsgs);
     }
 
   return ID;
@@ -236,9 +233,6 @@ Maquette::addParentBox(unsigned int ID, const unsigned int date, const unsigned 
                 }
             }
         }
-
-      newBox->setFirstMessagesToSend(firstMsgs);
-      newBox->setLastMessagesToSend(lastMsgs);
     }
 
   return ID;
@@ -285,8 +279,8 @@ Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const s
           motherBox->addChild(newBoxID);
         }
 
-      _engines->setCtrlPointMessagesToSend(newBoxID, BEGIN_CONTROL_POINT_INDEX, newBox->firstMessagesToSend());
-      _engines->setCtrlPointMessagesToSend(newBoxID, END_CONTROL_POINT_INDEX, newBox->lastMessagesToSend());
+//      _engines->setCtrlPointMessagesToSend(newBoxID, BEGIN_CONTROL_POINT_INDEX, newBox->firstMessagesToSend());
+//      _engines->setCtrlPointMessagesToSend(newBoxID, END_CONTROL_POINT_INDEX, newBox->lastMessagesToSend());
     }
 
   return newBoxID;
@@ -354,17 +348,6 @@ Maquette::getNetworkDeviceNames(vector<string> &deviceName, vector<bool> &namesp
 vector<string> Maquette::requestNetworkSnapShot(const string &address)
 {
   return _engines->requestNetworkSnapShot(address);
-}
-
-bool
-Maquette::updateMessagesToSend(unsigned int boxID)
-{
-  if (boxID != NO_ID) {
-      _engines->setCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, static_cast<ParentBox*>(_boxes[boxID])->firstMessagesToSend());
-      _engines->setCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, static_cast<ParentBox*>(_boxes[boxID])->lastMessagesToSend());
-      return true;
-    }
-  return false;
 }
 
 vector<string>
@@ -495,22 +478,6 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
 }
 
 bool
-Maquette::setFirstMessagesToSend(unsigned int boxID, const vector<string> &firstMsgs)
-{
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
-      _engines->setCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-      _boxes[boxID]->setFirstMessagesToSend(firstMsgs);
-
-      vector<string> lastMsgs;
-      _engines->getCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, lastMsgs);
-      updateCurves(boxID, firstMsgs, lastMsgs);
-
-      return true;
-    }
-  return false;
-}
-
-bool
 Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages)
 {
   vector<string> firstMsgs = messages->computeMessages();
@@ -614,22 +581,6 @@ Maquette::endMessages(unsigned int boxID)
       std::cerr << "Maquette::startMessage : wrong boxID" << std::endl;
       return NULL;
     }
-}
-
-bool
-Maquette::setLastMessagesToSend(unsigned int boxID, const vector<string> &lastMsgs)
-{
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
-      _engines->setCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, lastMsgs);
-      _boxes[boxID]->setLastMessagesToSend(lastMsgs);
-
-      vector<string> firstMsgs;
-      _engines->getCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-      updateCurves(boxID, firstMsgs, lastMsgs);
-
-      return true;
-    }
-  return false;
 }
 
 bool
@@ -1626,9 +1577,7 @@ Maquette::load(const string &fileName)
             newBox->setName(QString::fromStdString(name));
             newBox->setID(boxID);
             newBox->setColor(color);
-            newBox->setFirstMessagesToSend(firstMsgs);
-            newBox->setLastMessagesToSend(lastMsgs);
-            
+
             _boxes[boxID] = newBox;
             _parentBoxes[boxID] = newBox;
             
