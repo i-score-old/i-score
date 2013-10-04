@@ -147,19 +147,7 @@ class AbstractBox : public Abstract
      * \return the mother of the box
      */
     inline unsigned int
-    mother() const { return _motherID; }
-
-    /*!
-     * \brief Gets the messages to send at box start.
-     * \return the messages to send at box start
-     */
-    inline std::vector<std::string> firstMsgs() const { return _firstMsgs; }
-
-    /*!
-     * \brief Gets the messages to send at box end.
-     * \return the messages to send at box end
-     */
-    inline std::vector<std::string> lastMsgs() const { return _lastMsgs; }
+    mother() const { return _motherID; } 
 
     /*!
      * \brief Gets the messages to send at box start.
@@ -242,17 +230,6 @@ class AbstractBox : public Abstract
      * \brief Sets the messages to send at box start.
      * \param firstMsgs : the new messages to send at box start
      */
-    inline void
-    setFirstMsgs(const std::vector<std::string> &firstMsgs)
-    {
-      _firstMsgs.clear();
-      _firstMsgs = firstMsgs;
-    }
-
-    /*!
-     * \brief Sets the messages to send at box start.
-     * \param firstMsgs : the new messages to send at box start
-     */
     void setStartMessages(NetworkMessages *startMsgs);
 
     /*!
@@ -308,17 +285,6 @@ class AbstractBox : public Abstract
      * \brief Sets the messages to send at box end.
      * \param lastMsgs : the new messages to send at box end
      */
-    inline void
-    setLastMsgs(const std::vector<std::string> &lastMsgs)
-    {
-      _lastMsgs.clear();
-      _lastMsgs = lastMsgs;
-    }
-
-    /*!
-     * \brief Sets the messages to send at box end.
-     * \param lastMsgs : the new messages to send at box end
-     */
     void setEndMessages(NetworkMessages *endMsgs);
     inline bool
     hasFirstMsgs(){ return !_startMessages->messages().empty(); }
@@ -334,9 +300,7 @@ class AbstractBox : public Abstract
     std::string _name;                   //!< The name of the box.
     QColor _color;                       //!< The color of the box.
     unsigned int _ID;                    //!< The ID of the box.
-    unsigned int _motherID;              //!< The possible mother's ID
-    std::vector<std::string> _firstMsgs; //!< Messages linked to the start of the box
-    std::vector<std::string> _lastMsgs;  //!< Messages linked to the end of the box
+    unsigned int _motherID;              //!< The possible mother's ID    
     NetworkMessages *_startMessages;     //!< pairs QTreeWidgetItem-Message
     NetworkMessages *_endMessages;       //!< pairs QTreeWidgetItem-Message
     QMap<QTreeWidgetItem*, Data> _networkTreeItems;

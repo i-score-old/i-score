@@ -78,9 +78,9 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   setColumnWidth(INTERPOLATION_COLUMN, 25);
   setColumnWidth(REDUNDANCY_COLUMN, 25);
   setColumnWidth(SR_COLUMN, 32);
-  setColumnWidth(TYPE_COLUMN, 33);
-  setColumnWidth(MIN_COLUMN, 40);
-  setColumnWidth(MAX_COLUMN, 40);
+  setColumnWidth(TYPE_COLUMN, 34);
+  setColumnWidth(MIN_COLUMN, 31);
+  setColumnWidth(MAX_COLUMN, 31);
 
   setIndentation(13);
   setHeaderLabels(list);
@@ -418,8 +418,9 @@ NetworkTree::getOSCMessages()
 void
 NetworkTree::loadNetworkTree(AbstractBox *abBox)
 {
-  QList< QPair<QTreeWidgetItem *, Message> > startItemsAndMsgs = getItemsFromMsg(abBox->firstMsgs());
-  QList< QPair<QTreeWidgetItem *, Message> > endItemsAndMsgs = getItemsFromMsg(abBox->lastMsgs());
+    QList< QPair<QTreeWidgetItem *, Message> > startItemsAndMsgs = getItemsFromMsg(Maquette::getInstance()->firstMessagesToSend(abBox->ID()));
+    QList< QPair<QTreeWidgetItem *, Message> > endItemsAndMsgs = getItemsFromMsg(Maquette::getInstance()->lastMessagesToSend(abBox->ID()));
+
   QList< QPair<QTreeWidgetItem *, Message> >::iterator it0;
   QPair<QTreeWidgetItem *, Message> curPair;
 

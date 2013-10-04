@@ -939,12 +939,6 @@ BasicBox::triggerPointMessage(BoxExtremity extremity)
 }
 
 void
-BasicBox::setFirstMessagesToSend(const vector<string> &messages)
-{
-  _abstract->setFirstMsgs(messages);
-}
-
-void
 BasicBox::setStartMessages(NetworkMessages *messages)
 {
   _abstract->setStartMessages(messages);
@@ -980,11 +974,6 @@ BasicBox::clearExpandedItemsList()
 {
   _abstract->clearNetworkTreeExpandedItems();
 }
-void
-BasicBox::setLastMessagesToSend(const vector<string> &messages)
-{
-  _abstract->setLastMsgs(messages);
-}
 
 void
 BasicBox::setEndMessages(NetworkMessages *messages)
@@ -1014,17 +1003,6 @@ void
 BasicBox::setEndMessage(QTreeWidgetItem *item, QString address)
 {
   _abstract->setEndMessage(item, address);
-}
-vector<string>
-BasicBox::firstMessagesToSend() const
-{
-  return _abstract->firstMsgs();
-}
-
-vector<string>
-BasicBox::lastMessagesToSend() const
-{
-  return _abstract->lastMsgs();
 }
 
 AbstractCurve *

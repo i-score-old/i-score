@@ -249,7 +249,7 @@ class NetworkTree : public QTreeWidget
     void expandItems(QList<QTreeWidgetItem*> expandedItems);
 
     /*!
-     * \brief Loads assigned items and messages' value, from the _firstMsgs and _lastMsgs of the abstract box.
+     * \brief Loads assigned items and messages' value requesting engine.
      * \param abBox : The abstractBox.
      */
     void loadNetworkTree(AbstractBox *abBox);
