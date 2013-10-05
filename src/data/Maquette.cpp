@@ -1134,7 +1134,7 @@ Maquette::changeRelationBounds(unsigned int relID, const float &minBound, const 
   if (maxBound != NO_BOUND) {
       maxBoundMS = maxBound * (MaquetteScene::MS_PER_PIXEL * _scene->zoom());
     }
-
+  std::cout<<"MAquette bounds : "<<minBoundMS<<" ; "<<maxBoundMS<<std::endl;
   _engines->changeTemporalRelationBounds(relID, minBoundMS, maxBoundMS, movedBoxes);
 
   updateBoxesFromEngines(movedBoxes);

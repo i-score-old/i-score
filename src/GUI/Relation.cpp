@@ -259,6 +259,7 @@ Relation::setID(unsigned int ID)
 void
 Relation::changeBounds(const float &minBound, const float &maxBound)
 {
+    std::cout<<"Relation:setbounds("<<minBound<<" ; "<<maxBound<<")"<<std::endl;
   _abstract->setMinBound(minBound);
   _abstract->setMaxBound(maxBound);
 }
@@ -414,8 +415,10 @@ Relation::mousePressEvent(QGraphicsSceneMouseEvent * event)
           double startX = mapFromScene(_start).x();
           double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
 
+          std::cout<<"Click getbounds : "<<_abstract->minBound()<<" ; "<<_abstract->maxBound()<<std::endl;
+
           double startBound = startX;
-          if (_abstract->minBound() != NO_BOUND) {
+          if (_abstract->minBound() != NO_BOUND) {              
               startBound = startX + _abstract->minBound() * _scene->zoom();
             }
 
@@ -424,7 +427,8 @@ Relation::mousePressEvent(QGraphicsSceneMouseEvent * event)
               endBound = startX + _abstract->maxBound() * _scene->zoom();
             }
 
-          if (QRectF(startX + (endX - startX) / 2 - HANDLE_WIDTH / 2, endY - HANDLE_HEIGHT / 2, HANDLE_WIDTH, HANDLE_HEIGHT).contains(event->pos())) {
+          /// \todo : Le QRectF middleHandle devrait être en attribut. NH
+          if (!_flexibleRelation && QRectF(startX + (endX - startX) / 2 - HANDLE_WIDTH / 2, endY - HANDLE_HEIGHT / 2, HANDLE_WIDTH, HANDLE_HEIGHT).contains(event->pos())) {
               _middleHandleSelected = true;
               _mouseClickPosSave = event->pos();
             }
@@ -526,8 +530,6 @@ Relation::shape() const
       path.lineTo(endBound - HANDLE_WIDTH / 2, endY - HANDLE_HEIGHT / 2);
     }
 
-
-
   return path;
 }
 
@@ -549,7 +551,6 @@ Relation::updateFlexibility()
   else {
       _flexibleRelation = false;
     }
-
 
   double startX = mapFromScene(_start).x();
   double endX = mapFromScene(_end).x();
@@ -624,8 +625,8 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
   //----------------------- Flexible relation --------------------------//
   if (_flexibleRelation) {
-      /************ Draw relation ************/
 
+      /************ Draw relation ************/
       painter->setPen(solidLine);
 
       //Horizontal : Point to box
