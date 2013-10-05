@@ -258,8 +258,7 @@ Relation::setID(unsigned int ID)
 
 void
 Relation::changeBounds(const float &minBound, const float &maxBound)
-{
-    std::cout<<"Relation:setbounds("<<minBound<<" ; "<<maxBound<<")"<<std::endl;
+{    
   _abstract->setMinBound(minBound);
   _abstract->setMaxBound(maxBound);
 }
@@ -413,9 +412,7 @@ Relation::mousePressEvent(QGraphicsSceneMouseEvent * event)
   if (!_scene->playing()) {
       if (cursor().shape() == Qt::SplitHCursor) {
           double startX = mapFromScene(_start).x();
-          double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
-
-          std::cout<<"Click getbounds : "<<_abstract->minBound()<<" ; "<<_abstract->maxBound()<<std::endl;
+          double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();          
 
           double startBound = startX;
           if (_abstract->minBound() != NO_BOUND) {              

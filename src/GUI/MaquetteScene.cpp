@@ -1315,8 +1315,7 @@ void
 MaquetteScene::changeRelationBounds(unsigned int relID, const float &length, const float &minBound, const float &maxBound)
 {
   Relation *rel = getRelation(relID);
-  if (rel != NULL) {
-      std::cout<<"MaquetteScene bounds : "<<minBound<<" ; "<<maxBound<<std::endl;
+  if (rel != NULL) {      
       _maquette->changeRelationBounds(relID, minBound, maxBound);
       rel->changeBounds(minBound, maxBound);
       if (length != NO_LENGTH) {

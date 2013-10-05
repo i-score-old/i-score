@@ -1133,8 +1133,7 @@ Maquette::changeRelationBounds(unsigned int relID, const float &minBound, const 
   int maxBoundMS = NO_BOUND;
   if (maxBound != NO_BOUND) {
       maxBoundMS = maxBound * (MaquetteScene::MS_PER_PIXEL * _scene->zoom());
-    }
-  std::cout<<"MAquette bounds : "<<minBoundMS<<" ; "<<maxBoundMS<<std::endl;
+    }  
   _engines->changeTemporalRelationBounds(relID, minBoundMS, maxBoundMS, movedBoxes);
 
   updateBoxesFromEngines(movedBoxes);
@@ -1702,8 +1701,11 @@ Maquette::load(const string &fileName)
                 int maxBoundMS = _engines->getRelationMaxBound(*it);
                 float maxBoundPXL = NO_BOUND;
                 
-                if (maxBoundMS != NO_BOUND)
-                    maxBoundPXL = (float)maxBoundMS / (MaquetteScene::MS_PER_PIXEL * zoom);
+                //maxBoundMS == 0 and minBoundMS > 0 means there is no max bound (we have to return -1)
+                if(!(maxBoundMS == 0 && minBoundPXL > 0)){
+                    if (maxBoundMS != NO_BOUND)
+                        maxBoundPXL = (float)maxBoundMS / (MaquetteScene::MS_PER_PIXEL * zoom);
+                }
                 
                 abstractRel.setMinBound(minBoundPXL);
                 abstractRel.setMaxBound(maxBoundPXL);
@@ -1909,10 +1911,10 @@ Maquette::getObjectChildren(const std::string & address, std::vector<std::string
 
 void
 Maquette::setRangeBoundMin(unsigned int boxID, const string &address, float value){
-    std::cout<<"Maquette::setRangeBoundMin"<<std::endl;
+    /// \todo
 }
 
 void
 Maquette::setRangeBoundMax(unsigned int boxID, const string &address, float value){
-    std::cout<<"Maquette::setRangeBoundMax"<<std::endl;
+    /// \todo
 }
