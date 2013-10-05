@@ -863,7 +863,7 @@ void Engine::changeTemporalRelationBounds(IntervalId relationId, BoundValue minB
     TTTimeProcessPtr        timeProcess = getInterval(relationId);
     EngineCacheMapIterator  it;
     TTValue                 v;
-    
+
     // filtering NO_BOUND (-1) and negative value because we use unsigned int
     if (minBound == NO_BOUND)
         v = TTValue(TTUInt32(0));
