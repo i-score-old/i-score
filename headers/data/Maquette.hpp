@@ -560,11 +560,11 @@ class Maquette : public QObject
     TriggerPoint* getTriggerPoint(unsigned int trgID);
 
     /*!
-     * \brief Simulates a message reception for a trigger point.
+     * \brief Trigger a trigger point.
      *
-     * \param message : the message to simulate
+     * \param triggerPoint : the trigger point to trigger
      */
-    void simulateTriggeringMessage(const std::string &message);
+    void trigger(TriggerPoint *triggerPoint);
 
     /*!
      * \brief Set trigger point 's message.

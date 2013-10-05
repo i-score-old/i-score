@@ -1083,7 +1083,7 @@ MaquetteScene::removeTriggerPoint(unsigned int trgID)
 void
 MaquetteScene::trigger(TriggerPoint *triggerPoint)
 {
-  _maquette->simulateTriggeringMessage(static_cast<AbstractTriggerPoint *>(triggerPoint->abstract())->message());
+  _maquette->trigger(triggerPoint);
   removeFromTriggerQueue(triggerPoint);
   triggerPoint->setSelected(false);
 }
@@ -1092,7 +1092,7 @@ void
 MaquetteScene::triggerNext()
 {
    TriggerPoint *triggerPoint = triggersQueueList()->first();
-  _maquette->simulateTriggeringMessage(static_cast<AbstractTriggerPoint *>(triggerPoint->abstract())->message());
+  _maquette->trigger(triggerPoint);
   removeFromTriggerQueue(triggerPoint);
   triggerPoint->setSelected(false);
 }
