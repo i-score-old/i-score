@@ -1344,15 +1344,19 @@ void Engine::getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex cont
 
 void Engine::setCtrlPointMutingState(TimeProcessId boxId, TimeEventIndex controlPointIndex, bool mute)
 {
-#ifdef TODO_ENGINE
-	ECOProcess* currentProcess = m_executionMachine->getProcess(boxId);
+    TTValue             v;
+    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
+    TTTimeEventPtr      event;
     
-	if ((currentProcess->getType() == PROCESS_TYPE_NETWORK_MESSAGE_TO_SEND)) {
-		SendNetworkMessageProcess* currentSendOSCProcess = (SendNetworkMessageProcess*) currentProcess;
-		ControlPoint* currentControlPoint = m_editor->getBoxById(boxId)->getControlPoint(controlPointIndex);
-		currentSendOSCProcess->setMessageMuteState(currentControlPoint->getProcessStepId(), mute);
-	}
-#endif
+    // Get the start or end event
+    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+    else
+        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
+    
+    event = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+    
+    event->setAttributeValue(kTTSym_mute, TTBoolean(mute));
 }
 
 //CURVES ////////////////////////////////////////////////////////////////////////////////////
@@ -1819,17 +1823,28 @@ QPointF Engine::getViewPosition()
 //Execution ///////////////////////////////////////////////////////////
 void Engine::setGotoValue(TimeValue gotoValue)
 {
-#ifdef TODO_ENGINE    
-	m_executionMachine->setGotoInformation(gotoValue);
-#endif
+    TTValue         v;
+    TTObjectBasePtr scheduler;
+    
+    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
+    
+    scheduler = v[0];
+    
+    scheduler->setAttributeValue(kTTSym_offset, TTFloat64(gotoValue));
 }
 
 TimeValue Engine::getGotoValue()
 {
-#ifdef TODO_ENGINE    
-	return m_executionMachine->getGotoInformation();
-#endif
-    return 0;
+    TTValue         v;
+    TTObjectBasePtr scheduler;
+    
+    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
+    
+    scheduler = v[0];
+    
+    scheduler->getAttributeValue(kTTSym_offset, v);
+    
+    return TimeValue(TTFloat64(v[0]));
 }
 
 bool Engine::play()
