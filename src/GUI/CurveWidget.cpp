@@ -370,7 +370,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
               float pow = 1.;
               QPointF lastPoint = absoluteCoordinates(QPointF(1, _abstract->_curve.back()));
               if (mousePosY > lastPoint.y()) { // mouse under : pow between 0 and 1
-                  pow = std::max(1 - std::min((float)(mousePosY - lastPoint.y()), (float)50.) / 50., 0.1);
+                  pow = std::max(1 - std::min((float)(mousePosY - lastPoint.y()), (float)50.) / 50., 0.01);
               }
               else if (lastPoint.y() > mousePosY) { // mouse above : pow between 1 and 6
                   pow = 1 + std::min((float)(lastPoint.y() - mousePosY), (float)50.) / 10.;
@@ -387,7 +387,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
                   float div;
                   if (mousePosY > it->second.first) { // mouse under : pow between 0 and 1
                       div = std::min(50., (double)std::max(fabs(_maxY), fabs(_minY)));
-                      pow = std::max(1 - std::min(mousePosY - it->second.first, (float)50.) / (double)div, 0.1);
+                      pow = std::max(1 - std::min(mousePosY - it->second.first, (float)50.) / (double)div, 0.01);
                   }
                   else if (it->second.first > mousePosY) { // mouse above : pow between 1 and 6
                       div = std::min(50., std::max(fabs(_maxY), fabs(_minY))) / 5;
