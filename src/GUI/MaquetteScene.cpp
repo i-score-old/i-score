@@ -263,7 +263,7 @@ MaquetteScene::getProgression(unsigned int boxID)
 
 void
 MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[], const QStyleOptionGraphicsItem options[], QWidget *widget)
-{
+{    
   QGraphicsScene::drawItems(painter, numItems, items, options, widget);
   qreal xmax = width(), ymax = height();
 

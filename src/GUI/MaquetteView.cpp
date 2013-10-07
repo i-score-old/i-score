@@ -64,8 +64,7 @@ MaquetteView::MaquetteView(MainWindow *mw)
   _mainWindow = mw;
   setRenderHint(QPainter::Antialiasing);
 
-  setBackgroundBrush(QColor(160, 160, 160));
-  setCacheMode(QGraphicsView::CacheBackground);
+  setBackgroundBrush(QColor(160, 160, 160));  
 
   setWindowTitle(tr("Maquette"));
 
