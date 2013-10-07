@@ -126,7 +126,7 @@ MaquetteScene::init()
   /// \todo MainWindow appelle init() de MaquetteScene, qui instancie lui même Maquette puis l'init. (par jaime Chao)
   _maquette = Maquette::getInstance();
   _maquette->setScene(this);
-  _maquette->init();
+  _maquette->init();      
 
   _tempBox = NULL;
   _resizeBox = NO_ID;
@@ -633,6 +633,9 @@ void
 MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
 {
   QGraphicsScene::mouseReleaseEvent(mouseEvent);
+
+  std::cout<<"box1"<<std::endl;
+  _editor->setAttributes(static_cast<AbstractBox *>(Maquette::getInstance()->getBox(1)->abstract()));
 
   _releasePoint = mouseEvent->scenePos();
   _clicked = false;

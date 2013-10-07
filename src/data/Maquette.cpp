@@ -79,7 +79,13 @@ Maquette::init()
 {
     // create a ScoreEngine instance
     // note : this is a temporary solution to test new Score framework easily
-    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback);
+    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback);        
+
+    //Creating box0 as the mainScenario
+    AbstractBox *scenarioAb = new AbstractBox();
+    scenarioAb->setID(1);
+    ParentBox *scenarioBox = new ParentBox(static_cast<AbstractParentBox *>(scenarioAb), _scene);
+    _boxes[1] = scenarioBox;
 }
 
 Maquette::Maquette() : _engines(NULL)
@@ -141,7 +147,7 @@ Maquette::getRelation(unsigned int ID)
 
 BasicBox*
 Maquette::getBox(unsigned int ID)
-{
+{    
   BoxesMap::iterator it = _boxes.find(ID);
   if (it != _boxes.end()) {
       return it->second;

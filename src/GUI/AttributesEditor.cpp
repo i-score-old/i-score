@@ -214,6 +214,8 @@ AttributesEditor::connectSlots()
 void
 AttributesEditor::setAttributes(AbstractBox *abBox)
 {
+    std::cout<<"setAttributes "<<abBox->ID()<<std::endl;
+
   bool boxModified = (_boxEdited != abBox->ID());
 
   _boxEdited = abBox->ID();
@@ -350,6 +352,7 @@ AttributesEditor::changeColor()
 void
 AttributesEditor::startMessagesChanged(bool forceUpdate)
 {
+    std::cout<<"StartMsgsChanged box"<<_boxEdited<<std::endl;
   if (_scene->paused()) {
       _scene->stopWithGoto();
     }
@@ -539,6 +542,8 @@ AttributesEditor::snapshotStartAssignment()
   QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot = _networkTree->treeSnapshot(_boxEdited);
 
   _networkTree->clearDevicesStartMsgs(treeSnapshot.second);
+
+  std::cout<<"boxedited : "<<_boxEdited<<std::endl;
 
   if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 
