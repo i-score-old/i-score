@@ -1544,7 +1544,7 @@ bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned
             
             v[i] = TTFloat64(percent[i/3] / 100.);
             v[i+1] = TTFloat64(y[i/3]);
-            v[i+2] = TTFloat64(coeff[i/3]);
+            v[i+2] = TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]);
         }
         
         // set a curve parameters
@@ -1574,14 +1574,14 @@ bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned
         err = curve->getAttributeValue(TTSymbol("parameters"), v);
         
         if (!err) {
-            
+
             // edit percent, y, sectionType and coeff from v : x1 y1 b1 x2 y2 b2
             for (i = 0; i < v.size(); i = i+3) {
                 
                 percent.push_back(TTFloat64(v[i]) * 100.);
                 y.push_back(TTFloat64(v[i+1]));
                 sectionType.push_back(1);
-                coeff.push_back(TTFloat64(v[i+2]));
+                coeff.push_back(sqrt(sqrt(TTFloat64(v[i+2]))));
             }
             
             sectionType.push_back(1);
