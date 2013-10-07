@@ -49,6 +49,7 @@ AbstractBox::AbstractBox(const QPointF &newTopLeft, const float &newWidth, const
   _topLeft(newTopLeft), _width(newWidth), _height(newHeight), _name(newName), _color(newColor),
   _ID(newID), _motherID(motherID), _startMessages(startMessages),_endMessages(endMessages)
 {
+    _networkTreeExpandedItems = QList<QTreeWidgetItem*>();
 }
 
 AbstractBox::AbstractBox(const AbstractBox &other) :
@@ -56,6 +57,7 @@ AbstractBox::AbstractBox(const AbstractBox &other) :
   _name(other._name), _color(other._color), _ID(other._ID), _motherID(other._motherID),
   _startMessages(other._startMessages),_endMessages(other._endMessages)
 {
+    _networkTreeExpandedItems = QList<QTreeWidgetItem*>();
 }
 
 void
@@ -79,7 +81,7 @@ AbstractBox::type() const
 void
 AbstractBox::setStartMessages(NetworkMessages *startMsgs)
 {
-  QMap<QTreeWidgetItem *, Message> *map = startMsgs->getMessages();
+  QMap<QTreeWidgetItem *, Message> map = startMsgs->getMessages();
   NetworkMessages *newMessages = new NetworkMessages(map);
   _startMessages = newMessages;
 }

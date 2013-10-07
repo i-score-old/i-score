@@ -1,4 +1,4 @@
-/*
+    /*
  * Copyright: LaBRI / SCRIME
  *
  * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
@@ -96,7 +96,8 @@ const QString BasicBox::SUB_SCENARIO_MODE_TEXT = tr("Scenario");
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
   : QGraphicsItem()
-{
+{    
+
   _scene = parent;
   _startMenu = NULL;
   _endMenu = NULL;
@@ -1759,7 +1760,7 @@ BasicBox::drawHoverShape(QPainter *painter)
 
 void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
+{    
   Q_UNUSED(option);
   Q_UNUSED(widget);
 
