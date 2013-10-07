@@ -551,7 +551,7 @@ NetworkTree::treeSnapshot(unsigned int boxID)
 bool
 NetworkTree::hasStartEndMsg(QTreeWidgetItem *item)
 {
-  return(_startMessages->getMessages()->contains(item) || _endMessages->getMessages()->contains(item));
+  return(_startMessages->getMessages().contains(item) || _endMessages->getMessages().contains(item));
 }
 
 
@@ -941,7 +941,7 @@ NetworkTree::updateStartOSCMsgsDisplay()
 
   for (it = items.begin(); it != items.end(); it++) {
       curItem = *it;
-      currentMsg = _OSCStartMessages->getMessages()->value(curItem);
+      currentMsg = _OSCStartMessages->getMessages().value(curItem);
       curItem->setText(START_COLUMN, currentMsg.value);
       curItem->setFont(NAME_COLUMN, font);
     }
@@ -959,7 +959,7 @@ NetworkTree::updateEndOSCMsgsDisplay()
 
   for (it = items.begin(); it != items.end(); it++) {
       curItem = *it;
-      currentMsg = _OSCEndMessages->getMessages()->value(curItem);
+      currentMsg = _OSCEndMessages->getMessages().value(curItem);
       curItem->setText(END_COLUMN, currentMsg.value);
       curItem->setFont(NAME_COLUMN, font);
     }
@@ -976,7 +976,7 @@ NetworkTree::updateStartMsgsDisplay()
 //    clearColumn(START_COLUMN);
   for (it = items.begin(); it != items.end(); it++) {
       curItem = *it;
-      currentMsg = _startMessages->getMessages()->value(curItem);
+      currentMsg = _startMessages->getMessages().value(curItem);
       curItem->setText(START_COLUMN, currentMsg.value);
       fatherColumnCheck(curItem, START_COLUMN);
     }
@@ -1013,7 +1013,7 @@ NetworkTree::updateEndMsgsDisplay()
 
   for (it = items.begin(); it != items.end(); it++) {
       curItem = *it;
-      currentMsg = _endMessages->getMessages()->value(curItem);
+      currentMsg = _endMessages->getMessages().value(curItem);
       curItem->setText(END_COLUMN, currentMsg.value);
 
       fatherColumnCheck(curItem, END_COLUMN);
@@ -1881,13 +1881,13 @@ NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue)
       if (item->type() == OSCNode) {
           _OSCStartMessages->removeMessage(item);
         }
-      if (!endMessages()->getMessages()->contains(item)) {
+      if (!endMessages()->getMessages().contains(item)) {
           removeAssignItem(item);
         }
       emit(startMessageValueChanged(item));
     }
   else {
-      if (!_startMessages->getMessages()->contains(item)) {
+      if (!_startMessages->getMessages().contains(item)) {
           QString Qaddress = getAbsoluteAddressWithValue(item, START_COLUMN);
           _startMessages->addMessageSimple(item, Qaddress);
           Data data;
@@ -1921,13 +1921,13 @@ NetworkTree::changeEndValue(QTreeWidgetItem *item, QString newValue)
       if (item->type() == OSCNode) {
           _OSCEndMessages->removeMessage(item);
         }
-      if (!startMessages()->getMessages()->contains(item)) {
+      if (!startMessages()->getMessages().contains(item)) {
           removeAssignItem(item);
         }
       emit(endMessageValueChanged(item));
     }
   else {
-      if (!_endMessages->getMessages()->contains(item)) {
+      if (!_endMessages->getMessages().contains(item)) {
           QString Qaddress = getAbsoluteAddressWithValue(item, END_COLUMN);
           _endMessages->addMessageSimple(item, Qaddress);
           if (item->type() == OSCNode) {

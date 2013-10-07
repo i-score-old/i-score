@@ -51,7 +51,7 @@ class NetworkMessages : public QObject {
 
   public:
     NetworkMessages();
-    NetworkMessages(QMap<QTreeWidgetItem *, Message> *msgs);
+    NetworkMessages(QMap<QTreeWidgetItem *, Message> msgs);
     ~NetworkMessages();
 
     /*!
@@ -96,9 +96,9 @@ class NetworkMessages : public QObject {
      * \brief Sets the list of messages.
      */
     inline void
-    setMessages(QMap<QTreeWidgetItem *, Message> *messages)
+    setMessages(QMap<QTreeWidgetItem *, Message> messages)
     {
-      _messages->clear();
+      _messages.clear();
       _messages = messages;
       ;
     }
@@ -120,15 +120,15 @@ class NetworkMessages : public QObject {
      */
     bool setValue(QTreeWidgetItem *item, QString newValue);
 
-    QMap<QTreeWidgetItem *, Message> *getMessages();
+    QMap<QTreeWidgetItem *, Message> getMessages();
 
-    inline QList<QTreeWidgetItem *> getItems(){ return _messages->keys(); }
+    inline QList<QTreeWidgetItem *> getItems(){ return _messages.keys(); }
     std::string computeMessage(const Message &msg);
     std::string computeMessageWithoutValue(const Message &msg);
-    inline QList<Message> messages(){ return _messages->values(); }
+    inline QList<Message> messages(){ return _messages.values(); }
     QMap<QString, QString> toMapAddressValue();
     inline bool
-    isEmpty(){ return _messages->isEmpty(); }
+    isEmpty(){ return _messages.isEmpty(); }
 
   public slots:
     void removeMessage(QTreeWidgetItem *item);
@@ -147,7 +147,7 @@ class NetworkMessages : public QObject {
   private:
     bool messageToString(const Message &msg, string &device, string &message, string &value);
 
-    QMap<QTreeWidgetItem *, Message> *_messages; //!<Messages list.
+    QMap<QTreeWidgetItem *, Message> _messages; //!<Messages list.
 
   protected:
 };
