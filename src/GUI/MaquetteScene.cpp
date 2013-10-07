@@ -634,9 +634,6 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
 {
   QGraphicsScene::mouseReleaseEvent(mouseEvent);
 
-  std::cout<<"box1"<<std::endl;
-  _editor->setAttributes(static_cast<AbstractBox *>(Maquette::getInstance()->getBox(1)->abstract()));
-
   _releasePoint = mouseEvent->scenePos();
   _clicked = false;
   switch (_currentInteractionMode) {
