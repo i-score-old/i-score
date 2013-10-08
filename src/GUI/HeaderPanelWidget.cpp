@@ -10,8 +10,18 @@ HeaderPanelWidget::HeaderPanelWidget(QWidget *parent, MaquetteScene *scene)
     : QWidget(parent){
 
     _scene = scene;
+    _color = QColor(Qt::white);
     _sliderMoved = false;
     _valueEntered = false;
+    _nameLabel = new QLabel;
+    _toolBar = new QToolBar;
+    _accelerationWidget = new QWidget;
+
+    createAccelerationWidget();
+    createActions();
+    createToolBar();
+    createNameLabel();
+    createLayout();
 
     setGeometry(0, 0, width(), HEADER_HEIGHT);
     setFixedHeight(HEADER_HEIGHT);
@@ -22,6 +32,15 @@ HeaderPanelWidget::HeaderPanelWidget(QWidget *parent, MaquetteScene *scene)
 HeaderPanelWidget::~HeaderPanelWidget()
 {
     delete _scene;
+    delete _toolBar;
+    delete _nameLabel;
+    delete _playAction;
+    delete _stopAction;
+    delete _rewindAction;
+    delete _accelerationSlider;
+    delete _accelerationDisplay;
+    delete _accelerationWidget;
+    delete _layout;
 }
 
 void
@@ -110,6 +129,11 @@ HeaderPanelWidget::createNameLabel()
 
 void
 HeaderPanelWidget::createLayout(){
+    setGeometry(0, 0, width(), HEADER_HEIGHT);
+    setFixedHeight(HEADER_HEIGHT);
+    setPalette(QPalette(_color));
+    setAutoFillBackground(true);
+
     _layout = new QBoxLayout(QBoxLayout::LeftToRight);
     _layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
@@ -128,22 +152,31 @@ HeaderPanelWidget::createLayout(){
 
 void
 HeaderPanelWidget::play(){
-
+    _scene->play();
+    updatePlayMode();
 }
 
 void
 HeaderPanelWidget::stop(){
-
+    if (_scene->playing()) {
+        _scene->pause();
+      }
+    else {
+        _scene->stopGotoStart();
+      }
+    updatePlayMode();
 }
 
 void
 HeaderPanelWidget::rewind(){
-
+    _scene->stopGotoStart();
+    updatePlayMode();
 }
 
 void
 HeaderPanelWidget::pause(){
-
+    _scene->pause();
+    updatePlayMode();
 }
 
 void

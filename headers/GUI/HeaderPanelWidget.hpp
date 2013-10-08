@@ -7,6 +7,12 @@
 #include "LogarithmicSlider.hpp"
 #include "MaquetteScene.hpp"
 
+/*!
+ * \class HeaderPanelWidget
+ *
+ * \brief Widget displaying and managing the panel with the scenario's name, play/stop button, accelerationSlider ...
+ *
+ */
 class HeaderPanelWidget : public QWidget {
   Q_OBJECT
 
@@ -14,17 +20,22 @@ class HeaderPanelWidget : public QWidget {
     HeaderPanelWidget(QWidget *parent, MaquetteScene *scene);
     ~HeaderPanelWidget();
 
-    void updatePlayMode();
+    /*!
+     * \brief Sets the scenario's name
+     */
     void setName(QString name);
 
     static const float HEADER_HEIGHT = 42.;
     static const float NAME_POINT_SIZE = 20.;
 
   signals:
-    void stopSignal();
     void accelerationValueChanged(int);
 
   public slots:
+    /*!
+     * \brief Updates the play/stop button asking the play state to the Maquette.
+     */
+    void updatePlayMode();
     void play();
     void stop();
     void pause();

@@ -52,6 +52,7 @@
 #include <QSlider>
 
 #include "MaquetteScene.hpp"
+#include "HeaderPanelWidget.hpp"
 #include "MaquetteWidget.hpp"
 
 class MaquetteView;
@@ -127,8 +128,8 @@ class MainWindow : public QMainWindow
     bool commandKey();
 
     void setMaquetteSceneTitle(QString name);
-    inline MaquetteWidget *
-    maquetteWidget(){ return _maquetteWidget; }
+    inline HeaderPanelWidget *
+    headerPanelWidget(){ return _headerPanelWidget; }
 
   protected:
     /*!
@@ -279,6 +280,8 @@ class MainWindow : public QMainWindow
     MaquetteView *_view;                    //!< The maquette view.
     MaquetteScene *_scene;                  //!< The maquette scene.
     AttributesEditor *_editor;              //!< The attributes editor.
+    QGridLayout *_centralLayout;
+    QWidget *_centralWidget;
 
     QString _curFile;                       //!< The current file name.
 
@@ -313,6 +316,7 @@ class MainWindow : public QMainWindow
 
     Help *_helpDialog;                      //!< Help dialog.
 
+    HeaderPanelWidget *_headerPanelWidget;
     MaquetteWidget *_maquetteWidget;
     NetworkConfig *_networkConfig;
 
