@@ -53,7 +53,6 @@
 
 #include "MaquetteScene.hpp"
 #include "HeaderPanelWidget.hpp"
-#include "MaquetteWidget.hpp"
 
 class MaquetteView;
 class AttributesEditor;
@@ -317,7 +316,6 @@ class MainWindow : public QMainWindow
     Help *_helpDialog;                      //!< Help dialog.
 
     HeaderPanelWidget *_headerPanelWidget;
-    MaquetteWidget *_maquetteWidget;
     NetworkConfig *_networkConfig;
 
     bool _commandKey; //!< State of Command Key state.
