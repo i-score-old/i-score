@@ -430,7 +430,9 @@ ConditionedProcessId Engine::cacheConditionedProcess(TimeProcessId timeProcessId
     cacheReadyCallback(id, controlPointId);
     
     // We cache a TTData to allow remote triggering
-    cacheTriggerDataCallback(id, timeProcessId);
+    // théo : we don't create the /Box.n/start or /Box.n/end message for the moment
+    // because it makes strange trouble if it is written into the i-score namespace
+    //cacheTriggerDataCallback(id, timeProcessId);
     
     return id;
 }
