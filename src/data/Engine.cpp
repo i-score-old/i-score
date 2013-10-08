@@ -1921,7 +1921,7 @@ void Engine::setExecutionSpeedFactor(float factor)
     m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
     aScheduler = TTObjectBasePtr(v[0]);
     
-    aScheduler->setAttributeValue(TTSymbol("speed"), TTFloat64(factor));
+    aScheduler->setAttributeValue(kTTSym_speed, TTFloat64(factor));
 }
 
 float Engine::getExecutionSpeedFactor()
@@ -1933,7 +1933,7 @@ float Engine::getExecutionSpeedFactor()
     m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
     aScheduler = TTObjectBasePtr(v[0]);
     
-    aScheduler->getAttributeValue(TTSymbol("speed"), v);
+    aScheduler->getAttributeValue(kTTSym_speed, v);
     
     return TTFloat64(v[0]);
 }
