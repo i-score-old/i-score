@@ -214,6 +214,7 @@ AttributesEditor::connectSlots()
 void
 AttributesEditor::setAttributes(AbstractBox *abBox)
 {    
+    std::cout<<"setAttributes("<<abBox->ID()<<")"<<std::endl;
   bool boxModified = (_boxEdited != abBox->ID());
 
   _boxEdited = abBox->ID();

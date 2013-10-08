@@ -43,6 +43,9 @@ class HeaderPanelWidget : public QWidget {
     void accelerationValueModified(int value);
     void accelerationValueEntered(double value);
 
+  protected:
+    virtual void mouseReleaseEvent(QMouseEvent *event);
+
   private:
     QBoxLayout *_layout;
 

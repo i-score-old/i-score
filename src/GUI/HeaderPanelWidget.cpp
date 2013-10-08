@@ -225,3 +225,10 @@ HeaderPanelWidget::setName(QString name)
   _nameLabel->setText(name);
 }
 
+void
+HeaderPanelWidget::mouseReleaseEvent(QMouseEvent *event){
+    QWidget::mouseReleaseEvent(event);
+
+    //Set attributes of the main scenario
+    _scene->setAttributes(static_cast<AbstractBox *>(Maquette::getInstance()->getBox(1)->abstract()));
+}
