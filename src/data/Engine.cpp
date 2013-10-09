@@ -320,7 +320,8 @@ TimeProcessId Engine::cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::
     m_timeProcessMap[id] = e;
     m_nextTimeProcessId++;
     
-    cacheRunningCallback(id);
+    cacheStartCallback(id);
+    cacheEndCallback(id);
     
     return id;
 }
@@ -334,7 +335,8 @@ void Engine::uncacheTimeProcess(TimeProcessId boxId)
 {
     EngineCacheElementPtr e = m_timeProcessMap[boxId];
     
-    uncacheRunningCallback(boxId);
+    uncacheStartCallback(boxId);
+    uncacheEndCallback(boxId);
     
     delete e;
     m_timeProcessMap.erase(boxId);
@@ -349,13 +351,15 @@ void Engine::clearTimeProcess()
         // don't remove the root time process (the main scenario)
         if (it->first != ROOT_BOX_ID) {
             
-            uncacheRunningCallback(it->first);
+            uncacheStartCallback(it->first);
+            uncacheEndCallback(it->first);
             delete it->second;
         }
     }
     
     // don't clear the m_timeProcessMap (because it is not empty)
-    m_runningCallbackMap.clear();
+    m_startCallbackMap.clear();
+    m_endCallbackMap.clear();
     
     // set the next id to 2 because the main scenario is registered with the 1 id
     m_nextTimeProcessId = 2;
@@ -498,7 +502,7 @@ TTTimeConditionPtr Engine::getTimeCondition(ConditionedProcessId triggerId)
 
 void Engine::uncacheTimeCondition(ConditionedProcessId triggerId)
 {
-    EngineCacheElementPtr   e = m_runningCallbackMap[triggerId];
+    EngineCacheElementPtr   e = m_timeConditionMap[triggerId];
     
     delete e;
     m_timeConditionMap.erase(triggerId);
@@ -514,64 +518,112 @@ void Engine::clearTimeCondition()
     m_timeConditionMap.clear();
 }
 
-void Engine::cacheRunningCallback(TimeProcessId boxId)
+void Engine::cacheStartCallback(TimeProcessId boxId)
 {
     EngineCacheElementPtr   e;
     TTValue                 v;
-    TTValuePtr              runningAttributeBaton;
-    TTObjectBasePtr         scheduler;
-    TTAttributePtr          anAttribute;
+    TTValuePtr              startMessageBaton;
+    TTMessagePtr            aMessage;
     TTErr                   err;
     
     e = new EngineCacheElement();
     e->object = NULL;
     e->index = boxId;
     
-    // create a TTCallback to observe each time process scheduler running attribute (using TimeProcessSchedulerRunningAttributeCallback)
+    // create a TTCallback to observe when time process starts (using TimeProcessStartCallback)
     TTObjectBaseInstantiate(TTSymbol("callback"), &e->object, kTTValNONE);
     
-    runningAttributeBaton = new TTValue(TTPtr(this)); // runningAttributeBaton will be deleted during the callback destruction
-    runningAttributeBaton->append(TTUInt32(boxId));
+    startMessageBaton = new TTValue(TTPtr(this)); // startMessageBaton will be deleted during the callback destruction
+    startMessageBaton->append(TTUInt32(boxId));
     
-    e->object->setAttributeValue(kTTSym_baton, TTPtr(runningAttributeBaton));
-    e->object->setAttributeValue(kTTSym_function, TTPtr(&TimeProcessSchedulerRunningAttributeCallback));
+    e->object->setAttributeValue(kTTSym_baton, TTPtr(startMessageBaton));
+    e->object->setAttributeValue(kTTSym_function, TTPtr(&TimeProcessStartCallback));
     
-    // register for scheduler running attribute observation
-    getTimeProcess(boxId)->getAttributeValue(TTSymbol("scheduler"), v);
-    scheduler = v[0];
-    
-    err = scheduler->findAttribute(TTSymbol("running"), &anAttribute);
-    
+    // register for ProcessStart message observation
+    err = getTimeProcess(boxId)->findMessage(kTTSym_ProcessStart, &aMessage);
+
     if (!err)
-        anAttribute->registerObserverForNotifications(*e->object);
+        aMessage->registerObserverForNotifications(*e->object);
     
-    m_runningCallbackMap[boxId] = e;
+    m_startCallbackMap[boxId] = e;
 }
 
-void Engine::uncacheRunningCallback(TimeProcessId boxId)
+void Engine::uncacheStartCallback(TimeProcessId boxId)
 {
-    EngineCacheElementPtr   e = m_runningCallbackMap[boxId];
+    EngineCacheElementPtr   e = m_startCallbackMap[boxId];
     TTValue                 v;
-    TTObjectBasePtr         scheduler;
-    TTAttributePtr          anAttribute;
+    TTMessagePtr            aMessage;
     TTErr                   err;
     
-    // unregister for scheduler running attribute observation
-    getTimeProcess(boxId)->getAttributeValue(TTSymbol("scheduler"), v);
-    scheduler = v[0];
-    
-    err = scheduler->findAttribute(TTSymbol("running"), &anAttribute);
+    // unregister for ProcessStart message observation
+    err = getTimeProcess(boxId)->findMessage(kTTSym_ProcessStart, &aMessage);
     
     if (!err) {
         
-        err = anAttribute->unregisterObserverForNotifications(*e->object);
+        err = aMessage->unregisterObserverForNotifications(*e->object);
         
-        if (!err)
+        if (!err) {
+            delete (TTValuePtr)TTCallbackPtr(e->object)->getBaton();
             TTObjectBaseRelease(&e->object);
+        }
     }
     
     delete e;
-    m_runningCallbackMap.erase(boxId);
+    m_startCallbackMap.erase(boxId);
+}
+
+void Engine::cacheEndCallback(TimeProcessId boxId)
+{
+    EngineCacheElementPtr   e;
+    TTValue                 v;
+    TTValuePtr              endMessageBaton;
+    TTMessagePtr            aMessage;
+    TTErr                   err;
+    
+    e = new EngineCacheElement();
+    e->object = NULL;
+    e->index = boxId;
+    
+    // create a TTCallback to observe when time process ends (using TimeProcessEndCallback)
+    TTObjectBaseInstantiate(TTSymbol("callback"), &e->object, kTTValNONE);
+    
+    endMessageBaton = new TTValue(TTPtr(this)); // endMessageBaton will be deleted during the callback destruction
+    endMessageBaton->append(TTUInt32(boxId));
+    
+    e->object->setAttributeValue(kTTSym_baton, TTPtr(endMessageBaton));
+    e->object->setAttributeValue(kTTSym_function, TTPtr(&TimeProcessEndCallback));
+    
+    // register for ProcessEnd message observation
+    err = getTimeProcess(boxId)->findMessage(kTTSym_ProcessEnd, &aMessage);
+    
+    if (!err)
+        aMessage->registerObserverForNotifications(*e->object);
+    
+    m_endCallbackMap[boxId] = e;
+}
+
+void Engine::uncacheEndCallback(TimeProcessId boxId)
+{
+    EngineCacheElementPtr   e = m_endCallbackMap[boxId];
+    TTValue                 v;
+    TTMessagePtr            aMessage;
+    TTErr                   err;
+    
+    // unregister for ProcessEnd message observation
+    err = getTimeProcess(boxId)->findMessage(kTTSym_ProcessEnd, &aMessage);
+    
+    if (!err) {
+        
+        err = aMessage->unregisterObserverForNotifications(*e->object);
+        
+        if (!err) {
+            delete (TTValuePtr)TTCallbackPtr(e->object)->getBaton();
+            TTObjectBaseRelease(&e->object);
+        }
+    }
+    
+    delete e;
+    m_endCallbackMap.erase(boxId);
 }
 
 void Engine::cacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId)
@@ -639,8 +691,10 @@ void Engine::uncacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex
         
         err = anAttribute->unregisterObserverForNotifications(*e->object);
         
-        if (!err)
+        if (!err) {
+            delete (TTValuePtr)TTCallbackPtr(e->object)->getBaton();
             TTObjectBaseRelease(&e->object);
+        }
     }
     
     delete e;
@@ -2538,33 +2592,44 @@ void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value)
     }
 }
 
-void TimeProcessSchedulerRunningAttributeCallback(TTPtr baton, const TTValue& value)
+void TimeProcessStartCallback(TTPtr baton, const TTValue& value)
 {
     TTValuePtr      b;
     EnginePtr       engine;
     TimeProcessId   boxId;
-    TTBoolean       running;
 	
 	// unpack baton (engine, boxId)
 	b = (TTValuePtr)baton;
 	engine = EnginePtr((TTPtr)(*b)[0]);
     boxId = TTUInt32((*b)[1]);
-	
-	// Unpack data (running)
-	running = value[0];
     
-    iscoreEngineDebug {
-        
-        if (running)
-            TTLogMessage("TimeProcess %ld scheduler starts at %ld ms\n", boxId, engine->getCurrentExecutionTime());
-        else
-            TTLogMessage("TimeProcess %ld scheduler ends at %ld ms\n", boxId, engine->getCurrentExecutionTime());
-    }
+    iscoreEngineDebug 
+        TTLogMessage("TimeProcess %ld starts at %ld ms\n", boxId, engine->getCurrentExecutionTime());
     
     // don't pass main scenario running state
     if (boxId > 1 && engine->m_TimeProcessSchedulerRunningAttributeCallback != NULL)
-        engine->m_TimeProcessSchedulerRunningAttributeCallback(boxId, running);
+        engine->m_TimeProcessSchedulerRunningAttributeCallback(boxId, YES);
 
+}
+
+void TimeProcessEndCallback(TTPtr baton, const TTValue& value)
+{
+    TTValuePtr      b;
+    EnginePtr       engine;
+    TimeProcessId   boxId;
+	
+	// unpack baton (engine, boxId)
+	b = (TTValuePtr)baton;
+	engine = EnginePtr((TTPtr)(*b)[0]);
+    boxId = TTUInt32((*b)[1]);
+    
+    iscoreEngineDebug
+        TTLogMessage("TimeProcess %ld ends at %ld ms\n", boxId, engine->getCurrentExecutionTime());
+    
+    // don't pass main scenario running state
+    if (boxId > 1 && engine->m_TimeProcessSchedulerRunningAttributeCallback != NULL)
+        engine->m_TimeProcessSchedulerRunningAttributeCallback(boxId, NO);
+    
 }
 
 void TransportDataValueCallback(TTPtr baton, const TTValue& value)

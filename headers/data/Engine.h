@@ -147,7 +147,8 @@ private:
     EngineCacheMap      m_timeConditionMap;                             /// All condition stored using an unique id
     EngineCacheMap      m_conditionedProcessMap;                        /// All conditioned time process with an conditioned event stored using an unique id
     
-    EngineCacheMap      m_runningCallbackMap;                           /// All callback to observe time process running state stored using a time process id
+    EngineCacheMap      m_startCallbackMap;                             /// All callback to observe when a time process starts stored using a time process id
+    EngineCacheMap      m_endCallbackMap;                               /// All callback to observe when a time process ends stored using a time process id
     
     EngineCacheMap      m_readyCallbackMap;                             /// All callback to observe time event ready state stored using using a trigger id
     EngineCacheMap      m_triggerDataMap;                               /// All TTData to expose conditioned event on the network stored using using a trigger id
@@ -198,8 +199,11 @@ public:
     void                uncacheTimeCondition(ConditionedProcessId triggerId);
     void                clearTimeCondition();
     
-    void                cacheRunningCallback(TimeProcessId boxId);
-    void                uncacheRunningCallback(TimeProcessId boxId);
+    void                cacheStartCallback(TimeProcessId boxId);
+    void                uncacheStartCallback(TimeProcessId boxId);
+    
+    void                cacheEndCallback(TimeProcessId boxId);
+    void                uncacheEndCallback(TimeProcessId boxId);
     
     void                cacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId);
     void                uncacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId);
@@ -949,7 +953,8 @@ public:
     void printExecutionInLinuxConsole();
     
 	friend void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value);
-    friend void TimeProcessSchedulerRunningAttributeCallback(TTPtr baton, const TTValue& value);
+    friend void TimeProcessStartCallback(TTPtr baton, const TTValue& value);
+    friend void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
     friend void TransportDataValueCallback(TTPtr baton, const TTValue& value);
     friend void TriggerReceiverValueCallback(TTPtr baton, const TTValue& value);
     
@@ -980,15 +985,21 @@ typedef Engine* EnginePtr;
  @return                an error code */
 void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value);
 
-/** Any time process running state callback
+/** Callback used each time a process starts
+ @param	baton			a TTValuePtr containing an EnginePtr and an TimeProcessId
+ @param	value			nothing
+ @return                an error code */
+void TimeProcessStartCallback(TTPtr baton, const TTValue& value);
+
+/** Callback used each time a process ends
  @param	baton			a TTValuePtr containing an EnginePtr and an TimeProcessId
  @param	value			the time process running state
  @return                an error code */
-void TimeProcessSchedulerRunningAttributeCallback(TTPtr baton, const TTValue& value);
+void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
 
 /** Any transport data value callback
  @param	baton			a TTValuePtr containing an EnginePtr and a TTDataPtr
- @param	value			the value of the data
+ @param	value			nothing
  @return                an error code */
 void TransportDataValueCallback(TTPtr baton, const TTValue& value);
 
