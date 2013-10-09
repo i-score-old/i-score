@@ -1008,14 +1008,20 @@ Maquette::updateBoxesFromEngines()
 {
   BoxesMap::iterator it;
   for (it = _boxes.begin(); it != _boxes.end(); ++it) {
-      it->second->setRelativeTopLeft(QPoint(_engines->getBoxBeginTime(it->first) / MaquetteScene::MS_PER_PIXEL,
-                                            it->second->getTopLeft().y()));
-      it->second->setSize(QPoint((_engines->getBoxEndTime(it->first) / MaquetteScene::MS_PER_PIXEL -
-                                  _engines->getBoxBeginTime(it->first) / MaquetteScene::MS_PER_PIXEL),
-                                 it->second->getSize().y()));
-      it->second->setPos(it->second->getCenter());
-      it->second->centerWidget();
-      it->second->update();
+      if(it->first == ROOT_BOX_ID){
+          ;
+          /// \todo repaint maquetteView (resetCacheMode)
+      }
+      else{
+          it->second->setRelativeTopLeft(QPoint(_engines->getBoxBeginTime(it->first) / MaquetteScene::MS_PER_PIXEL,
+                                                it->second->getTopLeft().y()));
+          it->second->setSize(QPoint((_engines->getBoxEndTime(it->first) / MaquetteScene::MS_PER_PIXEL -
+                                      _engines->getBoxBeginTime(it->first) / MaquetteScene::MS_PER_PIXEL),
+                                     it->second->getSize().y()));
+          it->second->setPos(it->second->getCenter());
+          it->second->centerWidget();
+          it->second->update();
+      }
     }
 }
 
