@@ -2524,8 +2524,18 @@ void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value)
 	// Unpack data (isReady)
 	isReady = value[0];
     
-	if (engine->m_TimeEventReadyAttributeCallback != NULL)
+	if (engine->m_TimeEventReadyAttributeCallback != NULL) {
+        
 		engine->m_TimeEventReadyAttributeCallback(triggerId, isReady);
+        
+        iscoreEngineDebug {
+            
+            if (isReady)
+                TTLogMessage("TriggerPoint %ld is ready\n", triggerId);
+            else
+                TTLogMessage("TriggerPoint %ld is not ready\n", triggerId);
+        }
+    }
 }
 
 void TimeProcessSchedulerRunningAttributeCallback(TTPtr baton, const TTValue& value)
@@ -2546,9 +2556,9 @@ void TimeProcessSchedulerRunningAttributeCallback(TTPtr baton, const TTValue& va
     iscoreEngineDebug {
         
         if (running)
-            TTLogMessage("TimeProcess %ld starts at %ld ms\n", boxId, engine->getCurrentExecutionTime());
+            TTLogMessage("TimeProcess %ld scheduler starts at %ld ms\n", boxId, engine->getCurrentExecutionTime());
         else
-            TTLogMessage("TimeProcess %ld ends at %ld ms\n", boxId, engine->getCurrentExecutionTime());
+            TTLogMessage("TimeProcess %ld scheduler ends at %ld ms\n", boxId, engine->getCurrentExecutionTime());
     }
     
     // don't pass main scenario running state
