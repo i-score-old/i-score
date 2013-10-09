@@ -126,7 +126,7 @@ MaquetteScene::init()
   /// \todo MainWindow appelle init() de MaquetteScene, qui instancie lui même Maquette puis l'init. (par jaime Chao)
   _maquette = Maquette::getInstance();
   _maquette->setScene(this);
-  _maquette->init();
+  _maquette->init();      
 
   _tempBox = NULL;
   _resizeBox = NO_ID;
@@ -1719,7 +1719,7 @@ MaquetteScene::updateBoxesWidgets()
   std::map<unsigned int, BasicBox*> boxes = _maquette->getBoxes();
   for (it = boxes.begin(); it != boxes.end(); it++) {
       unsigned int boxID = it->first;
-      if (boxID != NO_ID) {
+      if (boxID != NO_ID && boxID != ROOT_BOX_ID) {
           setAttributes(static_cast<AbstractBox*>(getBox(boxID)->abstract()));
         }
     }

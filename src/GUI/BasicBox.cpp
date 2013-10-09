@@ -103,7 +103,11 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
   _endMenu = NULL;
   _startMenuButton = NULL;
   _endMenuButton = NULL;
-
+  _boxContentWidget = NULL;
+  _boxWidget = NULL;
+  _comboBox = NULL;
+  _startMenuButton = NULL;
+  _endMenuButton = NULL;
 
   /// \todo : !! Problème d'arrondi, on cast en int des floats !! A étudier parce que crash (avec 0 notamment) si on remet en float. NH
   int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
@@ -132,14 +136,21 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 void
 BasicBox::centerWidget()
 {
-  _boxWidget->move(-(width()) / 2 + LINE_WIDTH, -(height()) / 2 + (1.2 * RESIZE_TOLERANCE));
-  _boxWidget->resize(width() - 2 * LINE_WIDTH, height() - 1.5 * RESIZE_TOLERANCE);
+    if(_boxWidget != NULL){
+        _boxWidget->move(-(width()) / 2 + LINE_WIDTH, -(height()) / 2 + (1.2 * RESIZE_TOLERANCE));
+        _boxWidget->resize(width() - 2 * LINE_WIDTH, height() - 1.5 * RESIZE_TOLERANCE);
+    }
 
-  _comboBox->move(0, -(height() / 2 + LINE_WIDTH));
-  _comboBox->resize((width() - 4 * LINE_WIDTH - BOX_MARGIN) / 2, COMBOBOX_HEIGHT);
+    if(_comboBox != NULL){
+        _comboBox->move(0, -(height() / 2 + LINE_WIDTH));
+        _comboBox->resize((width() - 4 * LINE_WIDTH - BOX_MARGIN) / 2, COMBOBOX_HEIGHT);
+    }
 
-  _startMenuButton->move(-(width()) / 2 + LINE_WIDTH, -(height()) / 2);
-  _endMenuButton->move((width()) / 2 + 2 * LINE_WIDTH - BOX_MARGIN, -(height()) / 2 + LINE_WIDTH);
+    if(_startMenuButton != NULL)
+        _startMenuButton->move(-(width()) / 2 + LINE_WIDTH, -(height()) / 2);
+
+    if(_endMenuButton != NULL)
+        _endMenuButton->move((width()) / 2 + 2 * LINE_WIDTH - BOX_MARGIN, -(height()) / 2 + LINE_WIDTH);
 }
 
 void
@@ -184,7 +195,8 @@ BasicBox::createMenus()
     "background-color: transparent;"
     "};"
     );
-  _boxContentWidget->setStartMenu(_startMenu);
+  if(_boxContentWidget != NULL)
+      _boxContentWidget->setStartMenu(_startMenu);
 
   //--- end button ---
   QIcon endMenuIcon(":/images/boxEndMenu.svg");
@@ -198,7 +210,8 @@ BasicBox::createMenus()
     "background-color: transparent;"
     "}"
     );
-  _boxContentWidget->setEndMenu(_endMenu);
+  if(_boxContentWidget != NULL)
+      _boxContentWidget->setEndMenu(_endMenu);
 
   QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
   startMenuProxy->setWidget(_startMenuButton);
@@ -342,35 +355,45 @@ BasicBox::changeColor(QColor color)
 void
 BasicBox::addToComboBox(QString address)
 {
-  _boxContentWidget->addToComboBox(address);
+    if(_boxContentWidget != NULL){
+        _boxContentWidget->addToComboBox(address);
+    }
 }
 
 void
 BasicBox::updateCurves()
 {
-  _boxContentWidget->updateMessages(_abstract->ID(), true);
-  update();
+    if(_boxContentWidget != NULL){
+        _boxContentWidget->updateMessages(_abstract->ID(), true);
+        update();
+    }
 }
 
 void
 BasicBox::updateCurve(string address, bool forceUpdate)
 {
-  _boxContentWidget->updateCurve(address, forceUpdate);
-  update();
+    if(_boxContentWidget != NULL){
+        _boxContentWidget->updateCurve(address, forceUpdate);
+        update();
+    }
 }
 
 void
 BasicBox::updateCurveRangeBoundMin(string address, float value)
 {
-    _boxContentWidget->updateCurveRangeBoundMin(address, value);
-  update();
+    if(_boxContentWidget != NULL){
+        _boxContentWidget->updateCurveRangeBoundMin(address, value);
+        update();
+    }
 }
 
 void
 BasicBox::updateCurveRangeBoundMax(string address, float value)
 {
-  _boxContentWidget->updateCurveRangeBoundMax(address, value);
-  update();
+    if(_boxContentWidget != NULL){
+        _boxContentWidget->updateCurveRangeBoundMax(address, value);
+        update();
+    }
 }
 
 int
@@ -1024,8 +1047,9 @@ BasicBox::curveActivationChanged(string address, bool activated)
   if (!hasCurve(address)) {
       addCurve(address);
     }
-
-  _boxContentWidget->curveActivationChanged(QString::fromStdString(address), activated);
+  if(_boxContentWidget != NULL){
+      _boxContentWidget->curveActivationChanged(QString::fromStdString(address), activated);
+  }
 
   if (!activated) {
       removeCurve(address);

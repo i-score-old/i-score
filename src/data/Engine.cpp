@@ -1320,7 +1320,6 @@ void Engine::getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex cont
     lines = TTListPtr((TTPtr)v[0]);
     
     if (lines) {
-        
         // edit each line address into a "directory/address value" string
         for (lines->begin(); lines->end(); lines->next()) {
             

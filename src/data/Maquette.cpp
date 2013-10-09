@@ -79,7 +79,15 @@ Maquette::init()
 {
     // create a ScoreEngine instance
     // note : this is a temporary solution to test new Score framework easily
-    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback);
+    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback);        
+
+    //Creating rootBox as the mainScenario
+    AbstractBox *scenarioAb = new AbstractBox();
+    scenarioAb->setID(ROOT_BOX_ID);
+    /// \todo : set root the box name. NH
+
+    ParentBox *scenarioBox = new ParentBox(static_cast<AbstractParentBox *>(scenarioAb), _scene);
+    _boxes[ROOT_BOX_ID] = scenarioBox;
 }
 
 Maquette::Maquette() : _engines(NULL)
@@ -141,7 +149,7 @@ Maquette::getRelation(unsigned int ID)
 
 BasicBox*
 Maquette::getBox(unsigned int ID)
-{
+{    
   BoxesMap::iterator it = _boxes.find(ID);
   if (it != _boxes.end()) {
       return it->second;
@@ -354,7 +362,7 @@ vector<string>
 Maquette::firstMessagesToSend(unsigned int boxID)
 {
   vector<string> messages;
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if ((boxID != NO_ID && (getBox(boxID) != NULL)) || boxID == ROOT_BOX_ID) {
 
       _engines->getCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, messages);
       
@@ -1519,7 +1527,7 @@ Maquette::save(const string &fileName)
 
 void
 Maquette::load(const string &fileName)
-{
+{    
     vector<unsigned int>::iterator it;
     float zoom;
 
@@ -1564,12 +1572,7 @@ Maquette::load(const string &fileName)
             color = _engines->getBoxColor(boxID);
             
             QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
-            QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);
-            vector<string> firstMsgs;
-            vector<string> lastMsgs;
-            
-            _engines->getCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-            _engines->getCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, lastMsgs);
+            QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);           
             
             ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
             

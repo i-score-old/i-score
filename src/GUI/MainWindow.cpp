@@ -47,7 +47,7 @@
 #include "MaquetteView.hpp"
 #include "NetworkConfig.hpp"
 #include "ViewRelations.hpp"
-#include "MaquetteWidget.hpp"
+#include "HeaderPanelWidget.hpp"
 #include "NetworkTree.hpp"
 
 #include <QResource>
@@ -94,15 +94,11 @@ MainWindow::MainWindow()
 
   // Creation of Scene and View
   _scene = new MaquetteScene(QRectF(0, 0, width(), height()), _editor);
-
   _view = new MaquetteView(this);  
 
   // Initialisation of Scene and View
   _view->setScene(_scene);
-  _view->updateScene();
-
-  // Store background to increase speed
-  _view->setCacheMode(QGraphicsView::CacheBackground); /// \todo devrait être fait dans le constructeur de MaquetteView. (par jaime Chao)
+  _view->updateScene();  
 
   _scene->updateView();
   _scene->init(); /// \todo Les méthodes init() sont à bannir, il y a des constructeurs pour ça !!! (par jaime Chao)
@@ -114,9 +110,18 @@ MainWindow::MainWindow()
   _commandKey = false;
 
   // Central Widget
-  _maquetteWidget = new MaquetteWidget(this, _view, _scene);
+  _centralLayout = new QGridLayout;
+  _centralWidget = new QWidget;
+  _headerPanelWidget = new HeaderPanelWidget(NULL,_scene);
+
+  _centralLayout->addWidget(_headerPanelWidget);
+  _centralLayout->addWidget(_view);
+  _centralLayout->setContentsMargins(0, 0, 0, 0);
+  _centralLayout->setVerticalSpacing(0);
+  _centralWidget->setLayout(_centralLayout);
+
   _networkConfig = new NetworkConfig(_scene, this);
-  setCentralWidget(_maquetteWidget);
+  setCentralWidget(_centralWidget);
 
   // Creation of widgets
   createActions();
@@ -129,46 +134,51 @@ MainWindow::MainWindow()
   connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, std::string)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, std::string)));
   connect(_editor->networkTree(), SIGNAL(cmdKeyStateChanged(bool)), this, SLOT(updateCmdKeyState(bool)));
   connect(_view->verticalScrollBar(), SIGNAL(valueChanged(int)), _scene, SLOT(verticalScroll(int)));  //TimeBar is painted on MaquetteScene, so a vertical scroll has to move the timeBar.
+  connect(_scene, SIGNAL(stopPlaying()), _headerPanelWidget, SLOT(stop()));
+  connect(_view, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
+  connect(_scene, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
 }
 
 MainWindow::~MainWindow()
 {
-  delete _view;
-  delete _scene;
-  delete _editor;
-  delete _maquetteWidget;
+    delete _view;
+    delete _scene;
+    delete _editor;
+    delete _headerPanelWidget;
+    delete _centralLayout;
+    delete _centralWidget;
 
-  delete _menuBar;
-  delete _fileMenu;
-  delete _editMenu;
-  delete _viewMenu;
-//  delete _helpMenu;
-  delete _newAct;
-  delete _openAct;
-  delete _saveAct;
-  delete _saveAsAct;
-  delete _exportAct;
-  delete _printAct;
-  delete _quitAct;
-  delete _aboutAct;
-  delete _helpAct;
+    delete _menuBar;
+    delete _fileMenu;
+    delete _editMenu;
+    delete _viewMenu;
+    //  delete _helpMenu;
+    delete _newAct;
+    delete _openAct;
+    delete _saveAct;
+    delete _saveAsAct;
+    delete _exportAct;
+    delete _printAct;
+    delete _quitAct;
+    delete _aboutAct;
+    delete _helpAct;
 
-  delete _zoomInAct;
-  delete _zoomOutAct;
-  delete _networkAct;
-  delete _editorAct;
+    delete _zoomInAct;
+    delete _zoomOutAct;
+    delete _networkAct;
+    delete _editorAct;
 
-  delete _cutAct;
-  delete _copyAct;
-  delete _pasteAct;
-  delete _selectAllAct;
-  delete _modeAct;
-  delete _selectModeAct;
-  delete _PBModeAct;
-  delete _commentModeAct;
+    delete _cutAct;
+    delete _copyAct;
+    delete _pasteAct;
+    delete _selectAllAct;
+    delete _modeAct;
+    delete _selectModeAct;
+    delete _PBModeAct;
+    delete _commentModeAct;
 
-  delete _helpDialog;
-  delete _networkConfig;
+    delete _helpDialog;
+    delete _networkConfig;
 }
 
 void
@@ -764,7 +774,7 @@ void
 MainWindow::setMaquetteSceneTitle(QString name)
 {
   name.remove(".score");
-  _maquetteWidget->setName(name);
+  _headerPanelWidget->setName(name);
 }
 
 QString

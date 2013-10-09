@@ -72,6 +72,7 @@ MaquetteView::MaquetteView(MainWindow *mw)
   centerOn(0, 0);
   _zoom = 1;
   _gotoValue = 0;      
+  _scenarioSelected = false;
   setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
   setCacheMode(QGraphicsView::CacheBackground);
 }
@@ -136,52 +137,32 @@ MaquetteView::updateScene()
 }
 
 void
-MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
+MaquetteView::drawStartIndicator(QPainter *painter)
 {
+    AbstractBox *scenarioAbstract = static_cast<AbstractBox *>(Maquette::getInstance()->getBox(1)->abstract());
+
+    if(scenarioAbstract->hasFirstMsgs()){
+        painter->save();
+        painter->setOpacity(_scenarioSelected ? 1 : 0.6);
+        QRectF gradientRect(0,0,GRADIENT_WIDTH,height());
+        QLinearGradient lgradient(gradientRect.topLeft(),gradientRect.topRight());
+
+//        lgradient.setColorAt(0,scenarioAbstract->color());
+        lgradient.setColorAt(0,Qt::white);
+        lgradient.setColorAt(1, Qt::transparent);
+
+        painter->fillRect(gradientRect, lgradient);
+        painter->restore();
+    }
+}
+
+void
+MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
+{    
   QGraphicsView::drawBackground(painter, rect);
-  QPen pen(QColor(160, 160, 160));
-  //was QPen pen(QColor(145, 145, 145));
 
-  painter->setPen(pen);
-
-  static const int S_TO_MS = 1000;
-  const int WIDTH = sceneRect().width();
-  const int HEIGHT = sceneRect().height();
-  for (int i = 0; i <= (WIDTH*MaquetteScene::MS_PER_PIXEL) / S_TO_MS; i++) {     // for each second
-      int i_PXL = i * S_TO_MS / MaquetteScene::MS_PER_PIXEL;
-
-      if (_zoom < 1 && ((i % (int)(1. / _zoom)) != 0)) {
-          continue;
-        }
-      painter->drawLine(QPointF(i_PXL, 0), QPointF(i_PXL, HEIGHT));
-
-//      if (_zoom > 1) {
-//          QPen pen = painter->pen();
-//          QPen savePen = pen;
-//          painter->setPen(pen);
-//          for (float j = i; j < i + 1; j += 1. / _zoom) {
-//              if (i != j) {
-//                  float j_PXL = 0; //=  j * S_TO_MS / (float)MaquetteScene::MS_PER_PIXEL;
-//                  if (_zoom > 4 || QString("%1").arg(j - (int)j).length() < 5) {
-//                      painter->drawText(QPointF(j_PXL - 10, 15), QString("%1").arg(round(j * 1000) / 1000.));
-//                    }
-//                  painter->drawLine(QPointF(j_PXL, 15), QPointF(j_PXL, HEIGHT));
-//                }
-//            }
-//          painter->setPen(savePen);
-//        }
-    }
-
-  if (_scene->tracksView()) {
-      QPen pen2(Qt::darkGray);
-      pen2.setStyle(Qt::SolidLine);
-      pen2.setWidth(4);
-      painter->setPen(pen2);
-
-      for (int i = 0; i <= MaquetteScene::MAX_SCENE_HEIGHT; i = i + 150) {
-          painter->drawLine(QPointF(0, i), QPointF(_scene->getMaxSceneWidth(), i));
-        }
-    }
+  //Draw gradient if the root box (scenario) has start messages
+  drawStartIndicator(painter);
 }
 
 void
@@ -388,4 +369,11 @@ MaquetteView::zoomOut()
   _scene->updateProgressBar();
   _scene->zoomChanged(_zoom);
   setSceneRect((QRectF(0,0,_scene->getMaxSceneWidth(),_scene->height())));
+}
+
+void
+MaquetteView::setScenarioSelected(bool selected){
+    _scenarioSelected = selected;
+    resetCachedContent();
+    update();
 }

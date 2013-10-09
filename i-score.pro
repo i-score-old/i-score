@@ -119,9 +119,9 @@ headers/GUI/TreeMapElement.hpp \
 headers/GUI/ViewRelations.hpp \
 headers/GUI/BoxWidget.hpp \
 headers/GUI/BoxCurveEdit.hpp \
-headers/GUI/MaquetteWidget.hpp \
 headers/GUI/TimeBarWidget.hpp \
 headers/GUI/DeviceEdit.hpp \
+headers/GUI/HeaderPanelWidget.hpp
 
 SOURCES += src/main.cpp \
 src/data/Abstract.cpp \
@@ -162,6 +162,6 @@ src/GUI/TreeMapElement.cpp \
 src/GUI/ViewRelations.cpp \
 src/GUI/BoxWidget.cpp \
 src/GUI/BoxCurveEdit.cpp \
-src/GUI/MaquetteWidget.cpp \
 src/GUI/TimeBarWidget.cpp \
 src/GUI/DeviceEdit.cpp \
+src/GUI/HeaderPanelWidget.cpp
