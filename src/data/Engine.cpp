@@ -430,7 +430,9 @@ ConditionedProcessId Engine::cacheConditionedProcess(TimeProcessId timeProcessId
     cacheReadyCallback(id, controlPointId);
     
     // We cache a TTData to allow remote triggering
-    cacheTriggerDataCallback(id, timeProcessId);
+    // théo : we don't create the /Box.n/start or /Box.n/end message for the moment
+    // because it makes strange trouble if it is written into the i-score namespace
+    //cacheTriggerDataCallback(id, timeProcessId);
     
     return id;
 }
@@ -1527,7 +1529,7 @@ bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
     TTObjectBasePtr     curve;
     TTValue             v;
-    TTUInt32            i, nbPoints = percent.size();
+    TTUInt32            i, nbPoints = coeff.size();
     TTErr               err;
     
     // get curve object at address
@@ -1545,6 +1547,7 @@ bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned
             v[i] = TTFloat64(percent[i/3] / 100.);
             v[i+1] = TTFloat64(y[i/3]);
             v[i+2] = TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]);
+            
         }
         
         // set a curve parameters
@@ -1575,7 +1578,7 @@ bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned
         
         if (!err) {
 
-            // edit percent, y, sectionType and coeff from v : x1 y1 b1 x2 y2 b2
+            // edit percent, y, sectionType and coeff from v : x1 y1 b1 x2 y2 b2 . . .
             for (i = 0; i < v.size(); i = i+3) {
                 
                 percent.push_back(TTFloat64(v[i]) * 100.);
@@ -1583,9 +1586,6 @@ bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned
                 sectionType.push_back(1);
                 coeff.push_back(sqrt(sqrt(TTFloat64(v[i+2]))));
             }
-            
-            sectionType.push_back(1);
-            coeff.push_back(1);
         }
     }
     
@@ -1921,7 +1921,7 @@ void Engine::setExecutionSpeedFactor(float factor)
     m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
     aScheduler = TTObjectBasePtr(v[0]);
     
-    aScheduler->setAttributeValue(TTSymbol("speed"), TTFloat64(factor));
+    aScheduler->setAttributeValue(kTTSym_speed, TTFloat64(factor));
 }
 
 float Engine::getExecutionSpeedFactor()
@@ -1933,7 +1933,7 @@ float Engine::getExecutionSpeedFactor()
     m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
     aScheduler = TTObjectBasePtr(v[0]);
     
-    aScheduler->getAttributeValue(TTSymbol("speed"), v);
+    aScheduler->getAttributeValue(kTTSym_speed, v);
     
     return TTFloat64(v[0]);
 }

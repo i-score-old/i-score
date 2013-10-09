@@ -186,8 +186,6 @@ CurveWidget::setAttributes(unsigned int boxID,
       _abstract->_breakpoints[xPercents[i] / 100.] = pair<float, float>(yValues[i], coeff[i]);
     }
 
-  _abstract->_lastPointCoeff = coeff.back();
-
   curveRepresentationOutdated();
 }
 
@@ -365,20 +363,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
       switch (event->modifiers()) {
       case Qt::ShiftModifier: // POW
       {
-          if (_lastPointSelected) {
-              float mousePosY = event->pos().y();
-              float pow = 1.;
-              QPointF lastPoint = absoluteCoordinates(QPointF(1, _abstract->_curve.back()));
-              if (mousePosY > lastPoint.y()) { // mouse under : pow between 0 and 1
-                  pow = std::max(1 - std::min((float)(mousePosY - lastPoint.y()), (float)50.) / 50., 0.01);
-              }
-              else if (lastPoint.y() > mousePosY) { // mouse above : pow between 1 and 6
-                  pow = 1 + std::min((float)(lastPoint.y() - mousePosY), (float)50.) / 10.;
-              }
-              _abstract->_lastPointCoeff = pow;
-              curveChanged();
-          }
-          else if (_movingBreakpointX != -1) {
+          if (_movingBreakpointX != -1) {
               map<float, pair<float, float> >::iterator it;
 
               if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
@@ -386,12 +371,12 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
                   float pow = 1.;
                   float div;
                   if (mousePosY > it->second.first) { // mouse under : pow between 0 and 1
-                      div = std::min(50., (double)std::max(fabs(_maxY), fabs(_minY)));
-                      pow = std::max(1 - std::min(mousePosY - it->second.first, (float)50.) / (double)div, 0.01);
+                      div = std::min(100., (double)std::max(fabs(_maxY), fabs(_minY)));
+                      pow = std::max(1 - std::min(mousePosY - it->second.first, (float)100.) / (double)div, 0.01);
                   }
                   else if (it->second.first > mousePosY) { // mouse above : pow between 1 and 6
-                      div = std::min(50., std::max(fabs(_maxY), fabs(_minY))) / 5;
-                      pow = 1 + std::min(it->second.first - mousePosY, (float)50.) / div;
+                      div = std::min(100., std::max(fabs(_maxY), fabs(_minY))) / 10;
+                      pow = 1 + std::min(it->second.first - mousePosY, (float)100.) / div;
                   }
                   it->second = std::make_pair(it->second.first, pow);
                   _movingBreakpointY = -1;
@@ -549,44 +534,44 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event)
 bool
 CurveWidget::curveChanged()
 {
-  vector<float> xPercents;
-  vector<float> yValues;
-  vector<short> sectionType;
-  vector<float> coeff;
-  map<float, pair<float, float> >::iterator it;
-  for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
-      xPercents.push_back(it->first * 100);
-      yValues.push_back(it->second.first);
-      coeff.push_back(it->second.second);
-
-      sectionType.push_back(CURVE_POW);
+    vector<float> xPercents;
+    vector<float> yValues;
+    vector<short> sectionType;
+    vector<float> coeff;
+    map<float, pair<float, float> >::iterator it;
+    
+    for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
+        
+        xPercents.push_back(it->first * 100);
+        yValues.push_back(it->second.first);
+        
+        coeff.push_back(it->second.second);
+        sectionType.push_back(CURVE_POW);
     }
-  sectionType.push_back(CURVE_POW);
-  coeff.push_back(_abstract->_lastPointCoeff);
-
-  if (Maquette::getInstance()->setCurveSections(_abstract->_boxID, _abstract->_address, 0, xPercents, yValues, sectionType, coeff)) {
-      unsigned int sampleRate;
-      bool redundancy, interpolate;
-      vector<string> argTypes;
-      vector<float> values;
-      xPercents.clear();
-      yValues.clear();
-      sectionType.clear();
-      coeff.clear();
-      if (Maquette::getInstance()->getCurveAttributes(_abstract->_boxID, _abstract->_address, 0, sampleRate, redundancy, interpolate, values, argTypes, xPercents, yValues, sectionType, coeff)) {
-          setAttributes(_abstract->_boxID, _abstract->_address, 0, values, sampleRate, redundancy, interpolate, _abstract->_show, argTypes, xPercents, yValues, sectionType, coeff);
-          update();
-          return true;
+    
+    if (Maquette::getInstance()->setCurveSections(_abstract->_boxID, _abstract->_address, 0, xPercents, yValues, sectionType, coeff)) {
+        unsigned int sampleRate;
+        bool redundancy, interpolate;
+        vector<string> argTypes;
+        vector<float> values;
+        xPercents.clear();
+        yValues.clear();
+        sectionType.clear();
+        coeff.clear();
+        if (Maquette::getInstance()->getCurveAttributes(_abstract->_boxID, _abstract->_address, 0, sampleRate, redundancy, interpolate, values, argTypes, xPercents, yValues, sectionType, coeff)) {
+            setAttributes(_abstract->_boxID, _abstract->_address, 0, values, sampleRate, redundancy, interpolate, _abstract->_show, argTypes, xPercents, yValues, sectionType, coeff);
+            update();
+            return true;
         }
-      else {
-          std::cerr << "CurveWidget::curveChanged() : getting attributes failed" << std::endl;
+        else {
+            std::cerr << "CurveWidget::curveChanged() : getting attributes failed" << std::endl;
         }
     }
-  else {
-      std::cerr << "CurveWidget::curveChanged() : setting curve sections failed" << std::endl;
+    else {
+        std::cerr << "CurveWidget::curveChanged() : setting curve sections failed" << std::endl;
     }
-
-  return false;
+    
+    return false;
 }
 
 void

@@ -90,7 +90,6 @@ class AbstractCurve : public Abstract
     bool _redundancy;         //!< Handles curve's redundancy
     bool _show;
     bool _interpolate;
-    float _lastPointCoeff;     //!< Coefficient for last point.
     std::vector<float> _curve; //!< List of all curve values.
     //! Map of breakpoints with their values and curving values.
     std::map<float, std::pair<float, float> > _breakpoints;
