@@ -74,6 +74,9 @@ class MaquetteView : public QGraphicsView
      */
     void setGotoValue(int value);
 
+    //! \brief Handles gradient width, indicates if the scenario (box1) has start messages or not.
+    static const float GRADIENT_WIDTH = 100;
+
     inline int
     gotoValue(){ return _gotoValue; }
     QList<TriggerPoint *> *triggersQueueList();
@@ -124,7 +127,15 @@ class MaquetteView : public QGraphicsView
      */
     QPointF getCenterCoordinates();
 
+    void setScenarioSelected(bool selected);
+
   protected:
+
+    /*!
+     * \brief Draws the indicator of a start cue (as a linearGradient for example)
+     */
+    void drawStartIndicator(QPainter *painter);
+
     /*!
      * \brief Redefinition of QGraphicsView::drawBackground().
      * This method is automatically called by QGraphicsView::render().
@@ -151,9 +162,11 @@ class MaquetteView : public QGraphicsView
     virtual void wheelEvent(QWheelEvent *event);
 
   private:
+
     MaquetteScene *_scene; //!< The scene displayed by the view.
     MainWindow *_mainWindow;
     float _zoom;           //!< The zoom factor value.
     int _gotoValue;        //!< The goto value in pixels.
+    bool _scenarioSelected;
 };
 #endif

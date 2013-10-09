@@ -254,8 +254,16 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
           //END PRINT
         }
     }
-  _networkTree->updateCurves(_boxEdited);
-  updateWidgets(boxModified);
+
+
+//Special update for the main scenario
+  if(_boxEdited == ROOT_BOX_ID){
+      _scene->view()->setScenarioSelected(true);
+  }
+  else{
+      _networkTree->updateCurves(_boxEdited);
+      updateWidgets(boxModified);
+  }
 }
 
 void
@@ -362,9 +370,17 @@ AttributesEditor::startMessagesChanged(bool forceUpdate)
       Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
       Maquette::getInstance()->setStartMessagesToSend(_boxEdited, _networkTree->startMessages());
 
-      _networkTree->updateStartMsgsDisplay();
-      _networkTree->updateCurves(_boxEdited, forceUpdate);
-      box->updateCurves();
+      _networkTree->updateStartMsgsDisplay();      
+
+      //Case scenario start cue
+      if(_boxEdited==1){
+          _scene->view()->resetCachedContent();
+          _scene->view()->update();
+      }
+      else{
+          _networkTree->updateCurves(_boxEdited, forceUpdate);
+          box->updateCurves();
+      }
     }
   else{
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
