@@ -143,7 +143,7 @@ MaquetteView::drawStartIndicator(QPainter *painter)
 
     if(scenarioAbstract->hasFirstMsgs()){
         painter->save();
-        painter->setOpacity(_scenarioSelected ? 1 : 0.4);
+        painter->setOpacity(_scenarioSelected ? 1 : 0.6);
         QRectF gradientRect(0,0,GRADIENT_WIDTH,height());
         QLinearGradient lgradient(gradientRect.topLeft(),gradientRect.topRight());
 
@@ -161,36 +161,9 @@ MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
 {
     std::cout<<"drawBackground"<<std::endl;
   QGraphicsView::drawBackground(painter, rect);
-  QPen pen(QColor(160, 160, 160));
-  //was QPen pen(QColor(145, 145, 145));
 
-  //Draw gradient if the box1 (scenario) has start messages
-
+  //Draw gradient if the root box (scenario) has start messages
   drawStartIndicator(painter);
-
-  painter->setPen(pen);
-
-  static const int S_TO_MS = 1000;
-  const int WIDTH = sceneRect().width();
-  const int HEIGHT = sceneRect().height();
-  for (int i = 0; i <= (WIDTH*MaquetteScene::MS_PER_PIXEL) / S_TO_MS; i++) {     // for each second
-      int i_PXL = i * S_TO_MS / MaquetteScene::MS_PER_PIXEL;
-      if (_zoom < 1 && ((i % (int)(1. / _zoom)) != 0)) {
-          continue;
-        }
-      painter->drawLine(QPointF(i_PXL, 0), QPointF(i_PXL, HEIGHT));
-    }
-
-  if (_scene->tracksView()) {
-      QPen pen2(Qt::darkGray);
-      pen2.setStyle(Qt::SolidLine);
-      pen2.setWidth(4);
-      painter->setPen(pen2);
-
-      for (int i = 0; i <= MaquetteScene::MAX_SCENE_HEIGHT; i = i + 150) {
-          painter->drawLine(QPointF(0, i), QPointF(_scene->getMaxSceneWidth(), i));
-        }
-    }
 }
 
 void
@@ -403,5 +376,4 @@ MaquetteView::setScenarioSelected(bool selected){
     _scenarioSelected = selected;
     resetCachedContent();
     update();
-    _scenarioSelected = false;
 }

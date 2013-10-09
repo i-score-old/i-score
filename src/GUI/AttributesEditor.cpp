@@ -261,6 +261,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
       _scene->view()->setScenarioSelected(true);
   }
   else{
+      _scene->view()->setScenarioSelected(false);
       _networkTree->updateCurves(_boxEdited);
       updateWidgets(boxModified);
   }
@@ -373,10 +374,8 @@ AttributesEditor::startMessagesChanged(bool forceUpdate)
       _networkTree->updateStartMsgsDisplay();      
 
       //Case scenario start cue
-      if(_boxEdited==1){
+      if(_boxEdited == ROOT_BOX_ID)
           _scene->view()->resetCachedContent();
-          _scene->view()->update();
-      }
       else{
           _networkTree->updateCurves(_boxEdited, forceUpdate);
           box->updateCurves();
@@ -399,10 +398,12 @@ AttributesEditor::endMessagesChanged(bool forceUpdate)
       QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
       Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
       Maquette::getInstance()->setEndMessagesToSend(_boxEdited, _networkTree->endMessages());
-      _networkTree->updateEndMsgsDisplay();
-      _networkTree->updateCurves(_boxEdited, forceUpdate);
 
-      box->updateCurves();
+      if(_boxEdited != ROOT_BOX_ID){
+          _networkTree->updateEndMsgsDisplay();
+          _networkTree->updateCurves(_boxEdited, forceUpdate);
+          box->updateCurves();
+      }
     }
   else {
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
