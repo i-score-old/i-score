@@ -75,7 +75,7 @@ class MaquetteView : public QGraphicsView
     void setGotoValue(int value);
 
     //! \brief Handles gradient width, indicates if the scenario (box1) has start messages or not.
-    static const float GRADIENT_WIDTH = 50;
+    static constexpr float GRADIENT_WIDTH = 50;
 
     inline int
     gotoValue(){ return _gotoValue; }

@@ -25,8 +25,8 @@ class HeaderPanelWidget : public QWidget {
      */
     void setName(QString name);
 
-    static const float HEADER_HEIGHT = 42.;
-    static const float NAME_POINT_SIZE = 20.;
+    static constexpr float HEADER_HEIGHT = 42.;
+    static constexpr float NAME_POINT_SIZE = 20.;
 
   signals:
     void accelerationValueChanged(int);
