@@ -158,8 +158,7 @@ MaquetteView::drawStartIndicator(QPainter *painter)
 
 void
 MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
-{
-    std::cout<<"drawBackground"<<std::endl;
+{    
   QGraphicsView::drawBackground(painter, rect);
 
   //Draw gradient if the root box (scenario) has start messages

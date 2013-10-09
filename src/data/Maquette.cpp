@@ -81,9 +81,11 @@ Maquette::init()
     // note : this is a temporary solution to test new Score framework easily
     _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback);        
 
-    //Creating box1 as the mainScenario
+    //Creating rootBox as the mainScenario
     AbstractBox *scenarioAb = new AbstractBox();
     scenarioAb->setID(ROOT_BOX_ID);
+    /// \todo : set root the box name. NH
+
     ParentBox *scenarioBox = new ParentBox(static_cast<AbstractParentBox *>(scenarioAb), _scene);
     _boxes[ROOT_BOX_ID] = scenarioBox;
 }
@@ -1525,8 +1527,7 @@ Maquette::save(const string &fileName)
 
 void
 Maquette::load(const string &fileName)
-{
-    std::cout<<"load"<<std::endl;
+{    
     vector<unsigned int>::iterator it;
     float zoom;
 

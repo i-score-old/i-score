@@ -213,8 +213,7 @@ AttributesEditor::connectSlots()
 
 void
 AttributesEditor::setAttributes(AbstractBox *abBox)
-{    
-    std::cout<<"setAttributes("<<abBox->ID()<<")"<<std::endl;
+{        
   bool boxModified = (_boxEdited != abBox->ID());
 
   _boxEdited = abBox->ID();
@@ -259,6 +258,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 //Special update for the main scenario
   if(_boxEdited == ROOT_BOX_ID){
       _scene->view()->setScenarioSelected(true);
+      _boxName->setText(QString::fromStdString(abBox->name()));
   }
   else{
       _scene->view()->setScenarioSelected(false);
@@ -359,8 +359,7 @@ AttributesEditor::changeColor()
 
 void
 AttributesEditor::startMessagesChanged(bool forceUpdate)
-{
-    std::cout<<"StartMsgsChanged box"<<_boxEdited<<std::endl;
+{    
   if (_scene->paused()) {
       _scene->stopWithGoto();
     }
@@ -557,9 +556,7 @@ AttributesEditor::snapshotStartAssignment()
 {
   QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot = _networkTree->treeSnapshot(_boxEdited);
 
-  _networkTree->clearDevicesStartMsgs(treeSnapshot.second);
-
-  std::cout<<"boxedited : "<<_boxEdited<<std::endl;
+  _networkTree->clearDevicesStartMsgs(treeSnapshot.second);  
 
   if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 
