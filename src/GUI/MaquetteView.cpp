@@ -260,7 +260,8 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
       _scene->pause();
     }
   else if (event->key() == Qt::Key_Space && _scene->playing()) {
-      _scene->stopWithGoto();
+//      _scene->stopWithGoto();
+      _scene->pause();
     }
   else if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
       _scene->stopGotoStart();
