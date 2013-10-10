@@ -1009,8 +1009,7 @@ Maquette::updateBoxesFromEngines()
   BoxesMap::iterator it;
   for (it = _boxes.begin(); it != _boxes.end(); ++it) {
       if(it->first == ROOT_BOX_ID){
-          ;
-          /// \todo repaint maquetteView (resetCacheMode)
+          _scene->view()->resetCachedContent();
       }
       else{
           it->second->setRelativeTopLeft(QPoint(_engines->getBoxBeginTime(it->first) / MaquetteScene::MS_PER_PIXEL,

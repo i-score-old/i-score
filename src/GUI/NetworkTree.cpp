@@ -976,7 +976,7 @@ NetworkTree::updateStartMsgsDisplay()
 //    clearColumn(START_COLUMN);
   for (it = items.begin(); it != items.end(); it++) {
       curItem = *it;
-      currentMsg = _startMessages->getMessages().value(curItem);
+      currentMsg = _startMessages->getMessages().value(curItem);            
       curItem->setText(START_COLUMN, currentMsg.value);
       fatherColumnCheck(curItem, START_COLUMN);
     }

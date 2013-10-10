@@ -139,7 +139,7 @@ MaquetteView::updateScene()
 void
 MaquetteView::drawStartIndicator(QPainter *painter)
 {
-    AbstractBox *scenarioAbstract = static_cast<AbstractBox *>(Maquette::getInstance()->getBox(1)->abstract());
+    AbstractBox *scenarioAbstract = static_cast<AbstractBox *>(Maquette::getInstance()->getBox(ROOT_BOX_ID)->abstract());
 
     if(scenarioAbstract->hasFirstMsgs()){
         painter->save();
