@@ -1340,6 +1340,7 @@ Maquette::stopPlaying()
   for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
       it->second->unlock();
     }
+    
   _engines->stop();
 
   BoxesMap::iterator it;
