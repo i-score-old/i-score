@@ -1297,7 +1297,7 @@ Maquette::pause()
 void
 Maquette::startPlaying()
 {
-  _engines->pause(false);
+  //_engines->stop();
   double gotoValue = (double)_engines->getGotoValue();
   initSceneState();
   generateTriggerQueue();
@@ -1350,6 +1350,7 @@ Maquette::stopPlaying()
   for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
       it->second->unlock();
     }
+    
   _engines->stop();
 
   BoxesMap::iterator it;

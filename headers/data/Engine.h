@@ -160,6 +160,8 @@ private:
     TTObjectBasePtr     m_dataStartPoint;                               /// A Modular TTData to expose StartPoint transport service
     TTObjectBasePtr     m_dataSpeed;                                    /// A Modular TTData to expose Speed transport service
     
+    TTObjectBasePtr     m_sender;                                       /// A Modular TTSender to send message to any application
+    
 	void (*m_TimeEventReadyAttributeCallback)(ConditionedProcessId, bool);
     void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);
     void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);

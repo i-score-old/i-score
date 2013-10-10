@@ -386,14 +386,14 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
           break;
       }
 
-      case Qt::ControlModifier: // VERTICAL SLIDE
+      case Qt::ControlModifier:
       {
-
+// Draw mode
           _abstract->_breakpoints[relativePoint.x()] = std::make_pair<float, float>(relativePoint.y(), 1.);
           curveChanged();
 
           break;
-
+// VERTICAL SLIDE
 //          if (_movingBreakpointX != -1) {
 
 //              if(relativePoint.y() > _maxY && _maxRangeBoundLocked){
