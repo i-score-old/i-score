@@ -1341,9 +1341,13 @@ void Engine::setCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex cont
     // Flatten the state to increase the speed of the recall
     state->sendMessage(TTSymbol("Flatten"));
     
-    // Update all curves (for automation process only)
-    TTValue empty; // théo : this is to pass thru a Foundation bug which will disapear in a next version
-    timeProcess->sendMessage(TTSymbol("CurveUpdate"), empty, empty);
+    // Don't update curve for the root box because it is a Scenario and not an Automation
+    if (boxId != ROOT_BOX_ID) {
+    
+        // Update all curves (for automation process only)
+        TTValue empty; // théo : this is to pass thru a Foundation bug which will disapear in a next version
+        timeProcess->sendMessage(TTSymbol("CurveUpdate"), empty, empty);
+    }
 }
 
 void Engine::getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex controlPointIndex, std::vector<std::string>& messages)
