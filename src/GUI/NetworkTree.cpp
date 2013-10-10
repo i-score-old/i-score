@@ -68,19 +68,20 @@ unsigned int NetworkTree::TEXT_POINT_SIZE = 10;
 NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 {
   init();
+
   setColumnCount(9);
   QStringList list;
-  list << "Address" << "Value" << "Start" << " ~ " << "End" << " = " << " % "<<" type "<<" min "<<" max ";
-  setColumnWidth(NAME_COLUMN, 130);
-  setColumnWidth(VALUE_COLUMN, 65);
-  setColumnWidth(START_COLUMN, 65);
-  setColumnWidth(END_COLUMN, 65);
-  setColumnWidth(INTERPOLATION_COLUMN, 25);
-  setColumnWidth(REDUNDANCY_COLUMN, 25);
-  setColumnWidth(SR_COLUMN, 32);
+  list << "Address" << "Value" << "Start" << " ~ " << "End" << " = " << " % "<<" type "<<"min "<<"max ";
+  setColumnWidth(NAME_COLUMN, 118);
+  setColumnWidth(VALUE_COLUMN, 63);
+  setColumnWidth(START_COLUMN, 60);
+  setColumnWidth(END_COLUMN, 60);
+  setColumnWidth(INTERPOLATION_COLUMN, 23);
+  setColumnWidth(REDUNDANCY_COLUMN, 23);
+  setColumnWidth(SR_COLUMN, 31);
   setColumnWidth(TYPE_COLUMN, 34);
-  setColumnWidth(MIN_COLUMN, 31);
-  setColumnWidth(MAX_COLUMN, 31);
+  setColumnWidth(MIN_COLUMN, 30);
+  setColumnWidth(MAX_COLUMN, 30);
 
   setIndentation(13);
   setHeaderLabels(list);
@@ -192,7 +193,7 @@ NetworkTree::load()
           createOCSBranch(curItem);
         }
       else {
-          curItem = new QTreeWidgetItem(deviceName, NodeNamespaceType);
+          curItem = new QTreeWidgetItem(deviceName, NodeNamespaceType);          
           try{
               treeRecursiveExploration(curItem, true);
             }catch (const std::exception & e) {
@@ -849,7 +850,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                             childItem = new QTreeWidgetItem(name, LeaveType);
                         }
                         else{
-                            childItem = new QTreeWidgetItem(name, NodeNamespaceType);
+                            childItem = new QTreeWidgetItem(name, NodeNoNamespaceType);
                         }
                         name.clear();
                         curItem->addChild(childItem);
@@ -1032,7 +1033,7 @@ NetworkTree::brothersPartiallyChecked(QTreeWidgetItem *item, int column)
       childrenCount = father->childCount();
       for (int i = 0; i < childrenCount; i++) {
           child = father->child(i);
-          if (child->type() == NodeNamespaceType) {
+          if (child->type() == NodeNoNamespaceType) {
               if (child->checkState(column) == Qt::Checked || child->checkState(column) == Qt::PartiallyChecked) {
                   countCheckedItems++;
                 }
@@ -1319,7 +1320,7 @@ NetworkTree::allBrothersAssigned(QTreeWidgetItem *item)
       int childrenCount = father->childCount();
       for (int i = 0; i < childrenCount; i++) {
           child = father->child(i);
-          if (child->type() == NodeNamespaceType) {
+          if (child->type() == NodeNoNamespaceType) {
 //                std::cout<<child->text(0).toStdString()<<" > NodeNameSpace"<<std::endl;
               if (!_nodesWithSomeChildrenAssigned.contains(child)) {
 //                    std::cout<<"----------------------> false1 "<<std::endl;
@@ -1356,7 +1357,7 @@ NetworkTree::allBrothersChecked(QTreeWidgetItem *item, int column)
       for (int i = 0; i < childrenCount; i++) {
           child = father->child(i);
 
-          if (child->type() == NodeNamespaceType) {
+          if (child->type() == NodeNoNamespaceType) {
               if (child->checkState(column) == Qt::Unchecked || child->checkState(column) == Qt::PartiallyChecked) {
                   return false;
                 }
@@ -1418,6 +1419,18 @@ NetworkTree::resetAssignedNodes()
       unassignTotally(curItem);
     }
   _nodesWithAllChildrenAssigned.clear();
+}
+
+void
+NetworkTree::refreshCurrentItemNamespace(){
+    if(currentItem() != NULL){
+        string application = getAbsoluteAddress(currentItem()).toStdString();
+
+        currentItem()->takeChildren();
+        Maquette::getInstance()->refreshNetworkNamespace(application);
+        treeRecursiveExploration(currentItem(),true);
+        Maquette::getInstance()->updateBoxesAttributes();
+    }
 }
 
 
@@ -1609,7 +1622,7 @@ NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select)
       int childrenCount = curItem->childCount();
       for (i = 0; i < childrenCount; i++) {
           child = curItem->child(i);
-          if (child->type() == NodeNamespaceType) {
+          if (child->type() == NodeNoNamespaceType) {
               child->setSelected(select);
               recursiveChildrenSelection(child, select);
             }
@@ -1625,6 +1638,26 @@ NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select)
 /*************************************************************************
  *                         SLOTS - Virtual methods
  ************************************************************************/
+
+void
+NetworkTree::mousePressEvent(QMouseEvent *event)
+{
+    QTreeWidget::mousePressEvent(event);
+    if(event->button()==Qt::RightButton){
+        if(currentItem()->type() == NodeNamespaceType){
+            std::cout<<"right click on "<<currentItem()->text(0).toStdString()<<std::endl;
+
+            QMenu *contextMenu = new QMenu(this);
+            QAction *refreshAct = new QAction(tr("Refresh"),this);
+            contextMenu->addAction(refreshAct);
+            connect(refreshAct, SIGNAL(triggered()), this, SLOT(refreshCurrentItemNamespace()));
+            contextMenu->exec(event->pos());
+
+            delete refreshAct;
+            delete contextMenu;
+        }
+    }
+}
 
 void
 NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
@@ -1657,7 +1690,7 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
         else if (currentItem()->type() == addOSCNode) {
             ;
         }
-        else if (currentItem()->type() == NodeNamespaceType) {
+        else if (currentItem()->type() == NodeNoNamespaceType) {
             if(currentColumn() == NAME_COLUMN){
                 QString deviceName = currentItem()->text(NAME_COLUMN);
                 _deviceEdit->edit(deviceName);
@@ -1722,9 +1755,8 @@ NetworkTree::keyPressEvent(QKeyEvent *event)
 
 void
 NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
-{
-  if (item != NULL) {
-
+{    
+  if (item != NULL) {      
       if (item->isSelected()) {
           recursiveChildrenSelection(item, true);
           recursiveFatherSelection(item, true);

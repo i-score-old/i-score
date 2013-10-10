@@ -292,6 +292,8 @@ class AbstractBox : public Abstract
     hasLastMsgs(){ return !_endMessages->messages().empty(); }
     void setStartMessage(QTreeWidgetItem *item, QString address);
     void setEndMessage(QTreeWidgetItem *item, QString address);
+    inline void clearMessages(){_networkTreeExpandedItems.clear();
+                                _networkTreeItems.clear();}
 
   protected:
     QPointF _topLeft;                    //!< The local coordinates of the upper left corner.

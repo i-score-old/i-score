@@ -680,6 +680,11 @@ class Maquette : public QObject
     int requestNetworkNamespace(const std::string &address, std::string &nodeType, std::vector<std::string>& nodes, std::vector<std::string>& leaves,
                                 std::vector<std::string>& attributes, std::vector<std::string>& attributesValue);
     /*!
+     * \brief Refresh the network's namespace.
+     */
+    void refreshNetworkNamespace(const std::string &application);
+
+    /*!
      * \brief Requests a snapshot of the network on a namespace.
      *
      * \param address : the address to take snapshot on
@@ -689,7 +694,7 @@ class Maquette : public QObject
      * \param attributes : the attributes to be filled
      * \param attributesValue : the respective values of the attributes to be filled
      */
-    int requestObjectAttribruteValue(const std::string &address, const std::string &attributeName, std::vector<std::string>& value);
+    int requestObjectAttribruteValue(const std::string &address, const std::string &attributeName, std::vector<std::string>& value);    
 
     void setRangeBoundMin(unsigned int boxID, const string &address, float value);
     void setRangeBoundMax(unsigned int boxID, const string &address, float value);
@@ -798,6 +803,11 @@ class Maquette : public QObject
      * \return True(1) or false(0) if the request failed or not.
      */
     int getObjectChildren(const std::string & address, std::vector<std::string>& children);
+
+    /*!
+     * \brief Updates all boxes' attributes
+     */
+    void updateBoxesAttributes();
 
   private:
     /*!

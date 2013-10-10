@@ -315,6 +315,11 @@ Maquette::requestNetworkNamespace(const string &address, string &nodeType, vecto
 }
 
 void
+Maquette::refreshNetworkNamespace(const std::string &application){
+    _engines->refreshNetworkNamespace(application);
+}
+
+void
 Maquette::changeNetworkDevice(const string &deviceName, const string &pluginName, const string &IP, const string &port)
 {
   if (_devices.find(deviceName) != _devices.end()) {
@@ -981,6 +986,11 @@ Maquette::getCurveAttributes(unsigned int boxID, const std::string &address, uns
     }
 
   return false;
+}
+
+void
+Maquette::updateBoxesAttributes(){
+    _scene->updateBoxesWidgets();
 }
 
 void
