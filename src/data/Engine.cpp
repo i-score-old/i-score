@@ -132,6 +132,11 @@ void Engine::initModular()
     
     TTModularRegisterObject(TTAddress("/Transport/Speed"), m_dataSpeed);
     
+    // Create a sender to send message to any application
+    m_sender = NULL;
+    args.clear();
+    TTObjectBaseInstantiate(kTTSym_Sender, &m_sender, args);
+    
     
     ////////////
     // Example : Create a distant application
@@ -305,6 +310,9 @@ Engine::~Engine()
     // Delete the main scenario
     m_mainScenario->sendMessage(TTSymbol("ReleaseEvents"));
     TTObjectBaseRelease(TTObjectBaseHandle(&m_mainScenario));
+    
+    // delete the sender
+    TTObjectBaseRelease(&m_sender);
 }
 
 TimeProcessId Engine::cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::string & name)
@@ -1333,9 +1341,13 @@ void Engine::setCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex cont
     // Flatten the state to increase the speed of the recall
     state->sendMessage(TTSymbol("Flatten"));
     
-    // Update all curves (for automation process only)
-    TTValue empty; // théo : this is to pass thru a Foundation bug which will disapear in a next version
-    timeProcess->sendMessage(TTSymbol("CurveUpdate"), empty, empty);
+    // Don't update curve for the root box because it is a Scenario and not an Automation
+    if (boxId != ROOT_BOX_ID) {
+    
+        // Update all curves (for automation process only)
+        TTValue empty; // théo : this is to pass thru a Foundation bug which will disapear in a next version
+        timeProcess->sendMessage(TTSymbol("CurveUpdate"), empty, empty);
+    }
 }
 
 void Engine::getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex controlPointIndex, std::vector<std::string>& messages)
@@ -1905,7 +1917,7 @@ bool Engine::play()
     // compile the main scenario
     m_mainScenario->sendMessage(TTSymbol("Compile"));
     
-    return !m_mainScenario->sendMessage(TTSymbol("Play"));
+    return !m_mainScenario->sendMessage(TTSymbol("Start"));
 }
 
 void Engine::pause(bool pauseValue)
@@ -1932,7 +1944,7 @@ bool Engine::isPaused()
 
 bool Engine::stop()
 {
-    return !m_mainScenario->sendMessage(TTSymbol("Stop"));
+    return !m_mainScenario->sendMessage(TTSymbol("End"));
 }
 
 bool Engine::isRunning()
@@ -2093,9 +2105,15 @@ void Engine::removeNetworkDevice(const std::string & deviceName)
 
 void Engine::sendNetworkMessage(const std::string & stringToSend)
 {
-#ifdef TODO_ENGINE
-	m_networkController->deviceSendSetRequest(stringToSend);
-#endif
+    TTValue out, data, v = TTString(stringToSend);
+    v.fromString();
+    
+    TTSymbol aSymbol = v[0];
+    TTAddress anAddress = toTTAddress(aSymbol.string().data());
+    data.copyFrom(v, 1);
+    
+    m_sender->setAttributeValue(kTTSym_address, anAddress);
+    m_sender->sendMessage(kTTSym_Send, data, out);
 }
 
 void Engine::getNetworkDevicesName(std::vector<std::string>& devicesName, std::vector<bool>& couldSendNamespaceRequest)
