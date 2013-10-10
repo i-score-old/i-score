@@ -1709,7 +1709,7 @@ MaquetteScene::load(const string &fileName)
 {
   _maquette->load(fileName);
   setModified(false);
-  updateBoxesWidgets();
+  updateBoxesWidgets();  
 }
 
 void
@@ -1719,7 +1719,7 @@ MaquetteScene::updateBoxesWidgets()
   std::map<unsigned int, BasicBox*> boxes = _maquette->getBoxes();
   for (it = boxes.begin(); it != boxes.end(); it++) {
       unsigned int boxID = it->first;
-      if (boxID != NO_ID && boxID != ROOT_BOX_ID) {
+      if (boxID != NO_ID) {
           setAttributes(static_cast<AbstractBox*>(getBox(boxID)->abstract()));
         }
     }
