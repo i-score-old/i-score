@@ -170,22 +170,24 @@ void
 NetworkTree::load()
 {
   vector<string> deviceNames;
-  vector<bool> deviceRequestable;
-  Maquette::getInstance()->getNetworkDeviceNames(deviceNames, deviceRequestable);
+  Maquette::getInstance()->getNetworkDeviceNames(deviceNames);
 
   vector<string>::iterator nameIt;
-  vector<bool>::iterator requestableIt;
 
   QList<QTreeWidgetItem*> itemsList;
   QTreeWidgetItem *OSCRootNode;
 
-  for (nameIt = deviceNames.begin(), requestableIt = deviceRequestable.begin(); nameIt != deviceNames.end(), requestableIt != deviceRequestable.end(); ++nameIt, ++requestableIt) {
+  for (nameIt = deviceNames.begin(); nameIt != deviceNames.end(); ++nameIt) {
+      
       QStringList deviceName;
 
       deviceName << QString::fromStdString(*nameIt);
 
       QTreeWidgetItem *curItem = NULL;
-      if (!(*requestableIt)) {
+      
+      bool isRequestable = Maquette::getInstance()->isNetworkDeviceRequestable(*nameIt);
+      
+      if (!isRequestable) {
           //OSCDevice
           curItem = new QTreeWidgetItem(deviceName, NodeNamespaceType);
           OSCRootNode = curItem;

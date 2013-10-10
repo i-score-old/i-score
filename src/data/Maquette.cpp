@@ -353,9 +353,15 @@ Maquette::removeNetworkDevice(string deviceName)
 }
 
 void
-Maquette::getNetworkDeviceNames(vector<string> &deviceName, vector<bool> &namespaceRequestable)
+Maquette::getNetworkDeviceNames(vector<string> &deviceName)
 {
-  _engines->getNetworkDevicesName(deviceName, namespaceRequestable);
+  _engines->getNetworkDevicesName(deviceName);
+}
+
+bool
+Maquette::isNetworkDeviceRequestable(string deviceName)
+{
+    return _engines->isNetworkDeviceRequestable(deviceName);
 }
 
 vector<string> Maquette::requestNetworkSnapShot(const string &address)
@@ -1367,9 +1373,11 @@ void
 Maquette::stopPlayingWithGoto()
 {
   unsigned int gotoValue = _scene->getCurrentTime();
+    
   for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
       it->second->unlock();
     }
+    
   _engines->stop();
 
   BoxesMap::iterator it;

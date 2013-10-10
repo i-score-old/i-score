@@ -1923,9 +1923,9 @@ bool Engine::play()
 void Engine::pause(bool pauseValue)
 {
     if (pauseValue)
-        m_mainScenario->sendMessage(TTSymbol("Pause"));
+        m_mainScenario->sendMessage(kTTSym_Pause);
     else
-        m_mainScenario->sendMessage(TTSymbol("Resume"));
+        m_mainScenario->sendMessage(kTTSym_Resume);
 }
 
 bool Engine::isPaused()
@@ -1944,7 +1944,7 @@ bool Engine::isPaused()
 
 bool Engine::stop()
 {
-    return !m_mainScenario->sendMessage(TTSymbol("End"));
+    return !m_mainScenario->sendMessage(kTTSym_Stop);
 }
 
 bool Engine::isRunning()
@@ -2116,10 +2116,10 @@ void Engine::sendNetworkMessage(const std::string & stringToSend)
     m_sender->sendMessage(kTTSym_Send, data, out);
 }
 
-void Engine::getNetworkDevicesName(std::vector<std::string>& devicesName, std::vector<bool>& couldSendNamespaceRequest)
+void Engine::getNetworkDevicesName(std::vector<std::string>& devicesName)
 {
-    TTValue applicationNames, protocolNames;
-    TTSymbol name;
+    TTValue     applicationNames;
+    TTSymbol    name;
     
     // get all application name
     TTModularApplications->getAttributeValue(TTSymbol("applicationNames"), applicationNames);
@@ -2133,18 +2133,27 @@ void Engine::getNetworkDevicesName(std::vector<std::string>& devicesName, std::v
             continue;
         
         devicesName.push_back(name.c_str());
-        
-        // get all protocol names used by this application
-        protocolNames = getApplicationProtocols(name);
-        
-        // if there is at least one protocol,
-        if (protocolNames.size()) {
-            
-            // look if it provides namespace exploration
-            name = protocolNames[0];
-            couldSendNamespaceRequest.push_back(getProtocol(name)->mDiscover);
-        }
     }
+}
+
+bool Engine::isNetworkDeviceRequestable(const std::string deviceName)
+{
+    
+    TTSymbol    name = TTSymbol(deviceName);
+    TTBoolean   discover = NO;
+    
+    // get all protocol names used by this application
+    TTValue protocolNames = getApplicationProtocols(name);
+    
+    // if there is at least one protocol,
+    if (protocolNames.size()) {
+        
+        // look if it provides namespace exploration
+        name = protocolNames[0];
+        discover = getProtocol(name)->mDiscover;
+    }
+    
+    return discover;
 }
 
 std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & address)
