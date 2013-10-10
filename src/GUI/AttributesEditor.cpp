@@ -360,10 +360,6 @@ AttributesEditor::changeColor()
 void
 AttributesEditor::startMessagesChanged(bool forceUpdate)
 {    
-  if (_scene->paused()) {
-      _scene->stopWithGoto();
-    }
-
   BasicBox * box = _scene->getBox(_boxEdited);
   if (_boxEdited != NO_ID) {
       QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
