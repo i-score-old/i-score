@@ -304,7 +304,7 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
                   itemsMatchedList << newPair;
                 }
               else { //No item in tree
-                  ;
+                  std::cout << "NetworkTree::getItemsFromMsg : " << curName.toStdString() << " not found" << std::endl;
                 }
             }
         }
