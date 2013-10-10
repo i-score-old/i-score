@@ -3,6 +3,6 @@
  <g>
   <title>Layer 1</title>
   <circle fill-opacity="0.01" stroke="#000000" fill="#ffffff" stroke-width="30" cx="238.500063" cy="240.499998" r="234.359482" id="svg_7"/>
-  <path stroke="#000000" transform="rotate(-180 207.5 239.5)" id="svg_1" d="m101,104l0,271l213,-124.016968l-213,-146.983032z" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="5" fill="#000000"/>
+  <path stroke="#000000" id="svg_1" d="m151,104l0,271l213,-124.016968l-213,-146.983032z" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="5" fill="#000000"/>
  </g>
 </svg>
