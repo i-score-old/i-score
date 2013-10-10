@@ -989,6 +989,11 @@ Maquette::getCurveAttributes(unsigned int boxID, const std::string &address, uns
 }
 
 void
+Maquette::updateBoxesAttributes(){
+    _scene->updateBoxesWidgets();
+}
+
+void
 Maquette::updateBoxesFromEngines(const vector<unsigned int> &movedBoxes)
 {
   vector<unsigned int>::const_iterator it;

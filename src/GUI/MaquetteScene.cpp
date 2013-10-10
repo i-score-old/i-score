@@ -1719,6 +1719,7 @@ MaquetteScene::updateBoxesWidgets()
   std::map<unsigned int, BasicBox*> boxes = _maquette->getBoxes();
   for (it = boxes.begin(); it != boxes.end(); it++) {
       unsigned int boxID = it->first;
+      static_cast<AbstractBox*>(getBox(boxID)->abstract())->clearMessages();
       if (boxID != NO_ID) {
           setAttributes(static_cast<AbstractBox*>(getBox(boxID)->abstract()));
         }

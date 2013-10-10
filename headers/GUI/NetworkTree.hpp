@@ -180,6 +180,7 @@ class NetworkTree : public QTreeWidget
      * \return True if start and end messages are set.
      */
     bool hasStartEndMsg(QTreeWidgetItem *item);
+
     
     /***********************************************************************
     *                       General display tools
@@ -377,6 +378,7 @@ class NetworkTree : public QTreeWidget
     virtual void keyPressEvent(QKeyEvent *event);
     virtual void keyReleaseEvent(QKeyEvent *event);
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
 
     static int NAME_COLUMN;
     static int VALUE_COLUMN;
@@ -419,7 +421,7 @@ class NetworkTree : public QTreeWidget
     void rangeBoundMaxChanged(QTreeWidgetItem *item, float newValue);
 
   private:
-    void treeRecursiveExploration(QTreeWidgetItem *curItem, bool onflict);
+    void treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict);
     void createOCSBranch(QTreeWidgetItem *curItem);
 
 
@@ -506,9 +508,14 @@ class NetworkTree : public QTreeWidget
     int _OSCMessageCount;
     bool _treeFilterActive;
 
-    DeviceEdit *_deviceEdit;
+    DeviceEdit *_deviceEdit;  
 
   public slots:
+    /*!
+      * \brief Rebuild the networkTree under the current item, after asking the engine to refresh its namespace.
+      * \param The application we want to refresh.
+      */
+    void refreshCurrentItemNamespace();
     void itemCollapsed();
     void clickInNetworkTree(QTreeWidgetItem *item, int column);
     void valueChanged(QTreeWidgetItem* item, int column);

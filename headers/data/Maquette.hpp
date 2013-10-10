@@ -804,6 +804,11 @@ class Maquette : public QObject
      */
     int getObjectChildren(const std::string & address, std::vector<std::string>& children);
 
+    /*!
+     * \brief Updates all boxes' attributes
+     */
+    void updateBoxesAttributes();
+
   private:
     /*!
      * \brief Generates the triggerQueueList.

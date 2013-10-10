@@ -222,7 +222,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
       _networkTree->resetNetworkTree();
       if (_boxEdited != NO_ID) {
           if (abBox->networkTreeItems().isEmpty() && abBox->networkTreeExpandedItems().isEmpty()) {
-              //LOAD FILE
+              //LOAD FILE	
               _networkTree->loadNetworkTree(abBox);
               startMessagesChanged();
               endMessagesChanged();
