@@ -2271,6 +2271,11 @@ Engine::requestObjectChildren(const std::string & address, vector<string>& child
     return 0;
 }
 
+void Engine::refreshNetworkNamespace(const string &application, const string &address)
+{
+    getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryBuild"));
+}
+
 int Engine::requestNetworkNamespace(const std::string & address, std::string & nodeType, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)
 {
     TTAddress           anAddress = toTTAddress(address);

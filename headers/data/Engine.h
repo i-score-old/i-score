@@ -930,6 +930,14 @@ public:
      */
     int requestObjectChildren(const std::string & address, std::vector<std::string>& children);
 
+    /*!
+     * Refresh the namespace, rebuilding the mirror
+     *
+     * \param application : the application's address. ex : /MinuitDevice1
+     * \param address : the object's address
+     */
+    void refreshNetworkNamespace(const std::string& application, const std::string& address = "/");
+
 	//Store and load ////////////////////////////////////////////////////////////////////////////////////
     
 	/*!
