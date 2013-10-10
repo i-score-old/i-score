@@ -280,21 +280,21 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
         break;
       }
 
-      case Qt::ControlModifier:
-      {
-        map<float, pair<float, float> >::iterator it;
-        bool found;
-        QPointF relativePoint = relativeCoordinates(event->pos());
-        for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
-            if (fabs(it->first - relativePoint.x()) < 0.01) {
-                found = true;
-                _movingBreakpointX = it->first;
-                _movingBreakpointY = -1;
-                break;
-              }
-          }
-        break;
-      }
+//      case Qt::ControlModifier:
+//      {
+//        map<float, pair<float, float> >::iterator it;
+//        bool found;
+//        QPointF relativePoint = relativeCoordinates(event->pos());
+//        for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
+//            if (fabs(it->first - relativePoint.x()) < 0.01) {
+//                found = true;
+//                _movingBreakpointX = it->first;
+//                _movingBreakpointY = -1;
+//                break;
+//              }
+//          }
+//        break;
+//      }
 
       case Qt::NoModifier:
       {
@@ -388,38 +388,44 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 
       case Qt::ControlModifier: // VERTICAL SLIDE
       {
-          if (_movingBreakpointX != -1) {
 
-              if(relativePoint.y() > _maxY && _maxRangeBoundLocked){
-                  Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (high range clipMode)").toStdString(), INDICATION_LEVEL);
-                  break;
-              }
-              if(relativePoint.y() < _minY && _minRangeBoundLocked){
-                  Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (low range clipMode)").toStdString(), INDICATION_LEVEL);
-                  break;
-              }
+          _abstract->_breakpoints[relativePoint.x()] = std::make_pair<float, float>(relativePoint.y(), 1.);
+          curveChanged();
 
-              map<float, pair<float, float> >::iterator it;
-              if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
-                  it->second = std::make_pair(relativePoint.y(), it->second.second);
-              }
-              else {
-                  _abstract->_breakpoints[_movingBreakpointX] = std::make_pair<float, float>(relativePoint.y(), 1.);
-              }
-
-              if(relativePoint.y() > _maxY){
-                  _maxY = relativePoint.y();
-                  _maxYModified = true;
-              }
-              if(relativePoint.y() < _minY){
-                  _minY = relativePoint.y();
-                  _minYModified = true;
-              }
-
-              _movingBreakpointY = -1;
-              curveChanged();
-          }
           break;
+
+//          if (_movingBreakpointX != -1) {
+
+//              if(relativePoint.y() > _maxY && _maxRangeBoundLocked){
+//                  Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (high range clipMode)").toStdString(), INDICATION_LEVEL);
+//                  break;
+//              }
+//              if(relativePoint.y() < _minY && _minRangeBoundLocked){
+//                  Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (low range clipMode)").toStdString(), INDICATION_LEVEL);
+//                  break;
+//              }
+
+//              map<float, pair<float, float> >::iterator it;
+//              if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
+//                  it->second = std::make_pair(relativePoint.y(), it->second.second);
+//              }
+//              else {
+//                  _abstract->_breakpoints[_movingBreakpointX] = std::make_pair<float, float>(relativePoint.y(), 1.);
+//              }
+
+//              if(relativePoint.y() > _maxY){
+//                  _maxY = relativePoint.y();
+//                  _maxYModified = true;
+//              }
+//              if(relativePoint.y() < _minY){
+//                  _minY = relativePoint.y();
+//                  _minYModified = true;
+//              }
+
+//              _movingBreakpointY = -1;
+//              curveChanged();
+//          }
+//          break;
       }
 
       case Qt::NoModifier: //move
