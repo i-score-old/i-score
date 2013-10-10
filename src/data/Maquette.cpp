@@ -1282,7 +1282,7 @@ Maquette::pause()
 void
 Maquette::startPlaying()
 {
-  _engines->pause(false);
+  //_engines->stop();
   double gotoValue = (double)_engines->getGotoValue();
   initSceneState();
   generateTriggerQueue();
