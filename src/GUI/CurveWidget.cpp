@@ -107,6 +107,7 @@ CurveWidget::init()
   _movingBreakpointY = -1;
 
   _lastPointSelected = false;
+  _lastPowSave = 1.;
   setLayout(_layout);
   _xAxisPos = height() / 2.;
 
@@ -309,6 +310,7 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
 
                 _movingBreakpointX = it->first;
                 _movingBreakpointY = it->second.first;
+                _lastPowSave = it->second.second;
 //                _abstract->_breakpoints.erase(it);
                 curveChanged();
                 update();
@@ -519,10 +521,11 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event)
               }
 
           map<float, pair<float, float> >::iterator it;
+
           if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
               _abstract->_breakpoints.erase(it);
           }
-          _abstract->_breakpoints[static_cast<qreal>(relativePoint.x())] = std::make_pair<float, float>(static_cast<qreal>(_movingBreakpointY), 1.);
+          _abstract->_breakpoints[static_cast<qreal>(relativePoint.x())] = std::make_pair<float, float>(static_cast<qreal>(_movingBreakpointY), static_cast<qreal>(_lastPowSave));
           curveChanged();
           update();
 

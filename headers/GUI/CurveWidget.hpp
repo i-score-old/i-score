@@ -206,5 +206,6 @@ class CurveWidget : public QWidget
     bool _minRangeBoundLocked;
 
     bool _lastPointSelected;     //!< Last point selected.
+    float _lastPowSave;
 };
 #endif /* CURVE_WIDGET_HPP */
