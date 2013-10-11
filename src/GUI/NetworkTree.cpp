@@ -770,6 +770,21 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                         return;
                     }
                 }
+                if(nodeType == "PresetManager"){
+                    curItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
+
+                    QFont curFont = curItem->font(NAME_COLUMN);
+                    curFont.setItalic(true);
+                    curItem->setFont(NAME_COLUMN,curFont);
+
+                    QBrush brush(Qt::lightGray);
+                    curItem->setForeground(NAME_COLUMN, brush);
+                    curItem->setForeground(VALUE_COLUMN, brush);
+
+                    curItem->setText(TYPE_COLUMN,QString("->"));
+                    curItem->setToolTip(TYPE_COLUMN, tr("Type PresetManager"));
+                    return;
+                }
             }
 
             if(Maquette::getInstance()->requestObjectAttribruteValue(address,"service",attributesValues) > 0){
@@ -1646,14 +1661,13 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
 {
     QTreeWidget::mousePressEvent(event);
     if(event->button()==Qt::RightButton){
-        if(currentItem()->type() == NodeNamespaceType){
-            std::cout<<"right click on "<<currentItem()->text(0).toStdString()<<std::endl;
+        if(currentItem()->type() == NodeNamespaceType){            
 
             QMenu *contextMenu = new QMenu(this);
             QAction *refreshAct = new QAction(tr("Refresh"),this);
             contextMenu->addAction(refreshAct);
             connect(refreshAct, SIGNAL(triggered()), this, SLOT(refreshCurrentItemNamespace()));
-            contextMenu->exec(event->pos());
+            contextMenu->exec(event->globalPos());
 
             delete refreshAct;
             delete contextMenu;
