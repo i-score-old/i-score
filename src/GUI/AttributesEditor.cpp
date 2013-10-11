@@ -392,13 +392,15 @@ AttributesEditor::endMessagesChanged(bool forceUpdate)
       _scene->stopWithGoto();
     }
   if (_boxEdited != NO_ID) {
+
       BasicBox * box = _scene->getBox(_boxEdited);
 
       QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
       Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
       Maquette::getInstance()->setEndMessagesToSend(_boxEdited, _networkTree->endMessages());
-
-      if(_boxEdited != ROOT_BOX_ID){
+      if(_boxEdited == ROOT_BOX_ID)
+          _scene->view()->resetCachedContent();
+      else{
           _networkTree->updateEndMsgsDisplay();
           _networkTree->updateCurves(_boxEdited, forceUpdate);
           box->updateCurves();
@@ -417,17 +419,23 @@ AttributesEditor::startMessageChanged(QTreeWidgetItem *item)
     }
 
   if (_boxEdited != NO_ID) {
+
       //PAS OPTIMAL, NE DEVRAIT MODIFIER QU'UN SEUL ITEM
       QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
       Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
       Maquette::getInstance()->setStartMessagesToSend(_boxEdited, _networkTree->startMessages());
 
-      _networkTree->updateCurve(item, _boxEdited, true);
-      _networkTree->updateStartMsgsDisplay();
+      if(_boxEdited == ROOT_BOX_ID)
+          _scene->view()->resetCachedContent();
+      else{
+          _networkTree->updateCurve(item, _boxEdited, true);
+          _networkTree->updateStartMsgsDisplay();
 
-      BasicBox * box = _scene->getBox(_boxEdited);
-      box->updateCurve(_networkTree->getAbsoluteAddress(item).toStdString(), true);
-    }
+          BasicBox * box = _scene->getBox(_boxEdited);
+          box->updateCurve(_networkTree->getAbsoluteAddress(item).toStdString(), true);
+      }
+  }
+
   else {
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
       item->setText(NetworkTree::START_COLUMN, "");
@@ -466,10 +474,14 @@ AttributesEditor::startMessageRemoved(const string &address)
     }
 
   if (_boxEdited != NO_ID) {
-      QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
-      Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
-      Maquette::getInstance()->setStartMessagesToSend(_boxEdited, _networkTree->startMessages());
-      Maquette::getInstance()->removeCurve(_boxEdited, address);
+      if(_boxEdited == ROOT_BOX_ID)
+          _scene->view()->resetCachedContent();
+      else{
+          QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
+          Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
+          Maquette::getInstance()->setStartMessagesToSend(_boxEdited, _networkTree->startMessages());
+          Maquette::getInstance()->removeCurve(_boxEdited, address);
+      }
     }
   else {
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
