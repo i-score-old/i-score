@@ -857,13 +857,13 @@ public:
 	void sendNetworkMessage(const std::string & stringToSend);
     
 	/*!
-	 * Fills the given vectors with all network devices name, and matching information about if they could send namespace request.
+	 * Fills the given vectors with all network devices name.
 	 *
 	 * \param devicesName : will be filled with all network devices names.
-	 * \param couldSendNamespaceRequest : will be filled with information about if the matching device could
-	 * send namespace request.
 	 */
-	void getNetworkDevicesName(std::vector<std::string>& devicesName, std::vector<bool>& couldSendNamespaceRequest);
+	void getNetworkDevicesName(std::vector<std::string>& devicesName);
+    
+    bool isNetworkDeviceRequestable(const std::string deviceName);
     
 	/*!
 	 * Sends a network snapshot request.

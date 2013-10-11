@@ -244,10 +244,11 @@ class Maquette : public QObject
      * \brief Gets the set of devices and their respective requestability.
      *
      * \param deviceName : the devices to be filled
-     * \param pluginName : the respective requestabilities
      */
-    void getNetworkDeviceNames(std::vector<std::string>& deviceName, std::vector<bool>& namespaceRequestable);
+    void getNetworkDeviceNames(std::vector<std::string>& deviceName);
 
+    bool isNetworkDeviceRequestable(string deviceName);
+    
     /*!
      * \brief Requests a snapshot to the Engines.
      *
