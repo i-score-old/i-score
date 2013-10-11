@@ -770,6 +770,21 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                         return;
                     }
                 }
+                if(nodeType == "PresetManager"){
+                    curItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
+
+                    QFont curFont = curItem->font(NAME_COLUMN);
+                    curFont.setItalic(true);
+                    curItem->setFont(NAME_COLUMN,curFont);
+
+                    QBrush brush(Qt::lightGray);
+                    curItem->setForeground(NAME_COLUMN, brush);
+                    curItem->setForeground(VALUE_COLUMN, brush);
+
+                    curItem->setText(TYPE_COLUMN,QString("->"));
+                    curItem->setToolTip(TYPE_COLUMN, tr("Type PresetManager"));
+                    return;
+                }
             }
 
             if(Maquette::getInstance()->requestObjectAttribruteValue(address,"service",attributesValues) > 0){
