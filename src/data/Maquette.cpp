@@ -1274,7 +1274,7 @@ Maquette::initSceneState()
 
       //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
       //    Start messages
-      if (currentBox->date() < gotoValue) {
+      if (currentBox->date() <= gotoValue) {
           _engines->setCtrlPointMutingState(boxID, 1, true);
         }
 
