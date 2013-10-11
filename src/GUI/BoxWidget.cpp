@@ -111,16 +111,16 @@ BoxWidget::~BoxWidget()
 void
 BoxWidget::mousePressEvent(QMouseEvent *event)
 {
-  Q_UNUSED(event);
-
-  if (_box->maquetteScene()->paused()) {
-      _box->maquetteScene()->stopWithGoto();
-    }
-
-  if (_box->isSelected()) {
-      hide();
-      setWindowModality(Qt::WindowModal);
-      show();
+    Q_UNUSED(event);
+    
+    if (_box->maquetteScene()->paused())
+        _box->maquetteScene()->stopAndGoToCurrentTime();
+    
+    
+    if (_box->isSelected()) {
+        hide();
+        setWindowModality(Qt::WindowModal);
+        show();
     }
 }
 
@@ -484,8 +484,8 @@ BoxWidget::jumpToStartCue()
     }
   _box->setSelected(true);
   _box->update();
-  unsigned int gotoValue = _box->date();
-  _box->maquetteScene()->gotoChanged(gotoValue);
+  unsigned int timeOffset = _box->date();
+  _box->maquetteScene()->changeTimeOffset(timeOffset);
   Maquette::getInstance()->initSceneState();   //reload scene (reset the remote application state)
 }
 
@@ -497,8 +497,8 @@ BoxWidget::jumpToEndCue()
     }
   _box->setSelected(true);
   _box->update();
-  unsigned int gotoValue = _box->date() + _box->duration();
-  _box->maquetteScene()->gotoChanged(gotoValue);
+  unsigned int timeOffset = _box->date() + _box->duration();
+  _box->maquetteScene()->changeTimeOffset(timeOffset);
   Maquette::getInstance()->initSceneState();   //reload scene (reset the remote application state)
 }
 

@@ -761,38 +761,62 @@ public:
     
 	//Execution ///////////////////////////////////////////////////////////////////////
     
-	void setGotoValue(TimeValue gotoValue);
-	TimeValue getGotoValue();
+    /*!
+	 * Sets scenario time offset to start from this date on the next play
+     *
+     * \param timeOffset: new timeOffset value
+	 *
+	 */
+	void setTimeOffset(TimeValue timeOffset);
+    
+    /*!
+	 * Gets the time offset where the scenario will start from on the next play
+     *
+     * \return time offset value
+	 *
+	 */
+	TimeValue getTimeOffset();
     
 	/*!
-	 * Plays the scenario (compiles and runs it).
+	 * Plays the main scenario (compiles and runs it).
 	 *
-	 * \param gotoInformation : (optional) time to start the execution.
-	 *
-	 * \return true if the ECOMachine is now running.
+	 * \return true if the scenario execution starts fine.
 	 */
 	bool play();
     
-	/*!
-	 * Stops the ECOMachine.
+    /*!
+	 * Tests if the main scenario is actually running.
 	 *
-	 * \return true if the ECOMachine will actually stop.
+	 * \return true if the main scnerio is running. False if not.
+	 */
+	bool isPlaying();
+    bool saveLastPlayingStateForTest;   // théo : only for debug purpose
+    
+	/*!
+	 * Stops the main scenario.
+	 *
+	 * \return true if the main scenario will actually stop.
 	 */
 	bool stop();
     
+    /*!
+	 * Pause the main scenrio execution
+     *
+     * \param pause: new pause value
+	 *
+	 */
 	void pause(bool pauseValue);
+    bool saveLastPausedStateForTest;   // théo : only for debug purpose
     
+    /*!
+	 * Tests if the main scenario is actually paused.
+	 *
+	 * \return true if the main scnerio is paused. False if not.
+	 */
 	bool isPaused();
     
 	/*!
-	 * Tests if the ECOMachine is actually running.
-	 *
-	 * \return true if the ECOMachine is running. False if not.
-	 */
-	bool isRunning();
-    
-	/*!
-	 * Gets the ECOMachine current execution time in milliseconds.
+	 * Gets the main scenario current execution time in milliseconds.
 	 *
 	 * \return the execution time in milliseconds.
 	 */
@@ -805,6 +829,11 @@ public:
 	 */
 	void setExecutionSpeedFactor(float factor);
     
+    /*!
+	 * Gets the execution speed.
+	 *
+	 * \return the speed factor.
+	 */
 	float getExecutionSpeedFactor();
     
 	/*!

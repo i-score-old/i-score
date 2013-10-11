@@ -1886,7 +1886,7 @@ QPointF Engine::getViewPosition()
 }
 
 //Execution ///////////////////////////////////////////////////////////
-void Engine::setGotoValue(TimeValue gotoValue)
+void Engine::setTimeOffset(TimeValue timeOffset)
 {
     TTValue         v;
     TTObjectBasePtr scheduler;
@@ -1895,10 +1895,12 @@ void Engine::setGotoValue(TimeValue gotoValue)
     
     scheduler = v[0];
     
-    scheduler->setAttributeValue(kTTSym_offset, TTFloat64(gotoValue));
+    scheduler->setAttributeValue(kTTSym_offset, TTFloat64(timeOffset));
+    
+    TTLogMessage("Engine::setTimeOffset = %ld\n", timeOffset);
 }
 
-TimeValue Engine::getGotoValue()
+TimeValue Engine::getTimeOffset()
 {
     TTValue         v;
     TTObjectBasePtr scheduler;
@@ -1909,23 +1911,58 @@ TimeValue Engine::getGotoValue()
     
     scheduler->getAttributeValue(kTTSym_offset, v);
     
+    TTLogMessage("Engine::getTimeOffset = %ld\n", TimeValue(TTFloat64(v[0])));
+    
     return TimeValue(TTFloat64(v[0]));
 }
 
 bool Engine::play()
 {
+    TTLogMessage("***************************************\n");
+    TTLogMessage("Engine::play\n");
+    
     // compile the main scenario
     m_mainScenario->sendMessage(TTSymbol("Compile"));
     
+    // make the start event to happen
     return !m_mainScenario->sendMessage(TTSymbol("Start"));
+}
+
+
+bool Engine::isPlaying()
+{
+    TTValue         v;
+    TTObjectBasePtr aScheduler;
+    
+    // get the scheduler object of the main scenario
+    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
+    aScheduler = TTObjectBasePtr(v[0]);
+    
+    aScheduler->getAttributeValue(TTSymbol("running"), v);
+    
+    if (TTBoolean(v[0]) != saveLastPlayingStateForTest) {
+    
+        if (TTBoolean(v[0]))
+            TTLogMessage("Engine::isPlaying returns true\n");
+        else
+            TTLogMessage("Engine::isPlaying returns false\n");
+    }
+    
+    saveLastPlayingStateForTest = TTBoolean(v[0]);
+    
+    return TTBoolean(v[0]);
 }
 
 void Engine::pause(bool pauseValue)
 {
-    if (pauseValue)
+    if (pauseValue) {
+        TTLogMessage("---------------------------------------\n");
         m_mainScenario->sendMessage(kTTSym_Pause);
-    else
+    }
+    else {
+        TTLogMessage("+++++++++++++++++++++++++++++++++++++++\n");
         m_mainScenario->sendMessage(kTTSym_Resume);
+    }
 }
 
 bool Engine::isPaused()
@@ -1939,26 +1976,44 @@ bool Engine::isPaused()
     
     aScheduler->getAttributeValue(TTSymbol("paused"), v);
     
+    if (TTBoolean(v[0]) != saveLastPausedStateForTest) {
+        
+        if (TTBoolean(v[0]))
+            TTLogMessage("Engine::isPaused returns true\n");
+        else
+            TTLogMessage("Engine::isPaused returns false\n");
+    }
+    
+    saveLastPausedStateForTest = TTBoolean(v[0]);
+    
     return TTBoolean(v[0]);
 }
 
 bool Engine::stop()
 {
-    return !m_mainScenario->sendMessage(kTTSym_Stop);
-}
-
-bool Engine::isRunning()
-{
-    TTValue         v;
-    TTObjectBasePtr aScheduler;
+    TTValue         objects;
+    TTObjectBasePtr timeProcess;
     
-    // get the scheduler object of the main scenario
-    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
-    aScheduler = TTObjectBasePtr(v[0]);
+    TTLogMessage("Engine::stop\n");
     
-    aScheduler->getAttributeValue(TTSymbol("running"), v);
+    // stop the main scenario execution
+    // but the end event don't happen
+    TTBoolean success = !m_mainScenario->sendMessage(kTTSym_Stop);
     
-    return TTBoolean(v[0]);
+    // get all TTTimeProcesses
+    m_mainScenario->getAttributeValue(TTSymbol("timeProcesses"), objects);
+    
+    // Stop all time process
+    for (TTUInt32 i = 0; i < objects.size(); i++) {
+        
+        timeProcess = objects[i];
+        
+        timeProcess->sendMessage(kTTSym_Stop);
+    }
+    
+    TTLogMessage("***************************************\n");
+    
+    return success;
 }
 
 TimeValue Engine::getCurrentExecutionTime()
@@ -2558,7 +2613,8 @@ void Engine::printExecutionInLinuxConsole()
     
 	bool mustDisplay = true;
     
-	while(isRunning()){
+	while(isPlaying()){
+        
 		if ((getCurrentExecutionTime()/60)%2 == 0) {
 			if (mustDisplay) {
 				std::system("clear");
@@ -2639,8 +2695,8 @@ void TimeProcessStartCallback(TTPtr baton, const TTValue& value)
     iscoreEngineDebug 
         TTLogMessage("TimeProcess %ld starts at %ld ms\n", boxId, engine->getCurrentExecutionTime());
     
-    // don't pass main scenario running state
-    if (boxId > 1 && engine->m_TimeProcessSchedulerRunningAttributeCallback != NULL)
+    // don't update main scenario running state
+    if (boxId > ROOT_BOX_ID && engine->m_TimeProcessSchedulerRunningAttributeCallback != NULL)
         engine->m_TimeProcessSchedulerRunningAttributeCallback(boxId, YES);
 
 }
@@ -2659,8 +2715,8 @@ void TimeProcessEndCallback(TTPtr baton, const TTValue& value)
     iscoreEngineDebug
         TTLogMessage("TimeProcess %ld ends at %ld ms\n", boxId, engine->getCurrentExecutionTime());
     
-    // don't pass main scenario running state
-    if (boxId > 1 && engine->m_TimeProcessSchedulerRunningAttributeCallback != NULL)
+    // update all process running state too
+    if (engine->m_TimeProcessSchedulerRunningAttributeCallback != NULL)
         engine->m_TimeProcessSchedulerRunningAttributeCallback(boxId, NO);
     
 }
@@ -2687,13 +2743,13 @@ void TransportDataValueCallback(TTPtr baton, const TTValue& value)
     
     else if (transport == TTSymbol("Rewind")) {
         engine->stop();
-        engine->setGotoValue(0);
+        engine->setTimeOffset(0);
     }
     else if (transport == TTSymbol("StartPoint")) {
         
         if (value.size() == 1)
             if (value[0].type() == kTypeUInt32)
-                engine->setGotoValue(value[0]);
+                engine->setTimeOffset(value[0]);
         
     }
     else if (transport == TTSymbol("Speed")) {

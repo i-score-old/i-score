@@ -70,8 +70,7 @@ MaquetteView::MaquetteView(MainWindow *mw)
 
   setAlignment(Qt::AlignLeft | Qt::AlignTop);
   centerOn(0, 0);
-  _zoom = 1;
-  _gotoValue = 0;      
+  _zoom = 1;    
   _scenarioSelected = false;
   setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
   setCacheMode(QGraphicsView::CacheBackground);
@@ -108,9 +107,8 @@ MaquetteView::wheelEvent(QWheelEvent *event)
 }
 
 void
-MaquetteView::setGotoValue(int value)
+MaquetteView::updateTimeOffsetView()
 {
-  _gotoValue = value;
   _scene->updateProgressBar();
   updateSceneWithoutCenterOn();
 }
@@ -235,21 +233,20 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
       _scene->displayMessage(tr("Selection removed").toStdString(), INDICATION_LEVEL);
     }
   else if ((event->key() == Qt::Key_Space || event->key() == Qt::Key_Comma || event->key() == Qt::Key_Period) && !_scene->playing()) {
-      _scene->play();
+      _scene->playOrResume();
     }
   else if ((event->key() == Qt::Key_Comma || event->key() == Qt::Key_Period) && _scene->playing()) {
-      _scene->pause();
+      _scene->stopOrPause();
     }
   else if (event->key() == Qt::Key_Space && _scene->playing()) {
-//      _scene->stopWithGoto();
-      _scene->pause();
+      _scene->stopOrPause();
     }
   else if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
-      _scene->stopGotoStart();
+      _scene->stopAndGoToStart();
     }
   else if (event->key() == Qt::Key_0) {
       if (!_scene->playing()) {
-          _scene->play();
+          _scene->stopOrPause();
         }
       else {
           triggerShortcut(Qt::Key_0);

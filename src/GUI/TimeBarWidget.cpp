@@ -78,8 +78,8 @@ TimeBarWidget::~TimeBarWidget()
 void
 TimeBarWidget::mousePressEvent(QMouseEvent *event)
 {
-  int value = event->pos().x() * MaquetteScene::MS_PER_PIXEL;
-  emit gotoValueEntered(value);
+  unsigned int timeOffset = event->pos().x() * MaquetteScene::MS_PER_PIXEL;
+  emit timeOffsetEntered(timeOffset);
 }
 
 void

@@ -1195,31 +1195,41 @@ Maquette::getProgression(unsigned int boxID)
 }
 
 void
-Maquette::setGotoValue(int gotoValue)
+Maquette::setTimeOffset(unsigned int timeOffset)
 {
-  _scene->view()->setGotoValue(gotoValue);
-  _engines->setGotoValue(gotoValue);
+    _engines->setTimeOffset(timeOffset);
+    _scene->view()->updateTimeOffsetView();
+}
+
+unsigned int
+Maquette::getTimeOffset()
+{
+    return _engines->getTimeOffset();
 }
 
 void
 Maquette::generateTriggerQueue()
 {
-  _scene->triggersQueueList()->clear();
-  TrgPntMap::iterator it1;
-  TriggerPoint *curTrg;
-  for (it1 = _triggerPoints.begin(); it1 != _triggerPoints.end(); ++it1) {
-      curTrg = it1->second;
-      if(curTrg->date()>=_engines->getGotoValue())
-        _scene->addToTriggerQueue(it1->second);
+    // Clear the current trigger queue list
+    _scene->triggersQueueList()->clear();
+    
+    TrgPntMap::iterator it1;
+    TriggerPoint *curTrg;
+    
+    // add all triggers which are after the current time offset
+    for (it1 = _triggerPoints.begin(); it1 != _triggerPoints.end(); ++it1) {
+        curTrg = it1->second;
+        if(curTrg->date()>=_engines->getTimeOffset())
+            _scene->addToTriggerQueue(it1->second);
     }
 }
 
 void
 Maquette::initSceneState()
 {
-  //Pour palier au bug du moteur (qui envoie tous les messages début et fin de toutes les boîtes < Goto)
+  //Pour palier au bug du moteur (qui envoie tous les messages début et fin de toutes les boîtes < time offset)
 
-  double gotoValue = (double)_engines->getGotoValue();
+  double timeOffset = (double)_engines->getTimeOffset();
 
   unsigned int boxID;
   QMap<QString, QPair<QString, unsigned int> > msgs, boxMsgs;
@@ -1236,10 +1246,10 @@ Maquette::initSceneState()
       _engines->setCtrlPointMutingState(boxID, 1, false);
       _engines->setCtrlPointMutingState(boxID, 2, false);
 
-      if (currentBox->date() < gotoValue && (currentBox->date() + currentBox->duration()) <= gotoValue) {
+      if (currentBox->date() < timeOffset && (currentBox->date() + currentBox->duration()) <= timeOffset) {
           boxMsgs = currentBox->getFinalState();
         }
-      else if (gotoValue > currentBox->date() && gotoValue < (currentBox->date() + currentBox->duration())) {
+      else if (timeOffset > currentBox->date() && timeOffset < (currentBox->date() + currentBox->duration())) {
           //goto au milieu d'une boîte : On envoie la valeur du début de boîte
           boxMsgs = currentBox->getStartState();
           curvesList = _engines->getCurvesAddress(boxID);
@@ -1252,7 +1262,7 @@ Maquette::initSceneState()
                 }
             }
         }
-      else if (gotoValue == currentBox->date()) {
+      else if (timeOffset == currentBox->date()) {
           boxMsgs = currentBox->getStartState();
         }
       boxAddresses = boxMsgs.keys();
@@ -1260,26 +1270,26 @@ Maquette::initSceneState()
       //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
       for (QList<QString>::iterator it2 = boxAddresses.begin(); it2 != boxAddresses.end(); it2++) {
           if (msgs.contains(*it2)) {
-              if (msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second <= gotoValue) {
+              if (msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second <= timeOffset) {
                   msgs.insert(*it2, boxMsgs.value(*it2));
                 }
             }
 
           //sinon on ajoute dans la liste de messages
           else
-          if (boxMsgs.value(*it2).second <= gotoValue) {
+          if (boxMsgs.value(*it2).second <= timeOffset) {
               msgs.insert(*it2, boxMsgs.value(*it2));
             }
         }
 
       //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
       //    Start messages
-      if (currentBox->date() < gotoValue) {
+      if (currentBox->date() < timeOffset) {
           _engines->setCtrlPointMutingState(boxID, 1, true);
         }
 
       //    End messages
-      if (currentBox->date() + currentBox->duration() < gotoValue) {
+      if (currentBox->date() + currentBox->duration() < timeOffset) {
           _engines->setCtrlPointMutingState(boxID, 2, true);
         }
     }
@@ -1295,100 +1305,110 @@ Maquette::initSceneState()
 }
 
 void
-Maquette::pause()
-{
-  _engines->pause(true);
-}
-
-void
-Maquette::startPlaying()
-{
-  //_engines->stop();
-  double gotoValue = (double)_engines->getGotoValue();
-  initSceneState();
-  generateTriggerQueue();
-  int nbTrg = _scene->triggersQueueList()->size();
-
-  try{
-      for (int i = 0; i < nbTrg; i++) {
-          if (gotoValue >= _scene->triggersQueueList()->first()->date()) {
-              _scene->triggersQueueList()->removeFirst();
-            }
-          else {
-              break;
-            }
+Maquette::turnExecutionOn()
+{    
+    // Start execution from where is the time offset is
+    
+    initSceneState();
+    
+    generateTriggerQueue();
+    
+    // Remove the first trigger which are before or equal to the time offset
+    // théo : is this really usefull ?
+    unsigned int timeOffset = _engines->getTimeOffset();
+    int nbTrg = _scene->triggersQueueList()->size();
+    
+    try {
+        
+        for (int i = 0; i < nbTrg; i++) {
+            
+            if (timeOffset >= _scene->triggersQueueList()->first()->date()) 
+                _scene->triggersQueueList()->removeFirst();
+            
+            else
+                break;
         }
     }
-  catch (const std::exception & e) {
-      std::cerr << e.what();
-    }
-
-  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
-      it->second->lock();
-    }
-  _engines->play();
-}
-
-void
-Maquette::stopPlayingGotoStart()
-{
-  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
-      it->second->unlock();
-    }
-
-  _engines->stop();
-
-  BoxesMap::iterator it;
-  for (it = _boxes.begin(); it != _boxes.end(); it++) {
-      int type = it->second->type();
-      if (type == PARENT_BOX_TYPE) {
-          static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
-        }
-    }
-  _scene->triggersQueueList()->clear();
-
-  setGotoValue(0);
-}
-
-void
-Maquette::stopPlaying()
-{
-  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
-      it->second->unlock();
+    catch (const std::exception & e) {
+        std::cerr << e.what();
     }
     
-  _engines->stop();
+    // Lock all boxes
+    for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++)
+        it->second->lock();
+    
+    // Start engine execution
+    _engines->play();
+}
 
-  BoxesMap::iterator it;
-  for (it = _boxes.begin(); it != _boxes.end(); it++) {
-      int type = it->second->type();
-      if (type == PARENT_BOX_TYPE) {
-          static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
-        }
-    }
-  _scene->triggersQueueList()->clear();
+bool
+Maquette::isExecutionOn()
+{
+    return _engines->isPlaying();
 }
 
 void
-Maquette::stopPlayingWithGoto()
-{
-  unsigned int gotoValue = _scene->getCurrentTime();
+Maquette::turnExecutionOff()
+{    
+    // Stop engine execution
+    _engines->stop();
     
-  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
-      it->second->unlock();
-    }
+    // Unlock all boxes
+    for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++)
+        it->second->unlock();
     
-  _engines->stop();
+    // Set all boxes as if they crossed there end extremity
+    BoxesMap::iterator it;
+    for (it = _boxes.begin(); it != _boxes.end(); it++)
+        if (it->second->type() == PARENT_BOX_TYPE)
+            static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
+    
+    // Clear the trigger queue list
+    _scene->triggersQueueList()->clear();
+}
 
-  BoxesMap::iterator it;
-  for (it = _boxes.begin(); it != _boxes.end(); it++) {
-      int type = it->second->type();
-      if (type == PARENT_BOX_TYPE) {
-          static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
-        }
-    }
-  _scene->triggersQueueList()->clear();
-  setGotoValue(gotoValue);
+void
+Maquette::pauseExecution()
+{
+    _engines->pause(true);
+}
+
+void
+Maquette::resumeExecution()
+{
+    _engines->pause(false);
+}
+
+bool
+Maquette::isExecutionPaused()
+{
+    return _engines->isPaused();
+}
+
+void
+Maquette::stopPlayingAndGoToStart()
+{
+    turnExecutionOff();
+
+    setTimeOffset(0);
+}
+
+void
+Maquette::stopPlayingAndGoToTimeOffset(unsigned int timeOffset)
+{
+  turnExecutionOff();
+    
+  setTimeOffset(timeOffset);
+}
+
+void
+Maquette::stopPlayingAndGoToCurrentTime()
+{
+    unsigned int timeOffset = _engines->getCurrentExecutionTime();
+    
+    turnExecutionOff();
+    
+    setTimeOffset(timeOffset);
 }
 
 void
@@ -1846,10 +1866,10 @@ transportCallback(TTSymbol& transport, const TTValue& value)
     if (scene != NULL) {
         
         if (transport == TTSymbol("Play"))
-            scene->play();
+            scene->playOrResume();
         
         else if (transport == TTSymbol("Stop"))
-            scene->stopWithGoto();
+            scene->stopOrPause();
         
         else if (transport == TTSymbol("Pause"))
             ;
@@ -1861,7 +1881,7 @@ transportCallback(TTSymbol& transport, const TTValue& value)
             
             if (value.size() == 1)
                 if (value[0].type() == kTypeUInt32)
-                    scene->gotoChanged(value[0]);
+                    scene->changeTimeOffset(value[0]);
             
         }
         else if (transport == TTSymbol("Speed")) {

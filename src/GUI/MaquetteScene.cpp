@@ -84,8 +84,6 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 {
   _editor = editor;
   _clicked = false;
-  _playing = false;
-  _paused = false;
   _modified = false;
   _maxSceneWidth = 100000;
 
@@ -137,19 +135,19 @@ MaquetteScene::init()
 
   _mousePos = QPointF(0., 0.);
 
-  connect(_timeBar, SIGNAL(gotoValueEntered(double)), this, SLOT(gotoChanged(double)));
-  connect(this, SIGNAL(stopPlaying()), this, SLOT(stop()));
+  connect(_timeBar, SIGNAL(timeOffsetEntered(unsigned int)), this, SLOT(changeTimeOffset(unsigned int)));
+  connect(this, SIGNAL(stopPlaying()), this, SLOT(stopOrPause()));
 }
 
 void
 MaquetteScene::updateProgressBar()
 {
-  if (_playing) {      
+  if (_maquette->isExecutionOn()) {      
       _progressLine->setPos(_maquette->getCurrentTime() / MS_PER_PIXEL, sceneRect().topLeft().y());
       invalidate();
     }
   else {      
-      _progressLine->setPos(_view->gotoValue() / MS_PER_PIXEL, sceneRect().topLeft().y());
+      _progressLine->setPos(_maquette->getTimeOffset() / MS_PER_PIXEL, sceneRect().topLeft().y());
       invalidate();
     }
 }
@@ -166,13 +164,11 @@ MaquetteScene::zoomChanged(float value)
 }
 
 void
-MaquetteScene::gotoChanged(double value)
+MaquetteScene::changeTimeOffset(unsigned int timeOffset)
 {
-  if (_paused) {
-      stop();
-    }
-  Maquette::getInstance()->setGotoValue(value);
-  _view->repaint();
+    stopAndGoToTimeOffset(timeOffset);
+    
+    _view->repaint();
 }
 
 void
@@ -261,6 +257,12 @@ MaquetteScene::getProgression(unsigned int boxID)
   return _maquette->getProgression(boxID);
 }
 
+unsigned int
+MaquetteScene::getTimeOffset()
+{
+    return _maquette->getTimeOffset();
+}
+
 void
 MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[], const QStyleOptionGraphicsItem options[], QWidget *widget)
 {    
@@ -283,7 +285,7 @@ void
 MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
 {
   Q_UNUSED(rect);
-  if (!_playing) {
+  if (!_maquette->isExecutionOn()) {
 
       if (_currentInteractionMode == RELATION_MODE) {
           if (_clicked) {
@@ -482,7 +484,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
   _clicked = true;
  
   if (paused())
-    stopWithGoto();
+    stopAndGoToCurrentTime();
 
   if (_tempBox) {
       removeItem(_tempBox);
@@ -559,7 +561,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 void
 MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
 {
-  if (!_playing) {
+  if (!_maquette->isExecutionOn()) {
       QGraphicsScene::mouseMoveEvent(mouseEvent);
 
       switch (_currentInteractionMode) {
@@ -980,7 +982,7 @@ MaquetteScene::clear()
 {
   selectAll();
   removeSelectedItems();
-  gotoChanged(0);
+  changeTimeOffset(0);
   setModified(true);
 }
 
@@ -1508,15 +1510,15 @@ MaquetteScene::removeBox(unsigned int boxID)
 }
 
 bool
-MaquetteScene::playing() const
+MaquetteScene::playing()
 {
-  return _playing;
+  return _maquette->isExecutionOn() && !_maquette->isExecutionPaused();
 }
 
 bool
-MaquetteScene::paused() const
+MaquetteScene::paused()
 {
-  return _paused;
+  return _maquette->isExecutionPaused();
 }
 
 void
@@ -1561,61 +1563,71 @@ MaquetteScene::updatePlayingBoxes()
 }
 
 void
-MaquetteScene::play()
+MaquetteScene::playOrResume()
 {
-  displayMessage(tr("Playing ...").toStdString(), INDICATION_LEVEL);
-  if (_paused) {
-      _playing = true;
-      _maquette->setAccelerationFactor(_accelerationFactor);
-      _maquette->startPlaying();
-      _playThread->start();
-      _paused = false;
+    displayMessage(tr("Playing ...").toStdString(), INDICATION_LEVEL);
+    
+    _maquette->setAccelerationFactor(_accelerationFactor);
+    
+    if (_maquette->isExecutionPaused())
+        
+        _maquette->resumeExecution();
+    
+    else
+        _maquette->turnExecutionOn();
+        
+    _playThread->start();
+    _startingValue = _maquette->getTimeOffset();
+    
+    emit(playModeChanged());
+}
+
+void
+MaquetteScene::stopOrPause()
+{
+    if (!_maquette->isExecutionPaused())
+        
+        _maquette->pauseExecution();
+    
+    else {
+        
+        _maquette->turnExecutionOff();
+        _playingBoxes.clear();
+        
+        _playThread->quit();
     }
-  else {
-      _playing = true;
-      _maquette->startPlaying();
-      _playThread->start();
-      _startingValue = _view->gotoValue();
-    }  
-  emit(playModeChanged());
+    
+    update();
+    
+    emit(playModeChanged());
 }
 
 void
-MaquetteScene::pause()
+MaquetteScene::stopAndGoToTimeOffset(unsigned int timeOffset)
 {
-  displayMessage(tr("Paused").toStdString(), INDICATION_LEVEL);
-  _playing = false;
-  _paused = true;
-  _maquette->pause();
-  _playThread->quit();
-  _accelerationFactorSave = _maquette->accelerationFactor();
-  _maquette->setAccelerationFactor(0.);
-  update();
-  emit(playModeChanged());
-}
-
-
-void
-MaquetteScene::stop()
-{
-  _playing = false;
-  _maquette->stopPlaying();
-  _playThread->quit();
-  _playingBoxes.clear();
-  update();
-  emit(playModeChanged());
+    displayMessage(tr("Stopped").toStdString(), INDICATION_LEVEL);
+    
+    _maquette->stopPlayingAndGoToTimeOffset(timeOffset);
+    _playThread->quit();
+    _playingBoxes.clear();
+    
+    update();
+    
+    emit(playModeChanged());
 }
 
 void
-MaquetteScene::stopWithGoto()
+MaquetteScene::stopAndGoToCurrentTime()
 {
-  displayMessage(tr("Stopped").toStdString(), INDICATION_LEVEL);
-  _playing = false;
-  _maquette->stopPlayingWithGoto();
-  _playThread->quit();
-  _playingBoxes.clear();
-  update();
-  emit(playModeChanged());
+    displayMessage(tr("Stopped").toStdString(), INDICATION_LEVEL);
+    
+    _maquette->stopPlayingAndGoToCurrentTime();
+    _playThread->quit();
+    _playingBoxes.clear();
+    
+    update();
+    
+    emit(playModeChanged());
 }
 
 void
@@ -1633,18 +1645,19 @@ MaquetteScene::speedChanged(double value)
 }
 
 void
-MaquetteScene::stopGotoStart()
+MaquetteScene::stopAndGoToStart()
 {
-  displayMessage(tr("Stopped and go to start").toStdString(), INDICATION_LEVEL);
-  _playing = false;
-  _paused = false;
-  _maquette->setAccelerationFactor(1.);
-  emit(accelerationValueChanged(1.));
-  _maquette->stopPlayingGotoStart();
-  _playThread->quit();
-  _playingBoxes.clear();
-  update();
-  emit(playModeChanged());
+    displayMessage(tr("Stopped and go to start").toStdString(), INDICATION_LEVEL);
+    
+    _maquette->setAccelerationFactor(1.);
+    emit(accelerationValueChanged(1.));
+    _maquette->stopPlayingAndGoToStart();
+    _playThread->quit();
+    _playingBoxes.clear();
+    
+    update();
+    
+    emit(playModeChanged());
 }
 
 void
@@ -1683,9 +1696,11 @@ MaquetteScene::removeSelectedItems()
 void
 MaquetteScene::timeEndReached()
 {
-  _playing = false;
-  emit(playModeChanged());
-  update();
+    _maquette->stopPlayingAndGoToStart();
+    
+    update();
+    
+    emit(playModeChanged());
 }
 
 bool

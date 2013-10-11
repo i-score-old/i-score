@@ -455,6 +455,13 @@ class MaquetteScene : public QGraphicsScene
      * \return the box progress ratio.
      */
     float getProgression(unsigned int boxID);
+    
+    /*!
+     * \brief Gets the curent time offset.
+     *
+     * \return the current time offset.
+     */
+    unsigned int getTimeOffset();
 
     /*!
      * \brief Gets a set of temporal relations involving a particular entity.
@@ -510,14 +517,14 @@ class MaquetteScene : public QGraphicsScene
      *
      * \return the playing state
      */
-    bool playing() const;
+    bool playing();
 
     /*!
      * \brief Determines the paused state.
      *
      * \return the paused state
      */
-    bool paused() const;
+    bool paused();
 
     /*!
      * \brief Updates the boxes currently playing.
@@ -634,7 +641,7 @@ class MaquetteScene : public QGraphicsScene
 
   public slots:
     void verticalScroll(int value);
-    void gotoChanged(double value);
+    void changeTimeOffset(unsigned int timeOffset);
     void zoomChanged(float value);
     void speedChanged(double value);
 
@@ -666,24 +673,20 @@ class MaquetteScene : public QGraphicsScene
     void updateStartingTime(int value);
 
     /*!
-     * \brief Plays the whole composition.
+     * \brief Plays the whole composition or resume it depending of the context
      */
-    void play();
+    void playOrResume();
 
     /*!
      * \brief Stops playing the composition.
      */
-    void stop();
-    void stopGotoStart();
-    void stopWithGoto();
-
-    /*!
-     * \brief Pauses playing the composition.
-     */
-    void pause();
+    void stopOrPause();
+    void stopAndGoToStart();
+    void stopAndGoToTimeOffset(unsigned int timeOffset);
+    void stopAndGoToCurrentTime();
+    
     bool noBoxSelected();
-    inline void
-    resetSelection(){ clearSelection(); }
+    inline void resetSelection(){ clearSelection(); }
     void updateBoxesWidgets();
 
   private:
@@ -762,8 +765,6 @@ class MaquetteScene : public QGraphicsScene
 
     unsigned int _resizeBox;           //!< During a resizing operation, the concerned box
     bool _clicked;                     //!< Handles if a click just occured.
-    bool _playing;                     //!< Handles playing state.
-    bool _paused;                      //!< Handles paused state.
 
     unsigned int _startingValue;       //!< Starting time in ms.
 

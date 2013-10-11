@@ -709,23 +709,40 @@ class Maquette : public QObject
     static const unsigned int SIZE;
 
   public slots:
+    
     /*!
-     * \brief Sets the goto value in the engines in ms.
+     * \brief Sets the time offset value in ms where the engine will start from at the nex execution.
      */
-    void setGotoValue(int gotoValue);
+    void setTimeOffset(unsigned int timeOffset);
+    
+    unsigned int getTimeOffset();
 
     /*!
-     * \brief Launches the playing process.
+     * \brief Turn engine execution on depending on the context
      */
-    void startPlaying();
+    void turnExecutionOn();
+    
+    /*!
+     * \brief Is the engine running ?
+     *
+     * \return true if the engine is running
+     *
+     */
+    bool isExecutionOn();
 
     /*!
-     * \brief Stops the playing process.
+     * \brief Turn engine execution off depending on the context
      */
-    void stopPlaying();
-    void stopPlayingGotoStart();
-    void stopPlayingWithGoto();
-    void pause();
+    void turnExecutionOff();
+    void stopPlayingAndGoToStart();
+    void stopPlayingAndGoToTimeOffset(unsigned int timeOffset);
+    void stopPlayingAndGoToCurrentTime();
+    
+    
+    void pauseExecution();
+    void resumeExecution();
+    
+    bool isExecutionPaused();
 
     /*!
      * \brief Sets a new acceleration factor.
@@ -768,7 +785,7 @@ class Maquette : public QObject
     inline std::map<unsigned int, BasicBox*> getBoxes(){ return _boxes; }
 
     /*!
-     * \brief When a goto value is entered, the scenario before this value is simulated.
+     * \brief When a time offset is entered, the scenario before this value is simulated.
      * Messages (final state of each boxes) are sended to the engine.
      */
     void initSceneState();

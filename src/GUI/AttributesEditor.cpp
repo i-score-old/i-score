@@ -361,7 +361,7 @@ void
 AttributesEditor::startMessagesChanged(bool forceUpdate)
 {    
     if (_scene->paused()) {
-        _scene->stopWithGoto();
+        _scene->stopAndGoToCurrentTime();
       }
 
   BasicBox * box = _scene->getBox(_boxEdited);
@@ -389,7 +389,7 @@ void
 AttributesEditor::endMessagesChanged(bool forceUpdate)
 {
   if (_scene->paused()) {
-      _scene->stopWithGoto();
+      _scene->stopAndGoToCurrentTime();
     }
   if (_boxEdited != NO_ID) {
       BasicBox * box = _scene->getBox(_boxEdited);
@@ -413,7 +413,7 @@ void
 AttributesEditor::startMessageChanged(QTreeWidgetItem *item)
 {
   if (_scene->paused()) {
-      _scene->stopWithGoto();
+      _scene->stopAndGoToCurrentTime();
     }
 
   if (_boxEdited != NO_ID) {
@@ -438,7 +438,7 @@ void
 AttributesEditor::endMessageChanged(QTreeWidgetItem *item)
 {
   if (_scene->paused()) {
-      _scene->stopWithGoto();
+      _scene->stopAndGoToCurrentTime();
     }
 
   if (_boxEdited != NO_ID) {
@@ -462,7 +462,7 @@ void
 AttributesEditor::startMessageRemoved(const string &address)
 {
   if (_scene->paused()) {
-      _scene->stopWithGoto();
+      _scene->stopAndGoToCurrentTime();
     }
 
   if (_boxEdited != NO_ID) {
@@ -480,7 +480,7 @@ void
 AttributesEditor::endMessageRemoved(const string &address)
 {
   if (_scene->paused()) {
-      _scene->stopWithGoto();
+      _scene->stopAndGoToCurrentTime();
     }
   if (_boxEdited != NO_ID) {
       Maquette::getInstance()->setEndMessagesToSend(_boxEdited, _networkTree->endMessages());
@@ -495,7 +495,7 @@ void
 AttributesEditor::deployMessageChanged(QTreeWidgetItem *item, QString newName)
 {
   if (_scene->paused()) {
-      _scene->stopWithGoto();
+      _scene->stopAndGoToCurrentTime();
     }
   std::map<unsigned int, BasicBox *>::iterator it;
   std::map<unsigned int, BasicBox *> boxesMap = Maquette::getInstance()->getBoxes();
@@ -524,7 +524,7 @@ void
 AttributesEditor::deployDeviceChanged(QString oldName, QString newName)
 {
   if (_scene->paused()) {
-      _scene->stopWithGoto();
+      _scene->stopAndGoToCurrentTime();
     }
 
   std::map<unsigned int, BasicBox *>::iterator it;

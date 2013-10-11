@@ -38,7 +38,6 @@ class HeaderPanelWidget : public QWidget {
     void updatePlayMode();
     void play();
     void stop();
-    void pause();
     void rewind();
     void accelerationValueModified(int value);
     void accelerationValueEntered(double value);

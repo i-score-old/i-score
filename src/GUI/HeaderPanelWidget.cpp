@@ -152,30 +152,25 @@ HeaderPanelWidget::createLayout(){
 
 void
 HeaderPanelWidget::play(){
-    _scene->play();
+    
+    _scene->playOrResume();
+    
     updatePlayMode();
 }
 
 void
 HeaderPanelWidget::stop(){
-    if (_scene->playing()) {
-        _scene->pause();
-      }
-    else {
-        _scene->stopGotoStart();
-      }
+    
+    _scene->stopOrPause();
+    
     updatePlayMode();
 }
 
 void
 HeaderPanelWidget::rewind(){
-    _scene->stopGotoStart();
-    updatePlayMode();
-}
-
-void
-HeaderPanelWidget::pause(){
-    _scene->pause();
+    
+    _scene->stopAndGoToStart();
+    
     updatePlayMode();
 }
 
@@ -213,6 +208,7 @@ HeaderPanelWidget::accelerationValueEntered(double value){
 
 void
 HeaderPanelWidget::updatePlayMode(){
+    
     bool playing = _scene->playing();
 
     _stopAction->setVisible(playing);
