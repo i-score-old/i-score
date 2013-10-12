@@ -2375,7 +2375,7 @@ Engine::requestObjectChildren(const std::string & address, vector<string>& child
 
 void Engine::refreshNetworkNamespace(const string &application, const string &address)
 {
-    getApplicationDirectory(TTSymbol(application))->init();
+    getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryClear"));
     getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryBuild"));
 }
 
