@@ -1473,17 +1473,22 @@ void Engine::setCurveSampleRate(TimeProcessId boxId, const std::string & address
 {
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
     TTObjectBasePtr     curve;
-    TTValue             v;
+    TTValue             objects;
+    TTUInt32            i;
     TTErr               err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
+    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), objects);
     
     if (!err) {
         
-        curve = v[0];
-        
-        curve->setAttributeValue(TTSymbol("sampleRate"), nbSamplesBySec);
+        // set each indexed curve
+        for (i = 0; i < objects.size(); i++) {
+            
+            curve = objects[i];
+            
+            curve->setAttributeValue(TTSymbol("sampleRate"), nbSamplesBySec);
+        }
     }
 }
 
@@ -1491,15 +1496,15 @@ unsigned int Engine::getCurveSampleRate(TimeProcessId boxId, const std::string &
 {
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
     TTObjectBasePtr     curve;
-    TTValue             v;
+    TTValue             v, objects;
     TTErr               err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
+    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), objects);
     
     if (!err) {
         
-        curve = v[0];
+        curve = objects[0];
         
         curve->getAttributeValue(TTSymbol("sampleRate"), v);
         
@@ -1513,17 +1518,22 @@ void Engine::setCurveRedundancy(TimeProcessId boxId, const std::string & address
 {
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
     TTObjectBasePtr     curve;
-    TTValue             v;
+    TTValue             objects;
+    TTUInt32            i;
     TTErr               err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
+    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), objects);
     
     if (!err) {
         
-        curve = v[0];
-        
-        curve->setAttributeValue(TTSymbol("redundancy"), redundancy);
+        // set each indexed curve
+        for (i = 0; i < objects.size(); i++) {
+            
+            curve = objects[i];
+            
+            curve->setAttributeValue(TTSymbol("redundancy"), redundancy);
+        }
     }
 }
 
@@ -1531,15 +1541,16 @@ bool Engine::getCurveRedundancy(TimeProcessId boxId, const std::string & address
 {
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
     TTObjectBasePtr     curve;
-    TTValue             v;
+    TTValue             v, objects;
     TTErr               err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
+    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), objects);
     
     if (!err) {
         
-        curve = v[0];
+        // get first indexed curve only
+        curve = objects[0];
         
         curve->getAttributeValue(TTSymbol("redundancy"), v);
         
@@ -1553,17 +1564,22 @@ void Engine::setCurveMuteState(TimeProcessId boxId, const std::string & address,
 {
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
     TTObjectBasePtr     curve;
-    TTValue             v;
+    TTValue             objects;
+    TTUInt32            i;
     TTErr               err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
+    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), objects);
     
     if (!err) {
         
-        curve = v[0];
+        // set each indexed curve
+        for (i = 0; i < objects.size(); i++) {
         
-        curve->setAttributeValue(TTSymbol("active"), !muteState);
+            curve = objects[i];
+        
+            curve->setAttributeValue(TTSymbol("active"), !muteState);
+        }
     }
 }
 
@@ -1571,15 +1587,16 @@ bool Engine::getCurveMuteState(TimeProcessId boxId, const std::string & address)
 {
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
     TTObjectBasePtr     curve;
-    TTValue             v;
+    TTValue             v, objects;
     TTErr               err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
+    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), objects);
     
     if (!err) {
         
-        curve = v[0];
+        // get first indexed curve only
+        curve = objects[0];
         
         curve->getAttributeValue(TTSymbol("active"), v);
         
@@ -1593,16 +1610,14 @@ bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned
 {
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
     TTObjectBasePtr     curve;
-    TTValue             v;
+    TTValue             v, objects;
     TTUInt32            i, nbPoints = coeff.size();
     TTErr               err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
+    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), objects);
     
     if (!err) {
-        
-        curve = v[0];
         
         // edit value as : x1 y1 b1 x2 y2 b2
         v.resize(nbPoints * 3);
@@ -1614,6 +1629,9 @@ bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned
             v[i+2] = TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]);
             
         }
+        
+        // set first indexed curve only
+        curve = objects[0];
         
         // set a curve parameters
         err = curve->setAttributeValue(TTSymbol("parameters"), v);
@@ -1627,16 +1645,17 @@ bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned
 {
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
     TTObjectBasePtr     curve;
-    TTValue             v;
+    TTValue             v, objects;
     TTUInt32            i;
     TTErr               err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
+    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), objects);
     
     if (!err) {
         
-        curve = v[0];
+        // get first indexed curve only
+        curve = objects[0];
 
         // get a curve parameters
         err = curve->getAttributeValue(TTSymbol("parameters"), v);
@@ -1669,6 +1688,7 @@ bool Engine::getCurveValues(TimeProcessId boxId, const std::string & address, un
 
     if (!err) {
         
+        // get first indexed curve only
         curve = v[0];
         
         // get time process duration
