@@ -795,9 +795,8 @@ void Engine::removeBox(TimeProcessId boxId)
     // Retreive the time process using the boxId
     timeProcess = getTimeProcess(boxId);
     
-    // TODO : delete TTCallback used to observe each time process scheduler running attribute
-    // getTimeProcess(boxId)->removeObserver() ?
-    
+    /* théo : useless because they are destroyed by the interface
+     
     // Is it an conditionedProcess ?
     // note : it can be registered 2 times for a start and end conditioned event
     for (it = m_conditionedProcessMap.begin(); it != m_conditionedProcessMap.end(); ++it) {
@@ -811,6 +810,7 @@ void Engine::removeBox(TimeProcessId boxId)
     
     if (id1) uncacheConditionedProcess(id1);
     if (id2) uncacheConditionedProcess(id2);
+     */
     
     // Remove the time process from the cache
     uncacheTimeProcess(boxId);

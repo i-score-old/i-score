@@ -1493,15 +1493,15 @@ MaquetteScene::removeBox(unsigned int boxID)
             }
         }
 
+      box->removeComment();
+      box->removeTriggerPoint(BOX_START);
+      box->removeTriggerPoint(BOX_END);
+      
       vector<unsigned int> removedRelations = _maquette->removeBox(boxID);
       for (vector<unsigned int>::iterator it = removedRelations.begin(); it != removedRelations.end(); it++) {
           removeRelation(*it);
         }
-
-      box->removeComment();
-      box->removeTriggerPoint(BOX_START);
-      box->removeTriggerPoint(BOX_END);
-
+      
       delete box;
       setModified(true);
     }
