@@ -107,6 +107,13 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   connect(_deviceEdit, SIGNAL(devicePluginChanged(QString)), this, SLOT(updateDevicePlugin(QString)));
 }
 
+NetworkTree::~NetworkTree(){
+
+    delete _startMessages;
+    delete _endMessages;
+    delete _OSCStartMessages;
+    delete _OSCEndMessages;
+}
 
 /****************************************************************************
 *                          General tools
@@ -159,6 +166,17 @@ void
 NetworkTree::clear()
 {
   QList<QTreeWidgetItem*>::iterator it;
+
+  _addressMap.clear();
+  _nodesWithSelectedChildren.clear();
+  _assignedItems.clear();
+  _nodesWithSomeChildrenAssigned.clear();
+  _nodesWithAllChildrenAssigned.clear();
+
+  _startMessages->clear();
+  _endMessages->clear();
+  _OSCStartMessages->clear();
+  _OSCEndMessages->clear();
 
   _OSCMessages.clear();
   _OSCMessageCount = 0;
