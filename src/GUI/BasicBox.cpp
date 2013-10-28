@@ -600,6 +600,10 @@ BasicBox::getStartState()
   return finalMessages;
 }
 
+std::vector<std::string>
+BasicBox::getStartMessages(){
+    return _abstract->startMessages()->computeMessages();
+}
 
 void
 BasicBox::resizeWidthEdition(float width)

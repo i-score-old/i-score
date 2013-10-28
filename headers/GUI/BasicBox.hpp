@@ -619,6 +619,13 @@ class BasicBox : public QObject, public QGraphicsItem
      */
     void setEndMessages(NetworkMessages *messages);
 
+    /*!
+     * \brief Return, as a QString list, the start messages.
+     *
+     * \return Start cue.
+     */
+    std::vector<std::string> getStartMessages();
+
     NetworkMessages *endMessages();
     void setEndMessage(QTreeWidgetItem *item, QString address);
     void updateWidgets();
