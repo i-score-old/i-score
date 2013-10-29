@@ -100,8 +100,7 @@ class BoxWidget : public QWidget
     void addCurve(QString address, CurveWidget *curveWidget);
     void clearCurves();
 
-    QComboBox *_comboBox;
-    QTabWidget *_tabWidget;
+    QComboBox *_comboBox;    
     Interpolation *_interpolation;
     std::map<std::string, unsigned int> _curveIndexes; //!< Map of curves tabs' indexes mapped by their addresses
     QMap<std::string, CurveWidget *> *_curveMap;       //!< Map of curves tabs mapped by their addresses

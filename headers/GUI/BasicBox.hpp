@@ -711,6 +711,7 @@ class BasicBox : public QObject, public QGraphicsItem
     void changeColor(QColor color);
     inline QColor
     currentColor(){ return _color; }
+    void select();
 
     /*!
      * \brief Return the messages list, like if the box just ended its execution.
