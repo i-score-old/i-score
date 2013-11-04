@@ -97,6 +97,8 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   NAME_MODIFIED = false;
   MIN_MODIFIED = false;
   MAX_MODIFIED = false;
+  _cmd = false;
+  _recMode = false;
   hideColumn(VALUE_COLUMN);
 
   connect(this, SIGNAL(itemClicked(QTreeWidgetItem *, int)), this, SLOT(clickInNetworkTree(QTreeWidgetItem *, int)));
@@ -105,6 +107,8 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   connect(this, SIGNAL(endValueChanged(QTreeWidgetItem*, QString)), this, SLOT(changeEndValue(QTreeWidgetItem*, QString)));
   connect(_deviceEdit, SIGNAL(deviceNameChanged(QString, QString)), this, SLOT(updateDeviceName(QString, QString)));
   connect(_deviceEdit, SIGNAL(devicePluginChanged(QString)), this, SLOT(updateDevicePlugin(QString)));
+  connect(this,SIGNAL(cmdKeyStateChanged(bool)),this,SLOT(setCmdKeyState(bool)));
+  connect(this,SIGNAL(recModeChanged(QTreeWidgetItem *, bool)),this,SLOT(setRecMode(QTreeWidgetItem*,bool)));
 }
 
 NetworkTree::~NetworkTree(){
@@ -1615,7 +1619,7 @@ NetworkTree::keyPressEvent(QKeyEvent *event)
 
 void
 NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
-{    
+{        
   if (item != NULL) {      
       if (item->isSelected()) {
           recursiveChildrenSelection(item, true);
@@ -1629,14 +1633,21 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
         }
 
       if ((item->type() == LeaveType || item->type() == OSCNode) && column == INTERPOLATION_COLUMN) {
-          if (isAssigned(item) && hasCurve(item)) {
-              bool activated = item->checkState(column) == Qt::Checked;
-              emit(curveActivationChanged(item, activated));
-            }
-          else {
-              item->setCheckState(column, Qt::Unchecked);
-            }
-        }
+          if(_cmd){
+              std::cout<<"cmd pressed"<<std::endl;
+              emit recModeChanged(item,!_recMode);
+          }
+          else{
+              std::cout<<"cmd not pressed"<<std::endl;
+              if (isAssigned(item) && hasCurve(item)) {
+                  bool activated = item->checkState(column) == Qt::Checked;
+                  emit(curveActivationChanged(item, activated));
+              }
+              else {
+                  item->setCheckState(column, Qt::Unchecked);
+              }
+          }
+  }
 
       if ((item->type() == LeaveType || item->type() == OSCNode) && column == REDUNDANCY_COLUMN) {
           if (isAssigned(item) && hasCurve(item)) {
@@ -1666,10 +1677,11 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 
 void
 NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
-{
+{    
     Data data;
-  data.hasCurve = false;
-  data.address = getAbsoluteAddress(item);
+    data.hasCurve = false;
+    QString qaddress = getAbsoluteAddress(item);
+    data.address = qaddress;
 
   if (item->type() == LeaveType && column == START_COLUMN && VALUE_MODIFIED) {
       VALUE_MODIFIED = FALSE;
@@ -1722,31 +1734,32 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
       item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
     
-    //Case message
-    //PROVISIONAL
-    /// \todo : engine->requestType(address,type) and not to compare with "->" symbol.
-  if (item->text(TYPE_COLUMN) == "->"){
-      if (column == START_COLUMN && VALUE_MODIFIED) {
-          VALUE_MODIFIED = FALSE;
-          assignItem(item, data);
-          emit(startValueChanged(item, item->text(START_COLUMN)));
-          item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+  //Case message
+  vector<string> attributesValues;
+  if(Maquette::getInstance()->requestObjectAttribruteValue(qaddress.toStdString(),"service",attributesValues) > 0){
+      if(attributesValues[0]=="message"){
+          if (column == START_COLUMN && VALUE_MODIFIED) {
+              VALUE_MODIFIED = FALSE;
+              assignItem(item, data);
+              emit(startValueChanged(item, item->text(START_COLUMN)));
+              item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+          }
       }
+  }
+  else if (column == END_COLUMN && VALUE_MODIFIED) {
+      VALUE_MODIFIED = FALSE;
+      assignItem(item, data);
+      emit(endValueChanged(item, item->text(END_COLUMN)));
+      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
+  }
 
-      else if (column == END_COLUMN && VALUE_MODIFIED) {
-          VALUE_MODIFIED = FALSE;
-          assignItem(item, data);
-          emit(endValueChanged(item, item->text(END_COLUMN)));
-          item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
-      }
-
-      else if (column == SR_COLUMN && SR_MODIFIED) {
-          SR_MODIFIED = FALSE;
-          emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
-          item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
-      }      
+  else if (column == SR_COLUMN && SR_MODIFIED) {
+      SR_MODIFIED = FALSE;
+      emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
+      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
   }
 }
+
 
 QString
 NetworkTree::getAbsoluteAddressWithValue(QTreeWidgetItem *item, int column) const
@@ -2078,4 +2091,22 @@ NetworkTree::updateDevicePlugin(QString newPlugin)
   emit(pluginChanged(deviceName));
 
   //Va supprimer les message de cette device
+}
+
+void
+NetworkTree::setCmdKeyState(bool pressed){
+    _cmd = pressed;
+}
+
+void
+NetworkTree::setRecMode(QTreeWidgetItem *item, bool activated){
+    std::cout<<"setRecMode"<<std::endl;
+    _recMode = activated;
+
+    if(_recMode){
+        std::cout<<"TRUE"<<std::endl;
+        item->setIcon(INTERPOLATION_COLUMN,QIcon(":/images/boxStartMenu.svg"));
+    }
+    else
+        item->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
 }

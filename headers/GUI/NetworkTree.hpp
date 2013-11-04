@@ -419,6 +419,7 @@ class NetworkTree : public QTreeWidget
     void cmdKeyStateChanged(bool);
     void rangeBoundMinChanged(QTreeWidgetItem *item, float newValue);
     void rangeBoundMaxChanged(QTreeWidgetItem *item, float newValue);
+    void recModeChanged(QTreeWidgetItem *item, bool activated);
 
   private:
     void treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict);
@@ -507,6 +508,8 @@ class NetworkTree : public QTreeWidget
 
     int _OSCMessageCount;
     bool _treeFilterActive;
+    bool _cmd;
+    bool _recMode;
 
     DeviceEdit *_deviceEdit;  
 
@@ -524,6 +527,8 @@ class NetworkTree : public QTreeWidget
     void changeNameValue(QTreeWidgetItem* item, QString newValue);
     void updateDeviceName(QString newName, QString plugin);
     void updateDevicePlugin(QString newName);
+    void setCmdKeyState(bool pressed);
+    void setRecMode(QTreeWidgetItem *item, bool activated);
 
     virtual void clear();
 };
