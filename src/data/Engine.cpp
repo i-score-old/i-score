@@ -1792,7 +1792,7 @@ std::string Engine::getTriggerPointMessage(ConditionedProcessId triggerId)
     timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
     
     // Get the expression associated to this event
-    if (!getTimeCondition(triggerId)->sendMessage(TTSymbol("CaseFind"), v, out)) {
+    if (!getTimeCondition(triggerId)->sendMessage(TTSymbol("ExpressionFind"), v, out)) {
         
         expression = out[0];
         return expression.c_str();
