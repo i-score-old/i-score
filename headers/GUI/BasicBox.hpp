@@ -619,6 +619,13 @@ class BasicBox : public QObject, public QGraphicsItem
      */
     void setEndMessages(NetworkMessages *messages);
 
+    /*!
+     * \brief Return, as a QString list, the start messages.
+     *
+     * \return Start cue.
+     */
+    std::vector<std::string> getStartMessages();
+
     NetworkMessages *endMessages();
     void setEndMessage(QTreeWidgetItem *item, QString address);
     void updateWidgets();
@@ -704,6 +711,7 @@ class BasicBox : public QObject, public QGraphicsItem
     void changeColor(QColor color);
     inline QColor
     currentColor(){ return _color; }
+    void select();
 
     /*!
      * \brief Return the messages list, like if the box just ended its execution.

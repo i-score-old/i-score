@@ -69,7 +69,7 @@ class NetworkTree : public QTreeWidget
 
   public:
     NetworkTree(QWidget * parent = 0);
-
+    ~NetworkTree();
     void load();
 
     void init();

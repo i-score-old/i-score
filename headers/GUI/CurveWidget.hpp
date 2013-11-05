@@ -160,7 +160,7 @@ class CurveWidget : public QWidget
      * \brief This event handler can be reimplemented in a subclass to receive widget resize events which are passed in the event parameter.
      * \param event : the resizing event
      */
-    virtual void resizeEvent(QResizeEvent * event);
+    virtual void resizeEvent(QResizeEvent * event);  
 
   private:
     /*!

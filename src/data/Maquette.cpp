@@ -1388,9 +1388,13 @@ Maquette::isExecutionPaused()
 void
 Maquette::stopPlayingAndGoToStart()
 {
-    turnExecutionOff();
-
+    turnExecutionOff();    
     setTimeOffset(0);
+
+    //send root box start messages
+    std::vector<std::string> startCue = getBox(ROOT_BOX_ID)->getStartMessages();
+    for(int i=0; i<startCue.size(); i++)
+        sendMessage(startCue.at(i));
 }
 
 void
@@ -1929,17 +1933,19 @@ Maquette::getRangeBounds(const std::string& address, std::vector<float>& rangeBo
         QString qvalues = QString::fromStdString(values[0]);
         QStringList valuesParsed = qvalues.split(" ");
 
-        //minBound
-        std::istringstream issMin(valuesParsed.at(0).toStdString());
-        issMin >> min;
-        rangeBounds.push_back(min);
+        if(valuesParsed.size()==2){
+            //minBound
+            std::istringstream issMin(valuesParsed.at(0).toStdString());
+            issMin >> min;
+            rangeBounds.push_back(min);
 
-        //maxBound
-        std::istringstream issMax(valuesParsed.at(1).toStdString());
-        issMax >> max;
-        rangeBounds.push_back(max);
+            //maxBound
+            std::istringstream issMax(valuesParsed.at(1).toStdString());
+            issMax >> max;
+            rangeBounds.push_back(max);
 
-        return 1;
+            return 1;
+        }
     }
     return 0;
 }

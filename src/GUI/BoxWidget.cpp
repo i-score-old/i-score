@@ -88,9 +88,7 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
   _box = box;
   _comboBox = new QComboBox;
   _curveWidget = new CurveWidget(NULL);
-  _tabWidget = new QTabWidget; /// \todo _tabWidget seems to be unused, and replaced by _stackedLayout.
-  _tabWidget->lower();
-  _tabWidget->setAttribute(Qt::WA_TranslucentBackground, true);
+
   _stackedLayout = new QStackedLayout;
   _stackedLayout->setStackingMode(QStackedLayout::StackAll);
 
@@ -110,9 +108,10 @@ BoxWidget::~BoxWidget()
 
 void
 BoxWidget::mousePressEvent(QMouseEvent *event)
-{
+{        
     Q_UNUSED(event);
-    
+
+
     if (_box->maquetteScene()->paused())
         _box->maquetteScene()->stopAndGoToCurrentTime();
     
@@ -121,7 +120,9 @@ BoxWidget::mousePressEvent(QMouseEvent *event)
         hide();
         setWindowModality(Qt::WindowModal);
         show();
-    }
+    }    
+    else
+        _box->select();
 }
 
 void
@@ -172,7 +173,7 @@ BoxWidget::updateDisplay(const QString &address)
 
 void
 BoxWidget::displayCurve(const QString &address)
-{
+{    
   std::string add = address.toStdString();
   QMap<string, CurveWidget *>::iterator curveIt;
   CurveWidget *curveWidget;

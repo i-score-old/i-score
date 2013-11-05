@@ -600,6 +600,10 @@ BasicBox::getStartState()
   return finalMessages;
 }
 
+std::vector<std::string>
+BasicBox::getStartMessages(){
+    return _abstract->startMessages()->computeMessages();
+}
 
 void
 BasicBox::resizeWidthEdition(float width)
@@ -1926,4 +1930,9 @@ BasicBox::displayBoxDuration(){
     //Displays in the maquetteScene's bottom
     QString durationMsg = QString("box duration : %1").arg(duration);
     maquetteScene()->displayMessage(durationMsg.toStdString(),INDICATION_LEVEL);
+}
+void
+BasicBox::select(){
+    setSelected(true);
+    _scene->setAttributes(_abstract);
 }
