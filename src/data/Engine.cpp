@@ -1721,9 +1721,13 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
     
     timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
     
-    // Create a TTTimeCondition with no case
+    // Create a TTTimeCondition
     m_mainScenario->sendMessage(TTSymbol("TimeConditionCreate"), args, v);
     timeCondition = TTTimeConditionPtr(TTObjectBasePtr(v[0]));
+    
+    // Add the event to the condition with no associated expression
+    args = TTObjectBasePtr(timeEvent);
+    timeCondition->sendMessage(TTSymbol("EventAdd"), args, v);
     
     // We cache the time process and the event index instead of the event itself
     triggerId = cacheConditionedProcess(containingBoxId, controlPointIndex);
@@ -1731,7 +1735,7 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
     // We cache the TTTimeCondition
     cacheTimeCondition(triggerId, timeCondition);
     
-    // note : see in setTriggerPointMessage to see how the event is linked to the condition
+    // note : see in setTriggerPointMessage to see how the expression associated to an event is edited
     
 	return triggerId;
 }
@@ -1765,16 +1769,10 @@ void Engine::setTriggerPointMessage(ConditionedProcessId triggerId, std::string 
     
     timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
     
-    // clear the former case
-    getTimeCondition(triggerId)->sendMessage(TTSymbol("CaseRemove"), TTSymbol(triggerMessage), out);
-    
-    // add a case to the condition
-    getTimeCondition(triggerId)->sendMessage(TTSymbol("CaseAdd"), TTSymbol(triggerMessage), out);
-    
-    // link the event to the case
-    v = TTSymbol(triggerMessage);
-    v.append(TTObjectBasePtr(timeEvent));
-    getTimeCondition(triggerId)->sendMessage(TTSymbol("CaseLinkEvent"), v, out);
+    // edit the expression associated to this event
+    v = TTObjectBasePtr(timeEvent);
+    v.append(TTSymbol(triggerMessage));
+    getTimeCondition(triggerId)->sendMessage(TTSymbol("EventExpression"), v, out);
 }
 
 std::string Engine::getTriggerPointMessage(ConditionedProcessId triggerId)
@@ -1793,7 +1791,7 @@ std::string Engine::getTriggerPointMessage(ConditionedProcessId triggerId)
     
     timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
     
-    // Get the expression case related to this event
+    // Get the expression associated to this event
     if (!getTimeCondition(triggerId)->sendMessage(TTSymbol("CaseFind"), v, out)) {
         
         expression = out[0];
@@ -2548,12 +2546,14 @@ void Engine::load(std::string fileName)
     // Create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
     
-    // Pass the application manager and the main scenario object
+    // Read the file to setup TTModularApplications
     v = TTObjectBasePtr(TTModularApplications);
-    v.append(m_mainScenario);
     aXmlHandler.set(kTTSym_object, v);
+    aXmlHandler.send(kTTSym_Read, TTSymbol(fileName), none);
     
-    // Read
+    // Read the file to setup m_mainScenario
+    v = TTObjectBasePtr(m_mainScenario);
+    aXmlHandler.set(kTTSym_object, v);
     aXmlHandler.send(kTTSym_Read, TTSymbol(fileName), none);
     
     // Rebuild all the EngineCacheMaps from the main scenario content
