@@ -61,6 +61,7 @@
 #include <QObject>
 #include <QPushButton>
 #include <QMenu>
+#include <QGraphicsColorizeEffect>
 
 #include "TTScore.h"
 
@@ -649,7 +650,7 @@ class BasicBox : public QObject, public QGraphicsItem
     static const int COMBOBOX_HEIGHT;
     static const float MSGS_INDICATOR_WIDTH;
     static const float GRIP_CIRCLE_SIZE;
-    static const QString SUB_SCENARIO_MODE_TEXT;
+    static const QString SUB_SCENARIO_MODE_TEXT;    
 
     /*!
      * \brief Painting method, redefinition of QGraphicsItem::paint().
@@ -712,6 +713,7 @@ class BasicBox : public QObject, public QGraphicsItem
     inline QColor
     currentColor(){ return _color; }
     void select();
+    void setRecMode(bool activated);
 
     /*!
      * \brief Return the messages list, like if the box just ended its execution.
@@ -810,6 +812,7 @@ class BasicBox : public QObject, public QGraphicsItem
     QMenu* _contextMenu;                                                        //!< The contextual menu, if one.
     bool _shift;                                                                //!< State of Shift Key.
     bool _playing;                                                              //!< State of playing.
+    bool _recording;                                                            //!< State of recording.
     TextEdit *_trgPntMsgEdit;                                                   //!< The trigger point editing dialog.
     Comment *_comment;                                                          //!< The box comment.
     QMap<BoxExtremity, TriggerPoint*> *_triggerPoints;                          //!< The trigger points.
@@ -834,6 +837,8 @@ class BasicBox : public QObject, public QGraphicsItem
     qreal _currentZvalue;
     QColor _color;
     QColor _colorUnselected;
+    QGraphicsColorizeEffect *_recEffect;
+
     bool _low;
     bool _hover;
 

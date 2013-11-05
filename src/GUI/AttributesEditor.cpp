@@ -209,6 +209,7 @@ AttributesEditor::connectSlots()
 
   connect(_networkTree, SIGNAL(rangeBoundMinChanged(QTreeWidgetItem*,float)), this, SLOT(changeRangeBoundMin(QTreeWidgetItem*, float)));
   connect(_networkTree, SIGNAL(rangeBoundMaxChanged(QTreeWidgetItem*,float)), this, SLOT(changeRangeBoundMax(QTreeWidgetItem*, float)));
+  connect(_networkTree, SIGNAL(recModeChanged(QTreeWidgetItem*,bool)), this, SLOT(changeRecMode(QTreeWidgetItem*, bool)));
 }
 
 void
@@ -695,3 +696,14 @@ AttributesEditor::changeRangeBoundMax(QTreeWidgetItem *item, float value){
       }
 }
 
+void
+AttributesEditor::changeRecMode(QTreeWidgetItem* item, bool activated){
+    if (_boxEdited != NO_ID) {
+          BasicBox * box = _scene->getBox(_boxEdited);
+
+          box->setRecMode(activated);
+//          todo :
+//          std::string address = _networkTree->getAbsoluteAddress(item).toStdString();
+//          Maquette::getInstance()->turnRecordingOn(boxId,address);
+    }
+}

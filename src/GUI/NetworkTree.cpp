@@ -2105,7 +2105,7 @@ NetworkTree::setRecMode(QTreeWidgetItem *item, bool activated){
 
     if(_recMode){
         std::cout<<"TRUE"<<std::endl;
-        item->setIcon(INTERPOLATION_COLUMN,QIcon(":/images/boxStartMenu.svg"));
+//        item->setIcon(INTERPOLATION_COLUMN,QIcon(":/images/boxStartMenu.svg"));
     }
     else
         item->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);

@@ -138,6 +138,7 @@ class AttributesEditor : public QDockWidget
 
     void changeRangeBoundMin(QTreeWidgetItem* item, float value);
     void changeRangeBoundMax(QTreeWidgetItem* item, float value);
+    void changeRecMode(QTreeWidgetItem* item, bool activated);
 
     inline NetworkTree *
     networkTree(){ return _networkTree; }

@@ -301,7 +301,24 @@ BasicBox::~BasicBox()
       removeRelations(BOX_START);
       removeRelations(BOX_END);
       delete static_cast<AbstractBox*>(_abstract);
-    }
+  }
+  delete _recEffect;
+  delete _boxContentWidget;
+  delete _boxWidget;
+  delete _comboBox;
+
+  delete _startMenuButton;
+  delete _endMenuButton;
+
+  delete _jumpToStartCue;
+  delete _jumpToEndCue;
+  delete _updateStartCue;
+  delete _updateEndCue;
+
+//  delete _curveProxy;
+//  delete _comboBoxProxy;
+//  delete _startMenu;
+//  delete _endMenu;
 }
 
 QString
@@ -323,11 +340,18 @@ BasicBox::init()
   _hasContextMenu = false;
   _shift = false;
   _playing = false;
+  _recording = true;
   _low = false;
   _triggerPoints = new QMap<BoxExtremity, TriggerPoint*>();
   _comment = NULL;
   _color = QColor(Qt::white);
   _colorUnselected = QColor(Qt::white);
+
+  _recEffect = new QGraphicsColorizeEffect(this);
+  _recEffect->setColor(Qt::red);
+  _recEffect->setEnabled(false);
+  setGraphicsEffect(_recEffect);
+
   _hover = false;
 
   updateBoxSize();
@@ -1814,8 +1838,6 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
   painter->setBrush(QBrush(Qt::white, Qt::NoBrush));
   painter->drawRect(_boxRect);
 
-
-
   drawMsgsIndicators(painter);
   drawInteractionGrips(painter);
   drawTriggerGrips(painter);
@@ -1935,4 +1957,11 @@ void
 BasicBox::select(){
     setSelected(true);
     _scene->setAttributes(_abstract);
+}
+
+void
+BasicBox::setRecMode(bool activated){
+    _recording = activated;
+    _recEffect->setEnabled(_recording);
+    update();
 }

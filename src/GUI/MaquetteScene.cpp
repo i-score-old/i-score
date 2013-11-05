@@ -1539,7 +1539,7 @@ MaquetteScene::setPlaying(unsigned int boxID, bool playing)
           _playingBoxes.erase(it);
         }
       else {
-          std::cerr << "MaquetteScene::setPlaying : trying to start playing an playing box" << std::endl;
+          std::cerr << "MaquetteScene::setPlaying : trying to start playing on playing box" << std::endl;
         }
     }
   else {
