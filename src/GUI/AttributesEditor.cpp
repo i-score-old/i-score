@@ -230,17 +230,12 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
             }
           else {
               _networkTree->setAssignedItems(abBox->networkTreeItems());
-              _networkTree->expandItems(abBox->networkTreeExpandedItems());
+              _networkTree->expandItems(abBox->networkTreeExpandedItems());              
             }
 
           _networkTree->displayBoxContent(abBox);
 
-          //PRINT MESSAGES
-          QList<std::string> msgToRec = abBox->messagesToRecord();
-
-          for(int i=0; i<msgToRec.size(); i++)
-              std::cout<<"toRec : "<<msgToRec.at(i)<<std::endl;
-
+          //PRINT MESSAGES         
 //            QList<QTreeWidgetItem *> items = _networkTree->assignedItems().keys();
 //            QList<QTreeWidgetItem *>::iterator i;
 //            QTreeWidgetItem *curIt;
@@ -704,17 +699,19 @@ AttributesEditor::changeRangeBoundMax(QTreeWidgetItem *item, float value){
 void
 AttributesEditor::changeRecMode(QTreeWidgetItem* item){
     if (_boxEdited != NO_ID) {
-          BasicBox * box = _scene->getBox(_boxEdited);
-          std::string address = _networkTree->getAbsoluteAddress(item).toStdString();
-          bool activated = !static_cast<AbstractBox *>(box->abstract())->messagesToRecord().contains(address);
-
-          if(activated){
-              box->addMessageToRecord(address);
-          }
-          else{
-              box->removeMessageToRecord(address);
-          }
+          BasicBox * box = _scene->getBox(_boxEdited);          
+          bool activated = !static_cast<AbstractBox *>(box->abstract())->messagesToRecord().contains(item);
 
           _networkTree->setRecMode(item,activated);
+
+          if(activated){
+              box->addMessageToRecord(item);
+          }
+          else{
+              box->removeMessageToRecord(item);
+              _networkTree->updateCurve(item, _boxEdited, true);
+              BasicBox *box = _scene->getBox(_boxEdited);
+              box->updateCurve(_networkTree->getAbsoluteAddress(item).toStdString(), true);
+          }
     }
 }

@@ -98,7 +98,6 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   NAME_MODIFIED = false;
   MIN_MODIFIED = false;
   MAX_MODIFIED = false;
-  _recMode = false;
   hideColumn(VALUE_COLUMN);
 
   connect(this, SIGNAL(itemClicked(QTreeWidgetItem *, int)), this, SLOT(clickInNetworkTree(QTreeWidgetItem *, int)));
@@ -133,6 +132,7 @@ NetworkTree::init()
   _OSCMessageCount = 0;
   _OSCStartMessages = new NetworkMessages;
   _OSCEndMessages = new NetworkMessages;
+  _recMessages = QList<QTreeWidgetItem*>();
 
   setStyleSheet(
     "QTreeView {"
@@ -179,6 +179,7 @@ NetworkTree::clear()
   _endMessages->clear();
   _OSCStartMessages->clear();
   _OSCEndMessages->clear();
+  _recMessages.clear();
 
   _OSCMessages.clear();
   _OSCMessageCount = 0;
@@ -736,7 +737,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
 
 void
 NetworkTree::clearColumn(unsigned int column)
-{
+{    
   if (!_assignedItems.isEmpty()) {
       QList<QTreeWidgetItem *>::iterator it;
       QTreeWidgetItem *curIt;
@@ -746,13 +747,17 @@ NetworkTree::clearColumn(unsigned int column)
 
       for (it = assignedItems.begin(); it != assignedItems.end(); it++) {
           curIt = *it;
-
-          if (curIt->checkState(column)) {
-              curIt->setCheckState(column, Qt::Unchecked);
-            }
+          curIt->setCheckState(column, Qt::Unchecked);
           curIt->setText(column, emptyString);
-        }
+        }      
     }
+
+  //clear record icon
+  if(column == INTERPOLATION_COLUMN && !_recMessages.isEmpty()){
+      QList<QTreeWidgetItem *>::iterator it;
+      for(it = _recMessages.begin(); it != _recMessages.end() ; it++)
+          (*it)->setCheckState(column, Qt::Unchecked);
+  }
 }
 
 void
@@ -790,7 +795,8 @@ NetworkTree::displayBoxContent(AbstractBox *abBox)
   setEndMessages(abBox->endMessages());
   updateStartMsgsDisplay();
   updateEndMsgsDisplay();
-  assignItems(assignedItems());
+  assignItems(assignedItems());  
+  setRecMode(abBox->messagesToRecord(),true);
 }
 
 void
@@ -1002,6 +1008,7 @@ NetworkTree::resetNetworkTree()
   resetSelectedItems();
   resetAssignedItems();
   resetAssignedNodes();
+  _recMessages.clear();
 }
 
 
@@ -1437,15 +1444,13 @@ NetworkTree::noBrothersSelected(QTreeWidgetItem *item)
 void
 NetworkTree::resetSelectedItems()
 {
-  QList<QTreeWidgetItem*> selection = selectedItems() /*+assignedItems()*/;
+  QList<QTreeWidgetItem*> selection = selectedItems();
   QList<QTreeWidgetItem *>::iterator it;
   QTreeWidgetItem *curItem;
 
   for (it = selection.begin(); it != selection.end(); ++it) {
       curItem = *it;
       curItem->setSelected(false);
-
-//        curItem->setCheckState(0,Qt::Unchecked);
     }
 
   for (it = _nodesWithSelectedChildren.begin(); it != _nodesWithSelectedChildren.end(); ++it) {
@@ -1456,10 +1461,7 @@ NetworkTree::resetSelectedItems()
           curItem->setBackground(i, QBrush(Qt::NoBrush));
         }
 
-//      curItem->setFont(0, font);
       curItem->setSelected(false);
-
-//        curItem->setCheckState(0,Qt::Unchecked);
       curItem->setCheckState(START_COLUMN, Qt::Unchecked);
       curItem->setCheckState(END_COLUMN, Qt::Unchecked);
     }
@@ -1634,8 +1636,7 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
           if(static_cast<MainWindow *>(this->topLevelWidget())->commandKey()){
               emit recModeChanged(item);
           }
-          else{
-              std::cout<<"cmd not pressed"<<std::endl;
+          else{              
               if (isAssigned(item) && hasCurve(item)) {
                   bool activated = item->checkState(column) == Qt::Checked;
                   emit(curveActivationChanged(item, activated));
@@ -2092,13 +2093,26 @@ NetworkTree::updateDevicePlugin(QString newPlugin)
 
 void
 NetworkTree::setRecMode(QTreeWidgetItem *item, bool activated){
-    std::cout<<"setRecMode"<<std::endl;
-    _recMode = activated;
+    std::cout<<"setRecMode "<<getAbsoluteAddress(item).toStdString()<<std::endl;
 
-    if(_recMode){
-        std::cout<<"TRUE"<<std::endl;
-//        item->setIcon(INTERPOLATION_COLUMN,QIcon(":/images/boxStartMenu.svg"));
+    if(activated){
+
+        if(!_recMessages.contains(item))
+            _recMessages<<item;
+        std::cout<<"active "<<_recMessages.size() <<std::endl;
+        item->setData(INTERPOLATION_COLUMN, Qt::CheckStateRole, QVariant());
+        item->setIcon(INTERPOLATION_COLUMN,QIcon(":/images/boxStartMenu.svg"));
     }
-    else
+    else{
+        if(_recMessages.contains(item))
+           _recMessages.removeAll(item);
         item->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
+    }
+}
+
+void
+NetworkTree::setRecMode(QList<QTreeWidgetItem *> items, bool activated){
+    QList<QTreeWidgetItem*>::iterator it;
+    for(it=items.begin() ; it!=items.end() ; it++)
+        setRecMode(*it,activated);
 }

@@ -50,7 +50,7 @@ AbstractBox::AbstractBox(const QPointF &newTopLeft, const float &newWidth, const
   _ID(newID), _motherID(motherID), _startMessages(startMessages),_endMessages(endMessages)
 {
     _networkTreeExpandedItems = QList<QTreeWidgetItem*>();
-    _messagesToRecord = QList<std::string>();
+    _messagesToRecord = QList<QTreeWidgetItem *>();
 }
 
 AbstractBox::AbstractBox(const AbstractBox &other) :
@@ -59,7 +59,7 @@ AbstractBox::AbstractBox(const AbstractBox &other) :
   _startMessages(other._startMessages),_endMessages(other._endMessages)
 {
     _networkTreeExpandedItems = QList<QTreeWidgetItem*>();
-    _messagesToRecord = QList<std::string>();
+    _messagesToRecord = QList<QTreeWidgetItem *>();
 }
 
 void
@@ -95,12 +95,12 @@ AbstractBox::setEndMessages(NetworkMessages *endMsgs)
 }
 
 void
-AbstractBox::addMessageToRecord(std::string address){
-    if(!_messagesToRecord.contains(address))
-        _messagesToRecord.push_back(address);
+AbstractBox::addMessageToRecord(QTreeWidgetItem *item){
+    if(!_messagesToRecord.contains(item))
+        _messagesToRecord.push_back(item);
 }
 
 void
-AbstractBox::removeMessageToRecord(std::string address){
-    _messagesToRecord.removeAll(address);
+AbstractBox::removeMessageToRecord(QTreeWidgetItem *item){
+    _messagesToRecord.removeAll(item);
 }

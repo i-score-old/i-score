@@ -504,7 +504,9 @@ class NetworkTree : public QTreeWidget
     NetworkMessages *_endMessages;
     NetworkMessages *_OSCStartMessages;
     NetworkMessages *_OSCEndMessages;
+    QList<QTreeWidgetItem *> _recMessages;
     QMap<QTreeWidgetItem *, QString> _OSCMessages;
+
 
     int _OSCMessageCount;
     bool _treeFilterActive;
@@ -527,6 +529,7 @@ class NetworkTree : public QTreeWidget
     void updateDeviceName(QString newName, QString plugin);
     void updateDevicePlugin(QString newName);
     void setRecMode(QTreeWidgetItem *item, bool activated);
+    void setRecMode(QList<QTreeWidgetItem *> items, bool activated);
 
     virtual void clear();
 };
