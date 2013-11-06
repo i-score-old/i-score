@@ -1965,3 +1965,16 @@ BasicBox::setRecMode(bool activated){
     _recEffect->setEnabled(_recording);
     update();
 }
+
+void
+BasicBox::addMessageToRecord(std::string address){
+    _abstract->addMessageToRecord(address);
+    setRecMode(!_abstract->messagesToRecord().isEmpty());
+}
+
+void
+BasicBox::removeMessageToRecord(std::string address){
+    std::cout<<"remove"<<std::endl;
+    _abstract->removeMessageToRecord(address);
+    setRecMode(!_abstract->messagesToRecord().isEmpty());
+}

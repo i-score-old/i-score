@@ -107,8 +107,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   connect(this, SIGNAL(endValueChanged(QTreeWidgetItem*, QString)), this, SLOT(changeEndValue(QTreeWidgetItem*, QString)));
   connect(_deviceEdit, SIGNAL(deviceNameChanged(QString, QString)), this, SLOT(updateDeviceName(QString, QString)));
   connect(_deviceEdit, SIGNAL(devicePluginChanged(QString)), this, SLOT(updateDevicePlugin(QString)));
-  connect(this,SIGNAL(cmdKeyStateChanged(bool)),this,SLOT(setCmdKeyState(bool)));
-  connect(this,SIGNAL(recModeChanged(QTreeWidgetItem *, bool)),this,SLOT(setRecMode(QTreeWidgetItem*,bool)));
+  connect(this,SIGNAL(cmdKeyStateChanged(bool)),this,SLOT(setCmdKeyState(bool)));  
 }
 
 NetworkTree::~NetworkTree(){
@@ -1634,8 +1633,7 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 
       if ((item->type() == LeaveType || item->type() == OSCNode) && column == INTERPOLATION_COLUMN) {
           if(_cmd){
-              std::cout<<"cmd pressed"<<std::endl;
-              emit recModeChanged(item,!_recMode);
+              emit recModeChanged(item);
           }
           else{
               std::cout<<"cmd not pressed"<<std::endl;

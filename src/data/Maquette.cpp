@@ -1830,13 +1830,17 @@ void
 Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
 {
     int type = getBox(boxID)->type();
+    BasicBox *box = static_cast<BasicBox*>(_boxes[boxID]);
     
     if (type == PARENT_BOX_TYPE) {
         
-        if (running)
-            static_cast<BasicBox*>(_boxes[boxID])->setCrossedExtremity(BOX_START);
-        else
-            static_cast<BasicBox*>(_boxes[boxID])->setCrossedExtremity(BOX_END);
+        if (running){
+            box->setCrossedExtremity(BOX_START);
+
+        }
+        else{
+            box->setCrossedExtremity(BOX_END);
+        }
     }
 }
 

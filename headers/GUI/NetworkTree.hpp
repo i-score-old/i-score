@@ -419,7 +419,7 @@ class NetworkTree : public QTreeWidget
     void cmdKeyStateChanged(bool);
     void rangeBoundMinChanged(QTreeWidgetItem *item, float newValue);
     void rangeBoundMaxChanged(QTreeWidgetItem *item, float newValue);
-    void recModeChanged(QTreeWidgetItem *item, bool activated);
+    void recModeChanged(QTreeWidgetItem *item);
 
   private:
     void treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict);

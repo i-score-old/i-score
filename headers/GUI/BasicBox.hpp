@@ -694,6 +694,8 @@ class BasicBox : public QObject, public QGraphicsItem
     setStackedLayout(QStackedLayout *slayout){ boxContentWidget()->setStackedLayout(slayout); }
     inline bool
     hasCurve(string address){ return _curvesAddresses.contains(address); }
+    void addMessageToRecord(std::string address);
+    void removeMessageToRecord(std::string address);
 
     QPointF getLeftGripPoint();
     QPointF getRightGripPoint();

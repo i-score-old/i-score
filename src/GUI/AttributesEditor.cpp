@@ -209,7 +209,7 @@ AttributesEditor::connectSlots()
 
   connect(_networkTree, SIGNAL(rangeBoundMinChanged(QTreeWidgetItem*,float)), this, SLOT(changeRangeBoundMin(QTreeWidgetItem*, float)));
   connect(_networkTree, SIGNAL(rangeBoundMaxChanged(QTreeWidgetItem*,float)), this, SLOT(changeRangeBoundMax(QTreeWidgetItem*, float)));
-  connect(_networkTree, SIGNAL(recModeChanged(QTreeWidgetItem*,bool)), this, SLOT(changeRecMode(QTreeWidgetItem*, bool)));
+  connect(_networkTree, SIGNAL(recModeChanged(QTreeWidgetItem*)), this, SLOT(changeRecMode(QTreeWidgetItem*)));
 }
 
 void
@@ -236,6 +236,11 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
           _networkTree->displayBoxContent(abBox);
 
           //PRINT MESSAGES
+          QList<std::string> msgToRec = abBox->messagesToRecord();
+
+          for(int i=0; i<msgToRec.size(); i++)
+              std::cout<<"toRec : "<<msgToRec.at(i)<<std::endl;
+
 //            QList<QTreeWidgetItem *> items = _networkTree->assignedItems().keys();
 //            QList<QTreeWidgetItem *>::iterator i;
 //            QTreeWidgetItem *curIt;
@@ -697,13 +702,19 @@ AttributesEditor::changeRangeBoundMax(QTreeWidgetItem *item, float value){
 }
 
 void
-AttributesEditor::changeRecMode(QTreeWidgetItem* item, bool activated){
+AttributesEditor::changeRecMode(QTreeWidgetItem* item){
     if (_boxEdited != NO_ID) {
           BasicBox * box = _scene->getBox(_boxEdited);
+          std::string address = _networkTree->getAbsoluteAddress(item).toStdString();
+          bool activated = !static_cast<AbstractBox *>(box->abstract())->messagesToRecord().contains(address);
 
-          box->setRecMode(activated);
-//          todo :
-//          std::string address = _networkTree->getAbsoluteAddress(item).toStdString();
-//          Maquette::getInstance()->turnRecordingOn(boxId,address);
+          if(activated){
+              box->addMessageToRecord(address);
+          }
+          else{
+              box->removeMessageToRecord(address);
+          }
+
+          _networkTree->setRecMode(item,activated);
     }
 }
