@@ -448,7 +448,7 @@ BoxWidget::setComboBox(QComboBox *cbox)
 void
 BoxWidget::execStartAction()
 {
-  MainWindow *ui = _box->maquetteScene()->view()->mainWindow();
+  MainWindow *ui = static_cast<MainWindow *>(this->topLevelWidget());
 
   if (ui->commandKey()) {
       updateStartCue();

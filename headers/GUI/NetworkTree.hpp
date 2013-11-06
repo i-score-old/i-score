@@ -508,7 +508,6 @@ class NetworkTree : public QTreeWidget
 
     int _OSCMessageCount;
     bool _treeFilterActive;
-    bool _cmd;
     bool _recMode;
 
     DeviceEdit *_deviceEdit;  
@@ -527,7 +526,6 @@ class NetworkTree : public QTreeWidget
     void changeNameValue(QTreeWidgetItem* item, QString newValue);
     void updateDeviceName(QString newName, QString plugin);
     void updateDevicePlugin(QString newName);
-    void setCmdKeyState(bool pressed);
     void setRecMode(QTreeWidgetItem *item, bool activated);
 
     virtual void clear();

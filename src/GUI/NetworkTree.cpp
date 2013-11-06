@@ -40,6 +40,7 @@
 
 #include "NetworkTree.hpp"
 #include "Maquette.hpp"
+#include "MainWindow.hpp"
 #include <QList>
 #include <map>
 #include <exception>
@@ -97,7 +98,6 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   NAME_MODIFIED = false;
   MIN_MODIFIED = false;
   MAX_MODIFIED = false;
-  _cmd = false;
   _recMode = false;
   hideColumn(VALUE_COLUMN);
 
@@ -107,7 +107,6 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   connect(this, SIGNAL(endValueChanged(QTreeWidgetItem*, QString)), this, SLOT(changeEndValue(QTreeWidgetItem*, QString)));
   connect(_deviceEdit, SIGNAL(deviceNameChanged(QString, QString)), this, SLOT(updateDeviceName(QString, QString)));
   connect(_deviceEdit, SIGNAL(devicePluginChanged(QString)), this, SLOT(updateDevicePlugin(QString)));
-  connect(this,SIGNAL(cmdKeyStateChanged(bool)),this,SLOT(setCmdKeyState(bool)));  
 }
 
 NetworkTree::~NetworkTree(){
@@ -1632,7 +1631,7 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
         }
 
       if ((item->type() == LeaveType || item->type() == OSCNode) && column == INTERPOLATION_COLUMN) {
-          if(_cmd){
+          if(static_cast<MainWindow *>(this->topLevelWidget())->commandKey()){
               emit recModeChanged(item);
           }
           else{
@@ -2089,11 +2088,6 @@ NetworkTree::updateDevicePlugin(QString newPlugin)
   emit(pluginChanged(deviceName));
 
   //Va supprimer les message de cette device
-}
-
-void
-NetworkTree::setCmdKeyState(bool pressed){
-    _cmd = pressed;
 }
 
 void
