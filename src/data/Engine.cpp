@@ -1606,6 +1606,19 @@ bool Engine::getCurveMuteState(TimeProcessId boxId, const std::string & address)
 	return false;
 }
 
+void Engine::setCurveRecording(TimeProcessId boxId, const std::string & address, bool record)
+{
+    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
+    TTValue             v, out;
+    TTErr               err;
+    
+    // enable/disable recording
+    v = toTTAddress(address);
+    v.append(record);
+    
+    timeProcess->sendMessage(TTSymbol("CurveRecord"), toTTAddress(address), out);
+}
+
 bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned int argNb, const std::vector<float> & percent, const std::vector<float> & y, const std::vector<short> & sectionType, const std::vector<float> & coeff)
 {
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
