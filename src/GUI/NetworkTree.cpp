@@ -2096,16 +2096,13 @@ NetworkTree::setRecMode(QTreeWidgetItem *item, bool activated){
     std::cout<<"setRecMode "<<getAbsoluteAddress(item).toStdString()<<std::endl;
 
     if(activated){
-
         if(!_recMessages.contains(item))
             _recMessages<<item;
-        std::cout<<"active "<<_recMessages.size() <<std::endl;
         item->setData(INTERPOLATION_COLUMN, Qt::CheckStateRole, QVariant());
-        item->setIcon(INTERPOLATION_COLUMN,QIcon(":/images/boxStartMenu.svg"));
+        item->setIcon(INTERPOLATION_COLUMN,QIcon(":/images/record.svg"));
     }
     else{
-        if(_recMessages.contains(item))
-           _recMessages.removeAll(item);
+        _recMessages.removeAll(item);
         item->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
     }
 }
