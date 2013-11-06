@@ -2101,7 +2101,7 @@ NetworkTree::setRecMode(QTreeWidgetItem *item, bool activated){
             _recMessages<<item;
         std::cout<<"active "<<_recMessages.size() <<std::endl;
         item->setData(INTERPOLATION_COLUMN, Qt::CheckStateRole, QVariant());
-        item->setIcon(INTERPOLATION_COLUMN,QIcon(":/images/boxStartMenu.svg"));
+        item->setIcon(INTERPOLATION_COLUMN,QIcon(":/images/record.svg"));
     }
     else{
         if(_recMessages.contains(item))

@@ -54,5 +54,6 @@
         <file>images/boxStartMenu.svg</file>
         <file>images/boxEndMenu.svg</file>
         <file>images/rewind.svg</file>
+        <file>images/record.svg</file>
     </qresource>
 </RCC>
