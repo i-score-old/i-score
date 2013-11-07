@@ -592,6 +592,16 @@ public:
 	void setCurveMuteState(TimeProcessId boxId, const std::string & address, bool muteState);
 	bool getCurveMuteState(TimeProcessId boxId, const std::string & address);
     
+    /*!
+	 * Changes the recording information of a curve.
+	 * If set to true, the curve will record it self during the next execution of the box
+	 *
+	 * \param boxId : the Id of the box.
+	 * \param address : curve address.
+	 * \param record : new record information.
+	 */
+    void setCurveRecording(TimeProcessId boxId, const std::string & address, bool record);
+    
 	/*!
 	 * Sets sections informations for sending more complicated curves.
 	 *
