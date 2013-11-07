@@ -297,6 +297,7 @@ class AbstractBox : public Abstract
     void addMessageToRecord(QTreeWidgetItem *item, std::string address);
     void removeMessageToRecord(QTreeWidgetItem *item, std::string address);
     inline QList<QTreeWidgetItem *> messagesToRecord() const {return _messagesToRecord;}
+    inline QList<std::string> messagesToRecordAsString() const {return _messagesToRecordAsString;}
 
   protected:
     QPointF _topLeft;                    //!< The local coordinates of the upper left corner.

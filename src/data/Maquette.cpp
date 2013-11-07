@@ -1831,15 +1831,26 @@ Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
 {
     int type = getBox(boxID)->type();
     BasicBox *box = static_cast<BasicBox*>(_boxes[boxID]);
-    
+
+    //gets addresses to record
+    QList<std::string> msgsToRec = static_cast<AbstractBox *>(box->abstract())->messagesToRecordAsString();
+    QList<std::string>::iterator it;
     if (type == PARENT_BOX_TYPE) {
         
         if (running){
-            box->setCrossedExtremity(BOX_START);
-            //record curves
+            box->setCrossedExtremity(BOX_START);                
         }
         else{
             box->setCrossedExtremity(BOX_END);
+        }
+
+        //Sets curve recording
+        for(it=msgsToRec.begin() ; it!=msgsToRec.end() ; it++){
+
+            if(running) std::cout<<*it<<"rec ON"<<std::endl;
+            else std::cout<<*it<<"rec OFF"<<std::endl;
+
+            _engines->setCurveRecording(boxID, *it, running);
         }
     }
 }
