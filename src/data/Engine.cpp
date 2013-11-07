@@ -1608,6 +1608,14 @@ bool Engine::getCurveMuteState(TimeProcessId boxId, const std::string & address)
 
 void Engine::setCurveRecording(TimeProcessId boxId, const std::string & address, bool record)
 {
+    // --- print ---
+    std::cout<<address;
+    if(record)
+        std::cout<<" > rec ON"<<std::endl;
+    else
+        std::cout<<" > rec OFF"<<std::endl;
+    // -------------
+
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
     TTValue             v, out;
     TTErr               err;
