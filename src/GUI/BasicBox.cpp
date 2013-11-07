@@ -1967,13 +1967,13 @@ BasicBox::setRecMode(bool activated){
 }
 
 void
-BasicBox::addMessageToRecord(QTreeWidgetItem *item, std::string address){
-    _abstract->addMessageToRecord(item,address);
+BasicBox::addMessageToRecord(std::string address){
+    _abstract->addMessageToRecord(address);
     setRecMode(!_abstract->messagesToRecord().isEmpty());
 }
 
 void
-BasicBox::removeMessageToRecord(QTreeWidgetItem *item, std::string address){
-    _abstract->removeMessageToRecord(item,address);
+BasicBox::removeMessageToRecord(std::string address){
+    _abstract->removeMessageToRecord(address);
     setRecMode(!_abstract->messagesToRecord().isEmpty());
 }

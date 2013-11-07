@@ -528,8 +528,8 @@ class NetworkTree : public QTreeWidget
     void changeNameValue(QTreeWidgetItem* item, QString newValue);
     void updateDeviceName(QString newName, QString plugin);
     void updateDevicePlugin(QString newName);
-    void setRecMode(QTreeWidgetItem *item, bool activated);
-    void setRecMode(QList<QTreeWidgetItem *> items, bool activated);
+    void setRecMode(std::string address, bool activated);
+    void setRecMode(QList<std::string> items, bool activated);
 
     virtual void clear();
 };

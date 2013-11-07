@@ -700,18 +700,18 @@ void
 AttributesEditor::changeRecMode(QTreeWidgetItem* item){
     if (_boxEdited != NO_ID) {
           BasicBox * box = _scene->getBox(_boxEdited);          
-          bool activated = !static_cast<AbstractBox *>(box->abstract())->messagesToRecord().contains(item);
           std::string address = _networkTree->getAbsoluteAddress(item).toStdString();
-          _networkTree->setRecMode(item,activated);
+          bool activated = !static_cast<AbstractBox *>(box->abstract())->messagesToRecord().contains(address);
 
           if(activated){
-              box->addMessageToRecord(item,address);
+              box->addMessageToRecord(address);
           }
           else{
-              box->removeMessageToRecord(item,address);
+              box->removeMessageToRecord(address);
               _networkTree->updateCurve(item, _boxEdited, true);
               BasicBox *box = _scene->getBox(_boxEdited);
-              box->updateCurve(_networkTree->getAbsoluteAddress(item).toStdString(), true);
+              box->updateCurve(address, true);
           }
+          _networkTree->setRecMode(address,activated);
     }
 }

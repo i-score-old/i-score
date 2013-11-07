@@ -294,10 +294,9 @@ class AbstractBox : public Abstract
     void setEndMessage(QTreeWidgetItem *item, QString address);
     inline void clearMessages(){_networkTreeExpandedItems.clear();
                                 _networkTreeItems.clear();}
-    void addMessageToRecord(QTreeWidgetItem *item, std::string address);
-    void removeMessageToRecord(QTreeWidgetItem *item, std::string address);
-    inline QList<QTreeWidgetItem *> messagesToRecord() const {return _messagesToRecord;}
-    inline QList<std::string> messagesToRecordAsString() const {return _messagesToRecordAsString;}
+    void addMessageToRecord(std::string address);
+    void removeMessageToRecord(std::string address);
+    inline QList<std::string> messagesToRecord() const {return _messagesToRecord;}
 
   protected:
     QPointF _topLeft;                    //!< The local coordinates of the upper left corner.
@@ -311,7 +310,6 @@ class AbstractBox : public Abstract
     NetworkMessages *_endMessages;       //!< pairs QTreeWidgetItem-Message
     QMap<QTreeWidgetItem *, Data> _networkTreeItems;
     QList<QTreeWidgetItem *> _networkTreeExpandedItems;
-    QList<QTreeWidgetItem *> _messagesToRecord;
-    QList<std::string> _messagesToRecordAsString;
+    QList<std::string> _messagesToRecord;
 };
 #endif

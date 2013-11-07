@@ -1833,7 +1833,7 @@ Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
     BasicBox *box = static_cast<BasicBox*>(_boxes[boxID]);
 
     //gets addresses to record
-    QList<std::string> msgsToRec = static_cast<AbstractBox *>(box->abstract())->messagesToRecordAsString();
+    QList<std::string> msgsToRec = static_cast<AbstractBox *>(box->abstract())->messagesToRecord();
     QList<std::string>::iterator it;
     if (type == PARENT_BOX_TYPE) {
         
