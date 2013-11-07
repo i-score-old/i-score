@@ -51,6 +51,7 @@ AbstractBox::AbstractBox(const QPointF &newTopLeft, const float &newWidth, const
 {
     _networkTreeExpandedItems = QList<QTreeWidgetItem*>();
     _messagesToRecord = QList<QTreeWidgetItem *>();
+    _messagesToRecordAsString = QList<std::string>(); /// \todo Should be better to save it in score ? NH
 }
 
 AbstractBox::AbstractBox(const AbstractBox &other) :
@@ -60,6 +61,7 @@ AbstractBox::AbstractBox(const AbstractBox &other) :
 {
     _networkTreeExpandedItems = QList<QTreeWidgetItem*>();
     _messagesToRecord = QList<QTreeWidgetItem *>();
+    _messagesToRecordAsString = QList<std::string>(); /// \todo Should be better to save it in score ? NH
 }
 
 void
@@ -95,12 +97,15 @@ AbstractBox::setEndMessages(NetworkMessages *endMsgs)
 }
 
 void
-AbstractBox::addMessageToRecord(QTreeWidgetItem *item){
+AbstractBox::addMessageToRecord(QTreeWidgetItem *item, std::string address){
     if(!_messagesToRecord.contains(item))
         _messagesToRecord.push_back(item);
+    if(!_messagesToRecordAsString.contains(address))
+        _messagesToRecordAsString.push_back(address);
 }
 
 void
-AbstractBox::removeMessageToRecord(QTreeWidgetItem *item){
+AbstractBox::removeMessageToRecord(QTreeWidgetItem *item, std::string address){
     _messagesToRecord.removeAll(item);
+    _messagesToRecordAsString.removeAll(address);
 }

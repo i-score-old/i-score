@@ -294,8 +294,8 @@ class AbstractBox : public Abstract
     void setEndMessage(QTreeWidgetItem *item, QString address);
     inline void clearMessages(){_networkTreeExpandedItems.clear();
                                 _networkTreeItems.clear();}
-    void addMessageToRecord(QTreeWidgetItem *item);
-    void removeMessageToRecord(QTreeWidgetItem *item);
+    void addMessageToRecord(QTreeWidgetItem *item, std::string address);
+    void removeMessageToRecord(QTreeWidgetItem *item, std::string address);
     inline QList<QTreeWidgetItem *> messagesToRecord() const {return _messagesToRecord;}
 
   protected:
@@ -311,5 +311,6 @@ class AbstractBox : public Abstract
     QMap<QTreeWidgetItem *, Data> _networkTreeItems;
     QList<QTreeWidgetItem *> _networkTreeExpandedItems;
     QList<QTreeWidgetItem *> _messagesToRecord;
+    QList<std::string> _messagesToRecordAsString;
 };
 #endif

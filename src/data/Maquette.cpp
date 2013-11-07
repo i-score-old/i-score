@@ -1836,7 +1836,7 @@ Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
         
         if (running){
             box->setCrossedExtremity(BOX_START);
-
+            //record curves
         }
         else{
             box->setCrossedExtremity(BOX_END);

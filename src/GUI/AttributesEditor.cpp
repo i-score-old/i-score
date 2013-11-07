@@ -701,14 +701,14 @@ AttributesEditor::changeRecMode(QTreeWidgetItem* item){
     if (_boxEdited != NO_ID) {
           BasicBox * box = _scene->getBox(_boxEdited);          
           bool activated = !static_cast<AbstractBox *>(box->abstract())->messagesToRecord().contains(item);
-
+          std::string address = _networkTree->getAbsoluteAddress(item).toStdString();
           _networkTree->setRecMode(item,activated);
 
           if(activated){
-              box->addMessageToRecord(item);
+              box->addMessageToRecord(item,address);
           }
           else{
-              box->removeMessageToRecord(item);
+              box->removeMessageToRecord(item,address);
               _networkTree->updateCurve(item, _boxEdited, true);
               BasicBox *box = _scene->getBox(_boxEdited);
               box->updateCurve(_networkTree->getAbsoluteAddress(item).toStdString(), true);
