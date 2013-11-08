@@ -1559,6 +1559,12 @@ MaquetteScene::updatePlayingBoxes()
 
   for (it = _playingBoxes.begin(); it != _playingBoxes.end(); ++it) {
       it->second->update();
+
+      //updating recorded curves
+      QList<std::string> recMsgs = static_cast<AbstractBox *>(it->second->abstract())->messagesToRecord();
+      if(!recMsgs.isEmpty())
+          for(int i=0 ; i<recMsgs.size() ; i++)
+              it->second->updateCurve(recMsgs.at(i),true);
     }
 }
 
