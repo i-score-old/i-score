@@ -747,7 +747,8 @@ NetworkTree::clearColumn(unsigned int column)
 
       for (it = assignedItems.begin(); it != assignedItems.end(); it++) {
           curIt = *it;
-          curIt->setCheckState(column, Qt::Unchecked);
+          if(curIt->checkState(column))
+              curIt->setCheckState(column, Qt::Unchecked);
           curIt->setText(column, emptyString);
         }      
     }
@@ -796,7 +797,6 @@ NetworkTree::displayBoxContent(AbstractBox *abBox)
   updateStartMsgsDisplay();
   updateEndMsgsDisplay();
   assignItems(assignedItems());  
-//  setRecMode(abBox->messagesToRecord(),true);
   setRecMode(abBox->messagesToRecord(),true);
 }
 
