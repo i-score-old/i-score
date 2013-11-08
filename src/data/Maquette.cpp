@@ -1843,14 +1843,6 @@ Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
         else{
             box->setCrossedExtremity(BOX_END);
         }
-
-        //Sets curves recording
-        for(it=msgsToRec.begin() ; it!=msgsToRec.end() ; it++){
-            _engines->setCurveRecording(boxID, *it, running);
-
-            if(!running)
-                box->removeMessageToRecord(*it);    //Messages to record automatically removed after running
-        }
     }
 }
 
