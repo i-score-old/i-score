@@ -827,6 +827,11 @@ class Maquette : public QObject
      */
     void updateBoxesAttributes();
 
+    /*!
+     * \brief Sets address record mode.
+     */
+    void setCurveRecording(unsigned int boxID, std::string address, bool activated);
+
   private:
     /*!
      * \brief Generates the triggerQueueList.

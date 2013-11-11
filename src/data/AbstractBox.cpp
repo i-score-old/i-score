@@ -96,11 +96,12 @@ AbstractBox::setEndMessages(NetworkMessages *endMsgs)
 
 void
 AbstractBox::addMessageToRecord(std::string address){
-    if(!_messagesToRecord.contains(address))
+    if(!_messagesToRecord.contains(address)){
         _messagesToRecord.push_back(address);
+    }
 }
 
 void
 AbstractBox::removeMessageToRecord(std::string address){
-    _messagesToRecord.removeAll(address);
+    _messagesToRecord.removeAll(address);    
 }

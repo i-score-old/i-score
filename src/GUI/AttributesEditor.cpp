@@ -697,13 +697,15 @@ AttributesEditor::changeRangeBoundMax(QTreeWidgetItem *item, float value){
 }
 
 void
-AttributesEditor::changeRecMode(QTreeWidgetItem* item){
+AttributesEditor::changeRecMode(QTreeWidgetItem* item){    
+    /// \toto Should be better to ask messagesToRecord list to score (instead of abstractBox). As start/end messages. NH
+
     if (_boxEdited != NO_ID) {
           BasicBox * box = _scene->getBox(_boxEdited);          
           std::string address = _networkTree->getAbsoluteAddress(item).toStdString();
           bool activated = !static_cast<AbstractBox *>(box->abstract())->messagesToRecord().contains(address);
 
-          if(activated){
+          if(activated){              
               box->addMessageToRecord(address);
           }
           else{
@@ -712,6 +714,6 @@ AttributesEditor::changeRecMode(QTreeWidgetItem* item){
               BasicBox *box = _scene->getBox(_boxEdited);
               box->updateCurve(address, true);
           }
-          _networkTree->setRecMode(address,activated);
+          _networkTree->setRecMode(address,activated);          
     }
 }

@@ -1842,6 +1842,9 @@ Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
         }
         else{
             box->setCrossedExtremity(BOX_END);
+            //Messages to record automatically removed after running
+            for(it=msgsToRec.begin() ; it!=msgsToRec.end() ; it++)
+                box->removeMessageToRecord(*it);    //Messages to record automatically removed after running
         }
     }
 }
@@ -1976,4 +1979,9 @@ Maquette::setRangeBoundMin(unsigned int boxID, const string &address, float valu
 void
 Maquette::setRangeBoundMax(unsigned int boxID, const string &address, float value){
     /// \todo
+}
+
+void
+Maquette::setCurveRecording(unsigned int boxID, const string address, bool activated){
+    _engines->setCurveRecording(boxID,address,activated);
 }
