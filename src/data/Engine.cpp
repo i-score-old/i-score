@@ -1608,23 +1608,14 @@ bool Engine::getCurveMuteState(TimeProcessId boxId, const std::string & address)
 
 void Engine::setCurveRecording(TimeProcessId boxId, const std::string & address, bool record)
 {
-    // --- print ---
-    std::cout<<address;
-    if(record)
-        std::cout<<" > rec ON"<<std::endl;
-    else
-        std::cout<<" > rec OFF"<<std::endl;
-    // -------------
-
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
     TTValue             v, out;
-    TTErr               err;
     
     // enable/disable recording
     v = toTTAddress(address);
     v.append(record);
     
-    timeProcess->sendMessage(TTSymbol("CurveRecord"), toTTAddress(address), out);
+    timeProcess->sendMessage(TTSymbol("CurveRecord"), v, out);
 }
 
 bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned int argNb, const std::vector<float> & percent, const std::vector<float> & y, const std::vector<short> & sectionType, const std::vector<float> & coeff)
@@ -1979,16 +1970,6 @@ bool Engine::isPlaying()
     
     aScheduler->getAttributeValue(TTSymbol("running"), v);
     
-    if (TTBoolean(v[0]) != saveLastPlayingStateForTest) {
-    
-        if (TTBoolean(v[0]))
-            TTLogMessage("Engine::isPlaying returns true\n");
-        else
-            TTLogMessage("Engine::isPlaying returns false\n");
-    }
-    
-    saveLastPlayingStateForTest = TTBoolean(v[0]);
-    
     return TTBoolean(v[0]);
 }
 
@@ -2014,16 +1995,6 @@ bool Engine::isPaused()
     aScheduler = TTObjectBasePtr(v[0]);
     
     aScheduler->getAttributeValue(TTSymbol("paused"), v);
-    
-    if (TTBoolean(v[0]) != saveLastPausedStateForTest) {
-        
-        if (TTBoolean(v[0]))
-            TTLogMessage("Engine::isPaused returns true\n");
-        else
-            TTLogMessage("Engine::isPaused returns false\n");
-    }
-    
-    saveLastPausedStateForTest = TTBoolean(v[0]);
     
     return TTBoolean(v[0]);
 }

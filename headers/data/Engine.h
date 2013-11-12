@@ -800,8 +800,7 @@ public:
 	 * \return true if the main scnerio is running. False if not.
 	 */
 	bool isPlaying();
-    bool saveLastPlayingStateForTest;   // théo : only for debug purpose
-    
+
 	/*!
 	 * Stops the main scenario.
 	 *
@@ -816,8 +815,7 @@ public:
 	 *
 	 */
 	void pause(bool pauseValue);
-    bool saveLastPausedStateForTest;   // théo : only for debug purpose
-    
+ 
     /*!
 	 * Tests if the main scenario is actually paused.
 	 *
