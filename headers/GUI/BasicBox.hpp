@@ -716,6 +716,7 @@ class BasicBox : public QObject, public QGraphicsItem
     currentColor(){ return _color; }
     void select();
     void setRecMode(bool activated);
+    inline bool recording(){return _recording;}
 
     /*!
      * \brief Return the messages list, like if the box just ended its execution.
