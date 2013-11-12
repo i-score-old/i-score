@@ -1842,9 +1842,9 @@ Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
         }
         else{
             box->setCrossedExtremity(BOX_END);
-            //Messages to record automatically removed after running
-            for(it=msgsToRec.begin() ; it!=msgsToRec.end() ; it++)
-                box->removeMessageToRecord(*it);    //Messages to record automatically removed after running
+//            //Messages to record automatically removed after running
+//            for(it=msgsToRec.begin() ; it!=msgsToRec.end() ; it++)
+//                box->removeMessageToRecord(*it);
         }
     }
 }

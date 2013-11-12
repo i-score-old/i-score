@@ -310,7 +310,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
   BasicBox *box = Maquette::getInstance()->getBox(_boxID);
 
   if (box != NULL) { // Box Found
-      if (box->hasCurve(address)) {
+//      if (box->hasCurve(address)) {
           AbstractCurve *abCurve = box->getCurve(address);
           QMap<string, CurveWidget *>::iterator curveIt2 = _curveMap->find(address);
           QString curveAddressStr = QString::fromStdString(address);
@@ -410,10 +410,10 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
                     }
                 }
             }
-        }
-      else {
-          return false;
-        }
+//        }
+//      else {
+//          return false;
+//        }
     }
   else {  // Box Not Found
       return false;

@@ -265,6 +265,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
       _scene->view()->setScenarioSelected(false);
       _networkTree->updateCurves(_boxEdited);
       updateWidgets(boxModified);
+
   }
 }
 
@@ -297,6 +298,12 @@ AttributesEditor::updateWidgets(bool boxModified)
       _boxName->setText(box->name());
       _colorButtonPixmap->fill(box->currentColor());
       _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
+
+      //update recorded curves
+      QList<std::string> recMsgs = static_cast<AbstractBox *>(box->abstract())->messagesToRecord();
+      for(int i=0 ; i<recMsgs.size() ; i++){
+          box->updateCurve(recMsgs[i],true);
+      }
   }
 
   update();
