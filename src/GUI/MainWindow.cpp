@@ -137,6 +137,8 @@ MainWindow::MainWindow()
   connect(_scene, SIGNAL(stopPlaying()), _headerPanelWidget, SLOT(stop()));
   connect(_view, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
   connect(_scene, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
+  connect(_view, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
+  connect(_scene, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
 }
 
 MainWindow::~MainWindow()
@@ -794,4 +796,11 @@ MainWindow::updateCmdKeyState(bool state)
 {
   displayMessage(state ? tr("command key pressed") : tr(""), INDICATION_LEVEL);
   _commandKey = state;
+}
+
+void
+MainWindow::updatePlayMode(){
+    _scene->unselectAll();
+    _editor->noBoxEdited();
+    _editor->setDisabled(_scene->playing());
 }

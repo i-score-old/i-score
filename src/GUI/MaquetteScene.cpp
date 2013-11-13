@@ -1784,3 +1784,11 @@ float
 MaquetteScene::getMaxSceneWidth(){
   return _maxSceneWidth;
 }
+
+void
+MaquetteScene::unselectAll(){
+    QList<QGraphicsItem *> items = selectedItems();
+    QList<QGraphicsItem *>::iterator it;
+    for(it = items.begin(); it != items.end() ; it++)
+        (*it)->setSelected(false);
+}

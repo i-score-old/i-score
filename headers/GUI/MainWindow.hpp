@@ -218,6 +218,7 @@ class MainWindow : public QMainWindow
     void selectAll();
     void changeNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, std::string port);
     void updateCmdKeyState(bool state);
+    void updatePlayMode();
 
   private:
     /*!
@@ -274,7 +275,7 @@ class MainWindow : public QMainWindow
      * \param the full name
      * \return the stripped name
      */
-    QString strippedName(const QString &fullFileName);
+    QString strippedName(const QString &fullFileName);    
 
     MaquetteView *_view;                    //!< The maquette view.
     MaquetteScene *_scene;                  //!< The maquette scene.
