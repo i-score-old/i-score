@@ -1975,7 +1975,17 @@ BasicBox::addMessageToRecord(std::string address){
 
 void
 BasicBox::removeMessageToRecord(std::string address){
+    std::cout<<"remove "<<address<<std::endl;
     _abstract->removeMessageToRecord(address);
     setRecMode(!_abstract->messagesToRecord().isEmpty());
     Maquette::getInstance()->setCurveRecording(_abstract->ID(), address, false);
+}
+
+void
+BasicBox::updateRecordingCurves(){
+    QList<std::string> recMsgs = _abstract->messagesToRecord();
+    for(int i=0 ; i<recMsgs.size() ; i++){
+        updateCurve(recMsgs[i],true);
+        removeMessageToRecord(recMsgs[i]);
+    }
 }

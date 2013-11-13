@@ -1359,9 +1359,10 @@ Maquette::turnExecutionOff()
     
     // Set all boxes as if they crossed there end extremity
     BoxesMap::iterator it;
-    for (it = _boxes.begin(); it != _boxes.end(); it++)
+    for (it = _boxes.begin(); it != _boxes.end(); it++){
         if (it->second->type() == PARENT_BOX_TYPE)
-            static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
+            static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);        
+    }
     
     // Clear the trigger queue list
     _scene->triggersQueueList()->clear();
@@ -1832,19 +1833,12 @@ Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
     int type = getBox(boxID)->type();
     BasicBox *box = static_cast<BasicBox*>(_boxes[boxID]);
 
-    //gets addresses to record
-    QList<std::string> msgsToRec = static_cast<AbstractBox *>(box->abstract())->messagesToRecord();
-    QList<std::string>::iterator it;
-    if (type == PARENT_BOX_TYPE) {
-        
+    if (type == PARENT_BOX_TYPE) {        
         if (running){
             box->setCrossedExtremity(BOX_START);                
         }
         else{
             box->setCrossedExtremity(BOX_END);
-//            //Messages to record automatically removed after running
-//            for(it=msgsToRec.begin() ; it!=msgsToRec.end() ; it++)
-//                box->removeMessageToRecord(*it);
         }
     }
 }

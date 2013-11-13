@@ -803,4 +803,13 @@ MainWindow::updatePlayMode(){
     _scene->unselectAll();
     _editor->noBoxEdited();
     _editor->setDisabled(_scene->playing());
+
+    if(!_scene->playing()){
+        //update recorded curves
+        std::map<unsigned int, BasicBox*> boxes = Maquette::getInstance() ->getBoxes();
+        std::map<unsigned int, BasicBox*>::iterator it;
+        for (it = boxes.begin(); it != boxes.end(); it++) {
+            (it->second)->updateRecordingCurves();
+        }
+    }
 }

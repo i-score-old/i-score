@@ -1631,7 +1631,7 @@ MaquetteScene::stopAndGoToCurrentTime()
     _maquette->stopPlayingAndGoToCurrentTime();
     _playThread->quit();
     _playingBoxes.clear();
-    
+
     update();
     
     emit(playModeChanged());
