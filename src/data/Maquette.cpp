@@ -99,6 +99,7 @@ Maquette::~Maquette()
 {
   _boxes.clear();
   _parentBoxes.clear();
+  _recordingBoxes.clear();
   delete _engines;
 }
 
@@ -1978,4 +1979,8 @@ Maquette::setRangeBoundMax(unsigned int boxID, const string &address, float valu
 void
 Maquette::setCurveRecording(unsigned int boxID, const string address, bool activated){
     _engines->setCurveRecording(boxID,address,activated);
+    if(activated)
+        _recordingBoxes<<getBox(boxID);
+    else
+        _recordingBoxes.removeAll(getBox(boxID));
 }

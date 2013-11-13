@@ -783,7 +783,7 @@ class Maquette : public QObject
     void updateTriggerPointActiveStatus(unsigned int trgID, bool active);
     
     inline std::map<unsigned int, BasicBox*> getBoxes(){ return _boxes; }
-
+    inline QList<BasicBox *> getRecordingBoxes(){return _recordingBoxes ;}
     /*!
      * \brief When a time offset is entered, the scenario before this value is simulated.
      * Messages (final state of each boxes) are sended to the engine.
@@ -911,6 +911,8 @@ class Maquette : public QObject
     //! The set of available Engines listening ports.
     std::vector<unsigned int> _listeningPorts;
     std::vector<std::string> _plugins;
+
+    QList<BasicBox *> _recordingBoxes;
 
     //Device _defaultDevice; //!< The default network device used.
 
