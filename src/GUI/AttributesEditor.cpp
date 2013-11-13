@@ -222,8 +222,8 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
   if (boxModified || (_boxEdited == NO_ID)) {
       _networkTree->resetNetworkTree();
       if (_boxEdited != NO_ID) {
-          if (abBox->networkTreeItems().isEmpty() && abBox->networkTreeExpandedItems().isEmpty()) {
-              //LOAD FILE	
+          if (abBox->networkTreeItems().isEmpty() /*&& abBox->networkTreeExpandedItems().isEmpty()*/) {
+              //LOAD FILE
               _networkTree->loadNetworkTree(abBox);
               startMessagesChanged();
               endMessagesChanged();
@@ -303,6 +303,7 @@ AttributesEditor::updateWidgets(bool boxModified)
       QList<std::string> recMsgs = static_cast<AbstractBox *>(box->abstract())->messagesToRecord();
       for(int i=0 ; i<recMsgs.size() ; i++){
           box->updateCurve(recMsgs[i],true);
+          box->removeMessageToRecord(recMsgs[i]);
       }
   }
 

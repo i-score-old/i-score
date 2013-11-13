@@ -397,7 +397,7 @@ void
 BasicBox::updateCurve(string address, bool forceUpdate)
 {
     if(_boxContentWidget != NULL){
-        _boxContentWidget->updateCurve(address, forceUpdate);
+        _boxContentWidget->updateCurve(address, forceUpdate);                
         update();
     }
 }
