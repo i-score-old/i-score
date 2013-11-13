@@ -2137,7 +2137,7 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
             getProtocol(protocolName)->setAttributeValue(TTSymbol("applicationParameters"), v);
             
             // run the protocol for this application
-            getProtocol(protocolName)->sendMessage(TTSymbol("Run"), applicationName, kTTValNONE);
+            getProtocol(protocolName)->sendMessage(kTTSym_Run, applicationName, kTTValNONE);
         }
     }
 }
@@ -2157,7 +2157,7 @@ void Engine::removeNetworkDevice(const std::string & deviceName)
         protocolName = v[0]; // we register application to 1 protocol only
         
         // stop the protocol for this application
-        getProtocol(protocolName)->sendMessage(TTSymbol("Stop"), applicationName, kTTValNONE);
+        getProtocol(protocolName)->sendMessage(kTTSym_Stop, applicationName, kTTValNONE);
         
         // unregister the application to the protocol
         v = TTValue(applicationName);
@@ -2250,7 +2250,7 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
                 if (type == TTSymbol("Data")) {
                     
                     // get the value attribute
-                    aMirror->getAttributeValue(TTSymbol("value"), v);
+                    aMirror->getAttributeValue(kTTSym_value, v);
                     v.toString();
                     s = TTString(v[0]);
                     
@@ -2407,7 +2407,7 @@ int Engine::requestNetworkNamespace(const std::string & address, std::string & n
                 attributs.push_back("service");
                 
                 // get the value of the service attribute
-                if (!aMirror->getAttributeValue(TTSymbol("service"), v))
+                if (!aMirror->getAttributeValue(kTTSym_service, v))
                     service = v[0];
                 else
                     service = TTSymbol("error");
@@ -2423,7 +2423,7 @@ int Engine::requestNetworkNamespace(const std::string & address, std::string & n
                     attributs.push_back("value");
                 
                     // get the value attribute
-                    aMirror->getAttributeValue(TTSymbol("value"), v);
+                    aMirror->getAttributeValue(kTTSym_value, v);
                     v.toString();
                     s = TTString(v[0]);
                     attributsValue.push_back(s.c_str());
@@ -2434,7 +2434,7 @@ int Engine::requestNetworkNamespace(const std::string & address, std::string & n
                 attributs.push_back("rangeBounds");
                 
                 // get the value of the rangeBounds attribute
-                aMirror->getAttributeValue(TTSymbol("rangeBounds"), v);
+                aMirror->getAttributeValue(kTTSym_rangeBounds, v);
                     
                 v.toString();
                 s = TTString(v[0]);
@@ -2446,7 +2446,7 @@ int Engine::requestNetworkNamespace(const std::string & address, std::string & n
                 attributs.push_back("service");
                 
                 // get the value of the service attribute
-                if (!aMirror->getAttributeValue(TTSymbol("service"), v))
+                if (!aMirror->getAttributeValue(kTTSym_service, v))
                     service = v[0];
                 else
                     service = TTSymbol("error");
