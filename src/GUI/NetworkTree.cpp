@@ -691,7 +691,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
 
             //Get range bounds
             vector<float> rangeBounds;
-            if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0){
+            if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0){                
                 curItem->setText(MIN_COLUMN,QString("%1").arg(rangeBounds[0]));
                 curItem->setToolTip(MIN_COLUMN, curItem->text(MIN_COLUMN));
                 curItem->setText(MAX_COLUMN,QString("%1").arg(rangeBounds[1]));
