@@ -220,6 +220,11 @@ class MainWindow : public QMainWindow
     void updateCmdKeyState(bool state);
     void updatePlayMode();
 
+    /*!
+     * \brief Updates start/end messages and messages to assign, asking to engine.
+     */
+    void updateRecordingBoxes();
+
   private:
     /*!
      * \brief Initializes actions.
