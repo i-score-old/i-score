@@ -876,7 +876,8 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
     if (!err) {
         
         // Set the time process rigid
-        timeProcess->setAttributeValue(TTSymbol("rigid"), kTTBoolYes);
+        v = TTBoolean(YES);
+        timeProcess->setAttributeValue(TTSymbol("rigid"), v);
         
         // Cache it and get an unique id for this process
         relationId = cacheInterval(timeProcess);
@@ -1358,7 +1359,7 @@ void Engine::getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex cont
     TTBoolean           flattened;
     TTObjectBasePtr     state;
     TTListPtr           lines = NULL;
-    TTDictionaryPtr     aLine;
+    TTDictionaryBasePtr aLine;
     TTAddress           address;
     std::string         s;
     
@@ -1389,7 +1390,7 @@ void Engine::getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex cont
         // edit each line address into a "directory/address value" string
         for (lines->begin(); lines->end(); lines->next()) {
             
-            aLine = TTDictionaryPtr((TTPtr)lines->current()[0]);
+            aLine = TTDictionaryBasePtr((TTPtr)lines->current()[0]);
             
             // get the target address
             aLine->lookup(kTTSym_target, v);
