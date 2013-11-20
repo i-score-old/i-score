@@ -607,7 +607,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
             conflict = false;
 
             if(treeFilterActive()){
-                if(nodeType == "Model" || nodeType == "Input.audio" ||nodeType == "Output.audio"){
+                if(nodeType == "ModelInfo" || nodeType == "Input.audio" ||nodeType == "Output.audio"){
                     delete(curItem);
                     return;
                 }                
