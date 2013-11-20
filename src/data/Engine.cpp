@@ -2324,6 +2324,7 @@ Engine::requestObjectType(const std::string & address, std::string & nodeType){
     TTNodeDirectoryPtr  aDirectory;
     TTAddress           anAddress = toTTAddress(address);
     TTSymbol            type;
+    TTObjectBasePtr     anObject;
     TTMirrorPtr         aMirror;
     TTNodePtr           aNode;
 
@@ -2335,16 +2336,21 @@ Engine::requestObjectType(const std::string & address, std::string & nodeType){
 
     if (!aDirectory->getTTNode(anAddress, &aNode)) {
 
-        aMirror = TTMirrorPtr(aNode->getObject());
-        if (aMirror) {
-
-            type = aMirror->getName();
-
-            if (type != kTTSymEmpty)
-                nodeType = type.c_str();
+        anObject = aNode->getObject();
+        
+        if (anObject) {
             
+            if (anObject->getName() == kTTSym_Mirror)
+                type = TTMirrorPtr(anObject)->getName();
+            else
+                type = anObject->getName();
+            
+            if (type != kTTSymEmpty) {
+                
+                nodeType = type.c_str();
+                return 1;
+            }
         }
-        return 1;
     }
     return 0;
 }
