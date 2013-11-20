@@ -804,35 +804,39 @@ MainWindow::updatePlayMode(){
     _editor->noBoxEdited();
     _editor->setDisabled(_scene->playing());
 
-    if(!_scene->playing()){
+    if(!_scene->playing())
+        updateRecordingBoxes();
+}
 
-        //update recorded curves
-        QList<BasicBox*> boxes = Maquette::getInstance()->getRecordingBoxes();
-        QList<BasicBox*>::iterator it;
-        for (it = boxes.begin(); it != boxes.end(); it++){
+void
+MainWindow::updateRecordingBoxes(){
 
-            //Setting start/end messages
-            QList< QPair<QTreeWidgetItem *, Message> > startItemsAndMsgs = _editor->networkTree()->getItemsFromMsg(Maquette::getInstance()->firstMessagesToSend((*it)->ID()));
-            QList< QPair<QTreeWidgetItem *, Message> > endItemsAndMsgs = _editor->networkTree()->getItemsFromMsg(Maquette::getInstance()->lastMessagesToSend((*it)->ID()));
-            NetworkMessages *startMsg = new NetworkMessages();
-            NetworkMessages *endMsg = new NetworkMessages();
-            startMsg->setMessages(startItemsAndMsgs);
-            endMsg->setMessages(endItemsAndMsgs);
-            Maquette::getInstance()->setStartMessagesToSend((*it)->ID(), startMsg);
-            Maquette::getInstance()->setEndMessagesToSend((*it)->ID(), endMsg);
+    //Update recorded curves
+    QList<BasicBox*> boxes = Maquette::getInstance()->getRecordingBoxes();
+    QList<BasicBox*>::iterator it;
+    for (it = boxes.begin(); it != boxes.end(); it++){
 
-            //setting messages to assign
-            QMap<QTreeWidgetItem*, Data> itemsToAssign;
-            Data data;
-            data.hasCurve = true;
-            data.curveActivated = true;
-            for(int i=0; i<startItemsAndMsgs.size(); i++)
-                itemsToAssign.insert(startItemsAndMsgs[i].first,data);
+        //Setting start/end messages
+        QList< QPair<QTreeWidgetItem *, Message> > startItemsAndMsgs = _editor->networkTree()->getItemsFromMsg(Maquette::getInstance()->firstMessagesToSend((*it)->ID()));
+        QList< QPair<QTreeWidgetItem *, Message> > endItemsAndMsgs = _editor->networkTree()->getItemsFromMsg(Maquette::getInstance()->lastMessagesToSend((*it)->ID()));
+        NetworkMessages *startMsg = new NetworkMessages();
+        NetworkMessages *endMsg = new NetworkMessages();
+        startMsg->setMessages(startItemsAndMsgs);
+        endMsg->setMessages(endItemsAndMsgs);
+        Maquette::getInstance()->setStartMessagesToSend((*it)->ID(), startMsg);
+        Maquette::getInstance()->setEndMessagesToSend((*it)->ID(), endMsg);
 
-            Maquette::getInstance()->setSelectedItemsToSend((*it)->ID(), itemsToAssign);
+        //Setting messages to assign
+        QMap<QTreeWidgetItem*, Data> itemsToAssign;
+        Data data;
+        data.hasCurve = true;
+        data.curveActivated = true;
+        for(int i=0; i<startItemsAndMsgs.size(); i++)
+            itemsToAssign.insert(startItemsAndMsgs[i].first,data);
 
-            //updating curve
-            (*it)->updateRecordingCurves();
-        }
+        Maquette::getInstance()->setSelectedItemsToSend((*it)->ID(), itemsToAssign);
+
+        //Updating curve
+        (*it)->updateRecordingCurves();
     }
 }
