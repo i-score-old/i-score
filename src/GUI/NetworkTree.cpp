@@ -622,7 +622,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
 
                     QFont curFont = curItem->font(NAME_COLUMN);
                     curFont.setItalic(true);
-                    curItem->setFont(NAME_COLUMN,curFont);
+                    curItem->setFont(NAME_COLUMN,curFont);                    
 
                     QBrush brush(Qt::lightGray);
                     curItem->setForeground(NAME_COLUMN, brush);
@@ -630,6 +630,8 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
 
                     curItem->setText(TYPE_COLUMN,QString("->"));
                     curItem->setToolTip(TYPE_COLUMN, tr("Type PresetManager"));
+                    curItem->setWhatsThis(NAME_COLUMN,"Message");
+
                     return;
                 }
             }
@@ -677,6 +679,8 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
 
                         curItem->setText(TYPE_COLUMN,QString("->"));
                         curItem->setToolTip(TYPE_COLUMN, tr("Type message"));
+                        curItem->setWhatsThis(NAME_COLUMN,"Message");
+
                         return;
                     }
 
@@ -1734,17 +1738,15 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
     }
     
   //Case message
-  vector<string> attributesValues;
-  if(Maquette::getInstance()->requestObjectAttribruteValue(qaddress.toStdString(),"service",attributesValues) > 0){
-      if(attributesValues[0]=="message"){
-          if (column == START_COLUMN && VALUE_MODIFIED) {
-              VALUE_MODIFIED = FALSE;
-              assignItem(item, data);
-              emit(startValueChanged(item, item->text(START_COLUMN)));
-              item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
-          }
+  if(item->whatsThis(NAME_COLUMN)=="Message"){
+      if (column == START_COLUMN && VALUE_MODIFIED) {
+          VALUE_MODIFIED = FALSE;
+          assignItem(item, data);
+          emit(startValueChanged(item, item->text(START_COLUMN)));
+          item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
       }
   }
+
   else if (column == END_COLUMN && VALUE_MODIFIED) {
       VALUE_MODIFIED = FALSE;
       assignItem(item, data);
