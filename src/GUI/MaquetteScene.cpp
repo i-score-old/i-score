@@ -1658,10 +1658,15 @@ MaquetteScene::stopAndGoToStart()
     
     _maquette->setAccelerationFactor(1.);
     emit(accelerationValueChanged(1.));
-    _maquette->stopPlayingAndGoToStart();
     _playThread->quit();
     _playingBoxes.clear();
-    
+    _maquette->stopPlayingAndGoToStart();
+
+    //send root box start messages
+    std::vector<std::string> startCue = _maquette->getBox(ROOT_BOX_ID)->getStartMessages();
+    for(int i=0; i<startCue.size(); i++)
+        sendMessage(startCue.at(i));
+
     update();
     
     emit(playModeChanged());
