@@ -607,7 +607,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
             conflict = false;
 
             if(treeFilterActive()){
-                if(nodeType == "ModelInfo" || nodeType == "Input.audio" ||nodeType == "Output.audio"){
+                if(nodeType == "Model" || nodeType == "ModelInfo" || nodeType == "Input.audio" ||nodeType == "Output.audio"){
                     delete(curItem);
                     return;
                 }                
@@ -617,7 +617,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                         return;
                     }
                 }
-                if(nodeType == "PresetManager"){
+                if(nodeType == "PresetManager"){                    
                     curItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
 
                     QFont curFont = curItem->font(NAME_COLUMN);
