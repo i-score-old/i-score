@@ -722,6 +722,6 @@ AttributesEditor::changeRecMode(QTreeWidgetItem* item){
               BasicBox *box = _scene->getBox(_boxEdited);
               box->updateCurve(address, true);
           }
-          _networkTree->setRecMode(address,activated);          
+          _networkTree->setRecMode(address);
     }
 }

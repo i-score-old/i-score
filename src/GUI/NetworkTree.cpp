@@ -797,7 +797,7 @@ NetworkTree::displayBoxContent(AbstractBox *abBox)
   updateStartMsgsDisplay();
   updateEndMsgsDisplay();
   assignItems(assignedItems());  
-  setRecMode(abBox->messagesToRecord(),true);
+  setRecMode(abBox->messagesToRecord());
 }
 
 void
@@ -2093,11 +2093,9 @@ NetworkTree::updateDevicePlugin(QString newPlugin)
 }
 
 void
-NetworkTree::setRecMode(std::string address, bool activated){
-    std::cout<<"setRecMode "<<address<<std::endl;
+NetworkTree::setRecMode(std::string address){
     QTreeWidgetItem *item = getItemFromAddress(address);
 
-//    if(activated){
     if(!_recMessages.contains(item)){
         _recMessages<<item;
         item->setData(INTERPOLATION_COLUMN, Qt::CheckStateRole, QVariant());
@@ -2110,8 +2108,8 @@ NetworkTree::setRecMode(std::string address, bool activated){
 }
 
 void
-NetworkTree::setRecMode(QList<std::string> address, bool activated){
+NetworkTree::setRecMode(QList<std::string> address){
     QList<std::string>::iterator it;
     for(it=address.begin() ; it!=address.end() ; it++)
-        setRecMode(*it,activated);
+        setRecMode(*it);
 }
