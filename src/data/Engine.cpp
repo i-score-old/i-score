@@ -2170,7 +2170,7 @@ void Engine::removeNetworkDevice(const std::string & deviceName)
 }
 
 void Engine::sendNetworkMessage(const std::string & stringToSend)
-{
+{    
     TTValue out, data, v = TTString(stringToSend);
     v.fromString();
     

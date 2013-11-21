@@ -624,8 +624,7 @@ Maquette::setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages)
 bool
 Maquette::sendMessage(const string &message)
 {
-  if (!message.empty()) {
-
+  if (!message.empty()) {      
       _engines->sendNetworkMessage(message);
 
       return true;
@@ -1263,7 +1262,7 @@ Maquette::initSceneState()
                 }
             }
         }
-      else if (timeOffset == currentBox->date()) {
+      else if (timeOffset == currentBox->date() && timeOffset > 0) { // <timeOffset to avoid rootBox cue duplication
           boxMsgs = currentBox->getStartState();
         }
       boxAddresses = boxMsgs.keys();
@@ -1309,14 +1308,14 @@ void
 Maquette::turnExecutionOn()
 {    
     // Start execution from where is the time offset is
-    
+    unsigned int timeOffset = _engines->getTimeOffset();
+
     initSceneState();
     
     generateTriggerQueue();
     
     // Remove the first trigger which are before or equal to the time offset
-    // théo : is this really usefull ?
-    unsigned int timeOffset = _engines->getTimeOffset();
+    // théo : is this really usefull ?    
     int nbTrg = _scene->triggersQueueList()->size();
     
     try {
@@ -1390,13 +1389,13 @@ Maquette::isExecutionPaused()
 void
 Maquette::stopPlayingAndGoToStart()
 {
-    turnExecutionOff();    
+    turnExecutionOff();
     setTimeOffset(0);
 
     //send root box start messages
-    std::vector<std::string> startCue = getBox(ROOT_BOX_ID)->getStartMessages();
-    for(int i=0; i<startCue.size(); i++)
-        sendMessage(startCue.at(i));
+//    std::vector<std::string> startCue = getBox(ROOT_BOX_ID)->getStartMessages();
+//    for(int i=0; i<startCue.size(); i++)
+//        sendMessage(startCue.at(i));
 }
 
 void

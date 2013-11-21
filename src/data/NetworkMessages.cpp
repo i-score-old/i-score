@@ -202,10 +202,10 @@ NetworkMessages::computeMessages()
 {
   vector<string> msgs;
   QMap<QTreeWidgetItem *, Message>::iterator it;
-  for (it = _messages.begin(); it != _messages.end(); it++) {
-      string lineMsg = computeMessage(*it);
+  for (it = _messages.begin(); it != _messages.end(); it++) {      
+      string lineMsg = computeMessage(*it);            
       if (lineMsg != "") {
-          msgs.push_back(lineMsg);
+          msgs.push_back(lineMsg);          
         }
       else {
           std::cerr << "NetworkMessages::computeMessages : bad message ignored" << std::endl;
