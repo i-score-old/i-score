@@ -1638,30 +1638,41 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
         }
 
       if ((item->type() == LeaveType || item->type() == OSCNode) && column == INTERPOLATION_COLUMN) {
+
           if(static_cast<MainWindow *>(this->topLevelWidget())->commandKey()){
               emit recModeChanged(item);
           }
-          else{              
+          else{
               if (isAssigned(item) && hasCurve(item)) {
                   bool activated = item->checkState(column) == Qt::Checked;
                   emit(curveActivationChanged(item, activated));
               }
               else {
-                  item->setCheckState(column, Qt::Unchecked);
+                  //Creates curve with start=minBound and end=maxBound (default 0 1)
+                  vector<float> rangeBounds;
+                  float min = 0., max = 1.;
+                  std::string address = getAbsoluteAddress(item).toStdString();
+                  if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0){
+                      min = rangeBounds[0];
+                      max = rangeBounds[1];
+                  }
+                  VALUE_MODIFIED = true;
+                  item->setText(START_COLUMN,QString("%1").arg(min));
+                  VALUE_MODIFIED = true;
+                  item->setText(END_COLUMN,QString("%1").arg(max));
               }
           }
-  }
-
+      }
       if ((item->type() == LeaveType || item->type() == OSCNode) && column == REDUNDANCY_COLUMN) {
           if (isAssigned(item) && hasCurve(item)) {
               bool activated = item->checkState(column) == Qt::Checked;
               emit(curveRedundancyChanged(item, activated));
-            }
+          }
           else {
               item->setCheckState(column, Qt::Unchecked);
-            }
-        }
-    }
+          }
+      }
+  }
 
   if (selectionMode() == QAbstractItemView::ContiguousSelection) {
       QList<QTreeWidgetItem*> selection = selectedItems();
@@ -1686,79 +1697,79 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
     QString qaddress = getAbsoluteAddress(item);
     data.address = qaddress;
 
-  if (item->type() == LeaveType && column == START_COLUMN && VALUE_MODIFIED) {
-      VALUE_MODIFIED = FALSE;
-      assignItem(item, data);
-      emit(startValueChanged(item, item->text(START_COLUMN)));
+    if (item->type() == LeaveType && column == START_COLUMN && VALUE_MODIFIED) {
+        VALUE_MODIFIED = FALSE;
+        assignItem(item, data);
+        emit(startValueChanged(item, item->text(START_COLUMN)));
     }
 
-  if (item->type() == LeaveType && column == END_COLUMN && VALUE_MODIFIED) {
-      VALUE_MODIFIED = FALSE;
-      assignItem(item, data);
-      emit(endValueChanged(item, item->text(END_COLUMN)));
+    if (item->type() == LeaveType && column == END_COLUMN && VALUE_MODIFIED) {
+        VALUE_MODIFIED = FALSE;
+        assignItem(item, data);
+        emit(endValueChanged(item, item->text(END_COLUMN)));
     }
 
-  if (item->type() == LeaveType && column == SR_COLUMN && SR_MODIFIED) {
-      SR_MODIFIED = FALSE;
-      emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
+    if (item->type() == LeaveType && column == SR_COLUMN && SR_MODIFIED) {
+        SR_MODIFIED = FALSE;
+        emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
     }
 
-  if (item->type() == LeaveType && column == MIN_COLUMN && MIN_MODIFIED){
-      MIN_MODIFIED = false;
-      emit(rangeBoundMinChanged(item,item->text(MIN_COLUMN).toFloat()));
-  }
-
-  if (item->type() == LeaveType && column == MAX_COLUMN && MAX_MODIFIED){
-      MAX_MODIFIED = false;
-      emit(rangeBoundMaxChanged(item,item->text(MAX_COLUMN).toFloat()));
-  }
-  if (item->type() == OSCNode && column == NAME_COLUMN && NAME_MODIFIED) {
-      NAME_MODIFIED = FALSE;
-      changeNameValue(item, item->text(NAME_COLUMN));
-      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
-    }
-  if (item->type() == OSCNode && column == START_COLUMN && VALUE_MODIFIED) {
-      VALUE_MODIFIED = FALSE;
-      assignItem(item, data);
-      emit(startValueChanged(item, item->text(START_COLUMN)));
-      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+    if (item->type() == LeaveType && column == MIN_COLUMN && MIN_MODIFIED){
+        MIN_MODIFIED = false;
+        emit(rangeBoundMinChanged(item,item->text(MIN_COLUMN).toFloat()));
     }
 
-  if (item->type() == OSCNode && column == END_COLUMN && VALUE_MODIFIED) {
-      VALUE_MODIFIED = FALSE;
-      assignItem(item, data);
-      emit(endValueChanged(item, item->text(END_COLUMN)));
-      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
+    if (item->type() == LeaveType && column == MAX_COLUMN && MAX_MODIFIED){
+        MAX_MODIFIED = false;
+        emit(rangeBoundMaxChanged(item,item->text(MAX_COLUMN).toFloat()));
+    }
+    if (item->type() == OSCNode && column == NAME_COLUMN && NAME_MODIFIED) {
+        NAME_MODIFIED = FALSE;
+        changeNameValue(item, item->text(NAME_COLUMN));
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+    }
+    if (item->type() == OSCNode && column == START_COLUMN && VALUE_MODIFIED) {
+        VALUE_MODIFIED = FALSE;
+        assignItem(item, data);
+        emit(startValueChanged(item, item->text(START_COLUMN)));
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
 
-  if (item->type() == OSCNode && column == SR_COLUMN && SR_MODIFIED) {
-      SR_MODIFIED = FALSE;
-      emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
-      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+    if (item->type() == OSCNode && column == END_COLUMN && VALUE_MODIFIED) {
+        VALUE_MODIFIED = FALSE;
+        assignItem(item, data);
+        emit(endValueChanged(item, item->text(END_COLUMN)));
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
     }
-    
-  //Case message
-  if(item->whatsThis(NAME_COLUMN)=="Message"){
-      if (column == START_COLUMN && VALUE_MODIFIED) {
-          VALUE_MODIFIED = FALSE;
-          assignItem(item, data);
-          emit(startValueChanged(item, item->text(START_COLUMN)));
-          item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
-      }
-  }
 
-  else if (column == END_COLUMN && VALUE_MODIFIED) {
-      VALUE_MODIFIED = FALSE;
-      assignItem(item, data);
-      emit(endValueChanged(item, item->text(END_COLUMN)));
-      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
-  }
+    if (item->type() == OSCNode && column == SR_COLUMN && SR_MODIFIED) {
+        SR_MODIFIED = FALSE;
+        emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+    }
 
-  else if (column == SR_COLUMN && SR_MODIFIED) {
-      SR_MODIFIED = FALSE;
-      emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
-      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
-  }
+    //Case message
+    if(item->whatsThis(NAME_COLUMN)=="Message"){
+        if (column == START_COLUMN && VALUE_MODIFIED) {
+            VALUE_MODIFIED = FALSE;
+            assignItem(item, data);
+            emit(startValueChanged(item, item->text(START_COLUMN)));
+            item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+        }
+    }
+
+    else if (column == END_COLUMN && VALUE_MODIFIED) {
+        VALUE_MODIFIED = FALSE;
+        assignItem(item, data);
+        emit(endValueChanged(item, item->text(END_COLUMN)));
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
+    }
+
+    else if (column == SR_COLUMN && SR_MODIFIED) {
+        SR_MODIFIED = FALSE;
+        emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+    }
 }
 
 
