@@ -142,10 +142,10 @@ MaquetteView::drawStartIndicator(QPainter *painter)
     if(scenarioAbstract->hasFirstMsgs()){
         painter->save();
         painter->setOpacity(_scenarioSelected ? 1 : 0.6);
-        QRectF gradientRect(0,0,GRADIENT_WIDTH,height());
+        QRectF gradientRect(0,0,GRADIENT_WIDTH,MaquetteScene::MAX_SCENE_HEIGHT);
         QLinearGradient lgradient(gradientRect.topLeft(),gradientRect.topRight());
 
-//        lgradient.setColorAt(0,scenarioAbstract->color());
+        //todo : lgradient.setColorAt(0,scenarioAbstract->color());
         lgradient.setColorAt(0,Qt::white);
         lgradient.setColorAt(1, Qt::transparent);
 
