@@ -1391,11 +1391,6 @@ Maquette::stopPlayingAndGoToStart()
 {
     turnExecutionOff();
     setTimeOffset(0);
-
-//    //send root box start messages
-//    std::vector<std::string> startCue = getBox(ROOT_BOX_ID)->getStartMessages();
-//    for(int i=0; i<startCue.size(); i++)
-//        sendMessage(startCue.at(i));
 }
 
 void
