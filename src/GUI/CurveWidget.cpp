@@ -257,7 +257,6 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
 {
   QWidget::mousePressEvent(event);
   _clicked = true;
-  QPointF relativePoint = relativeCoordinates(event->pos());
 
   switch (event->modifiers()) {
       case Qt::ShiftModifier:
@@ -281,44 +280,29 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
         break;
       }
 
-//      case Qt::ControlModifier:
-//      {
-//        map<float, pair<float, float> >::iterator it;
-//        bool found;
-//        QPointF relativePoint = relativeCoordinates(event->pos());
-//        for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
-//            if (fabs(it->first - relativePoint.x()) < 0.01) {
-//                found = true;
-//                _movingBreakpointX = it->first;
-//                _movingBreakpointY = -1;
-//                break;
-//              }
-//          }
-//        break;
-//      }
+      case Qt::ControlModifier:
+      {
+        break;
+      }
 
       case Qt::NoModifier:
       {
         map<float, pair<float, float> >::iterator it;
         bool found;
         QPointF relativePoint = relativeCoordinates(event->pos());
+
         for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
             if (fabs(it->first - relativePoint.x()) < 0.01) {
-
-                found = true;
-                //existing breakpoint
-
+                found = true; //existing breakpoint
                 _movingBreakpointX = it->first;
                 _movingBreakpointY = it->second.first;
                 _lastPowSave = it->second.second;
-//                _abstract->_breakpoints.erase(it);
                 curveChanged();
                 update();
                 break;
               }
           }
-        if (!found) {
-            //new breakpoint
+        if (!found) { //new breakpoint
             _abstract->_breakpoints[relativePoint.x()] = std::make_pair<float, float>(relativePoint.y(), 1.);
             _clicked = false;
             curveChanged();
@@ -508,8 +492,7 @@ CurveWidget::curveChanged()
     vector<float> coeff;
     map<float, pair<float, float> >::iterator it;
     
-    for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
-        
+    for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {        
         xPercents.push_back(it->first * 100);
         yValues.push_back(it->second.first);
         
@@ -526,6 +509,7 @@ CurveWidget::curveChanged()
         yValues.clear();
         sectionType.clear();
         coeff.clear();
+
         if (Maquette::getInstance()->getCurveAttributes(_abstract->_boxID, _abstract->_address, 0, sampleRate, redundancy, interpolate, values, argTypes, xPercents, yValues, sectionType, coeff)) {
             setAttributes(_abstract->_boxID, _abstract->_address, 0, values, sampleRate, redundancy, interpolate, _abstract->_show, argTypes, xPercents, yValues, sectionType, coeff);
             update();
