@@ -54,6 +54,7 @@ using std::string;
 #include <QWidget>
 #include <QGraphicsEffect>
 #include <QGraphicsOpacityEffect>
+#include <QApplication>
 
 #include "AbstractCurve.hpp"
 #include "BasicBox.hpp"
@@ -447,10 +448,8 @@ BoxWidget::setComboBox(QComboBox *cbox)
 
 void
 BoxWidget::execStartAction()
-{
-  MainWindow *ui = static_cast<MainWindow *>(this->topLevelWidget());
-
-  if (ui->commandKey()) {
+{            
+  if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
       updateStartCue();
     }
   else {
@@ -463,10 +462,8 @@ BoxWidget::execStartAction()
 
 void
 BoxWidget::execEndAction()
-{
-  MainWindow *ui = _box->maquetteScene()->view()->mainWindow();
-
-  if (ui->commandKey()) {
+{  
+  if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
       updateEndCue();
     }
   else {

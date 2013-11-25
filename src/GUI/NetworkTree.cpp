@@ -50,6 +50,7 @@
 #include <QAbstractItemModel>
 #include <QAbstractItemView>
 #include <QTreeView>
+#include <QApplication>
 
 int NetworkTree::NAME_COLUMN = 0;
 int NetworkTree::VALUE_COLUMN = 1;
@@ -1599,17 +1600,11 @@ NetworkTree::keyReleaseEvent(QKeyEvent *event)
   if (event->key() == Qt::Key_Shift) {
       setSelectionMode(QAbstractItemView::MultiSelection);
     }
-  if (event->key() == Qt::Key_Control) {
-      emit(cmdKeyStateChanged(false));
-    }
 }
 
 void
 NetworkTree::keyPressEvent(QKeyEvent *event)
 {
-  if (event->key() == Qt::Key_Control) {
-      emit(cmdKeyStateChanged(true));
-    }
   if (event->key() == Qt::Key_Shift) {
       setSelectionMode(QAbstractItemView::ContiguousSelection);
     }
@@ -1639,7 +1634,7 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 
       if ((item->type() == LeaveType || item->type() == OSCNode) && column == INTERPOLATION_COLUMN) {
 
-          if(static_cast<MainWindow *>(this->topLevelWidget())->commandKey()){
+          if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
               emit recModeChanged(item);
           }
           else{

@@ -418,7 +418,6 @@ class NetworkTree : public QTreeWidget
     void messageChanged(QTreeWidgetItem *item, QString address);
     void deviceChanged(QString oldName, QString newName);
     void pluginChanged(QString deviceName);
-    void cmdKeyStateChanged(bool);
     void rangeBoundMinChanged(QTreeWidgetItem *item, float newValue);
     void rangeBoundMaxChanged(QTreeWidgetItem *item, float newValue);
     void recModeChanged(QTreeWidgetItem *item);

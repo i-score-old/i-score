@@ -107,8 +107,6 @@ MainWindow::MainWindow()
   _editor->init(); /// \todo Les méthodes init() sont à bannir, il y a des constructeurs pour ça !!! (par jaime Chao)
   _editor->show();
 
-  _commandKey = false;
-
   // Central Widget
   _centralLayout = new QGridLayout;
   _centralWidget = new QWidget;
@@ -131,8 +129,7 @@ MainWindow::MainWindow()
   setCurrentFile("");
   setAcceptDrops(false);
 
-  connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, std::string)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, std::string)));
-  connect(_editor->networkTree(), SIGNAL(cmdKeyStateChanged(bool)), this, SLOT(updateCmdKeyState(bool)));
+  connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, std::string)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, std::string)));  
   connect(_view->verticalScrollBar(), SIGNAL(valueChanged(int)), _scene, SLOT(verticalScroll(int)));  //TimeBar is painted on MaquetteScene, so a vertical scroll has to move the timeBar.
   connect(_scene, SIGNAL(stopPlaying()), _headerPanelWidget, SLOT(stop()));
   connect(_view, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
@@ -407,30 +404,6 @@ MainWindow::pasteSelection()
 {
   _scene->pasteBoxes();
 }
-
-void
-MainWindow::keyPressEvent(QKeyEvent *event)
-{
-  QMainWindow::keyPressEvent(event);
-  if (event->key() == Qt::Key_Control) {
-      updateCmdKeyState(true);
-    }
-}
-
-void
-MainWindow::keyReleaseEvent(QKeyEvent *event)
-{
-  QMainWindow::keyReleaseEvent(event);
-  updateCmdKeyState(false);
-  _commandKey = false;
-}
-
-bool
-MainWindow::commandKey()
-{
-  return _commandKey;
-}
-
 
 void
 MainWindow::selectAll()
@@ -789,13 +762,6 @@ void
 MainWindow::changeNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, std::string port)
 {
   _networkConfig->setNetworkConfig(deviceName, pluginName, IP, port);
-}
-
-void
-MainWindow::updateCmdKeyState(bool state)
-{
-  displayMessage(state ? tr("command key pressed") : tr(""), INDICATION_LEVEL);
-  _commandKey = state;
 }
 
 void
