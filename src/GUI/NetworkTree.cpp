@@ -604,7 +604,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
         requestResult = Maquette::getInstance()->getObjectType(address,nodeType);
         requestSuccess = requestResult > 0;
 
-        if (requestSuccess) {
+//        if (requestSuccess) {
             conflict = false;
 
             if(treeFilterActive()){
@@ -706,7 +706,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
             //Get object's chidren
             if(Maquette::getInstance()->getObjectChildren(address,children) > 0){
 
-                for(it = children.begin() ; it != children.end() ; ++it){
+                for(it = children.begin() ; it != children.end() ; ++it){                    
                     QStringList name;
                     name << QString::fromStdString(*it);
                     QTreeWidgetItem *childItem;
@@ -715,29 +715,34 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                     childAbsoluteAddress.append(*it);
 
                     if(Maquette::getInstance()->getObjectType(childAbsoluteAddress,nodeType)){
+
                         if(nodeType == "Data"){
                             childItem = new QTreeWidgetItem(name, LeaveType);
                         }
                         else{
                             childItem = new QTreeWidgetItem(name, NodeNoNamespaceType);
                         }
-                        name.clear();
-                        curItem->addChild(childItem);
-                        curItem->setCheckState(START_COLUMN, Qt::Unchecked);
-                        curItem->setCheckState(END_COLUMN, Qt::Unchecked);
-                        treeRecursiveExploration(childItem, conflict);
                     }
+                    else{
+                        childItem = new QTreeWidgetItem(name, NodeNoNamespaceType);
+                    }
+                    name.clear();
+                    curItem->addChild(childItem);
+                    curItem->setCheckState(START_COLUMN, Qt::Unchecked);
+                    curItem->setCheckState(END_COLUMN, Qt::Unchecked);
+                    treeRecursiveExploration(childItem, conflict);
+                }
                 }
             }
-        }
-        else {
-            if (conflict) {
-                curItem->setIcon(NAME_COLUMN, QIcon(":/images/error-icon.png"));
-                curItem->setToolTip(NAME_COLUMN, tr("Network connection failed : Please check if your remote application is running or if another i-score instance is not already working"));
-                curItem->setFlags(Qt::ItemIsEnabled);
-            }
-        }
-    }
+//        }
+//        else {
+//            if (conflict) {
+//                curItem->setIcon(NAME_COLUMN, QIcon(":/images/error-icon.png"));
+//                curItem->setToolTip(NAME_COLUMN, tr("Network connection failed : Please check if your remote application is running or if another i-score instance is not already working"));
+//                curItem->setFlags(Qt::ItemIsEnabled);
+//            }
+//        }
+//    }
 }
 
 void
