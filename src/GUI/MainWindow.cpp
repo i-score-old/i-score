@@ -686,25 +686,25 @@ MainWindow::loadFile(const QString &fileName)
 bool
 MainWindow::saveFile(const QString &fileName)
 {
-  /**** Backup automatique Résidence Albi ****/
+  /*********** Backup automatique *************/
 
     QDate date = QDate::currentDate();
     QTime time = QTime::currentTime();
     QString timeString = time.toString();
 
-    QString concat(tr("(")+QString("%1-%2-%3").arg(date.day()).arg(date.month()).arg(date.year())+tr("-")+timeString+tr(")"));
+    QString concat(tr("_")+QString("%1-%2-%3").arg(date.day()).arg(date.month()).arg(date.year())+tr("-")+timeString);
 
     QString backupName = fileName;
     int i = fileName.indexOf(".score");
     backupName.insert(i,concat);
 
     QProcess process;
-    QStringList XMLargs;
+    QStringList args;
 
-    XMLargs<< fileName;
-    XMLargs<< backupName;
+    args<< fileName;
+    args<< backupName;
 
-    process.start("cp", XMLargs);
+    process.start("cp", args);
     process.close();
 
   /*******************************************/
