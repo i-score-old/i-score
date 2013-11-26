@@ -458,6 +458,7 @@ BoxWidget::execStartAction()
 
   //set button focus off
   _box->setFocus();
+  _box->setSelected(true);
 }
 
 void
