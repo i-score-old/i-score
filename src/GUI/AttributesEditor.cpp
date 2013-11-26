@@ -256,7 +256,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 //            for(int i=0; i<endMessages.size(); i++){
 //                std::cout<<endMessages[i]<<std::endl;
 //            }
-          //END PRINT
+          //END PRINT          
         }
     }
 

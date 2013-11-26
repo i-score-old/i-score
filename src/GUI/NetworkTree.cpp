@@ -1926,8 +1926,9 @@ NetworkTree::getSampleRate(QTreeWidgetItem *item)
 
 bool
 NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUpdate)
-{
-  string address = getAbsoluteAddress(item).toStdString();
+{    
+  string address = getAbsoluteAddress(item).toStdString();  
+
   BasicBox *box = Maquette::getInstance()->getBox(boxID);
   if (box != NULL) { // Box Found
       if (box->hasCurve(address)) {

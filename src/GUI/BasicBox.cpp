@@ -1813,7 +1813,7 @@ BasicBox::drawHoverShape(QPainter *painter)
 void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {    
-  Q_UNUSED(option);
+    painter->setClipRect( option->exposedRect );//To increase performance
   Q_UNUSED(widget);
 
 //    QPen penR(Qt::lightGray,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);

@@ -254,7 +254,7 @@ CurveWidget::absoluteCoordinates(const QPointF &point)
 
 void
 CurveWidget::mousePressEvent(QMouseEvent *event)
-{
+{    
   QWidget::mousePressEvent(event);
   _clicked = true;
 
@@ -339,8 +339,8 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 
     // Draw cursor coordinates as a tooltip
     QPointF mousePos = relativeCoordinates(event->pos());
-    QString posStr = QString("%1 ; %2").arg(mousePos.x(), 0, 'f', 2).arg(mousePos.y(), 0, 'f', 2);
-    this->setToolTip(posStr);
+    QString posStr = QString("%1 ; %2").arg(mousePos.x(), 0, 'f', 3).arg(mousePos.y(), 0, 'f', 3);
+    Maquette::getInstance()->scene()->displayMessage(posStr.toStdString(), INDICATION_LEVEL);
 
     /// \todo : Doesn't work (only updated when entering again in the widget). NH
     //Setting cursor associated to the mode (draw, move, eraser...)
@@ -563,17 +563,17 @@ CurveWidget::paintEngine()
 
 void
 CurveWidget::paintEvent(QPaintEvent * /* event */)
-{    
+{
   QPainter *painter = new QPainter(this);
 
-  QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect;
+//  QGraphicsOpacityEffect effect = QGraphicsOpacityEffect();
 
-  if (_unactive) {
-      effect->setOpacity(0.4);
-    }
-  else {
-      effect->setOpacity(1);
-    }
+//  if (_unactive) {
+//      effect.setOpacity(0.4);
+//    }
+//  else {
+//      effect.setOpacity(1);
+//    }
 
   painter->setRenderHint(QPainter::Antialiasing, true);
   static const QColor BASE_COLOR(Qt::black);
