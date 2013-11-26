@@ -342,6 +342,23 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
     QString posStr = QString("%1 ; %2").arg(mousePos.x(), 0, 'f', 2).arg(mousePos.y(), 0, 'f', 2);
     this->setToolTip(posStr);
 
+    /// \todo : Doesn't work (only updated when entering again in the widget). NH
+    //Setting cursor associated to the mode (draw, move, eraser...)
+//    switch (event->modifiers()) {
+//    case Qt::ControlModifier:{
+//        setCursor(Qt::CrossCursor);
+//        break;
+//    }
+//    case Qt::AltModifier:{
+//        setCursor(Qt::ForbiddenCursor);
+//        break;
+//    }
+//    default:{
+//        setCursor(Qt::CrossCursor);
+//        break;
+//    }
+//    }
+
     // Handle interactions
     if (_clicked) {
         QPointF relativePoint = relativeCoordinates(event->pos());
