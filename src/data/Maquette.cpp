@@ -164,6 +164,11 @@ void Maquette::setBoxColor(unsigned int ID, QColor newColor)
     _engines->setBoxColor(ID, newColor);
 }
 
+void
+Maquette::setBoxName(unsigned int ID, std::string name){
+    _engines->setBoxName(ID, name);
+}
+
 map<unsigned int, ParentBox*>
 Maquette::parentBoxes()
 {
@@ -278,11 +283,12 @@ Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const s
                                            (secondCorner.x() - firstCorner.x()) * MaquetteScene::MS_PER_PIXEL, name, motherID);
 
   if (newBoxID != NO_ID) {
-      newBox->setName(QString::fromStdString(name));
 
       _boxes[newBoxID] = newBox;
       _parentBoxes[newBoxID] = newBox;
       newBox->setID(newBoxID);
+      newBox->setName(QString::fromStdString(name));
+
       if (motherBox != NULL) {
           newBox->setMother(motherID);
           motherBox->addChild(newBoxID);
@@ -1619,9 +1625,9 @@ Maquette::load(const string &fileName)
             QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);           
             
             ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
-            
-            newBox->setName(QString::fromStdString(name));
+                        
             newBox->setID(boxID);
+            newBox->setName(QString::fromStdString(name));
             newBox->setColor(color);
 
             _boxes[boxID] = newBox;

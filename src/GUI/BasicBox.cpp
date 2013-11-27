@@ -677,8 +677,10 @@ BasicBox::name() const
 void
 BasicBox::setName(const QString & name)
 {
-  _abstract->setName(name.toStdString());
-  update();
+    std::string nameStr = name.toStdString();
+    _abstract->setName(nameStr);
+    Maquette::getInstance()->setBoxName(ID(),nameStr);
+    update();
 }
 
 QColor

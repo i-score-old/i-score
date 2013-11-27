@@ -404,7 +404,16 @@ public:
 	 */
     void setBoxColor(TimeProcessId boxId, QColor newColor);
     
-    
+    /*!
+     * Sets the name of the box matching the given ID
+     *
+     *
+     * \param boxId : the ID of the box
+     *
+     * \param newColor : the name of the box matching the given ID
+     */
+    void setBoxName(TimeProcessId boxId, std::string name);
+
 	/*!
 	 * Gets the begin value of the box matching the given ID
 	 *

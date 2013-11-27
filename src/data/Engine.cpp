@@ -1252,6 +1252,15 @@ void Engine::setBoxColor(TimeProcessId boxId, QColor newColor)
 	timeProcess->setAttributeValue(TTSymbol("color"), v);
 }
 
+void Engine::setBoxName(TimeProcessId boxId, string name)
+{
+    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
+    TTSymbol            boxName;
+
+    boxName = TTSymbol(name);
+    timeProcess->setAttributeValue(kTTSym_name, boxName);
+}
+
 TimeValue Engine::getBoxBeginTime(TimeProcessId boxId)
 {
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);

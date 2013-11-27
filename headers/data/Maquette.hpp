@@ -626,6 +626,14 @@ class Maquette : public QObject
     void setBoxColor(unsigned int ID, QColor newColor);
 
     /*!
+     * \brief Set the name of a specific box.
+     *
+     * \param ID : the ID of the box wanted
+     * \param name : the box specified by the ID
+     */
+    void setBoxName(unsigned int ID, std::string name);
+
+    /*!
      * \brief Gets a specific relation.
      *
      * \param : the ID of the relation wanted
