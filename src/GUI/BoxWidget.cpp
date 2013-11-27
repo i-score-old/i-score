@@ -88,16 +88,11 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
 
   _box = box;
   _comboBox = new QComboBox;
-  _curveWidget = new CurveWidget(NULL);
 
   _stackedLayout = new QStackedLayout;
-  _stackedLayout->setStackingMode(QStackedLayout::StackAll);
+  _stackedLayout->setStackingMode(QStackedLayout::StackAll);  
 
-  _curvePageLayout = new QGridLayout;
-  setLayout(_stackedLayout);
-
-  _parentWidget = parent;
-  _curveWidgetList = new QList<CurveWidget *>;
+  setLayout(_stackedLayout); 
 
   _startMenu = NULL;
   _endMenu = NULL;
@@ -256,7 +251,6 @@ BoxWidget::clearCurves()
 
   _curveMap->clear();
   _curveIndexes.clear();
-  _curveWidgetList->clear();
 }
 
 void

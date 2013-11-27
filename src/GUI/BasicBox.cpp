@@ -255,7 +255,6 @@ BasicBox::createWidget()
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setAlignment(_boxWidget, Qt::AlignLeft);
   _boxWidget->setLayout(layout);
-  _boxContentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   _curveProxy = new QGraphicsProxyWidget(this);
 
