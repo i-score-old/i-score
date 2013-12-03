@@ -405,6 +405,16 @@ public:
     void setBoxColor(TimeProcessId boxId, QColor newColor);
     
     /*!
+     * Sets the mute state of the box (process) matching the given ID
+     *
+     *
+     * \param boxId : the ID of the box
+     *
+     * \param muteState : the muteState of the box matching the given ID
+     */
+    void setBoxMuteState(TimeProcessId boxId, bool muteState);
+
+    /*!
      * Sets the name of the box matching the given ID
      *
      *

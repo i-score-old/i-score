@@ -1244,13 +1244,14 @@ Maquette::initSceneState()
   std::vector<string> curvesList;
 
   //Pour toutes les boîtes avant le goto, on récupère leur état final (on simule leur exécution)
-  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
+  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {     
       boxID = it->first;
       currentBox = (*it).second;
 
       //réinit : On démute toutes les boîtes, elles ont potentiellement pu être mutées à la fin de l'algo
       _engines->setCtrlPointMutingState(boxID, 1, false);
       _engines->setCtrlPointMutingState(boxID, 2, false);
+      _engines->setBoxMuteState(boxID, false);
 
       if (currentBox->date() < timeOffset && (currentBox->date() + currentBox->duration()) <= timeOffset) {
           boxMsgs = currentBox->getFinalState();
@@ -1297,6 +1298,9 @@ Maquette::initSceneState()
       //    End messages
       if (currentBox->date() + currentBox->duration() < timeOffset) {
           _engines->setCtrlPointMutingState(boxID, 2, true);
+          if(boxID!=ROOT_BOX_ID)
+              _engines->setBoxMuteState(boxID, true);
+           std::cout<<"mute process box "<<boxID<<std::endl;
         }
     }
 

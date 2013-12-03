@@ -601,7 +601,6 @@ BasicBox::getFinalState()
           finalMessages.insert(*it, QPair<QString, unsigned int>(startMsgs.value(*it), date()));
         }
     }
-
   return finalMessages;
 }
 

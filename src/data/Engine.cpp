@@ -1252,6 +1252,16 @@ void Engine::setBoxColor(TimeProcessId boxId, QColor newColor)
 	timeProcess->setAttributeValue(TTSymbol("color"), v);
 }
 
+void Engine::setBoxMuteState(TimeProcessId boxId, bool muteState)
+{
+    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
+    TTValue             v;
+
+    v = (TTBoolean)muteState;
+
+    timeProcess->setAttributeValue(TTSymbol("mute"), v);
+}
+
 void Engine::setBoxName(TimeProcessId boxId, string name)
 {
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
