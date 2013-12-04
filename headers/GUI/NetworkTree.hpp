@@ -211,7 +211,7 @@ class NetworkTree : public QTreeWidget
      * \brief Clears a columns.
      * \param column : the column numero.
      */
-    void clearColumn(unsigned int column);
+    void clearColumn(unsigned int column, bool fullCleaning = true);
 
     /*!
      * \brief Expands items.

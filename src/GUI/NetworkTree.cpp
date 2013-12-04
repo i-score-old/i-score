@@ -553,7 +553,7 @@ NetworkTree::treeSnapshot(unsigned int boxID)
 
               QPair<QTreeWidgetItem *, Data> curPair;
 
-              if (!address.isEmpty()) {
+              if (!address.isEmpty()) {                  
                   vector<string> snapshot = Maquette::getInstance()->requestNetworkSnapShot(address.toStdString());
 
                   Data data;
@@ -746,8 +746,8 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
 }
 
 void
-NetworkTree::clearColumn(unsigned int column)
-{    
+NetworkTree::clearColumn(unsigned int column, bool fullCleaning)
+{        
   if (!_assignedItems.isEmpty()) {
       QList<QTreeWidgetItem *>::iterator it;
       QTreeWidgetItem *curIt;
@@ -759,7 +759,13 @@ NetworkTree::clearColumn(unsigned int column)
           curIt = *it;
           if(curIt->checkState(column))
               curIt->setCheckState(column, Qt::Unchecked);
-          curIt->setText(column, emptyString);
+
+          if(!fullCleaning){
+              if(curIt->whatsThis(NAME_COLUMN)=="Message")
+                  ;//we don't clear type message
+          }
+          else
+              curIt->setText(column, emptyString);
         }      
     }
 
@@ -781,7 +787,7 @@ NetworkTree::clearStartMsgs()
 void
 NetworkTree::clearDevicesStartMsgs(QList<QString> devices)
 {
-  clearColumn(START_COLUMN);
+  clearColumn(START_COLUMN,false);
   _startMessages->clearDevicesMsgs(devices);
 }
 
@@ -795,7 +801,7 @@ NetworkTree::clearEndMsgs()
 void
 NetworkTree::clearDevicesEndMsgs(QList<QString> devices)
 {
-  clearColumn(END_COLUMN);
+  clearColumn(END_COLUMN,false);
   _endMessages->clearDevicesMsgs(devices);
 }
 
@@ -1754,6 +1760,12 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
             VALUE_MODIFIED = FALSE;
             assignItem(item, data);
             emit(startValueChanged(item, item->text(START_COLUMN)));
+            item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+        }
+        else if (column == END_COLUMN && VALUE_MODIFIED) {
+            VALUE_MODIFIED = FALSE;
+            assignItem(item, data);
+            emit(endValueChanged(item, item->text(START_COLUMN)));
             item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
         }
     }
