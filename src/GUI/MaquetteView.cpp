@@ -63,6 +63,10 @@ MaquetteView::MaquetteView(MainWindow *mw)
 {
   _mainWindow = mw;
   setRenderHint(QPainter::Antialiasing);
+  setOptimizationFlags(QGraphicsView::IndirectPainting);
+  setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
+  setTransformationAnchor(QGraphicsView::NoAnchor);
+  setCacheMode(QGraphicsView::CacheBackground);
 
   setBackgroundBrush(QColor(160, 160, 160));  
 
@@ -72,8 +76,6 @@ MaquetteView::MaquetteView(MainWindow *mw)
   centerOn(0, 0);
   _zoom = 1;    
   _scenarioSelected = false;
-  setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-  setCacheMode(QGraphicsView::CacheBackground);
 }
 
 MaquetteView::~MaquetteView()
@@ -209,7 +211,7 @@ MaquetteView::triggerShortcut(int shorcut)
 
 void
 MaquetteView::keyPressEvent(QKeyEvent *event)
-{
+{    
   QGraphicsView::keyPressEvent(event);
 
   if (event->matches(QKeySequence::Copy)) {

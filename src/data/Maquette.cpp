@@ -1380,7 +1380,7 @@ Maquette::turnExecutionOff()
 
 void
 Maquette::pauseExecution()
-{
+{    
     _engines->pause(true);
 }
 

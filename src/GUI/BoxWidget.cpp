@@ -72,7 +72,7 @@ using std::string;
 
 BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
   : QWidget(parent)
-{
+{        
   _curveMap = new QMap<std::string, CurveWidget *>();
 
   QBrush brush;
@@ -92,7 +92,7 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
   _stackedLayout = new QStackedLayout;
   _stackedLayout->setStackingMode(QStackedLayout::StackAll);  
 
-  setLayout(_stackedLayout); 
+  setLayout(_stackedLayout);
 
   _startMenu = NULL;
   _endMenu = NULL;
@@ -100,6 +100,7 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
 
 BoxWidget::~BoxWidget()
 {
+    delete _stackedLayout;
 }
 
 void
@@ -183,8 +184,7 @@ BoxWidget::displayCurve(const QString &address)
 
   for (int i = 0; i < count; i++) {
       cur = values.at(i);
-      cur->setLowerStyle(true);
-      cur->repaint();
+      cur->setLowerStyle(true);      
     }
 
   if (address != BasicBox::SUB_SCENARIO_MODE_TEXT) {
@@ -194,8 +194,7 @@ BoxWidget::displayCurve(const QString &address)
 
       if (curveFound) {
           curveWidget = curveIt.value();
-          curveWidget->setLowerStyle(false);
-          curveWidget->repaint();
+          curveWidget->setLowerStyle(false);          
           _stackedLayout->setCurrentWidget(curveWidget);
         }
     }

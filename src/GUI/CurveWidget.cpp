@@ -80,7 +80,7 @@ CurveWidget::~CurveWidget() {}
 
 void
 CurveWidget::init()
-{
+{    
 //    setAttribute(Qt::WA_PaintOnScreen,true);
 //    setWindowFlags(Qt::Window);
   _abstract = new AbstractCurve(NO_ID, "", 0, 10, false, true, true, 1, vector<float>(), map<float, pair<float, float> >());
@@ -564,6 +564,7 @@ CurveWidget::paintEngine()
 void
 CurveWidget::paintEvent(QPaintEvent * /* event */)
 {
+    std::cout<<"paint"<<std::endl;
   QPainter *painter = new QPainter(this);
 
 //  QGraphicsOpacityEffect effect = QGraphicsOpacityEffect();
@@ -663,9 +664,9 @@ CurveWidget::paintEvent(QPaintEvent * /* event */)
 
 void
 CurveWidget::setLowerStyle(bool state)
-{
+{    
   _unactive = state;
-  repaint();
+  repaint(); 
 }
 
 void

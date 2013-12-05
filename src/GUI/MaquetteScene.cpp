@@ -721,7 +721,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
 
   setCurrentMode(_savedInteractionMode, BoxCreationMode(_savedBoxMode));
 
-  update();
+//  update();
 }
 
 void

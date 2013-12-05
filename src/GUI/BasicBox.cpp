@@ -651,11 +651,7 @@ BasicBox::resizeWidthEdition(float width)
 void
 BasicBox::resizeHeightEdition(float height)
 {
-  _abstract->setHeight(height);
-
-  if (_comment != NULL) {
-      _comment->updatePos();
-    }
+  _abstract->setHeight(height); 
   centerWidget();
 }
 
@@ -1362,7 +1358,7 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
           _scene->setResizeMode(DIAGONAL_RESIZE);
           _scene->setResizeBox(_abstract->ID());
         }
-      update();
+//      update();
     }
 }
 
@@ -1812,7 +1808,7 @@ BasicBox::drawHoverShape(QPainter *painter)
 
 void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{    
+{        
     painter->setClipRect(option->exposedRect);//To increase performance
     Q_UNUSED(widget);
     bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
