@@ -1248,11 +1248,6 @@ Maquette::initSceneState()
       boxID = it->first;
       currentBox = (*it).second;
 
-      //réinit : On démute toutes les boîtes, elles ont potentiellement pu être mutées à la fin de l'algo
-      _engines->setCtrlPointMutingState(boxID, 1, false);
-      _engines->setCtrlPointMutingState(boxID, 2, false);
-      _engines->setBoxMuteState(boxID, false);
-
       if (currentBox->date() < timeOffset && (currentBox->date() + currentBox->duration()) <= timeOffset) {
           boxMsgs = currentBox->getFinalState();
         }
@@ -1288,20 +1283,6 @@ Maquette::initSceneState()
               msgs.insert(*it2, boxMsgs.value(*it2));
             }
         }
-
-      //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
-      //    Start messages
-      if (currentBox->date() < timeOffset) {
-          _engines->setCtrlPointMutingState(boxID, 1, true);
-        }
-
-      //    End messages
-      if (currentBox->date() + currentBox->duration() < timeOffset) {
-          _engines->setCtrlPointMutingState(boxID, 2, true);
-          if(boxID!=ROOT_BOX_ID)
-              _engines->setBoxMuteState(boxID, true);
-           std::cout<<"mute process box "<<boxID<<std::endl;
-        }
     }
 
   //traduction en QMap<QString,QString>, on supprime le champs date des messages
@@ -1320,7 +1301,7 @@ Maquette::turnExecutionOn()
     // Start execution from where is the time offset is
     unsigned int timeOffset = _engines->getTimeOffset();
 
-    initSceneState();
+    //initSceneState();
     
     generateTriggerQueue();
     
