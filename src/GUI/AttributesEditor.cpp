@@ -108,11 +108,15 @@ void
 AttributesEditor::noBoxEdited()
 {
   _boxEdited = NO_ID;
-  setAttributes(new AbstractBox);
+  AbstractBox *emptyAbstractBox = new AbstractBox;
+
+  setAttributes(emptyAbstractBox);
   _boxStartValue->clear();
   _boxLengthValue->clear();
   _boxName->clear();
   _colorButtonPixmap->fill(Qt::gray);
+
+  delete emptyAbstractBox;
 }
 
 void
