@@ -1938,14 +1938,13 @@ QPointF Engine::getViewPosition()
 //Execution ///////////////////////////////////////////////////////////
 void Engine::setTimeOffset(TimeValue timeOffset)
 {
-    TTValue         v;
-    TTObjectBasePtr scheduler;
+    TTValue none;
     
-    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
+    // set the time process at time offset
+    m_mainScenario->sendMessage(kTTSym_Goto, timeOffset, none);
     
-    scheduler = v[0];
-    
-    scheduler->setAttributeValue(kTTSym_offset, TTFloat64(timeOffset));
+    // process at time offset (passing nothing to the Process method)
+    m_mainScenario->sendMessage(kTTSym_Process, none, none);
     
     TTLogMessage("Engine::setTimeOffset = %ld\n", timeOffset);
 }
@@ -1955,6 +1954,7 @@ TimeValue Engine::getTimeOffset()
     TTValue         v;
     TTObjectBasePtr scheduler;
     
+    // TODO : TTTimeProcess should extend Scheduler class
     m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
     
     scheduler = v[0];
@@ -1984,6 +1984,7 @@ bool Engine::isPlaying()
     TTValue         v;
     TTObjectBasePtr aScheduler;
     
+    // TODO : TTTimeProcess should extend Scheduler class
     // get the scheduler object of the main scenario
     m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
     aScheduler = TTObjectBasePtr(v[0]);
@@ -2010,6 +2011,7 @@ bool Engine::isPaused()
     TTValue         v;
     TTObjectBasePtr aScheduler;
     
+    // TODO : TTTimeProcess should extend Scheduler class
     // get the scheduler object of the main scenario
     m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
     aScheduler = TTObjectBasePtr(v[0]);
@@ -2052,6 +2054,7 @@ TimeValue Engine::getCurrentExecutionTime()
     TTUInt32        time;
     TTObjectBasePtr aScheduler;
     
+    // TODO : TTTimeProcess should extend Scheduler class
     // get the scheduler object of the main scenario
     m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
     aScheduler = TTObjectBasePtr(v[0]);
@@ -2067,6 +2070,7 @@ void Engine::setExecutionSpeedFactor(float factor)
     TTValue         v;
     TTObjectBasePtr aScheduler;
 
+    // TODO : TTTimeProcess should extend Scheduler class
     // get the scheduler object of the main scenario
     m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
     aScheduler = TTObjectBasePtr(v[0]);
@@ -2079,6 +2083,7 @@ float Engine::getExecutionSpeedFactor()
     TTValue         v;
     TTObjectBasePtr aScheduler;
     
+    // TODO : TTTimeProcess should extend Scheduler class
     // get the scheduler object of the main scenario
     m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
     aScheduler = TTObjectBasePtr(v[0]);
@@ -2095,6 +2100,7 @@ float Engine::getProcessProgression(TimeProcessId processId)
     TTTimeProcessPtr  timeProcess = getTimeProcess(processId);
     TTObjectBasePtr aScheduler;
     
+    // TODO : TTTimeProcess should extend Scheduler class
     // get the scheduler object of the time process
     timeProcess->getAttributeValue(TTSymbol("scheduler"), v);
     aScheduler = TTObjectBasePtr(v[0]);
