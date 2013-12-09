@@ -200,7 +200,7 @@ NetworkTree::load()
   QTreeWidgetItem *OSCRootNode;
 
   for (nameIt = deviceNames.begin(); nameIt != deviceNames.end(); ++nameIt) {
-      
+
       QStringList deviceName;
 
       deviceName << QString::fromStdString(*nameIt);
@@ -208,13 +208,18 @@ NetworkTree::load()
       QTreeWidgetItem *curItem = NULL;
       
       bool isRequestable = Maquette::getInstance()->isNetworkDeviceRequestable(*nameIt);
-      
+      std::cout<<*nameIt;
       if (!isRequestable) {
           //OSCDevice
           curItem = new QTreeWidgetItem(deviceName, NodeNamespaceType);
-          OSCRootNode = curItem;
-
-          createOCSBranch(curItem);
+          try{
+              treeRecursiveExploration(curItem, true);
+            }catch (const std::exception & e) {
+              std::cerr << *nameIt << " : " << e.what();
+            }
+          itemsList << curItem;
+//          OSCRootNode = curItem;
+//          createOCSBranch(curItem);
         }
       else {
           curItem = new QTreeWidgetItem(deviceName, NodeNamespaceType);          
