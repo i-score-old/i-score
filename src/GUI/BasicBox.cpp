@@ -1943,6 +1943,7 @@ void
 BasicBox::select(){
     setSelected(true);
     _scene->setAttributes(_abstract);
+    update();
 }
 
 void

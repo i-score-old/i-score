@@ -563,19 +563,8 @@ CurveWidget::paintEngine()
 
 void
 CurveWidget::paintEvent(QPaintEvent * /* event */)
-{
-    std::cout<<"paint"<<std::endl;
+{    
   QPainter *painter = new QPainter(this);
-
-//  QGraphicsOpacityEffect effect = QGraphicsOpacityEffect();
-
-//  if (_unactive) {
-//      effect.setOpacity(0.4);
-//    }
-//  else {
-//      effect.setOpacity(1);
-//    }
-
   painter->setRenderHint(QPainter::Antialiasing, true);
   static const QColor BASE_COLOR(Qt::black);
   static const QColor AXE_COLOR(Qt::black);

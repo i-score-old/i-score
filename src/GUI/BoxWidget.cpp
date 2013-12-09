@@ -449,9 +449,10 @@ BoxWidget::execStartAction()
       jumpToStartCue();
     }
 
+  _box->select();
+
   //set button focus off
-  _box->setFocus();
-  _box->setSelected(true);
+  _box->setFocus();  
 }
 
 void
@@ -464,8 +465,10 @@ BoxWidget::execEndAction()
       jumpToEndCue();
     }
 
+  _box->select();
+
   //unactive button focus
-  _box->setFocus();
+  _box->setFocus();  
 }
 
 void
@@ -474,8 +477,7 @@ BoxWidget::jumpToStartCue()
   if (_startMenu != NULL) {
       _startMenu->close();
     }
-  _box->setSelected(true);
-  _box->update();
+  _box->select();
   unsigned int timeOffset = _box->date();
   _box->maquetteScene()->changeTimeOffset(timeOffset);
   //Maquette::getInstance()->initSceneState();   //reload scene (reset the remote application state)
@@ -487,8 +489,7 @@ BoxWidget::jumpToEndCue()
   if (_endMenu != NULL) {
       _endMenu->close();
     }
-  _box->setSelected(true);
-  _box->update();
+  _box->select();
   unsigned int timeOffset = _box->date() + _box->duration();
   _box->maquetteScene()->changeTimeOffset(timeOffset);
   //Maquette::getInstance()->initSceneState();   //reload scene (reset the remote application state)

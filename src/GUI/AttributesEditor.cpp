@@ -223,7 +223,7 @@ AttributesEditor::connectSlots()
 
 void
 AttributesEditor::setAttributes(AbstractBox *abBox)
-{        
+{            
   bool boxModified = (_boxEdited != abBox->ID());
 
   _boxEdited = abBox->ID();
