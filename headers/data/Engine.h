@@ -82,8 +82,6 @@ typedef std::map<unsigned int, EngineCacheElementPtr>::iterator EngineCacheMapIt
 
 #define CURVE_POW 1
 
-#define SCENARIO_SIZE 600000
-
 /// Allen relations types
 enum AllenType { ALLEN_BEFORE, ALLEN_AFTER, ALLEN_EQUALS, ALLEN_MEETS, ALLEN_OVERLAPS, ALLEN_DURING, ALLEN_STARTS, ALLEN_FINISHES, ALLEN_NONE };
 
