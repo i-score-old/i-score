@@ -249,27 +249,26 @@ void Engine::initModular()
 
 void Engine::initScore()
 {
+    TTValue args;
+    
     // this initializes the Score framework
     TTScoreInitialize();
     
     // Create a time event for the start
     TTScoreTimeEventCreate(&m_mainStartEvent, 0);
     
-    // Create a time event for the end
-    TTScoreTimeEventCreate(&m_mainEndEvent, SCENARIO_SIZE);
+    // Create a time event for the end at 1 hour (in millisecond)
+    TTScoreTimeEventCreate(&m_mainEndEvent, 36000000);
 
     // Create the main scenario
     TTScoreTimeProcessCreate(&m_mainScenario, "Scenario", m_mainStartEvent, m_mainEndEvent);
     TTScoreTimeProcessSetName(m_mainScenario, "root");
 
-    /* TODO : use TTScoreAPI to be notified when a time process starts via startCallbackFunction(TTTimeProcessPtr)
-    TTScoreTimeProcessStartCallbackCreate(m_mainScenario, &m_mainStartCallback, startCallbackFunction);
-    */
+    // TODO : use TTScoreAPI to be notified when a time process starts via startCallbackFunction(TTTimeProcessPtr)
+    //TTScoreTimeProcessStartCallbackCreate(m_mainScenario, &m_mainStartCallback, startCallbackFunction);
 
-    /* TODO : use TTScoreAPI to be notified when a time process ends via endCallbackFunction(TTTimeProcessPtr)
-    TTObjectBasePtr endCallback;
-    TTScoreTimeProcessEndCallbackCreate(m_mainScenario, &m_mainEndCallback, endCallbackFunction);
-    */
+    // TODO : use TTScoreAPI to be notified when a time process ends via endCallbackFunction(TTTimeProcessPtr)
+    //TTScoreTimeProcessEndCallbackCreate(m_mainScenario, &m_mainEndCallback, endCallbackFunction);
 
     // Store the main scenario (so ROOT_BOX_ID is 1)
     cacheTimeProcess(m_mainScenario, "root");
@@ -768,7 +767,7 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const s
     
     // Create a new automation time process into the main scenario
     TTScoreTimeProcessCreate(&timeProcess, "Automation", startEvent, endEvent, TTTimeContainerPtr(m_mainScenario));
-    TTScoreTimeProcessSetName(timeProcess, name);
+    TTScoreTimeProcessSetName(timeProcess, name.c_str());
     
     // Cache it and get an unique id for this process
     boxId = cacheTimeProcess(timeProcess, name);
