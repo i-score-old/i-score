@@ -248,9 +248,7 @@ void Engine::initModular()
 }
 
 void Engine::initScore()
-{
-    TTValue args;
-    
+{   
     // this initializes the Score framework
     TTScoreInitialize();
     
@@ -756,8 +754,6 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const s
     TTTimeEventPtr      startEvent, endEvent;
     TTTimeProcessPtr    timeProcess;
     TimeProcessId       boxId;
-    TTSymbol            boxName;
-    TTValue             v, args;
     
     // Create a time event for the start into the main scenario
     TTScoreTimeEventCreate(&startEvent, boxBeginPos, TTTimeContainerPtr(m_mainScenario));
@@ -885,26 +881,27 @@ void Engine::changeTemporalRelationBounds(IntervalId relationId, BoundValue minB
 {
     TTTimeProcessPtr        timeProcess = getInterval(relationId);
     EngineCacheMapIterator  it;
-    TTValue                 v;
+    TTUInt32                durationMin;
+    TTUInt32                durationMax;
 
     // filtering NO_BOUND (-1) and negative value because we use unsigned int
     if (minBound == NO_BOUND)
-        v = TTValue(TTUInt32(0));
+        durationMin = 0;
     else if (minBound < 0)
-        v = TTValue(TTUInt32(abs(minBound)));
+        durationMin = abs(minBound);
     else
-        v = TTValue(TTUInt32(minBound));
+        durationMin = minBound;
     
     if (maxBound == NO_BOUND)
-        v.append(TTUInt32(0));
+        durationMax = 0;
     else if (maxBound < 0)
-        v = TTValue(TTUInt32(abs(maxBound)));
+        durationMax = abs(maxBound);
     else
-        v.append(TTUInt32(maxBound));
+        durationMax = maxBound;
     
     // NOTE : sending 0 0 means the relation is not rigid
     // NOTE : it is also possible to use the "rigid" attribute to swicth between those two states
-    timeProcess->sendMessage(TTSymbol("Limit"), v, kTTValNONE);
+    TTScoreTimeProcessLimit(timeProcess, durationMin, durationMax);
     
     // return the entire timeProcessMap except the first process !!! (this is bad but it is like former engine)
     it = m_timeProcessMap.begin();
@@ -1118,14 +1115,10 @@ BoundValue Engine::getRelationMaxBound(IntervalId relationId)
 bool Engine::performBoxEditing(TimeProcessId boxId, TimeValue start, TimeValue end, vector<TimeProcessId>& movedBoxes)
 {
     TTTimeProcessPtr        timeProcess = getTimeProcess(boxId);
-    TTValue                 v;
     EngineCacheMapIterator  it;
     TTErr                   err;
     
-    v = TTValue(start);
-    v.append(end);
-    
-    err = timeProcess->sendMessage(TTSymbol("Move"), v, kTTValNONE);
+    err = TTScoreTimeProcessMove(timeProcess, start, end);
     
     // return the entire timeProcessMap except the first process !!! (this is bad but it is like former engine)
     it = m_timeProcessMap.begin();
@@ -1289,11 +1282,9 @@ void Engine::setCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex cont
 
     // Get the start or end event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+        TTScoreTimeProcessGetStartEvent(timeProcess, &event);
     else
-        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-    
-    event = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+        TTScoreTimeProcessGetEndEvent(timeProcess, &event);
     
     // get the state of the event
     event->getAttributeValue(TTSymbol("state"), v);
@@ -1342,11 +1333,9 @@ void Engine::getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex cont
     
     // Get the start or end event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+        TTScoreTimeProcessGetStartEvent(timeProcess, &event);
     else
-        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-    
-    event = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+        TTScoreTimeProcessGetEndEvent(timeProcess, &event);
     
     // get the state of the event
     event->getAttributeValue(TTSymbol("state"), v);
@@ -1395,11 +1384,9 @@ void Engine::setCtrlPointMutingState(TimeProcessId boxId, TimeEventIndex control
     
     // Get the start or end event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+        TTScoreTimeProcessGetStartEvent(timeProcess, &event);
     else
-        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-    
-    event = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+        TTScoreTimeProcessGetEndEvent(timeProcess, &event);
     
     event->setAttributeValue(kTTSym_mute, TTBoolean(mute));
 }
@@ -1705,11 +1692,9 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
     
     // Get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+        TTScoreTimeProcessGetStartEvent(timeProcess, &timeEvent);
     else
-        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-    
-    timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+        TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
     
     // Create a TTTimeCondition
     m_mainScenario->sendMessage(TTSymbol("TimeConditionCreate"), args, v);
@@ -1753,11 +1738,9 @@ void Engine::setTriggerPointMessage(ConditionedProcessId triggerId, std::string 
     
     // Get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+        TTScoreTimeProcessGetStartEvent(timeProcess, &timeEvent);
     else
-        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-    
-    timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+        TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
     
     // edit the expression associated to this event
     v = TTObjectBasePtr(timeEvent);
@@ -1775,11 +1758,9 @@ std::string Engine::getTriggerPointMessage(ConditionedProcessId triggerId)
     
     // Get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+        TTScoreTimeProcessGetStartEvent(timeProcess, &timeEvent);
     else
-        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-    
-    timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+        TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
     
     // Get the expression associated to this event
     if (!getTimeCondition(triggerId)->sendMessage(TTSymbol("ExpressionFind"), v, out)) {
@@ -2075,11 +2056,9 @@ void Engine::trigger(ConditionedProcessId triggerId)
     
     // Get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+        TTScoreTimeProcessGetStartEvent(timeProcess, &timeEvent);
     else
-        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-            
-    timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+        TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
             
     timeEvent->sendMessage(kTTSym_Trigger);
 }
