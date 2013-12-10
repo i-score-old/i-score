@@ -1575,14 +1575,12 @@ MaquetteScene::playOrResume()
     displayMessage(tr("Playing ...").toStdString(), INDICATION_LEVEL);
     
     _maquette->setAccelerationFactor(_accelerationFactor);
-    
-    if (_maquette->isExecutionPaused())
-        
-        _maquette->resumeExecution();
-    
+
+    if (_maquette->isExecutionPaused())        
+        _maquette->resumeExecution();    
     else
         _maquette->turnExecutionOn();
-        
+
     _playThread->start();
     _startingValue = _maquette->getTimeOffset();
     
@@ -1592,35 +1590,27 @@ MaquetteScene::playOrResume()
 void
 MaquetteScene::stopOrPause()
 {
-    if (!_maquette->isExecutionPaused())
-        
+    if (!_maquette->isExecutionPaused()){
         _maquette->pauseExecution();
-    
-    else {
-        
-        _maquette->turnExecutionOff();
-        _playingBoxes.clear();
-        
-        _playThread->quit();
+        emit(playModeChanged());
     }
-    
-    update();
-    
-    emit(playModeChanged());
+    else {
+        _playThread->quit();
+        _maquette->turnExecutionOff();
+        emit(playModeChanged());
+        _playingBoxes.clear();        
+    }        
 }
 
 void
 MaquetteScene::stopAndGoToTimeOffset(unsigned int timeOffset)
 {
     displayMessage(tr("Stopped").toStdString(), INDICATION_LEVEL);
-    
-    _maquette->stopPlayingAndGoToTimeOffset(timeOffset);
+
     _playThread->quit();
-    _playingBoxes.clear();
-    
-    update();
-    
+    _maquette->stopPlayingAndGoToTimeOffset(timeOffset);    
     emit(playModeChanged());
+    _playingBoxes.clear();            
 }
 
 void
@@ -1630,11 +1620,8 @@ MaquetteScene::stopAndGoToCurrentTime()
     
     _maquette->stopPlayingAndGoToCurrentTime();
     _playThread->quit();
-    _playingBoxes.clear();
-
-    update();
-    
     emit(playModeChanged());
+    _playingBoxes.clear();           
 }
 
 void
