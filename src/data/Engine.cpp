@@ -767,7 +767,7 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const s
     
     // Create a new automation time process into the main scenario
     TTScoreTimeProcessCreate(&timeProcess, "Automation", startEvent, endEvent, TTTimeContainerPtr(m_mainScenario));
-    TTScoreTimeProcessSetName(timeProcess, name.c_str());
+    TTScoreTimeProcessSetName(timeProcess, name);
     
     // Cache it and get an unique id for this process
     boxId = cacheTimeProcess(timeProcess, name);
