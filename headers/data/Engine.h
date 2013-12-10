@@ -137,6 +137,8 @@ class Engine
 private:
     
     TTTimeProcessPtr    m_mainScenario;                                 /// The top scenario
+    TTTimeEventPtr      m_mainStartEvent;                               /// The top scenario start event
+    TTTimeEventPtr      m_mainEndEvent;                                 /// The top scenario end event
     
     unsigned int        m_nextTimeProcessId;                            /// the next Id to give to any created time process
     unsigned int        m_nextIntervalId;                               /// the next Id to give to any created interval

@@ -78,7 +78,7 @@ macx-clang {
 }
 
 # Input
-HEADERS += /usr/local/jamoma/includes/TTScore.h \
+HEADERS += /usr/local/jamoma/includes/TTScoreAPI.h \
 /usr/local/jamoma/includes/TTModular.h \
 /usr/local/jamoma/includes/TTDSP.h \
 headers/data/Abstract.hpp \

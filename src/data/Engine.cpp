@@ -249,28 +249,28 @@ void Engine::initModular()
 
 void Engine::initScore()
 {
-    TTTimeEventPtr  startEvent = NULL;
-    TTTimeEventPtr  endEvent = NULL;
-    TTValue         args;
-    
     // this initializes the Score framework
-    TTScoreInit();
+    TTScoreInitialize();
     
     // Create a time event for the start
-    args = TTUInt32(0);
-    TTObjectBaseInstantiate(TTSymbol("TimeEvent"), TTObjectBaseHandle(&startEvent), args);
+    TTScoreTimeEventCreate(&m_mainStartEvent, 0);
     
     // Create a time event for the end
-    args = TTUInt32(SCENARIO_SIZE);
-    TTObjectBaseInstantiate(TTSymbol("TimeEvent"), TTObjectBaseHandle(&endEvent), args);
-    
+    TTScoreTimeEventCreate(&m_mainEndEvent, SCENARIO_SIZE);
+
     // Create the main scenario
-    args = TTObjectBasePtr(startEvent);
-    args.append(TTObjectBasePtr(endEvent));
-    TTObjectBaseInstantiate(TTSymbol("Scenario"), TTObjectBaseHandle(&m_mainScenario), args);
-    
-    m_mainScenario->setAttributeValue(kTTSym_name, TTSymbol("root"));
-    
+    TTScoreTimeProcessCreate(&m_mainScenario, "Scenario", m_mainStartEvent, m_mainEndEvent);
+    TTScoreTimeProcessSetName(m_mainScenario, "root");
+
+    /* TODO : use TTScoreAPI to be notified when a time process starts via startCallbackFunction(TTTimeProcessPtr)
+    TTScoreTimeProcessStartCallbackCreate(m_mainScenario, &m_mainStartCallback, startCallbackFunction);
+    */
+
+    /* TODO : use TTScoreAPI to be notified when a time process ends via endCallbackFunction(TTTimeProcessPtr)
+    TTObjectBasePtr endCallback;
+    TTScoreTimeProcessEndCallbackCreate(m_mainScenario, &m_mainEndCallback, endCallbackFunction);
+    */
+
     // Store the main scenario (so ROOT_BOX_ID is 1)
     cacheTimeProcess(m_mainScenario, "root");
 }
@@ -308,8 +308,13 @@ Engine::~Engine()
     clearTimeCondition();
     
     // Delete the main scenario
-    m_mainScenario->sendMessage(TTSymbol("ReleaseEvents"));
-    TTObjectBaseRelease(TTObjectBaseHandle(&m_mainScenario));
+    TTScoreTimeProcessRelease(&m_mainScenario);
+    
+    // Delete the main scenario start event
+    TTScoreTimeEventRelease(&m_mainStartEvent);
+    
+    // Delete the main scenario end event
+    TTScoreTimeEventRelease(&m_mainEndEvent);
     
     // delete the sender
     TTObjectBaseRelease(&m_sender);
@@ -755,25 +760,15 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const s
     TTSymbol            boxName;
     TTValue             v, args;
     
-    // Create a time event for the start
-    args = TTUInt32(boxBeginPos);
-    m_mainScenario->sendMessage(TTSymbol("TimeEventCreate"), args, v);
-    startEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+    // Create a time event for the start into the main scenario
+    TTScoreTimeEventCreate(&startEvent, boxBeginPos, TTTimeContainerPtr(m_mainScenario));
+
+    // Create a time event for the end into the main scenario
+    TTScoreTimeEventCreate(&endEvent, boxBeginPos+boxLength, TTTimeContainerPtr(m_mainScenario));
     
-    // Create a time event for the end
-    args = TTUInt32(boxBeginPos+boxLength);
-    m_mainScenario->sendMessage(TTSymbol("TimeEventCreate"), args, v);
-    endEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
-    
-    // Create a new automation time process
-    args = TTSymbol("Automation");
-    args.append(TTObjectBasePtr(startEvent));
-    args.append(TTObjectBasePtr(endEvent));
-    m_mainScenario->sendMessage(TTSymbol("TimeProcessCreate"), args, v);
-    timeProcess = TTTimeProcessPtr(TTObjectBasePtr(v[0]));
-    
-    boxName = TTSymbol(name);
-    timeProcess->setAttributeValue(kTTSym_name, boxName);
+    // Create a new automation time process into the main scenario
+    TTScoreTimeProcessCreate(&timeProcess, "Automation", startEvent, endEvent, TTTimeContainerPtr(m_mainScenario));
+    TTScoreTimeProcessSetName(timeProcess, name);
     
     // Cache it and get an unique id for this process
     boxId = cacheTimeProcess(timeProcess, name);
@@ -785,47 +780,26 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const s
 
 void Engine::removeBox(TimeProcessId boxId)
 {
-    TTTimeProcessPtr        timeProcess;
-    EngineCacheMapIterator  it;
-    ConditionedProcessId    id1 = 0;
-    ConditionedProcessId    id2 = 0;
-    TTValue                 v, events;
-    TTErr                   err;
+    TTTimeProcessPtr    timeProcess;
+    TTTimeEventPtr      startEvent, endEvent;
+    TTErr               err;
     
     // Retreive the time process using the boxId
     timeProcess = getTimeProcess(boxId);
     
-    /* théo : useless because they are destroyed by the interface
-     
-    // Is it an conditionedProcess ?
-    // note : it can be registered 2 times for a start and end conditioned event
-    for (it = m_conditionedProcessMap.begin(); it != m_conditionedProcessMap.end(); ++it) {
-        
-        if (it->second->object == timeProcess) {
-         
-            if (!id1) id1 = it->first;
-            else if (!id2) id2 = it->first;
-        }
-    }
-    
-    if (id1) uncacheConditionedProcess(id1);
-    if (id2) uncacheConditionedProcess(id2);
-     */
-    
     // Remove the time process from the cache
     uncacheTimeProcess(boxId);
     
-    // Release the time process
-    v = TTObjectBasePtr(timeProcess);
-    m_mainScenario->sendMessage(TTSymbol("TimeProcessRelease"), v, events);
+    // Release the time process from the main scenario
+    TTScoreTimeProcessRelease(&timeProcess, TTTimeContainerPtr(m_mainScenario), &startEvent, &endEvent);
     
-    // Release start event
-    err = m_mainScenario->sendMessage(TTSymbol("TimeEventRelease"), events[0], kTTValNONE);
+    // Release start event from the main scenario
+    err = TTScoreTimeEventRelease(&startEvent, TTTimeContainerPtr(m_mainScenario));
     if (err)
         iscoreEngineDebug TTLogMessage("Box %ld cannot release his start event\n", boxId);
     
-    // Release end event
-    err = m_mainScenario->sendMessage(TTSymbol("TimeEventRelease"), events[1], kTTValNONE);
+    // Release end event from the main scenario
+    err = TTScoreTimeEventRelease(&endEvent, TTTimeContainerPtr(m_mainScenario));
     if (err)
         iscoreEngineDebug TTLogMessage("Box %ld cannot release his end event\n", boxId);
 }
@@ -841,7 +815,6 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
     TTTimeProcessPtr        tp1, tp2;
     TTTimeEventPtr          startEvent, endEvent;
     IntervalId              relationId;
-    TTValue                 v, args;
     EngineCacheMapIterator  it;
     TTErr                   err;
     
@@ -850,34 +823,23 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
     tp2 = getTimeProcess(boxId2);
     
     if (controlPoint1 == BEGIN_CONTROL_POINT_INDEX)
-        tp1->getAttributeValue(TTSymbol("startEvent"), v);
+        TTScoreTimeProcessGetStartEvent(tp1, &startEvent);
     else
-        tp1->getAttributeValue(TTSymbol("endEvent"), v);
-    
-    startEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+        TTScoreTimeProcessGetEndEvent(tp1, &startEvent);
     
     if (controlPoint2 == BEGIN_CONTROL_POINT_INDEX)
-        tp2->getAttributeValue(TTSymbol("startEvent"), v);
+        TTScoreTimeProcessGetStartEvent(tp2, &endEvent);
     else
-        tp2->getAttributeValue(TTSymbol("endEvent"), v);
-    
-    endEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
-    
-    // TODO : order the events
-    
-    // Create a new interval time process
-    args = TTSymbol("Interval");
-    args.append(TTObjectBasePtr(startEvent));
-    args.append(TTObjectBasePtr(endEvent));
-    err = m_mainScenario->sendMessage(TTSymbol("TimeProcessCreate"), args, v);
-    timeProcess = TTTimeProcessPtr(TTObjectBasePtr(v[0]));
+        TTScoreTimeProcessGetEndEvent(tp2, &endEvent);
+
+    // Create a new interval time process into the main scenario
+    TTScoreTimeProcessCreate(&timeProcess, "Interval", startEvent, endEvent, TTTimeContainerPtr(m_mainScenario));
 
     // an error can append if the start is after the end
     if (!err) {
         
         // Set the time process rigid
-        v = TTBoolean(YES);
-        timeProcess->setAttributeValue(TTSymbol("rigid"), v);
+        TTScoreTimeProcessSetRigid(timeProcess, true);
         
         // Cache it and get an unique id for this process
         relationId = cacheInterval(timeProcess);
@@ -897,28 +859,25 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
 void Engine::removeTemporalRelation(IntervalId relationId)
 {
     TTTimeProcessPtr    timeProcess;
-    TTValue             v, events;
+    TTTimeEventPtr      startEvent, endEvent;
     TTErr               err;
     
     // Retreive the interval using the relationId
     timeProcess = getInterval(relationId);
     
-    // Don't release the events (they are destroyed with the box)
-    
-    // Release the time process
-    v = TTObjectBasePtr(timeProcess);
-    m_mainScenario->sendMessage(TTSymbol("TimeProcessRelease"), v, events);
-    
-    // Release start event
-    err = m_mainScenario->sendMessage(TTSymbol("TimeEventRelease"), events[0], kTTValNONE);
+    // Release the time process from the main scenario
+    TTScoreTimeProcessRelease(&timeProcess, TTTimeContainerPtr(m_mainScenario), &startEvent, &endEvent);
+
+    // Release start event from the main scenario
+    err = TTScoreTimeEventRelease(&startEvent, TTTimeContainerPtr(m_mainScenario));
     if (err)
         iscoreEngineDebug TTLogMessage("Relation %ld cannot release his start event\n", relationId);
-    
-    // Release end event
-    err = m_mainScenario->sendMessage(TTSymbol("TimeEventRelease"), events[1], kTTValNONE);
+
+    // Release end event from the main scenario
+    err = TTScoreTimeEventRelease(&endEvent, TTTimeContainerPtr(m_mainScenario));
     if (err)
         iscoreEngineDebug TTLogMessage("Relation %ld cannot release his end event\n", relationId);
-    
+
     // Remove the interval from the cache
     uncacheInterval(relationId);
 }
