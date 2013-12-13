@@ -563,7 +563,7 @@ CurveWidget::paintEngine()
 
 void
 CurveWidget::paintEvent(QPaintEvent * /* event */)
-{    
+{        
   QPainter *painter = new QPainter(this);
   painter->setRenderHint(QPainter::Antialiasing, true);
   static const QColor BASE_COLOR(Qt::black);

@@ -168,7 +168,7 @@ MaquetteScene::changeTimeOffset(unsigned int timeOffset)
 {
     stopAndGoToTimeOffset(timeOffset);
     
-    _view->repaint();
+//    _view->repaint();
 }
 
 void
