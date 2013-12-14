@@ -531,10 +531,7 @@ void Engine::clearTimeCondition()
 void Engine::cacheStartCallback(TimeProcessId boxId)
 {
     EngineCacheElementPtr   e;
-    TTValue                 v;
-    TTValuePtr              startMessageBaton;
-    TTMessagePtr            aMessage;
-    TTErr                   err;
+    TTValuePtr              processStartedBaton;
     
     e = new EngineCacheElement();
     e->object = NULL;
@@ -543,18 +540,16 @@ void Engine::cacheStartCallback(TimeProcessId boxId)
     // create a TTCallback to observe when time process starts (using TimeProcessStartCallback)
     TTObjectBaseInstantiate(TTSymbol("callback"), &e->object, kTTValNONE);
     
-    startMessageBaton = new TTValue(TTPtr(this)); // startMessageBaton will be deleted during the callback destruction
-    startMessageBaton->append(TTUInt32(boxId));
+    processStartedBaton = new TTValue(TTPtr(this)); // processStartedBaton will be deleted during the callback destruction
+    processStartedBaton->append(TTUInt32(boxId));
     
-    e->object->setAttributeValue(kTTSym_baton, TTPtr(startMessageBaton));
+    e->object->setAttributeValue(kTTSym_baton, TTPtr(processStartedBaton));
     e->object->setAttributeValue(kTTSym_function, TTPtr(&TimeProcessStartCallback));
+    e->object->setAttributeValue(kTTSym_notification, kTTSym_ProcessStarted);
     
-    // register for ProcessStart message observation
-    err = getTimeProcess(boxId)->findMessage(kTTSym_ProcessStart, &aMessage);
+    // observe the "ProcessStarted" notification
+    getTimeProcess(boxId)->registerObserverForNotifications(*e->object);
 
-    if (!err)
-        aMessage->registerObserverForNotifications(*e->object);
-    
     m_startCallbackMap[boxId] = e;
 }
 
@@ -562,20 +557,14 @@ void Engine::uncacheStartCallback(TimeProcessId boxId)
 {
     EngineCacheElementPtr   e = m_startCallbackMap[boxId];
     TTValue                 v;
-    TTMessagePtr            aMessage;
     TTErr                   err;
     
-    // unregister for ProcessStart message observation
-    err = getTimeProcess(boxId)->findMessage(kTTSym_ProcessStart, &aMessage);
+    // don't observe the "ProcessStarted" notification anymore
+    err = getTimeProcess(boxId)->unregisterObserverForNotifications(*e->object);
     
     if (!err) {
-        
-        err = aMessage->unregisterObserverForNotifications(*e->object);
-        
-        if (!err) {
-            delete (TTValuePtr)TTCallbackPtr(e->object)->getBaton();
-            TTObjectBaseRelease(&e->object);
-        }
+        delete (TTValuePtr)TTCallbackPtr(e->object)->getBaton();
+        TTObjectBaseRelease(&e->object);
     }
     
     delete e;
@@ -585,10 +574,7 @@ void Engine::uncacheStartCallback(TimeProcessId boxId)
 void Engine::cacheEndCallback(TimeProcessId boxId)
 {
     EngineCacheElementPtr   e;
-    TTValue                 v;
-    TTValuePtr              endMessageBaton;
-    TTMessagePtr            aMessage;
-    TTErr                   err;
+    TTValuePtr              processEndedBaton;
     
     e = new EngineCacheElement();
     e->object = NULL;
@@ -597,17 +583,15 @@ void Engine::cacheEndCallback(TimeProcessId boxId)
     // create a TTCallback to observe when time process ends (using TimeProcessEndCallback)
     TTObjectBaseInstantiate(TTSymbol("callback"), &e->object, kTTValNONE);
     
-    endMessageBaton = new TTValue(TTPtr(this)); // endMessageBaton will be deleted during the callback destruction
-    endMessageBaton->append(TTUInt32(boxId));
+    processEndedBaton = new TTValue(TTPtr(this)); // processEndedBaton will be deleted during the callback destruction
+    processEndedBaton->append(TTUInt32(boxId));
     
-    e->object->setAttributeValue(kTTSym_baton, TTPtr(endMessageBaton));
+    e->object->setAttributeValue(kTTSym_baton, TTPtr(processEndedBaton));
     e->object->setAttributeValue(kTTSym_function, TTPtr(&TimeProcessEndCallback));
+    e->object->setAttributeValue(kTTSym_notification, kTTSym_ProcessEnded);
     
-    // register for ProcessEnd message observation
-    err = getTimeProcess(boxId)->findMessage(kTTSym_ProcessEnd, &aMessage);
-    
-    if (!err)
-        aMessage->registerObserverForNotifications(*e->object);
+    // observe the "ProcessEnded" notification
+    getTimeProcess(boxId)->registerObserverForNotifications(*e->object);
     
     m_endCallbackMap[boxId] = e;
 }
@@ -616,20 +600,14 @@ void Engine::uncacheEndCallback(TimeProcessId boxId)
 {
     EngineCacheElementPtr   e = m_endCallbackMap[boxId];
     TTValue                 v;
-    TTMessagePtr            aMessage;
     TTErr                   err;
     
-    // unregister for ProcessEnd message observation
-    err = getTimeProcess(boxId)->findMessage(kTTSym_ProcessEnd, &aMessage);
+    // don't observe the "ProcessEnded" notification anymore
+    err = getTimeProcess(boxId)->registerObserverForNotifications(*e->object);
     
     if (!err) {
-        
-        err = aMessage->unregisterObserverForNotifications(*e->object);
-        
-        if (!err) {
-            delete (TTValuePtr)TTCallbackPtr(e->object)->getBaton();
-            TTObjectBaseRelease(&e->object);
-        }
+        delete (TTValuePtr)TTCallbackPtr(e->object)->getBaton();
+        TTObjectBaseRelease(&e->object);
     }
     
     delete e;
@@ -642,8 +620,7 @@ void Engine::cacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex c
     TTTimeProcessPtr        timeProcess = getConditionedProcess(triggerId, controlPointId);
     TTTimeEventPtr          timeEvent;
     TTValue                 v, out;
-    TTValuePtr              readyAttributeBaton;
-    TTAttributePtr          anAttribute;
+    TTValuePtr              readyChangedBaton;
     TTErr                   err;
     
     // Create a new engine cache element
@@ -662,18 +639,16 @@ void Engine::cacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex c
     // Create a TTCallback to observe time event ready attribute (using TimeEventReadyAttributeCallback)
     TTObjectBaseInstantiate(TTSymbol("callback"), &e->object, kTTValNONE);
     
-    readyAttributeBaton = new TTValue(TTPtr(this)); // readyAttributeBaton will be deleted during the callback destruction
-    readyAttributeBaton->append(TTUInt32(triggerId));
+    readyChangedBaton = new TTValue(TTPtr(this)); // readyChangedBaton will be deleted during the callback destruction
+    readyChangedBaton->append(TTUInt32(triggerId));
     
-    e->object->setAttributeValue(kTTSym_baton, TTPtr(readyAttributeBaton));
+    e->object->setAttributeValue(kTTSym_baton, TTPtr(readyChangedBaton));
     e->object->setAttributeValue(kTTSym_function, TTPtr(&TimeEventReadyAttributeCallback));
+    e->object->setAttributeValue(kTTSym_notification, kTTSym_EventReadyChanged);
     
-    // register for ready attribute observation
-    err = timeEvent->findAttribute(TTSymbol("ready"), &anAttribute);
-    
-    if (!err)
-        anAttribute->registerObserverForNotifications(*e->object);
-    
+    // observe the "EventReadyChanged" notification
+    timeEvent->registerObserverForNotifications(*e->object);
+
     m_readyCallbackMap[triggerId] = e;
 }
 
@@ -683,7 +658,6 @@ void Engine::uncacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex
     TTTimeProcessPtr        timeProcess = getConditionedProcess(triggerId, controlPointId);
     TTTimeEventPtr          timeEvent;
     TTValue                 v;
-    TTAttributePtr          anAttribute;
     TTErr                   err;
     
     // Get start or end time event
@@ -694,17 +668,12 @@ void Engine::uncacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex
     
     timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
     
-    // unregister for scheduler running attribute observation    
-    err = timeEvent->findAttribute(TTSymbol("ready"), &anAttribute);
+    // don't observe the "EventReadyChanged" notification anymore
+    err = timeEvent->unregisterObserverForNotifications(*e->object);
     
     if (!err) {
-        
-        err = anAttribute->unregisterObserverForNotifications(*e->object);
-        
-        if (!err) {
-            delete (TTValuePtr)TTCallbackPtr(e->object)->getBaton();
-            TTObjectBaseRelease(&e->object);
-        }
+        delete (TTValuePtr)TTCallbackPtr(e->object)->getBaton();
+        TTObjectBaseRelease(&e->object);
     }
     
     delete e;
@@ -2635,6 +2604,8 @@ void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value)
     TTValuePtr              b;
     EnginePtr               engine;
     ConditionedProcessId    triggerId;
+    TTObjectBasePtr         event;
+    TTValue                 v;
     TTBoolean               isReady;
 	
 	// unpack baton (engine, triggerId)
@@ -2642,8 +2613,10 @@ void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value)
 	engine = EnginePtr((TTPtr)(*b)[0]);
     triggerId = ConditionedProcessId((*b)[1]);
 	
-	// Unpack data (isReady)
-	isReady = value[0];
+	// Unpack data (event)
+	event = value[0];
+    event->getAttributeValue(kTTSym_ready, v);
+    isReady = v[0];
     
 	if (engine->m_TimeEventReadyAttributeCallback != NULL) {
         
