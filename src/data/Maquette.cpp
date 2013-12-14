@@ -1340,23 +1340,26 @@ Maquette::isExecutionOn()
 
 void
 Maquette::turnExecutionOff()
-{    
-    // Stop engine execution
-    _engines->stop();
-    
-    // Unlock all boxes
-    for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++)
-        it->second->unlock();
-    
-    // Set all boxes as if they crossed there end extremity
-    BoxesMap::iterator it;
-    for (it = _boxes.begin(); it != _boxes.end(); it++){
-        if (it->second->type() == PARENT_BOX_TYPE)
-            static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);        
+{
+    if(_engines->isPlaying()){
+
+        // Stop engine execution
+        _engines->stop();
+
+        // Unlock all boxes
+        for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++)
+            it->second->unlock();
+
+        // Set all boxes as if they crossed there end extremity
+        BoxesMap::iterator it;
+        for (it = _boxes.begin(); it != _boxes.end(); it++){
+            if (it->second->type() == PARENT_BOX_TYPE)
+                static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
+        }
+
+        // Clear the trigger queue list
+        _scene->triggersQueueList()->clear();
     }
-    
-    // Clear the trigger queue list
-    _scene->triggersQueueList()->clear();
 }
 
 void
@@ -1387,8 +1390,7 @@ Maquette::stopPlayingAndGoToStart()
 void
 Maquette::stopPlayingAndGoToTimeOffset(unsigned int timeOffset)
 {
-  turnExecutionOff();
-    
+  turnExecutionOff();    
   setTimeOffset(timeOffset);
 }
 
