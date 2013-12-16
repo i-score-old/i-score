@@ -1340,26 +1340,19 @@ Maquette::isExecutionOn()
 
 void
 Maquette::turnExecutionOff()
-{
-    if(_engines->isPlaying()){
+{    
+    // Stop engine execution
+    _engines->stop();
 
-        // Stop engine execution
-        _engines->stop();
-
-        // Unlock all boxes
-        for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++)
-            it->second->unlock();
-
-        // Set all boxes as if they crossed there end extremity
-        BoxesMap::iterator it;
-        for (it = _boxes.begin(); it != _boxes.end(); it++){
-            if (it->second->type() == PARENT_BOX_TYPE)
-                static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
-        }
-
-        // Clear the trigger queue list
-        _scene->triggersQueueList()->clear();
+    // Set all boxes as if they crossed there end extremity
+    BoxesMap::iterator it;
+    for (it = _boxes.begin(); it != _boxes.end(); it++){
+        it->second->unlock();
+        static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
     }
+
+    // Clear the trigger queue list
+    _scene->triggersQueueList()->clear();
 }
 
 void
@@ -1382,9 +1375,13 @@ Maquette::isExecutionPaused()
 
 void
 Maquette::stopPlayingAndGoToStart()
-{
+{    
     turnExecutionOff();
-    setTimeOffset(0);
+
+    /// \todo Check this. NH
+//NH : commenté car est fait automatiquement (il semblerait)
+//     et provoquait un problème au timeEndReached (l'updatePlayMode ne se faisait plus)
+//    setTimeOffset(0);
 }
 
 void

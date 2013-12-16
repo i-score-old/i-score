@@ -1511,7 +1511,7 @@ MaquetteScene::removeBox(unsigned int boxID)
 
 bool
 MaquetteScene::playing()
-{
+{    
   return _maquette->isExecutionOn() && !_maquette->isExecutionPaused();
 }
 
@@ -1694,7 +1694,7 @@ MaquetteScene::removeSelectedItems()
 
 void
 MaquetteScene::timeEndReached()
-{
+{    
     _maquette->stopPlayingAndGoToStart();
     
     update();

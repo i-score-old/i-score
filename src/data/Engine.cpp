@@ -1927,7 +1927,7 @@ bool Engine::isPaused()
 }
 
 bool Engine::stop()
-{
+{    
     TTValue         objects;
     TTObjectBasePtr timeProcess;
     

@@ -208,7 +208,7 @@ HeaderPanelWidget::accelerationValueEntered(double value){
 
 void
 HeaderPanelWidget::updatePlayMode(){
-    
+
     bool playing = _scene->playing();
 
     _stopAction->setVisible(playing);
