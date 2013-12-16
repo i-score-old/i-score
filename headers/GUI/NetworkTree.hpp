@@ -59,7 +59,9 @@ using std::map;
 
 
 enum { NodeNamespaceType = QTreeWidgetItem::UserType + 1, NodeNoNamespaceType = QTreeWidgetItem::UserType + 2,
-       LeaveType = QTreeWidgetItem::UserType + 3, AttributeType = QTreeWidgetItem::UserType + 4, OSCNamespace = QTreeWidgetItem::UserType + 5, OSCNode = QTreeWidgetItem::UserType + 6, addOSCNode = QTreeWidgetItem::UserType + 7 };
+       LeaveType = QTreeWidgetItem::UserType + 3, AttributeType = QTreeWidgetItem::UserType + 4,
+       OSCNamespace = QTreeWidgetItem::UserType + 5, OSCNode = QTreeWidgetItem::UserType + 6, addOSCNode = QTreeWidgetItem::UserType + 7,
+       MessageType = QTreeWidgetItem::UserType + 7};
 
 
 
@@ -209,7 +211,7 @@ class NetworkTree : public QTreeWidget
      * \brief Clears a columns.
      * \param column : the column numero.
      */
-    void clearColumn(unsigned int column);
+    void clearColumn(unsigned int column, bool fullCleaning = true);
 
     /*!
      * \brief Expands items.
@@ -416,9 +418,9 @@ class NetworkTree : public QTreeWidget
     void messageChanged(QTreeWidgetItem *item, QString address);
     void deviceChanged(QString oldName, QString newName);
     void pluginChanged(QString deviceName);
-    void cmdKeyStateChanged(bool);
     void rangeBoundMinChanged(QTreeWidgetItem *item, float newValue);
     void rangeBoundMaxChanged(QTreeWidgetItem *item, float newValue);
+    void recModeChanged(QTreeWidgetItem *item);
 
   private:
     void treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict);
@@ -503,10 +505,13 @@ class NetworkTree : public QTreeWidget
     NetworkMessages *_endMessages;
     NetworkMessages *_OSCStartMessages;
     NetworkMessages *_OSCEndMessages;
+    QList<QTreeWidgetItem *> _recMessages;
     QMap<QTreeWidgetItem *, QString> _OSCMessages;
+
 
     int _OSCMessageCount;
     bool _treeFilterActive;
+    bool _recMode;
 
     DeviceEdit *_deviceEdit;  
 
@@ -524,6 +529,8 @@ class NetworkTree : public QTreeWidget
     void changeNameValue(QTreeWidgetItem* item, QString newValue);
     void updateDeviceName(QString newName, QString plugin);
     void updateDevicePlugin(QString newName);
+    void setRecMode(std::string address);
+    void setRecMode(QList<std::string> items);
 
     virtual void clear();
 };

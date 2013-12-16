@@ -40,6 +40,7 @@
 
 #include "NetworkTree.hpp"
 #include "Maquette.hpp"
+#include "MainWindow.hpp"
 #include <QList>
 #include <map>
 #include <exception>
@@ -49,6 +50,7 @@
 #include <QAbstractItemModel>
 #include <QAbstractItemView>
 #include <QTreeView>
+#include <QApplication>
 
 int NetworkTree::NAME_COLUMN = 0;
 int NetworkTree::VALUE_COLUMN = 1;
@@ -131,6 +133,7 @@ NetworkTree::init()
   _OSCMessageCount = 0;
   _OSCStartMessages = new NetworkMessages;
   _OSCEndMessages = new NetworkMessages;
+  _recMessages = QList<QTreeWidgetItem*>();
 
   setStyleSheet(
     "QTreeView {"
@@ -177,6 +180,7 @@ NetworkTree::clear()
   _endMessages->clear();
   _OSCStartMessages->clear();
   _OSCEndMessages->clear();
+  _recMessages.clear();
 
   _OSCMessages.clear();
   _OSCMessageCount = 0;
@@ -196,7 +200,7 @@ NetworkTree::load()
   QTreeWidgetItem *OSCRootNode;
 
   for (nameIt = deviceNames.begin(); nameIt != deviceNames.end(); ++nameIt) {
-      
+
       QStringList deviceName;
 
       deviceName << QString::fromStdString(*nameIt);
@@ -204,13 +208,18 @@ NetworkTree::load()
       QTreeWidgetItem *curItem = NULL;
       
       bool isRequestable = Maquette::getInstance()->isNetworkDeviceRequestable(*nameIt);
-      
+      std::cout<<*nameIt;
       if (!isRequestable) {
           //OSCDevice
           curItem = new QTreeWidgetItem(deviceName, NodeNamespaceType);
-          OSCRootNode = curItem;
-
-          createOCSBranch(curItem);
+          try{
+              treeRecursiveExploration(curItem, true);
+            }catch (const std::exception & e) {
+              std::cerr << *nameIt << " : " << e.what();
+            }
+          itemsList << curItem;
+//          OSCRootNode = curItem;
+//          createOCSBranch(curItem);
         }
       else {
           curItem = new QTreeWidgetItem(deviceName, NodeNamespaceType);          
@@ -549,7 +558,7 @@ NetworkTree::treeSnapshot(unsigned int boxID)
 
               QPair<QTreeWidgetItem *, Data> curPair;
 
-              if (!address.isEmpty()) {
+              if (!address.isEmpty()) {                  
                   vector<string> snapshot = Maquette::getInstance()->requestNetworkSnapShot(address.toStdString());
 
                   Data data;
@@ -600,26 +609,27 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
         requestResult = Maquette::getInstance()->getObjectType(address,nodeType);
         requestSuccess = requestResult > 0;
 
-        if (requestSuccess) {
+//        if (requestSuccess) {
             conflict = false;
 
             if(treeFilterActive()){
-                if(nodeType == "ModelInfo" || nodeType == "Input.audio" ||nodeType == "Output.audio"){
+
+                if(nodeType == "Model" || nodeType == "ModelInfo" || nodeType == "Input.audio" || nodeType == "Output.audio" || nodeType == "Viewer"){
                     delete(curItem);
                     return;
-                }                
+                }
                 if(Maquette::getInstance()->requestObjectAttribruteValue(address,"tag",attributesValues) > 0){
                     if(attributesValues[0] == "setup"){
                         delete(curItem);
                         return;
                     }
                 }
-                if(nodeType == "PresetManager"){
+                if(nodeType == "PresetManager"){                    
                     curItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
 
                     QFont curFont = curItem->font(NAME_COLUMN);
                     curFont.setItalic(true);
-                    curItem->setFont(NAME_COLUMN,curFont);
+                    curItem->setFont(NAME_COLUMN,curFont);                    
 
                     QBrush brush(Qt::lightGray);
                     curItem->setForeground(NAME_COLUMN, brush);
@@ -627,6 +637,8 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
 
                     curItem->setText(TYPE_COLUMN,QString("->"));
                     curItem->setToolTip(TYPE_COLUMN, tr("Type PresetManager"));
+                    curItem->setWhatsThis(NAME_COLUMN,"Message");
+
                     return;
                 }
             }
@@ -674,6 +686,8 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
 
                         curItem->setText(TYPE_COLUMN,QString("->"));
                         curItem->setToolTip(TYPE_COLUMN, tr("Type message"));
+                        curItem->setWhatsThis(NAME_COLUMN,"Message");
+
                         return;
                     }
 
@@ -688,7 +702,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
 
             //Get range bounds
             vector<float> rangeBounds;
-            if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0){
+            if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0){                
                 curItem->setText(MIN_COLUMN,QString("%1").arg(rangeBounds[0]));
                 curItem->setToolTip(MIN_COLUMN, curItem->text(MIN_COLUMN));
                 curItem->setText(MAX_COLUMN,QString("%1").arg(rangeBounds[1]));
@@ -698,7 +712,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
             //Get object's chidren
             if(Maquette::getInstance()->getObjectChildren(address,children) > 0){
 
-                for(it = children.begin() ; it != children.end() ; ++it){
+                for(it = children.begin() ; it != children.end() ; ++it){                    
                     QStringList name;
                     name << QString::fromStdString(*it);
                     QTreeWidgetItem *childItem;
@@ -707,34 +721,39 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                     childAbsoluteAddress.append(*it);
 
                     if(Maquette::getInstance()->getObjectType(childAbsoluteAddress,nodeType)){
+
                         if(nodeType == "Data"){
                             childItem = new QTreeWidgetItem(name, LeaveType);
                         }
                         else{
                             childItem = new QTreeWidgetItem(name, NodeNoNamespaceType);
                         }
-                        name.clear();
-                        curItem->addChild(childItem);
-                        curItem->setCheckState(START_COLUMN, Qt::Unchecked);
-                        curItem->setCheckState(END_COLUMN, Qt::Unchecked);
-                        treeRecursiveExploration(childItem, conflict);
                     }
+                    else{
+                        childItem = new QTreeWidgetItem(name, NodeNoNamespaceType);
+                    }
+                    name.clear();
+                    curItem->addChild(childItem);
+                    curItem->setCheckState(START_COLUMN, Qt::Unchecked);
+                    curItem->setCheckState(END_COLUMN, Qt::Unchecked);
+                    treeRecursiveExploration(childItem, conflict);
+                }
                 }
             }
-        }
-        else {
-            if (conflict) {
-                curItem->setIcon(NAME_COLUMN, QIcon(":/images/error-icon.png"));
-                curItem->setToolTip(NAME_COLUMN, tr("Network connection failed : Please check if your remote application is running or if another i-score instance is not already working"));
-                curItem->setFlags(Qt::ItemIsEnabled);
-            }
-        }
-    }
+//        }
+//        else {
+//            if (conflict) {
+//                curItem->setIcon(NAME_COLUMN, QIcon(":/images/error-icon.png"));
+//                curItem->setToolTip(NAME_COLUMN, tr("Network connection failed : Please check if your remote application is running or if another i-score instance is not already working"));
+//                curItem->setFlags(Qt::ItemIsEnabled);
+//            }
+//        }
+//    }
 }
 
 void
-NetworkTree::clearColumn(unsigned int column)
-{
+NetworkTree::clearColumn(unsigned int column, bool fullCleaning)
+{        
   if (!_assignedItems.isEmpty()) {
       QList<QTreeWidgetItem *>::iterator it;
       QTreeWidgetItem *curIt;
@@ -744,13 +763,24 @@ NetworkTree::clearColumn(unsigned int column)
 
       for (it = assignedItems.begin(); it != assignedItems.end(); it++) {
           curIt = *it;
-
-          if (curIt->checkState(column)) {
+          if(curIt->checkState(column))
               curIt->setCheckState(column, Qt::Unchecked);
-            }
-          curIt->setText(column, emptyString);
-        }
+
+          if(!fullCleaning){
+              if(curIt->whatsThis(NAME_COLUMN)=="Message")
+                  ;//we don't clear type message
+          }
+          else
+              curIt->setText(column, emptyString);
+        }      
     }
+
+  //clear record icon
+  if(column == INTERPOLATION_COLUMN && !_recMessages.isEmpty()){
+      QList<QTreeWidgetItem *>::iterator it;
+      for(it = _recMessages.begin(); it != _recMessages.end() ; it++)
+          (*it)->setCheckState(column, Qt::Unchecked);
+  }
 }
 
 void
@@ -763,7 +793,7 @@ NetworkTree::clearStartMsgs()
 void
 NetworkTree::clearDevicesStartMsgs(QList<QString> devices)
 {
-  clearColumn(START_COLUMN);
+  clearColumn(START_COLUMN,false);
   _startMessages->clearDevicesMsgs(devices);
 }
 
@@ -777,7 +807,7 @@ NetworkTree::clearEndMsgs()
 void
 NetworkTree::clearDevicesEndMsgs(QList<QString> devices)
 {
-  clearColumn(END_COLUMN);
+  clearColumn(END_COLUMN,false);
   _endMessages->clearDevicesMsgs(devices);
 }
 
@@ -788,7 +818,8 @@ NetworkTree::displayBoxContent(AbstractBox *abBox)
   setEndMessages(abBox->endMessages());
   updateStartMsgsDisplay();
   updateEndMsgsDisplay();
-  assignItems(assignedItems());
+  assignItems(assignedItems());  
+  setRecMode(abBox->messagesToRecord());
 }
 
 void
@@ -1000,6 +1031,7 @@ NetworkTree::resetNetworkTree()
   resetSelectedItems();
   resetAssignedItems();
   resetAssignedNodes();
+  _recMessages.clear();
 }
 
 
@@ -1435,15 +1467,13 @@ NetworkTree::noBrothersSelected(QTreeWidgetItem *item)
 void
 NetworkTree::resetSelectedItems()
 {
-  QList<QTreeWidgetItem*> selection = selectedItems() /*+assignedItems()*/;
+  QList<QTreeWidgetItem*> selection = selectedItems();
   QList<QTreeWidgetItem *>::iterator it;
   QTreeWidgetItem *curItem;
 
   for (it = selection.begin(); it != selection.end(); ++it) {
       curItem = *it;
       curItem->setSelected(false);
-
-//        curItem->setCheckState(0,Qt::Unchecked);
     }
 
   for (it = _nodesWithSelectedChildren.begin(); it != _nodesWithSelectedChildren.end(); ++it) {
@@ -1454,10 +1484,7 @@ NetworkTree::resetSelectedItems()
           curItem->setBackground(i, QBrush(Qt::NoBrush));
         }
 
-//      curItem->setFont(0, font);
       curItem->setSelected(false);
-
-//        curItem->setCheckState(0,Qt::Unchecked);
       curItem->setCheckState(START_COLUMN, Qt::Unchecked);
       curItem->setCheckState(END_COLUMN, Qt::Unchecked);
     }
@@ -1590,17 +1617,11 @@ NetworkTree::keyReleaseEvent(QKeyEvent *event)
   if (event->key() == Qt::Key_Shift) {
       setSelectionMode(QAbstractItemView::MultiSelection);
     }
-  if (event->key() == Qt::Key_Control) {
-      emit(cmdKeyStateChanged(false));
-    }
 }
 
 void
 NetworkTree::keyPressEvent(QKeyEvent *event)
 {
-  if (event->key() == Qt::Key_Control) {
-      emit(cmdKeyStateChanged(true));
-    }
   if (event->key() == Qt::Key_Shift) {
       setSelectionMode(QAbstractItemView::ContiguousSelection);
     }
@@ -1615,7 +1636,7 @@ NetworkTree::keyPressEvent(QKeyEvent *event)
 
 void
 NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
-{    
+{        
   if (item != NULL) {      
       if (item->isSelected()) {
           recursiveChildrenSelection(item, true);
@@ -1629,36 +1650,41 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
         }
 
       if ((item->type() == LeaveType || item->type() == OSCNode) && column == INTERPOLATION_COLUMN) {
-          if (isAssigned(item) && hasCurve(item)) {
-              bool activated = item->checkState(column) == Qt::Checked;
-              emit(curveActivationChanged(item, activated));
-            }
-          else {
-              //Creates curve with start=minBound and end=maxBound (default 0 1)
-              vector<float> rangeBounds;
-              float min = 0., max = 1.;
-              std::string address = getAbsoluteAddress(item).toStdString();
-              if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0){
-                  min = rangeBounds[0];
-                  max = rangeBounds[1];
-              }
-              VALUE_MODIFIED = true;
-              item->setText(START_COLUMN,QString("%1").arg(min));
-              VALUE_MODIFIED = true;
-              item->setText(END_COLUMN,QString("%1").arg(max));
-            }
-        }
 
+          if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
+              emit recModeChanged(item);
+          }
+          else{
+              if (isAssigned(item) && hasCurve(item)) {
+                  bool activated = item->checkState(column) == Qt::Checked;
+                  emit(curveActivationChanged(item, activated));
+              }
+              else {
+                  //Creates curve with start=minBound and end=maxBound (default 0 1)
+                  vector<float> rangeBounds;
+                  float min = 0., max = 1.;
+                  std::string address = getAbsoluteAddress(item).toStdString();
+                  if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0){
+                      min = rangeBounds[0];
+                      max = rangeBounds[1];
+                  }
+                  VALUE_MODIFIED = true;
+                  item->setText(START_COLUMN,QString("%1").arg(min));
+                  VALUE_MODIFIED = true;
+                  item->setText(END_COLUMN,QString("%1").arg(max));
+              }
+          }
+      }
       if ((item->type() == LeaveType || item->type() == OSCNode) && column == REDUNDANCY_COLUMN) {
           if (isAssigned(item) && hasCurve(item)) {
               bool activated = item->checkState(column) == Qt::Checked;
               emit(curveRedundancyChanged(item, activated));
-            }
+          }
           else {
               item->setCheckState(column, Qt::Unchecked);
-            }
-        }
-    }
+          }
+      }
+  }
 
   if (selectionMode() == QAbstractItemView::ContiguousSelection) {
       QList<QTreeWidgetItem*> selection = selectedItems();
@@ -1677,10 +1703,11 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 
 void
 NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
-{
+{    
     Data data;
     data.hasCurve = false;
-    data.address = getAbsoluteAddress(item);
+    QString qaddress = getAbsoluteAddress(item);
+    data.address = qaddress;
 
     if (item->type() == LeaveType && column == START_COLUMN && VALUE_MODIFIED) {
         VALUE_MODIFIED = FALSE;
@@ -1732,32 +1759,37 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
         emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
-    
+
     //Case message
-    //PROVISIONAL
-    /// \todo : engine->requestType(address,type) and not to compare with "->" symbol.
-    if (item->text(TYPE_COLUMN) == "->"){
+    if(item->whatsThis(NAME_COLUMN)=="Message"){
         if (column == START_COLUMN && VALUE_MODIFIED) {
             VALUE_MODIFIED = FALSE;
             assignItem(item, data);
             emit(startValueChanged(item, item->text(START_COLUMN)));
             item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
         }
-
         else if (column == END_COLUMN && VALUE_MODIFIED) {
             VALUE_MODIFIED = FALSE;
             assignItem(item, data);
-            emit(endValueChanged(item, item->text(END_COLUMN)));
-            item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
-        }
-
-        else if (column == SR_COLUMN && SR_MODIFIED) {
-            SR_MODIFIED = FALSE;
-            emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
+            emit(endValueChanged(item, item->text(START_COLUMN)));
             item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
         }
     }
+
+    else if (column == END_COLUMN && VALUE_MODIFIED) {
+        VALUE_MODIFIED = FALSE;
+        assignItem(item, data);
+        emit(endValueChanged(item, item->text(END_COLUMN)));
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
+    }
+
+    else if (column == SR_COLUMN && SR_MODIFIED) {
+        SR_MODIFIED = FALSE;
+        emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+    }
 }
+
 
 QString
 NetworkTree::getAbsoluteAddressWithValue(QTreeWidgetItem *item, int column) const
@@ -1917,8 +1949,9 @@ NetworkTree::getSampleRate(QTreeWidgetItem *item)
 
 bool
 NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUpdate)
-{
-  string address = getAbsoluteAddress(item).toStdString();
+{    
+  string address = getAbsoluteAddress(item).toStdString();  
+
   BasicBox *box = Maquette::getInstance()->getBox(boxID);
   if (box != NULL) { // Box Found
       if (box->hasCurve(address)) {
@@ -2089,4 +2122,26 @@ NetworkTree::updateDevicePlugin(QString newPlugin)
   emit(pluginChanged(deviceName));
 
   //Va supprimer les message de cette device
+}
+
+void
+NetworkTree::setRecMode(std::string address){
+    QTreeWidgetItem *item = getItemFromAddress(address);
+
+    if(!_recMessages.contains(item)){
+        _recMessages<<item;
+        item->setData(INTERPOLATION_COLUMN, Qt::CheckStateRole, QVariant());
+        item->setIcon(INTERPOLATION_COLUMN,QIcon(":/images/record.svg"));
+    }
+    else{
+        _recMessages.removeAll(item);
+        item->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
+    }
+}
+
+void
+NetworkTree::setRecMode(QList<std::string> address){
+    QList<std::string>::iterator it;
+    for(it=address.begin() ; it!=address.end() ; it++)
+        setRecMode(*it);
 }

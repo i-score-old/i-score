@@ -121,9 +121,9 @@ HeaderPanelWidget::createToolBar()
 void
 HeaderPanelWidget::createNameLabel()
 {
-  QFont *font = new QFont();
-  font->setPointSize(NAME_POINT_SIZE);
-  _nameLabel->setFont(*font);
+  QFont font;
+  font.setPointSize(NAME_POINT_SIZE);
+  _nameLabel->setFont(font);
   _nameLabel->setText("Scenario");
 }
 

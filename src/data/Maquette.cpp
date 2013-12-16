@@ -99,6 +99,7 @@ Maquette::~Maquette()
 {
   _boxes.clear();
   _parentBoxes.clear();
+  _recordingBoxes.clear();
   delete _engines;
 }
 
@@ -161,6 +162,11 @@ Maquette::getBox(unsigned int ID)
 void Maquette::setBoxColor(unsigned int ID, QColor newColor)
 {
     _engines->setBoxColor(ID, newColor);
+}
+
+void
+Maquette::setBoxName(unsigned int ID, std::string name){
+    _engines->setBoxName(ID, name);
 }
 
 map<unsigned int, ParentBox*>
@@ -277,11 +283,12 @@ Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const s
                                            (secondCorner.x() - firstCorner.x()) * MaquetteScene::MS_PER_PIXEL, name, motherID);
 
   if (newBoxID != NO_ID) {
-      newBox->setName(QString::fromStdString(name));
 
       _boxes[newBoxID] = newBox;
       _parentBoxes[newBoxID] = newBox;
       newBox->setID(newBoxID);
+      newBox->setName(QString::fromStdString(name));
+
       if (motherBox != NULL) {
           newBox->setMother(motherID);
           motherBox->addChild(newBoxID);
@@ -623,8 +630,7 @@ Maquette::setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages)
 bool
 Maquette::sendMessage(const string &message)
 {
-  if (!message.empty()) {
-
+  if (!message.empty()) {      
       _engines->sendNetworkMessage(message);
 
       return true;
@@ -1238,13 +1244,9 @@ Maquette::initSceneState()
   std::vector<string> curvesList;
 
   //Pour toutes les boîtes avant le goto, on récupère leur état final (on simule leur exécution)
-  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
+  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {     
       boxID = it->first;
       currentBox = (*it).second;
-
-      //réinit : On démute toutes les boîtes, elles ont potentiellement pu être mutées à la fin de l'algo
-      _engines->setCtrlPointMutingState(boxID, 1, false);
-      _engines->setCtrlPointMutingState(boxID, 2, false);
 
       if (currentBox->date() < timeOffset && (currentBox->date() + currentBox->duration()) <= timeOffset) {
           boxMsgs = currentBox->getFinalState();
@@ -1262,7 +1264,7 @@ Maquette::initSceneState()
                 }
             }
         }
-      else if (timeOffset == currentBox->date()) {
+      else if (timeOffset == currentBox->date() && timeOffset > 0) { // <timeOffset to avoid rootBox cue duplication
           boxMsgs = currentBox->getStartState();
         }
       boxAddresses = boxMsgs.keys();
@@ -1281,17 +1283,6 @@ Maquette::initSceneState()
               msgs.insert(*it2, boxMsgs.value(*it2));
             }
         }
-
-      //On mute tous les messages avant le goto (Bug du moteur, qui envoyait des valeurs non désirées)
-      //    Start messages
-      if (currentBox->date() < timeOffset) {
-          _engines->setCtrlPointMutingState(boxID, 1, true);
-        }
-
-      //    End messages
-      if (currentBox->date() + currentBox->duration() < timeOffset) {
-          _engines->setCtrlPointMutingState(boxID, 2, true);
-        }
     }
 
   //traduction en QMap<QString,QString>, on supprime le champs date des messages
@@ -1308,14 +1299,14 @@ void
 Maquette::turnExecutionOn()
 {    
     // Start execution from where is the time offset is
-    
-    initSceneState();
+    unsigned int timeOffset = _engines->getTimeOffset();
+
+    //initSceneState();
     
     generateTriggerQueue();
     
     // Remove the first trigger which are before or equal to the time offset
-    // théo : is this really usefull ?
-    unsigned int timeOffset = _engines->getTimeOffset();
+    // théo : is this really usefull ?    
     int nbTrg = _scene->triggersQueueList()->size();
     
     try {
@@ -1349,27 +1340,31 @@ Maquette::isExecutionOn()
 
 void
 Maquette::turnExecutionOff()
-{    
-    // Stop engine execution
-    _engines->stop();
-    
-    // Unlock all boxes
-    for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++)
-        it->second->unlock();
-    
-    // Set all boxes as if they crossed there end extremity
-    BoxesMap::iterator it;
-    for (it = _boxes.begin(); it != _boxes.end(); it++)
-        if (it->second->type() == PARENT_BOX_TYPE)
-            static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
-    
-    // Clear the trigger queue list
-    _scene->triggersQueueList()->clear();
+{
+    if(_engines->isPlaying()){
+
+        // Stop engine execution
+        _engines->stop();
+
+        // Unlock all boxes
+        for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++)
+            it->second->unlock();
+
+        // Set all boxes as if they crossed there end extremity
+        BoxesMap::iterator it;
+        for (it = _boxes.begin(); it != _boxes.end(); it++){
+            if (it->second->type() == PARENT_BOX_TYPE)
+                static_cast<BasicBox*>(it->second)->setCrossedExtremity(BOX_END);
+        }
+
+        // Clear the trigger queue list
+        _scene->triggersQueueList()->clear();
+    }
 }
 
 void
 Maquette::pauseExecution()
-{
+{    
     _engines->pause(true);
 }
 
@@ -1388,20 +1383,14 @@ Maquette::isExecutionPaused()
 void
 Maquette::stopPlayingAndGoToStart()
 {
-    turnExecutionOff();    
+    turnExecutionOff();
     setTimeOffset(0);
-
-    //send root box start messages
-    std::vector<std::string> startCue = getBox(ROOT_BOX_ID)->getStartMessages();
-    for(int i=0; i<startCue.size(); i++)
-        sendMessage(startCue.at(i));
 }
 
 void
 Maquette::stopPlayingAndGoToTimeOffset(unsigned int timeOffset)
 {
-  turnExecutionOff();
-    
+  turnExecutionOff();    
   setTimeOffset(timeOffset);
 }
 
@@ -1623,9 +1612,9 @@ Maquette::load(const string &fileName)
             QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);           
             
             ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
-            
-            newBox->setName(QString::fromStdString(name));
+                        
             newBox->setID(boxID);
+            newBox->setName(QString::fromStdString(name));
             newBox->setColor(color);
 
             _boxes[boxID] = newBox;
@@ -1830,13 +1819,15 @@ void
 Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
 {
     int type = getBox(boxID)->type();
-    
-    if (type == PARENT_BOX_TYPE) {
-        
-        if (running)
-            static_cast<BasicBox*>(_boxes[boxID])->setCrossedExtremity(BOX_START);
-        else
-            static_cast<BasicBox*>(_boxes[boxID])->setCrossedExtremity(BOX_END);
+    BasicBox *box = static_cast<BasicBox*>(_boxes[boxID]);
+
+    if (type == PARENT_BOX_TYPE) {        
+        if (running){
+            box->setCrossedExtremity(BOX_START);                
+        }
+        else{
+            box->setCrossedExtremity(BOX_END);
+        }
     }
 }
 
@@ -1970,4 +1961,13 @@ Maquette::setRangeBoundMin(unsigned int boxID, const string &address, float valu
 void
 Maquette::setRangeBoundMax(unsigned int boxID, const string &address, float value){
     /// \todo
+}
+
+void
+Maquette::setCurveRecording(unsigned int boxID, const string address, bool activated){
+    _engines->setCurveRecording(boxID,address,activated);
+    if(activated)
+        _recordingBoxes<<getBox(boxID);
+    else
+        _recordingBoxes.removeAll(getBox(boxID));
 }

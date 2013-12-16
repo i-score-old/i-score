@@ -54,6 +54,7 @@ using std::string;
 #include <QWidget>
 #include <QGraphicsEffect>
 #include <QGraphicsOpacityEffect>
+#include <QApplication>
 
 #include "AbstractCurve.hpp"
 #include "BasicBox.hpp"
@@ -71,7 +72,7 @@ using std::string;
 
 BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
   : QWidget(parent)
-{
+{        
   _curveMap = new QMap<std::string, CurveWidget *>();
 
   QBrush brush;
@@ -87,16 +88,11 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
 
   _box = box;
   _comboBox = new QComboBox;
-  _curveWidget = new CurveWidget(NULL);
 
   _stackedLayout = new QStackedLayout;
-  _stackedLayout->setStackingMode(QStackedLayout::StackAll);
+  _stackedLayout->setStackingMode(QStackedLayout::StackAll);  
 
-  _curvePageLayout = new QGridLayout;
   setLayout(_stackedLayout);
-
-  _parentWidget = parent;
-  _curveWidgetList = new QList<CurveWidget *>;
 
   _startMenu = NULL;
   _endMenu = NULL;
@@ -104,6 +100,7 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
 
 BoxWidget::~BoxWidget()
 {
+    delete _stackedLayout;
 }
 
 void
@@ -187,8 +184,7 @@ BoxWidget::displayCurve(const QString &address)
 
   for (int i = 0; i < count; i++) {
       cur = values.at(i);
-      cur->setLowerStyle(true);
-      cur->repaint();
+      cur->setLowerStyle(true);      
     }
 
   if (address != BasicBox::SUB_SCENARIO_MODE_TEXT) {
@@ -198,8 +194,7 @@ BoxWidget::displayCurve(const QString &address)
 
       if (curveFound) {
           curveWidget = curveIt.value();
-          curveWidget->setLowerStyle(false);
-          curveWidget->repaint();
+          curveWidget->setLowerStyle(false);          
           _stackedLayout->setCurrentWidget(curveWidget);
         }
     }
@@ -255,7 +250,6 @@ BoxWidget::clearCurves()
 
   _curveMap->clear();
   _curveIndexes.clear();
-  _curveWidgetList->clear();
 }
 
 void
@@ -310,7 +304,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
   BasicBox *box = Maquette::getInstance()->getBox(_boxID);
 
   if (box != NULL) { // Box Found
-      if (box->hasCurve(address)) {
+      if (box->hasCurve(address) || box->recording()) {
           AbstractCurve *abCurve = box->getCurve(address);
           QMap<string, CurveWidget *>::iterator curveIt2 = _curveMap->find(address);
           QString curveAddressStr = QString::fromStdString(address);
@@ -410,10 +404,10 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
                     }
                 }
             }
-        }
+      }
       else {
           return false;
-        }
+      }
     }
   else {  // Box Not Found
       return false;
@@ -447,34 +441,34 @@ BoxWidget::setComboBox(QComboBox *cbox)
 
 void
 BoxWidget::execStartAction()
-{
-  MainWindow *ui = _box->maquetteScene()->view()->mainWindow();
-
-  if (ui->commandKey()) {
+{            
+  if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
       updateStartCue();
     }
   else {
       jumpToStartCue();
     }
 
+  _box->select();
+
   //set button focus off
-  _box->setFocus();
+  _box->setFocus();  
 }
 
 void
 BoxWidget::execEndAction()
-{
-  MainWindow *ui = _box->maquetteScene()->view()->mainWindow();
-
-  if (ui->commandKey()) {
+{  
+  if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
       updateEndCue();
     }
   else {
       jumpToEndCue();
     }
 
+  _box->select();
+
   //unactive button focus
-  _box->setFocus();
+  _box->setFocus();  
 }
 
 void
@@ -483,11 +477,10 @@ BoxWidget::jumpToStartCue()
   if (_startMenu != NULL) {
       _startMenu->close();
     }
-  _box->setSelected(true);
-  _box->update();
+  _box->select();
   unsigned int timeOffset = _box->date();
   _box->maquetteScene()->changeTimeOffset(timeOffset);
-  Maquette::getInstance()->initSceneState();   //reload scene (reset the remote application state)
+  //Maquette::getInstance()->initSceneState();   //reload scene (reset the remote application state)
 }
 
 void
@@ -496,11 +489,10 @@ BoxWidget::jumpToEndCue()
   if (_endMenu != NULL) {
       _endMenu->close();
     }
-  _box->setSelected(true);
-  _box->update();
+  _box->select();
   unsigned int timeOffset = _box->date() + _box->duration();
   _box->maquetteScene()->changeTimeOffset(timeOffset);
-  Maquette::getInstance()->initSceneState();   //reload scene (reset the remote application state)
+  //Maquette::getInstance()->initSceneState();   //reload scene (reset the remote application state)
 }
 
 void

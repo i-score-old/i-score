@@ -82,8 +82,6 @@ typedef std::map<unsigned int, EngineCacheElementPtr>::iterator EngineCacheMapIt
 
 #define CURVE_POW 1
 
-#define SCENARIO_SIZE 600000
-
 /// Allen relations types
 enum AllenType { ALLEN_BEFORE, ALLEN_AFTER, ALLEN_EQUALS, ALLEN_MEETS, ALLEN_OVERLAPS, ALLEN_DURING, ALLEN_STARTS, ALLEN_FINISHES, ALLEN_NONE };
 
@@ -137,6 +135,8 @@ class Engine
 private:
     
     TTTimeProcessPtr    m_mainScenario;                                 /// The top scenario
+    TTTimeEventPtr      m_mainStartEvent;                               /// The top scenario start event
+    TTTimeEventPtr      m_mainEndEvent;                                 /// The top scenario end event
     
     unsigned int        m_nextTimeProcessId;                            /// the next Id to give to any created time process
     unsigned int        m_nextIntervalId;                               /// the next Id to give to any created interval
@@ -404,7 +404,26 @@ public:
 	 */
     void setBoxColor(TimeProcessId boxId, QColor newColor);
     
-    
+    /*!
+     * Sets the mute state of the box (process) matching the given ID
+     *
+     *
+     * \param boxId : the ID of the box
+     *
+     * \param muteState : the muteState of the box matching the given ID
+     */
+    void setBoxMuteState(TimeProcessId boxId, bool muteState);
+
+    /*!
+     * Sets the name of the box matching the given ID
+     *
+     *
+     * \param boxId : the ID of the box
+     *
+     * \param newColor : the name of the box matching the given ID
+     */
+    void setBoxName(TimeProcessId boxId, std::string name);
+
 	/*!
 	 * Gets the begin value of the box matching the given ID
 	 *
@@ -800,8 +819,7 @@ public:
 	 * \return true if the main scnerio is running. False if not.
 	 */
 	bool isPlaying();
-    bool saveLastPlayingStateForTest;   // théo : only for debug purpose
-    
+
 	/*!
 	 * Stops the main scenario.
 	 *
@@ -816,8 +834,7 @@ public:
 	 *
 	 */
 	void pause(bool pauseValue);
-    bool saveLastPausedStateForTest;   // théo : only for debug purpose
-    
+ 
     /*!
 	 * Tests if the main scenario is actually paused.
 	 *

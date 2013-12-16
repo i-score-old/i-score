@@ -63,6 +63,10 @@ MaquetteView::MaquetteView(MainWindow *mw)
 {
   _mainWindow = mw;
   setRenderHint(QPainter::Antialiasing);
+  setOptimizationFlags(QGraphicsView::IndirectPainting);
+  setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
+  setTransformationAnchor(QGraphicsView::NoAnchor);
+  setCacheMode(QGraphicsView::CacheBackground);
 
   setBackgroundBrush(QColor(160, 160, 160));  
 
@@ -72,8 +76,6 @@ MaquetteView::MaquetteView(MainWindow *mw)
   centerOn(0, 0);
   _zoom = 1;    
   _scenarioSelected = false;
-  setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-  setCacheMode(QGraphicsView::CacheBackground);
 }
 
 MaquetteView::~MaquetteView()
@@ -142,10 +144,10 @@ MaquetteView::drawStartIndicator(QPainter *painter)
     if(scenarioAbstract->hasFirstMsgs()){
         painter->save();
         painter->setOpacity(_scenarioSelected ? 1 : 0.6);
-        QRectF gradientRect(0,0,GRADIENT_WIDTH,height());
+        QRectF gradientRect(0,0,GRADIENT_WIDTH,MaquetteScene::MAX_SCENE_HEIGHT);
         QLinearGradient lgradient(gradientRect.topLeft(),gradientRect.topRight());
 
-//        lgradient.setColorAt(0,scenarioAbstract->color());
+        /// \todo : lgradient.setColorAt(0,scenarioAbstract->color()); (rootBox color white for the moment)
         lgradient.setColorAt(0,Qt::white);
         lgradient.setColorAt(1, Qt::transparent);
 
@@ -209,7 +211,7 @@ MaquetteView::triggerShortcut(int shorcut)
 
 void
 MaquetteView::keyPressEvent(QKeyEvent *event)
-{
+{    
   QGraphicsView::keyPressEvent(event);
 
   if (event->matches(QKeySequence::Copy)) {

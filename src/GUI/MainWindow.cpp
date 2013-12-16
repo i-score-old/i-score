@@ -107,8 +107,6 @@ MainWindow::MainWindow()
   _editor->init(); /// \todo Les méthodes init() sont à bannir, il y a des constructeurs pour ça !!! (par jaime Chao)
   _editor->show();
 
-  _commandKey = false;
-
   // Central Widget
   _centralLayout = new QGridLayout;
   _centralWidget = new QWidget;
@@ -131,12 +129,13 @@ MainWindow::MainWindow()
   setCurrentFile("");
   setAcceptDrops(false);
 
-  connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, std::string)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, std::string)));
-  connect(_editor->networkTree(), SIGNAL(cmdKeyStateChanged(bool)), this, SLOT(updateCmdKeyState(bool)));
+  connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, std::string)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, std::string)));  
   connect(_view->verticalScrollBar(), SIGNAL(valueChanged(int)), _scene, SLOT(verticalScroll(int)));  //TimeBar is painted on MaquetteScene, so a vertical scroll has to move the timeBar.
   connect(_scene, SIGNAL(stopPlaying()), _headerPanelWidget, SLOT(stop()));
   connect(_view, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
   connect(_scene, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
+  connect(_view, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
+  connect(_scene, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
 }
 
 MainWindow::~MainWindow()
@@ -405,30 +404,6 @@ MainWindow::pasteSelection()
 {
   _scene->pasteBoxes();
 }
-
-void
-MainWindow::keyPressEvent(QKeyEvent *event)
-{
-  QMainWindow::keyPressEvent(event);
-  if (event->key() == Qt::Key_Control) {
-      updateCmdKeyState(true);
-    }
-}
-
-void
-MainWindow::keyReleaseEvent(QKeyEvent *event)
-{
-  QMainWindow::keyReleaseEvent(event);
-  updateCmdKeyState(false);
-  _commandKey = false;
-}
-
-bool
-MainWindow::commandKey()
-{
-  return _commandKey;
-}
-
 
 void
 MainWindow::selectAll()
@@ -711,25 +686,25 @@ MainWindow::loadFile(const QString &fileName)
 bool
 MainWindow::saveFile(const QString &fileName)
 {
-  /**** Backup automatique Résidence Albi ****/
+  /*********** Backup automatique *************/
 
     QDate date = QDate::currentDate();
     QTime time = QTime::currentTime();
     QString timeString = time.toString();
 
-    QString concat(tr("(")+QString("%1-%2-%3").arg(date.day()).arg(date.month()).arg(date.year())+tr("-")+timeString+tr(")"));
+    QString concat(tr("_")+QString("%1-%2-%3").arg(date.day()).arg(date.month()).arg(date.year())+tr("-")+timeString);
 
     QString backupName = fileName;
     int i = fileName.indexOf(".score");
     backupName.insert(i,concat);
 
     QProcess process;
-    QStringList XMLargs;
+    QStringList args;
 
-    XMLargs<< fileName;
-    XMLargs<< backupName;
+    args<< fileName;
+    args<< backupName;
 
-    process.start("cp", XMLargs);
+    process.start("cp", args);
     process.close();
 
   /*******************************************/
@@ -790,8 +765,44 @@ MainWindow::changeNetworkConfig(std::string deviceName, std::string pluginName, 
 }
 
 void
-MainWindow::updateCmdKeyState(bool state)
-{
-  displayMessage(state ? tr("command key pressed") : tr(""), INDICATION_LEVEL);
-  _commandKey = state;
+MainWindow::updatePlayMode(){
+    _scene->unselectAll();
+    _editor->noBoxEdited();
+    _editor->setDisabled(_scene->playing());
+
+    if(!_scene->playing())
+        updateRecordingBoxes();
+}
+
+void
+MainWindow::updateRecordingBoxes(){
+
+    //Update recorded curves
+    QList<BasicBox*> boxes = Maquette::getInstance()->getRecordingBoxes();
+    QList<BasicBox*>::iterator it;
+    for (it = boxes.begin(); it != boxes.end(); it++){
+
+        //Setting start/end messages
+        QList< QPair<QTreeWidgetItem *, Message> > startItemsAndMsgs = _editor->networkTree()->getItemsFromMsg(Maquette::getInstance()->firstMessagesToSend((*it)->ID()));
+        QList< QPair<QTreeWidgetItem *, Message> > endItemsAndMsgs = _editor->networkTree()->getItemsFromMsg(Maquette::getInstance()->lastMessagesToSend((*it)->ID()));
+        NetworkMessages *startMsg = new NetworkMessages();
+        NetworkMessages *endMsg = new NetworkMessages();
+        startMsg->setMessages(startItemsAndMsgs);
+        endMsg->setMessages(endItemsAndMsgs);
+        Maquette::getInstance()->setStartMessagesToSend((*it)->ID(), startMsg);
+        Maquette::getInstance()->setEndMessagesToSend((*it)->ID(), endMsg);
+
+        //Setting messages to assign
+        QMap<QTreeWidgetItem*, Data> itemsToAssign;
+        Data data;
+        data.hasCurve = true;
+        data.curveActivated = true;
+        for(int i=0; i<startItemsAndMsgs.size(); i++)
+            itemsToAssign.insert(startItemsAndMsgs[i].first,data);
+
+        Maquette::getInstance()->setSelectedItemsToSend((*it)->ID(), itemsToAssign);
+
+        //Updating curve
+        (*it)->updateRecordingCurves();
+    }
 }

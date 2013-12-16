@@ -110,7 +110,7 @@ class AttributesEditor : public QDockWidget
      *
      * \return the box edited in the editor
      **/
-    unsigned int currentBox();
+    unsigned int currentBox();    
 
   public slots:
     void addToExpandedItemsList(QTreeWidgetItem *item);
@@ -138,6 +138,7 @@ class AttributesEditor : public QDockWidget
 
     void changeRangeBoundMin(QTreeWidgetItem* item, float value);
     void changeRangeBoundMax(QTreeWidgetItem* item, float value);
+    void changeRecMode(QTreeWidgetItem* item);
 
     inline NetworkTree *
     networkTree(){ return _networkTree; }

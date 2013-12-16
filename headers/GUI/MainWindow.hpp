@@ -118,14 +118,6 @@ class MainWindow : public QMainWindow
      * \brief Called when the end of the composition is reached.
      */
     void timeEndReached();
-
-    /*!
-     * \brief Get the Command Key state.
-     *
-     * \return True if pressed, false if not.
-     */
-    bool commandKey();
-
     void setMaquetteSceneTitle(QString name);
     inline HeaderPanelWidget *
     headerPanelWidget(){ return _headerPanelWidget; }
@@ -137,9 +129,7 @@ class MainWindow : public QMainWindow
      *
      * \param event : the QT closing event
      */
-    virtual void closeEvent(QCloseEvent *event); /// \todo virtual seulement si on a besoin d'hériter de MainWindow, ce qui n'est pas le cas. (par jaime Chao)
-    virtual void keyPressEvent(QKeyEvent *event);
-    virtual void keyReleaseEvent(QKeyEvent *event);
+    virtual void closeEvent(QCloseEvent *event); /// \todo virtual seulement si on a besoin d'hériter de MainWindow, ce qui n'est pas le cas. (par jaime Chao)    
 
   private slots:
     /*!
@@ -216,8 +206,13 @@ class MainWindow : public QMainWindow
      * \brief Selects the whole set of boxes.
      */
     void selectAll();
-    void changeNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, std::string port);
-    void updateCmdKeyState(bool state);
+    void changeNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, std::string port);    
+    void updatePlayMode();
+
+    /*!
+     * \brief Updates start/end messages and messages to assign, asking to engine.
+     */
+    void updateRecordingBoxes();
 
   private:
     /*!
@@ -274,7 +269,7 @@ class MainWindow : public QMainWindow
      * \param the full name
      * \return the stripped name
      */
-    QString strippedName(const QString &fullFileName);
+    QString strippedName(const QString &fullFileName);    
 
     MaquetteView *_view;                    //!< The maquette view.
     MaquetteScene *_scene;                  //!< The maquette scene.
@@ -316,8 +311,6 @@ class MainWindow : public QMainWindow
     Help *_helpDialog;                      //!< Help dialog.
 
     HeaderPanelWidget *_headerPanelWidget;
-    NetworkConfig *_networkConfig;
-
-    bool _commandKey; //!< State of Command Key state.
+    NetworkConfig *_networkConfig; 
 };
 #endif

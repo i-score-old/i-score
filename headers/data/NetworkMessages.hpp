@@ -28,7 +28,7 @@ struct Message {
    */
   QString device;   // MinuitDevice
   QString message;  // /gain/
-  QString value;
+  QString value;   
 };
 
 struct Data {

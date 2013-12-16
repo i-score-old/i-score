@@ -47,15 +47,16 @@
 
 static const int ENGLISH = 0;
 static const int FRENCH = 1;
-
-#define TOP_MARGIN 5
-#define BOTTOM_MARGIN 5
-#define LEFT_MARGIN 5
-#define RIGHT_MARGIN 5
-#define MINIMUM_WIDTH 400
-#define COLOR_ICON_SIZE 21
-
 static const float S_TO_MS = 1000.;
+
+static const int TOP_MARGIN = 5;
+static const int BOTTOM_MARGIN = 5;
+static const int LEFT_MARGIN = 5;
+static const int RIGHT_MARGIN = 5;
+static const int MINIMUM_WIDTH = 400;
+static const int COLOR_ICON_SIZE = 21;
+static const int CENTRAL_LAYOUT_VERTICAL_SPACING = 0;
+static const int BOX_SETTING_LAYOUT_SPACING = 15;
 
 AttributesEditor::AttributesEditor(QWidget* parent) : QDockWidget(tr("Inspector"), parent, 0)
 {
@@ -107,11 +108,15 @@ void
 AttributesEditor::noBoxEdited()
 {
   _boxEdited = NO_ID;
-  setAttributes(new AbstractBox);
+  AbstractBox *emptyAbstractBox = new AbstractBox;
+
+  setAttributes(emptyAbstractBox);
   _boxStartValue->clear();
   _boxLengthValue->clear();
   _boxName->clear();
   _colorButtonPixmap->fill(Qt::gray);
+
+  delete emptyAbstractBox;
 }
 
 void
@@ -163,6 +168,9 @@ void
 AttributesEditor::addWidgetsToLayout()
 {
   static const unsigned int BOX_EXTREMITY_PRECISION = 3;
+  const int verticalSpacing = 0;
+  const int horizontalSpacing = 15;
+
   _boxStartValue->setRange(0., _scene->getMaxSceneWidth() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
   _boxStartValue->setDecimals(BOX_EXTREMITY_PRECISION);
   _boxStartValue->setKeyboardTracking(false);
@@ -174,12 +182,13 @@ AttributesEditor::addWidgetsToLayout()
   _boxSettingsLayout->addWidget(_boxName);
   _boxSettingsLayout->addWidget(_generalColorButton);
   _boxSettingsLayout->addWidget(_snapshotAssignEnd);
-  _boxSettingsLayout->setSpacing(15);
+  _boxSettingsLayout->setSpacing(horizontalSpacing);
 
   // Set Central Widget
   _centralLayout->addLayout(_boxSettingsLayout, 0, 1, Qt::AlignTop);
   _centralLayout->addWidget(_networkTree, 1, 0, 1, 5);
   _centralWidget->setLayout(_centralLayout);
+  _centralLayout->setVerticalSpacing(verticalSpacing);
 
   setWidget(_centralWidget);
 }
@@ -209,11 +218,12 @@ AttributesEditor::connectSlots()
 
   connect(_networkTree, SIGNAL(rangeBoundMinChanged(QTreeWidgetItem*,float)), this, SLOT(changeRangeBoundMin(QTreeWidgetItem*, float)));
   connect(_networkTree, SIGNAL(rangeBoundMaxChanged(QTreeWidgetItem*,float)), this, SLOT(changeRangeBoundMax(QTreeWidgetItem*, float)));
+  connect(_networkTree, SIGNAL(recModeChanged(QTreeWidgetItem*)), this, SLOT(changeRecMode(QTreeWidgetItem*)));
 }
 
 void
 AttributesEditor::setAttributes(AbstractBox *abBox)
-{        
+{            
   bool boxModified = (_boxEdited != abBox->ID());
 
   _boxEdited = abBox->ID();
@@ -222,19 +232,19 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
       _networkTree->resetNetworkTree();
       if (_boxEdited != NO_ID) {
           if (abBox->networkTreeItems().isEmpty() && abBox->networkTreeExpandedItems().isEmpty()) {
-              //LOAD FILE	
+              //LOAD FILE
               _networkTree->loadNetworkTree(abBox);
               startMessagesChanged();
               endMessagesChanged();
             }
           else {
               _networkTree->setAssignedItems(abBox->networkTreeItems());
-              _networkTree->expandItems(abBox->networkTreeExpandedItems());
+              _networkTree->expandItems(abBox->networkTreeExpandedItems());              
             }
 
           _networkTree->displayBoxContent(abBox);
 
-          //PRINT MESSAGES
+          //PRINT MESSAGES         
 //            QList<QTreeWidgetItem *> items = _networkTree->assignedItems().keys();
 //            QList<QTreeWidgetItem *>::iterator i;
 //            QTreeWidgetItem *curIt;
@@ -250,7 +260,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 //            for(int i=0; i<endMessages.size(); i++){
 //                std::cout<<endMessages[i]<<std::endl;
 //            }
-          //END PRINT
+          //END PRINT          
         }
     }
 
@@ -264,6 +274,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
       _scene->view()->setScenarioSelected(false);
       _networkTree->updateCurves(_boxEdited);
       updateWidgets(boxModified);
+
   }
 }
 
@@ -296,6 +307,13 @@ AttributesEditor::updateWidgets(bool boxModified)
       _boxName->setText(box->name());
       _colorButtonPixmap->fill(box->currentColor());
       _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
+
+//      //update recorded curves
+//      QList<std::string> recMsgs = static_cast<AbstractBox *>(box->abstract())->messagesToRecord();
+//      for(int i=0 ; i<recMsgs.size() ; i++){
+//          box->updateCurve(recMsgs[i],true);
+//          box->removeMessageToRecord(recMsgs[i]);
+//      }
   }
 
   update();
@@ -695,3 +713,24 @@ AttributesEditor::changeRangeBoundMax(QTreeWidgetItem *item, float value){
       }
 }
 
+void
+AttributesEditor::changeRecMode(QTreeWidgetItem* item){    
+    /// \toto Should be better to ask messagesToRecord list to score (instead of abstractBox). As start/end messages. NH
+
+    if (_boxEdited != NO_ID) {
+          BasicBox * box = _scene->getBox(_boxEdited);          
+          std::string address = _networkTree->getAbsoluteAddress(item).toStdString();
+          bool activated = !static_cast<AbstractBox *>(box->abstract())->messagesToRecord().contains(address);
+
+          if(activated){              
+              box->addMessageToRecord(address);
+          }
+          else{
+              box->removeMessageToRecord(address);
+              _networkTree->updateCurve(item, _boxEdited, true);
+              BasicBox *box = _scene->getBox(_boxEdited);
+              box->updateCurve(address, true);
+          }
+          _networkTree->setRecMode(address);
+    }
+}

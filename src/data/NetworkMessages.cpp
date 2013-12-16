@@ -87,12 +87,28 @@ NetworkMessages::clearDevicesMsgs(QList<QString> devices)
   QList<QTreeWidgetItem *>::iterator it;
   QTreeWidgetItem *curItem;
   Message curMsg;
+  vector<string> attributesValues;
+  string nodeType;
+  string address;
 
   for (it = messagesList.begin(); it != messagesList.end(); it++) {
       curItem = *it;
       curMsg = _messages.value(curItem);
+      address = computeMessageWithoutValue(curMsg);
+
       if (devices.contains(curMsg.device)) {
-          _messages.remove(curItem);
+
+          //we don't remove messages and preset manager
+          if(Maquette::getInstance()->requestObjectAttribruteValue(address,"service",attributesValues) > 0){
+              if(attributesValues[0]=="message")
+                  ;
+          }
+          else if(Maquette::getInstance()->getObjectType(address,nodeType)>0){
+              if(nodeType=="PresetManager")
+                  ;
+          }
+          else
+              _messages.remove(curItem);
         }
     }
 }
@@ -202,10 +218,10 @@ NetworkMessages::computeMessages()
 {
   vector<string> msgs;
   QMap<QTreeWidgetItem *, Message>::iterator it;
-  for (it = _messages.begin(); it != _messages.end(); it++) {
-      string lineMsg = computeMessage(*it);
+  for (it = _messages.begin(); it != _messages.end(); it++) {      
+      string lineMsg = computeMessage(*it);            
       if (lineMsg != "") {
-          msgs.push_back(lineMsg);
+          msgs.push_back(lineMsg);          
         }
       else {
           std::cerr << "NetworkMessages::computeMessages : bad message ignored" << std::endl;

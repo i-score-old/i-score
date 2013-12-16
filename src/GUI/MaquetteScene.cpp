@@ -168,7 +168,7 @@ MaquetteScene::changeTimeOffset(unsigned int timeOffset)
 {
     stopAndGoToTimeOffset(timeOffset);
     
-    _view->repaint();
+//    _view->repaint();
 }
 
 void
@@ -721,7 +721,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
 
   setCurrentMode(_savedInteractionMode, BoxCreationMode(_savedBoxMode));
 
-  update();
+//  update();
 }
 
 void
@@ -1539,7 +1539,7 @@ MaquetteScene::setPlaying(unsigned int boxID, bool playing)
           _playingBoxes.erase(it);
         }
       else {
-          std::cerr << "MaquetteScene::setPlaying : trying to start playing an playing box" << std::endl;
+          std::cerr << "MaquetteScene::setPlaying : trying to start playing on playing box" << std::endl;
         }
     }
   else {
@@ -1559,6 +1559,13 @@ MaquetteScene::updatePlayingBoxes()
 
   for (it = _playingBoxes.begin(); it != _playingBoxes.end(); ++it) {
       it->second->update();
+
+      //Recording curves
+//      if(it->second->recording()){
+//          QList<std::string> recMsgs = static_cast<AbstractBox *>(it->second->abstract())->messagesToRecord();
+//          for(int i=0 ; i<recMsgs.size() ; i++)
+//              it->second->updateCurve(recMsgs.at(i),true);
+//      }
     }
 }
 
@@ -1568,14 +1575,12 @@ MaquetteScene::playOrResume()
     displayMessage(tr("Playing ...").toStdString(), INDICATION_LEVEL);
     
     _maquette->setAccelerationFactor(_accelerationFactor);
-    
-    if (_maquette->isExecutionPaused())
-        
-        _maquette->resumeExecution();
-    
+
+    if (_maquette->isExecutionPaused())        
+        _maquette->resumeExecution();    
     else
         _maquette->turnExecutionOn();
-        
+
     _playThread->start();
     _startingValue = _maquette->getTimeOffset();
     
@@ -1585,35 +1590,27 @@ MaquetteScene::playOrResume()
 void
 MaquetteScene::stopOrPause()
 {
-    if (!_maquette->isExecutionPaused())
-        
+    if (!_maquette->isExecutionPaused()){
         _maquette->pauseExecution();
-    
-    else {
-        
-        _maquette->turnExecutionOff();
-        _playingBoxes.clear();
-        
-        _playThread->quit();
+        emit(playModeChanged());
     }
-    
-    update();
-    
-    emit(playModeChanged());
+    else {
+        _playThread->quit();
+        _maquette->turnExecutionOff();
+        emit(playModeChanged());
+        _playingBoxes.clear();        
+    }        
 }
 
 void
 MaquetteScene::stopAndGoToTimeOffset(unsigned int timeOffset)
 {
     displayMessage(tr("Stopped").toStdString(), INDICATION_LEVEL);
-    
-    _maquette->stopPlayingAndGoToTimeOffset(timeOffset);
+
     _playThread->quit();
-    _playingBoxes.clear();
-    
-    update();
-    
+    _maquette->stopPlayingAndGoToTimeOffset(timeOffset);    
     emit(playModeChanged());
+    _playingBoxes.clear();            
 }
 
 void
@@ -1623,11 +1620,8 @@ MaquetteScene::stopAndGoToCurrentTime()
     
     _maquette->stopPlayingAndGoToCurrentTime();
     _playThread->quit();
-    _playingBoxes.clear();
-    
-    update();
-    
     emit(playModeChanged());
+    _playingBoxes.clear();           
 }
 
 void
@@ -1651,10 +1645,15 @@ MaquetteScene::stopAndGoToStart()
     
     _maquette->setAccelerationFactor(1.);
     emit(accelerationValueChanged(1.));
-    _maquette->stopPlayingAndGoToStart();
     _playThread->quit();
     _playingBoxes.clear();
-    
+    _maquette->stopPlayingAndGoToStart();
+
+    //send root box start messages
+    std::vector<std::string> startCue = _maquette->getBox(ROOT_BOX_ID)->getStartMessages();
+    for(int i=0; i<startCue.size(); i++)
+        sendMessage(startCue.at(i));
+
     update();
     
     emit(playModeChanged());
@@ -1776,4 +1775,12 @@ MaquetteScene::setMaxSceneWidth(float maxSceneWidth){
 float
 MaquetteScene::getMaxSceneWidth(){
   return _maxSceneWidth;
+}
+
+void
+MaquetteScene::unselectAll(){
+    QList<QGraphicsItem *> items = selectedItems();
+    QList<QGraphicsItem *>::iterator it;
+    for(it = items.begin(); it != items.end() ; it++)
+        (*it)->setSelected(false);
 }
