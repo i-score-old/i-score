@@ -29,11 +29,11 @@ EngineCacheElement::~EngineCacheElement()
     ;
 }
 
-Engine::Engine(void(*timeEventReadyAttributeCallback)(ConditionedProcessId, bool),
+Engine::Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
                void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
                void(*transportDataValueCallback)(TTSymbol&, const TTValue&))
 {
-    m_TimeEventReadyAttributeCallback = timeEventReadyAttributeCallback;
+    m_TimeEventStatusAttributeCallback = timeEventStatusAttributeCallback;
     m_TimeProcessSchedulerRunningAttributeCallback = timeProcessSchedulerRunningAttributeCallback;
     m_TransportDataValueCallback = transportDataValueCallback;
     
@@ -440,8 +440,8 @@ ConditionedProcessId Engine::cacheConditionedProcess(TimeProcessId timeProcessId
     m_conditionedProcessMap[id] = e;
     m_nextConditionedProcessId++;
     
-    // We cache an observer on time event ready attribute
-    cacheReadyCallback(id, controlPointId);
+    // We cache an observer on time event status attribute
+    cacheStatusCallback(id, controlPointId);
     
     // We cache a TTData to allow remote triggering
     // théo : we don't create the /Box.n/start or /Box.n/end message for the moment
@@ -463,8 +463,8 @@ void Engine::uncacheConditionedProcess(ConditionedProcessId triggerId)
     // Get the engine cache element
     EngineCacheElementPtr e = m_conditionedProcessMap[triggerId];
     
-    // Uncache observer on time event ready attribute
-    uncacheReadyCallback(triggerId, e->index);
+    // Uncache observer on time event status attribute
+    uncacheStatusCallback(triggerId, e->index);
     
     // Uncache TTData used for remote triggering
     uncacheTriggerDataCallback(triggerId);
@@ -480,14 +480,14 @@ void Engine::clearConditionedProcess()
     
     for (it = m_conditionedProcessMap.begin(); it != m_conditionedProcessMap.end(); ++it) {
         
-        uncacheReadyCallback(it->first, it->second->index);
+        uncacheStatusCallback(it->first, it->second->index);
         uncacheTriggerDataCallback(it->first);
         
         delete it->second;
     }
     
     m_conditionedProcessMap.clear();
-    m_readyCallbackMap.clear();
+    m_statusCallbackMap.clear();
     m_triggerDataMap.clear();
     
     m_nextConditionedProcessId = 1;
@@ -614,13 +614,13 @@ void Engine::uncacheEndCallback(TimeProcessId boxId)
     m_endCallbackMap.erase(boxId);
 }
 
-void Engine::cacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId)
+void Engine::cacheStatusCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId)
 {
     EngineCacheElementPtr   e;
     TTTimeProcessPtr        timeProcess = getConditionedProcess(triggerId, controlPointId);
     TTTimeEventPtr          timeEvent;
     TTValue                 v, out;
-    TTValuePtr              readyChangedBaton;
+    TTValuePtr              statusChangedBaton;
     TTErr                   err;
     
     // Create a new engine cache element
@@ -636,25 +636,25 @@ void Engine::cacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex c
     
     timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
     
-    // Create a TTCallback to observe time event ready attribute (using TimeEventReadyAttributeCallback)
+    // Create a TTCallback to observe time event status attribute (using TimeEventStatusAttributeCallback)
     TTObjectBaseInstantiate(TTSymbol("callback"), &e->object, kTTValNONE);
     
-    readyChangedBaton = new TTValue(TTPtr(this)); // readyChangedBaton will be deleted during the callback destruction
-    readyChangedBaton->append(TTUInt32(triggerId));
+    statusChangedBaton = new TTValue(TTPtr(this)); // statusChangedBaton will be deleted during the callback destruction
+    statusChangedBaton->append(TTUInt32(triggerId));
     
-    e->object->setAttributeValue(kTTSym_baton, TTPtr(readyChangedBaton));
-    e->object->setAttributeValue(kTTSym_function, TTPtr(&TimeEventReadyAttributeCallback));
-    e->object->setAttributeValue(kTTSym_notification, kTTSym_EventReadyChanged);
+    e->object->setAttributeValue(kTTSym_baton, TTPtr(statusChangedBaton));
+    e->object->setAttributeValue(kTTSym_function, TTPtr(&TimeEventStatusAttributeCallback));
+    e->object->setAttributeValue(kTTSym_notification, kTTSym_EventStatusChanged);
     
     // observe the "EventReadyChanged" notification
     timeEvent->registerObserverForNotifications(*e->object);
 
-    m_readyCallbackMap[triggerId] = e;
+    m_statusCallbackMap[triggerId] = e;
 }
 
-void Engine::uncacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId)
+void Engine::uncacheStatusCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId)
 {
-    EngineCacheElementPtr   e = m_readyCallbackMap[triggerId];
+    EngineCacheElementPtr   e = m_statusCallbackMap[triggerId];
     TTTimeProcessPtr        timeProcess = getConditionedProcess(triggerId, controlPointId);
     TTTimeEventPtr          timeEvent;
     TTValue                 v;
@@ -668,7 +668,7 @@ void Engine::uncacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex
     
     timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
     
-    // don't observe the "EventReadyChanged" notification anymore
+    // don't observe the "EventStatusChanged" notification anymore
     err = timeEvent->unregisterObserverForNotifications(*e->object);
     
     if (!err) {
@@ -677,7 +677,7 @@ void Engine::uncacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex
     }
     
     delete e;
-    m_readyCallbackMap.erase(triggerId);
+    m_statusCallbackMap.erase(triggerId);
 }
 
 void Engine::cacheTriggerDataCallback(ConditionedProcessId triggerId, TimeProcessId boxId)
@@ -2599,14 +2599,14 @@ void Engine::printExecutionInLinuxConsole()
 #pragma mark Callback Methods
 #endif
 
-void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value)
+void TimeEventStatusAttributeCallback(TTPtr baton, const TTValue& value)
 {
     TTValuePtr              b;
     EnginePtr               engine;
     ConditionedProcessId    triggerId;
     TTObjectBasePtr         event;
     TTValue                 v;
-    TTBoolean               isReady;
+    TTSymbol                status;
 	
 	// unpack baton (engine, triggerId)
 	b = (TTValuePtr)baton;
@@ -2615,19 +2615,40 @@ void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value)
 	
 	// Unpack data (event)
 	event = value[0];
-    event->getAttributeValue(kTTSym_ready, v);
-    isReady = v[0];
     
-	if (engine->m_TimeEventReadyAttributeCallback != NULL) {
+    // get status
+    event->getAttributeValue(kTTSym_status, v);
+    status = v[0];
+    
+	if (engine->m_TimeEventStatusAttributeCallback != NULL) {
         
-		engine->m_TimeEventReadyAttributeCallback(triggerId, isReady);
+        if (status == kTTSym_eventWaiting) {
+            engine->m_TimeEventStatusAttributeCallback(triggerId, false);
+        }
+        else if (status == kTTSym_eventPending) {
+            engine->m_TimeEventStatusAttributeCallback(triggerId, true);
+        }
+        else if (status == kTTSym_eventHappened) {
+            engine->m_TimeEventStatusAttributeCallback(triggerId, false);
+        }
+        else if (status == kTTSym_eventDisposed) {
+            engine->m_TimeEventStatusAttributeCallback(triggerId, false);
+        }
         
         iscoreEngineDebug {
             
-            if (isReady)
-                TTLogMessage("TriggerPoint %ld is ready\n", triggerId);
-            else
-                TTLogMessage("TriggerPoint %ld is not ready\n", triggerId);
+            if (status == kTTSym_eventWaiting) {
+                TTLogMessage("TriggerPoint %ld is waiting\n", triggerId);
+            }
+            else if (status == kTTSym_eventPending) {
+                TTLogMessage("TriggerPoint %ld is pending\n", triggerId);
+            }
+            else if (status == kTTSym_eventHappened) {
+                TTLogMessage("TriggerPoint %ld happened\n", triggerId);
+            }
+            else if (status == kTTSym_eventDisposed) {
+                TTLogMessage("TriggerPoint %ld is disposed\n", triggerId);
+            }
         }
     }
 }
