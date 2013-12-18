@@ -1580,7 +1580,7 @@ bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned
         curve = objects[0];
         
         // set a curve parameters
-        err = curve->setAttributeValue(TTSymbol("parameters"), v);
+        err = curve->setAttributeValue(TTSymbol("functionParameters"), v);
     }
     
     return err == kTTErrNone;
@@ -1604,7 +1604,7 @@ bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned
         curve = objects[0];
 
         // get a curve parameters
-        err = curve->getAttributeValue(TTSymbol("parameters"), v);
+        err = curve->getAttributeValue(TTSymbol("functionParameters"), v);
         
         if (!err) {
 
