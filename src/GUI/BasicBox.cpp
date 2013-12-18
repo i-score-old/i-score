@@ -1808,7 +1808,7 @@ BasicBox::drawHoverShape(QPainter *painter)
 
 void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{            
+{                
     painter->setClipRect(option->exposedRect);//To increase performance
     Q_UNUSED(widget);
     bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
