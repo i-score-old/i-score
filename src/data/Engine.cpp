@@ -797,7 +797,7 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
         TTScoreTimeProcessGetEndEvent(tp2, &endEvent);
 
     // Create a new interval time process into the main scenario
-    TTScoreTimeProcessCreate(&timeProcess, "Interval", startEvent, endEvent, TTTimeContainerPtr(m_mainScenario));
+    err = TTScoreTimeProcessCreate(&timeProcess, "Interval", startEvent, endEvent, TTTimeContainerPtr(m_mainScenario));
 
     // an error can append if the start is after the end
     if (!err) {
