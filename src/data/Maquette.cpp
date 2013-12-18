@@ -73,6 +73,7 @@ typedef map<unsigned int, Relation*> RelationsMap;
 typedef map<unsigned int, TriggerPoint*> TrgPntMap;
 
 #define SCENARIO_DURATION 1800000
+#define NO_PAINT false
 
 void
 Maquette::init()
@@ -1616,8 +1617,9 @@ Maquette::load(const string &fileName)
 
             _boxes[boxID] = newBox;
             _parentBoxes[boxID] = newBox;
-            
-            _scene->addParentBox(boxID);
+
+            if(!NO_PAINT)
+                _scene->addParentBox(boxID);
         }
     }
 
