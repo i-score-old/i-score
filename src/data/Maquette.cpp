@@ -85,7 +85,7 @@ Maquette::init()
     //Creating rootBox as the mainScenario
     AbstractBox *scenarioAb = new AbstractBox();
     scenarioAb->setID(ROOT_BOX_ID);
-    /// \todo : set root the box name. NH
+    /// \todo : set root box name. NH
 
     ParentBox *scenarioBox = new ParentBox(static_cast<AbstractParentBox *>(scenarioAb), _scene);
     _boxes[ROOT_BOX_ID] = scenarioBox;
@@ -710,7 +710,7 @@ Maquette::updateBox(unsigned int boxID, const Coords &coord)
         if (moveAccepted = _engines->performBoxEditing(boxID, coord.topLeftX * MaquetteScene::MS_PER_PIXEL,
                                                        coord.topLeftX * MaquetteScene::MS_PER_PIXEL +
                                                        coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
-            
+
             _engines->setBoxVerticalPosition(boxID, coord.topLeftY);
             _engines->setBoxVerticalSize(boxID, coord.sizeY);
             

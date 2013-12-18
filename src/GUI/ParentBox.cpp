@@ -67,15 +67,11 @@ using std::stringstream;
 
 ParentBox::ParentBox(const QPointF &corner1, const QPointF &corner2, MaquetteScene *parent)
   : BasicBox(corner1, corner2, parent)
-{
-  setFlag(ItemSendsGeometryChanges, true);
-  setCacheMode(QGraphicsItem::ItemCoordinateCache,QSize(width(),height()));
+{   
   AbstractBox *abstract = new AbstractParentBox(*_abstract);
   delete _abstract;
 
   _abstract = abstract;
-
-  //_group = new QGraphicsItem(this);
 
   init();
   update();
@@ -98,7 +94,6 @@ ParentBox::init()
 
   addToComboBox(BasicBox::SUB_SCENARIO_MODE_TEXT);
   _hasContextMenu = true;
-//  setAcceptDrops(true);
 }
 
 Abstract*
@@ -115,7 +110,7 @@ ParentBox::type() const
 
 void
 ParentBox::updateDisplay(QString displayMode)
-{
+{    
   BasicBox *curBox;
   std::map<unsigned int, BasicBox*>::iterator it;
   if (displayMode == SUB_SCENARIO_MODE_TEXT) {
@@ -188,43 +183,43 @@ ParentBox::empty() const
   return _children.empty();
 }
 
-QVariant
-ParentBox::itemChange(GraphicsItemChange change, const QVariant &value)
-{
-  QVariant newValue = BasicBox::itemChange(change, value);
-  if (change == ItemPositionChange) {
-      QPointF newPos = newValue.toPoint();
-      std::map<unsigned int, BasicBox*>::iterator it;
-      for (it = _children.begin(); it != _children.end(); ++it) {
-          if (_scene->resizeMode() == NO_RESIZE) {
-              it->second->setTopLeft(QPointF(it->second->beginPos(), it->second->getTopLeft().y() + (newPos.y() - pos().y())));
-              it->second->setPos(it->second->getCenter());
-            }
-          else {
-              if (_scene->resizeMode() == HORIZONTAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE) {
-                  if (it->second->getBottomRight().x() >= (newPos.x() + (newPos.x() - _abstract->topLeft().x()))) {
-                      // Handled by ParentBox::resizeWidthEdition()
-                    }
-                }
-              if (_scene->resizeMode() == VERTICAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE) {
-                  if (it->second->getBottomRight().y() >= (newPos.y() + _abstract->height() / 2.)) {
-                      setSize(QPointF(_abstract->width(), it->second->getBottomRight().y() - _abstract->topLeft().y()));
-                      newPos.setY(it->second->getBottomRight().y() - _abstract->height() / 2.);
-#ifdef DEBUG
-                      std::cerr << "ParentBox::itemChange : Trying to COMPRESS vertically" << std::endl;
-#endif
-                    }
-                }
-            }
-        }
-      newValue = QVariant(newPos);
-    }
-  return newValue;
-}
+//QVariant
+//ParentBox::itemChange(GraphicsItemChange change, const QVariant &value)
+//{
+//  QVariant newValue = BasicBox::itemChange(change, value);
+//  if (change == ItemPositionChange) {
+//      QPointF newPos = newValue.toPoint();
+//      std::map<unsigned int, BasicBox*>::iterator it;
+//      for (it = _children.begin(); it != _children.end(); ++it) {
+//          if (_scene->resizeMode() == NO_RESIZE) {
+//              it->second->setTopLeft(QPointF(it->second->beginPos(), it->second->getTopLeft().y() + (newPos.y() - pos().y())));
+//              it->second->setPos(it->second->getCenter());
+//            }
+//          else {
+//              if (_scene->resizeMode() == HORIZONTAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE) {
+//                  if (it->second->getBottomRight().x() >= (newPos.x() + (newPos.x() - _abstract->topLeft().x()))) {
+//                      // Handled by ParentBox::resizeWidthEdition()
+//                    }
+//                }
+//              if (_scene->resizeMode() == VERTICAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE) {
+//                  if (it->second->getBottomRight().y() >= (newPos.y() + _abstract->height() / 2.)) {
+//                      setSize(QPointF(_abstract->width(), it->second->getBottomRight().y() - _abstract->topLeft().y()));
+//                      newPos.setY(it->second->getBottomRight().y() - _abstract->height() / 2.);
+//#ifdef DEBUG
+//                      std::cerr << "ParentBox::itemChange : Trying to COMPRESS vertically" << std::endl;
+//#endif
+//                    }
+//                }
+//            }
+//        }
+//      newValue = QVariant(newPos);
+//    }
+//  return newValue;
+//}
 
 void
 ParentBox::resizeWidthEdition(int width)
-{
+{    
   BasicBox::resizeWidthEdition(width);
   float newWidth = _abstract->width();
   std::map<unsigned int, BasicBox*>::iterator it;
@@ -323,84 +318,7 @@ ParentBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 }
 
 void
-ParentBox::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
-{
-  if (event->mimeData()->hasFormat("text/csv")) {
-      event->accept();
-      event->acceptProposedAction();
-      setSelected(true);
-    }
-  else {
-      std::cerr << "ParentBox::dragEnterEvent : Unrecognized format during drop" << std::endl;
-    }
-}
-
-void
-ParentBox::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
-{
-  if (event->mimeData()->hasFormat("text/csv")) {
-      event->accept();
-      setSelected(false);
-    }
-}
-
-void
-ParentBox::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
-{
-  if (event->mimeData()->hasFormat("text/csv")) {
-      event->accept();
-      event->acceptProposedAction();
-    }
-}
-
-void
-ParentBox::dropEvent(QGraphicsSceneDragDropEvent *event)
-{
-  event->accept();
-  const QMimeData *mimeData = event->mimeData();
-  QByteArray input = mimeData->data("text/csv");
-  QBuffer inputBuffer(&input);
-  inputBuffer.open(QIODevice::ReadOnly);
-
-  QDataStream in(&inputBuffer);
-
-  /// \todo Old TODO updated (by jC) : use pasting STUFF
-
-  event->acceptProposedAction();
-
-  setSelected(false);
-
-  update();
-}
-
-void
 ParentBox::play()
 {
   /// \todo old TODO updated (by jC) : parent box play function
-}
-
-void
-ParentBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-  BasicBox::paint(painter, option, widget);
-
-
-//	painter->save();
-
-//	if (_playing) {
-//		QPen pen = painter->pen();
-//		QBrush brush = painter->brush();
-//		brush.setStyle(Qt::NoBrush);
-//		painter->setPen(pen);
-//		painter->setBrush(brush);
-//	}
-
-//    painter->setRenderHint(QPainter::Antialiasing, true);
-
-//	painter->setBrush(Qt::white);
-
-//	painter->drawRect(mapFromScene(getTopLeft()).x(),mapFromScene(getTopLeft()).y(),_abstract->width(),_abstract->height());
-
-//	painter->translate(0,0);
-//	painter->restore();
 }

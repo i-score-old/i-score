@@ -1086,9 +1086,9 @@ bool Engine::performBoxEditing(TimeProcessId boxId, TimeValue start, TimeValue e
     TTTimeProcessPtr        timeProcess = getTimeProcess(boxId);
     EngineCacheMapIterator  it;
     TTErr                   err;
-    
+
     err = TTScoreTimeProcessMove(timeProcess, start, end);
-    
+
     // return the entire timeProcessMap except the first process !!! (this is bad but it is like former engine)
     it = m_timeProcessMap.begin();
     it++;
