@@ -331,6 +331,6 @@ ParentBox::play()
 void
 ParentBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    std::cout<<"ParentBox paint"<<std::endl;
+    //std::cout<<"ParentBox paint"<<std::endl;
   BasicBox::paint(painter, option, widget);
 }
