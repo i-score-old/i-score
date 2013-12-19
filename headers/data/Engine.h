@@ -150,7 +150,7 @@ private:
     EngineCacheMap      m_startCallbackMap;                             /// All callback to observe when a time process starts stored using a time process id
     EngineCacheMap      m_endCallbackMap;                               /// All callback to observe when a time process ends stored using a time process id
     
-    EngineCacheMap      m_readyCallbackMap;                             /// All callback to observe time event ready state stored using using a trigger id
+    EngineCacheMap      m_statusCallbackMap;                             /// All callback to observe time event ready state stored using using a trigger id
     EngineCacheMap      m_triggerDataMap;                               /// All TTData to expose conditioned event on the network stored using using a trigger id
 
     TTObjectBasePtr     m_dataPlay;                                     /// A Modular TTData to expose Play transport service
@@ -162,13 +162,13 @@ private:
     
     TTObjectBasePtr     m_sender;                                       /// A Modular TTSender to send message to any application
     
-	void (*m_TimeEventReadyAttributeCallback)(ConditionedProcessId, bool);
+	void (*m_TimeEventStatusAttributeCallback)(ConditionedProcessId, bool);
     void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);
     void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);
 
 public:
 
-    Engine(void(*timeEventReadyAttributeCallback)(ConditionedProcessId, bool),
+    Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
            void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
            void(*transportDataValueCallback)(TTSymbol&, const TTValue&));
     
@@ -207,8 +207,8 @@ public:
     void                cacheEndCallback(TimeProcessId boxId);
     void                uncacheEndCallback(TimeProcessId boxId);
     
-    void                cacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId);
-    void                uncacheReadyCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId);
+    void                cacheStatusCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId);
+    void                uncacheStatusCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId);
     
     void                cacheTriggerDataCallback(ConditionedProcessId triggerId, TimeProcessId boxId);
     void                uncacheTriggerDataCallback(ConditionedProcessId triggerId);
@@ -1018,7 +1018,7 @@ public:
 	void print();
     void printExecutionInLinuxConsole();
     
-	friend void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value);
+    friend void TimeEventStatusAttributeCallback(TTPtr baton, const TTValue& value);
     friend void TimeProcessStartCallback(TTPtr baton, const TTValue& value);
     friend void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
     friend void TransportDataValueCallback(TTPtr baton, const TTValue& value);
@@ -1045,11 +1045,11 @@ private:
 
 typedef Engine* EnginePtr;
 
-/** Any time event ready attribute callback
+/** time event status attribute callback
  @param	baton			a TTValuePtr containing an EnginePtr and an ConditionedProcessId
- @param	value			the time event ready state
+ @param	value			a time event
  @return                an error code */
-void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value);
+void TimeEventStatusAttributeCallback(TTPtr baton, const TTValue& value);
 
 /** Callback used each time a process starts
  @param	baton			a TTValuePtr containing an EnginePtr and an TimeProcessId

@@ -67,7 +67,7 @@ using std::stringstream;
 
 ParentBox::ParentBox(const QPointF &corner1, const QPointF &corner2, MaquetteScene *parent)
   : BasicBox(corner1, corner2, parent)
-{   
+{
   AbstractBox *abstract = new AbstractParentBox(*_abstract);
   delete _abstract;
 
