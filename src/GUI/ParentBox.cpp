@@ -68,14 +68,10 @@ using std::stringstream;
 ParentBox::ParentBox(const QPointF &corner1, const QPointF &corner2, MaquetteScene *parent)
   : BasicBox(corner1, corner2, parent)
 {
-  setFlag(ItemSendsGeometryChanges, true);
-  setCacheMode(QGraphicsItem::ItemCoordinateCache);
   AbstractBox *abstract = new AbstractParentBox(*_abstract);
   delete _abstract;
 
   _abstract = abstract;
-
-  //_group = new QGraphicsItem(this);
 
   init();
   update();
@@ -98,7 +94,6 @@ ParentBox::init()
 
   addToComboBox(BasicBox::SUB_SCENARIO_MODE_TEXT);
   _hasContextMenu = true;
-//  setAcceptDrops(true);
 }
 
 Abstract*
@@ -115,7 +110,7 @@ ParentBox::type() const
 
 void
 ParentBox::updateDisplay(QString displayMode)
-{
+{    
   BasicBox *curBox;
   std::map<unsigned int, BasicBox*>::iterator it;
   if (displayMode == SUB_SCENARIO_MODE_TEXT) {
@@ -326,11 +321,4 @@ void
 ParentBox::play()
 {
   /// \todo old TODO updated (by jC) : parent box play function
-}
-
-void
-ParentBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    //std::cout<<"ParentBox paint"<<std::endl;
-  BasicBox::paint(painter, option, widget);
 }

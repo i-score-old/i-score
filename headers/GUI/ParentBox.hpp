@@ -169,15 +169,6 @@ class ParentBox : public BasicBox
      */
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 
-    /*!
-     * \brief Redefinition of QWidget paint function.
-     *
-     * \param painter : the painter used for painting
-     * \param option : array of various options used for painting
-     * \param widget : the painter that is beeing painting on
-     */
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
-
   private:
     std::map<unsigned int, BasicBox*> _children;    //!< Handling box's children by ID.
 };
