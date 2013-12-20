@@ -1966,16 +1966,7 @@ TimeValue Engine::getCurrentExecutionTime()
     
     aScheduler->getAttributeValue(TTSymbol("realTime"), v);
     time = TTFloat64(v[0]);
-    
-    iscoreEngineDebug {
         
-        m_mainScenario->getAttributeValue(kTTSym_duration, v);
-        TTUInt32 duration = v[0];
-    
-        if (time > duration)
-            TTLogMessage("Engine::getCurrentExecutionTime : current time (%d) is greater than scenario duration (%d)\n", time, duration);
-    }
-    
     return time;
 }
 
