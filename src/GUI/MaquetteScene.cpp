@@ -110,6 +110,7 @@ MaquetteScene::init()
   _progressLine->setZValue(2);
   _timeBarProxy->setZValue(3);
   _timeBarProxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+  _timeBarProxy->setFlag(QGraphicsItem::ItemClipsToShape);
 
   _currentInteractionMode = SELECTION_MODE;
   setCurrentMode(SELECTION_MODE);
@@ -261,24 +262,6 @@ unsigned int
 MaquetteScene::getTimeOffset()
 {
     return _maquette->getTimeOffset();
-}
-
-void
-MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[], const QStyleOptionGraphicsItem options[], QWidget *widget)
-{    
-  QGraphicsScene::drawItems(painter, numItems, items, options, widget);
-  qreal xmax = width(), ymax = height();
-
-  for (int i = 0; i < numItems; i++) {
-
-      // Look if the scene rectangle has to be updated
-      if (xmax < items[i]->mapToScene(items[i]->boundingRect().bottomRight()).x()) {
-          xmax = items[i]->mapToScene(items[i]->boundingRect().bottomRight()).x();
-        }
-      if (ymax < items[i]->mapToScene(items[i]->boundingRect().bottomRight()).y()) {
-          ymax = items[i]->mapToScene(items[i]->boundingRect().bottomRight()).y();
-        }
-    }
 }
 
 void

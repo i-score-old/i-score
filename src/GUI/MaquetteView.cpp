@@ -63,7 +63,7 @@ MaquetteView::MaquetteView(MainWindow *mw)
 {
   _mainWindow = mw;
   setRenderHint(QPainter::Antialiasing);
-  setOptimizationFlags(QGraphicsView::IndirectPainting);
+  setOptimizationFlags(QGraphicsView::DontSavePainterState);
   setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
   setTransformationAnchor(QGraphicsView::NoAnchor);
   setCacheMode(QGraphicsView::CacheBackground);

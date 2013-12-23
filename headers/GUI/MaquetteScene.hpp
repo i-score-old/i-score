@@ -577,19 +577,6 @@ class MaquetteScene : public QGraphicsScene
     void setMaxSceneWidth(float maxSceneWidth);
 
   protected:
-    /*!
-     * \brief Redifinition of QGraphicsScene::drawItems().
-     * This method is automatically called by QGraphicsScene::update().
-     *
-     * \param painter : the painter used to draw
-     * \param numItem : the number of items into the scene
-     * \param items : collection of the graphical items
-     * \param options : array of options
-     * \param widget : the widget that is being painting on
-     */
-    virtual void drawItems(QPainter *painter, int numItems, QGraphicsItem *items[],
-                           const QStyleOptionGraphicsItem options[],
-                           QWidget *widget);
 
     /*!
      * \brief Redefinition of QGraphicsScene::drawForeground().
