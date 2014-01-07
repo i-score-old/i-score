@@ -56,7 +56,7 @@ PlayingThread::run()
 {
   while (_scene->playing()) {
       _scene->updatePlayingBoxes();
-//      _scene->updateProgressBar();
+      _scene->updateProgressBar();
 
       msleep(10);
     }
