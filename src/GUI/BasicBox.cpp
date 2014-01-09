@@ -75,6 +75,7 @@
 #include <QAbstractItemView>
 #include <QStyleOptionViewItem>
 #include <cmath>
+#include <QPixmapCache>
 
 using std::string;
 using std::vector;
@@ -357,6 +358,10 @@ BasicBox::init()
 
   setCacheMode(QGraphicsItem::ItemCoordinateCache);
   setFlag(QGraphicsItem::ItemIsMovable, true);
+
+  /// \todo Affiner la limite du cache. Cette ligne permet de résoudre le bug de latence (toutes les boîtes automatiquement repeintes au scroll/move/resize).
+  QPixmapCache::setCacheLimit(220000);
+
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setFlag(QGraphicsItem::ItemIsFocusable, true);
   setFlag(ItemSendsGeometryChanges, true);
