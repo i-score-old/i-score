@@ -67,7 +67,7 @@ macx-clang {
     INCLUDEPATH += headers/data
     INCLUDEPATH += /Library/Frameworks/
     INCLUDEPATH += /usr/local/jamoma/includes
-    INCLUDEPATH += /usr/local/include/libxml2
+    INCLUDEPATH += /usr/include/libxml2
 
     LIBS += /usr/local/jamoma/lib/JamomaFoundation.dylib
     LIBS += /usr/local/jamoma/lib/JamomaDSP.dylib
