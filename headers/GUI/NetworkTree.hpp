@@ -183,6 +183,10 @@ class NetworkTree : public QTreeWidget
      */
     bool hasStartEndMsg(QTreeWidgetItem *item);
 
+    /*!
+     * \brief Returns the index of the given item.
+     */
+    int getIndex(QTreeWidgetItem *item);
     
     /***********************************************************************
     *                       General display tools

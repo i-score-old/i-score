@@ -360,6 +360,14 @@ class Maquette : public QObject
     std::vector<std::string> lastMessagesToSend(unsigned int boxID);
 
     /*!
+     * \brief Sorts the NetworkMessages by priority - Based on the index of the NetworkTree - and returns the sorted list.
+     *
+     * \param msgs : the messages to sort.
+     *
+     * \return The sorted messages as vector<string>.
+     */
+    std::vector<std::string> sortMessages(NetworkMessages *messages);
+    /*!
      * \brief Sets the set of messages to send for the end of a box.
      *
      * \param boxID : the box to get messages set from
