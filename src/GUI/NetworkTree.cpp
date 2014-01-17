@@ -586,8 +586,8 @@ NetworkTree::hasStartEndMsg(QTreeWidgetItem *item)
 
 int
 NetworkTree::getIndex(QTreeWidgetItem *item){
-
-    return indexFromItem(item).data().toFloat();
+    //TODO : QModelIndex a des opérandes < ... les essayer.
+    return indexFromItem(item).row();
 }
 
 /****************************************************************************
