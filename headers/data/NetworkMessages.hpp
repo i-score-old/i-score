@@ -123,7 +123,6 @@ class NetworkMessages : public QObject {
     QMap<QTreeWidgetItem *, Message> getMessages();
 
     inline QList<QTreeWidgetItem *> getItems(){ return _messages.keys(); }
-    inline Message getMessage(QTreeWidgetItem *item){ return _messages.value(item); }
     std::string computeMessage(const Message &msg);
     std::string computeMessageWithoutValue(const Message &msg);
     inline QList<Message> messages(){ return _messages.values(); }

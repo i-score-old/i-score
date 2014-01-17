@@ -584,11 +584,6 @@ NetworkTree::hasStartEndMsg(QTreeWidgetItem *item)
   return(_startMessages->getMessages().contains(item) || _endMessages->getMessages().contains(item));
 }
 
-int
-NetworkTree::getIndex(QTreeWidgetItem *item){
-    //TODO : QModelIndex a des opérandes < ... les essayer.
-    return indexFromItem(item).row();
-}
 
 /****************************************************************************
 *                          General display tools

@@ -504,30 +504,9 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
     }
 }
 
-vector<string>
-Maquette::sortMessages(NetworkMessages *messages){
-
-    vector<string>                      sortedMessages;
-    QList<QTreeWidgetItem *>            items = messages->getItems();
-    QList<QTreeWidgetItem *>::iterator  it;
-    QTreeWidgetItem *                   curIt;
-    int                                 index = 0;
-    string                              message;
-
-    for(it=items.begin(); it!=items.end(); it++){
-        curIt = *it;
-        index = _scene->editor()->networkTree()->getIndex(curIt);
-        message = messages->computeMessage(messages-> getMessage(curIt));
-        std::cout<<message<<" >"<<index<<std::endl;
-    }
-
-    return sortedMessages;
-}
-
 bool
 Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages)
 {
-  vector<string> firstMsgsSorted = sortMessages(messages);
   vector<string> firstMsgs = messages->computeMessages();
 
   if (boxID != NO_ID && (getBox(boxID) != NULL)) {

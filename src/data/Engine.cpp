@@ -1723,7 +1723,7 @@ std::string Engine::getTriggerPointMessage(ConditionedProcessId triggerId)
     TTTimeProcessPtr        timeProcess = getConditionedProcess(triggerId, controlPointIndex);
     TTTimeEventPtr          timeEvent;
     TTSymbol                expression;
-    TTValue                 out;
+    TTValue                 v, out;
     
     // Get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
@@ -1732,7 +1732,7 @@ std::string Engine::getTriggerPointMessage(ConditionedProcessId triggerId)
         TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
     
     // Get the expression associated to this event
-    if (!getTimeCondition(triggerId)->sendMessage(TTSymbol("ExpressionFind"), TTObjectBasePtr(timeEvent), out)) {
+    if (!getTimeCondition(triggerId)->sendMessage(TTSymbol("ExpressionFind"), v, out)) {
         
         expression = out[0];
         return expression.c_str();
