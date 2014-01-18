@@ -483,6 +483,9 @@ BoxWidget::jumpToStartCue()
 
   _box->maquetteScene()->changeTimeOffset(timeOffset);
   //Maquette::getInstance()->initSceneState();   //reload scene (reset the remote application state)
+
+  //unactive button focus
+  _box->setFocus();
 }
 
 void
@@ -495,6 +498,9 @@ BoxWidget::jumpToEndCue()
   unsigned int timeOffset = _box->date() + _box->duration();
   _box->maquetteScene()->changeTimeOffset(timeOffset);
   //Maquette::getInstance()->initSceneState();   //reload scene (reset the remote application state)
+
+  //unactive button focus
+  _box->setFocus();
 }
 
 void
