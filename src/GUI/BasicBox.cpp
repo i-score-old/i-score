@@ -1319,14 +1319,6 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
   if (event->button() == Qt::LeftButton) {
       setSelected(true);
 
-//        if(_startMenuButton->is){
-//            std::cout<<"<<<<<CHECKED>>>>>"<<std::endl;
-//            if(event->modifiers()==Qt::ControlModifier){
-//                std::cout<<"<<<<<STARTMENU>>>>>"<<std::endl;
-//                _updateStartCue->trigger();
-//            }
-//        }
-
       if (cursor().shape() == Qt::OpenHandCursor) {
           setCursor(Qt::ClosedHandCursor);
         }

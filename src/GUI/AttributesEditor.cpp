@@ -198,8 +198,6 @@ AttributesEditor::connectSlots()
 {
   // General
   connect(_generalColorButton, SIGNAL(clicked()), this, SLOT(changeColor()));
-  connect(_boxStartValue, SIGNAL(valueChanged(double)), this, SLOT(startChanged()));
-  connect(_boxLengthValue, SIGNAL(valueChanged(double)), this, SLOT(lengthChanged()));
   connect(_boxName, SIGNAL(returnPressed()), this, SLOT(nameChanged()));
 
   connect(_networkTree, SIGNAL(startMessageValueChanged(QTreeWidgetItem *)), this, SLOT(startMessageChanged(QTreeWidgetItem *)));
@@ -219,6 +217,11 @@ AttributesEditor::connectSlots()
   connect(_networkTree, SIGNAL(rangeBoundMinChanged(QTreeWidgetItem*,float)), this, SLOT(changeRangeBoundMin(QTreeWidgetItem*, float)));
   connect(_networkTree, SIGNAL(rangeBoundMaxChanged(QTreeWidgetItem*,float)), this, SLOT(changeRangeBoundMax(QTreeWidgetItem*, float)));
   connect(_networkTree, SIGNAL(recModeChanged(QTreeWidgetItem*)), this, SLOT(changeRecMode(QTreeWidgetItem*)));
+
+
+  /// \todo Ajouter les spinBox ci-dessous. Attention problème : ces signaux sont automatiquement appelés lorsque l'on sélectionne simplement une boite (setAttributes (...) updateWidgets()). Une erreur d'arrondi (certainement) fait que la date de start de plusieurs boite est modifié au simple click...
+  //  connect(_boxStartValue, SIGNAL(valueChanged(double)), this, SLOT(startChanged()));
+  //  connect(_boxLengthValue, SIGNAL(valueChanged(double)), this, SLOT(lengthChanged()));
 }
 
 void
