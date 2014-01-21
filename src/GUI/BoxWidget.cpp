@@ -495,7 +495,7 @@ BoxWidget::jumpToEndCue()
       _endMenu->close();
     }
   _box->select();
-  unsigned int timeOffset = _box->date() + _box->duration();
+  unsigned int timeOffset = _box->date()+1 + _box->duration();
   _box->maquetteScene()->changeTimeOffset(timeOffset);
   //Maquette::getInstance()->initSceneState();   //reload scene (reset the remote application state)
 
