@@ -719,9 +719,9 @@ class Maquette : public QObject
   public slots:
     
     /*!
-     * \brief Sets the time offset value in ms where the engine will start from at the nex execution.
+     * \brief Sets the time offset value in ms where the engine will start from at the nex execution. The boolean "mute" mutes or not the dump of all messages (the scene state at timeOffset).
      */
-    void setTimeOffset(unsigned int timeOffset);
+    void setTimeOffset(unsigned int timeOffset, bool mute = NO);
     
     unsigned int getTimeOffset();
 
