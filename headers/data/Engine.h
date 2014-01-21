@@ -796,7 +796,7 @@ public:
      * \param timeOffset: new timeOffset value
 	 *
 	 */
-	void setTimeOffset(TimeValue timeOffset);
+	void setTimeOffset(TimeValue timeOffset, bool mute = NO);
     
     /*!
 	 * Gets the time offset where the scenario will start from on the next play

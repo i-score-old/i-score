@@ -1844,12 +1844,20 @@ QPointF Engine::getViewPosition()
 }
 
 //Execution ///////////////////////////////////////////////////////////
-void Engine::setTimeOffset(TimeValue timeOffset)
+void Engine::setTimeOffset(TimeValue timeOffset, bool mute)
 {
     TTValue none;
     
+    // mute the time process to not output anythning
+    if (mute)
+        m_mainScenario->setAttributeValue(kTTSym_mute, YES);
+    
     // set the time process at time offset
     m_mainScenario->sendMessage(kTTSym_Goto, timeOffset, none);
+    
+    // unmute the time process
+    if (mute)
+        m_mainScenario->setAttributeValue(kTTSym_mute, NO);
     
     TTLogMessage("Engine::setTimeOffset = %ld\n", timeOffset);       
 }
