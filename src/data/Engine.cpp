@@ -1851,7 +1851,7 @@ void Engine::setTimeOffset(TimeValue timeOffset)
     // set the time process at time offset
     m_mainScenario->sendMessage(kTTSym_Goto, timeOffset, none);
     
-    TTLogMessage("Engine::setTimeOffset = %ld\n", timeOffset);
+    TTLogMessage("Engine::setTimeOffset = %ld\n", timeOffset);       
 }
 
 TimeValue Engine::getTimeOffset()

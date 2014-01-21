@@ -1206,6 +1206,7 @@ Maquette::setTimeOffset(unsigned int timeOffset)
 {
     _engines->setTimeOffset(timeOffset);
     _scene->view()->updateTimeOffsetView();
+    _scene->displayMessage(QString("Time offset moved to %1").arg(timeOffset).toStdString(), INDICATION_LEVEL);
 }
 
 unsigned int
