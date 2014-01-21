@@ -1235,7 +1235,6 @@ Maquette::generateTriggerQueue()
 void
 Maquette::initSceneState()
 {
-    std::cout<<">>>InitSceneState<<<"<<std::endl;
   //Pour palier au bug du moteur (qui envoie tous les messages début et fin de toutes les boîtes < time offset)
 
   double timeOffset = (double)_engines->getTimeOffset();
@@ -1391,8 +1390,7 @@ void
 Maquette::stopPlayingAndGoToTimeOffset(unsigned int timeOffset)
 {
   turnExecutionOff();    
-  setTimeOffset(timeOffset,YES);
-  initSceneState();
+  setTimeOffset(timeOffset);
 }
 
 void
@@ -1402,7 +1400,7 @@ Maquette::stopPlayingAndGoToCurrentTime()
     
     turnExecutionOff();
     
-    setTimeOffset(timeOffset,YES);
+    setTimeOffset(timeOffset);
 }
 
 void
