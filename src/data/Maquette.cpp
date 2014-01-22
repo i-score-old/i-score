@@ -72,7 +72,6 @@ typedef map<unsigned int, BasicBox*> BoxesMap;
 typedef map<unsigned int, Relation*> RelationsMap;
 typedef map<unsigned int, TriggerPoint*> TrgPntMap;
 
-#define SCENARIO_DURATION 1800000
 #define NO_PAINT false
 
 void
