@@ -1003,6 +1003,28 @@ public:
      */
     void refreshNetworkNamespace(const std::string& application, const std::string& address = "/");
 
+    /*!
+     * Gets an integer parameter associated to the protocol and the device.
+     *
+     * \param protocol : the protocol's name. ex : Minuit
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param parameter : the parameter asked. ex: port
+     * \param integer : the integer returned. ex: 8002
+     * \return 0 if no error, else 1.
+     */
+    bool getDeviceIntegerParameter(const std::string device, const std::string protocol, const std::string parameter, unsigned int &integer);
+
+    /*!
+     * Gets a string parameter associated to the protocol and the device.
+     *
+     * \param protocol : the protocol's name. ex : Minuit
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param parameter : the parameter asked. ex: ip
+     * \param string : the integer returned. ex: 192.168.1.1
+     * \return 0 if no error, else 1.
+     */
+    bool getDeviceStringParameter(const std::string device, const std::string protocol, const std::string parameter, std::string &string);
+
 	//Store and load ////////////////////////////////////////////////////////////////////////////////////
     
 	/*!
