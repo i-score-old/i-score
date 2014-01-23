@@ -1577,10 +1577,11 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
         else if (currentItem()->type() == addOSCNode) {
             ;
         }
-        else if (currentItem()->type() == NodeNoNamespaceType) {
+        else if (currentItem()->type() == NodeNamespaceType) {
             if(currentColumn() == NAME_COLUMN){
                 QString deviceName = currentItem()->text(NAME_COLUMN);
-                _deviceEdit->edit(deviceName);
+                _deviceEdit->exec();
+//                _deviceEdit->edit(deviceName);
             }
         }
         else {
