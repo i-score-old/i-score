@@ -2113,7 +2113,23 @@ void Engine::sendNetworkMessage(const std::string & stringToSend)
     m_sender->sendMessage(kTTSym_Send, data, out);
 }
 
-void Engine::getNetworkDevicesName(std::vector<std::string>& devicesName)
+void Engine::getProtocolNames(std::vector<std::string>& allProtocolNames)
+{
+    TTValue     protocolNames;
+    TTSymbol    name;
+    
+    // get all protocol names
+    TTModularApplications->getAttributeValue(TTSymbol("protocolNames"), protocolNames);
+    
+    for (TTUInt8 i = 0; i < protocolNames.size(); i++) {
+        
+        name = protocolNames[i];
+        
+        allProtocolNames.push_back(name.c_str());
+    }
+}
+
+void Engine::getNetworkDevicesName(std::vector<std::string>& allDeviceNames)
 {
     TTValue     applicationNames;
     TTSymbol    name;
@@ -2129,7 +2145,7 @@ void Engine::getNetworkDevicesName(std::vector<std::string>& devicesName)
         if (name == getLocalApplicationName)
             continue;
         
-        devicesName.push_back(name.c_str());
+        allDeviceNames.push_back(name.c_str());
     }
 }
 

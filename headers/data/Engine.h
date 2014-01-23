@@ -912,12 +912,19 @@ public:
 	 */
 	void sendNetworkMessage(const std::string & stringToSend);
     
+    /*!
+	 * Fills the given vectors with all protocol names.
+	 *
+	 * \param allProtocolNames : will be filled with all protocol names.
+	 */
+    void getProtocolNames(std::vector<std::string>& allProtocolNames);
+    
 	/*!
 	 * Fills the given vectors with all network devices name.
 	 *
-	 * \param devicesName : will be filled with all network devices names.
+	 * \param allDeviceNames : will be filled with all network devices names.
 	 */
-	void getNetworkDevicesName(std::vector<std::string>& devicesName);
+	void getNetworkDevicesName(std::vector<std::string>& allDeviceNames);
     
     bool isNetworkDeviceRequestable(const std::string deviceName);
     
