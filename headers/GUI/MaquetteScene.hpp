@@ -540,7 +540,7 @@ class MaquetteScene : public QGraphicsScene
     void setPlaying(unsigned int boxID, bool playing);
 
     //! Integer handling scene's maximal width.
-    static const int MAX_SCENE_WIDTH = 100000;
+    static const int MAX_SCENE_WIDTH = 300000;
 
     //! Integer handling scene's maximal height.
     static const int MAX_SCENE_HEIGHT = 1000;

@@ -85,7 +85,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
   _editor = editor;
   _clicked = false;
   _modified = false;
-  _maxSceneWidth = 100000;
+  _maxSceneWidth = 360000;
 
   _relation = new AbstractRelation; /// \todo pourquoi instancier une AbstractRelation ici ? (par jaime Chao)
   _playThread = new PlayingThread(this);
@@ -156,8 +156,9 @@ MaquetteScene::updateProgressBar()
 void
 MaquetteScene::zoomChanged(float value)
 {
+    std::cout<<value<<std::endl;
   setMaxSceneWidth(MaquetteScene::MAX_SCENE_WIDTH*value);
-
+  std::cout<<" > "<<MaquetteScene::MAX_SCENE_WIDTH*value<<std::endl;
   updateProgressBar();
   _timeBar->updateZoom(value);
     
