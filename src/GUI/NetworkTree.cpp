@@ -566,6 +566,9 @@ NetworkTree::treeSnapshot(unsigned int boxID)
                       data.msg = QString::fromStdString(*it2);
                       data.address = address;
 
+                      unsigned int priority;
+                      Maquette::getInstance()->getPriority(address.toStdString(), priority);
+                      data.priority = priority;
 //                        data.sampleRate = Maquette::getInstance()->getCurveSampleRate(boxID,address.toStdString());
                       data.hasCurve = false;
                       snapshots.insert(*it, data);
@@ -1552,7 +1555,7 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
     Q_UNUSED(event);
     if(currentItem()!=NULL){
         
-        /// \todo : engine->resquestType(itemAddress) instead of the comparaison with "->".
+        /// \todo : replace by if(item->whatsThis(NAME_COLUMN)=="Message").
         if (currentItem()->type() == OSCNode || currentItem()->text(TYPE_COLUMN) == "->") {
             editItem(currentItem(), currentColumn());
             if (currentColumn() == NAME_COLUMN) {
@@ -1825,6 +1828,7 @@ NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue)
   else {
       if (!_startMessages->getMessages().contains(item)) {
           QString Qaddress = getAbsoluteAddressWithValue(item, START_COLUMN);
+          //TODO Request la priority et faire un addMessage PAS SIMPLE
           _startMessages->addMessageSimple(item, Qaddress);
           Data data;
           assignItem(item, data);
