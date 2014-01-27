@@ -1947,6 +1947,11 @@ Maquette::getObjectType(const std::string & address, std::string & nodeType)
 }
 
 int
+Maquette::getPriority(const std::string & address, unsigned int & priority){
+    return _engines->requestObjectPriority(address,priority);
+}
+
+int
 Maquette::getObjectChildren(const std::string & address, std::vector<std::string>& children)
 {
     return _engines->requestObjectChildren(address,children);

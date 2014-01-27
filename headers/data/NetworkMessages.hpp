@@ -28,7 +28,8 @@ struct Message {
    */
   QString device;   // MinuitDevice
   QString message;  // /gain/
-  QString value;   
+  QString value;     
+  unsigned int priority;
 };
 
 struct Data {
@@ -39,12 +40,11 @@ struct Data {
   bool hasCurve;
   bool curveActivated;
   bool redundancy;
+  unsigned int priority;
 };
 
 /**!
  * \class NetworkMessages
- *
- * \brief Network messages editor, derived class from Qt's QObject.
  */
 class NetworkMessages : public QObject {
   Q_OBJECT

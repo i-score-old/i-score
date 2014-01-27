@@ -2282,6 +2282,34 @@ Engine::requestObjectType(const std::string & address, std::string & nodeType){
 }
 
 int
+Engine::requestObjectPriority(const std::string &address, unsigned int &priority){
+    TTNodeDirectoryPtr  aDirectory;
+    TTAddress           anAddress = toTTAddress(address);
+    TTObjectBasePtr     anObject;
+    TTNodePtr           aNode;
+    TTValue             v;
+
+    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+
+    if (!aDirectory)
+        return 0;
+
+    if (!aDirectory->getTTNode(anAddress, &aNode)) {
+
+        anObject = aNode->getObject();
+
+        if (anObject) {
+
+            if (!anObject->getAttributeValue(kTTSym_priority, v))
+                priority = v[0];
+            else
+                return 1;
+        }
+    }
+    return 0;
+}
+
+int
 Engine::requestObjectChildren(const std::string & address, vector<string>& children)
 {
     TTNodeDirectoryPtr  aDirectory;

@@ -986,6 +986,16 @@ public:
     int requestObjectType(const std::string & address, std::string & nodeType);
 
     /*!
+     * Sends a request to get the type of an object.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param Priority : will be filled with the priority.
+     *
+     * \return True(1) or false(0) if the request failed or not.
+     */
+    int requestObjectPriority(const std::string & address, unsigned int & nodeType);
+
+    /*!
      * Sends a request to get the children nodes of an object.
      *
      * \param address : the object's address. ex : /deviceName/address1/address2/
