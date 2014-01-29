@@ -274,9 +274,10 @@ NetworkMessages::changeDevice(QString oldName, QString newName)
 }
 
 void
-NetworkMessages::addMessageLong(QTreeWidgetItem *treeItem, const QString &device, const QString &message, const QString &value)
+NetworkMessages::addMessageLong(QTreeWidgetItem *treeItem, const QString &device, const QString &message, const QString &value, const unsigned int &priority)
 {
-  Message msg = { device, message, value };
+    std::cout<<"addMsgLong PRIORITY = "<<priority<<std::endl;
+  Message msg = { device, message, value, priority };
   _messages.insert(treeItem, msg);
 }
 
@@ -303,12 +304,13 @@ NetworkMessages::setMessages(const QMap<QTreeWidgetItem *, Data> messagesList)
   QList<QTreeWidgetItem *> itemsList = messagesList.keys();
   QList<QTreeWidgetItem *>::iterator it;
   QTreeWidgetItem *item;
-
+  unsigned int priority = 0;
   unsigned int msgsCount = 0;
 
   for (it = itemsList.begin(); it != itemsList.end(); it++) {
       item = *it;
       string msg = messagesList.value(item).msg.toStdString();
+      priority = messagesList.value(item).priority;
 
       if (!msg.empty()) {
           size_t msgBeginPos;
@@ -324,7 +326,7 @@ NetworkMessages::setMessages(const QMap<QTreeWidgetItem *, Data> messagesList)
                           QString Qmsg = QString::fromStdString(msg);
                           QString Qdevice = QString::fromStdString(device);
                           QString Qvalue = QString::fromStdString(value);
-                          addMessageLong(item, Qdevice, Qmsg, Qvalue);
+                          addMessageLong(item, Qdevice, Qmsg, Qvalue, priority);
                           msgsCount++;
                         }
                       else {
