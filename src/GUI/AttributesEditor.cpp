@@ -247,7 +247,13 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 
           _networkTree->displayBoxContent(abBox);
 
-          //PRINT MESSAGES         
+          //PRINT MESSAGES
+
+          //Priority
+//          QList<Message> msgs = _scene->getBox(_boxEdited)->startMessages()->getMessages().values();
+//          for (int i=0 ; i<msgs.size() ; i++)
+//              std::cout<<msgs.at(i).message.toStdString()<<" "<<msgs.at(i).priority<<std::endl;
+
 //            QList<QTreeWidgetItem *> items = _networkTree->assignedItems().keys();
 //            QList<QTreeWidgetItem *>::iterator i;
 //            QTreeWidgetItem *curIt;

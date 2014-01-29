@@ -73,7 +73,7 @@ class NetworkMessages : public QObject {
      * \param msg : the message to send
      */
     void addMessageLong(QTreeWidgetItem *item, const QString &device, const QString &message, const QString &value , const unsigned int &priority = 0);
-    void addMessageSimple(QTreeWidgetItem *item, QString address);
+    void addMessageSimple(QTreeWidgetItem *item, QString address,  unsigned int priority = 0);
     void changeMessage(QTreeWidgetItem *item, QString newName);
     void changeDevice(QString oldName, QString newName);
 

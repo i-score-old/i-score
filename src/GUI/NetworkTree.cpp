@@ -1826,10 +1826,14 @@ NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue)
       emit(startMessageValueChanged(item));
     }
   else {
-      if (!_startMessages->getMessages().contains(item)) {
+      if (!_startMessages->getMessages().contains(item)) { //New message
+
           QString Qaddress = getAbsoluteAddressWithValue(item, START_COLUMN);
+
+          unsigned int priority;
+          Maquette::getInstance()->getPriority(Qaddress.toStdString(), priority);
           //TODO Request la priority et faire un addMessage PAS SIMPLE
-          _startMessages->addMessageSimple(item, Qaddress);
+          _startMessages->addMessageSimple(item, Qaddress, priority);
           Data data;
           assignItem(item, data);
           if (item->type() == OSCNode) {
@@ -1837,7 +1841,7 @@ NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue)
             }
           emit(startMessageValueChanged(item));
         }
-      else {
+      else { //new value entered
           if (_startMessages->setValue(item, newValue)) {
               if (item->type() == OSCNode) {
                   _OSCStartMessages->setValue(item, newValue);

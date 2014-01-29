@@ -403,7 +403,7 @@ NetworkMessages::setMessages(const QList < QPair<QTreeWidgetItem *, QString> > m
 }
 
 void
-NetworkMessages::addMessageSimple(QTreeWidgetItem *item, QString address)
+NetworkMessages::addMessageSimple(QTreeWidgetItem *item, QString address, unsigned int priority)
 {
   unsigned int msgsCount = 0;
   string msg = address.toStdString();
