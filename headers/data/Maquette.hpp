@@ -378,6 +378,12 @@ class Maquette : public QObject
      *
      * \return if itemsSelected could be set
      */
+    bool setSelectedItemsToSend(unsigned int boxID, QMap<QTreeWidgetItem*, Data> itemsSelected);
+
+    /*!
+     * \brief Calls the NetworkTree method getAbsoluteAddress.
+     */
+    QString getAbsoluteAddress(QTreeWidgetItem *item);
 
     /*!
      * \brief Sorts messages by priority than alphabetical.
@@ -387,8 +393,8 @@ class Maquette : public QObject
      * \return if itemsSelected could be set
      */
     std::vector<std::string> sortByPriority(NetworkMessages *messages);
+    static int compareByPriority(const QPair<QTreeWidgetItem *, std::string> v1, const QPair<QTreeWidgetItem *, std::string> v2);
 
-    bool setSelectedItemsToSend(unsigned int boxID, QMap<QTreeWidgetItem*, Data> itemsSelected);
 
     /*!
      * \brief Sets the set of treeItems expanded.

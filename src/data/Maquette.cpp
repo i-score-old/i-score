@@ -540,10 +540,65 @@ Maquette::startMessages(unsigned int boxID)
     }
 }
 
+QString
+Maquette::getAbsoluteAddress(QTreeWidgetItem *item){
+    /// \todo Ne pas dupliquer cette fonction déjà présente dans NetworkTree. Modifier cette dernière pour pouvoir l'appeler ainsi : NetworkTree::getAbsoluteAddress. NH
+    return _scene->editor()->networkTree()->getAbsoluteAddress(item);
+}
+
+int
+Maquette::compareByPriority(const QPair<QTreeWidgetItem *, std::string> v1, const QPair<QTreeWidgetItem *, std::string> v2)
+{
+    QString                     name1 = QString::fromStdString(v1.second),
+                                name2 = QString::fromStdString(v2.second);
+    QTreeWidgetItem             *item1 = v1.first,
+                                *item2 = v2.first;
+    unsigned int                priority1,
+                                priority2;
+
+    //Gets priority
+    std::istringstream issPriority1(item1->text(NetworkTree::PRIORITY_COLUMN).toStdString());
+    issPriority1 >> priority1;
+
+    std::istringstream issPriority2(item2->text(NetworkTree::PRIORITY_COLUMN).toStdString());
+    issPriority2 >> priority2;
+
+    //Begin compare cases
+    if (priority1 == priority2){
+        /// \todo : Gérer le cas où name1==name2. Comparer alors les instances. NH
+        return name1 < name2;
+    }
+
+    if (priority1 == 0)
+        return 0; //true
+
+    if(priority2 == 0)
+        return 1; //false
+
+    return priority1 < priority2;
+}
+
 vector<string>
 Maquette::sortByPriority(NetworkMessages *messages){
-    vector<string> sortedMessages;
-    //TODO
+    vector<string>                              sortedMessages;
+    QPair<QTreeWidgetItem *, std::string>       pair; //<item, absoluteAddress>
+    QList<QTreeWidgetItem *>                    itemsList = messages->getItems();
+    QList< QPair<QTreeWidgetItem *,string> >    pairsList;
+
+    //Make pairs list <item, address>
+    for(int i=0 ; i<itemsList.size() ; i++)
+    {
+        pair = qMakePair( itemsList.at(i), messages->computeMessage(messages->getMessage(itemsList.at(i))));
+        pairsList << pair;
+    }
+
+    //Sort list
+    qSort(pairsList.begin(), pairsList.end(), compareByPriority);
+
+    //convert to vector<string>
+    for(int i=0 ; i<pairsList.size() ; i++)
+        sortedMessages.push_back(pairsList.at(i).second);
+
     return sortedMessages;
 }
 
