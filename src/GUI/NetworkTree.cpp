@@ -480,6 +480,7 @@ NetworkTree::loadNetworkTree(AbstractBox *abBox)
   setAssignedItems(itemsFromMsg);
   NetworkMessages *startMsg = new NetworkMessages();
   NetworkMessages *endMsg = new NetworkMessages();
+
   startMsg->setMessages(startItemsAndMsgs);
   endMsg->setMessages(endItemsAndMsgs);
   setStartMessages(startMsg);
@@ -567,10 +568,6 @@ NetworkTree::treeSnapshot(unsigned int boxID)
                   for (it2 = snapshot.begin(); it2 != snapshot.end(); it2++) {
                       data.msg = QString::fromStdString(*it2);
                       data.address = address;
-
-                      unsigned int priority;
-                      Maquette::getInstance()->getPriority(address.toStdString(), priority);
-                      data.priority = priority;
 //                        data.sampleRate = Maquette::getInstance()->getCurveSampleRate(boxID,address.toStdString());
                       data.hasCurve = false;
                       snapshots.insert(*it, data);
@@ -1828,10 +1825,8 @@ NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue)
 
           QString Qaddress = getAbsoluteAddressWithValue(item, START_COLUMN);
 
-          unsigned int priority;
-          Maquette::getInstance()->getPriority(Qaddress.toStdString(), priority);
           //TODO Request la priority et faire un addMessage PAS SIMPLE
-          _startMessages->addMessageSimple(item, Qaddress, priority);
+          _startMessages->addMessageSimple(item, Qaddress);
           Data data;
           assignItem(item, data);
           if (item->type() == OSCNode) {

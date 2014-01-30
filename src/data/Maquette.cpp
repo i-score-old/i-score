@@ -504,9 +504,16 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
 }
 
 bool
-Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages)
+Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages, bool sort)
 {
-  vector<string> firstMsgs = messages->computeMessages();
+    vector<string> firstMsgs;
+    if(sort){
+        firstMsgs = sortByPriority(messages);
+    }
+    else
+        firstMsgs = messages->computeMessages();
+
+  //sortByPriority(firstMsgs);
 
   if (boxID != NO_ID && (getBox(boxID) != NULL)) {
       _engines->setCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
@@ -531,6 +538,13 @@ Maquette::startMessages(unsigned int boxID)
       std::cerr << "Maquette::startMessage : wrong boxID" << std::endl;
       return NULL;
     }
+}
+
+vector<string>
+Maquette::sortByPriority(NetworkMessages *messages){
+    vector<string> sortedMessages;
+    //TODO
+    return sortedMessages;
 }
 
 bool
@@ -610,9 +624,14 @@ Maquette::endMessages(unsigned int boxID)
 }
 
 bool
-Maquette::setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages)
-{
-  vector<string> lastMsgs = messages->computeMessages();
+Maquette::setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages, bool sort)
+{  
+  vector<string> lastMsgs;
+  if(sort){
+      lastMsgs = sortByPriority(messages);
+  }
+  else
+      lastMsgs = messages->computeMessages();
 
   if (boxID != NO_ID && (getBox(boxID) != NULL)) {
       _engines->setCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, lastMsgs);

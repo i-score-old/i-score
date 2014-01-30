@@ -274,11 +274,10 @@ NetworkMessages::changeDevice(QString oldName, QString newName)
 }
 
 void
-NetworkMessages::addMessageLong(QTreeWidgetItem *treeItem, const QString &device, const QString &message, const QString &value, const unsigned int &priority)
+NetworkMessages::addMessageLong(QTreeWidgetItem *treeItem, const QString &device, const QString &message, const QString &value)
 {
-    std::cout<<"addMsgLong PRIORITY = "<<priority<<std::endl;
-  Message msg = { device, message, value, priority };
-  _messages.insert(treeItem, msg);
+    Message msg = { device, message, value };
+    _messages.insert(treeItem, msg);
 }
 
 void
@@ -304,13 +303,11 @@ NetworkMessages::setMessages(const QMap<QTreeWidgetItem *, Data> messagesList)
   QList<QTreeWidgetItem *> itemsList = messagesList.keys();
   QList<QTreeWidgetItem *>::iterator it;
   QTreeWidgetItem *item;
-  unsigned int priority = 0;
   unsigned int msgsCount = 0;
 
   for (it = itemsList.begin(); it != itemsList.end(); it++) {
       item = *it;
       string msg = messagesList.value(item).msg.toStdString();
-      priority = messagesList.value(item).priority;
 
       if (!msg.empty()) {
           size_t msgBeginPos;
@@ -326,7 +323,7 @@ NetworkMessages::setMessages(const QMap<QTreeWidgetItem *, Data> messagesList)
                           QString Qmsg = QString::fromStdString(msg);
                           QString Qdevice = QString::fromStdString(device);
                           QString Qvalue = QString::fromStdString(value);
-                          addMessageLong(item, Qdevice, Qmsg, Qvalue, priority);
+                          addMessageLong(item, Qdevice, Qmsg, Qvalue);
                           msgsCount++;
                         }
                       else {
@@ -403,7 +400,7 @@ NetworkMessages::setMessages(const QList < QPair<QTreeWidgetItem *, QString> > m
 }
 
 void
-NetworkMessages::addMessageSimple(QTreeWidgetItem *item, QString address, unsigned int priority)
+NetworkMessages::addMessageSimple(QTreeWidgetItem *item, QString address)
 {
   unsigned int msgsCount = 0;
   string msg = address.toStdString();

@@ -28,8 +28,7 @@ struct Message {
    */
   QString device;   // MinuitDevice
   QString message;  // /gain/
-  QString value;     
-  unsigned int priority;
+  QString value;
 };
 
 struct Data {
@@ -40,7 +39,6 @@ struct Data {
   bool hasCurve;
   bool curveActivated;
   bool redundancy;
-  unsigned int priority;
 };
 
 /**!
@@ -72,8 +70,8 @@ class NetworkMessages : public QObject {
      * \param device : the device to use
      * \param msg : the message to send
      */
-    void addMessageLong(QTreeWidgetItem *item, const QString &device, const QString &message, const QString &value , const unsigned int &priority = 0);
-    void addMessageSimple(QTreeWidgetItem *item, QString address,  unsigned int priority = 0);
+    void addMessageLong(QTreeWidgetItem *item, const QString &device, const QString &message, const QString &value );
+    void addMessageSimple(QTreeWidgetItem *item, QString address);
     void changeMessage(QTreeWidgetItem *item, QString newName);
     void changeDevice(QString oldName, QString newName);
 

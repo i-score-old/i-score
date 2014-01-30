@@ -367,7 +367,7 @@ class Maquette : public QObject
      *
      * \return if messages could be set
      */
-    bool setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages);
+    bool setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages, bool sort = true);
     NetworkMessages *startMessages(unsigned int boxID);
 
     /*!
@@ -378,6 +378,15 @@ class Maquette : public QObject
      *
      * \return if itemsSelected could be set
      */
+
+    /*!
+     * \brief Sorts messages by priority than alphabetical.
+     *
+     * \param messages : message to sort
+     *
+     * \return if itemsSelected could be set
+     */
+    std::vector<std::string> sortByPriority(NetworkMessages *messages);
 
     bool setSelectedItemsToSend(unsigned int boxID, QMap<QTreeWidgetItem*, Data> itemsSelected);
 
@@ -440,7 +449,7 @@ class Maquette : public QObject
      *
      * \return if messages could be set
      */
-    bool setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages);
+    bool setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages, bool sort = true);
 
     /*!
      * \brief Sends a specific message with current device.
