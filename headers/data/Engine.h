@@ -170,9 +170,10 @@ public:
 
     Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
            void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
-           void(*transportDataValueCallback)(TTSymbol&, const TTValue&));
+           void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
+           std::string pathToTheJamomaFolder);
     
-    void initModular();
+    void initModular(const char* pathToTheJamomaFolder = NULL);
     void initScore();
     
     void dumpAddressBelow(TTNodePtr aNode);

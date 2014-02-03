@@ -44,6 +44,7 @@
 #include "Maquette.hpp"
 
 #include <QFile>
+#include <QDir>
 #include "MainWindow.hpp"
 #include "MaquetteView.hpp"
 #include <QDomDocument>
@@ -77,9 +78,15 @@ typedef map<unsigned int, TriggerPoint*> TrgPntMap;
 void
 Maquette::init()
 {
+    // check if the jamoma framework can be loaded from the i-score application folder (else it will automatically loaded from /usr/local/lib)
+    string jamomaFolder = (QCoreApplication::applicationDirPath() + "/../Frameworks/jamoma").toStdString();
+    
+    if (!QDir(QString::fromStdString(jamomaFolder)).exists())
+        jamomaFolder = "";
+
     // create a ScoreEngine instance
     // note : this is a temporary solution to test new Score framework easily
-    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback);        
+    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, jamomaFolder);
 
     //Creating rootBox as the mainScenario
     AbstractBox *scenarioAb = new AbstractBox();

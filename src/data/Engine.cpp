@@ -31,7 +31,8 @@ EngineCacheElement::~EngineCacheElement()
 
 Engine::Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
                void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
-               void(*transportDataValueCallback)(TTSymbol&, const TTValue&))
+               void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
+               std::string pathToTheJamomaFolder)
 {
     m_TimeEventStatusAttributeCallback = timeEventStatusAttributeCallback;
     m_TimeProcessSchedulerRunningAttributeCallback = timeProcessSchedulerRunningAttributeCallback;
@@ -43,11 +44,15 @@ Engine::Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, boo
     
     m_mainScenario = NULL;
     
-    initModular();
+    if (!pathToTheJamomaFolder.empty())
+        initModular(pathToTheJamomaFolder.c_str());
+    else
+        initModular();
+    
     initScore();
 }
 
-void Engine::initModular()
+void Engine::initModular(const char* pathToTheJamomaFolder)
 {
     TTErr           err;
     TTValue         args, v;
@@ -56,8 +61,8 @@ void Engine::initModular()
     TTString        configFile = "/usr/local/include/IScore/i-scoreConfiguration.xml";
     TTHashPtr       hashParameters;
     
-    // this initializes the Modular framework and loads protocol plugins (in /usr/local/jamoma/extensions folder)
-    TTModularInit();
+    // this initializes the Modular framework and loads protocol plugins
+    TTModularInit(pathToTheJamomaFolder);
     
     // create a local application named i-score
     TTModularCreateLocalApplication(applicationName, configFile);
