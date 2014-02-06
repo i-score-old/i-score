@@ -58,6 +58,6 @@ PlayingThread::run()
       _scene->updatePlayingBoxes();
       _scene->updateProgressBar();
 
-      msleep(10);
+      msleep(30);
     }
 }
