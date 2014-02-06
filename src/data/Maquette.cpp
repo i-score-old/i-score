@@ -291,6 +291,10 @@ Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const s
 
   if (newBoxID != NO_ID) {
 
+      // CB set vertical position and size in the engine
+      _engines->setBoxVerticalPosition(newBoxID, firstCorner.y());
+      _engines->setBoxVerticalSize(newBoxID, secondCorner.y() - firstCorner.y());
+
       _boxes[newBoxID] = newBox;
       _parentBoxes[newBoxID] = newBox;
       newBox->setID(newBoxID);
