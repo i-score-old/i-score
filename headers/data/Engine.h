@@ -170,9 +170,10 @@ public:
 
     Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
            void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
-           void(*transportDataValueCallback)(TTSymbol&, const TTValue&));
+           void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
+           std::string pathToTheJamomaFolder);
     
-    void initModular();
+    void initModular(const char* pathToTheJamomaFolder = NULL);
     void initScore();
     
     void dumpAddressBelow(TTNodePtr aNode);
@@ -984,6 +985,16 @@ public:
      * \return True(1) or false(0) if the request failed or not.
      */
     int requestObjectType(const std::string & address, std::string & nodeType);
+
+    /*!
+     * Sends a request to get the type of an object.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param Priority : will be filled with the priority.
+     *
+     * \return True(1) or false(0) if the request failed or not.
+     */
+    int requestObjectPriority(const std::string & address, unsigned int & nodeType);
 
     /*!
      * Sends a request to get the children nodes of an object.

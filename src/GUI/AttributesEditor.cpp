@@ -247,7 +247,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 
           _networkTree->displayBoxContent(abBox);
 
-          //PRINT MESSAGES         
+          //PRINT MESSAGES
 //            QList<QTreeWidgetItem *> items = _networkTree->assignedItems().keys();
 //            QList<QTreeWidgetItem *>::iterator i;
 //            QTreeWidgetItem *curIt;
