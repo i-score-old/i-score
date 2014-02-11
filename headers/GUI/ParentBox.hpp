@@ -135,7 +135,7 @@ class ParentBox : public BasicBox
      *
      * \param width : the new width
      */
-    virtual void resizeWidthEdition(int width);
+	virtual void resizeWidthEdition(float width);
     virtual void updateDisplay(QString displayMode);
 
   protected:

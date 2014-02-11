@@ -218,7 +218,7 @@ ParentBox::empty() const
 //}
 
 void
-ParentBox::resizeWidthEdition(int width)
+ParentBox::resizeWidthEdition(float width)
 {    
   BasicBox::resizeWidthEdition(width);
   float newWidth = _abstract->width();

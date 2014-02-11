@@ -288,7 +288,7 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
       case Qt::NoModifier:
       {
         map<float, pair<float, float> >::iterator it;
-        bool found;
+		bool found{false};
         QPointF relativePoint = relativeCoordinates(event->pos());
 
         for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
@@ -556,9 +556,10 @@ CurveWidget::resizeEvent(QResizeEvent * event)
   curveRepresentationOutdated();
 }
 
-void
-CurveWidget::paintEngine()
+QPaintEngine* CurveWidget::paintEngine() const
 {
+	//TODO
+	return nullptr;
 }
 
 void

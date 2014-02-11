@@ -65,7 +65,7 @@
 #include "TimeBarWidget.hpp"
 #include <QGraphicsProxyWidget>
 #include <QGraphicsLineItem>
-
+#include <QtWidgets/QMessageBox>
 #include <sstream>
 #include <map>
 #include <cmath>
@@ -297,10 +297,10 @@ MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
                       double endX = 0., endY = 0.;
                       static const double arrowSize = 12.;
                       BasicBox *box = NULL;
-                      if (itemAt(_mousePos) != 0) {
-                          int type = itemAt(_mousePos)->type();
+					  if (itemAt(_mousePos, QTransform()) != 0) {
+						  int type = itemAt(_mousePos, QTransform())->type();
                           if (type == PARENT_BOX_TYPE) {
-                              box = static_cast<BasicBox*>(itemAt(_mousePos));
+							  box = static_cast<BasicBox*>(itemAt(_mousePos, QTransform()));
                               if (_mousePos.x() < (box->mapToScene(box->boundingRect().topLeft()).x()
                                                    + BasicBox::RESIZE_TOLERANCE)) {
                                   endX = box->getLeftGripPoint().x();
@@ -453,8 +453,8 @@ MaquetteScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 bool
 MaquetteScene::subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent)
 {
-  if (getSelectedItem() != NULL && itemAt(mouseEvent->scenePos()) != 0) {
-      return(getSelectedItem()->type() == PARENT_BOX_TYPE && static_cast<BasicBox*>(getSelectedItem())->currentText() == BasicBox::SUB_SCENARIO_MODE_TEXT && static_cast<BasicBox*>(getSelectedItem())->boxBody().contains(mouseEvent->pos()) && itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::ArrowCursor);
+  if (getSelectedItem() != NULL && itemAt(mouseEvent->scenePos(), QTransform()) != 0) {
+	  return(getSelectedItem()->type() == PARENT_BOX_TYPE && static_cast<BasicBox*>(getSelectedItem())->currentText() == BasicBox::SUB_SCENARIO_MODE_TEXT && static_cast<BasicBox*>(getSelectedItem())->boxBody().contains(mouseEvent->pos()) && itemAt(mouseEvent->scenePos(), QTransform())->cursor().shape() == Qt::ArrowCursor);
     }
   else {
       return false;
@@ -486,11 +486,11 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
       setCurrentMode(SELECTION_MODE);
     }
 
-  if (itemAt(mouseEvent->scenePos()) != 0) {
-      if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::PointingHandCursor && _currentInteractionMode != TRIGGER_MODE) {
+  if (itemAt(mouseEvent->scenePos(), QTransform()) != 0) {
+	  if (itemAt(mouseEvent->scenePos(), QTransform())->cursor().shape() == Qt::PointingHandCursor && _currentInteractionMode != TRIGGER_MODE) {
           setCurrentMode(TRIGGER_MODE);
         }
-      if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::CrossCursor && _currentInteractionMode != RELATION_MODE) {
+	  if (itemAt(mouseEvent->scenePos(), QTransform())->cursor().shape() == Qt::CrossCursor && _currentInteractionMode != RELATION_MODE) {
           setCurrentMode(RELATION_MODE);
         }
     }
@@ -510,7 +510,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         break;
 
       case CREATION_MODE:
-        if (itemAt(mouseEvent->scenePos()) == 0) {
+		if (itemAt(mouseEvent->scenePos(), QTransform()) == 0) {
             if (resizeMode() == NO_RESIZE) {
                 // Store the first pressed point
                 _pressPoint = mouseEvent->scenePos();
@@ -562,10 +562,10 @@ MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
                 if (_relation->firstBox() != NO_ID) {
                     update();
                   }
-                if (itemAt(mouseEvent->scenePos()) != 0) {
-                    int type = itemAt(mouseEvent->scenePos())->type();
+				if (itemAt(mouseEvent->scenePos(), QTransform()) != 0) {
+					int type = itemAt(mouseEvent->scenePos(), QTransform())->type();
                     if (type == PARENT_BOX_TYPE) {
-                        BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
+						BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos(), QTransform()));
                         if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE) ||
                             mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
                             _relationBoxFound = true;
@@ -634,10 +634,10 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
   switch (_currentInteractionMode) {
       case RELATION_MODE:
 
-        if (itemAt(mouseEvent->scenePos()) != 0) {
-            int type = itemAt(mouseEvent->scenePos())->type();
+		if (itemAt(mouseEvent->scenePos(), QTransform()) != 0) {
+			int type = itemAt(mouseEvent->scenePos(), QTransform())->type();
             if (type == PARENT_BOX_TYPE) {
-                BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
+				BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos(), QTransform()));
 
                 BasicBox *firstBox = getBox(_relation->firstBox());
                 if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE)) {
@@ -682,7 +682,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
         break;
 
       case TEXT_MODE:
-        if (itemAt(mouseEvent->scenePos()) == 0) {
+		if (itemAt(mouseEvent->scenePos(), QTransform()) == 0) {
             addComment(tr("Comment").toStdString(), mouseEvent->scenePos(), NO_ID);
           }
         break;
@@ -1641,7 +1641,7 @@ MaquetteScene::stopAndGoToStart()
 
     //send root box start messages
     std::vector<std::string> startCue = _maquette->getBox(ROOT_BOX_ID)->getStartMessages();
-    for(int i=0; i<startCue.size(); i++)
+	for(unsigned long i=0; i<startCue.size(); i++)
         sendMessage(startCue.at(i));
 
     update();

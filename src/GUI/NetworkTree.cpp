@@ -52,6 +52,8 @@
 #include <QTreeView>
 #include <QApplication>
 
+#define FALSE 0
+
 int NetworkTree::NAME_COLUMN = 0;
 int NetworkTree::VALUE_COLUMN = 1;
 int NetworkTree::START_COLUMN = 2;
@@ -752,7 +754,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
 }
 
 void
-NetworkTree::clearColumn(unsigned int column, bool fullCleaning)
+NetworkTree::clearColumn(int column, bool fullCleaning)
 {        
   if (!_assignedItems.isEmpty()) {
       QList<QTreeWidgetItem *>::iterator it;

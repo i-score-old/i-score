@@ -264,7 +264,7 @@ BasicBox::createWidget()
   _curveProxy->setFlag(QGraphicsItem::ItemIsMovable, false);
   _curveProxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
   _curveProxy->setVisible(true);
-  _curveProxy->setAcceptsHoverEvents(true);
+  _curveProxy->acceptHoverEvents();
   _curveProxy->setWidget(_boxWidget);
   _curveProxy->setPalette(palette);
 
@@ -366,7 +366,7 @@ BasicBox::init()
   setFlag(QGraphicsItem::ItemIsFocusable, true);
   setFlag(ItemSendsGeometryChanges, true);
   setVisible(true);
-  setAcceptsHoverEvents(true);
+  acceptHoverEvents();
   _currentZvalue = 0;
   setZValue(_currentZvalue);
   updateFlexibility();
@@ -480,6 +480,7 @@ BasicBox::getRightGripPoint()
     }
   catch (const std::exception & e) {
       std::cerr << "BasicBox::getRightGripPoint() : " << e.what();
+	  return QPointF();
     }
 }
 

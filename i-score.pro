@@ -1,17 +1,25 @@
 TEMPLATE = app
 TARGET = i-score
-CONFIG += x86_64
+CONFIG += x86_64 c++11
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
 
 QMAKE_CXXFLAGS += -O0 -fPIC -msse3
 
 # This variable specifies the #include directories which should be searched when compiling the project.
-INCLUDEPATH += headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2
+INCLUDEPATH += headers/GUI headers/data /usr/local/include/IScore /usr/include/libxml2 \
+		/home/doom/stage/soft/Jamoma/Core/Score/library/tests/ \
+		/home/doom/stage/soft/Jamoma/Core/Modular/library/PeerObject \
+		/home/doom/stage/soft/Jamoma/Core/Modular/library/ProtocolLib \
+		/home/doom/stage/soft/Jamoma/Core/Modular/library/SchedulerLib \
+		/home/doom/stage/soft/Jamoma/Core/DSP/library/includes \
+		/home/doom/stage/soft/Jamoma/Core/Modular/library/includes \
+		/home/doom/stage/soft/Jamoma/Core/Score/library/includes \
+		/home/doom/stage/soft/Jamoma/Core/Foundation/library/includes
 
 # This variable contains a general set of flags that are passed to the linker.
 QMAKE_LFLAGS += -L/usr/local/lib/
 
-QT += network xml svg
+QT += network xml svg printsupport
 
 # This variable specifies the directory where all intermediate objetcts and moc files should be placed.
 OBJECTS_DIR = bin
@@ -32,7 +40,7 @@ linux-g++ {
     # This variable specifies the C++ compiler that will be used when building projects containing C++ source code
     QMAKE_CXX = /usr/bin/g++
 
-    LIBS += -lIscore -lDeviceManager -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodescheduling -lgecodeset -lgecodesupport -lgecodegraph
+    LIBS += -lJamomaFoundation -lJamomaDSP -lJamomaScore -lJamomaModular -lIscore -lDeviceManager -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodescheduling -lgecodeset -lgecodesupport -lgecodegraph
 }
 
 linux-g++-64 {
@@ -40,7 +48,10 @@ QMAKE_CXX = /usr/bin/g++
 
     LIBS += -lIscore -lDeviceManager -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodescheduling -lgecodeset -lgecodesupport -lgecodegraph
 }
-
+linux-clang {
+    QMAKE_CXXFLAGS += -Wno-unused-parameter
+    LIBS += -lJamomaFoundation -lJamomaDSP -lJamomaScore -lJamomaModular  -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodeset -lgecodesupport
+}
 macx-g++ {
     QMAKE_CXX = /usr/bin/g++
     #QMAKE_CXXFLAGS += -std=c++11  #have to update g++ to v2.4
