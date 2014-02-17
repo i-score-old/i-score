@@ -2060,3 +2060,17 @@ Maquette::setCurveRecording(unsigned int boxID, const string address, bool activ
     else
         _recordingBoxes.removeAll(getBox(boxID));
 }
+
+std::string
+Maquette::getIP(std::string deviceName, std::string protocol){
+    std::string ip;
+    _engines->getDeviceStringParameter(deviceName,protocol,"ip",ip);
+    return ip;
+}
+
+unsigned int
+Maquette::getPort(std::string deviceName, std::string protocol){
+    unsigned int port;
+    _engines->getDeviceIntegerParameter(deviceName,protocol,"port",port);
+    return port;
+}

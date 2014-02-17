@@ -731,6 +731,9 @@ class Maquette : public QObject
     scene(){ return _scene; }
     static const unsigned int SIZE;
 
+    std::string getIP(std::string deviceName, std::string protocol);
+    unsigned int getPort(std::string deviceName,  std::string protocol);
+
   public slots:
     
     /*!
