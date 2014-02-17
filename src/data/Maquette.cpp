@@ -2065,7 +2065,7 @@ std::string
 Maquette::getIP(std::string deviceName, std::string protocol){
     std::string ip;
 
-    if(_engines->getDeviceStringParameter(deviceName,protocol,"ip",ip))
+    if(_engines->getDeviceStringParameter(deviceName,protocol,"ip",ip) == 0)
         return ip;
     else{
         std::cerr << "Maquette::getPort : cannot find port the device :"<<deviceName << std::endl;
@@ -2077,7 +2077,7 @@ unsigned int
 Maquette::getPort(std::string deviceName, std::string protocol){
     unsigned int port;
 
-    if(_engines->getDeviceIntegerParameter(deviceName,protocol,"port",port))
+    if(_engines->getDeviceIntegerParameter(deviceName,protocol,"port",port) == 0)
         return port;
     else{
         std::cerr << "Maquette::getPort : cannot find port the device :"<<deviceName << std::endl;
@@ -2089,10 +2089,10 @@ std::string
 Maquette::getProtocol(std::string deviceName){
     std::string protocol;
 
-    if (_engines->getDeviceProtocol(deviceName,protocol))
+    if (_engines->getDeviceProtocol(deviceName,protocol) == 0)
         return protocol;
     else{
-        std::cerr << "Maquette::getProtocol : cannot find protocol name for the device :"<<deviceName << std::endl;
+        std::cerr << "Maquette::getProtocol : cannot find protocol name for the device : "<<deviceName << std::endl;
         return NULL;
     }
 

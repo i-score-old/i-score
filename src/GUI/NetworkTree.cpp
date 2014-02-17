@@ -201,7 +201,7 @@ NetworkTree::load()
   QList<QTreeWidgetItem*> itemsList;
   QTreeWidgetItem *OSCRootNode;
 
-  for (nameIt = deviceNames.begin(); nameIt != deviceNames.end(); ++nameIt) {
+  for (nameIt = deviceNames.begin(); nameIt != deviceNames.end(); ++nameIt) {      
 
       QStringList deviceName;
 
@@ -224,6 +224,7 @@ NetworkTree::load()
 //          createOCSBranch(curItem);
         }
       else {
+
           curItem = new QTreeWidgetItem(deviceName, NodeNamespaceType);          
           try{
               treeRecursiveExploration(curItem, true);
