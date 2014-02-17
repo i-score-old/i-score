@@ -2400,6 +2400,25 @@ bool Engine::getDeviceStringParameter(const string device, const string protocol
     return 1;
 }
 
+bool
+Engine::getDeviceProtocol(std::string deviceName, std::string &protocol){
+    TTValue         v;
+    TTSymbol        applicationName(deviceName);
+    TTSymbol        protocolName;
+    TTObjectBasePtr anApplication = getApplication(applicationName);
+
+    // if the application exists
+    if (anApplication) {
+
+        // get the protocols of the application
+        v = getApplicationProtocols(applicationName);
+        protocolName = v[0]; // we register application to 1 protocol only
+        protocol = protocolName.c_str();
+        return 0;
+    }
+    return 1;
+}
+
 int Engine::requestNetworkNamespace(const std::string & address, std::string & nodeType, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)
 {
     TTAddress           anAddress = toTTAddress(address);

@@ -1036,6 +1036,15 @@ public:
      */
     bool getDeviceStringParameter(const std::string device, const std::string protocol, const std::string parameter, std::string &string);
 
+    /*!
+     * Gets the protocol name associated to the device.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param protocol : the protocol name returned. ex: Minuit
+     * \return 0 if no error, else 1.
+     */
+    bool getDeviceProtocol(std::string deviceName, std::string &protocol);
+
 	//Store and load ////////////////////////////////////////////////////////////////////////////////////
     
 	/*!

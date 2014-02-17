@@ -2064,13 +2064,36 @@ Maquette::setCurveRecording(unsigned int boxID, const string address, bool activ
 std::string
 Maquette::getIP(std::string deviceName, std::string protocol){
     std::string ip;
-    _engines->getDeviceStringParameter(deviceName,protocol,"ip",ip);
-    return ip;
+
+    if(_engines->getDeviceStringParameter(deviceName,protocol,"ip",ip))
+        return ip;
+    else{
+        std::cerr << "Maquette::getPort : cannot find port the device :"<<deviceName << std::endl;
+        return NULL;
+    }
 }
 
 unsigned int
 Maquette::getPort(std::string deviceName, std::string protocol){
     unsigned int port;
-    _engines->getDeviceIntegerParameter(deviceName,protocol,"port",port);
-    return port;
+
+    if(_engines->getDeviceIntegerParameter(deviceName,protocol,"port",port))
+        return port;
+    else{
+        std::cerr << "Maquette::getPort : cannot find port the device :"<<deviceName << std::endl;
+        return NULL;
+    }
+}
+
+std::string
+Maquette::getProtocol(std::string deviceName){
+    std::string protocol;
+
+    if (_engines->getDeviceProtocol(deviceName,protocol))
+        return protocol;
+    else{
+        std::cerr << "Maquette::getProtocol : cannot find protocol name for the device :"<<deviceName << std::endl;
+        return NULL;
+    }
+
 }
