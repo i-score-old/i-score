@@ -734,6 +734,7 @@ class Maquette : public QObject
     std::string getIP(std::string deviceName, std::string protocol);
     unsigned int getPort(std::string deviceName,  std::string protocol);
     std::string getProtocol(std::string deviceName);
+    std::vector<std::string> getProtocolsName();
 
   public slots:
     

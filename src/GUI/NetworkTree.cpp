@@ -378,6 +378,7 @@ NetworkTree::createItemFromMessage(QString message)
 
   QTreeWidgetItem *father = itemsFound.first();
 
+  //***************** change that, plutôt donner en paramètre un cas OSC ?
   map<string, MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
   map<string, MyDevice>::iterator it2 = devices.find(device.toStdString());
 
@@ -386,6 +387,7 @@ NetworkTree::createItemFromMessage(QString message)
       addOSCMessage(father, *(++it));
     }
   else {
+      //****************************************************************
       for (++it; it != splitMessage.end(); it++) {
           name << *it;
           QTreeWidgetItem *newItem = new QTreeWidgetItem(father, name, nodeType);
@@ -1579,7 +1581,7 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
         else if (currentItem()->type() == NodeNamespaceType) {
             if(currentColumn() == NAME_COLUMN){
                 QString deviceName = currentItem()->text(NAME_COLUMN);
-                _deviceEdit->exec();
+                _deviceEdit->edit(deviceName);
 //                _deviceEdit->edit(deviceName);
             }
         }

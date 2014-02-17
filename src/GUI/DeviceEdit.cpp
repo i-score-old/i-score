@@ -70,8 +70,12 @@ DeviceEdit::init()
   _IPBox = new QLineEdit;
   _nameEdit = new QLineEdit;
 
+  //-------- ComboBox ---------
   _pluginsComboBox = new QComboBox;
-  _pluginsComboBox->setEnabled(false);
+  std::vector<std::string> protocols = Maquette::getInstance()->getProtocolsName();
+  for (unsigned int i = 0; i < protocols.size(); i++)
+      _pluginsComboBox->addItem(QString::fromStdString(protocols[i]));
+
 
   _layout->addWidget(_deviceNameLabel, 0, 0, 1, 1);
   _layout->addWidget(_nameEdit, 0, 1, 1, 1);
@@ -101,40 +105,46 @@ DeviceEdit::init()
 void
 DeviceEdit::edit(QString name)
 {
-  std::map<string, MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
-  std::vector<std::string> plugins = Maquette::getInstance()->getPlugins();
-  std::map<string, MyDevice>::iterator it;
+  std::vector<std::string>              devicesName;
+  unsigned int                          networkPort;
+  std::string                           networkHost;
+  std::string                           protocol;
+  std::vector<std::string>              protocols = Maquette::getInstance()->getProtocolsName();
+  std::map<string, MyDevice>::iterator  it;
 
-  if ((it = devices.find(name.toStdString())) != devices.end()) {
-      _currentDevice = it->second;
-    }
-  else {
+  Maquette::getInstance()->getNetworkDeviceNames(devicesName);
+
+  if (std::find(devicesName.begin(), devicesName.end(), name.toStdString()) == devicesName.end()) {
       QMessageBox::warning(this, "", tr("Device not found"));
       return;
     }
 
-  _portOutputBox->setValue(_currentDevice.networkPort);
-  _IPBox->setText(QString::fromStdString(_currentDevice.networkHost));
+  protocol = Maquette::getInstance()->getProtocol(name.toStdString());
+  networkHost = Maquette::getInstance()->getIP(name.toStdString(),protocol);
+  networkPort = Maquette::getInstance()->getPort(name.toStdString(),protocol);
 
-  _nameEdit->setText(QString::fromStdString(_currentDevice.name));
+  _IPBox->setText(QString::fromStdString(networkHost));
+  _portOutputBox->setValue(networkPort);
+
+  _nameEdit->setText(QString::fromStdString(name.toStdString()));
   _nameEdit->selectAll();
 
-  /***************************   Plugins *****************************/
-  for (unsigned int i = 0; i < plugins.size(); i++) {
-      if (_pluginsComboBox->findText(QString::fromStdString(plugins[i])) == -1) {
-          _pluginsComboBox->addItem(QString::fromStdString(plugins[i]));
+  /***************************   Plugins   *****************************/
+  for (unsigned int i = 0; i < protocols.size(); i++) {
+      if (_pluginsComboBox->findText(QString::fromStdString(protocols[i])) == -1) {
+          _pluginsComboBox->addItem(QString::fromStdString(protocols[i]));
         }
     }
-  if (_pluginsComboBox->findText(QString::fromStdString(_currentDevice.plugin)) == -1) {
-      _pluginsComboBox->addItem(QString::fromStdString(_currentDevice.plugin));
+  if (_pluginsComboBox->findText(QString::fromStdString(protocol)) == -1) {
+      _pluginsComboBox->addItem(QString::fromStdString(protocol));
     }
 
   int found = -1;
-  if ((found = _pluginsComboBox->findText(QString::fromStdString(_currentDevice.plugin))) != -1) {
+  if ((found = _pluginsComboBox->findText(QString::fromStdString(protocol))) != -1) {
       _pluginsComboBox->setCurrentIndex(found);
     }
   else {
-      QMessageBox::warning(this, "", QString::fromStdString(_currentDevice.plugin) + tr(" plugin not found : default selected"));
+      QMessageBox::warning(this, "", QString::fromStdString(protocol) + tr(" protocol not found : default selected"));
       _pluginsComboBox->setCurrentIndex(0);
     }
 

@@ -2095,5 +2095,12 @@ Maquette::getProtocol(std::string deviceName){
         std::cerr << "Maquette::getProtocol : cannot find protocol name for the device : "<<deviceName << std::endl;
         return NULL;
     }
+}
+
+std::vector<std::string>
+Maquette::getProtocolsName(){
+    std::vector<std::string> protocols;
+    _engines->getProtocolNames(protocols);
+    return protocols;
 
 }
