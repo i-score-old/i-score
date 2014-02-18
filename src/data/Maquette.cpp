@@ -2112,7 +2112,6 @@ Maquette::getProtocolsName(){
     std::vector<std::string> protocols;
     _engines->getProtocolNames(protocols);
     return protocols;
-
 }
 
 bool

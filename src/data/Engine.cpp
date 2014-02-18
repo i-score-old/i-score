@@ -2426,7 +2426,32 @@ Engine::setDeviceName(string deviceName, string newName){
 
 bool
 Engine::setDevicePort(string deviceName, int port){
+    TTValue         v;
+    TTSymbol        applicationName(deviceName);
+    TTHashPtr       hashParameters;
+    TTErr           err;
+    std::string     protocol;
 
+    v = TTSymbol(applicationName);
+
+    if(getDeviceProtocol(deviceName,protocol) != 0)
+        return 1;
+
+    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
+
+    if (!err) {
+        hashParameters = TTHashPtr((TTPtr)v[0]);
+
+        // replace the Minuit parameters for the application
+        hashParameters->remove(TTSymbol("port"));
+        hashParameters->append(TTSymbol("port"), port);
+
+        v = TTSymbol(applicationName);
+        v.append((TTPtr)hashParameters);
+        getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
+    }
+
+    return 1;
 }
 
 bool
