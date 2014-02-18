@@ -2128,3 +2128,8 @@ bool
 Maquette::setDeviceLocalHost(std::string device, std::string localHost){
     return _engines->setDeviceLocalHost(device, localHost);
 }
+
+bool
+Maquette::setDeviceProtocol(std::string device, std::string protocol){
+    return _engines->setDeviceProtocol(device, protocol);
+}

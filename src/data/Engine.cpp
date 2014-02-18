@@ -2489,6 +2489,8 @@ Engine::setDevicePort(string deviceName, int port)
         v = TTSymbol(applicationName);
         v.append((TTPtr)hashParameters);
         getProtocol(TTSymbol(protocol))->setAttributeValue(TTSymbol("applicationParameters"), v);
+
+        return 0;
     }
 
     return 1;
@@ -2519,9 +2521,11 @@ Engine::setDeviceLocalHost(string deviceName, string localHost)
         v = TTSymbol(applicationName);
         v.append((TTPtr)hashParameters);
         getProtocol(TTSymbol(protocol))->setAttributeValue(TTSymbol("applicationParameters"), v);
+
+        return 0;
     }
 
-//    return 1;
+    return 1;
 }
 
 bool

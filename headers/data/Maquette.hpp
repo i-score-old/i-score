@@ -743,6 +743,7 @@ class Maquette : public QObject
     bool setDeviceName(std::string device, std::string newName);
     bool setDevicePort(std::string device, int port);
     bool setDeviceLocalHost(std::string device, std::string localHost);
+    bool setDeviceProtocol(std::string device, std::string protocol);
 
   public slots:
     

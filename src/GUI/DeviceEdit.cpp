@@ -92,8 +92,8 @@ DeviceEdit::init()
 
   connect(_nameEdit, SIGNAL(editingFinished()), this, SLOT(setDeviceNameChanged()));
   connect(_protocolsComboBox, SIGNAL(activated(int)), this, SLOT(setProtocolChanged()));
-  connect(_portOutputBox, SIGNAL(valueChanged(int)), this, SLOT(setChanged()));
-  connect(_localHostBox, SIGNAL(textChanged(const QString &)), this, SLOT(setChanged()));
+  connect(_portOutputBox, SIGNAL(valueChanged(int)), this, SLOT(setNetworkPortChanged()));
+  connect(_localHostBox, SIGNAL(textChanged(const QString &)), this, SLOT(setLocalHostChanged()));
 
   connect(_okButton, SIGNAL(clicked()), this, SLOT(updateNetworkConfiguration()));
   connect(_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
@@ -203,7 +203,8 @@ DeviceEdit::updateNetworkConfiguration()
           Maquette::getInstance()->setDevicePort(_currentDevice.toStdString(), _portOutputBox->value());
       }
       if (_protocolChanged) {
-          emit(deviceProtocolChanged(_protocolsComboBox->currentText()));
+          Maquette::getInstance()->setDeviceProtocol(_currentDevice.toStdString(), _protocolsComboBox->currentText().toStdString());
+//          emit(deviceProtocolChanged(_protocolsComboBox->currentText()));
       }
   }
 
