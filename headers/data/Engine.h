@@ -1045,6 +1045,42 @@ public:
      */
     bool getDeviceProtocol(std::string deviceName, std::string &protocol);
 
+    /*!
+     * Sets the device's name.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param newName : the newName. ex: MyMinuit
+     * \return 0 if no error, else 1.
+     */
+    bool setDeviceName(std::string deviceName, std::string newName);
+
+    /*!
+     * Sets the device's port.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param port : the port value. ex: 8002
+     * \return 0 if no error, else 1.
+     */
+    bool setDevicePort(std::string deviceName, int port);
+
+    /*!
+     * Sets the device's local host.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param port : the local host value. ex: 192.168.1.1
+     * \return 0 if no error, else 1.
+     */
+    bool setDeviceLocalHost(std::string deviceName, std::string localHost);
+
+    /*!
+     * Sets the device's protocol. (considering a device has only one)
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param port : the protocol name. ex: OSC
+     * \return 0 if no error, else 1.
+     */
+    bool setDeviceProtocol(std::string deviceName, std::string protocol);
+
 	//Store and load ////////////////////////////////////////////////////////////////////////////////////
     
 	/*!

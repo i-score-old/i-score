@@ -2117,18 +2117,15 @@ Maquette::getProtocolsName(){
 
 bool
 Maquette::setDeviceName(std::string device, std::string newName){
-//TODO
-    return true;
+    return _engines->setDeviceName(device, newName);
 }
 
 bool
 Maquette::setDevicePort(std::string device, int port){
-//TODO
-    return true;
+    return _engines->setDevicePort(device, port);
 }
 
 bool
 Maquette::setDeviceLocalHost(std::string device, std::string localHost){
-//TODO
-    return true;
+    return _engines->setDeviceLocalHost(device, localHost);
 }

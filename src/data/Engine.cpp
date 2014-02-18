@@ -2419,6 +2419,26 @@ Engine::getDeviceProtocol(std::string deviceName, std::string &protocol){
     return 1;
 }
 
+bool
+Engine::setDeviceName(string deviceName, string newName){
+
+}
+
+bool
+Engine::setDevicePort(string deviceName, int port){
+
+}
+
+bool
+Engine::setDeviceLocalHost(string deviceName, string localHost){
+
+}
+
+bool
+Engine::setDeviceProtocol(string deviceName, string protocol){
+
+}
+
 int Engine::requestNetworkNamespace(const std::string & address, std::string & nodeType, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)
 {
     TTAddress           anAddress = toTTAddress(address);
