@@ -2422,46 +2422,25 @@ Engine::getDeviceProtocol(std::string deviceName, std::string &protocol){
 bool
 Engine::setDeviceName(string deviceName, string newName)
 {
-    TTValue         v, ip, port;
-    std::string     protocol;
-    TTSymbol        applicationName(newName);
-    TTObjectBasePtr anApplication = NULL;
-    TTHashPtr          hashParameters;
-    TTErr           err;
+    string          protocol,
+                    localHost;
+    unsigned int    port;
 
-    // if the application doesn't already exist
-    if (!getApplication(applicationName)) {
+    //get protocol name
+    if(getDeviceProtocol(deviceName,protocol) != 0)
+        return 1;
 
-        //save parameters
-        err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
+    //get port
+    if(getDeviceIntegerParameter(deviceName,protocol,"port",port) != 0)
+        return 1;
+    QString portString = QString("%1").arg(port);
 
-        if (!err){
-            hashParameters = TTHashPtr((TTPtr)v[0]);
-            getDeviceProtocol(deviceName,protocol);
-            hashParameters->lookup(TTSymbol("ip"),ip);
-            hashParameters->lookup(TTSymbol("port"),port);
+    //get ip
+    if(getDeviceStringParameter(deviceName,protocol,"ip",localHost) != 0)
+        return 1;
 
-            // create the application
-            v = applicationName;
-            TTObjectBaseInstantiate(kTTSym_Application, TTObjectBaseHandle(&anApplication), v);
-
-            // register the application to the protocol
-            getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("registerApplication"), v, kTTValNONE);
-
-            // set plugin parameters (OSC or Minuit Plugin)
-            hashParameters->append(TTSymbol("ip"), ip);
-            hashParameters->append(TTSymbol("port"), port);
-
-            v.append(TTPtr(&hashParameters));
-            getProtocol(TTSymbol(protocol))->setAttributeValue(TTSymbol("applicationParameters"), v);
-
-            // run the protocol for this application
-            getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Run"), applicationName, kTTValNONE);
-
-            return 0;
-        }
-    }
-    return 1;
+    addNetworkDevice(newName,protocol,localHost,portString.toStdString());
+    removeNetworkDevice(deviceName);
 }
 
 bool
