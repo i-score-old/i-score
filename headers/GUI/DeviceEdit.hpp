@@ -29,38 +29,44 @@ class DeviceEdit : public QDialog
 
   public slots:
     void edit(QString name);
+    void edit();
     void setChanged();
-    void setPluginChanged();
+    void setProtocolChanged();
+    void setDeviceNameChanged();
+    void setNetworkPortChanged();
+    void setLocalHostChanged();
     void updateNetworkConfiguration();
-    void deviceNameChanged();
+
 
   signals:
     void deviceNameChanged(QString, QString);
-    void devicePluginChanged(QString);
+    void deviceProtocolChanged(QString);
 
   private:
     void init();
 
     bool _changed;
     bool _nameChanged;
-    bool _pluginChanged;
+    bool _protocolChanged;
+    bool _localHostChanged;
+    bool _networkPortChanged;
 
-    MyDevice _currentDevice;
+    QString _currentDevice;
 
     QGridLayout *_layout;
     QLabel *_deviceNameLabel;
     QLineEdit *_nameEdit;
 
     QLabel *_devicesLabel;       //!< QLabel for devices.
-    QLabel *_pluginsLabel;       //!< QLabel for plugins.
+    QLabel *_protocolsLabel;       //!< QLabel for protocols.
     QLabel *_portOutputLabel;          //!< QLabel for output ports.
     QLabel *_portInputLabel;          //!< QLabel for intput ports.
-    QLabel *_IPLabel;            //!< QLabel for network adress.
+    QLabel *_localHostLabel;            //!< QLabel for network adress.
 
-    QComboBox *_pluginsComboBox; //!< QComboBox handling various plug-ins available.
+    QComboBox *_protocolsComboBox; //!< QComboBox handling various plug-ins available.
     QSpinBox *_portOutputBox;          //!< QSpinBox managing output port value.
-    QSpinBox *_portInputBox;          //!< QSpinBox managing input port value.
-    QLineEdit *_IPBox;           //!< QLineEdit
+//    QSpinBox *_portInputBox;          //!< QSpinBox managing input port value.
+    QLineEdit *_localHostBox;           //!< QLineEdit
 
     QPushButton *_okButton;      //!< Button used to confirme.
     QPushButton *_cancelButton;  //!< Button used to cancel.

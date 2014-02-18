@@ -49,54 +49,51 @@ void
 DeviceEdit::init()
 {
   _changed = false;
-  _nameChanged = false;
+  _nameChanged = false;  
+  _protocolChanged = false;
+  _localHostChanged = false;
+  _networkPortChanged = false;
 
   _layout = new QGridLayout(this);
   setLayout(_layout);
 
   _deviceNameLabel = new QLabel(tr("DeviceName"));
-  _pluginsLabel = new QLabel(tr("Plugins"));
+  _protocolsLabel = new QLabel(tr("protocols"));
   _portOutputLabel = new QLabel(tr("Port (output)"));
-  _portInputLabel = new QLabel(tr("Port (input)"));
-  _IPLabel = new QLabel(tr("IP"));
+//  _portInputLabel = new QLabel(tr("Port (input)"));
+  _localHostLabel = new QLabel(tr("localHost"));
 
   _portOutputBox = new QSpinBox;
   _portOutputBox->setRange(0, 10000);
-  _portInputBox = new QSpinBox;
-  _portInputBox->setRange(0, 10000);
-  _portInputBox->setValue(7002);
-  _portInputBox->setEnabled(false);
+//  _portInputBox = new QSpinBox;
+//  _portInputBox->setRange(0, 10000);
+//  _portInputBox->setValue(7002);
+//  _portInputBox->setEnabled(false);
 
-  _IPBox = new QLineEdit;
+  _localHostBox = new QLineEdit;
   _nameEdit = new QLineEdit;
-
-  //-------- ComboBox ---------
-  _pluginsComboBox = new QComboBox;
-  std::vector<std::string> protocols = Maquette::getInstance()->getProtocolsName();
-  for (unsigned int i = 0; i < protocols.size(); i++)
-      _pluginsComboBox->addItem(QString::fromStdString(protocols[i]));
-
+  _protocolsComboBox = new QComboBox;
 
   _layout->addWidget(_deviceNameLabel, 0, 0, 1, 1);
   _layout->addWidget(_nameEdit, 0, 1, 1, 1);
-  _layout->addWidget(_pluginsLabel, 1, 0, 1, 1);
-  _layout->addWidget(_pluginsComboBox, 1, 1, 1, 1);
+  _layout->addWidget(_protocolsLabel, 1, 0, 1, 1);
+  _layout->addWidget(_protocolsComboBox, 1, 1, 1, 1);
   _layout->addWidget(_portOutputLabel, 2, 0, 1, 1);
   _layout->addWidget(_portOutputBox, 2, 1, 1, 1);
-  _layout->addWidget(_portInputLabel, 3, 0, 1, 1);
-  _layout->addWidget(_portInputBox, 3, 1, 1, 1);
-  _layout->addWidget(_IPLabel, 4, 0, 1, 1);
-  _layout->addWidget(_IPBox, 4, 1, 1, 1);
+//  _layout->addWidget(_portInputLabel, 3, 0, 1, 1);
+//  _layout->addWidget(_portInputBox, 3, 1, 1, 1);
+  _layout->addWidget(_localHostLabel, 4, 0, 1, 1);
+  _layout->addWidget(_localHostBox, 4, 1, 1, 1);
 
   _okButton = new QPushButton(tr("OK"), this);
   _layout->addWidget(_okButton, 4, 2, 1, 1);
   _cancelButton = new QPushButton(tr("Cancel"), this);
   _layout->addWidget(_cancelButton, 4, 3, 1, 1);
 
-  connect(_nameEdit, SIGNAL(editingFinished()), this, SLOT(deviceNameChanged()));
-  connect(_pluginsComboBox, SIGNAL(activated(int)), this, SLOT(setPluginChanged()));
+  connect(_nameEdit, SIGNAL(editingFinished()), this, SLOT(setDeviceNameChanged()));
+  connect(_protocolsComboBox, SIGNAL(activated(int)), this, SLOT(setProtocolChanged()));
   connect(_portOutputBox, SIGNAL(valueChanged(int)), this, SLOT(setChanged()));
-  connect(_IPBox, SIGNAL(textChanged(const QString &)), this, SLOT(setChanged()));
+  connect(_localHostBox, SIGNAL(textChanged(const QString &)), this, SLOT(setChanged()));
 
   connect(_okButton, SIGNAL(clicked()), this, SLOT(updateNetworkConfiguration()));
   connect(_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
@@ -110,53 +107,74 @@ DeviceEdit::edit(QString name)
   std::string                           networkHost;
   std::string                           protocol;
   std::vector<std::string>              protocols = Maquette::getInstance()->getProtocolsName();
-  std::map<string, MyDevice>::iterator  it;
 
+  // Check if device exists
   Maquette::getInstance()->getNetworkDeviceNames(devicesName);
-
   if (std::find(devicesName.begin(), devicesName.end(), name.toStdString()) == devicesName.end()) {
       QMessageBox::warning(this, "", tr("Device not found"));
       return;
     }
+  else
+      _currentDevice = name;
 
-  protocol = Maquette::getInstance()->getProtocol(name.toStdString());
-  networkHost = Maquette::getInstance()->getIP(name.toStdString(),protocol);
-  networkPort = Maquette::getInstance()->getPort(name.toStdString(),protocol);
+  // Get device's parameters
+  protocol = Maquette::getInstance()->getDeviceProtocol(name.toStdString());
+  networkHost = Maquette::getInstance()->getDeviceLocalHost(name.toStdString(),protocol);
+  networkPort = Maquette::getInstance()->getDevicePort(name.toStdString(),protocol);
 
-  _IPBox->setText(QString::fromStdString(networkHost));
+  // Set values
+  _localHostBox->setText(QString::fromStdString(networkHost));
   _portOutputBox->setValue(networkPort);
 
   _nameEdit->setText(QString::fromStdString(name.toStdString()));
   _nameEdit->selectAll();
 
-  /***************************   Plugins   *****************************/
+  // Protocols
   for (unsigned int i = 0; i < protocols.size(); i++) {
-      if (_pluginsComboBox->findText(QString::fromStdString(protocols[i])) == -1) {
-          _pluginsComboBox->addItem(QString::fromStdString(protocols[i]));
+      if (_protocolsComboBox->findText(QString::fromStdString(protocols[i])) == -1) {
+          _protocolsComboBox->addItem(QString::fromStdString(protocols[i]));
         }
     }
-  if (_pluginsComboBox->findText(QString::fromStdString(protocol)) == -1) {
-      _pluginsComboBox->addItem(QString::fromStdString(protocol));
+  if (_protocolsComboBox->findText(QString::fromStdString(protocol)) == -1) {
+      _protocolsComboBox->addItem(QString::fromStdString(protocol));
     }
 
   int found = -1;
-  if ((found = _pluginsComboBox->findText(QString::fromStdString(protocol))) != -1) {
-      _pluginsComboBox->setCurrentIndex(found);
+  if ((found = _protocolsComboBox->findText(QString::fromStdString(protocol))) != -1) {
+      _protocolsComboBox->setCurrentIndex(found);
     }
   else {
       QMessageBox::warning(this, "", QString::fromStdString(protocol) + tr(" protocol not found : default selected"));
-      _pluginsComboBox->setCurrentIndex(0);
+      _protocolsComboBox->setCurrentIndex(0);
     }
-
-  /*******************************************************************/
 
   exec();
 }
 
 void
-DeviceEdit::setPluginChanged()
+DeviceEdit::edit(){
+    //TODO new device
+
+}
+
+void
+DeviceEdit::setProtocolChanged()
 {
-  _pluginChanged = true;
+  _protocolChanged = true;
+  setChanged();
+}
+
+void
+DeviceEdit::setLocalHostChanged()
+{
+  _localHostChanged = true;
+  setChanged();
+}
+
+void
+DeviceEdit::setNetworkPortChanged()
+{
+  _networkPortChanged = true;
   setChanged();
 }
 
@@ -170,32 +188,36 @@ void
 DeviceEdit::updateNetworkConfiguration()
 {
   if (_changed) {
-      QHostAddress hostAddress(_IPBox->text());
-      if (!hostAddress.isNull()) {
-          Maquette::getInstance()->changeNetworkDevice(_nameEdit->text().toStdString(), _pluginsComboBox->currentText().toStdString(),
-                                                       _IPBox->text().toStdString(), _portOutputBox->text().toStdString());
-          if (_pluginChanged) {
-              emit(devicePluginChanged(_pluginsComboBox->currentText()));
-            }
-          if (_nameChanged) {
-              emit(deviceNameChanged(_nameEdit->text(), _pluginsComboBox->currentText()));
-            }
+//      QHostAddress hostAddress(_localHostBox->text());
+//      if (!hostAddress.isNull()) {
+//          Maquette::getInstance()->changeNetworkDevice(_nameEdit->text().toStdString(), _protocolsComboBox->currentText().toStdString(),
+//                                                       _localHostBox->text().toStdString(), _portOutputBox->text().toStdString());
+      if (_nameChanged) {
+//          emit(deviceNameChanged(_nameEdit->text(), _protocolsComboBox->currentText()));
+          Maquette::getInstance()->setDeviceName(_currentDevice.toStdString(), _nameEdit->text().toStdString());
+      }
+      if (_localHostChanged) {
+          Maquette::getInstance()->setDeviceLocalHost(_currentDevice.toStdString(), _localHostBox->text().toStdString());
+      }
+      if (_networkPortChanged) {
+          Maquette::getInstance()->setDevicePort(_currentDevice.toStdString(), _portOutputBox->value());
+      }
+      if (_protocolChanged) {
+          emit(deviceProtocolChanged(_protocolsComboBox->currentText()));
+      }
+  }
 
-          accept();
-        }
-      else {
-          QMessageBox::warning(this, "", tr("Unvalid IP address"));
-        }
-    }
-  else {
-      accept();
-    }
+  accept();
+
   _changed = false;
   _nameChanged = false;
+  _protocolChanged = false;
+  _localHostChanged = false;
+  _networkPortChanged = false;
 }
 
 void
-DeviceEdit::deviceNameChanged()
+DeviceEdit::setDeviceNameChanged()
 {
   _nameChanged = true;
   setChanged();

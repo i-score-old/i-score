@@ -2062,7 +2062,7 @@ Maquette::setCurveRecording(unsigned int boxID, const string address, bool activ
 }
 
 std::string
-Maquette::getIP(std::string deviceName, std::string protocol){
+Maquette::getDeviceLocalHost(std::string deviceName, std::string protocol){
     std::string ip;
 
     if(_engines->getDeviceStringParameter(deviceName,protocol,"ip",ip) == 0)
@@ -2073,8 +2073,13 @@ Maquette::getIP(std::string deviceName, std::string protocol){
     }
 }
 
+std::string
+Maquette::getDeviceLocalHost(std::string deviceName){
+    getDeviceLocalHost(deviceName,getDeviceProtocol(deviceName));
+}
+
 unsigned int
-Maquette::getPort(std::string deviceName, std::string protocol){
+Maquette::getDevicePort(std::string deviceName, std::string protocol){
     unsigned int port;
 
     if(_engines->getDeviceIntegerParameter(deviceName,protocol,"port",port) == 0)
@@ -2085,8 +2090,13 @@ Maquette::getPort(std::string deviceName, std::string protocol){
     }
 }
 
+unsigned int
+Maquette::getDevicePort(std::string deviceName){
+    getDevicePort(deviceName,getDeviceProtocol(deviceName));
+}
+
 std::string
-Maquette::getProtocol(std::string deviceName){
+Maquette::getDeviceProtocol(std::string deviceName){
     std::string protocol;
 
     if (_engines->getDeviceProtocol(deviceName,protocol) == 0)
@@ -2103,4 +2113,22 @@ Maquette::getProtocolsName(){
     _engines->getProtocolNames(protocols);
     return protocols;
 
+}
+
+bool
+Maquette::setDeviceName(std::string device, std::string newName){
+//TODO
+    return true;
+}
+
+bool
+Maquette::setDevicePort(std::string device, int port){
+//TODO
+    return true;
+}
+
+bool
+Maquette::setDeviceLocalHost(std::string device, std::string localHost){
+//TODO
+    return true;
 }

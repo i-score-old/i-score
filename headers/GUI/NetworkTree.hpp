@@ -529,7 +529,7 @@ class NetworkTree : public QTreeWidget
     void changeEndValue(QTreeWidgetItem* item, QString newValue);
     void changeNameValue(QTreeWidgetItem* item, QString newValue);
     void updateDeviceName(QString newName, QString plugin);
-    void updateDevicePlugin(QString newName);
+    void updateDeviceProtocol(QString newName);
     void setRecMode(std::string address);
     void setRecMode(QList<std::string> items);
 

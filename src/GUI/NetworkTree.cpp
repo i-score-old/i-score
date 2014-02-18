@@ -108,7 +108,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   connect(this, SIGNAL(startValueChanged(QTreeWidgetItem*, QString)), this, SLOT(changeStartValue(QTreeWidgetItem*, QString)));
   connect(this, SIGNAL(endValueChanged(QTreeWidgetItem*, QString)), this, SLOT(changeEndValue(QTreeWidgetItem*, QString)));
   connect(_deviceEdit, SIGNAL(deviceNameChanged(QString, QString)), this, SLOT(updateDeviceName(QString, QString)));
-  connect(_deviceEdit, SIGNAL(devicePluginChanged(QString)), this, SLOT(updateDevicePlugin(QString)));
+  connect(_deviceEdit, SIGNAL(deviceProtocolChanged(QString)), this, SLOT(updateDeviceProtocol(QString)));
 }
 
 NetworkTree::~NetworkTree(){
@@ -2111,15 +2111,15 @@ NetworkTree::updateDeviceName(QString newName, QString plugin)
 }
 
 void
-NetworkTree::updateDevicePlugin(QString newPlugin)
+NetworkTree::updateDeviceProtocol(QString newName)
 {
   QString deviceName = currentItem()->text(NAME_COLUMN);
   QTreeWidgetItem *item = currentItem();
-  if (newPlugin == "OSC") {
+  if (newName == "OSC") {
       item->takeChildren();
       createOCSBranch(item);
     }
-  else if (newPlugin == "Minuit") {
+  else if (newName == "Minuit") {
       item->takeChildren();
 
       //networkRequest

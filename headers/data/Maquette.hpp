@@ -731,10 +731,18 @@ class Maquette : public QObject
     scene(){ return _scene; }
     static const unsigned int SIZE;
 
-    std::string getIP(std::string deviceName, std::string protocol);
-    unsigned int getPort(std::string deviceName,  std::string protocol);
-    std::string getProtocol(std::string deviceName);
+    std::string getDeviceLocalHost(std::string deviceName, std::string protocol);
+    std::string getDeviceLocalHost(std::string deviceName);
+
+    unsigned int getDevicePort(std::string deviceName,  std::string protocol);
+    unsigned int getDevicePort(std::string deviceName);
+
+    std::string getDeviceProtocol(std::string deviceName);
     std::vector<std::string> getProtocolsName();
+
+    bool setDeviceName(std::string device, std::string newName);
+    bool setDevicePort(std::string device, int port);
+    bool setDeviceLocalHost(std::string device, std::string localHost);
 
   public slots:
     
