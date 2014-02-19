@@ -2401,7 +2401,8 @@ bool Engine::getDeviceStringParameter(const string device, const string protocol
 }
 
 bool
-Engine::getDeviceProtocol(std::string deviceName, std::string &protocol){
+Engine::getDeviceProtocol(std::string deviceName, std::string &protocol)
+{
     TTValue         v;
     TTSymbol        applicationName(deviceName);
     TTSymbol        protocolName;
@@ -2409,7 +2410,6 @@ Engine::getDeviceProtocol(std::string deviceName, std::string &protocol){
 
     // if the application exists
     if (anApplication) {
-
         // get the protocols of the application
         v = getApplicationProtocols(applicationName);
         protocolName = v[0]; // we register application to 1 protocol only
@@ -2441,6 +2441,8 @@ Engine::setDeviceName(string deviceName, string newName)
 
     addNetworkDevice(newName,protocol,localHost,portString.toStdString());
     removeNetworkDevice(deviceName);
+
+    return 0;
 }
 
 bool
@@ -2510,46 +2512,38 @@ Engine::setDeviceLocalHost(string deviceName, string localHost)
 bool
 Engine::setDeviceProtocol(string deviceName, string protocol)
 {
-    TTValue         v, ip, port;
-    std::string     oldProtocol;
-    TTSymbol        applicationName(deviceName);
-    TTObjectBasePtr anApplication = NULL;
-    TTHashPtr       hashParameters;
-    TTErr           err;
+
+    string          oldProtocol,
+                    localHost;
+    unsigned int    port;
 
     //save parameters
-    err = getProtocol(TTSymbol(oldProtocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
+    //get protocol name
+    if(getDeviceProtocol(deviceName,oldProtocol) != 0)
+        return 1;
 
-    if (!err){
-        hashParameters = TTHashPtr((TTPtr)v[0]);
-        hashParameters->lookup(TTSymbol("ip"),ip);
-        hashParameters->lookup(TTSymbol("port"),port);
+    //get port
+    if(getDeviceIntegerParameter(deviceName,oldProtocol,"port",port) != 0)
+        return 1;
+    QString portString = QString("%1").arg(port);
 
-        // create the application
-        v = applicationName;
-        TTObjectBaseInstantiate(kTTSym_Application, TTObjectBaseHandle(&anApplication), v);
+    //get ip
+    if(getDeviceStringParameter(deviceName,oldProtocol,"ip",localHost) != 0)
+        return 1;
 
-        // check if the protocol has been loaded
-        if (getProtocol(TTSymbol(protocol))) {
+    removeNetworkDevice(deviceName);
+    addNetworkDevice(deviceName,protocol,localHost,portString.toStdString());
 
-            // register the application to the protocol
-            v = applicationName;
-            getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("registerApplication"), v, kTTValNONE);
-
-            // set plugin parameters (OSC or Minuit Plugin)
-            hashParameters->append(TTSymbol("ip"), ip);
-            hashParameters->append(TTSymbol("port"), port);
-
-            v.append(TTPtr(&hashParameters));
-            getProtocol(TTSymbol(protocol))->setAttributeValue(TTSymbol("applicationParameters"), v);
-
-            // run the protocol for this application
-            getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Run"), applicationName, kTTValNONE);
-
-            return 0;
-        }
+    std::cout<<"-- new list --"<<std::endl;
+    vector<string> devices;
+    string protocolus;
+    getNetworkDevicesName(devices);
+    for(int i=0 ; i<devices.size() ; i++){
+        getDeviceProtocol(devices[i], protocolus);
+        std::cout<<"> "<<devices[i]<<" "<<protocolus<<std::endl;
     }
-    return 1;
+
+    return 0;
 }
 
 int Engine::requestNetworkNamespace(const std::string & address, std::string & nodeType, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)
