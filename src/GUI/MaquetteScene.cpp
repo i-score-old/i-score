@@ -199,14 +199,14 @@ MaquetteScene::getNetworkDevices()
 }
 
 void
-MaquetteScene::changeNetworkDevice(std::string deviceName, std::string pluginName, std::string IP, std::string port)
+MaquetteScene::changeNetworkDevice(std::string deviceName, std::string pluginName, std::string IP, unsigned int port)
 {
   _maquette->changeNetworkDevice(deviceName, pluginName, IP, port);
   setModified(true);
 }
 
 void
-MaquetteScene::setNetworDeviceConfig(string deviceName, string pluginName, string IP, string port)
+MaquetteScene::setNetworDeviceConfig(string deviceName, string pluginName, string IP, unsigned int port)
 {
   emit(networkConfigChanged(deviceName, pluginName, IP, port));
 }

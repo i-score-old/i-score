@@ -338,22 +338,13 @@ Maquette::refreshNetworkNamespace(const std::string &application){
 }
 
 void
-Maquette::changeNetworkDevice(const string &deviceName, const string &pluginName, const string &IP, const string &port)
+Maquette::changeNetworkDevice(const string &deviceName, const string &pluginName, const string &IP, const unsigned int &port)
 {
   if (_devices.find(deviceName) != _devices.end()) {
       removeNetworkDevice(deviceName);
     }
 
   addNetworkDevice(deviceName, pluginName, IP, port);
-
-  std::istringstream iss(port);
-  unsigned int portInt;
-  iss >> portInt;
-
-//    MyDevice newDevice(deviceName,pluginName,portInt,IP);
-//    _devices[deviceName] = newDevice;
-
-//    _engines->addNetworkDevice(deviceName,pluginName,IP,port);
   _currentDevice = deviceName;
 }
 
@@ -1842,13 +1833,9 @@ Maquette::load(const string &fileName)
 }
 
 void
-Maquette::addNetworkDevice(string deviceName, string plugin, string ip, string port)
+Maquette::addNetworkDevice(string deviceName, string plugin, string ip, unsigned int port)
 {
-  std::istringstream iss(port);
-  unsigned int portInt;
-  iss >> portInt;
-
-  MyDevice newDevice(deviceName, plugin, portInt, ip);
+  MyDevice newDevice(deviceName, plugin, port, ip);
   _devices[deviceName] = newDevice;
   _engines->addNetworkDevice(deviceName, plugin, ip, port);
 }

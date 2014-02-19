@@ -90,7 +90,7 @@ DeviceEdit::init()
   _cancelButton = new QPushButton(tr("Cancel"), this);
   _layout->addWidget(_cancelButton, 4, 3, 1, 1);
 
-  connect(_nameEdit, SIGNAL(editingFinished()), this, SLOT(setDeviceNameChanged()));
+  connect(_nameEdit, SIGNAL(textChanged(QString)), this, SLOT(setDeviceNameChanged()));
   connect(_protocolsComboBox, SIGNAL(activated(int)), this, SLOT(setProtocolChanged()));
   connect(_portOutputBox, SIGNAL(valueChanged(int)), this, SLOT(setNetworkPortChanged()));
   connect(_localHostBox, SIGNAL(textChanged(const QString &)), this, SLOT(setLocalHostChanged()));
@@ -121,13 +121,18 @@ DeviceEdit::edit(QString name)
   protocol = Maquette::getInstance()->getDeviceProtocol(name.toStdString());
   networkHost = Maquette::getInstance()->getDeviceLocalHost(name.toStdString(),protocol);
   networkPort = Maquette::getInstance()->getDevicePort(name.toStdString(),protocol);
+  std::cout<<"PORT "<<networkPort<<std::endl;
 
   // Set values
   _localHostBox->setText(QString::fromStdString(networkHost));
+  _localHostChanged = false;
+
   _portOutputBox->setValue(networkPort);
+  _networkPortChanged = false;
 
   _nameEdit->setText(QString::fromStdString(name.toStdString()));
   _nameEdit->selectAll();
+  _nameChanged = false;
 
   // Protocols
   for (unsigned int i = 0; i < protocols.size(); i++) {
@@ -147,6 +152,7 @@ DeviceEdit::edit(QString name)
       QMessageBox::warning(this, "", QString::fromStdString(protocol) + tr(" protocol not found : default selected"));
       _protocolsComboBox->setCurrentIndex(0);
     }
+  _protocolChanged = false;
 
   exec();
 }
@@ -188,13 +194,11 @@ void
 DeviceEdit::updateNetworkConfiguration()
 {
   if (_changed) {
-//      QHostAddress hostAddress(_localHostBox->text());
-//      if (!hostAddress.isNull()) {
-//          Maquette::getInstance()->changeNetworkDevice(_nameEdit->text().toStdString(), _protocolsComboBox->currentText().toStdString(),
-//                                                       _localHostBox->text().toStdString(), _portOutputBox->text().toStdString());
+
       if (_nameChanged) {
 //          emit(deviceNameChanged(_nameEdit->text(), _protocolsComboBox->currentText()));
           Maquette::getInstance()->setDeviceName(_currentDevice.toStdString(), _nameEdit->text().toStdString());
+          _currentDevice = _nameEdit->text();
       }
       if (_localHostChanged) {
           Maquette::getInstance()->setDeviceLocalHost(_currentDevice.toStdString(), _localHostBox->text().toStdString());

@@ -171,11 +171,11 @@ NetworkConfig::deviceSelected(int indexSelected)
 }
 
 void
-NetworkConfig::setNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, std::string port)
+NetworkConfig::setNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, unsigned int port)
 {
   Q_UNUSED(deviceName); Q_UNUSED(pluginName);
 
-  _devices["OSCDevice"].networkPort = atoi(port.c_str());
+  _devices["OSCDevice"].networkPort = port;
   _devices["OSCDevice"].networkHost = IP;
   updateNetworkConfiguration();
 }
@@ -187,7 +187,7 @@ NetworkConfig::updateNetworkConfiguration()
       QHostAddress hostAddress(_IPBox->text());
       if (!hostAddress.isNull()) {
           _scene->changeNetworkDevice(_devicesComboBox->currentText().toStdString(), _pluginsComboBox->currentText().toStdString(),
-                                      _IPBox->text().toStdString(), _portOutputBox->text().toStdString());
+                                      _IPBox->text().toStdString(), _portOutputBox->value());
           accept();
         }
       else {

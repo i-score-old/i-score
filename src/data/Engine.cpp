@@ -2040,7 +2040,7 @@ void Engine::trigger(ConditionedProcessId triggerId)
     timeEvent->sendMessage(kTTSym_Trigger);
 }
 
-void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const std::string & DevicePort)
+void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const unsigned int & DevicePort)
 {
     TTValue         v;
     TTSymbol        applicationName(deviceName);
@@ -2063,11 +2063,8 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
             getProtocol(protocolName)->sendMessage(TTSymbol("registerApplication"), v, kTTValNONE);
             
             // set plugin parameters (OSC or Minuit Plugin)
-            hashParameters.append(TTSymbol("ip"), TTSymbol(DeviceIp));
-            
-            v = TTSymbol(DevicePort);
-            v.fromString();
-            hashParameters.append(TTSymbol("port"), v);
+            hashParameters.append(TTSymbol("ip"), TTSymbol(DeviceIp));                        
+            hashParameters.append(TTSymbol("port"), DevicePort);
             
             v = applicationName;
             v.append(TTPtr(&hashParameters));
@@ -2075,6 +2072,15 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
             
             // run the protocol for this application
             getProtocol(protocolName)->sendMessage(TTSymbol("Run"), applicationName, kTTValNONE);
+
+            //DISPLAY
+            string ip;
+            getDeviceStringParameter(deviceName,pluginToUse,"ip",ip);
+            unsigned int port = 12;
+            getDeviceIntegerParameter(deviceName,pluginToUse,"port",port);
+
+            std::cout<<"ADD : "<<deviceName<<" "<<pluginToUse<<" "<<ip<<" "<<port<<std::endl;
+
         }
     }
 }
@@ -2422,6 +2428,7 @@ Engine::getDeviceProtocol(std::string deviceName, std::string &protocol)
 bool
 Engine::setDeviceName(string deviceName, string newName)
 {
+    std::cout<<"setName"<<std::endl;
     string          protocol,
                     localHost;
     unsigned int    port;
@@ -2433,15 +2440,13 @@ Engine::setDeviceName(string deviceName, string newName)
     //get port
     if(getDeviceIntegerParameter(deviceName,protocol,"port",port) != 0)
         return 1;
-    QString portString = QString("%1").arg(port);
 
     //get ip
     if(getDeviceStringParameter(deviceName,protocol,"ip",localHost) != 0)
         return 1;
 
-    addNetworkDevice(newName,protocol,localHost,portString.toStdString());
+    addNetworkDevice(newName,protocol,localHost,port);
     removeNetworkDevice(deviceName);
-
     return 0;
 }
 
@@ -2512,7 +2517,7 @@ Engine::setDeviceLocalHost(string deviceName, string localHost)
 bool
 Engine::setDeviceProtocol(string deviceName, string protocol)
 {
-
+    std::cout<<"setProtocol"<<std::endl;
     string          oldProtocol,
                     localHost;
     unsigned int    port;
@@ -2521,18 +2526,20 @@ Engine::setDeviceProtocol(string deviceName, string protocol)
     //get protocol name
     if(getDeviceProtocol(deviceName,oldProtocol) != 0)
         return 1;
-
+    std::cout<<"old protoc = "<<oldProtocol<<std::endl;
     //get port
     if(getDeviceIntegerParameter(deviceName,oldProtocol,"port",port) != 0)
         return 1;
-    QString portString = QString("%1").arg(port);
-
+    std::cout<<"ipOK "<<std::endl;
+std::cout<<"portOK "<<std::endl;
     //get ip
     if(getDeviceStringParameter(deviceName,oldProtocol,"ip",localHost) != 0)
         return 1;
 
+
+    std::cout<<"removin"<<std::endl;
     removeNetworkDevice(deviceName);
-    addNetworkDevice(deviceName,protocol,localHost,portString.toStdString());
+    addNetworkDevice(deviceName,protocol,localHost,port);
 
     std::cout<<"-- new list --"<<std::endl;
     vector<string> devices;

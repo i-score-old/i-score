@@ -129,7 +129,7 @@ MainWindow::MainWindow()
   setCurrentFile("");
   setAcceptDrops(false);
 
-  connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, std::string)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, std::string)));  
+  connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, unsigned int)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, unsigned int)));
   connect(_view->verticalScrollBar(), SIGNAL(valueChanged(int)), _scene, SLOT(verticalScroll(int)));  //TimeBar is painted on MaquetteScene, so a vertical scroll has to move the timeBar.
   connect(_scene, SIGNAL(stopPlaying()), _headerPanelWidget, SLOT(stop()));
   connect(_view, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
@@ -759,7 +759,7 @@ MainWindow::strippedName(const QString &fullFileName)
 }
 
 void
-MainWindow::changeNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, std::string port)
+MainWindow::changeNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, unsigned int port)
 {
   _networkConfig->setNetworkConfig(deviceName, pluginName, IP, port);
 }

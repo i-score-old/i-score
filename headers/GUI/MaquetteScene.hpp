@@ -362,8 +362,8 @@ class MaquetteScene : public QGraphicsScene
      * \param IP : the new IP for device
      * \param port : the new port for device
      */
-    void changeNetworkDevice(string deviceName, string pluginName, string IP, string port);
-    void setNetworDeviceConfig(string deviceName, string pluginName, string IP, string port);
+    void changeNetworkDevice(string deviceName, string pluginName, string IP, unsigned int port);
+    void setNetworDeviceConfig(string deviceName, string pluginName, string IP, unsigned int port);
 
     /*!
      * \brief Sends a specific message with current device.
@@ -623,7 +623,7 @@ class MaquetteScene : public QGraphicsScene
   signals:
     void stopPlaying();
     void accelerationValueChanged(double value);
-    void networkConfigChanged(std::string deviceName, std::string pluginName, std::string IP, std::string port);
+    void networkConfigChanged(std::string deviceName, std::string pluginName, std::string IP, unsigned int port);
     void playModeChanged();
 
   public slots:

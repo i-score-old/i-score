@@ -200,7 +200,7 @@ class Maquette : public QObject
      * \return the current network device used
      */
     std::string getNetworkDevice();
-    void addNetworkDevice(string deviceName, string plugin, string ip, string port);
+    void addNetworkDevice(string deviceName, string plugin, string ip, unsigned int port);
 
     /*!
      * \brief Gets a set of the available network devices.
@@ -238,7 +238,7 @@ class Maquette : public QObject
      * \param IP : the new IP to use
      * \param port : the new port to use
      */
-    void changeNetworkDevice(const std::string &deviceName, const std::string &pluginName, const std::string &IP, const std::string &port);
+    void changeNetworkDevice(const std::string &deviceName, const std::string &pluginName, const std::string &IP, const unsigned int &port);
 
     /*!
      * \brief Gets the set of devices and their respective requestability.
