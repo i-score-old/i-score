@@ -276,8 +276,8 @@ NetworkMessages::changeDevice(QString oldName, QString newName)
 void
 NetworkMessages::addMessageLong(QTreeWidgetItem *treeItem, const QString &device, const QString &message, const QString &value)
 {
-  Message msg = { device, message, value };
-  _messages.insert(treeItem, msg);
+    Message msg = { device, message, value };
+    _messages.insert(treeItem, msg);
 }
 
 void
@@ -303,7 +303,6 @@ NetworkMessages::setMessages(const QMap<QTreeWidgetItem *, Data> messagesList)
   QList<QTreeWidgetItem *> itemsList = messagesList.keys();
   QList<QTreeWidgetItem *>::iterator it;
   QTreeWidgetItem *item;
-
   unsigned int msgsCount = 0;
 
   for (it = itemsList.begin(); it != itemsList.end(); it++) {

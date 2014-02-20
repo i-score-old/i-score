@@ -28,7 +28,7 @@ struct Message {
    */
   QString device;   // MinuitDevice
   QString message;  // /gain/
-  QString value;   
+  QString value;
 };
 
 struct Data {
@@ -43,8 +43,6 @@ struct Data {
 
 /**!
  * \class NetworkMessages
- *
- * \brief Network messages editor, derived class from Qt's QObject.
  */
 class NetworkMessages : public QObject {
   Q_OBJECT
@@ -72,7 +70,7 @@ class NetworkMessages : public QObject {
      * \param device : the device to use
      * \param msg : the message to send
      */
-    void addMessageLong(QTreeWidgetItem *item, const QString &device, const QString &message, const QString &value);
+    void addMessageLong(QTreeWidgetItem *item, const QString &device, const QString &message, const QString &value );
     void addMessageSimple(QTreeWidgetItem *item, QString address);
     void changeMessage(QTreeWidgetItem *item, QString newName);
     void changeDevice(QString oldName, QString newName);
@@ -123,6 +121,7 @@ class NetworkMessages : public QObject {
     QMap<QTreeWidgetItem *, Message> getMessages();
 
     inline QList<QTreeWidgetItem *> getItems(){ return _messages.keys(); }
+    inline Message getMessage(QTreeWidgetItem *item){return _messages.value(item); }
     std::string computeMessage(const Message &msg);
     std::string computeMessageWithoutValue(const Message &msg);
     inline QList<Message> messages(){ return _messages.values(); }

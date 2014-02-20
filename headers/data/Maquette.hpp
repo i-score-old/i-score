@@ -367,7 +367,7 @@ class Maquette : public QObject
      *
      * \return if messages could be set
      */
-    bool setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages);
+    bool setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages, bool sort = true);
     NetworkMessages *startMessages(unsigned int boxID);
 
     /*!
@@ -378,8 +378,23 @@ class Maquette : public QObject
      *
      * \return if itemsSelected could be set
      */
-
     bool setSelectedItemsToSend(unsigned int boxID, QMap<QTreeWidgetItem*, Data> itemsSelected);
+
+    /*!
+     * \brief Calls the NetworkTree method getAbsoluteAddress.
+     */
+    QString getAbsoluteAddress(QTreeWidgetItem *item);
+
+    /*!
+     * \brief Sorts messages by priority than alphabetical.
+     *
+     * \param messages : message to sort
+     *
+     * \return if itemsSelected could be set
+     */
+    std::vector<std::string> sortByPriority(NetworkMessages *messages);
+    static int compareByPriority(const QPair<QTreeWidgetItem *, std::string> v1, const QPair<QTreeWidgetItem *, std::string> v2);
+
 
     /*!
      * \brief Sets the set of treeItems expanded.
@@ -440,7 +455,7 @@ class Maquette : public QObject
      *
      * \return if messages could be set
      */
-    bool setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages);
+    bool setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages, bool sort = true);
 
     /*!
      * \brief Sends a specific message with current device.
@@ -819,6 +834,16 @@ class Maquette : public QObject
      * \return True(1) or false(0) if the request failed or not.
      */
     int getObjectType(const std::string & address, std::string & nodeType);
+
+    /*!
+     * Gets the priority of an object.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param priority : will be filled with the priority.
+     *
+     * \return True(1) or false(0) if the request failed or not.
+     */
+    int getPriority(const std::string & address, unsigned int & priority);
 
     /*!
      * Gets the children nodes of an object.

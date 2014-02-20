@@ -170,9 +170,10 @@ public:
 
     Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
            void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
-           void(*transportDataValueCallback)(TTSymbol&, const TTValue&));
+           void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
+           std::string pathToTheJamomaFolder);
     
-    void initModular();
+    void initModular(const char* pathToTheJamomaFolder = NULL);
     void initScore();
     
     void dumpAddressBelow(TTNodePtr aNode);
@@ -912,12 +913,19 @@ public:
 	 */
 	void sendNetworkMessage(const std::string & stringToSend);
     
+    /*!
+	 * Fills the given vectors with all protocol names.
+	 *
+	 * \param allProtocolNames : will be filled with all protocol names.
+	 */
+    void getProtocolNames(std::vector<std::string>& allProtocolNames);
+    
 	/*!
 	 * Fills the given vectors with all network devices name.
 	 *
-	 * \param devicesName : will be filled with all network devices names.
+	 * \param allDeviceNames : will be filled with all network devices names.
 	 */
-	void getNetworkDevicesName(std::vector<std::string>& devicesName);
+	void getNetworkDevicesName(std::vector<std::string>& allDeviceNames);
     
     bool isNetworkDeviceRequestable(const std::string deviceName);
     
@@ -979,6 +987,16 @@ public:
     int requestObjectType(const std::string & address, std::string & nodeType);
 
     /*!
+     * Sends a request to get the type of an object.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param Priority : will be filled with the priority.
+     *
+     * \return True(1) or false(0) if the request failed or not.
+     */
+    int requestObjectPriority(const std::string & address, unsigned int & nodeType);
+
+    /*!
      * Sends a request to get the children nodes of an object.
      *
      * \param address : the object's address. ex : /deviceName/address1/address2/
@@ -995,6 +1013,28 @@ public:
      * \param address : the object's address
      */
     void refreshNetworkNamespace(const std::string& application, const std::string& address = "/");
+
+    /*!
+     * Gets an integer parameter associated to the protocol and the device.
+     *
+     * \param protocol : the protocol's name. ex : Minuit
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param parameter : the parameter asked. ex: port
+     * \param integer : the integer returned. ex: 8002
+     * \return 0 if no error, else 1.
+     */
+    bool getDeviceIntegerParameter(const std::string device, const std::string protocol, const std::string parameter, unsigned int &integer);
+
+    /*!
+     * Gets a string parameter associated to the protocol and the device.
+     *
+     * \param protocol : the protocol's name. ex : Minuit
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param parameter : the parameter asked. ex: ip
+     * \param string : the integer returned. ex: 192.168.1.1
+     * \return 0 if no error, else 1.
+     */
+    bool getDeviceStringParameter(const std::string device, const std::string protocol, const std::string parameter, std::string &string);
 
 	//Store and load ////////////////////////////////////////////////////////////////////////////////////
     

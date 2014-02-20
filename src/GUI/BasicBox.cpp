@@ -1306,7 +1306,7 @@ BasicBox::keyReleaseEvent(QKeyEvent *event)
 
 void
 BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
+{        
   QGraphicsItem::mousePressEvent(event);
 
   if (_startMenu != NULL) {
@@ -1356,7 +1356,7 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
           _scene->setResizeBox(_abstract->ID());
         }
 //      update();
-    }
+    }    
 }
 
 void
@@ -1805,102 +1805,94 @@ BasicBox::drawHoverShape(QPainter *painter)
 
 void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{                
-    painter->setClipRect(option->exposedRect);//To increase performance
+{
     Q_UNUSED(widget);
+    painter->setClipRect(option->exposedRect);//To increase performance
     bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
 
-  QPen penR(isSelected() ? _color : _colorUnselected, isSelected() ? 1.5 * LINE_WIDTH : LINE_WIDTH); 
+    //draw hover shape
+    if ((isSelected() || _hover) && !_playing)
+        drawHoverShape(painter);
 
-  //************* pour afficher la shape *************
-  QPen penG(Qt::blue);
-  penG.setWidth(4);
-  if (isSelected() || _hover) {
-      drawHoverShape(painter);
+    //draw duration text on hover
+    if(_hover && !_playing){
+        QFont textFont;
+        textFont.setPointSize(10.);
+        painter->setPen(QPen(Qt::black));
+        painter->setFont(textFont);
+        painter->drawText(QPoint(_boxRect.bottomRight().x() -38, _boxRect.bottomRight().y()-2), QString("%1").arg(duration()/1000.));
     }
 
-//    painter->drawRect(_leftEar);
-//    painter->drawRect(_rightEar);
-//    painter->drawRect(_startTriggerGrip);
-//    painter->drawRect(_endTriggerGrip);
-//    painter->drawRect(boundingRect());
-//    painter->drawRect(_boxRect);
-  //***************************************************/
+    //draw boxRect
+    QPen penR(isSelected() ? _color : _colorUnselected, isSelected() ? 1.5 * LINE_WIDTH : LINE_WIDTH);
+    painter->setPen(penR);
+    painter->setBrush(QBrush(Qt::white, Qt::NoBrush));
+    painter->drawRect(_boxRect);
 
-  //draw boxRect
-  painter->setPen(penR);
-  painter->setBrush(QBrush(Qt::white, Qt::NoBrush));
-  painter->drawRect(_boxRect);
+    //draw gradient (start/end)
+    drawMsgsIndicators(painter);
 
-  drawMsgsIndicators(painter);
-  drawInteractionGrips(painter);
-  drawTriggerGrips(painter);
+    //draw relations' grips
+    drawInteractionGrips(painter);
 
-  //duration text
-  if(_hover){
-      painter->save();
-      QFont textFont;
-      textFont.setPointSize(10.);
-      painter->setPen(QPen(Qt::black));
-      painter->setFont(textFont);
-      painter->drawText(QPoint(_boxRect.bottomRight().x() -38, _boxRect.bottomRight().y()-2), QString("%1").arg(duration()/1000.));
-      painter->restore();
-  }
+    //draw triggers' grips
+    drawTriggerGrips(painter);
 
-  _comboBoxProxy->setVisible(_abstract->height() > RESIZE_TOLERANCE + LINE_WIDTH);
-  _curveProxy->setVisible(_abstract->height() > RESIZE_TOLERANCE + LINE_WIDTH);
-
-  QBrush brush(Qt::lightGray, isSelected() ? Qt::SolidPattern : Qt::SolidPattern);
-  QPen pen(color(), isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
-  painter->setPen(pen);
-  painter->setBrush(brush);
-  painter->setRenderHint(QPainter::Antialiasing, true);
-
-  QRectF textRect = QRectF(mapFromScene(getTopLeft()).x(), mapFromScene(getTopLeft()).y(), width(), RESIZE_TOLERANCE - LINE_WIDTH);
-  QFont font;
-  font.setCapitalization(QFont::SmallCaps);
-  painter->setFont(font);
-  painter->translate(textRect.topLeft());
-
-  //rotate if small
-  if (_abstract->width() <= 3 * RESIZE_TOLERANCE) {
-      painter->translate(QPointF(RESIZE_TOLERANCE - LINE_WIDTH, 0));
-      painter->rotate(90);
-      textRect.setWidth(_abstract->height());
+    //curves' comboBox and widget
+    if (smallSize) {
+        _comboBoxProxy->setVisible(false);
+        _curveProxy->setVisible(false);
+    }
+    else{
+        _comboBoxProxy->setVisible(_abstract->height() > RESIZE_TOLERANCE + LINE_WIDTH);
+        _curveProxy->setVisible(_abstract->height() > RESIZE_TOLERANCE + LINE_WIDTH);
     }
 
-  //hide widgets if small size
-  if (smallSize) {
-      _comboBoxProxy->setVisible(false);
-      _curveProxy->setVisible(false);
+    //draw text rect
+    QBrush brush(Qt::lightGray, isSelected() ? Qt::SolidPattern : Qt::SolidPattern);
+    QPen pen(color(), isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
+    painter->setPen(pen);
+    painter->setBrush(brush);
+    painter->setRenderHint(QPainter::Antialiasing, true);
+
+    QRectF textRect = QRectF(mapFromScene(getTopLeft()).x(), mapFromScene(getTopLeft()).y(), width(), RESIZE_TOLERANCE - LINE_WIDTH);
+    QFont font;
+    font.setCapitalization(QFont::SmallCaps);
+    painter->setFont(font);
+    painter->translate(textRect.topLeft());
+
+    //rotate if small
+    if (_abstract->width() <= 3 * RESIZE_TOLERANCE) {
+        painter->translate(QPointF(RESIZE_TOLERANCE - LINE_WIDTH, 0));
+        painter->rotate(90);
+        textRect.setWidth(_abstract->height());
     }
 
-  //fill header
-  painter->fillRect(0, 0, textRect.width(), textRect.height(), isSelected() ? _color : _colorUnselected);
-  painter->save();
-  painter->setPen(QPen(Qt::black));
+    //fill header
+    painter->fillRect(0, 0, textRect.width(), textRect.height(), isSelected() ? _color : _colorUnselected);
+    painter->save();
+    painter->setPen(QPen(Qt::black));
 
-  //draw name
-  painter->drawText(QRectF(BOX_MARGIN, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
-  painter->restore();
+    //draw name
+    painter->drawText(QRectF(BOX_MARGIN, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
+    painter->restore();
 
-  //draw progress bar during execution
-  if (_playing) {
-      QPen pen = painter->pen();
-      pen.setColor(Qt::black);
-      pen.setWidth(3);
-      QBrush brush = painter->brush();
-      brush.setStyle(Qt::NoBrush);
-      painter->setPen(pen);
-      brush.setColor(Qt::blue);
-      painter->setBrush(brush);
-      const float progressPosX = _scene->getProgression(_abstract->ID()) * (_abstract->width());
-      painter->fillRect(0, _abstract->height() - RESIZE_TOLERANCE / 2., progressPosX, RESIZE_TOLERANCE / 2., Qt::darkGreen);
-
-      painter->drawLine(QPointF(progressPosX, RESIZE_TOLERANCE), QPointF(progressPosX, _abstract->height()));
+    //draw progress bar during execution
+    if (_playing) {
+        QPen pen = painter->pen();
+        pen.setColor(Qt::black);
+        pen.setWidth(3);
+        QBrush brush = painter->brush();
+        brush.setStyle(Qt::NoBrush);
+        painter->setPen(pen);
+        brush.setColor(Qt::blue);
+        painter->setBrush(brush);
+        const float progressPosX = _scene->getProgression(_abstract->ID()) * (_abstract->width());
+        painter->fillRect(0, _abstract->height() - RESIZE_TOLERANCE / 2., progressPosX, RESIZE_TOLERANCE / 2., Qt::darkGreen);
+        painter->drawLine(QPointF(progressPosX, RESIZE_TOLERANCE), QPointF(progressPosX, _abstract->height()));
     }
+    setOpacity(isSelected() ? 1 : 0.4);
 
-  setOpacity(isSelected() ? 1 : 0.4);
 }
 
 void

@@ -467,8 +467,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
   QGraphicsScene::mousePressEvent(mouseEvent);
   _clicked = true;
  
-  if (paused())
-      stopAndGoToCurrentTime();
+
 
   if (_tempBox) {
       removeItem(_tempBox);
@@ -539,7 +538,14 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
       case BOX_EDIT_MODE:
         break;
-    } 
+    }
+
+  if (paused())
+      stopOrPause();
+//      stopAndGoToCurrentTime();
+
+
+  /// \todo Remettre le stopAndGoToCurrentTime, mais cela ne doit pas renvoyer tout la cue. Modifier setTimeOffset pour ne pas envoyer de dump. NH
 }
 
 void

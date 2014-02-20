@@ -31,7 +31,8 @@ EngineCacheElement::~EngineCacheElement()
 
 Engine::Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
                void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
-               void(*transportDataValueCallback)(TTSymbol&, const TTValue&))
+               void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
+               std::string pathToTheJamomaFolder)
 {
     m_TimeEventStatusAttributeCallback = timeEventStatusAttributeCallback;
     m_TimeProcessSchedulerRunningAttributeCallback = timeProcessSchedulerRunningAttributeCallback;
@@ -43,11 +44,15 @@ Engine::Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, boo
     
     m_mainScenario = NULL;
     
-    initModular();
+    if (!pathToTheJamomaFolder.empty())
+        initModular(pathToTheJamomaFolder.c_str());
+    else
+        initModular();
+    
     initScore();
 }
 
-void Engine::initModular()
+void Engine::initModular(const char* pathToTheJamomaFolder)
 {
     TTErr           err;
     TTValue         args, v;
@@ -56,8 +61,8 @@ void Engine::initModular()
     TTString        configFile = "/usr/local/include/IScore/i-scoreConfiguration.xml";
     TTHashPtr       hashParameters;
     
-    // this initializes the Modular framework and loads protocol plugins (in /usr/local/jamoma/extensions folder)
-    TTModularInit();
+    // this initializes the Modular framework and loads protocol plugins
+    TTModularInit(pathToTheJamomaFolder);
     
     // create a local application named i-score
     TTModularCreateLocalApplication(applicationName, configFile);
@@ -2113,7 +2118,23 @@ void Engine::sendNetworkMessage(const std::string & stringToSend)
     m_sender->sendMessage(kTTSym_Send, data, out);
 }
 
-void Engine::getNetworkDevicesName(std::vector<std::string>& devicesName)
+void Engine::getProtocolNames(std::vector<std::string>& allProtocolNames)
+{
+    TTValue     protocolNames;
+    TTSymbol    name;
+    
+    // get all protocol names
+    TTModularApplications->getAttributeValue(TTSymbol("protocolNames"), protocolNames);
+    
+    for (TTUInt8 i = 0; i < protocolNames.size(); i++) {
+        
+        name = protocolNames[i];
+        
+        allProtocolNames.push_back(name.c_str());
+    }
+}
+
+void Engine::getNetworkDevicesName(std::vector<std::string>& allDeviceNames)
 {
     TTValue     applicationNames;
     TTSymbol    name;
@@ -2129,7 +2150,7 @@ void Engine::getNetworkDevicesName(std::vector<std::string>& devicesName)
         if (name == getLocalApplicationName)
             continue;
         
-        devicesName.push_back(name.c_str());
+        allDeviceNames.push_back(name.c_str());
     }
 }
 
@@ -2266,6 +2287,34 @@ Engine::requestObjectType(const std::string & address, std::string & nodeType){
 }
 
 int
+Engine::requestObjectPriority(const std::string &address, unsigned int &priority){
+    TTNodeDirectoryPtr  aDirectory;
+    TTAddress           anAddress = toTTAddress(address);
+    TTObjectBasePtr     anObject;
+    TTNodePtr           aNode;
+    TTValue             v;
+
+    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+
+    if (!aDirectory)
+        return 0;
+
+    if (!aDirectory->getTTNode(anAddress, &aNode)) {
+
+        anObject = aNode->getObject();
+
+        if (anObject) {
+
+            if (!anObject->getAttributeValue(kTTSym_priority, v))
+                priority = v[0];
+            else
+                return 1;
+        }
+    }
+    return 0;
+}
+
+int
 Engine::requestObjectChildren(const std::string & address, vector<string>& children)
 {
     TTNodeDirectoryPtr  aDirectory;
@@ -2305,6 +2354,50 @@ void Engine::refreshNetworkNamespace(const string &application, const string &ad
 {
     getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryClear"));
     getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryBuild"));
+}
+
+bool Engine::getDeviceIntegerParameter(const string device, const string protocol, const string parameter, unsigned int &integer){
+    TTSymbol        applicationName;
+    TTErr           err;
+    TTValue         p, v;
+    TTHashPtr       hashParameters;
+
+    applicationName = TTSymbol(device);
+
+    // get parameter's table
+    v = TTSymbol(applicationName);
+    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
+
+    if (!err) {
+        hashParameters = TTHashPtr((TTPtr)v[0]);
+        hashParameters->lookup(TTSymbol(parameter),p);
+        integer = TTUInt32(p[0]);
+        return 0;
+    }
+    return 1;
+}
+
+bool Engine::getDeviceStringParameter(const string device, const string protocol, const string parameter, string &string){
+
+    TTSymbol        applicationName, s;
+    TTErr           err;
+    TTValue         p, v;
+    TTHashPtr       hashParameters;
+
+    applicationName = TTSymbol(device);
+
+    // get parameter's table
+    v = TTSymbol(applicationName);
+    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
+
+    if (!err) {
+        hashParameters = TTHashPtr((TTPtr)v[0]);
+        hashParameters->lookup(TTSymbol(parameter),p);
+        s = p[0];
+        string = s.c_str();
+        return 0;
+    }
+    return 1;
 }
 
 int Engine::requestNetworkNamespace(const std::string & address, std::string & nodeType, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)
