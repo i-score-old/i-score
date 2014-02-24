@@ -118,9 +118,11 @@ DeviceEdit::edit(QString name)
       _currentDevice = name;
 
   // Get device's parameters
-  protocol = Maquette::getInstance()->getDeviceProtocol(name.toStdString());
-  networkHost = Maquette::getInstance()->getDeviceLocalHost(name.toStdString(),protocol);
-  networkPort = Maquette::getInstance()->getDevicePort(name.toStdString(),protocol);
+  protocol = Maquette::getInstance()->getDeviceProtocol(_currentDevice.toStdString());
+  std::cout<<"newProtoc "<<protocol<<std::endl;
+  networkHost = Maquette::getInstance()->getDeviceLocalHost(_currentDevice.toStdString(),protocol);
+  std::cout<<"newNetworkHost "<<networkHost<<std::endl;
+  networkPort = Maquette::getInstance()->getDevicePort(_currentDevice.toStdString(),protocol);
   std::cout<<"PORT "<<networkPort<<std::endl;
 
   // Set values
