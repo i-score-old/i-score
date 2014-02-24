@@ -1533,16 +1533,17 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
 {
     QTreeWidget::mousePressEvent(event);
     if(event->button()==Qt::RightButton){
-        if(currentItem()->type() == NodeNamespaceType){            
+        if(currentItem()!=NULL){
+            if(currentItem()->type() == NodeNamespaceType){
+                QMenu *contextMenu = new QMenu(this);
+                QAction *refreshAct = new QAction(tr("Refresh"),this);
+                contextMenu->addAction(refreshAct);
+                connect(refreshAct, SIGNAL(triggered()), this, SLOT(refreshCurrentItemNamespace()));
+                contextMenu->exec(event->globalPos());
 
-            QMenu *contextMenu = new QMenu(this);
-            QAction *refreshAct = new QAction(tr("Refresh"),this);
-            contextMenu->addAction(refreshAct);
-            connect(refreshAct, SIGNAL(triggered()), this, SLOT(refreshCurrentItemNamespace()));
-            contextMenu->exec(event->globalPos());
-
-            delete refreshAct;
-            delete contextMenu;
+                delete refreshAct;
+                delete contextMenu;
+            }
         }
     }
 }
