@@ -107,7 +107,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   connect(this, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(valueChanged(QTreeWidgetItem*, int)));
   connect(this, SIGNAL(startValueChanged(QTreeWidgetItem*, QString)), this, SLOT(changeStartValue(QTreeWidgetItem*, QString)));
   connect(this, SIGNAL(endValueChanged(QTreeWidgetItem*, QString)), this, SLOT(changeEndValue(QTreeWidgetItem*, QString)));
-  connect(_deviceEdit, SIGNAL(deviceNameChanged(QString, QString)), this, SLOT(updateDeviceName(QString, QString)));
+  connect(_deviceEdit, SIGNAL(deviceNameChanged(QString,QString)), this, SLOT(updateDeviceName(QString, QString)));
   connect(_deviceEdit, SIGNAL(deviceProtocolChanged(QString)), this, SLOT(updateDeviceProtocol(QString)));
 }
 
@@ -2096,18 +2096,15 @@ NetworkTree::updateOSCAddresses()
 }
 
 void
-NetworkTree::updateDeviceName(QString newName, QString plugin)
+NetworkTree::updateDeviceName(QString oldName, QString newName)
 {
-  QString oldName = currentItem()->text(NAME_COLUMN);
-
-  currentItem()->setText(NAME_COLUMN, newName);
-
-  //OSC
-  if (plugin == "OSC") {
-      updateOSCAddresses();
+//    findItems()
+    if(currentItem()->text(NAME_COLUMN)==oldName)
+        currentItem()->setText(NAME_COLUMN, newName);
+    else{//have to find in networkTree the device item
+        QList<QTreeWidgetItem *> items = findItems(oldName,Qt::MatchExactly,NAME_COLUMN);
+//        for(int i=0 ; i<items.size() ; i++)
     }
-
-  emit(deviceChanged(oldName, newName));
 }
 
 void
