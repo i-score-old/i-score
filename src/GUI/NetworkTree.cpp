@@ -111,7 +111,8 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   connect(_deviceEdit, SIGNAL(deviceNameChanged(QString,QString)), this, SLOT(updateDeviceName(QString, QString)));
   connect(_deviceEdit, SIGNAL(deviceProtocolChanged(QString)), this, SLOT(updateDeviceProtocol(QString)));
 
-  addTopLevelItem(addDeviceItem());
+  _addADeviceItem = addADeviceNode();
+  addTopLevelItem(_addADeviceItem);
 }
 
 NetworkTree::~NetworkTree(){
@@ -216,7 +217,7 @@ NetworkTree::load()
       std::cout<<*nameIt;
       if (!isRequestable) {
           //OSCDevice
-          curItem = new QTreeWidgetItem(deviceName, NodeNamespaceType);
+          curItem = new QTreeWidgetItem(deviceName, DeviceNode);
           try{
               treeRecursiveExploration(curItem, true);
             }catch (const std::exception & e) {
@@ -228,7 +229,7 @@ NetworkTree::load()
         }
       else {
 
-          curItem = new QTreeWidgetItem(deviceName, NodeNamespaceType);          
+          curItem = new QTreeWidgetItem(deviceName, DeviceNode);
           try{
               treeRecursiveExploration(curItem, true);
             }catch (const std::exception & e) {
@@ -366,7 +367,7 @@ NetworkTree::createItemFromMessage(QString message)
   QStringList::iterator it = splitMessage.begin();
   QString device = *it;
 
-  int nodeType = NodeNamespaceType;
+  int nodeType = DeviceNode;
   itemsFound = findItems(device, Qt::MatchRecursive);
   if (!itemsFound.isEmpty()) {
       if (itemsFound.size() > 1) {
@@ -505,12 +506,22 @@ NetworkTree::createOCSBranch(QTreeWidgetItem *curItem)
 }
 
 QTreeWidgetItem *
-NetworkTree::addDeviceItem()
+NetworkTree::addADeviceNode()
 {
-  QTreeWidgetItem *addDeviceItem = new QTreeWidgetItem(QStringList(ADD_A_DEVICE_TEXT), addDeviceNode);
-  addDeviceItem->setFlags(Qt::ItemIsEnabled);
-  addDeviceItem->setIcon(0, QIcon(":/images/addANode.png"));
-  return addDeviceItem;
+  QTreeWidgetItem *addADeviceNode = new QTreeWidgetItem(QStringList(ADD_A_DEVICE_TEXT), addDeviceNode);
+  addADeviceNode->setFlags(Qt::ItemIsEnabled);
+  addADeviceNode->setIcon(0, QIcon(":/images/addANode.png"));
+  return addADeviceNode;
+}
+
+QTreeWidgetItem *
+NetworkTree::addDeviceItem(QString name)
+{
+    QTreeWidgetItem *newItem = new QTreeWidgetItem(DeviceNode);
+    newItem->setText(NAME_COLUMN,name);
+    insertTopLevelItem(topLevelItemCount()-1, newItem);
+
+    return newItem;
 }
 
 QString
@@ -565,7 +576,7 @@ NetworkTree::treeSnapshot(unsigned int boxID)
       QTreeWidgetItem *curItem;
       for (it = selection.begin(); it != selection.end(); ++it) {
           curItem = *it;
-          if (curItem->type() != NodeNamespaceType && curItem->type() != NodeNoNamespaceType){
+          if (curItem->type() != DeviceNode && curItem->type() != NodeNoNamespaceType){
               QString address = getAbsoluteAddress(*it);
 
               //get device concerned
@@ -1328,14 +1339,16 @@ NetworkTree::resetAssignedNodes()
 }
 
 void
-NetworkTree::refreshCurrentItemNamespace(){
-    if(currentItem() != NULL){
-        string application = getAbsoluteAddress(currentItem()).toStdString();
+NetworkTree::refreshItemNamespace(QTreeWidgetItem *item){
+    if(item != NULL){
+        if(item->type()==DeviceNode){
 
-        currentItem()->takeChildren();
-        Maquette::getInstance()->refreshNetworkNamespace(application);
-        treeRecursiveExploration(currentItem(),true);
-        Maquette::getInstance()->updateBoxesAttributes();
+            string application = getAbsoluteAddress(item).toStdString();
+            item->takeChildren();
+            Maquette::getInstance()->refreshNetworkNamespace(application);
+            treeRecursiveExploration(item,true);
+            Maquette::getInstance()->updateBoxesAttributes();
+        }
     }
 }
 
@@ -1546,11 +1559,11 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
     QTreeWidget::mousePressEvent(event);
     if(currentItem()!=NULL){
         if(event->button()==Qt::RightButton){
-            if(currentItem()->type() == NodeNamespaceType){
+            if(currentItem()->type() == DeviceNode){
                 QMenu *contextMenu = new QMenu(this);
                 QAction *refreshAct = new QAction(tr("Refresh"),this);
                 contextMenu->addAction(refreshAct);
-                connect(refreshAct, SIGNAL(triggered()), this, SLOT(refreshCurrentItemNamespace()));
+                connect(refreshAct, SIGNAL(triggered()), this, SLOT(refreshItemNamespace(currentItem())));
                 contextMenu->exec(event->globalPos());
 
                 delete refreshAct;
@@ -1597,11 +1610,10 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
         else if (currentItem()->type() == addOSCNode) {
             ;
         }
-        else if (currentItem()->type() == NodeNamespaceType) {
+        else if (currentItem()->type() == DeviceNode) {
             if(currentColumn() == NAME_COLUMN){
                 QString deviceName = currentItem()->text(NAME_COLUMN);
                 _deviceEdit->edit(deviceName);
-//                _deviceEdit->edit(deviceName);
             }
         }
         else {
@@ -2117,12 +2129,37 @@ NetworkTree::updateOSCAddresses()
 void
 NetworkTree::updateDeviceName(QString oldName, QString newName)
 {
-//    findItems()
-    if(currentItem()->text(NAME_COLUMN)==oldName)
-        currentItem()->setText(NAME_COLUMN, newName);
-    else{//have to find in networkTree the device item
+    if(currentItem()!=NULL){
+
+        if(currentItem()->text(NAME_COLUMN) == oldName){
+            currentItem()->setText(NAME_COLUMN, newName);
+            return;
+        }
+
+        if(currentItem()->type() == addDeviceNode){
+            QTreeWidgetItem *newItem = addDeviceItem(newName);
+//            refreshItemNamespace(newItem);
+            return;
+        }
+    }
+
+    else{
+        //have to find in networkTree the device item
         QList<QTreeWidgetItem *> items = findItems(oldName,Qt::MatchExactly,NAME_COLUMN);
-//        for(int i=0 ; i<items.size() ; i++)
+
+        if(items.isEmpty()){ //no item found, create a new device item
+            QTreeWidgetItem *newItem = addDeviceItem(newName);
+            refreshItemNamespace(newItem);
+            return;
+        }
+        else{
+            for(int i=0 ; i<items.size() ; i++){
+                if(items[i]->type() == DeviceNode){ //first deviceType found is set
+                    items[i]->setText(NAME_COLUMN, newName);
+                    return;
+                }
+            }
+        }
     }
 }
 
