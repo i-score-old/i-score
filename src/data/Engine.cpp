@@ -2046,7 +2046,8 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
     TTSymbol        applicationName(deviceName);
     TTSymbol        protocolName(pluginToUse);
     TTObjectBasePtr anApplication = NULL;
-    TTHash          hashParameters;
+    TTHashPtr       hashParameters;
+    TTErr           err;
     
     // if the application doesn't already exist
     if (!getApplication(applicationName)) {
@@ -2065,13 +2066,23 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
             v = applicationName;
             getProtocol(protocolName)->sendMessage(TTSymbol("registerApplication"), v, none);
             
-            // set plugin parameters (OSC or Minuit Plugin)
-            hashParameters.append(TTSymbol("ip"), TTSymbol(DeviceIp));                        
-            hashParameters.append(TTSymbol("port"), DevicePort);
+            err = getProtocol(protocolName)->getAttributeValue(TTSymbol("applicationParameters"), v);
             
-            v = applicationName;
-            v.append(TTPtr(&hashParameters));
-            getProtocol(protocolName)->setAttributeValue(TTSymbol("applicationParameters"), v);
+            if (!err) {
+                
+                hashParameters = TTHashPtr((TTPtr)v[0]);
+            
+                // set plugin parameters (OSC or Minuit Plugin)
+                hashParameters->remove(TTSymbol("ip"));
+                hashParameters->append(TTSymbol("ip"), TTSymbol(DeviceIp));
+                
+                hashParameters->remove(TTSymbol("port"));
+                hashParameters->append(TTSymbol("port"), DevicePort);
+            
+                v = applicationName;
+                v.append(TTPtr(hashParameters));
+                getProtocol(protocolName)->setAttributeValue(TTSymbol("applicationParameters"), v);
+            }
             
             // run the protocol for this application
             getProtocol(protocolName)->sendMessage(TTSymbol("Run"));
@@ -2090,7 +2101,7 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
 
 void Engine::removeNetworkDevice(const std::string & deviceName)
 {
-    TTValue         v;
+    TTValue         v, none;
     TTSymbol        applicationName(deviceName);
     TTSymbol        protocolName;
     TTObjectBasePtr anApplication = getApplication(applicationName);
@@ -2103,11 +2114,10 @@ void Engine::removeNetworkDevice(const std::string & deviceName)
         protocolName = v[0]; // we register application to 1 protocol only
         
         // stop the protocol for this application
-        getProtocol(protocolName)->sendMessage(TTSymbol("Stop"), applicationName, kTTValNONE);
+        getProtocol(protocolName)->sendMessage(TTSymbol("Stop"));
         
         // unregister the application to the protocol
-        v = TTValue(applicationName);
-        getProtocol(protocolName)->sendMessage(TTSymbol("unregisterApplication"), v, kTTValNONE);
+        getProtocol(protocolName)->sendMessage(TTSymbol("unregisterApplication"), applicationName, none);
         
         // delete the application
         TTObjectBaseRelease(TTObjectBaseHandle(&anApplication));
