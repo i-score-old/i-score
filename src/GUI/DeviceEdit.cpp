@@ -118,16 +118,21 @@ DeviceEdit::edit(QString name)
       _currentDevice = name;
 
   // Get device's parameters
-  //TODO gestion des erreurs
-  if(!Maquette::getInstance()->getDeviceProtocol(_currentDevice.toStdString(), protocol))
-     /// \todo
+  if(Maquette::getInstance()->getDeviceProtocol(_currentDevice.toStdString(), protocol) != 0){
+      QMessageBox::warning(this, "", tr("Protocol not found"));
+      return;
+  }
 
-  if(!Maquette::getInstance()->getDeviceLocalHost(_currentDevice.toStdString(),protocol,networkHost))
-      /// \todo
+  if((Maquette::getInstance()->getDeviceLocalHost(_currentDevice.toStdString(),protocol,networkHost)) != 0){
+      QMessageBox::warning(this, "", tr("IP not found"));
+      return;
+  }
   std::cout<<"newNetworkHost "<<networkHost<<std::endl;
 
-  if(!Maquette::getInstance()->getDevicePort(_currentDevice.toStdString(),protocol,networkPort))
-      /// \todo
+  if((Maquette::getInstance()->getDevicePort(_currentDevice.toStdString(),protocol,networkPort)) != 0){
+      QMessageBox::warning(this, "", tr("Port not found"));
+      return;
+  }
   std::cout<<"PORT "<<networkPort<<std::endl;
 
   // Set values
@@ -203,7 +208,7 @@ DeviceEdit::updateNetworkConfiguration()
   if (_changed) {
 
       if (_nameChanged) {
-//          emit(deviceNameChanged(_nameEdit->text(), _protocolsComboBox->currentText()));
+          emit(deviceNameChanged(_currentDevice, _nameEdit->text()));
           Maquette::getInstance()->setDeviceName(_currentDevice.toStdString(), _nameEdit->text().toStdString());
           _currentDevice = _nameEdit->text();
       }
