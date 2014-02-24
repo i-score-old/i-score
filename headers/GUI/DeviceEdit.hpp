@@ -51,6 +51,12 @@ class DeviceEdit : public QDialog
     bool _localHostChanged;
     bool _networkPortChanged;
 
+    QString defaultName = "MyDevice";
+    QString defaultLocalHost = "192.168.0.1";
+    unsigned int defaultPort = 9998;
+    int defaultProtocolIndex = 0;
+
+
     QString _currentDevice;
 
     QGridLayout *_layout;

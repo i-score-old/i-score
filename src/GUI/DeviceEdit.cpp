@@ -74,6 +74,14 @@ DeviceEdit::init()
   _nameEdit = new QLineEdit;
   _protocolsComboBox = new QComboBox;
 
+  // Protocols
+  std::vector<std::string> protocols = Maquette::getInstance()->getProtocolsName();
+  for (unsigned int i = 0; i < protocols.size(); i++) {
+      if (_protocolsComboBox->findText(QString::fromStdString(protocols[i])) == -1) {
+          _protocolsComboBox->addItem(QString::fromStdString(protocols[i]));
+        }
+  }
+
   _layout->addWidget(_deviceNameLabel, 0, 0, 1, 1);
   _layout->addWidget(_nameEdit, 0, 1, 1, 1);
   _layout->addWidget(_protocolsLabel, 1, 0, 1, 1);
@@ -106,7 +114,6 @@ DeviceEdit::edit(QString name)
   unsigned int                          networkPort;
   std::string                           networkHost;
   std::string                           protocol;
-  std::vector<std::string>              protocols = Maquette::getInstance()->getProtocolsName();
 
   // Check if device exists
   Maquette::getInstance()->getNetworkDeviceNames(devicesName);
@@ -143,17 +150,7 @@ DeviceEdit::edit(QString name)
 
   _nameEdit->setText(QString::fromStdString(name.toStdString()));
   _nameEdit->selectAll();
-  _nameChanged = false;
-
-  // Protocols
-  for (unsigned int i = 0; i < protocols.size(); i++) {
-      if (_protocolsComboBox->findText(QString::fromStdString(protocols[i])) == -1) {
-          _protocolsComboBox->addItem(QString::fromStdString(protocols[i]));
-        }
-    }
-  if (_protocolsComboBox->findText(QString::fromStdString(protocol)) == -1) {
-      _protocolsComboBox->addItem(QString::fromStdString(protocol));
-    }
+  _nameChanged = false; 
 
   int found = -1;
   if ((found = _protocolsComboBox->findText(QString::fromStdString(protocol))) != -1) {
@@ -169,9 +166,15 @@ DeviceEdit::edit(QString name)
 }
 
 void
-DeviceEdit::edit(){
-    //TODO new device
+DeviceEdit::edit()
+{
+    _nameEdit->setText(defaultName);
+    _nameEdit->selectAll();
+    _localHostBox->setText(defaultLocalHost);
+    _portOutputBox->setValue(defaultPort);
+    _protocolsComboBox->setCurrentIndex(defaultProtocolIndex);
 
+    exec();
 }
 
 void
