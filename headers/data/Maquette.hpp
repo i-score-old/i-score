@@ -731,13 +731,13 @@ class Maquette : public QObject
     scene(){ return _scene; }
     static const unsigned int SIZE;
 
-    std::string getDeviceLocalHost(std::string deviceName, std::string protocol);
-    std::string getDeviceLocalHost(std::string deviceName);
+    bool getDeviceLocalHost(std::string deviceName, std::string protocol, std::string &localHost);
+    bool getDeviceLocalHost(std::string deviceName, std::string &localHost);
 
-    unsigned int getDevicePort(std::string deviceName,  std::string protocol);
-    unsigned int getDevicePort(std::string deviceName);
+    bool getDevicePort(std::string deviceName,  std::string protocol, unsigned int &port);
+    bool getDevicePort(std::string deviceName, unsigned int &port);
 
-    std::string getDeviceProtocol(std::string deviceName);
+    bool getDeviceProtocol(std::string deviceName, std::string &protocol);
     std::vector<std::string> getProtocolsName();
 
     bool setDeviceName(std::string device, std::string newName);

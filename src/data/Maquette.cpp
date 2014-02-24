@@ -2048,49 +2048,54 @@ Maquette::setCurveRecording(unsigned int boxID, const string address, bool activ
         _recordingBoxes.removeAll(getBox(boxID));
 }
 
-std::string
-Maquette::getDeviceLocalHost(std::string deviceName, std::string protocol){
-    std::string ip;
-
-    if(_engines->getDeviceStringParameter(deviceName,protocol,"ip",ip) == 0)
-        return ip;
+bool
+Maquette::getDeviceLocalHost(std::string deviceName, std::string protocol, string &localHost)
+{
+    if(_engines->getDeviceStringParameter(deviceName,protocol,"ip",localHost) == 0)
+        return 0;
     else{
-        std::cerr << "Maquette::getPort : cannot find port the device :"<<deviceName << std::endl;
-        return NULL;
+        std::cerr << "Maquette::getLocalHost : cannot find for device : "<<deviceName << std::endl;
+        return 1;
     }
 }
 
-std::string
-Maquette::getDeviceLocalHost(std::string deviceName){
-    getDeviceLocalHost(deviceName,getDeviceProtocol(deviceName));
+bool
+Maquette::getDeviceLocalHost(std::string deviceName, std::string &localHost)
+{
+    std::string protocol;
+    if(getDeviceProtocol(deviceName, protocol) == 0){
+        return getDeviceLocalHost(deviceName,protocol,localHost);
+
+    }
 }
 
-unsigned int
-Maquette::getDevicePort(std::string deviceName, std::string protocol){
-    unsigned int port;
+bool
+Maquette::getDevicePort(std::string deviceName, std::string protocol, unsigned int &port){
 
     if(_engines->getDeviceIntegerParameter(deviceName,protocol,"port",port) == 0)
-        return port;
+        return 0;
     else{
-        std::cerr << "Maquette::getPort : cannot find port the device :"<<deviceName << std::endl;
-        return NULL;
+        std::cerr << "Maquette::getPort : cannot find port for the device : "<<deviceName << std::endl;
+        return 1;
     }
 }
 
-unsigned int
-Maquette::getDevicePort(std::string deviceName){
-    getDevicePort(deviceName,getDeviceProtocol(deviceName));
+bool
+Maquette::getDevicePort(std::string deviceName, unsigned int &port)
+{
+    string protocol;
+    if (_engines->getDeviceProtocol(deviceName,protocol) == 0)
+        return getDevicePort(deviceName,protocol,port);
 }
 
-std::string
-Maquette::getDeviceProtocol(std::string deviceName){
-    std::string protocol;
+bool
+Maquette::getDeviceProtocol(std::string deviceName, std::string &protocol){
 
     if (_engines->getDeviceProtocol(deviceName,protocol) == 0)
-        return protocol;
+        return 0;
     else{
         std::cerr << "Maquette::getProtocol : cannot find protocol name for the device : "<<deviceName << std::endl;
-        return NULL;
+        return 1;
     }
 }
 
