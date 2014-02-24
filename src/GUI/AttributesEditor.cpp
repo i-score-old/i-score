@@ -157,7 +157,7 @@ AttributesEditor::createWidgets()
 
   //NetworkTree
   _networkTree = new NetworkTree(this);
-  _networkTree->load(); 
+  //_networkTree->load();
 
   //Start&End value
   _boxStartValue = new QDoubleSpinBox;

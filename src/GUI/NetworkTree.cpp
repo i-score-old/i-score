@@ -65,6 +65,7 @@ int NetworkTree::MAX_COLUMN = 9;
 unsigned int NetworkTree::PRIORITY_COLUMN = 10;
 
 QString NetworkTree::OSC_ADD_NODE_TEXT = QString("Add a node");
+QString NetworkTree::ADD_A_DEVICE_TEXT = QString("Add a device");
 
 unsigned int NetworkTree::TEXT_POINT_SIZE = 10;
 
@@ -109,6 +110,8 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   connect(this, SIGNAL(endValueChanged(QTreeWidgetItem*, QString)), this, SLOT(changeEndValue(QTreeWidgetItem*, QString)));
   connect(_deviceEdit, SIGNAL(deviceNameChanged(QString,QString)), this, SLOT(updateDeviceName(QString, QString)));
   connect(_deviceEdit, SIGNAL(deviceProtocolChanged(QString)), this, SLOT(updateDeviceProtocol(QString)));
+
+  addTopLevelItem(addDeviceItem());
 }
 
 NetworkTree::~NetworkTree(){
@@ -499,6 +502,15 @@ NetworkTree::createOCSBranch(QTreeWidgetItem *curItem)
   addANodeItem->setIcon(0, QIcon(":/images/addANode.png"));
   curItem->addChild(addANodeItem);
   curItem->setFlags(Qt::ItemIsEnabled);
+}
+
+QTreeWidgetItem *
+NetworkTree::addDeviceItem()
+{
+  QTreeWidgetItem *addDeviceItem = new QTreeWidgetItem(QStringList(ADD_A_DEVICE_TEXT), addDeviceNode);
+  addDeviceItem->setFlags(Qt::ItemIsEnabled);
+  addDeviceItem->setIcon(0, QIcon(":/images/addANode.png"));
+  return addDeviceItem;
 }
 
 QString
@@ -1532,8 +1544,8 @@ void
 NetworkTree::mousePressEvent(QMouseEvent *event)
 {
     QTreeWidget::mousePressEvent(event);
-    if(event->button()==Qt::RightButton){
-        if(currentItem()!=NULL){
+    if(currentItem()!=NULL){
+        if(event->button()==Qt::RightButton){
             if(currentItem()->type() == NodeNamespaceType){
                 QMenu *contextMenu = new QMenu(this);
                 QAction *refreshAct = new QAction(tr("Refresh"),this);
@@ -1543,6 +1555,12 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
 
                 delete refreshAct;
                 delete contextMenu;
+            }
+        }
+
+        if(event->button()==Qt::LeftButton){
+            if(currentItem()->type() == addDeviceNode){
+                 _deviceEdit->edit();
             }
         }
     }

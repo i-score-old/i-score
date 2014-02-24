@@ -61,7 +61,7 @@ using std::map;
 enum { NodeNamespaceType = QTreeWidgetItem::UserType + 1, NodeNoNamespaceType = QTreeWidgetItem::UserType + 2,
        LeaveType = QTreeWidgetItem::UserType + 3, AttributeType = QTreeWidgetItem::UserType + 4,
        OSCNamespace = QTreeWidgetItem::UserType + 5, OSCNode = QTreeWidgetItem::UserType + 6, addOSCNode = QTreeWidgetItem::UserType + 7,
-       MessageType = QTreeWidgetItem::UserType + 7};
+       MessageType = QTreeWidgetItem::UserType + 8, addDeviceNode = QTreeWidgetItem::UserType + 9};
 
 
 
@@ -394,6 +394,7 @@ class NetworkTree : public QTreeWidget
     static int MAX_COLUMN;
     static unsigned int PRIORITY_COLUMN;
     static QString OSC_ADD_NODE_TEXT;
+    static QString ADD_A_DEVICE_TEXT;
     static unsigned int TEXT_POINT_SIZE;
 
     bool VALUE_MODIFIED;
@@ -426,6 +427,7 @@ class NetworkTree : public QTreeWidget
   private:
     void treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict);
     void createOCSBranch(QTreeWidgetItem *curItem);
+    QTreeWidgetItem *addDeviceItem();
 
 
     /***********************************************************************
