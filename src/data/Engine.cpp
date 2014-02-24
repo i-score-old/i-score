@@ -2042,7 +2042,7 @@ void Engine::trigger(ConditionedProcessId triggerId)
 
 void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const unsigned int & DevicePort)
 {
-    TTValue         v;
+    TTValue         v, none;
     TTSymbol        applicationName(deviceName);
     TTSymbol        protocolName(pluginToUse);
     TTObjectBasePtr anApplication = NULL;
@@ -2058,9 +2058,12 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
         // check if the protocol has been loaded
 		if (getProtocol(protocolName)) {
             
+            // stop the protocol for this application
+            getProtocol(protocolName)->sendMessage(TTSymbol("Stop"));
+            
             // register the application to the protocol
             v = applicationName;
-            getProtocol(protocolName)->sendMessage(TTSymbol("registerApplication"), v, kTTValNONE);
+            getProtocol(protocolName)->sendMessage(TTSymbol("registerApplication"), v, none);
             
             // set plugin parameters (OSC or Minuit Plugin)
             hashParameters.append(TTSymbol("ip"), TTSymbol(DeviceIp));                        
@@ -2071,7 +2074,7 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
             getProtocol(protocolName)->setAttributeValue(TTSymbol("applicationParameters"), v);
             
             // run the protocol for this application
-            getProtocol(protocolName)->sendMessage(TTSymbol("Run"), applicationName, kTTValNONE);
+            getProtocol(protocolName)->sendMessage(TTSymbol("Run"));
 
             //DISPLAY
             string ip;
