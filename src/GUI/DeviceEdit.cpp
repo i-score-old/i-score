@@ -127,13 +127,12 @@ DeviceEdit::edit(QString name)
       QMessageBox::warning(this, "", tr("IP not found"));
       return;
   }
-  std::cout<<"newNetworkHost "<<networkHost<<std::endl;
 
   if((Maquette::getInstance()->getDevicePort(_currentDevice.toStdString(),protocol,networkPort)) != 0){
       QMessageBox::warning(this, "", tr("Port not found"));
       return;
   }
-  std::cout<<"PORT "<<networkPort<<std::endl;
+
 
   // Set values
   _localHostBox->setText(QString::fromStdString(networkHost));

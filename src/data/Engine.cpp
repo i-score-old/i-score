@@ -2441,7 +2441,6 @@ Engine::getDeviceProtocol(std::string deviceName, std::string &protocol)
 bool
 Engine::setDeviceName(string deviceName, string newName)
 {
-    std::cout<<"setName"<<std::endl;
     string          protocol,
                     localHost;
     unsigned int    port;
@@ -2460,6 +2459,7 @@ Engine::setDeviceName(string deviceName, string newName)
 
     addNetworkDevice(newName,protocol,localHost,port);
     removeNetworkDevice(deviceName);
+
     return 0;
 }
 
@@ -2530,11 +2530,10 @@ Engine::setDeviceLocalHost(string deviceName, string localHost)
 bool
 Engine::setDeviceProtocol(string deviceName, string protocol)
 {
-    string          oldProtocol,
-                    localHost;
-    unsigned int    port;
+    string              oldProtocol,
+                        localHost;
+    unsigned int        port;
 
-    //save parameters
     //get protocol name
     if(getDeviceProtocol(deviceName,oldProtocol) != 0)
         return 1;
@@ -2547,19 +2546,8 @@ Engine::setDeviceProtocol(string deviceName, string protocol)
     if(getDeviceIntegerParameter(deviceName,oldProtocol,"port",port) != 0)
         return 1;
 
-
-
     removeNetworkDevice(deviceName);
-    addNetworkDevice(deviceName,protocol,localHost,port);
-
-    std::cout<<"setProtoc:: -- new list --"<<std::endl;
-    vector<string> devices;
-    string protocolus;
-    getNetworkDevicesName(devices);
-    for(int i=0 ; i<devices.size() ; i++){
-        getDeviceProtocol(devices[i], protocolus);
-        std::cout<<"> "<<devices[i]<<" "<<protocolus<<std::endl;
-    }
+    addNetworkDevice(deviceName,protocol,localHost,port);    
 
     return 0;
 }
