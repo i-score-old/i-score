@@ -1572,8 +1572,9 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
         }
 
         if(event->button()==Qt::LeftButton){
-            if(currentItem()->type() == addDeviceNode){
+            if(currentItem()->type() == addDeviceNode){                
                  _deviceEdit->edit();
+                 setCurrentItem(NULL);
             }
         }
     }
@@ -2138,7 +2139,7 @@ NetworkTree::updateDeviceName(QString oldName, QString newName)
 
         if(currentItem()->type() == addDeviceNode){
             QTreeWidgetItem *newItem = addDeviceItem(newName);
-//            refreshItemNamespace(newItem);
+            refreshItemNamespace(newItem);
             return;
         }
     }
