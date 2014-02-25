@@ -134,6 +134,8 @@ class Engine
     
 private:
     
+    TTString            iscore;                                         /// application name
+    
     TTTimeProcessPtr    m_mainScenario;                                 /// The top scenario
     TTTimeEventPtr      m_mainStartEvent;                               /// The top scenario start event
     TTTimeEventPtr      m_mainEndEvent;                                 /// The top scenario end event
@@ -175,6 +177,9 @@ public:
     
     void initModular(const char* pathToTheJamomaFolder = NULL);
     void initScore();
+    
+    void registerIscoreTransportData();
+    void registerIscoreToProtocols();
     
     void dumpAddressBelow(TTNodePtr aNode);
     

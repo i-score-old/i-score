@@ -44,6 +44,8 @@ Engine::Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, boo
     
     m_mainScenario = NULL;
     
+    iscore = "i-score";
+    
     if (!pathToTheJamomaFolder.empty())
         initModular(pathToTheJamomaFolder.c_str());
     else
@@ -54,26 +56,34 @@ Engine::Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, boo
 
 void Engine::initModular(const char* pathToTheJamomaFolder)
 {
-    TTErr           err;
-    TTValue         args, v, none;
-    TTString        applicationName = "i-score";                  // TODO : declare as global variable
-    TTObjectBasePtr iscore;                                       // TODO : declare as global variable
-    TTString        configFile = "/usr/local/include/IScore/i-scoreConfiguration.xml";
-    TTHashPtr       hashParameters;
-    
+    TTErr    err;
+    TTValue  args;
+                      // TODO : declare as global variable
+    TTString configFile = "/usr/local/include/IScore/i-scoreConfiguration.xml";
+
     // this initializes the Modular framework and loads protocol plugins
     TTModularInit(pathToTheJamomaFolder);
     
     // create a local application named i-score
-    TTModularCreateLocalApplication(applicationName, configFile);
-    
-    // get i-score application
-    iscore = getLocalApplication;
+    TTModularCreateLocalApplication(iscore, configFile);
     
     // set the application in debug mode
-    iscore->setAttributeValue(TTSymbol("debug"), YES);
+    getLocalApplication->setAttributeValue(TTSymbol("debug"), YES);
     
-    // create TTData for tranport service and expose them
+    // Create a sender to send message to any application
+    m_sender = NULL;
+    args.clear();
+    TTObjectBaseInstantiate(kTTSym_Sender, &m_sender, args);
+    
+    registerIscoreTransportData();
+    registerIscoreToProtocols();
+}
+
+void Engine::registerIscoreTransportData()
+{
+    TTValue args, v, none;
+    
+    // create TTData for transport service and expose them
     
     // Play
     TTValuePtr batonPlay = new TTValue(TTPtr(this));
@@ -136,23 +146,24 @@ void Engine::initModular(const char* pathToTheJamomaFolder)
     m_dataSpeed->setAttributeValue(kTTSym_description, TTSymbol("change i-score speed rate execution"));
     
     TTModularRegisterObject(TTAddress("/Transport/Speed"), m_dataSpeed);
-    
-    // Create a sender to send message to any application
-    m_sender = NULL;
-    args.clear();
-    TTObjectBaseInstantiate(kTTSym_Sender, &m_sender, args);
+}
+
+void Engine::registerIscoreToProtocols()
+{
+    TTErr     err;
+    TTValue   args, v, none;
+    TTHashPtr hashParameters;
     
     // Register i-score to the Minuit and OSC protocol
-    ///////////////////////////////////////////////////
     
     // check if the Minuit protocol has been loaded
     if (getProtocol(TTSymbol("Minuit"))) {
         
         // register the local application to the Minuit protocol
-        getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), TTSymbol(applicationName), none);
+        getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), TTSymbol(iscore), none);
         
         // get parameter's table
-        v = TTSymbol(applicationName);
+        v = TTSymbol(iscore);
         err = getProtocol(TTSymbol("Minuit"))->getAttributeValue(TTSymbol("applicationParameters"), v);
         
         if (!err) {
@@ -166,7 +177,7 @@ void Engine::initModular(const char* pathToTheJamomaFolder)
             hashParameters->remove(TTSymbol("ip"));
             hashParameters->append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
         
-            v = TTSymbol(applicationName);
+            v = TTSymbol(iscore);
             v.append((TTPtr)hashParameters);
             getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
         }
@@ -179,10 +190,10 @@ void Engine::initModular(const char* pathToTheJamomaFolder)
     if (getProtocol(TTSymbol("OSC"))) {
         
         // register the local application to the Minuit protocol
-        getProtocol(TTSymbol("OSC"))->sendMessage(TTSymbol("registerApplication"), TTSymbol(applicationName), none);
+        getProtocol(TTSymbol("OSC"))->sendMessage(TTSymbol("registerApplication"), TTSymbol(iscore), none);
         
         // get parameter's table
-        v = TTSymbol(applicationName);
+        v = TTSymbol(iscore);
         err = getProtocol(TTSymbol("OSC"))->getAttributeValue(TTSymbol("applicationParameters"), v);
         
         if (!err) {
@@ -196,7 +207,7 @@ void Engine::initModular(const char* pathToTheJamomaFolder)
             hashParameters->remove(TTSymbol("ip"));
             hashParameters->append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
             
-            v = TTSymbol(applicationName);
+            v = TTSymbol(iscore);
             v.append((TTPtr)hashParameters);
             getProtocol(TTSymbol("OSC"))->setAttributeValue(TTSymbol("applicationParameters"), v);
         }
@@ -204,36 +215,6 @@ void Engine::initModular(const char* pathToTheJamomaFolder)
         // run the Minuit protocol
         TTModularApplications->sendMessage(TTSymbol("ProtocolRun"), TTSymbol("OSC"), none);
     }
-/*
-    ////////////
-    // Example : Read the namespace of MinuitDevice1 from a namespace file
-    ////////////
-    
-    // create a TTXmlHandler class to parse a xml namespace file
-    TTXmlHandlerPtr myXmlHandler = NULL;
-    TTObjectBaseInstantiate(kTTSym_XmlHandler, TTObjectBaseHandle(&myXmlHandler), kTTValNONE);
-    
-    // prepare the TTXmlHandler to pass the result of the parsing to MinuitDevice1
-    v = TTValue(anApplication);
-    myXmlHandler->setAttributeValue(TTSymbol("object"), v);
-    
-    // read a namespace file
-    err = myXmlHandler->sendMessage(TTSymbol("Read"), TTSymbol("/Users/WALL-E/Documents/Jamoma/Modules/Modular/implementations/MaxMSP/jcom.modular/remoteApp - namespace.xml"), kTTValNONE);
-    
-    if (!err) {
-        // get the root of the TNodeDirectory of MinuitDevice1
-        // note : the TTNodeDirectory is a tree structure used to registered and retrieve TTObjects using TTAddress
-        TTNodeDirectoryPtr anApplicationDirectory = getApplicationDirectory(TTSymbol("MinuitDevice1"));
-        
-        // return all addresses of the TTNodeDirectory
-        std::cout << "__ Dump MinuitDevice1 directory __" << std::endl;
-        
-        // start to dump addresses recursilvely from the root of the directory
-        dumpAddressBelow(anApplicationDirectory->getRoot());
-        
-        std::cout << "__________________________________" << std::endl;
-    }
-*/    
 }
 
 void Engine::initScore()
