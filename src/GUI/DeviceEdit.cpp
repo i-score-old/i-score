@@ -61,15 +61,14 @@ DeviceEdit::init()
   _deviceNameLabel = new QLabel(tr("DeviceName"));
   _protocolsLabel = new QLabel(tr("protocols"));
   _portOutputLabel = new QLabel(tr("Port (output)"));
-//  _portInputLabel = new QLabel(tr("Port (input)"));
+  _portInputLabel = new QLabel(tr("(input)"));
   _localHostLabel = new QLabel(tr("localHost"));
 
   _portOutputBox = new QSpinBox;
   _portOutputBox->setRange(0, 20000);
-//  _portInputBox = new QSpinBox;
-//  _portInputBox->setRange(0, 10000);
-//  _portInputBox->setValue(7002);
-//  _portInputBox->setEnabled(false);
+  _portInputBox = new QSpinBox;
+  _portInputBox->setRange(0, 20000);
+  _portInputBox->setEnabled(false);
 
   _localHostBox = new QLineEdit;
   _nameEdit = new QLineEdit;
@@ -89,15 +88,15 @@ DeviceEdit::init()
   _layout->addWidget(_protocolsComboBox, 1, 1, 1, 1);
   _layout->addWidget(_portOutputLabel, 2, 0, 1, 1);
   _layout->addWidget(_portOutputBox, 2, 1, 1, 1);
-//  _layout->addWidget(_portInputLabel, 3, 0, 1, 1);
-//  _layout->addWidget(_portInputBox, 3, 1, 1, 1);
+  _layout->addWidget(_portInputLabel, 2, 3, 1, 1);
+  _layout->addWidget(_portInputBox, 2, 4, 1, 1);
   _layout->addWidget(_localHostLabel, 4, 0, 1, 1);
   _layout->addWidget(_localHostBox, 4, 1, 1, 1);
 
   _okButton = new QPushButton(tr("OK"), this);
-  _layout->addWidget(_okButton, 4, 2, 1, 1);
+  _layout->addWidget(_okButton, 5, 0, 1, 1);
   _cancelButton = new QPushButton(tr("Cancel"), this);
-  _layout->addWidget(_cancelButton, 4, 3, 1, 1);
+  _layout->addWidget(_cancelButton, 5, 1, 1, 1);
 
   connect(_nameEdit, SIGNAL(textChanged(QString)), this, SLOT(setDeviceNameChanged()));
   connect(_protocolsComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setProtocolChanged()));
@@ -183,6 +182,13 @@ void
 DeviceEdit::setProtocolChanged()
 {
   _protocolChanged = true;
+
+  if(_protocolsComboBox->currentText() == "OSC")
+      _portInputBox->setValue(Maquette::getInstance()->getOSCInputPort());
+  else if (_protocolsComboBox->currentText() == "Minuit"){
+      _portInputBox->setValue(Maquette::getInstance()->getMinuitInputPort());
+  }
+
   setChanged();
 }
 

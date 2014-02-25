@@ -72,7 +72,7 @@ class DeviceEdit : public QDialog
 
     QComboBox *_protocolsComboBox; //!< QComboBox handling various plug-ins available.
     QSpinBox *_portOutputBox;          //!< QSpinBox managing output port value.
-//    QSpinBox *_portInputBox;          //!< QSpinBox managing input port value.
+    QSpinBox *_portInputBox;          //!< QSpinBox managing input port value.
     QLineEdit *_localHostBox;           //!< QLineEdit
 
     QPushButton *_okButton;      //!< Button used to confirme.
