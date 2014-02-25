@@ -2450,9 +2450,9 @@ Engine::setDeviceName(string deviceName, string newName)
 }
 
 bool
-Engine::setDevicePort(string deviceName, int port)
+Engine::setDevicePort(string deviceName, int destinationPort, int receptionPort)
 {
-    TTValue         v;
+    TTValue         v, portValue;
     TTSymbol        applicationName(deviceName);
     TTHashPtr       hashParameters;
     TTErr           err;
@@ -2469,7 +2469,12 @@ Engine::setDevicePort(string deviceName, int port)
         hashParameters = TTHashPtr((TTPtr)v[0]);
 
         hashParameters->remove(TTSymbol("port"));
-        hashParameters->append(TTSymbol("port"), port);
+        
+        portValue = destinationPort;
+        if (receptionPort != 0)
+            portValue.append(receptionPort);
+        
+        hashParameters->append(TTSymbol("port"), portValue);
 
         v = TTSymbol(applicationName);
         v.append((TTPtr)hashParameters);

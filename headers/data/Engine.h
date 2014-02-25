@@ -1074,10 +1074,11 @@ public:
      * Sets the device's port.
      *
      * \param device : the device's name. ex: MinuitDevice1
-     * \param port : the port value. ex: 8002
+     * \param destinationPort : the port value. ex: 8002
+     * \param receptionPort : the port value. ex: 8002 (useful for OSC plugin)
      * \return 0 if no error, else 1.
      */
-    bool setDevicePort(std::string deviceName, int port);
+    bool setDevicePort(std::string deviceName, int destinationPort, int receptionPort = 0);
 
     /*!
      * Sets the device's local host.
