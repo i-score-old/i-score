@@ -2364,6 +2364,20 @@ void Engine::refreshNetworkNamespace(const string &application, const string &ad
     getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryBuild"));
 }
 
+bool Engine::loadNetworkNamespace(const string &application, const string &filepath)
+{
+    // Create a TTXmlHandler
+    TTObject aXmlHandler(kTTSym_XmlHandler);
+    
+    // Read the file to setup an application
+    TTValue none, v = TTObjectBasePtr(getApplication(TTSymbol(application)));
+    aXmlHandler.set(kTTSym_object, v);
+    
+    TTErr err = aXmlHandler.send(kTTSym_Read, TTSymbol(filepath), none);
+    
+    return err == kTTErrNone;
+}
+
 bool Engine::getDeviceIntegerParameter(const string device, const string protocol, const string parameter, unsigned int &integer){
     TTSymbol        applicationName;
     TTErr           err;

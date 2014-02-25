@@ -1013,6 +1013,14 @@ public:
      * \param address : the object's address
      */
     void refreshNetworkNamespace(const std::string& application, const std::string& address = "/");
+    
+    /*!
+     * Load a namespace from a namespace file
+     *
+     * \param application : the application to setup
+     * \param filepath : the path to a namespace file
+     */
+    bool loadNetworkNamespace(const std::string &application, const std::string &filepath);
 
     /*!
      * Gets an integer parameter associated to the protocol and the device.
