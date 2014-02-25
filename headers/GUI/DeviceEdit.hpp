@@ -11,6 +11,7 @@
 #include <QSpinBox>
 #include <QPushButton>
 #include <QHostAddress>
+#include <QFileDialog>
 
 class MaquetteScene;
 
@@ -26,6 +27,7 @@ class DeviceEdit : public QDialog
 
   public:
     DeviceEdit(QWidget *parent);
+    ~DeviceEdit();
 
   public slots:
     void edit(QString name);
@@ -36,6 +38,7 @@ class DeviceEdit : public QDialog
     void setNetworkPortChanged();
     void setLocalHostChanged();
     void updateNetworkConfiguration();
+    void openDialog();
 
 
   signals:
@@ -74,6 +77,9 @@ class DeviceEdit : public QDialog
     QSpinBox *_portOutputBox;          //!< QSpinBox managing output port value.
     QSpinBox *_portInputBox;          //!< QSpinBox managing input port value.
     QLineEdit *_localHostBox;           //!< QLineEdit
+
+    QPushButton *_openNamespaceFileButton; //!< Button used to choose file
+    QLineEdit *_namespaceFilePath; //!< To edit/display the namespace file choosen
 
     QPushButton *_okButton;      //!< Button used to confirme.
     QPushButton *_cancelButton;  //!< Button used to cancel.

@@ -74,6 +74,9 @@ DeviceEdit::init()
   _nameEdit = new QLineEdit;
   _protocolsComboBox = new QComboBox;
 
+  _openNamespaceFileButton = new QPushButton("Open namespace");
+  _namespaceFilePath = new QLineEdit;
+
   // Protocols
   std::vector<std::string> protocols = Maquette::getInstance()->getProtocolsName();
   for (unsigned int i = 0; i < protocols.size(); i++) {
@@ -93,18 +96,30 @@ DeviceEdit::init()
   _layout->addWidget(_localHostLabel, 4, 0, 1, 1);
   _layout->addWidget(_localHostBox, 4, 1, 1, 1);
 
+  _layout->addWidget(_openNamespaceFileButton, 5, 0, 1, 1);
+  _layout->addWidget(_namespaceFilePath, 5, 1, 1, 1);
+
   _okButton = new QPushButton(tr("OK"), this);
-  _layout->addWidget(_okButton, 5, 3, 1, 1);
+  _layout->addWidget(_okButton, 6, 3, 1, 1);
   _cancelButton = new QPushButton(tr("Cancel"), this);
-  _layout->addWidget(_cancelButton, 5, 4, 1, 1);
+  _layout->addWidget(_cancelButton, 6, 4, 1, 1);
+
 
   connect(_nameEdit, SIGNAL(textChanged(QString)), this, SLOT(setDeviceNameChanged()));
   connect(_protocolsComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setProtocolChanged()));
   connect(_portOutputBox, SIGNAL(valueChanged(int)), this, SLOT(setNetworkPortChanged()));
   connect(_localHostBox, SIGNAL(textChanged(const QString &)), this, SLOT(setLocalHostChanged()));
 
+  connect(_openNamespaceFileButton, SIGNAL(clicked()), this, SLOT(openDialog()));
+
   connect(_okButton, SIGNAL(clicked()), this, SLOT(updateNetworkConfiguration()));
   connect(_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+
+  _okButton->setFocus();
+}
+
+DeviceEdit::~DeviceEdit(){
+//TODO
 }
 
 void
@@ -258,6 +273,16 @@ DeviceEdit::updateNetworkConfiguration()
     _localHostChanged = false;
     _networkPortChanged = false;
 
+}
+
+void
+DeviceEdit::openDialog()
+{
+    QString fileName = QFileDialog::getOpenFileName();
+    if (!fileName.isEmpty()) {
+        _namespaceFilePath->setText(fileName);
+        std::cout<<">>>>>>> "<<fileName.toStdString()<<std::endl;
+      }
 }
 
 void
