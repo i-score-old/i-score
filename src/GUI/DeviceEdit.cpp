@@ -94,9 +94,9 @@ DeviceEdit::init()
   _layout->addWidget(_localHostBox, 4, 1, 1, 1);
 
   _okButton = new QPushButton(tr("OK"), this);
-  _layout->addWidget(_okButton, 5, 0, 1, 1);
+  _layout->addWidget(_okButton, 5, 3, 1, 1);
   _cancelButton = new QPushButton(tr("Cancel"), this);
-  _layout->addWidget(_cancelButton, 5, 1, 1, 1);
+  _layout->addWidget(_cancelButton, 5, 4, 1, 1);
 
   connect(_nameEdit, SIGNAL(textChanged(QString)), this, SLOT(setDeviceNameChanged()));
   connect(_protocolsComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setProtocolChanged()));
