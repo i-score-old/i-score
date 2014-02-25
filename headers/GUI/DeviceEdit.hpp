@@ -41,6 +41,7 @@ class DeviceEdit : public QDialog
   signals:
     void deviceNameChanged(QString,QString);
     void deviceProtocolChanged(QString);
+    void newDeviceAdded(QString);
 
   private:
     void init();
@@ -50,6 +51,7 @@ class DeviceEdit : public QDialog
     bool _protocolChanged;
     bool _localHostChanged;
     bool _networkPortChanged;
+    bool _newDevice;
 
     QString defaultName = "MinuitDevice1";
     QString defaultLocalHost = "127.0.0.1";

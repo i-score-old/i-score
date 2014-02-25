@@ -530,6 +530,7 @@ class NetworkTree : public QTreeWidget
       * \param The application we want to refresh.
       */
     void refreshItemNamespace(QTreeWidgetItem *item);
+    void refreshCurrentItemNamespace();
     void itemCollapsed();
     void clickInNetworkTree(QTreeWidgetItem *item, int column);
     void valueChanged(QTreeWidgetItem* item, int column);
@@ -537,6 +538,7 @@ class NetworkTree : public QTreeWidget
     void changeEndValue(QTreeWidgetItem* item, QString newValue);
     void changeNameValue(QTreeWidgetItem* item, QString newValue);
     void updateDeviceName(QString oldName, QString newName);
+    void addNewDevice(QString deviceName);
     void updateDeviceProtocol(QString newName);
     void setRecMode(std::string address);
     void setRecMode(QList<std::string> items);

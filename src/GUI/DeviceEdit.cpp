@@ -53,6 +53,7 @@ DeviceEdit::init()
   _protocolChanged = false;
   _localHostChanged = false;
   _networkPortChanged = false;
+  _newDevice = false;
 
   _layout = new QGridLayout(this);
   setLayout(_layout);
@@ -173,6 +174,7 @@ DeviceEdit::edit()
     _localHostBox->setText(defaultLocalHost);
     _portOutputBox->setValue(defaultPort);
     _protocolsComboBox->setCurrentIndex(defaultProtocolIndex);
+    _newDevice = true;
 
     exec();
 }
@@ -207,39 +209,49 @@ DeviceEdit::setChanged()
 void
 DeviceEdit::updateNetworkConfiguration()
 {
-  if (_changed) {
+    if(_newDevice){
+        string          name = _nameEdit->text().toStdString(),
+                        ip   = _localHostBox->text().toStdString(),
+                        protocol = _protocolsComboBox->currentText().toStdString();
+        unsigned int    port = _portOutputBox->value();
 
-      if (_nameChanged) {
-          std::cout<<"nameChanged"<<std::endl;
+        Maquette:: getInstance()->addNetworkDevice(name,protocol,ip,port);
+        emit(newDeviceAdded(_nameEdit->text())); //sent to networkTree
 
-          Maquette::getInstance()->setDeviceName(_currentDevice.toStdString(), _nameEdit->text().toStdString());
-          _currentDevice = _nameEdit->text();
-      }
-      if (_localHostChanged) {
-          std::cout<<"IPChanged"<<std::endl;
-          Maquette::getInstance()->setDeviceLocalHost(_currentDevice.toStdString(), _localHostBox->text().toStdString());
-      }
-      if (_networkPortChanged) {
-          std::cout<<"portChanged"<<std::endl;
-          Maquette::getInstance()->setDevicePort(_currentDevice.toStdString(), _portOutputBox->value());
-      }
-      if (_protocolChanged) {
-          std::cout<<"protocolChanged"<<std::endl;
-          Maquette::getInstance()->setDeviceProtocol(_currentDevice.toStdString(), _protocolsComboBox->currentText().toStdString());
-//          emit(deviceProtocolChanged(_protocolsComboBox->currentText()));
-      }
+        _newDevice = false;
+    }
 
-      if (_nameChanged) //have to be after setting all parameters
-          emit(deviceNameChanged(_currentDevice, _nameEdit->text()));
-  }
+    else if (_changed) {
+        if (_nameChanged) {
+            Maquette::getInstance()->setDeviceName(_currentDevice.toStdString(), _nameEdit->text().toStdString());
+            _currentDevice = _nameEdit->text();
+        }
+        if (_localHostChanged) {
+            std::cout<<"IPChanged"<<std::endl;
+            Maquette::getInstance()->setDeviceLocalHost(_currentDevice.toStdString(), _localHostBox->text().toStdString());
+        }
+        if (_networkPortChanged) {
+            std::cout<<"portChanged"<<std::endl;
+            Maquette::getInstance()->setDevicePort(_currentDevice.toStdString(), _portOutputBox->value());
+        }
+        if (_protocolChanged) {
+            std::cout<<"protocolChanged"<<std::endl;
+            Maquette::getInstance()->setDeviceProtocol(_currentDevice.toStdString(), _protocolsComboBox->currentText().toStdString());
+            //          emit(deviceProtocolChanged(_protocolsComboBox->currentText()));
+        }
 
-  accept();
+        if (_nameChanged) //have to be after setting all parameters
+            emit(deviceNameChanged(_currentDevice, _nameEdit->text()));
+    }
 
-  _changed = false;
-  _nameChanged = false;
-  _protocolChanged = false;
-  _localHostChanged = false;
-  _networkPortChanged = false;
+    accept();
+
+    _changed = false;
+    _nameChanged = false;
+    _protocolChanged = false;
+    _localHostChanged = false;
+    _networkPortChanged = false;
+
 }
 
 void
