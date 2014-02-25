@@ -2088,6 +2088,16 @@ Maquette::getDevicePort(std::string deviceName, unsigned int &port)
         return getDevicePort(deviceName,protocol,port);
 }
 
+unsigned int
+Maquette::getOSCInputPort(){
+    return _engines->OSC_INPUT_PORT;
+}
+
+unsigned int
+Maquette::getMinuitInputPort(){
+    return _engines->MINUIT_INPUT_PORT;
+}
+
 bool
 Maquette::getDeviceProtocol(std::string deviceName, std::string &protocol){
 
