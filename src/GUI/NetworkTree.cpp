@@ -121,6 +121,7 @@ NetworkTree::~NetworkTree(){
     delete _endMessages;
     delete _OSCStartMessages;
     delete _OSCEndMessages;
+    delete _addADeviceItem;
 }
 
 /****************************************************************************
@@ -201,45 +202,22 @@ NetworkTree::load()
   Maquette::getInstance()->getNetworkDeviceNames(deviceNames);
 
   vector<string>::iterator nameIt;
-
   QList<QTreeWidgetItem*> itemsList;
-  QTreeWidgetItem *OSCRootNode;
+  _addADeviceItem = addADeviceNode();
 
   for (nameIt = deviceNames.begin(); nameIt != deviceNames.end(); ++nameIt) {      
 
-      QStringList deviceName;
+      QString deviceName = QString::fromStdString(*nameIt);
+      std::cout<<"NetworkTree::loading "<<*nameIt<<std::endl;
 
-      deviceName << QString::fromStdString(*nameIt);
-
-      QTreeWidgetItem *curItem = NULL;
-      
-      bool isRequestable = Maquette::getInstance()->isNetworkDeviceRequestable(*nameIt);
-      std::cout<<*nameIt;
-      if (!isRequestable) {
-          //OSCDevice
-          curItem = new QTreeWidgetItem(deviceName, DeviceNode);
-          try{
-              treeRecursiveExploration(curItem, true);
-            }catch (const std::exception & e) {
-              std::cerr << *nameIt << " : " << e.what();
-            }
-          itemsList << curItem;
-//          OSCRootNode = curItem;
-//          createOCSBranch(curItem);
-        }
-      else {
-
-          curItem = new QTreeWidgetItem(deviceName, DeviceNode);
-          try{
-              treeRecursiveExploration(curItem, true);
-            }catch (const std::exception & e) {
-              std::cerr << *nameIt << " : " << e.what();
-            }
-          itemsList << curItem;
-        }
+      QTreeWidgetItem *curItem = new QTreeWidgetItem(DeviceNode);
+      curItem->setText(NAME_COLUMN , deviceName);
+      treeRecursiveExploration(curItem, true);
+      itemsList << curItem;
     }
-  addTopLevelItems(itemsList);
-//  addTopLevelItem(OSCRootNode);
+
+  itemsList<<_addADeviceItem;
+  addTopLevelItems(itemsList);  
 }
 
 /*
