@@ -75,7 +75,7 @@ DeviceEdit::init()
   _nameEdit = new QLineEdit;
   _protocolsComboBox = new QComboBox;
 
-  _openNamespaceFileButton = new QPushButton("Load namespace");
+  _openNamespaceFileButton = new QPushButton("Load");
   _namespaceFilePath = new QLineEdit;
 
   // Protocols
