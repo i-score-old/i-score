@@ -61,7 +61,7 @@ DeviceEdit::init()
   _deviceNameLabel = new QLabel(tr("DeviceName"));
   _protocolsLabel = new QLabel(tr("protocols"));
   _portOutputLabel = new QLabel(tr("Port (output)"));
-  _portInputLabel = new QLabel(tr("(input)"));
+  _portInputLabel = new QLabel(tr("          (input)"));
   _localHostLabel = new QLabel(tr("localHost"));
 
   _portOutputBox = new QSpinBox;
