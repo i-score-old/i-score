@@ -38,7 +38,8 @@ class DeviceEdit : public QDialog
     void setNetworkPortChanged();
     void setLocalHostChanged();
     void updateNetworkConfiguration();
-    void openDialog();
+    void openFileDialog();
+    void setNamespacePathChanged();
 
 
   signals:
@@ -55,6 +56,7 @@ class DeviceEdit : public QDialog
     bool _localHostChanged;
     bool _networkPortChanged;
     bool _newDevice;
+    bool _namespacePathChanged;
 
     QString defaultName = "MinuitDevice1";
     QString defaultLocalHost = "127.0.0.1";

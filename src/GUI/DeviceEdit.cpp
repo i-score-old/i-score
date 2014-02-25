@@ -54,6 +54,7 @@ DeviceEdit::init()
   _localHostChanged = false;
   _networkPortChanged = false;
   _newDevice = false;
+  _namespacePathChanged = false;
 
   _layout = new QGridLayout(this);
   setLayout(_layout);
@@ -104,13 +105,13 @@ DeviceEdit::init()
   _cancelButton = new QPushButton(tr("Cancel"), this);
   _layout->addWidget(_cancelButton, 6, 4, 1, 1);
 
-
   connect(_nameEdit, SIGNAL(textChanged(QString)), this, SLOT(setDeviceNameChanged()));
   connect(_protocolsComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setProtocolChanged()));
   connect(_portOutputBox, SIGNAL(valueChanged(int)), this, SLOT(setNetworkPortChanged()));
   connect(_localHostBox, SIGNAL(textChanged(const QString &)), this, SLOT(setLocalHostChanged()));
 
-  connect(_openNamespaceFileButton, SIGNAL(clicked()), this, SLOT(openDialog()));
+  connect(_openNamespaceFileButton, SIGNAL(clicked()), this, SLOT(openFileDialog()));
+  connect(_namespaceFilePath, SIGNAL(textChanged(QString)), this, SLOT(setNamespacePathChanged()));
 
   connect(_okButton, SIGNAL(clicked()), this, SLOT(updateNetworkConfiguration()));
   connect(_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
@@ -239,6 +240,7 @@ DeviceEdit::updateNetworkConfiguration()
         Maquette:: getInstance()->addNetworkDevice(name,protocol,ip,port);
         emit(newDeviceAdded(_nameEdit->text())); //sent to networkTree
 
+        _currentDevice = _nameEdit->text();
         _newDevice = false;
     }
 
@@ -265,6 +267,10 @@ DeviceEdit::updateNetworkConfiguration()
             emit(deviceNameChanged(_currentDevice, _nameEdit->text()));
     }
 
+    if(_namespacePathChanged){
+        //check if currentDevice ok
+        //load
+    }
     accept();
 
     _changed = false;
@@ -276,13 +282,17 @@ DeviceEdit::updateNetworkConfiguration()
 }
 
 void
-DeviceEdit::openDialog()
+DeviceEdit::openFileDialog()
 {
     QString fileName = QFileDialog::getOpenFileName();
     if (!fileName.isEmpty()) {
         _namespaceFilePath->setText(fileName);
-        std::cout<<">>>>>>> "<<fileName.toStdString()<<std::endl;
       }
+}
+
+void
+DeviceEdit::setNamespacePathChanged(){
+    _namespacePathChanged = true;
 }
 
 void
