@@ -170,6 +170,9 @@ private:
 
 public:
 
+    const int OSC_INPUT_PORT = 13580;
+    const int MINUIT_INPUT_PORT = 13579;
+
     Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
            void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
            void(*transportDataValueCallback)(TTSymbol&, const TTValue&),

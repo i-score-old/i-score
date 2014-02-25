@@ -172,7 +172,7 @@ void Engine::registerIscoreToProtocols()
         
             // replace the Minuit parameters for the local application
             hashParameters->remove(TTSymbol("port"));
-            hashParameters->append(TTSymbol("port"), 13579);
+            hashParameters->append(TTSymbol("port"), MINUIT_INPUT_PORT);
             
             hashParameters->remove(TTSymbol("ip"));
             hashParameters->append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
@@ -202,7 +202,7 @@ void Engine::registerIscoreToProtocols()
             
             // replace the Minuit parameters for the local application
             hashParameters->remove(TTSymbol("port"));
-            hashParameters->append(TTSymbol("port"), 13580);
+            hashParameters->append(TTSymbol("port"), OSC_INPUT_PORT);
             
             hashParameters->remove(TTSymbol("ip"));
             hashParameters->append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
