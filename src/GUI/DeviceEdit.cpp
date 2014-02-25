@@ -280,7 +280,7 @@ DeviceEdit::updateNetworkConfiguration()
         if(Maquette::getInstance()->isNetworkDeviceRequestable(_currentDevice.toStdString()) == 0){
 
             //load
-            if(Maquette::getInstance()->loadNetworkNamespace(_currentDevice.toStdString(),_namespaceFilePath->text().toStdString())){
+            if(!Maquette::getInstance()->loadNetworkNamespace(_currentDevice.toStdString(),_namespaceFilePath->text().toStdString())){
                 emit(namespaceLoaded(_currentDevice));
                 _namespaceFilePath->clear();
             }
