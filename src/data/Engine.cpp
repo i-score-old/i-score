@@ -55,7 +55,7 @@ Engine::Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, boo
 void Engine::initModular(const char* pathToTheJamomaFolder)
 {
     TTErr           err;
-    TTValue         args, v;
+    TTValue         args, v, none;
     TTString        applicationName = "i-score";                  // TODO : declare as global variable
     TTObjectBasePtr iscore;                                       // TODO : declare as global variable
     TTString        configFile = "/usr/local/include/IScore/i-scoreConfiguration.xml";
@@ -142,30 +142,14 @@ void Engine::initModular(const char* pathToTheJamomaFolder)
     args.clear();
     TTObjectBaseInstantiate(kTTSym_Sender, &m_sender, args);
     
-    
-    ////////////
-    // Example : Create a distant application
-    ////////////
-    TTObjectBasePtr anApplication = NULL;
-    TTSymbol        MinuitApplicationName;
-    
-    // create an application called MinuitDevice1
-    MinuitApplicationName = TTSymbol("MinuitDevice1");
-    args = TTValue(MinuitApplicationName);
-    TTObjectBaseInstantiate(kTTSym_Application, TTObjectBaseHandle(&anApplication), args);
-    
-    // set application type : here 'mirror' because it use Minuit protocol
-    anApplication->setAttributeValue(kTTSym_type, TTSymbol("mirror"));
-    
-    ////////////
-    // Example : Register i-score and MinuitDevice1 to the Minuit protocol
-    ////////////
+    // Register i-score to the Minuit and OSC protocol
+    ///////////////////////////////////////////////////
     
     // check if the Minuit protocol has been loaded
     if (getProtocol(TTSymbol("Minuit"))) {
         
         // register the local application to the Minuit protocol
-        getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), TTSymbol(applicationName), kTTValNONE);
+        getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), TTSymbol(applicationName), none);
         
         // get parameter's table
         v = TTSymbol(applicationName);
@@ -177,7 +161,7 @@ void Engine::initModular(const char* pathToTheJamomaFolder)
         
             // replace the Minuit parameters for the local application
             hashParameters->remove(TTSymbol("port"));
-            hashParameters->append(TTSymbol("port"), 8002);
+            hashParameters->append(TTSymbol("port"), 13579);
             
             hashParameters->remove(TTSymbol("ip"));
             hashParameters->append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
@@ -187,38 +171,38 @@ void Engine::initModular(const char* pathToTheJamomaFolder)
             getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
         }
         
-        // register this application to the Minuit protocol
-        getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), MinuitApplicationName, kTTValNONE);
+        // run the Minuit protocol
+        TTModularApplications->sendMessage(TTSymbol("ProtocolRun"), TTSymbol("Minuit"), none);
+    }
+    
+    // check if the OSC protocol has been loaded
+    if (getProtocol(TTSymbol("OSC"))) {
+        
+        // register the local application to the Minuit protocol
+        getProtocol(TTSymbol("OSC"))->sendMessage(TTSymbol("registerApplication"), TTSymbol(applicationName), none);
         
         // get parameter's table
-        v = TTSymbol(MinuitApplicationName);
-        err = getProtocol(TTSymbol("Minuit"))->getAttributeValue(TTSymbol("applicationParameters"), v);
+        v = TTSymbol(applicationName);
+        err = getProtocol(TTSymbol("OSC"))->getAttributeValue(TTSymbol("applicationParameters"), v);
         
         if (!err) {
             
             hashParameters = TTHashPtr((TTPtr)v[0]);
-        
-            // replace the Minuit parameters for the distant application
+            
+            // replace the Minuit parameters for the local application
             hashParameters->remove(TTSymbol("port"));
-            hashParameters->append(TTSymbol("port"), 9998);
+            hashParameters->append(TTSymbol("port"), 13580);
             
             hashParameters->remove(TTSymbol("ip"));
             hashParameters->append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
-        
-            v = TTValue(MinuitApplicationName);
+            
+            v = TTSymbol(applicationName);
             v.append((TTPtr)hashParameters);
-            getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
+            getProtocol(TTSymbol("OSC"))->setAttributeValue(TTSymbol("applicationParameters"), v);
         }
         
         // run the Minuit protocol
-        TTModularApplications->sendMessage(TTSymbol("ProtocolRun"), TTSymbol("Minuit"), kTTValNONE);
-        
-        ////////////
-        // Example : Build the namespace of MinuitDevice1 using discovery feature (if the protocol provides it)
-        ////////////
-        
-        // you can create an OSC receive on the 9998 port to see that a namespace request is sent by i-score (using Pure Data for example)
-        anApplication->sendMessage(TTSymbol("DirectoryBuild"));
+        TTModularApplications->sendMessage(TTSymbol("ProtocolRun"), TTSymbol("OSC"), none);
     }
 /*
     ////////////
@@ -2055,6 +2039,11 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
         // create the application
         v = applicationName;
         TTObjectBaseInstantiate(kTTSym_Application, TTObjectBaseHandle(&anApplication), v);
+        
+        // set application type : here 'mirror' because it use Minuit protocol
+        // note : this should be done for all protocols which have a discovery feature
+        if (protocolName == TTSymbol("Minuit"))
+            anApplication->setAttributeValue(kTTSym_type, TTSymbol("mirror"));
         
         // check if the protocol has been loaded
 		if (getProtocol(protocolName)) {
