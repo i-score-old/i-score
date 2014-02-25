@@ -2358,7 +2358,7 @@ bool Engine::loadNetworkNamespace(const string &application, const string &filep
     
     TTErr err = aXmlHandler.send(kTTSym_Read, TTSymbol(filepath), none);    
 
-    return err == kTTErrNone;
+    return err != kTTErrNone;
 }
 
 bool Engine::getDeviceIntegerParameter(const string device, const string protocol, const string parameter, unsigned int &integer){
