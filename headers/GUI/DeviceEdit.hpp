@@ -62,7 +62,7 @@ class DeviceEdit : public QDialog
     QString defaultName = "MinuitDevice1";
     QString defaultLocalHost = "127.0.0.1";
     unsigned int defaultPort = 9998;
-    int defaultProtocolIndex = 1;
+    int defaultProtocolIndex = 0;
 
     QString _currentDevice;
 

@@ -75,7 +75,7 @@ DeviceEdit::init()
   _nameEdit = new QLineEdit;
   _protocolsComboBox = new QComboBox;
 
-  _openNamespaceFileButton = new QPushButton("Open namespace");
+  _openNamespaceFileButton = new QPushButton("Load namespace");
   _namespaceFilePath = new QLineEdit;
 
   // Protocols
@@ -115,8 +115,6 @@ DeviceEdit::init()
 
   connect(_okButton, SIGNAL(clicked()), this, SLOT(updateNetworkConfiguration()));
   connect(_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-
-  _okButton->setFocus();
 }
 
 DeviceEdit::~DeviceEdit(){
@@ -178,6 +176,8 @@ DeviceEdit::edit(QString name)
     }
   _protocolChanged = false;
 
+  _nameEdit->setFocus();
+  _okButton->setFocus();
   exec();
 }
 
@@ -199,10 +199,15 @@ DeviceEdit::setProtocolChanged()
 {
   _protocolChanged = true;
 
-  if(_protocolsComboBox->currentText() == "OSC")
+  if(_protocolsComboBox->currentText() == "OSC"){
       _portInputBox->setValue(Maquette::getInstance()->getOSCInputPort());
+      _namespaceFilePath->setHidden(false);
+      _openNamespaceFileButton->setHidden(false);
+  }
   else if (_protocolsComboBox->currentText() == "Minuit"){
       _portInputBox->setValue(Maquette::getInstance()->getMinuitInputPort());
+      _namespaceFilePath->setHidden(true);
+      _openNamespaceFileButton->setHidden(true);
   }
 
   setChanged();
@@ -277,6 +282,7 @@ DeviceEdit::updateNetworkConfiguration()
             //load
             if(Maquette::getInstance()->loadNetworkNamespace(_currentDevice.toStdString(),_namespaceFilePath->text().toStdString())){
                 emit(namespaceLoaded(_currentDevice));
+                _namespaceFilePath->clear();
             }
             else{
                 QMessageBox::warning(this, "", tr("Cannot load namespace file"));
@@ -296,7 +302,7 @@ DeviceEdit::updateNetworkConfiguration()
     _protocolChanged = false;
     _localHostChanged = false;
     _networkPortChanged = false;
-
+    _namespacePathChanged = false;
 }
 
 void
