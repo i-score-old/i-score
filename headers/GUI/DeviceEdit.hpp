@@ -52,10 +52,9 @@ class DeviceEdit : public QDialog
     bool _networkPortChanged;
 
     QString defaultName = "MinuitDevice1";
-    QString defaultLocalHost = "192.168.0.1";
+    QString defaultLocalHost = "127.0.0.1";
     unsigned int defaultPort = 9998;
     int defaultProtocolIndex = 1;
-
 
     QString _currentDevice;
 

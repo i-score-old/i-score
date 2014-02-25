@@ -208,8 +208,6 @@ NetworkTree::load()
   for (nameIt = deviceNames.begin(); nameIt != deviceNames.end(); ++nameIt) {      
 
       QString deviceName = QString::fromStdString(*nameIt);
-      std::cout<<"NetworkTree::loading "<<*nameIt<<std::endl;
-
       QTreeWidgetItem *curItem = new QTreeWidgetItem(DeviceNode);
       curItem->setText(NAME_COLUMN , deviceName);
       treeRecursiveExploration(curItem, true);
