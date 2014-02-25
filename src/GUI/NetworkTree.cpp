@@ -111,6 +111,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   connect(_deviceEdit, SIGNAL(deviceNameChanged(QString,QString)), this, SLOT(updateDeviceName(QString, QString)));
   connect(_deviceEdit, SIGNAL(deviceProtocolChanged(QString)), this, SLOT(updateDeviceProtocol(QString)));
   connect(_deviceEdit, SIGNAL(newDeviceAdded(QString)), this, SLOT(addNewDevice(QString)));
+  connect(_deviceEdit, SIGNAL(namespaceLoaded(QString)), this, SLOT(updateDeviceNamespace(QString)));
 
   _addADeviceItem = addADeviceNode();
   addTopLevelItem(_addADeviceItem);
@@ -2160,6 +2161,34 @@ NetworkTree::updateDeviceProtocol(QString newName)
   emit(pluginChanged(deviceName));
 
   //Va supprimer les message de cette device
+}
+
+void
+NetworkTree::updateDeviceNamespace(QString deviceName){
+    QTreeWidgetItem *deviceItem;
+
+    if(currentItem()!=NULL && currentItem()->text(NAME_COLUMN) == deviceName)
+        deviceItem = currentItem();
+
+    else{
+        //have to find in networkTree the device item
+        QList<QTreeWidgetItem *> items = findItems(deviceName,Qt::MatchExactly,NAME_COLUMN);
+
+        if(items.isEmpty()){ //no item found, create a new device item
+            std::cerr<<"NetworkTree::updateDeviceNamespace() : cannot find item assiocated to the device's name"<<std::endl;
+            return;
+        }
+        else{
+            for(int i=0 ; i<items.size() ; i++){
+                if(items.at(i)->type() == DeviceNode){ //first deviceType found is set
+                    deviceItem = items.at(i);
+                }
+            }
+        }
+    }
+
+    if (deviceItem != NULL)
+        treeRecursiveExploration(deviceItem,false);
 }
 
 void

@@ -2135,3 +2135,8 @@ bool
 Maquette::setDeviceProtocol(std::string device, std::string protocol){
     return _engines->setDeviceProtocol(device, protocol);
 }
+
+bool
+Maquette::loadNetworkNamespace(const string &application, const string &filepath){
+    return _engines->loadNetworkNamespace(application,filepath);
+}

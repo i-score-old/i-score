@@ -748,6 +748,8 @@ class Maquette : public QObject
     bool setDeviceLocalHost(std::string device, std::string localHost);
     bool setDeviceProtocol(std::string device, std::string protocol);
 
+    bool loadNetworkNamespace(const string &application, const string &filepath);
+
   public slots:
     
     /*!

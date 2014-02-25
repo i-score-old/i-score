@@ -238,6 +238,7 @@ DeviceEdit::updateNetworkConfiguration()
         unsigned int    port = _portOutputBox->value();
 
         Maquette:: getInstance()->addNetworkDevice(name,protocol,ip,port);
+
         emit(newDeviceAdded(_nameEdit->text())); //sent to networkTree
 
         _currentDevice = _nameEdit->text();
@@ -267,9 +268,26 @@ DeviceEdit::updateNetworkConfiguration()
             emit(deviceNameChanged(_currentDevice, _nameEdit->text()));
     }
 
+
     if(_namespacePathChanged){
+
         //check if currentDevice ok
-        //load
+        if(Maquette::getInstance()->isNetworkDeviceRequestable(_currentDevice.toStdString()) == 0){
+
+            //load
+            if(Maquette::getInstance()->loadNetworkNamespace(_currentDevice.toStdString(),_namespaceFilePath->text().toStdString())){
+                emit(namespaceLoaded(_currentDevice));
+            }
+            else{
+                QMessageBox::warning(this, "", tr("Cannot load namespace file"));
+                reject();
+            }
+        }
+
+        else{
+            QMessageBox::warning(this, "", tr("Cannot load namespace file - please verify your device's parameters"));
+            reject();
+        }
     }
     accept();
 

@@ -46,6 +46,7 @@ class DeviceEdit : public QDialog
     void deviceNameChanged(QString,QString);
     void deviceProtocolChanged(QString);
     void newDeviceAdded(QString);
+    void namespaceLoaded(QString);
 
   private:
     void init();
