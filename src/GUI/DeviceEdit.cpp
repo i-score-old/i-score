@@ -99,7 +99,7 @@ DeviceEdit::init()
   _layout->addWidget(_cancelButton, 4, 3, 1, 1);
 
   connect(_nameEdit, SIGNAL(textChanged(QString)), this, SLOT(setDeviceNameChanged()));
-  connect(_protocolsComboBox, SIGNAL(activated(int)), this, SLOT(setProtocolChanged()));
+  connect(_protocolsComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setProtocolChanged()));
   connect(_portOutputBox, SIGNAL(valueChanged(int)), this, SLOT(setNetworkPortChanged()));
   connect(_localHostBox, SIGNAL(textChanged(const QString &)), this, SLOT(setLocalHostChanged()));
 
@@ -210,20 +210,27 @@ DeviceEdit::updateNetworkConfiguration()
   if (_changed) {
 
       if (_nameChanged) {
-          emit(deviceNameChanged(_currentDevice, _nameEdit->text()));
+          std::cout<<"nameChanged"<<std::endl;
+
           Maquette::getInstance()->setDeviceName(_currentDevice.toStdString(), _nameEdit->text().toStdString());
           _currentDevice = _nameEdit->text();
       }
       if (_localHostChanged) {
+          std::cout<<"IPChanged"<<std::endl;
           Maquette::getInstance()->setDeviceLocalHost(_currentDevice.toStdString(), _localHostBox->text().toStdString());
       }
       if (_networkPortChanged) {
+          std::cout<<"portChanged"<<std::endl;
           Maquette::getInstance()->setDevicePort(_currentDevice.toStdString(), _portOutputBox->value());
       }
       if (_protocolChanged) {
+          std::cout<<"protocolChanged"<<std::endl;
           Maquette::getInstance()->setDeviceProtocol(_currentDevice.toStdString(), _protocolsComboBox->currentText().toStdString());
 //          emit(deviceProtocolChanged(_protocolsComboBox->currentText()));
       }
+
+      if (_nameChanged) //have to be after setting all parameters
+          emit(deviceNameChanged(_currentDevice, _nameEdit->text()));
   }
 
   accept();
