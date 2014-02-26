@@ -2378,7 +2378,7 @@ bool Engine::getDeviceIntegerParameter(const string device, const string protoco
     return 1;
 }
 
-bool Engine::getDeviceIntegerVectorParameter(const string device, const string protocol, const string parameter, vector<int> &integerVect){
+bool Engine::getDeviceIntegerVectorParameter(const string device, const string protocol, const string parameter, vector<int>& integerVect){
     TTSymbol        applicationName;
     TTErr           err;
     TTValue         p, v;
@@ -2394,11 +2394,8 @@ bool Engine::getDeviceIntegerVectorParameter(const string device, const string p
         hashParameters = TTHashPtr((TTPtr)v[0]);
         hashParameters->lookup(TTSymbol(parameter),p);
 
-        for (TTElementIter it = p.begin() ; it != p.end() ; it++){
-            ;
-            //TODO
-            //integerVect.push_back(TTUInt16(&it));
-        }
+        for (TTUInt32 i = 0 ; i < p.size() ; i++)
+            integerVect.push_back(TTUInt16(p[i]));
 
         return 0;
     }
