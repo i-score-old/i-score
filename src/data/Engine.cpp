@@ -2163,11 +2163,9 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
 {
     vector<string>      snapshot;
     TTAddress           anAddress = toTTAddress(address);
-    TTSymbol            type;
     TTNodeDirectoryPtr  aDirectory;
     TTNodePtr           aNode;
-    TTMirrorPtr         aMirror;
-    TTList              nodeList;
+    TTObjectBasePtr     anObject;
     TTString            s;
     TTValue             v;
     
@@ -2180,15 +2178,16 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
         if (!aDirectory->getTTNode(anAddress, &aNode)) {
             
             // get object attributes
-            aMirror = TTMirrorPtr(aNode->getObject());
-            if (aMirror) {
+            anObject = aNode->getObject();
+            
+            if (anObject) {
                 
-                type = aMirror->getName();
-                
-                if (type == TTSymbol("Data")) {
-                    
+                // in case of proxy data or mirror object
+                if (anObject->getName() == TTSymbol("Data") ||
+                    (anObject->getName() == kTTSym_Mirror && TTMirrorPtr(anObject)->getName() == TTSymbol("Data")))
+                {
                     // get the value attribute
-                    aMirror->getAttributeValue(TTSymbol("value"), v);
+                    anObject->getAttributeValue(TTSymbol("value"), v);
                     v.toString();
                     s = TTString(v[0]);
                     
