@@ -118,8 +118,28 @@ DeviceEdit::init()
   connect(_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
-DeviceEdit::~DeviceEdit(){
-//TODO
+DeviceEdit::~DeviceEdit()
+{
+    delete _layout;
+    delete _deviceNameLabel;
+    delete _nameEdit;
+
+    delete _devicesLabel;
+    delete _protocolsLabel;
+    delete _portOutputLabel;
+    delete _portInputLabel;
+    delete _localHostLabel;
+
+    delete _protocolsComboBox;
+    delete _portOutputBox;
+    delete _portInputBox;
+    delete _localHostBox;
+
+    delete _openNamespaceFileButton;
+    delete _namespaceFilePath;
+
+    delete _okButton;
+    delete _cancelButton;
 }
 
 void
