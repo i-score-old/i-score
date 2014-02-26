@@ -74,7 +74,6 @@ DeviceEdit::init()
   _nameEdit = new QLineEdit;
   _protocolsComboBox = new QComboBox;
 
-  _openNamespaceFileButton = new QPushButton("Load");
   _namespaceFilePath = new QLineEdit;
 
   // Protocols
@@ -96,10 +95,12 @@ DeviceEdit::init()
   _layout->addWidget(_localHostLabel, 4, 0, 1, 1);
   _layout->addWidget(_localHostBox, 4, 1, 1, 1);
 
+  _openNamespaceFileButton = new QPushButton("Load");
+  _openNamespaceFileButton->setAutoDefault(false);
   _layout->addWidget(_openNamespaceFileButton, 5, 0, 1, 1);
   _layout->addWidget(_namespaceFilePath, 5, 1, 1, 1);
 
-  _okButton = new QPushButton(tr("OK"), this);
+  _okButton = new QPushButton(tr("OK"), this);  
   _layout->addWidget(_okButton, 6, 3, 1, 1);
   _cancelButton = new QPushButton(tr("Cancel"), this);
   _layout->addWidget(_cancelButton, 6, 4, 1, 1);
@@ -177,14 +178,14 @@ DeviceEdit::edit(QString name)
   _protocolChanged = false;
 
   _nameEdit->setFocus();
-  _okButton->setFocus();
+
   exec();
 }
 
 void
 DeviceEdit::edit()
 {
-    _nameEdit->setText(defaultName);
+    _nameEdit->setText(defaultName);    
     _nameEdit->selectAll();
     _localHostBox->setText(defaultLocalHost);
     _portOutputBox->setValue(defaultPort);
@@ -192,6 +193,7 @@ DeviceEdit::edit()
     _protocolsComboBox->setCurrentIndex(defaultProtocolIndex);
     _newDevice = true;
 
+    _nameEdit->setFocus();
     exec();
 }
 
