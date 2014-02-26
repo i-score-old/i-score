@@ -150,10 +150,9 @@ DeviceEdit::edit(QString name)
   }
 
   if((Maquette::getInstance()->getDevicePort(_currentDevice.toStdString(),protocol,networkPort)) != 0){
-      QMessageBox::warning(this, "", tr("Port not found"));
+      QMessageBox::warning(this, "", tr("destination port not found"));
       return;
   }
-
 
   // Set values
   _localHostBox->setText(QString::fromStdString(networkHost));

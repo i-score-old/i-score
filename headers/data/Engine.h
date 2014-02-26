@@ -1041,6 +1041,7 @@ public:
      */
     bool getDeviceIntegerParameter(const std::string device, const std::string protocol, const std::string parameter, unsigned int &integer);
 
+    bool getDeviceIntegerVectorParameter(const std::string device, const std::string protocol, const std::string parameter, std::vector<int> &integerVect);
     /*!
      * Gets a string parameter associated to the protocol and the device.
      *
