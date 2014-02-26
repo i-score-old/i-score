@@ -2378,6 +2378,33 @@ bool Engine::getDeviceIntegerParameter(const string device, const string protoco
     return 1;
 }
 
+bool Engine::getDeviceIntegerVectorParameter(const string device, const string protocol, const string parameter, vector<int> &integerVect){
+    TTSymbol        applicationName;
+    TTErr           err;
+    TTValue         p, v;
+    TTHashPtr       hashParameters;
+
+    applicationName = TTSymbol(device);
+
+    // get parameter's table
+    v = TTSymbol(applicationName);
+    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
+
+    if (!err) {
+        hashParameters = TTHashPtr((TTPtr)v[0]);
+        hashParameters->lookup(TTSymbol(parameter),p);
+
+        for (TTElementIter it = p.begin() ; it != p.end() ; it++){
+            ;
+            //TODO
+            //integerVect.push_back(TTUInt16(&it));
+        }
+
+        return 0;
+    }
+    return 1;
+}
+
 bool Engine::getDeviceStringParameter(const string device, const string protocol, const string parameter, string &string){
 
     TTSymbol        applicationName, s;

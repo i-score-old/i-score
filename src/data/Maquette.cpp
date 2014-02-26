@@ -2122,8 +2122,8 @@ Maquette::setDeviceName(std::string device, std::string newName){
 }
 
 bool
-Maquette::setDevicePort(std::string device, int port){
-    return _engines->setDevicePort(device, port);
+Maquette::setDevicePort(std::string device, int destinationPort, int receptionPort){
+    return _engines->setDevicePort(device, destinationPort, receptionPort);
 }
 
 bool

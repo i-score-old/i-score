@@ -744,7 +744,7 @@ class Maquette : public QObject
     std::vector<std::string> getProtocolsName();
 
     bool setDeviceName(std::string device, std::string newName);
-    bool setDevicePort(std::string device, int port);
+    bool setDevicePort(std::string device, int destinationPort, int receptionPort = 0);
     bool setDeviceLocalHost(std::string device, std::string localHost);
     bool setDeviceProtocol(std::string device, std::string protocol);
 

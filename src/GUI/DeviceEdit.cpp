@@ -68,8 +68,7 @@ DeviceEdit::init()
   _portOutputBox = new QSpinBox;
   _portOutputBox->setRange(0, 20000);
   _portInputBox = new QSpinBox;
-  _portInputBox->setRange(0, 20000);
-  _portInputBox->setEnabled(false);
+  _portInputBox->setRange(0, 20000);  
 
   _localHostBox = new QLineEdit;
   _nameEdit = new QLineEdit;
@@ -108,6 +107,7 @@ DeviceEdit::init()
   connect(_nameEdit, SIGNAL(textChanged(QString)), this, SLOT(setDeviceNameChanged()));
   connect(_protocolsComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setProtocolChanged()));
   connect(_portOutputBox, SIGNAL(valueChanged(int)), this, SLOT(setNetworkPortChanged()));
+  connect(_portInputBox, SIGNAL(valueChanged(int)), this, SLOT(setNetworkPortChanged()));
   connect(_localHostBox, SIGNAL(textChanged(const QString &)), this, SLOT(setLocalHostChanged()));
 
   connect(_openNamespaceFileButton, SIGNAL(clicked()), this, SLOT(openFileDialog()));
@@ -150,10 +150,9 @@ DeviceEdit::edit(QString name)
   }
 
   if((Maquette::getInstance()->getDevicePort(_currentDevice.toStdString(),protocol,networkPort)) != 0){
-      QMessageBox::warning(this, "", tr("Port not found"));
+      QMessageBox::warning(this, "", tr("destination port not found"));
       return;
   }
-
 
   // Set values
   _localHostBox->setText(QString::fromStdString(networkHost));
@@ -188,6 +187,7 @@ DeviceEdit::edit()
     _nameEdit->selectAll();
     _localHostBox->setText(defaultLocalHost);
     _portOutputBox->setValue(defaultPort);
+    _portInputBox->setValue(defaultInputPort);
     _protocolsComboBox->setCurrentIndex(defaultProtocolIndex);
     _newDevice = true;
 
@@ -200,12 +200,14 @@ DeviceEdit::setProtocolChanged()
   _protocolChanged = true;
 
   if(_protocolsComboBox->currentText() == "OSC"){
-      _portInputBox->setValue(Maquette::getInstance()->getOSCInputPort());
+      _portInputLabel->setHidden(false);
+      _portInputBox->setHidden(false);
       _namespaceFilePath->setHidden(false);
-      _openNamespaceFileButton->setHidden(false);
+      _openNamespaceFileButton->setHidden(false);      
   }
   else if (_protocolsComboBox->currentText() == "Minuit"){
-      _portInputBox->setValue(Maquette::getInstance()->getMinuitInputPort());
+      _portInputLabel->setHidden(true);
+      _portInputBox->setHidden(true);
       _namespaceFilePath->setHidden(true);
       _openNamespaceFileButton->setHidden(true);
   }
@@ -240,13 +242,16 @@ DeviceEdit::updateNetworkConfiguration()
         string          name = _nameEdit->text().toStdString(),
                         ip   = _localHostBox->text().toStdString(),
                         protocol = _protocolsComboBox->currentText().toStdString();
-        unsigned int    port = _portOutputBox->value();
+        unsigned int    outputPort = _portOutputBox->value(),
+                        inputPort = _portInputBox->value();
 
-        Maquette:: getInstance()->addNetworkDevice(name,protocol,ip,port);
+        _currentDevice = _nameEdit->text();
+        Maquette:: getInstance()->addNetworkDevice(name,protocol,ip,outputPort);
+        Maquette::getInstance()->setDevicePort(_currentDevice.toStdString(), outputPort, inputPort);
 
         emit(newDeviceAdded(_nameEdit->text())); //sent to networkTree
 
-        _currentDevice = _nameEdit->text();
+
         _newDevice = false;
     }
 
@@ -261,7 +266,7 @@ DeviceEdit::updateNetworkConfiguration()
         }
         if (_networkPortChanged) {
             std::cout<<"portChanged"<<std::endl;
-            Maquette::getInstance()->setDevicePort(_currentDevice.toStdString(), _portOutputBox->value());
+            Maquette::getInstance()->setDevicePort(_currentDevice.toStdString(), _portOutputBox->value(), _portInputBox->value());
         }
         if (_protocolChanged) {
             std::cout<<"protocolChanged"<<std::endl;
