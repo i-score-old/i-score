@@ -736,6 +736,7 @@ class Maquette : public QObject
 
     bool getDevicePort(std::string deviceName,  std::string protocol, unsigned int &port);
     bool getDevicePort(std::string deviceName, unsigned int &port);
+    bool getDevicePorts(std::string deviceName, std::string protocol, std::vector<int> &portVector);
 
     int getOSCInputPort();
     int getMinuitInputPort();

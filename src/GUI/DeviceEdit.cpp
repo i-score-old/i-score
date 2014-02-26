@@ -125,7 +125,7 @@ void
 DeviceEdit::edit(QString name)
 {
   std::vector<std::string>              devicesName;
-  unsigned int                          networkPort;
+  std::vector<int>                      networkPorts;
   std::string                           networkHost;
   std::string                           protocol;
 
@@ -149,8 +149,8 @@ DeviceEdit::edit(QString name)
       return;
   }
 
-  if((Maquette::getInstance()->getDevicePort(_currentDevice.toStdString(),protocol,networkPort)) != 0){
-      QMessageBox::warning(this, "", tr("destination port not found"));
+  if((Maquette::getInstance()->getDevicePorts(_currentDevice.toStdString(),protocol,networkPorts)) != 0){
+      QMessageBox::warning(this, "", tr("Ports not found"));
       return;
   }
 
@@ -158,8 +158,9 @@ DeviceEdit::edit(QString name)
   _localHostBox->setText(QString::fromStdString(networkHost));
   _localHostChanged = false;
 
-  _portOutputBox->setValue(networkPort);
-  _networkPortChanged = false;
+  _portOutputBox->setValue(networkPorts[0]);
+  _portInputBox->setValue(networkPorts[1]);
+  _networkPortChanged = false;  
 
   _nameEdit->setText(QString::fromStdString(name.toStdString()));
   _nameEdit->selectAll();
