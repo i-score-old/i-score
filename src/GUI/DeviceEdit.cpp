@@ -61,8 +61,8 @@ DeviceEdit::init()
 
   _deviceNameLabel = new QLabel(tr("DeviceName"));
   _protocolsLabel = new QLabel(tr("protocols"));
-  _portOutputLabel = new QLabel(tr("Port (output)"));
-  _portInputLabel = new QLabel(tr("          (input)"));
+  _portOutputLabel = new QLabel(tr("Port (destination)"));
+  _portInputLabel = new QLabel(tr("          (reception)"));
   _localHostLabel = new QLabel(tr("localHost"));
 
   _portOutputBox = new QSpinBox;
@@ -251,7 +251,6 @@ DeviceEdit::updateNetworkConfiguration()
 
         emit(newDeviceAdded(_nameEdit->text())); //sent to networkTree
 
-
         _newDevice = false;
     }
 
@@ -261,15 +260,12 @@ DeviceEdit::updateNetworkConfiguration()
             _currentDevice = _nameEdit->text();
         }
         if (_localHostChanged) {
-            std::cout<<"IPChanged"<<std::endl;
             Maquette::getInstance()->setDeviceLocalHost(_currentDevice.toStdString(), _localHostBox->text().toStdString());
         }
         if (_networkPortChanged) {
-            std::cout<<"portChanged"<<std::endl;
             Maquette::getInstance()->setDevicePort(_currentDevice.toStdString(), _portOutputBox->value(), _portInputBox->value());
         }
         if (_protocolChanged) {
-            std::cout<<"protocolChanged"<<std::endl;
             Maquette::getInstance()->setDeviceProtocol(_currentDevice.toStdString(), _protocolsComboBox->currentText().toStdString());
             //          emit(deviceProtocolChanged(_protocolsComboBox->currentText()));
         }
