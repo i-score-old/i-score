@@ -2081,6 +2081,17 @@ Maquette::getDevicePort(std::string deviceName, std::string protocol, unsigned i
 }
 
 bool
+Maquette::getDevicePorts(std::string deviceName, std::string protocol, vector<int> &portVector){
+
+    if(_engines->getDeviceIntegerVectorParameter(deviceName,protocol,"port",portVector) == 0)
+        return 0;
+    else{
+        std::cerr << "Maquette::getDevicePorts : cannot find ports for the device : "<<deviceName << std::endl;
+        return 1;
+    }
+}
+
+bool
 Maquette::getDevicePort(std::string deviceName, unsigned int &port)
 {
     string protocol;
