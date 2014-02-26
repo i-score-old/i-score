@@ -907,7 +907,7 @@ public:
 	 * \param deviceIp : the ip of the network device.
 	 * \param devicePort : the port of the network device.
 	 */
-    void addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & deviceIp, const unsigned int & devicePort);
+    void addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & deviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort = 0);
     
 	/*!
 	 * Removes a network device.

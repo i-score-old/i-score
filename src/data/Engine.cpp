@@ -2001,9 +2001,9 @@ void Engine::trigger(ConditionedProcessId triggerId)
     timeEvent->sendMessage(kTTSym_Trigger);
 }
 
-void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const unsigned int & DevicePort)
+void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort)
 {
-    TTValue         v, none;
+    TTValue         v, portValue, none;
     TTSymbol        applicationName(deviceName);
     TTSymbol        protocolName(pluginToUse);
     TTObjectBasePtr anApplication = NULL;
@@ -2025,7 +2025,7 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
         // check if the protocol has been loaded
 		if (getProtocol(protocolName)) {
             
-            // stop the protocol for this application
+            // stop the protocol
             getProtocol(protocolName)->sendMessage(TTSymbol("Stop"));
             
             // register the application to the protocol
@@ -2042,25 +2042,20 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
                 hashParameters->remove(TTSymbol("ip"));
                 hashParameters->append(TTSymbol("ip"), TTSymbol(DeviceIp));
                 
+                portValue = destinationPort;
+                if (receptionPort != 0)
+                    portValue.append(receptionPort);
+                
                 hashParameters->remove(TTSymbol("port"));
-                hashParameters->append(TTSymbol("port"), DevicePort);
+                hashParameters->append(TTSymbol("port"), portValue);
             
                 v = applicationName;
                 v.append(TTPtr(hashParameters));
                 getProtocol(protocolName)->setAttributeValue(TTSymbol("applicationParameters"), v);
             }
             
-            // run the protocol for this application
+            // run the protocol
             getProtocol(protocolName)->sendMessage(TTSymbol("Run"));
-
-            //DISPLAY
-            string ip;
-            getDeviceStringParameter(deviceName,pluginToUse,"ip",ip);
-            unsigned int port = 12;
-            getDeviceIntegerParameter(deviceName,pluginToUse,"port",port);
-
-            std::cout<<"ADD : "<<deviceName<<" "<<pluginToUse<<" "<<ip<<" "<<port<<std::endl;
-
         }
     }
 }
@@ -2479,12 +2474,16 @@ Engine::setDevicePort(string deviceName, int destinationPort, int receptionPort)
 
     v = TTSymbol(applicationName);
 
-    if(getDeviceProtocol(deviceName,protocol) != 0)
+    if (getDeviceProtocol(deviceName,protocol) != 0)
         return 1;
 
     err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
 
     if (!err) {
+        
+        // stop the protocol
+        getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Stop"));
+        
         hashParameters = TTHashPtr((TTPtr)v[0]);
 
         hashParameters->remove(TTSymbol("port"));
@@ -2498,6 +2497,9 @@ Engine::setDevicePort(string deviceName, int destinationPort, int receptionPort)
         v = TTSymbol(applicationName);
         v.append((TTPtr)hashParameters);
         getProtocol(TTSymbol(protocol))->setAttributeValue(TTSymbol("applicationParameters"), v);
+        
+        // run the protocol
+        getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Run"));
 
         return 0;
     }
@@ -2522,6 +2524,10 @@ Engine::setDeviceLocalHost(string deviceName, string localHost)
     err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
 
     if (!err) {
+        
+        // stop the protocol
+        getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Stop"));
+        
         hashParameters = TTHashPtr((TTPtr)v[0]);
 
         hashParameters->remove(TTSymbol("ip"));
@@ -2530,6 +2536,9 @@ Engine::setDeviceLocalHost(string deviceName, string localHost)
         v = TTSymbol(applicationName);
         v.append((TTPtr)hashParameters);
         getProtocol(TTSymbol(protocol))->setAttributeValue(TTSymbol("applicationParameters"), v);
+        
+        // run the protocol
+        getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Run"));
 
         return 0;
     }

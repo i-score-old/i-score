@@ -243,12 +243,11 @@ DeviceEdit::updateNetworkConfiguration()
         string          name = _nameEdit->text().toStdString(),
                         ip   = _localHostBox->text().toStdString(),
                         protocol = _protocolsComboBox->currentText().toStdString();
-        unsigned int    outputPort = _portOutputBox->value(),
-                        inputPort = _portInputBox->value();
+        unsigned int    destinationPort = _portOutputBox->value(),
+                        receptionPort = _portInputBox->value();
 
         _currentDevice = _nameEdit->text();
-        Maquette:: getInstance()->addNetworkDevice(name,protocol,ip,outputPort);
-        Maquette::getInstance()->setDevicePort(_currentDevice.toStdString(), outputPort, inputPort);
+        Maquette:: getInstance()->addNetworkDevice(name, protocol, ip, destinationPort, receptionPort);
 
         emit(newDeviceAdded(_nameEdit->text())); //sent to networkTree
 

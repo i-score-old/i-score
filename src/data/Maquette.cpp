@@ -1833,11 +1833,11 @@ Maquette::load(const string &fileName)
 }
 
 void
-Maquette::addNetworkDevice(string deviceName, string plugin, string ip, unsigned int port)
+Maquette::addNetworkDevice(string deviceName, string plugin, string ip, unsigned int destinationPort, unsigned int receptionPort)
 {
-  MyDevice newDevice(deviceName, plugin, port, ip);
+  MyDevice newDevice(deviceName, plugin, destinationPort, ip);
   _devices[deviceName] = newDevice;
-  _engines->addNetworkDevice(deviceName, plugin, ip, port);
+  _engines->addNetworkDevice(deviceName, plugin, ip, destinationPort, receptionPort);
 }
 
 double
