@@ -170,8 +170,14 @@ private:
 
 public:
 
-    const int OSC_INPUT_PORT = 13580;
+    // to receive Minuit messages : used to receive query or answers from any other applications
     const int MINUIT_INPUT_PORT = 13579;
+    
+    // to receive OSC messages : used to control i-score
+    const int OSC_INPUT_PORT = 13580;
+    
+    // to emit OSC messages : used by i-score to send feedbacks or notifications
+    const int OSC_OUTPUT_PORT = 13581;
 
     Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
            void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),

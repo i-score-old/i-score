@@ -181,9 +181,6 @@ void Engine::registerIscoreToProtocols()
             v.append((TTPtr)hashParameters);
             getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
         }
-        
-        // run the Minuit protocol
-        TTModularApplications->sendMessage(TTSymbol("ProtocolRun"), TTSymbol("Minuit"), none);
     }
     
     // check if the OSC protocol has been loaded
@@ -202,6 +199,8 @@ void Engine::registerIscoreToProtocols()
             
             // replace the Minuit parameters for the local application
             hashParameters->remove(TTSymbol("port"));
+            
+            v = TTValue(OSC_INPUT_PORT, OSC_OUTPUT_PORT);
             hashParameters->append(TTSymbol("port"), OSC_INPUT_PORT);
             
             hashParameters->remove(TTSymbol("ip"));
@@ -211,9 +210,6 @@ void Engine::registerIscoreToProtocols()
             v.append((TTPtr)hashParameters);
             getProtocol(TTSymbol("OSC"))->setAttributeValue(TTSymbol("applicationParameters"), v);
         }
-        
-        // run the Minuit protocol
-        TTModularApplications->sendMessage(TTSymbol("ProtocolRun"), TTSymbol("OSC"), none);
     }
 }
 
