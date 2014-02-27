@@ -1335,6 +1335,33 @@ NetworkTree::refreshCurrentItemNamespace(){
         refreshItemNamespace(currentItem());
 }
 
+void
+NetworkTree::deleteCurrentItemNamespace()
+{
+    if(currentItem() != NULL){
+        QString itemName = getAbsoluteAddress(currentItem());
+
+        int ret = QMessageBox::warning(this, QString("Delete %s").arg(itemName),
+                                        QString("Do you really want to delete %1 ?").arg(itemName),
+                                        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                                        QMessageBox::Cancel);
+        switch (ret) {
+        case QMessageBox::Yes:{
+            delete currentItem();
+            Maquette::getInstance()->removeNetworkDevice(itemName.toStdString());
+            return;
+        }
+
+        case QMessageBox::No:
+            break;
+
+        case QMessageBox::Cancel:
+            break;
+
+        }
+    }
+}
+
 /*************************************************************************
  *                          Selection methods
  *************************************************************************
@@ -1542,13 +1569,21 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
     if(currentItem()!=NULL){
         if(event->button()==Qt::RightButton){
             if(currentItem()->type() == DeviceNode){
+
                 QMenu *contextMenu = new QMenu(this);
                 QAction *refreshAct = new QAction(tr("Refresh"),this);
+                QAction *deleteAct = new QAction(tr("Delete"),this);
+
                 contextMenu->addAction(refreshAct);
+                contextMenu->addAction(deleteAct);
+
                 connect(refreshAct, SIGNAL(triggered()), this, SLOT(refreshCurrentItemNamespace()));
+                connect(deleteAct, SIGNAL(triggered()), this, SLOT(deleteCurrentItemNamespace()));
+
                 contextMenu->exec(event->globalPos());
 
                 delete refreshAct;
+                delete deleteAct;
                 delete contextMenu;
             }
         }
