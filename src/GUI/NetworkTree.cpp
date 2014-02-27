@@ -1341,7 +1341,7 @@ NetworkTree::deleteCurrentItemNamespace()
     if(currentItem() != NULL){
         QString itemName = getAbsoluteAddress(currentItem());
 
-        int ret = QMessageBox::warning(this, QString("Delete %s").arg(itemName),
+        int ret = QMessageBox::warning(this, QString("Delete %1").arg(itemName),
                                         QString("Do you really want to delete %1 ?").arg(itemName),
                                         QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                                         QMessageBox::Cancel);
