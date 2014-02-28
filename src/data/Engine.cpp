@@ -2337,8 +2337,6 @@ void Engine::refreshNetworkNamespace(const string &application, const string &ad
 
 bool Engine::loadNetworkNamespace(const string &application, const string &filepath)
 {
-
-    std::cout<<"loadNetworkNamespace "<<application<< " "<<filepath<<std::endl;
     // Create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
     
