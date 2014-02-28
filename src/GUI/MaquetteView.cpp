@@ -142,12 +142,12 @@ MaquetteView::updateScene()
 void
 MaquetteView::drawStartIndicator(QPainter *painter)
 {
-  QGraphicsView::drawBackground(painter, rect);
   QPen pen(BACKGROUND_COLOR);
   //was QPen pen(QColor(145, 145, 145));
     AbstractBox *scenarioAbstract = static_cast<AbstractBox *>(Maquette::getInstance()->getBox(ROOT_BOX_ID)->abstract());
 
     if(scenarioAbstract->hasFirstMsgs()){
+        painter->setPen(pen);
         painter->save();
         painter->setOpacity(_scenarioSelected ? 1 : 0.6);
         QRectF gradientRect(0,0,GRADIENT_WIDTH,MaquetteScene::MAX_SCENE_HEIGHT);

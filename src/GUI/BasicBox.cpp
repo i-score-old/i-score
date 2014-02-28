@@ -1846,18 +1846,6 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         _comboBoxProxy->setVisible(false);
         _curveProxy->setVisible(false);
     }
-
-  painter->fillRect(0, 0, textRect.width(), textRect.height(), isSelected() ? _color : _colorUnselected);
-
-  //Text
-  painter->save();
-  painter->setPen(QPen(TEXT_COLOR));
-  painter->drawText(QRectF(BOX_MARGIN, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
-  painter->restore();
-
-  if (_abstract->width() <= 3 * RESIZE_TOLERANCE) {
-      painter->rotate(-90);
-      painter->translate(-QPointF(RESIZE_TOLERANCE - LINE_WIDTH, 0));
     else{
         _comboBoxProxy->setVisible(_abstract->height() > RESIZE_TOLERANCE + LINE_WIDTH);
         _curveProxy->setVisible(_abstract->height() > RESIZE_TOLERANCE + LINE_WIDTH);
