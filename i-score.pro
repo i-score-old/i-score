@@ -67,7 +67,7 @@ macx-clang {
     INCLUDEPATH += headers/data
     INCLUDEPATH += /Library/Frameworks/
     INCLUDEPATH += /usr/local/jamoma/includes
-    INCLUDEPATH += /usr/local/include/libxml2
+    INCLUDEPATH += /usr/include/libxml2
 
     LIBS += /usr/local/jamoma/lib/JamomaFoundation.dylib
     LIBS += /usr/local/jamoma/lib/JamomaDSP.dylib
@@ -78,7 +78,7 @@ macx-clang {
 }
 
 # Input
-HEADERS += /usr/local/jamoma/includes/TTScore.h \
+HEADERS += /usr/local/jamoma/includes/TTScoreAPI.h \
 /usr/local/jamoma/includes/TTModular.h \
 /usr/local/jamoma/includes/TTDSP.h \
 headers/data/Abstract.hpp \
@@ -119,9 +119,9 @@ headers/GUI/TreeMapElement.hpp \
 headers/GUI/ViewRelations.hpp \
 headers/GUI/BoxWidget.hpp \
 headers/GUI/BoxCurveEdit.hpp \
-headers/GUI/MaquetteWidget.hpp \
 headers/GUI/TimeBarWidget.hpp \
 headers/GUI/DeviceEdit.hpp \
+headers/GUI/HeaderPanelWidget.hpp
 
 SOURCES += src/main.cpp \
 src/data/Abstract.cpp \
@@ -162,6 +162,6 @@ src/GUI/TreeMapElement.cpp \
 src/GUI/ViewRelations.cpp \
 src/GUI/BoxWidget.cpp \
 src/GUI/BoxCurveEdit.cpp \
-src/GUI/MaquetteWidget.cpp \
 src/GUI/TimeBarWidget.cpp \
 src/GUI/DeviceEdit.cpp \
+src/GUI/HeaderPanelWidget.cpp

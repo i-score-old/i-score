@@ -47,7 +47,7 @@
 #include "MaquetteView.hpp"
 #include "NetworkConfig.hpp"
 #include "ViewRelations.hpp"
-#include "MaquetteWidget.hpp"
+#include "HeaderPanelWidget.hpp"
 #include "NetworkTree.hpp"
 
 #include <QResource>
@@ -94,15 +94,11 @@ MainWindow::MainWindow()
 
   // Creation of Scene and View
   _scene = new MaquetteScene(QRectF(0, 0, width(), height()), _editor);
-
   _view = new MaquetteView(this);  
 
   // Initialisation of Scene and View
   _view->setScene(_scene);
-  _view->updateScene();
-
-  // Store background to increase speed
-  _view->setCacheMode(QGraphicsView::CacheBackground); /// \todo devrait être fait dans le constructeur de MaquetteView. (par jaime Chao)
+  _view->updateScene();  
 
   _scene->updateView();
   _scene->init(); /// \todo Les méthodes init() sont à bannir, il y a des constructeurs pour ça !!! (par jaime Chao)
@@ -111,12 +107,19 @@ MainWindow::MainWindow()
   _editor->init(); /// \todo Les méthodes init() sont à bannir, il y a des constructeurs pour ça !!! (par jaime Chao)
   _editor->show();
 
-  _commandKey = false;
-
   // Central Widget
-  _maquetteWidget = new MaquetteWidget(this, _view, _scene);
+  _centralLayout = new QGridLayout;
+  _centralWidget = new QWidget;
+  _headerPanelWidget = new HeaderPanelWidget(NULL,_scene);
+
+  _centralLayout->addWidget(_headerPanelWidget);
+  _centralLayout->addWidget(_view);
+  _centralLayout->setContentsMargins(0, 0, 0, 0);
+  _centralLayout->setVerticalSpacing(0);
+  _centralWidget->setLayout(_centralLayout);
+
   _networkConfig = new NetworkConfig(_scene, this);
-  setCentralWidget(_maquetteWidget);
+  setCentralWidget(_centralWidget);
 
   // Creation of widgets
   createActions();
@@ -126,49 +129,55 @@ MainWindow::MainWindow()
   setCurrentFile("");
   setAcceptDrops(false);
 
-  connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, std::string)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, std::string)));
-  connect(_editor->networkTree(), SIGNAL(cmdKeyStateChanged(bool)), this, SLOT(updateCmdKeyState(bool)));
+  connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, unsigned int)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, unsigned int)));
   connect(_view->verticalScrollBar(), SIGNAL(valueChanged(int)), _scene, SLOT(verticalScroll(int)));  //TimeBar is painted on MaquetteScene, so a vertical scroll has to move the timeBar.
+  connect(_scene, SIGNAL(stopPlaying()), _headerPanelWidget, SLOT(stop()));
+  connect(_view, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
+  connect(_scene, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
+  connect(_view, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
+  connect(_scene, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
 }
 
 MainWindow::~MainWindow()
 {
-  delete _view;
-  delete _scene;
-  delete _editor;
-  delete _maquetteWidget;
+    delete _view;
+    delete _scene;
+    delete _editor;
+    delete _headerPanelWidget;
+    delete _centralLayout;
+    delete _centralWidget;
 
-  delete _menuBar;
-  delete _fileMenu;
-  delete _editMenu;
-  delete _viewMenu;
-//  delete _helpMenu;
-  delete _newAct;
-  delete _openAct;
-  delete _saveAct;
-  delete _saveAsAct;
-  delete _exportAct;
-  delete _printAct;
-  delete _quitAct;
-  delete _aboutAct;
-  delete _helpAct;
+    delete _menuBar;
+    delete _fileMenu;
+    delete _editMenu;
+    delete _viewMenu;
+    //  delete _helpMenu;
+    delete _newAct;
+    delete _openAct;
+    delete _saveAct;
+    delete _saveAsAct;
+    delete _exportAct;
+    delete _printAct;
+    delete _quitAct;
+    delete _aboutAct;
+    delete _helpAct;
 
-  delete _zoomInAct;
-  delete _zoomOutAct;
-  delete _networkAct;
-  delete _editorAct;
+    delete _zoomInAct;
+    delete _zoomOutAct;
+    delete _networkAct;
+    delete _editorAct;
 
-  delete _cutAct;
-  delete _copyAct;
-  delete _pasteAct;
-  delete _selectAllAct;
-  delete _modeAct;
-  delete _selectModeAct;
-  delete _PBModeAct;
-  delete _commentModeAct;
+    delete _cutAct;
+    delete _copyAct;
+    delete _pasteAct;
+    delete _selectAllAct;
+    delete _modeAct;
+    delete _selectModeAct;
+    delete _PBModeAct;
+    delete _commentModeAct;
 
-  delete _helpDialog;
-  delete _networkConfig;
+    delete _helpDialog;
+    delete _networkConfig;
 }
 
 void
@@ -293,7 +302,7 @@ MainWindow::open()
             break;
         }
     }
-  QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("XML Files (*.xml)"));
+  QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("XML Files (*.score)"));
   if (!fileName.isEmpty()) {
       loadFile(fileName);
     }
@@ -313,7 +322,7 @@ MainWindow::save()
 bool
 MainWindow::saveAs()
 {
-  QString fileName = QFileDialog::getSaveFileName(this, tr("Save File As"), "", tr("XML Files (*.xml)"));
+  QString fileName = QFileDialog::getSaveFileName(this, tr("Save File As"), "", tr("XML Files (*.score)"));
   if (fileName.isEmpty()) {
       return false;
     }
@@ -395,30 +404,6 @@ MainWindow::pasteSelection()
 {
   _scene->pasteBoxes();
 }
-
-void
-MainWindow::keyPressEvent(QKeyEvent *event)
-{
-  QMainWindow::keyPressEvent(event);
-  if (event->key() == Qt::Key_Control) {
-      updateCmdKeyState(true);
-    }
-}
-
-void
-MainWindow::keyReleaseEvent(QKeyEvent *event)
-{
-  QMainWindow::keyReleaseEvent(event);
-  updateCmdKeyState(false);
-  _commandKey = false;
-}
-
-bool
-MainWindow::commandKey()
-{
-  return _commandKey;
-}
-
 
 void
 MainWindow::selectAll()
@@ -701,36 +686,32 @@ MainWindow::loadFile(const QString &fileName)
 bool
 MainWindow::saveFile(const QString &fileName)
 {
-  /**** Backup automatique Résidence Albi ****/
+  /*********** Backup automatique *************/
 
     QDate date = QDate::currentDate();
     QTime time = QTime::currentTime();
     QString timeString = time.toString();
 
-    QString concat(tr("(")+QString("%1-%2-%3").arg(date.day()).arg(date.month()).arg(date.year())+tr("-")+timeString+tr(")"));
+    QString concat(tr("_")+QString("%1-%2-%3").arg(date.day()).arg(date.month()).arg(date.year())+tr("-")+timeString);
 
     QString backupName = fileName;
-    int i = fileName.indexOf(".xml");
+    int i = fileName.indexOf(".score");
     backupName.insert(i,concat);
 
     QProcess process;
-    QStringList XMLargs, SIMONEargs;
+    QStringList args;
 
-    XMLargs<< fileName;
-    XMLargs<< backupName;
+    args<< fileName;
+    args<< backupName;
 
-    SIMONEargs<< QString(fileName+tr(".simone"));
-    SIMONEargs<< QString(backupName+tr(".simone"));
-
-    process.start("cp", XMLargs);
-    process.execute("cp", SIMONEargs);
+    process.start("cp", args);
     process.close();
 
   /*******************************************/
 
   QString fileN;
-  if (!fileName.endsWith(".xml")) {
-      fileN = fileName + ".xml";
+  if (!fileName.endsWith(".score")) {
+      fileN = fileName + ".score";
     }
   else {
       fileN = fileName;
@@ -767,8 +748,8 @@ MainWindow::setCurrentFile(const QString &fileName)
 void
 MainWindow::setMaquetteSceneTitle(QString name)
 {
-  name.remove(".xml");
-  _maquetteWidget->setName(name);
+  name.remove(".score");
+  _headerPanelWidget->setName(name);
 }
 
 QString
@@ -778,14 +759,50 @@ MainWindow::strippedName(const QString &fullFileName)
 }
 
 void
-MainWindow::changeNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, std::string port)
+MainWindow::changeNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, unsigned int port)
 {
   _networkConfig->setNetworkConfig(deviceName, pluginName, IP, port);
 }
 
 void
-MainWindow::updateCmdKeyState(bool state)
-{
-  displayMessage(state ? tr("command key pressed") : tr(""), INDICATION_LEVEL);
-  _commandKey = state;
+MainWindow::updatePlayMode(){
+    _scene->unselectAll();
+    _editor->noBoxEdited();
+    _editor->setDisabled(_scene->playing());
+
+    if(!_scene->playing())
+        updateRecordingBoxes();
+}
+
+void
+MainWindow::updateRecordingBoxes(){
+
+    //Update recorded curves
+    QList<BasicBox*> boxes = Maquette::getInstance()->getRecordingBoxes();
+    QList<BasicBox*>::iterator it;
+    for (it = boxes.begin(); it != boxes.end(); it++){
+
+        //Setting start/end messages
+        QList< QPair<QTreeWidgetItem *, Message> > startItemsAndMsgs = _editor->networkTree()->getItemsFromMsg(Maquette::getInstance()->firstMessagesToSend((*it)->ID()));
+        QList< QPair<QTreeWidgetItem *, Message> > endItemsAndMsgs = _editor->networkTree()->getItemsFromMsg(Maquette::getInstance()->lastMessagesToSend((*it)->ID()));
+        NetworkMessages *startMsg = new NetworkMessages();
+        NetworkMessages *endMsg = new NetworkMessages();
+        startMsg->setMessages(startItemsAndMsgs);
+        endMsg->setMessages(endItemsAndMsgs);
+        Maquette::getInstance()->setStartMessagesToSend((*it)->ID(), startMsg);
+        Maquette::getInstance()->setEndMessagesToSend((*it)->ID(), endMsg);
+
+        //Setting messages to assign
+        QMap<QTreeWidgetItem*, Data> itemsToAssign;
+        Data data;
+        data.hasCurve = true;
+        data.curveActivated = true;
+        for(int i=0; i<startItemsAndMsgs.size(); i++)
+            itemsToAssign.insert(startItemsAndMsgs[i].first,data);
+
+        Maquette::getInstance()->setSelectedItemsToSend((*it)->ID(), itemsToAssign);
+
+        //Updating curve
+        (*it)->updateRecordingCurves();
+    }
 }

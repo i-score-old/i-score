@@ -61,6 +61,7 @@
 #include <QObject>
 #include <QPushButton>
 #include <QMenu>
+#include <QGraphicsColorizeEffect>
 
 #include "TTScore.h"
 
@@ -622,9 +623,18 @@ class BasicBox : public QObject, public QGraphicsItem
      */
     void setEndMessages(NetworkMessages *messages);
 
+    /*!
+     * \brief Return, as a QString list, the start messages.
+     *
+     * \return Start cue.
+     */
+    std::vector<std::string> getStartMessages();
+
     NetworkMessages *endMessages();
     void setEndMessage(QTreeWidgetItem *item, QString address);
     void updateWidgets();
+    void updateCurveRangeBoundMin(string address, float value);
+    void updateCurveRangeBoundMax(string address, float value);
 
     //! \brief Handles line width.
     static const unsigned int LINE_WIDTH = 2;
@@ -643,7 +653,7 @@ class BasicBox : public QObject, public QGraphicsItem
     static const int COMBOBOX_HEIGHT;
     static const float MSGS_INDICATOR_WIDTH;
     static const float GRIP_CIRCLE_SIZE;
-    static const QString SUB_SCENARIO_MODE_TEXT;
+    static const QString SUB_SCENARIO_MODE_TEXT;    
 
     /*!
      * \brief Painting method, redefinition of QGraphicsItem::paint().
@@ -687,6 +697,8 @@ class BasicBox : public QObject, public QGraphicsItem
     setStackedLayout(QStackedLayout *slayout){ boxContentWidget()->setStackedLayout(slayout); }
     inline bool
     hasCurve(string address){ return _curvesAddresses.contains(address); }
+    void addMessageToRecord(std::string address);
+    void removeMessageToRecord(std::string address);
 
     QPointF getLeftGripPoint();
     QPointF getRightGripPoint();
@@ -705,6 +717,10 @@ class BasicBox : public QObject, public QGraphicsItem
     void changeColor(QColor color);
     inline QColor
     currentColor(){ return _color; }
+    void select();
+    void setRecMode(bool activated);
+    inline bool recording(){return _recording;}
+    void updateRecordingCurves();
 
     /*!
      * \brief Return the messages list, like if the box just ended its execution.
@@ -803,6 +819,7 @@ class BasicBox : public QObject, public QGraphicsItem
     QMenu* _contextMenu;                                                        //!< The contextual menu, if one.
     bool _shift;                                                                //!< State of Shift Key.
     bool _playing;                                                              //!< State of playing.
+    bool _recording;                                                            //!< State of recording.
     TextEdit *_trgPntMsgEdit;                                                   //!< The trigger point editing dialog.
     Comment *_comment;                                                          //!< The box comment.
     QMap<BoxExtremity, TriggerPoint*> *_triggerPoints;                          //!< The trigger points.
@@ -827,6 +844,8 @@ class BasicBox : public QObject, public QGraphicsItem
     qreal _currentZvalue;
     QColor _color;
     QColor _colorUnselected;
+    QGraphicsColorizeEffect *_recEffect;
+
     bool _low;
     bool _hover;
 

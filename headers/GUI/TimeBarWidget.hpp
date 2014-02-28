@@ -19,7 +19,7 @@ class TimeBarWidget : public QWidget {
 
 
   signals:
-    void gotoValueEntered(double value);
+    void timeOffsetEntered(unsigned int timeOffset);
 
   public slots:
     void updateZoom(float newValue);

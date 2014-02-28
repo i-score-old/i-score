@@ -84,10 +84,8 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 {
   _editor = editor;
   _clicked = false;
-  _playing = false;
-  _paused = false;
   _modified = false;
-  _maxSceneWidth = 100000;
+  _maxSceneWidth = 360000;
 
   _relation = new AbstractRelation; /// \todo pourquoi instancier une AbstractRelation ici ? (par jaime Chao)
   _playThread = new PlayingThread(this);
@@ -112,6 +110,7 @@ MaquetteScene::init()
   _progressLine->setZValue(2);
   _timeBarProxy->setZValue(3);
   _timeBarProxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+  _timeBarProxy->setFlag(QGraphicsItem::ItemClipsToShape);
 
   _currentInteractionMode = SELECTION_MODE;
   setCurrentMode(SELECTION_MODE);
@@ -126,7 +125,7 @@ MaquetteScene::init()
   /// \todo MainWindow appelle init() de MaquetteScene, qui instancie lui même Maquette puis l'init. (par jaime Chao)
   _maquette = Maquette::getInstance();
   _maquette->setScene(this);
-  _maquette->init();
+  _maquette->init();      
 
   _tempBox = NULL;
   _resizeBox = NO_ID;
@@ -137,19 +136,19 @@ MaquetteScene::init()
 
   _mousePos = QPointF(0., 0.);
 
-  connect(_timeBar, SIGNAL(gotoValueEntered(double)), this, SLOT(gotoChanged(double)));
-  connect(this, SIGNAL(stopPlaying()), this, SLOT(stop()));
+  connect(_timeBar, SIGNAL(timeOffsetEntered(unsigned int)), this, SLOT(changeTimeOffset(unsigned int)));
+  connect(this, SIGNAL(stopPlaying()), this, SLOT(stopOrPause()));
 }
 
 void
 MaquetteScene::updateProgressBar()
 {
-  if (_playing) {      
+  if (_maquette->isExecutionOn()) {      
       _progressLine->setPos(_maquette->getCurrentTime() / MS_PER_PIXEL, sceneRect().topLeft().y());
       invalidate();
     }
   else {      
-      _progressLine->setPos(_view->gotoValue() / MS_PER_PIXEL, sceneRect().topLeft().y());
+      _progressLine->setPos(_maquette->getTimeOffset() / MS_PER_PIXEL, sceneRect().topLeft().y());
       invalidate();
     }
 }
@@ -157,20 +156,21 @@ MaquetteScene::updateProgressBar()
 void
 MaquetteScene::zoomChanged(float value)
 {
+    std::cout<<value<<std::endl;
   setMaxSceneWidth(MaquetteScene::MAX_SCENE_WIDTH*value);
-
+  std::cout<<" > "<<MaquetteScene::MAX_SCENE_WIDTH*value<<std::endl;
   updateProgressBar();
   _timeBar->updateZoom(value);
+    
+  Maquette::getInstance()->setViewZoom(QPointF(value, 1.));
 }
 
 void
-MaquetteScene::gotoChanged(double value)
+MaquetteScene::changeTimeOffset(unsigned int timeOffset)
 {
-  if (_paused) {
-      stop();
-    }
-  Maquette::getInstance()->setGotoValue(value);
-  _view->repaint();
+    stopAndGoToTimeOffset(timeOffset);
+    
+//    _view->repaint();
 }
 
 void
@@ -199,23 +199,16 @@ MaquetteScene::getNetworkDevices()
 }
 
 void
-MaquetteScene::changeNetworkDevice(std::string deviceName, std::string pluginName, std::string IP, std::string port)
+MaquetteScene::changeNetworkDevice(std::string deviceName, std::string pluginName, std::string IP, unsigned int port)
 {
   _maquette->changeNetworkDevice(deviceName, pluginName, IP, port);
   setModified(true);
 }
 
 void
-MaquetteScene::setNetworDeviceConfig(string deviceName, string pluginName, string IP, string port)
+MaquetteScene::setNetworDeviceConfig(string deviceName, string pluginName, string IP, unsigned int port)
 {
   emit(networkConfigChanged(deviceName, pluginName, IP, port));
-}
-
-bool
-MaquetteScene::updateMessagesToSend(unsigned int boxID)
-{
-  setModified(true);
-  return _maquette->updateMessagesToSend(boxID);
 }
 
 bool
@@ -266,29 +259,17 @@ MaquetteScene::getProgression(unsigned int boxID)
   return _maquette->getProgression(boxID);
 }
 
-void
-MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[], const QStyleOptionGraphicsItem options[], QWidget *widget)
+unsigned int
+MaquetteScene::getTimeOffset()
 {
-  QGraphicsScene::drawItems(painter, numItems, items, options, widget);
-  qreal xmax = width(), ymax = height();
-
-  for (int i = 0; i < numItems; i++) {
-
-      // Look if the scene rectangle has to be updated
-      if (xmax < items[i]->mapToScene(items[i]->boundingRect().bottomRight()).x()) {
-          xmax = items[i]->mapToScene(items[i]->boundingRect().bottomRight()).x();
-        }
-      if (ymax < items[i]->mapToScene(items[i]->boundingRect().bottomRight()).y()) {
-          ymax = items[i]->mapToScene(items[i]->boundingRect().bottomRight()).y();
-        }
-    }
+    return _maquette->getTimeOffset();
 }
 
 void
 MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
 {
   Q_UNUSED(rect);
-  if (!_playing) {
+  if (!_maquette->isExecutionOn()) {
 
       if (_currentInteractionMode == RELATION_MODE) {
           if (_clicked) {
@@ -485,6 +466,8 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
   QGraphicsScene::mousePressEvent(mouseEvent);
   _clicked = true;
+ 
+
 
   if (_tempBox) {
       removeItem(_tempBox);
@@ -556,12 +539,19 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
       case BOX_EDIT_MODE:
         break;
     }
+
+  if (paused())
+      stopOrPause();
+//      stopAndGoToCurrentTime();
+
+
+  /// \todo Remettre le stopAndGoToCurrentTime, mais cela ne doit pas renvoyer tout la cue. Modifier setTimeOffset pour ne pas envoyer de dump. NH
 }
 
 void
 MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
 {
-  if (!_playing) {
+  if (!_maquette->isExecutionOn()) {
       QGraphicsScene::mouseMoveEvent(mouseEvent);
 
       switch (_currentInteractionMode) {
@@ -721,7 +711,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
 
   setCurrentMode(_savedInteractionMode, BoxCreationMode(_savedBoxMode));
 
-  update();
+//  update();
 }
 
 void
@@ -912,8 +902,6 @@ MaquetteScene::pasteBoxes()
 
           newBox->setStartMessages(absCopyBox->startMessages());
           newBox->setEndMessages(absCopyBox->endMessages());
-          newBox->setFirstMessagesToSend(absCopyBox->startMessages()->computeMessages());
-          newBox->setLastMessagesToSend(absCopyBox->endMessages()->computeMessages());
 
           newBox->setSelected(true);
           newBox->centerWidget();
@@ -984,7 +972,7 @@ MaquetteScene::clear()
 {
   selectAll();
   removeSelectedItems();
-  gotoChanged(0);
+  changeTimeOffset(0);
   setModified(true);
 }
 
@@ -1090,7 +1078,7 @@ MaquetteScene::removeTriggerPoint(unsigned int trgID)
 void
 MaquetteScene::trigger(TriggerPoint *triggerPoint)
 {
-  _maquette->simulateTriggeringMessage(static_cast<AbstractTriggerPoint *>(triggerPoint->abstract())->message());
+  _maquette->trigger(triggerPoint);
   removeFromTriggerQueue(triggerPoint);
   triggerPoint->setSelected(false);
 }
@@ -1099,7 +1087,7 @@ void
 MaquetteScene::triggerNext()
 {
    TriggerPoint *triggerPoint = triggersQueueList()->first();
-  _maquette->simulateTriggeringMessage(static_cast<AbstractTriggerPoint *>(triggerPoint->abstract())->message());
+  _maquette->trigger(triggerPoint);
   removeFromTriggerQueue(triggerPoint);
   triggerPoint->setSelected(false);
 }
@@ -1322,7 +1310,7 @@ void
 MaquetteScene::changeRelationBounds(unsigned int relID, const float &length, const float &minBound, const float &maxBound)
 {
   Relation *rel = getRelation(relID);
-  if (rel != NULL) {
+  if (rel != NULL) {      
       _maquette->changeRelationBounds(relID, minBound, maxBound);
       rel->changeBounds(minBound, maxBound);
       if (length != NO_LENGTH) {
@@ -1495,15 +1483,15 @@ MaquetteScene::removeBox(unsigned int boxID)
             }
         }
 
+      box->removeComment();
+      box->removeTriggerPoint(BOX_START);
+      box->removeTriggerPoint(BOX_END);
+      
       vector<unsigned int> removedRelations = _maquette->removeBox(boxID);
       for (vector<unsigned int>::iterator it = removedRelations.begin(); it != removedRelations.end(); it++) {
           removeRelation(*it);
         }
-
-      box->removeComment();
-      box->removeTriggerPoint(BOX_START);
-      box->removeTriggerPoint(BOX_END);
-
+      
       delete box;
       setModified(true);
     }
@@ -1512,15 +1500,15 @@ MaquetteScene::removeBox(unsigned int boxID)
 }
 
 bool
-MaquetteScene::playing() const
-{
-  return _playing;
+MaquetteScene::playing()
+{    
+  return _maquette->isExecutionOn() && !_maquette->isExecutionPaused();
 }
 
 bool
-MaquetteScene::paused() const
+MaquetteScene::paused()
 {
-  return _paused;
+  return _maquette->isExecutionPaused();
 }
 
 void
@@ -1541,7 +1529,7 @@ MaquetteScene::setPlaying(unsigned int boxID, bool playing)
           _playingBoxes.erase(it);
         }
       else {
-          std::cerr << "MaquetteScene::setPlaying : trying to start playing an playing box" << std::endl;
+          std::cerr << "MaquetteScene::setPlaying : trying to start playing on playing box" << std::endl;
         }
     }
   else {
@@ -1561,65 +1549,69 @@ MaquetteScene::updatePlayingBoxes()
 
   for (it = _playingBoxes.begin(); it != _playingBoxes.end(); ++it) {
       it->second->update();
+
+      //Recording curves
+//      if(it->second->recording()){
+//          QList<std::string> recMsgs = static_cast<AbstractBox *>(it->second->abstract())->messagesToRecord();
+//          for(int i=0 ; i<recMsgs.size() ; i++)
+//              it->second->updateCurve(recMsgs.at(i),true);
+//      }
     }
 }
 
 void
-MaquetteScene::play()
+MaquetteScene::playOrResume()
 {
-  displayMessage(tr("Playing ...").toStdString(), INDICATION_LEVEL);
-  if (_paused) {
-      _playing = true;
-      _maquette->setAccelerationFactor(_accelerationFactor);
-      _maquette->startPlaying();
-      _playThread->start();
-      _paused = false;
+    displayMessage(tr("Playing ...").toStdString(), INDICATION_LEVEL);
+    
+    _maquette->setAccelerationFactor(_accelerationFactor);
+
+    if (_maquette->isExecutionPaused())        
+        _maquette->resumeExecution();    
+    else
+        _maquette->turnExecutionOn();
+
+    _playThread->start();
+    _startingValue = _maquette->getTimeOffset();
+    
+    emit(playModeChanged());
+}
+
+void
+MaquetteScene::stopOrPause()
+{
+    if (!_maquette->isExecutionPaused()){
+        _maquette->pauseExecution();
+        emit(playModeChanged());
     }
-  else {
-      _playing = true;
-      _maquette->startPlaying();
-      _playThread->start();
-      _startingValue = _view->gotoValue();
-    }  
-  emit(playModeChanged());
+    else {
+        _playThread->quit();
+        _maquette->turnExecutionOff();
+        emit(playModeChanged());
+        _playingBoxes.clear();        
+    }        
 }
 
 void
-MaquetteScene::pause()
+MaquetteScene::stopAndGoToTimeOffset(unsigned int timeOffset)
 {
-  displayMessage(tr("Paused").toStdString(), INDICATION_LEVEL);
-  _playing = false;
-  _paused = true;
-  _maquette->pause();
-  _playThread->quit();
-  _accelerationFactorSave = _maquette->accelerationFactor();
-  _maquette->setAccelerationFactor(0.);
-  update();
-  emit(playModeChanged());
-}
+    displayMessage(tr("Stopped").toStdString(), INDICATION_LEVEL);
 
-
-void
-MaquetteScene::stop()
-{
-  _playing = false;
-  _maquette->stopPlaying();
-  _playThread->quit();
-  _playingBoxes.clear();
-  update();
-  emit(playModeChanged());
+    _playThread->quit();
+    _maquette->stopPlayingAndGoToTimeOffset(timeOffset);    
+    emit(playModeChanged());
+    _playingBoxes.clear();            
 }
 
 void
-MaquetteScene::stopWithGoto()
+MaquetteScene::stopAndGoToCurrentTime()
 {
-  displayMessage(tr("Stopped").toStdString(), INDICATION_LEVEL);
-  _playing = false;
-  _maquette->stopPlayingWithGoto();
-  _playThread->quit();
-  _playingBoxes.clear();
-  update();
-  emit(playModeChanged());
+    displayMessage(tr("Stopped").toStdString(), INDICATION_LEVEL);
+    
+    _maquette->stopPlayingAndGoToCurrentTime();
+    _playThread->quit();
+    emit(playModeChanged());
+    _playingBoxes.clear();           
 }
 
 void
@@ -1637,18 +1629,24 @@ MaquetteScene::speedChanged(double value)
 }
 
 void
-MaquetteScene::stopGotoStart()
+MaquetteScene::stopAndGoToStart()
 {
-  displayMessage(tr("Stopped and go to start").toStdString(), INDICATION_LEVEL);
-  _playing = false;
-  _paused = false;
-  _maquette->setAccelerationFactor(1.);
-  emit(accelerationValueChanged(1.));
-  _maquette->stopPlayingGotoStart();
-  _playThread->quit();
-  _playingBoxes.clear();
-  update();
-  emit(playModeChanged());
+    displayMessage(tr("Stopped and go to start").toStdString(), INDICATION_LEVEL);
+    
+    _maquette->setAccelerationFactor(1.);
+    emit(accelerationValueChanged(1.));
+    _playThread->quit();
+    _playingBoxes.clear();
+    _maquette->stopPlayingAndGoToStart();
+
+    //send root box start messages
+    std::vector<std::string> startCue = _maquette->getBox(ROOT_BOX_ID)->getStartMessages();
+    for(int i=0; i<startCue.size(); i++)
+        sendMessage(startCue.at(i));
+
+    update();
+    
+    emit(playModeChanged());
 }
 
 void
@@ -1686,10 +1684,12 @@ MaquetteScene::removeSelectedItems()
 
 void
 MaquetteScene::timeEndReached()
-{
-  _playing = false;
-  emit(playModeChanged());
-  update();
+{    
+    _maquette->stopPlayingAndGoToStart();
+    
+    update();
+    
+    emit(playModeChanged());
 }
 
 bool
@@ -1716,7 +1716,7 @@ MaquetteScene::load(const string &fileName)
 {
   _maquette->load(fileName);
   setModified(false);
-  updateBoxesWidgets();
+  updateBoxesWidgets();  
 }
 
 void
@@ -1726,6 +1726,7 @@ MaquetteScene::updateBoxesWidgets()
   std::map<unsigned int, BasicBox*> boxes = _maquette->getBoxes();
   for (it = boxes.begin(); it != boxes.end(); it++) {
       unsigned int boxID = it->first;
+      static_cast<AbstractBox*>(getBox(boxID)->abstract())->clearMessages();
       if (boxID != NO_ID) {
           setAttributes(static_cast<AbstractBox*>(getBox(boxID)->abstract()));
         }
@@ -1764,4 +1765,12 @@ MaquetteScene::setMaxSceneWidth(float maxSceneWidth){
 float
 MaquetteScene::getMaxSceneWidth(){
   return _maxSceneWidth;
+}
+
+void
+MaquetteScene::unselectAll(){
+    QList<QGraphicsItem *> items = selectedItems();
+    QList<QGraphicsItem *>::iterator it;
+    for(it = items.begin(); it != items.end() ; it++)
+        (*it)->setSelected(false);
 }

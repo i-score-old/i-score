@@ -68,14 +68,14 @@ class MaquetteView : public QGraphicsView
     ~MaquetteView();
 
     /*!
-     * \brief Sets the goto value.
+     * \brief Update time offset view.
      *
-     * \param value : the goto value in ms
      */
-    void setGotoValue(int value);
+    void updateTimeOffsetView();
 
-    inline int
-    gotoValue(){ return _gotoValue; }
+    //! \brief Handles gradient width, indicates if the scenario (box1) has start messages or not.
+    static constexpr float GRADIENT_WIDTH = 50;
+
     QList<TriggerPoint *> *triggersQueueList();
     inline MainWindow *
     mainWindow(){ return _mainWindow; }
@@ -125,7 +125,15 @@ class MaquetteView : public QGraphicsView
      */
     QPointF getCenterCoordinates();
 
+    void setScenarioSelected(bool selected);
+
   protected:
+
+    /*!
+     * \brief Draws the indicator of a start cue (as a linearGradient for example)
+     */
+    void drawStartIndicator(QPainter *painter);
+
     /*!
      * \brief Redefinition of QGraphicsView::drawBackground().
      * This method is automatically called by QGraphicsView::render().
@@ -152,9 +160,10 @@ class MaquetteView : public QGraphicsView
     virtual void wheelEvent(QWheelEvent *event);
 
   private:
+
     MaquetteScene *_scene; //!< The scene displayed by the view.
     MainWindow *_mainWindow;
     float _zoom;           //!< The zoom factor value.
-    int _gotoValue;        //!< The goto value in pixels.
+    bool _scenarioSelected;
 };
 #endif

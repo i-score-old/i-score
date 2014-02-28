@@ -8,9 +8,9 @@ load ./doxygen/Doxyfile with Doxygen and run it.
 	==<[ MacOS (10.4+/10.8) ]>==
 
        . Download and install libraries from :
-              [ Qt (LGPL) ] : http://qt.nokia.com/downloads/qt-for-open-source-cpp-development-on-mac-os-x
+              [ Qt (LGPL) ] : http://qt-project.org/downloads
        	      [ Gecode 3.2.0 ] : http://www.gecode.org/download/Gecode-3.2.0.dmg
-	      [ LibXml2 ] : http://www.explain.com.au/download/combo-2007-10-07.dmg.gz
+	      [ LibXml2 ] : http://www.explain.com.au/download/combo-2007-10-07.dmg.gz -> copy libxml.framework to /Library/Frameworks
 
        . Get git repositories by : 
            - Downloading them from git repositories into the same parent folder (via the "Downloads" tool) :

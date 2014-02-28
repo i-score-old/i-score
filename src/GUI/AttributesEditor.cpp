@@ -47,15 +47,16 @@
 
 static const int ENGLISH = 0;
 static const int FRENCH = 1;
-
-#define TOP_MARGIN 5
-#define BOTTOM_MARGIN 5
-#define LEFT_MARGIN 5
-#define RIGHT_MARGIN 5
-#define MINIMUM_WIDTH 400
-#define COLOR_ICON_SIZE 21
-
 static const float S_TO_MS = 1000.;
+
+static const int TOP_MARGIN = 5;
+static const int BOTTOM_MARGIN = 5;
+static const int LEFT_MARGIN = 5;
+static const int RIGHT_MARGIN = 5;
+static const int MINIMUM_WIDTH = 400;
+static const int COLOR_ICON_SIZE = 21;
+static const int CENTRAL_LAYOUT_VERTICAL_SPACING = 0;
+static const int BOX_SETTING_LAYOUT_SPACING = 15;
 
 AttributesEditor::AttributesEditor(QWidget* parent) : QDockWidget(tr("Inspector"), parent, 0)
 {
@@ -111,11 +112,15 @@ void
 AttributesEditor::noBoxEdited()
 {
   _boxEdited = NO_ID;
-  setAttributes(new AbstractBox);
+  AbstractBox *emptyAbstractBox = new AbstractBox;
+
+  setAttributes(emptyAbstractBox);
   _boxStartValue->clear();
   _boxLengthValue->clear();
   _boxName->clear();
   _colorButtonPixmap->fill(Qt::gray);
+
+  delete emptyAbstractBox;
 }
 
 void
@@ -156,7 +161,7 @@ AttributesEditor::createWidgets()
 
   //NetworkTree
   _networkTree = new NetworkTree(this);
-  _networkTree->load(); 
+  //_networkTree->load();
 
   //Start&End value
   _boxStartValue = new QDoubleSpinBox;
@@ -167,6 +172,9 @@ void
 AttributesEditor::addWidgetsToLayout()
 {
   static const unsigned int BOX_EXTREMITY_PRECISION = 3;
+  const int verticalSpacing = 0;
+  const int horizontalSpacing = 15;
+
   _boxStartValue->setRange(0., _scene->getMaxSceneWidth() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
   _boxStartValue->setDecimals(BOX_EXTREMITY_PRECISION);
   _boxStartValue->setKeyboardTracking(false);
@@ -178,12 +186,13 @@ AttributesEditor::addWidgetsToLayout()
   _boxSettingsLayout->addWidget(_boxName);
   _boxSettingsLayout->addWidget(_generalColorButton);
   _boxSettingsLayout->addWidget(_snapshotAssignEnd);
-  _boxSettingsLayout->setSpacing(15);
+  _boxSettingsLayout->setSpacing(horizontalSpacing);
 
   // Set Central Widget
   _centralLayout->addLayout(_boxSettingsLayout, 0, 1, Qt::AlignTop);
   _centralLayout->addWidget(_networkTree, 1, 0, 1, 5);
   _centralWidget->setLayout(_centralLayout);
+  _centralLayout->setVerticalSpacing(verticalSpacing);
 
   setWidget(_centralWidget);
 }
@@ -193,8 +202,6 @@ AttributesEditor::connectSlots()
 {
   // General
   connect(_generalColorButton, SIGNAL(clicked()), this, SLOT(changeColor()));
-  connect(_boxStartValue, SIGNAL(valueChanged(double)), this, SLOT(startChanged()));
-  connect(_boxLengthValue, SIGNAL(valueChanged(double)), this, SLOT(lengthChanged()));
   connect(_boxName, SIGNAL(returnPressed()), this, SLOT(nameChanged()));
 
   connect(_networkTree, SIGNAL(startMessageValueChanged(QTreeWidgetItem *)), this, SLOT(startMessageChanged(QTreeWidgetItem *)));
@@ -210,11 +217,20 @@ AttributesEditor::connectSlots()
   connect(_networkTree, SIGNAL(curveSampleRateChanged(QTreeWidgetItem*, int)), this, SLOT(curveSampleRateChanged(QTreeWidgetItem*, int)));
   connect(_networkTree, SIGNAL(messageChanged(QTreeWidgetItem*, QString)), this, SLOT(deployMessageChanged(QTreeWidgetItem*, QString)));
   connect(_networkTree, SIGNAL(deviceChanged(QString, QString)), this, SLOT(deployDeviceChanged(QString, QString)));
+
+  connect(_networkTree, SIGNAL(rangeBoundMinChanged(QTreeWidgetItem*,float)), this, SLOT(changeRangeBoundMin(QTreeWidgetItem*, float)));
+  connect(_networkTree, SIGNAL(rangeBoundMaxChanged(QTreeWidgetItem*,float)), this, SLOT(changeRangeBoundMax(QTreeWidgetItem*, float)));
+  connect(_networkTree, SIGNAL(recModeChanged(QTreeWidgetItem*)), this, SLOT(changeRecMode(QTreeWidgetItem*)));
+
+
+  /// \todo Ajouter les spinBox ci-dessous. Attention problème : ces signaux sont automatiquement appelés lorsque l'on sélectionne simplement une boite (setAttributes (...) updateWidgets()). Une erreur d'arrondi (certainement) fait que la date de start de plusieurs boite est modifié au simple click...
+  //  connect(_boxStartValue, SIGNAL(valueChanged(double)), this, SLOT(startChanged()));
+  //  connect(_boxLengthValue, SIGNAL(valueChanged(double)), this, SLOT(lengthChanged()));
 }
 
 void
 AttributesEditor::setAttributes(AbstractBox *abBox)
-{
+{            
   bool boxModified = (_boxEdited != abBox->ID());
 
   _boxEdited = abBox->ID();
@@ -230,7 +246,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
             }
           else {
               _networkTree->setAssignedItems(abBox->networkTreeItems());
-              _networkTree->expandItems(abBox->networkTreeExpandedItems());
+              _networkTree->expandItems(abBox->networkTreeExpandedItems());              
             }
 
           _networkTree->displayBoxContent(abBox);
@@ -251,11 +267,22 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
 //            for(int i=0; i<endMessages.size(); i++){
 //                std::cout<<endMessages[i]<<std::endl;
 //            }
-          //END PRINT
+          //END PRINT          
         }
     }
-  _networkTree->updateCurves(_boxEdited);
-  updateWidgets(boxModified);
+
+
+//Special update for the main scenario
+  if(_boxEdited == ROOT_BOX_ID){
+      _scene->view()->setScenarioSelected(true);
+      _boxName->setText(QString::fromStdString(abBox->name()));
+  }
+  else{
+      _scene->view()->setScenarioSelected(false);
+      _networkTree->updateCurves(_boxEdited);
+      updateWidgets(boxModified);
+
+  }
 }
 
 void
@@ -287,6 +314,13 @@ AttributesEditor::updateWidgets(bool boxModified)
       _boxName->setText(box->name());
       _colorButtonPixmap->fill(box->currentColor());
       _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
+
+//      //update recorded curves
+//      QList<std::string> recMsgs = static_cast<AbstractBox *>(box->abstract())->messagesToRecord();
+//      for(int i=0 ; i<recMsgs.size() ; i++){
+//          box->updateCurve(recMsgs[i],true);
+//          box->removeMessageToRecord(recMsgs[i]);
+//      }
   }
 
   update();
@@ -350,20 +384,28 @@ AttributesEditor::changeColor()
 
 void
 AttributesEditor::startMessagesChanged(bool forceUpdate)
-{
-  if (_scene->paused()) {
-      _scene->stopWithGoto();
-    }
-
+{    
   BasicBox * box = _scene->getBox(_boxEdited);
   if (_boxEdited != NO_ID) {
       QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
       Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
       Maquette::getInstance()->setStartMessagesToSend(_boxEdited, _networkTree->startMessages());
 
-      _networkTree->updateStartMsgsDisplay();
-      _networkTree->updateCurves(_boxEdited, forceUpdate);
-      box->updateCurves();
+      _networkTree->updateStartMsgsDisplay();      
+
+      //Case scenario start cue
+      if(_boxEdited == ROOT_BOX_ID)
+          _scene->view()->resetCachedContent();
+      else{
+          _networkTree->updateCurves(_boxEdited, forceUpdate);
+          box->updateCurves();
+      }
+
+      if (_scene->paused()) {
+          /// \todo Modifier setTimeOffset pour ne pas faire de dump (dans ce cas là par exemple). NH
+//          _scene->stopAndGoToCurrentTime();
+          _scene->stopOrPause();
+      }
     }
   else{
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
@@ -373,19 +415,24 @@ AttributesEditor::startMessagesChanged(bool forceUpdate)
 void
 AttributesEditor::endMessagesChanged(bool forceUpdate)
 {
-  if (_scene->paused()) {
-      _scene->stopWithGoto();
-    }
   if (_boxEdited != NO_ID) {
+
       BasicBox * box = _scene->getBox(_boxEdited);
 
       QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
       Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
       Maquette::getInstance()->setEndMessagesToSend(_boxEdited, _networkTree->endMessages());
-      _networkTree->updateEndMsgsDisplay();
-      _networkTree->updateCurves(_boxEdited, forceUpdate);
-
-      box->updateCurves();
+      if(_boxEdited == ROOT_BOX_ID)
+          _scene->view()->resetCachedContent();
+      else{
+          _networkTree->updateEndMsgsDisplay();
+          _networkTree->updateCurves(_boxEdited, forceUpdate);
+          box->updateCurves();
+      }
+      if (_scene->paused()) {
+//          _scene->stopAndGoToCurrentTime();
+          _scene->stopOrPause();
+        }
     }
   else {
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
@@ -395,22 +442,29 @@ AttributesEditor::endMessagesChanged(bool forceUpdate)
 void
 AttributesEditor::startMessageChanged(QTreeWidgetItem *item)
 {
-  if (_scene->paused()) {
-      _scene->stopWithGoto();
-    }
-
   if (_boxEdited != NO_ID) {
+
       //PAS OPTIMAL, NE DEVRAIT MODIFIER QU'UN SEUL ITEM
       QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
       Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
       Maquette::getInstance()->setStartMessagesToSend(_boxEdited, _networkTree->startMessages());
 
-      _networkTree->updateCurve(item, _boxEdited, true);
-      _networkTree->updateStartMsgsDisplay();
+      if(_boxEdited == ROOT_BOX_ID)
+          _scene->view()->resetCachedContent();
+      else{
+          _networkTree->updateCurve(item, _boxEdited, true);
+          _networkTree->updateStartMsgsDisplay();
 
-      BasicBox * box = _scene->getBox(_boxEdited);
-      box->updateCurve(_networkTree->getAbsoluteAddress(item).toStdString(), true);
-    }
+          BasicBox * box = _scene->getBox(_boxEdited);
+          box->updateCurve(_networkTree->getAbsoluteAddress(item).toStdString(), true);
+      }
+
+      if (_scene->paused()) {
+//          _scene->stopAndGoToCurrentTime();
+          _scene->stopOrPause();
+        }
+  }
+
   else {
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
       item->setText(NetworkTree::START_COLUMN, "");
@@ -420,10 +474,6 @@ AttributesEditor::startMessageChanged(QTreeWidgetItem *item)
 void
 AttributesEditor::endMessageChanged(QTreeWidgetItem *item)
 {
-  if (_scene->paused()) {
-      _scene->stopWithGoto();
-    }
-
   if (_boxEdited != NO_ID) {
       QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
       Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
@@ -434,25 +484,35 @@ AttributesEditor::endMessageChanged(QTreeWidgetItem *item)
 
       BasicBox * box = _scene->getBox(_boxEdited);
       box->updateCurve(_networkTree->getAbsoluteAddress(item).toStdString(), true);
+
+      if (_scene->paused()) {
+//          _scene->stopAndGoToCurrentTime();
+          _scene->stopOrPause();
+        }
     }
   else {
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
       item->setText(NetworkTree::END_COLUMN, "");
-    }
+    }  
 }
 
 void
 AttributesEditor::startMessageRemoved(const string &address)
 {
-  if (_scene->paused()) {
-      _scene->stopWithGoto();
-    }
-
   if (_boxEdited != NO_ID) {
-      QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
-      Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
-      Maquette::getInstance()->setStartMessagesToSend(_boxEdited, _networkTree->startMessages());
-      Maquette::getInstance()->removeCurve(_boxEdited, address);
+      if(_boxEdited == ROOT_BOX_ID)
+          _scene->view()->resetCachedContent();
+      else{
+          QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
+          Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
+          Maquette::getInstance()->setStartMessagesToSend(_boxEdited, _networkTree->startMessages());
+          Maquette::getInstance()->removeCurve(_boxEdited, address);
+      }
+
+      if (_scene->paused()) {
+//          _scene->stopAndGoToCurrentTime();
+          _scene->stopOrPause();
+        }
     }
   else {
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
@@ -462,12 +522,14 @@ AttributesEditor::startMessageRemoved(const string &address)
 void
 AttributesEditor::endMessageRemoved(const string &address)
 {
-  if (_scene->paused()) {
-      _scene->stopWithGoto();
-    }
   if (_boxEdited != NO_ID) {
       Maquette::getInstance()->setEndMessagesToSend(_boxEdited, _networkTree->endMessages());
       Maquette::getInstance()->removeCurve(_boxEdited, address);
+
+      if (_scene->paused()) {
+//          _scene->stopAndGoToCurrentTime();
+          _scene->stopOrPause();
+        }
     }
   else {
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
@@ -477,9 +539,6 @@ AttributesEditor::endMessageRemoved(const string &address)
 void
 AttributesEditor::deployMessageChanged(QTreeWidgetItem *item, QString newName)
 {
-  if (_scene->paused()) {
-      _scene->stopWithGoto();
-    }
   std::map<unsigned int, BasicBox *>::iterator it;
   std::map<unsigned int, BasicBox *> boxesMap = Maquette::getInstance()->getBoxes();
   unsigned int boxID;
@@ -500,16 +559,16 @@ AttributesEditor::deployMessageChanged(QTreeWidgetItem *item, QString newName)
           messagesToSend->changeMessage(item, newName);
           Maquette::getInstance()->setEndMessagesToSend(boxID, messagesToSend);
         }
+    }
+  if (_scene->paused()) {
+//          _scene->stopAndGoToCurrentTime();
+      _scene->stopOrPause();
     }
 }
 
 void
 AttributesEditor::deployDeviceChanged(QString oldName, QString newName)
 {
-  if (_scene->paused()) {
-      _scene->stopWithGoto();
-    }
-
   std::map<unsigned int, BasicBox *>::iterator it;
   std::map<unsigned int, BasicBox *> boxesMap = Maquette::getInstance()->getBoxes();
 
@@ -531,6 +590,10 @@ AttributesEditor::deployDeviceChanged(QString oldName, QString newName)
           messagesToSend->changeDevice(oldName, newName);
           Maquette::getInstance()->setEndMessagesToSend(boxID, messagesToSend);
         }
+    }
+  if (_scene->paused()) {
+//          _scene->stopAndGoToCurrentTime();
+      _scene->stopOrPause();
     }
 }
 
@@ -539,7 +602,7 @@ AttributesEditor::snapshotStartAssignment()
 {
   QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot = _networkTree->treeSnapshot(_boxEdited);
 
-  _networkTree->clearDevicesStartMsgs(treeSnapshot.second);
+  _networkTree->clearDevicesStartMsgs(treeSnapshot.second);  
 
   if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 
@@ -642,5 +705,48 @@ AttributesEditor::curveSampleRateChanged(QTreeWidgetItem *item, int value)
   if (_boxEdited != NO_ID) {
       Maquette::getInstance()->setCurveSampleRate(_boxEdited, address, value);
       _networkTree->updateCurve(item, _boxEdited);
+    }
+}
+
+void
+AttributesEditor::changeRangeBoundMin(QTreeWidgetItem *item, float value){
+    string address = _networkTree->getAbsoluteAddress(item).toStdString();
+    if (_boxEdited != NO_ID) {
+
+          BasicBox * box = _scene->getBox(_boxEdited);
+          box->updateCurveRangeBoundMin(address,value);
+//        Maquette::getInstance()->setRangeBoundMin(_boxEdited, address, value);
+      }
+}
+
+void
+AttributesEditor::changeRangeBoundMax(QTreeWidgetItem *item, float value){
+
+    string address = _networkTree->getAbsoluteAddress(item).toStdString();
+    if (_boxEdited != NO_ID) {
+        BasicBox * box = _scene->getBox(_boxEdited);
+       box->updateCurveRangeBoundMax(address,value);
+      }
+}
+
+void
+AttributesEditor::changeRecMode(QTreeWidgetItem* item){    
+    /// \toto Should be better to ask messagesToRecord list to score (instead of abstractBox). As start/end messages. NH
+
+    if (_boxEdited != NO_ID) {
+          BasicBox * box = _scene->getBox(_boxEdited);          
+          std::string address = _networkTree->getAbsoluteAddress(item).toStdString();
+          bool activated = !static_cast<AbstractBox *>(box->abstract())->messagesToRecord().contains(address);
+
+          if(activated){              
+              box->addMessageToRecord(address);
+          }
+          else{
+              box->removeMessageToRecord(address);
+              _networkTree->updateCurve(item, _boxEdited, true);
+              BasicBox *box = _scene->getBox(_boxEdited);
+              box->updateCurve(address, true);
+          }
+          _networkTree->setRecMode(address);
     }
 }

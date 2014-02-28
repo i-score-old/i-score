@@ -7,89 +7,89 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		467C5CB017A178D000757DEE /* main.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = "<group>"; };
-		4699ECBD17160BF700E6526C /* Engine.h */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Engine.h; sourceTree = "<group>"; };
-		4699ECBE17160C2D00E6526C /* Engine.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Engine.cpp; sourceTree = "<group>"; };
-		46B522F4170EB46200F6DF2A /* Abstract.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Abstract.hpp; sourceTree = "<group>"; };
-		46B522F5170EB46200F6DF2A /* AbstractBox.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractBox.hpp; sourceTree = "<group>"; };
-		46B522F6170EB46200F6DF2A /* AbstractComment.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractComment.hpp; sourceTree = "<group>"; };
-		46B522F8170EB46200F6DF2A /* AbstractCurve.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractCurve.hpp; sourceTree = "<group>"; };
-		46B522F9170EB46200F6DF2A /* AbstractParentBox.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractParentBox.hpp; sourceTree = "<group>"; };
-		46B522FA170EB46200F6DF2A /* AbstractRelation.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractRelation.hpp; sourceTree = "<group>"; };
-		46B522FC170EB46200F6DF2A /* AbstractTriggerPoint.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractTriggerPoint.hpp; sourceTree = "<group>"; };
-		46B522FE170EB46200F6DF2A /* Maquette.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Maquette.hpp; sourceTree = "<group>"; };
-		46B522FF170EB46200F6DF2A /* NetworkMessages.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = NetworkMessages.hpp; sourceTree = "<group>"; };
-		46B52302170EB46200F6DF2A /* AttributesEditor.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AttributesEditor.hpp; sourceTree = "<group>"; };
-		46B52303170EB46200F6DF2A /* BasicBox.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BasicBox.hpp; sourceTree = "<group>"; };
-		46B52304170EB46200F6DF2A /* BoxContextMenu.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BoxContextMenu.hpp; sourceTree = "<group>"; };
-		46B52305170EB46200F6DF2A /* BoxCurveEdit.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BoxCurveEdit.hpp; sourceTree = "<group>"; };
-		46B52306170EB46200F6DF2A /* BoxWidget.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BoxWidget.hpp; sourceTree = "<group>"; };
-		46B52307170EB46200F6DF2A /* ChooseTemporalRelation.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChooseTemporalRelation.hpp; sourceTree = "<group>"; };
-		46B52308170EB46200F6DF2A /* Comment.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Comment.hpp; sourceTree = "<group>"; };
-		46B5230B170EB46200F6DF2A /* CurvesWidget.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CurvesWidget.hpp; sourceTree = "<group>"; };
-		46B5230C170EB46200F6DF2A /* CurveWidget.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CurveWidget.hpp; sourceTree = "<group>"; };
-		46B5230D170EB46200F6DF2A /* DeviceEdit.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DeviceEdit.hpp; sourceTree = "<group>"; };
-		46B5230E170EB46200F6DF2A /* Help.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Help.hpp; sourceTree = "<group>"; };
-		46B5230F170EB46200F6DF2A /* Interpolation.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Interpolation.hpp; sourceTree = "<group>"; };
-		46B52310170EB46200F6DF2A /* LogarithmicSlider.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LogarithmicSlider.hpp; sourceTree = "<group>"; };
-		46B52311170EB46200F6DF2A /* MainWindow.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MainWindow.hpp; sourceTree = "<group>"; };
-		46B52312170EB46200F6DF2A /* MaquetteScene.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MaquetteScene.hpp; sourceTree = "<group>"; };
-		46B52313170EB46200F6DF2A /* MaquetteView.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MaquetteView.hpp; sourceTree = "<group>"; };
-		46B52314170EB46200F6DF2A /* MaquetteWidget.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MaquetteWidget.hpp; sourceTree = "<group>"; };
-		46B52315170EB46200F6DF2A /* NetworkConfig.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = NetworkConfig.hpp; sourceTree = "<group>"; };
-		46B52316170EB46200F6DF2A /* NetworkMessagesEditor.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = NetworkMessagesEditor.hpp; sourceTree = "<group>"; };
-		46B52317170EB46200F6DF2A /* NetworkTree.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = NetworkTree.hpp; sourceTree = "<group>"; };
-		46B52318170EB46200F6DF2A /* ParentBox.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ParentBox.hpp; sourceTree = "<group>"; };
-		46B52319170EB46200F6DF2A /* ParentBoxContextMenu.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ParentBoxContextMenu.hpp; sourceTree = "<group>"; };
-		46B5231A170EB46200F6DF2A /* PlayingThread.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PlayingThread.hpp; sourceTree = "<group>"; };
-		46B5231C170EB46200F6DF2A /* Relation.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Relation.hpp; sourceTree = "<group>"; };
-		46B5231D170EB46200F6DF2A /* RelationEdit.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RelationEdit.hpp; sourceTree = "<group>"; };
-		46B52320170EB46200F6DF2A /* TextEdit.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TextEdit.hpp; sourceTree = "<group>"; };
-		46B52321170EB46200F6DF2A /* TimeBarWidget.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TimeBarWidget.hpp; sourceTree = "<group>"; };
-		46B52322170EB46200F6DF2A /* TreeMap.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TreeMap.hpp; sourceTree = "<group>"; };
-		46B52323170EB46200F6DF2A /* TreeMapElement.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TreeMapElement.hpp; sourceTree = "<group>"; };
-		46B52324170EB46200F6DF2A /* TriggerPoint.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TriggerPoint.hpp; sourceTree = "<group>"; };
-		46B52325170EB46200F6DF2A /* ViewRelations.hpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ViewRelations.hpp; sourceTree = "<group>"; };
-		46B52328170EB47E00F6DF2A /* Abstract.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Abstract.cpp; sourceTree = "<group>"; };
-		46B52329170EB47E00F6DF2A /* AbstractBox.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractBox.cpp; sourceTree = "<group>"; };
-		46B5232A170EB47E00F6DF2A /* AbstractComment.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractComment.cpp; sourceTree = "<group>"; };
-		46B5232C170EB47E00F6DF2A /* AbstractCurve.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractCurve.cpp; sourceTree = "<group>"; };
-		46B5232D170EB47E00F6DF2A /* AbstractParentBox.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractParentBox.cpp; sourceTree = "<group>"; };
-		46B5232E170EB47E00F6DF2A /* AbstractRelation.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractRelation.cpp; sourceTree = "<group>"; };
-		46B52330170EB47E00F6DF2A /* AbstractTriggerPoint.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractTriggerPoint.cpp; sourceTree = "<group>"; };
-		46B52331170EB47E00F6DF2A /* Maquette.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Maquette.cpp; sourceTree = "<group>"; };
-		46B52332170EB47E00F6DF2A /* NetworkMessages.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkMessages.cpp; sourceTree = "<group>"; };
-		46B52335170EB47E00F6DF2A /* AttributesEditor.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AttributesEditor.cpp; sourceTree = "<group>"; };
-		46B52336170EB47E00F6DF2A /* BasicBox.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BasicBox.cpp; sourceTree = "<group>"; };
-		46B52337170EB47E00F6DF2A /* BoxContextMenu.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BoxContextMenu.cpp; sourceTree = "<group>"; };
-		46B52338170EB47E00F6DF2A /* BoxCurveEdit.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BoxCurveEdit.cpp; sourceTree = "<group>"; };
-		46B52339170EB47E00F6DF2A /* BoxWidget.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BoxWidget.cpp; sourceTree = "<group>"; };
-		46B5233A170EB47E00F6DF2A /* ChooseTemporalRelation.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChooseTemporalRelation.cpp; sourceTree = "<group>"; };
-		46B5233B170EB47E00F6DF2A /* Comment.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Comment.cpp; sourceTree = "<group>"; };
-		46B5233E170EB47E00F6DF2A /* CurvesWidget.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CurvesWidget.cpp; sourceTree = "<group>"; };
-		46B5233F170EB47E00F6DF2A /* CurveWidget.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CurveWidget.cpp; sourceTree = "<group>"; };
-		46B52340170EB47E00F6DF2A /* DeviceEdit.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DeviceEdit.cpp; sourceTree = "<group>"; };
-		46B52341170EB47E00F6DF2A /* Help.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Help.cpp; sourceTree = "<group>"; };
-		46B52342170EB47E00F6DF2A /* Interpolation.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Interpolation.cpp; sourceTree = "<group>"; };
-		46B52343170EB47E00F6DF2A /* LogarithmicSlider.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LogarithmicSlider.cpp; sourceTree = "<group>"; };
-		46B52344170EB47E00F6DF2A /* MainWindow.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MainWindow.cpp; sourceTree = "<group>"; };
-		46B52345170EB47E00F6DF2A /* MaquetteScene.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MaquetteScene.cpp; sourceTree = "<group>"; };
-		46B52346170EB47E00F6DF2A /* MaquetteView.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MaquetteView.cpp; sourceTree = "<group>"; };
-		46B52347170EB47E00F6DF2A /* MaquetteWidget.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MaquetteWidget.cpp; sourceTree = "<group>"; };
-		46B52348170EB47E00F6DF2A /* NetworkConfig.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkConfig.cpp; sourceTree = "<group>"; };
-		46B52349170EB47E00F6DF2A /* NetworkMessagesEditor.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkMessagesEditor.cpp; sourceTree = "<group>"; };
-		46B5234A170EB47E00F6DF2A /* NetworkTree.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkTree.cpp; sourceTree = "<group>"; };
-		46B5234B170EB47E00F6DF2A /* ParentBox.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParentBox.cpp; sourceTree = "<group>"; };
-		46B5234C170EB47E00F6DF2A /* ParentBoxContextMenu.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParentBoxContextMenu.cpp; sourceTree = "<group>"; };
-		46B5234D170EB47E00F6DF2A /* PlayingThread.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PlayingThread.cpp; sourceTree = "<group>"; };
-		46B5234F170EB47E00F6DF2A /* Relation.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Relation.cpp; sourceTree = "<group>"; };
-		46B52350170EB47E00F6DF2A /* RelationEdit.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RelationEdit.cpp; sourceTree = "<group>"; };
-		46B52353170EB47E00F6DF2A /* TextEdit.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TextEdit.cpp; sourceTree = "<group>"; };
-		46B52354170EB47E00F6DF2A /* TimeBarWidget.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TimeBarWidget.cpp; sourceTree = "<group>"; };
-		46B52355170EB47E00F6DF2A /* TreeMap.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TreeMap.cpp; sourceTree = "<group>"; };
-		46B52356170EB47E00F6DF2A /* TreeMapElement.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TreeMapElement.cpp; sourceTree = "<group>"; };
-		46B52357170EB47E00F6DF2A /* TriggerPoint.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TriggerPoint.cpp; sourceTree = "<group>"; };
-		46B52358170EB47E00F6DF2A /* ViewRelations.cpp */ = {lastKnownFileType = wrapper.framework; isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ViewRelations.cpp; sourceTree = "<group>"; };
+		467C5CB017A178D000757DEE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = "<group>"; };
+		4699ECBD17160BF700E6526C /* Engine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Engine.h; sourceTree = "<group>"; };
+		4699ECBE17160C2D00E6526C /* Engine.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Engine.cpp; sourceTree = "<group>"; };
+		469B63BC1805ACFC0046AC95 /* HeaderPanelWidget.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = HeaderPanelWidget.hpp; sourceTree = "<group>"; };
+		469B63BD1805AD160046AC95 /* HeaderPanelWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = HeaderPanelWidget.cpp; sourceTree = "<group>"; };
+		46B522F4170EB46200F6DF2A /* Abstract.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Abstract.hpp; sourceTree = "<group>"; };
+		46B522F5170EB46200F6DF2A /* AbstractBox.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractBox.hpp; sourceTree = "<group>"; };
+		46B522F6170EB46200F6DF2A /* AbstractComment.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractComment.hpp; sourceTree = "<group>"; };
+		46B522F8170EB46200F6DF2A /* AbstractCurve.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractCurve.hpp; sourceTree = "<group>"; };
+		46B522F9170EB46200F6DF2A /* AbstractParentBox.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractParentBox.hpp; sourceTree = "<group>"; };
+		46B522FA170EB46200F6DF2A /* AbstractRelation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractRelation.hpp; sourceTree = "<group>"; };
+		46B522FC170EB46200F6DF2A /* AbstractTriggerPoint.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractTriggerPoint.hpp; sourceTree = "<group>"; };
+		46B522FE170EB46200F6DF2A /* Maquette.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Maquette.hpp; sourceTree = "<group>"; };
+		46B522FF170EB46200F6DF2A /* NetworkMessages.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = NetworkMessages.hpp; sourceTree = "<group>"; };
+		46B52302170EB46200F6DF2A /* AttributesEditor.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AttributesEditor.hpp; sourceTree = "<group>"; };
+		46B52303170EB46200F6DF2A /* BasicBox.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BasicBox.hpp; sourceTree = "<group>"; };
+		46B52304170EB46200F6DF2A /* BoxContextMenu.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BoxContextMenu.hpp; sourceTree = "<group>"; };
+		46B52305170EB46200F6DF2A /* BoxCurveEdit.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BoxCurveEdit.hpp; sourceTree = "<group>"; };
+		46B52306170EB46200F6DF2A /* BoxWidget.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BoxWidget.hpp; sourceTree = "<group>"; };
+		46B52307170EB46200F6DF2A /* ChooseTemporalRelation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChooseTemporalRelation.hpp; sourceTree = "<group>"; };
+		46B52308170EB46200F6DF2A /* Comment.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Comment.hpp; sourceTree = "<group>"; };
+		46B5230B170EB46200F6DF2A /* CurvesWidget.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CurvesWidget.hpp; sourceTree = "<group>"; };
+		46B5230C170EB46200F6DF2A /* CurveWidget.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CurveWidget.hpp; sourceTree = "<group>"; };
+		46B5230D170EB46200F6DF2A /* DeviceEdit.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DeviceEdit.hpp; sourceTree = "<group>"; };
+		46B5230E170EB46200F6DF2A /* Help.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Help.hpp; sourceTree = "<group>"; };
+		46B5230F170EB46200F6DF2A /* Interpolation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Interpolation.hpp; sourceTree = "<group>"; };
+		46B52310170EB46200F6DF2A /* LogarithmicSlider.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LogarithmicSlider.hpp; sourceTree = "<group>"; };
+		46B52311170EB46200F6DF2A /* MainWindow.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MainWindow.hpp; sourceTree = "<group>"; };
+		46B52312170EB46200F6DF2A /* MaquetteScene.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MaquetteScene.hpp; sourceTree = "<group>"; };
+		46B52313170EB46200F6DF2A /* MaquetteView.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MaquetteView.hpp; sourceTree = "<group>"; };
+		46B52315170EB46200F6DF2A /* NetworkConfig.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = NetworkConfig.hpp; sourceTree = "<group>"; };
+		46B52316170EB46200F6DF2A /* NetworkMessagesEditor.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = NetworkMessagesEditor.hpp; sourceTree = "<group>"; };
+		46B52317170EB46200F6DF2A /* NetworkTree.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = NetworkTree.hpp; sourceTree = "<group>"; };
+		46B52318170EB46200F6DF2A /* ParentBox.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ParentBox.hpp; sourceTree = "<group>"; };
+		46B52319170EB46200F6DF2A /* ParentBoxContextMenu.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ParentBoxContextMenu.hpp; sourceTree = "<group>"; };
+		46B5231A170EB46200F6DF2A /* PlayingThread.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PlayingThread.hpp; sourceTree = "<group>"; };
+		46B5231C170EB46200F6DF2A /* Relation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Relation.hpp; sourceTree = "<group>"; };
+		46B5231D170EB46200F6DF2A /* RelationEdit.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RelationEdit.hpp; sourceTree = "<group>"; };
+		46B52320170EB46200F6DF2A /* TextEdit.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TextEdit.hpp; sourceTree = "<group>"; };
+		46B52321170EB46200F6DF2A /* TimeBarWidget.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TimeBarWidget.hpp; sourceTree = "<group>"; };
+		46B52322170EB46200F6DF2A /* TreeMap.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TreeMap.hpp; sourceTree = "<group>"; };
+		46B52323170EB46200F6DF2A /* TreeMapElement.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TreeMapElement.hpp; sourceTree = "<group>"; };
+		46B52324170EB46200F6DF2A /* TriggerPoint.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TriggerPoint.hpp; sourceTree = "<group>"; };
+		46B52325170EB46200F6DF2A /* ViewRelations.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ViewRelations.hpp; sourceTree = "<group>"; };
+		46B52328170EB47E00F6DF2A /* Abstract.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Abstract.cpp; sourceTree = "<group>"; };
+		46B52329170EB47E00F6DF2A /* AbstractBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractBox.cpp; sourceTree = "<group>"; };
+		46B5232A170EB47E00F6DF2A /* AbstractComment.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractComment.cpp; sourceTree = "<group>"; };
+		46B5232C170EB47E00F6DF2A /* AbstractCurve.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractCurve.cpp; sourceTree = "<group>"; };
+		46B5232D170EB47E00F6DF2A /* AbstractParentBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractParentBox.cpp; sourceTree = "<group>"; };
+		46B5232E170EB47E00F6DF2A /* AbstractRelation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractRelation.cpp; sourceTree = "<group>"; };
+		46B52330170EB47E00F6DF2A /* AbstractTriggerPoint.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractTriggerPoint.cpp; sourceTree = "<group>"; };
+		46B52331170EB47E00F6DF2A /* Maquette.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Maquette.cpp; sourceTree = "<group>"; };
+		46B52332170EB47E00F6DF2A /* NetworkMessages.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkMessages.cpp; sourceTree = "<group>"; };
+		46B52335170EB47E00F6DF2A /* AttributesEditor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AttributesEditor.cpp; sourceTree = "<group>"; };
+		46B52336170EB47E00F6DF2A /* BasicBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BasicBox.cpp; sourceTree = "<group>"; };
+		46B52337170EB47E00F6DF2A /* BoxContextMenu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BoxContextMenu.cpp; sourceTree = "<group>"; };
+		46B52338170EB47E00F6DF2A /* BoxCurveEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BoxCurveEdit.cpp; sourceTree = "<group>"; };
+		46B52339170EB47E00F6DF2A /* BoxWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BoxWidget.cpp; sourceTree = "<group>"; };
+		46B5233A170EB47E00F6DF2A /* ChooseTemporalRelation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChooseTemporalRelation.cpp; sourceTree = "<group>"; };
+		46B5233B170EB47E00F6DF2A /* Comment.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Comment.cpp; sourceTree = "<group>"; };
+		46B5233E170EB47E00F6DF2A /* CurvesWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CurvesWidget.cpp; sourceTree = "<group>"; };
+		46B5233F170EB47E00F6DF2A /* CurveWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CurveWidget.cpp; sourceTree = "<group>"; };
+		46B52340170EB47E00F6DF2A /* DeviceEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DeviceEdit.cpp; sourceTree = "<group>"; };
+		46B52341170EB47E00F6DF2A /* Help.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Help.cpp; sourceTree = "<group>"; };
+		46B52342170EB47E00F6DF2A /* Interpolation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Interpolation.cpp; sourceTree = "<group>"; };
+		46B52343170EB47E00F6DF2A /* LogarithmicSlider.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LogarithmicSlider.cpp; sourceTree = "<group>"; };
+		46B52344170EB47E00F6DF2A /* MainWindow.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MainWindow.cpp; sourceTree = "<group>"; };
+		46B52345170EB47E00F6DF2A /* MaquetteScene.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MaquetteScene.cpp; sourceTree = "<group>"; };
+		46B52346170EB47E00F6DF2A /* MaquetteView.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MaquetteView.cpp; sourceTree = "<group>"; };
+		46B52348170EB47E00F6DF2A /* NetworkConfig.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkConfig.cpp; sourceTree = "<group>"; };
+		46B52349170EB47E00F6DF2A /* NetworkMessagesEditor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkMessagesEditor.cpp; sourceTree = "<group>"; };
+		46B5234A170EB47E00F6DF2A /* NetworkTree.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkTree.cpp; sourceTree = "<group>"; };
+		46B5234B170EB47E00F6DF2A /* ParentBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParentBox.cpp; sourceTree = "<group>"; };
+		46B5234C170EB47E00F6DF2A /* ParentBoxContextMenu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParentBoxContextMenu.cpp; sourceTree = "<group>"; };
+		46B5234D170EB47E00F6DF2A /* PlayingThread.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PlayingThread.cpp; sourceTree = "<group>"; };
+		46B5234F170EB47E00F6DF2A /* Relation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Relation.cpp; sourceTree = "<group>"; };
+		46B52350170EB47E00F6DF2A /* RelationEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RelationEdit.cpp; sourceTree = "<group>"; };
+		46B52353170EB47E00F6DF2A /* TextEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TextEdit.cpp; sourceTree = "<group>"; };
+		46B52354170EB47E00F6DF2A /* TimeBarWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TimeBarWidget.cpp; sourceTree = "<group>"; };
+		46B52355170EB47E00F6DF2A /* TreeMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TreeMap.cpp; sourceTree = "<group>"; };
+		46B52356170EB47E00F6DF2A /* TreeMapElement.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TreeMapElement.cpp; sourceTree = "<group>"; };
+		46B52357170EB47E00F6DF2A /* TriggerPoint.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TriggerPoint.cpp; sourceTree = "<group>"; };
+		46B52358170EB47E00F6DF2A /* ViewRelations.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ViewRelations.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -141,13 +141,13 @@
 				46B5230B170EB46200F6DF2A /* CurvesWidget.hpp */,
 				46B5230C170EB46200F6DF2A /* CurveWidget.hpp */,
 				46B5230D170EB46200F6DF2A /* DeviceEdit.hpp */,
+				469B63BC1805ACFC0046AC95 /* HeaderPanelWidget.hpp */,
 				46B5230E170EB46200F6DF2A /* Help.hpp */,
 				46B5230F170EB46200F6DF2A /* Interpolation.hpp */,
 				46B52310170EB46200F6DF2A /* LogarithmicSlider.hpp */,
 				46B52311170EB46200F6DF2A /* MainWindow.hpp */,
 				46B52312170EB46200F6DF2A /* MaquetteScene.hpp */,
 				46B52313170EB46200F6DF2A /* MaquetteView.hpp */,
-				46B52314170EB46200F6DF2A /* MaquetteWidget.hpp */,
 				46B52315170EB46200F6DF2A /* NetworkConfig.hpp */,
 				46B52316170EB46200F6DF2A /* NetworkMessagesEditor.hpp */,
 				46B52317170EB46200F6DF2A /* NetworkTree.hpp */,
@@ -205,13 +205,13 @@
 				46B5233E170EB47E00F6DF2A /* CurvesWidget.cpp */,
 				46B5233F170EB47E00F6DF2A /* CurveWidget.cpp */,
 				46B52340170EB47E00F6DF2A /* DeviceEdit.cpp */,
+				469B63BD1805AD160046AC95 /* HeaderPanelWidget.cpp */,
 				46B52341170EB47E00F6DF2A /* Help.cpp */,
 				46B52342170EB47E00F6DF2A /* Interpolation.cpp */,
 				46B52343170EB47E00F6DF2A /* LogarithmicSlider.cpp */,
 				46B52344170EB47E00F6DF2A /* MainWindow.cpp */,
 				46B52345170EB47E00F6DF2A /* MaquetteScene.cpp */,
 				46B52346170EB47E00F6DF2A /* MaquetteView.cpp */,
-				46B52347170EB47E00F6DF2A /* MaquetteWidget.cpp */,
 				46B52348170EB47E00F6DF2A /* NetworkConfig.cpp */,
 				46B52349170EB47E00F6DF2A /* NetworkMessagesEditor.cpp */,
 				46B5234A170EB47E00F6DF2A /* NetworkTree.cpp */,

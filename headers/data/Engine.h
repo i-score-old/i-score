@@ -25,6 +25,9 @@
 #include <map>
 #include <vector>
 
+#include <QColor>
+#include <QPointF>
+
 /** a temporary type dedicated to pass time value (date, duration, ...) */
 typedef unsigned int TimeValue;
 
@@ -79,8 +82,6 @@ typedef std::map<unsigned int, EngineCacheElementPtr>::iterator EngineCacheMapIt
 
 #define CURVE_POW 1
 
-#define SCENARIO_SIZE 600000
-
 /// Allen relations types
 enum AllenType { ALLEN_BEFORE, ALLEN_AFTER, ALLEN_EQUALS, ALLEN_MEETS, ALLEN_OVERLAPS, ALLEN_DURING, ALLEN_STARTS, ALLEN_FINISHES, ALLEN_NONE };
 
@@ -133,7 +134,11 @@ class Engine
     
 private:
     
+    TTString            iscore;                                         /// application name
+    
     TTTimeProcessPtr    m_mainScenario;                                 /// The top scenario
+    TTTimeEventPtr      m_mainStartEvent;                               /// The top scenario start event
+    TTTimeEventPtr      m_mainEndEvent;                                 /// The top scenario end event
     
     unsigned int        m_nextTimeProcessId;                            /// the next Id to give to any created time process
     unsigned int        m_nextIntervalId;                               /// the next Id to give to any created interval
@@ -144,9 +149,10 @@ private:
     EngineCacheMap      m_timeConditionMap;                             /// All condition stored using an unique id
     EngineCacheMap      m_conditionedProcessMap;                        /// All conditioned time process with an conditioned event stored using an unique id
     
-    EngineCacheMap      m_runningCallbackMap;                           /// All callback to observe time process running state stored using a time process id
+    EngineCacheMap      m_startCallbackMap;                             /// All callback to observe when a time process starts stored using a time process id
+    EngineCacheMap      m_endCallbackMap;                               /// All callback to observe when a time process ends stored using a time process id
     
-    EngineCacheMap      m_readyCallbackMap;                             /// All callback to observe time event ready state stored using using a trigger id
+    EngineCacheMap      m_statusCallbackMap;                             /// All callback to observe time event ready state stored using using a trigger id
     EngineCacheMap      m_triggerDataMap;                               /// All TTData to expose conditioned event on the network stored using using a trigger id
 
     TTObjectBasePtr     m_dataPlay;                                     /// A Modular TTData to expose Play transport service
@@ -156,18 +162,33 @@ private:
     TTObjectBasePtr     m_dataStartPoint;                               /// A Modular TTData to expose StartPoint transport service
     TTObjectBasePtr     m_dataSpeed;                                    /// A Modular TTData to expose Speed transport service
     
-	void (*m_TimeEventReadyAttributeCallback)(ConditionedProcessId, bool);
+    TTObjectBasePtr     m_sender;                                       /// A Modular TTSender to send message to any application
+    
+	void (*m_TimeEventStatusAttributeCallback)(ConditionedProcessId, bool);
     void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);
     void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);
 
 public:
 
-    Engine(void(*timeEventReadyAttributeCallback)(ConditionedProcessId, bool),
-           void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
-           void(*transportDataValueCallback)(TTSymbol&, const TTValue&));
+    // to receive Minuit messages : used to receive query or answers from any other applications
+    const int MINUIT_INPUT_PORT = 13579;
     
-    void initModular();
+    // to receive OSC messages : used to control i-score
+    const int OSC_INPUT_PORT = 13580;
+    
+    // to emit OSC messages : used by i-score to send feedbacks or notifications
+    const int OSC_OUTPUT_PORT = 13581;
+
+    Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
+           void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
+           void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
+           std::string pathToTheJamomaFolder);
+    
+    void initModular(const char* pathToTheJamomaFolder = NULL);
     void initScore();
+    
+    void registerIscoreTransportData();
+    void registerIscoreToProtocols();
     
     void dumpAddressBelow(TTNodePtr aNode);
     
@@ -178,24 +199,31 @@ public:
     TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::string & name);
     TTTimeProcessPtr    getTimeProcess(TimeProcessId boxId);
     void                uncacheTimeProcess(TimeProcessId boxId);
+    void                clearTimeProcess();
     
     IntervalId          cacheInterval(TTTimeProcessPtr timeProcess);
     TTTimeProcessPtr    getInterval(IntervalId relationId);
     void                uncacheInterval(IntervalId relationId);
+    void                clearInterval();
     
-    ConditionedProcessId cacheConditionedProcess(TTTimeProcessPtr timeProcess, TimeEventIndex controlPointId);
+    ConditionedProcessId cacheConditionedProcess(TimeProcessId timeProcessId, TimeEventIndex controlPointId);
     TTTimeProcessPtr    getConditionedProcess(ConditionedProcessId triggerId, TimeEventIndex& controlPointId);
     void                uncacheConditionedProcess(ConditionedProcessId triggerId);
+    void                clearConditionedProcess();
     
-    void                cacheTimeCondition(ConditionedProcessId triggerId);
+    void                cacheTimeCondition(ConditionedProcessId triggerId, TTTimeConditionPtr timeCondition);
     TTTimeConditionPtr  getTimeCondition(ConditionedProcessId triggerId);
     void                uncacheTimeCondition(ConditionedProcessId triggerId);
+    void                clearTimeCondition();
     
-    void                cacheRunningCallback(TimeProcessId boxId);
-    void                uncacheRunningCallback(TimeProcessId boxId);
+    void                cacheStartCallback(TimeProcessId boxId);
+    void                uncacheStartCallback(TimeProcessId boxId);
     
-    void                cacheReadyCallback(ConditionedProcessId triggerId, TTTimeEventPtr timeEvent);
-    void                uncacheReadyCallback(ConditionedProcessId triggerId, TTTimeEventPtr timeEvent);
+    void                cacheEndCallback(TimeProcessId boxId);
+    void                uncacheEndCallback(TimeProcessId boxId);
+    
+    void                cacheStatusCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId);
+    void                uncacheStatusCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId);
     
     void                cacheTriggerDataCallback(ConditionedProcessId triggerId, TimeProcessId boxId);
     void                uncacheTriggerDataCallback(ConditionedProcessId triggerId);
@@ -321,6 +349,96 @@ public:
 	 */
 	bool performBoxEditing(TimeProcessId boxId, TimeValue start, TimeValue end, std::vector<TimeProcessId>& movedBoxes);
     
+    /*!
+	 * Gets the name of the box matching the given ID
+	 *
+	 *
+	 * \param boxId : the ID of the box
+	 *
+	 * \return the name of the box matching the given ID
+	 */
+    std::string getBoxName(TimeProcessId boxId);
+    
+    /*!
+	 * Gets the vertical position of the box matching the given ID
+	 *
+	 *
+	 * \param boxId : the ID of the box
+	 *
+	 * \return the vertical position of the box matching the given ID
+	 */
+    unsigned int getBoxVerticalPosition(TimeProcessId boxId);
+    
+    /*!
+	 * Gets the vertical position of the box matching the given ID
+	 *
+	 *
+	 * \param boxId : the ID of the box
+	 *
+	 * \param newPosition : the new vertical position of the box matching the given ID
+	 */
+    void setBoxVerticalPosition(TimeProcessId boxId, unsigned int newPosition);
+    
+    /*!
+	 * Gets the vertical size of the box matching the given ID
+	 *
+	 *
+	 * \param boxId : the ID of the box
+	 *
+	 * \return the vertical size of the box matching the given ID
+	 */
+    unsigned int getBoxVerticalSize(TimeProcessId boxId);
+
+    /*!
+	 * Sets the vertical size of the box matching the given ID
+	 *
+	 *
+	 * \param boxId : the ID of the box
+	 *
+	 * \param newSize : the new vertical size of the box matching the given ID
+	 */
+    void setBoxVerticalSize(TimeProcessId boxId, unsigned int newSize);
+    
+    /*!
+	 * Gets the color of the box matching the given ID
+	 *
+	 *
+	 * \param boxId : the ID of the box
+	 *
+	 * \return the color of the box matching the given ID
+	 */
+    QColor getBoxColor(TimeProcessId boxId);
+    
+    /*!
+	 * Sets the color of the box matching the given ID
+	 *
+	 *
+	 * \param boxId : the ID of the box
+	 *
+	 * \param newColor : the color of the box matching the given ID
+	 */
+    void setBoxColor(TimeProcessId boxId, QColor newColor);
+    
+    /*!
+     * Sets the mute state of the box (process) matching the given ID
+     *
+     *
+     * \param boxId : the ID of the box
+     *
+     * \param muteState : the muteState of the box matching the given ID
+     */
+    void setBoxMuteState(TimeProcessId boxId, bool muteState);
+
+    /*!
+     * Sets the name of the box matching the given ID
+     *
+     *
+     * \param boxId : the ID of the box
+     *
+     * \param newColor : the name of the box matching the given ID
+     */
+    void setBoxName(TimeProcessId boxId, std::string name);
+
 	/*!
 	 * Gets the begin value of the box matching the given ID
 	 *
@@ -508,18 +626,15 @@ public:
 	void setCurveMuteState(TimeProcessId boxId, const std::string & address, bool muteState);
 	bool getCurveMuteState(TimeProcessId boxId, const std::string & address);
     
-    
-	/*!
-	 * Gets all arguments type of a given string. Useful too for getting the address information of a message.
+    /*!
+	 * Changes the recording information of a curve.
+	 * If set to true, the curve will record it self during the next execution of the box
 	 *
-	 * For example : "/deviceName/freq 100 200." will be cut into :
-	 *
-	 * </deviceName/freq INT FLOAT>
-	 *
-	 * \param stringToParse : the string to parse.
-	 * \param result : the result vector.
+	 * \param boxId : the Id of the box.
+	 * \param address : curve address.
+	 * \param record : new record information.
 	 */
-	void getCurveArgTypes(std::string stringToParse, std::vector<std::string>& result);
+    void setCurveRecording(TimeProcessId boxId, const std::string & address, bool record);
     
 	/*!
 	 * Sets sections informations for sending more complicated curves.
@@ -659,43 +774,91 @@ public:
 	 */
 	void getTriggersPointId(std::vector<ConditionedProcessId>& triggersID);
     
+    /*!
+	 * Set the zoom factor of the view of the main scenario
+	 * 
+	 * \param zoom : the zoom factor as QPointF variable
+	 */
+	void setViewZoom(QPointF zoom);
     
+    /*!
+	 * Get the zoom factor of the view of the main scenario
+	 *
+	 * \return the zoom factor as a QPointF variable
+	 */
+	QPointF getViewZoom();
+    
+    /*!
+	 * Set the position of the view of the main scenario
+	 *
+	 * \param zoom : the zoom factor as QPointF variable
+	 */
+	void setViewPosition(QPointF position);
+    
+    /*!
+	 * Get the position of the view of the main scenario
+	 *
+	 * \return the position as a QPointF variable
+	 */
+	QPointF getViewPosition();
     
     
 	//Execution ///////////////////////////////////////////////////////////////////////
     
-	void setGotoValue(TimeValue gotoValue);
-	TimeValue getGotoValue();
+    /*!
+	 * Sets scenario time offset to start from this date on the next play
+     *
+     * \param timeOffset: new timeOffset value
+	 *
+	 */
+	void setTimeOffset(TimeValue timeOffset, bool mute = NO);
+    
+    /*!
+	 * Gets the time offset where the scenario will start from on the next play
+     *
+     * \return time offset value
+	 *
+	 */
+	TimeValue getTimeOffset();
     
 	/*!
-	 * Plays the scenario (compiles and runs it).
+	 * Plays the main scenario (compiles and runs it).
 	 *
-	 * \param gotoInformation : (optional) time to start the execution.
-	 *
-	 * \return true if the ECOMachine is now running.
+	 * \return true if the scenario execution starts fine.
 	 */
 	bool play();
     
-	/*!
-	 * Stops the ECOMachine.
+    /*!
+	 * Tests if the main scenario is actually running.
 	 *
-	 * \return true if the ECOMachine will actually stop.
+	 * \return true if the main scnerio is running. False if not.
+	 */
+	bool isPlaying();
+
+	/*!
+	 * Stops the main scenario.
+	 *
+	 * \return true if the main scenario will actually stop.
 	 */
 	bool stop();
     
+    /*!
+	 * Pause the main scenrio execution
+     *
+     * \param pause: new pause value
+	 *
+	 */
 	void pause(bool pauseValue);
-    
+ 
+    /*!
+	 * Tests if the main scenario is actually paused.
+	 *
+	 * \return true if the main scnerio is paused. False if not.
+	 */
 	bool isPaused();
     
 	/*!
-	 * Tests if the ECOMachine is actually running.
-	 *
-	 * \return true if the ECOMachine is running. False if not.
-	 */
-	bool isRunning();
-    
-	/*!
-	 * Gets the ECOMachine current execution time in milliseconds.
+	 * Gets the main scenario current execution time in milliseconds.
 	 *
 	 * \return the execution time in milliseconds.
 	 */
@@ -708,6 +871,11 @@ public:
 	 */
 	void setExecutionSpeedFactor(float factor);
     
+    /*!
+	 * Gets the execution speed.
+	 *
+	 * \return the speed factor.
+	 */
 	float getExecutionSpeedFactor();
     
 	/*!
@@ -721,22 +889,14 @@ public:
     
 	//Network //////////////////////////////////////////////////////////////////////////////////////////////
     
-    /*!
-     * Tells the Engine that a network message was received and need to be handled.
-	 *
-	 * \param netMessage : the network message received.
-	 */
-	bool receiveNetworkMessage(std::string netMessage);
-    
 	/*!
-	 * Same behavior as receiveNetworkMessage function, but must be used by a user to simulate a network message reception.
-	 * For example to trigger a trigger point manually.
+	 * Trigger a trigger point manually.
 	 *
-	 * Tells the ECOMachine that a network message was received and need to be handled.
+	 * Tells the ECOMachine that a trigger point is trggered.
 	 *
-	 * \param netMessage : the network message received.
+	 * \param triggerId : the id of the trigger point to trigger.
 	 */
-	void simulateNetworkMessageReception(const std::string & netMessage);
+	void trigger(ConditionedProcessId triggerId);
     
 	/*!
 	 * Adds a network device.
@@ -747,7 +907,7 @@ public:
 	 * \param deviceIp : the ip of the network device.
 	 * \param devicePort : the port of the network device.
 	 */
-	void addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & deviceIp, const std::string & devicePort);
+    void addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & deviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort = 0);
     
 	/*!
 	 * Removes a network device.
@@ -767,14 +927,21 @@ public:
 	 */
 	void sendNetworkMessage(const std::string & stringToSend);
     
-	/*!
-	 * Fills the given vectors with all network devices name, and matching information about if they could send namespace request.
+    /*!
+	 * Fills the given vectors with all protocol names.
 	 *
-	 * \param devicesName : will be filled with all network devices names.
-	 * \param couldSendNamespaceRequest : will be filled with information about if the matching device could
-	 * send namespace request.
+	 * \param allProtocolNames : will be filled with all protocol names.
 	 */
-	void getNetworkDevicesName(std::vector<std::string>& devicesName, std::vector<bool>& couldSendNamespaceRequest);
+    void getProtocolNames(std::vector<std::string>& allProtocolNames);
+    
+	/*!
+	 * Fills the given vectors with all network devices name.
+	 *
+	 * \param allDeviceNames : will be filled with all network devices names.
+	 */
+	void getNetworkDevicesName(std::vector<std::string>& allDeviceNames);
+    
+    bool isNetworkDeviceRequestable(const std::string deviceName);
     
 	/*!
 	 * Sends a network snapshot request.
@@ -811,8 +978,133 @@ public:
                                 std::string & nodeType,
                                 std::vector<std::string>& nodes, std::vector<std::string>& leaves,
                                 std::vector<std::string>& attributs, std::vector<std::string>& attributsValue);
+
+    /*!
+     * Sends a request to get an attribute value.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param attribute : the attribute's name we request. ex : "service", "rangeBounds"...etc
+     * \param attributeValue : will be filled with the matching attribute values.
+     *
+     * \return True(1) or false(0) if the request failed or not.
+     */
+    int requestObjectAttributeValue(const std::string & address, const std::string & attribute, std::vector<std::string>& value);
+
+    /*!
+     * Sends a request to get the type of an object.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param nodeType : will be filled with the type.
+     *
+     * \return True(1) or false(0) if the request failed or not.
+     */
+    int requestObjectType(const std::string & address, std::string & nodeType);
+
+    /*!
+     * Sends a request to get the type of an object.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param Priority : will be filled with the priority.
+     *
+     * \return True(1) or false(0) if the request failed or not.
+     */
+    int requestObjectPriority(const std::string & address, unsigned int & nodeType);
+
+    /*!
+     * Sends a request to get the children nodes of an object.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param children : will be filled with the children' addresses.
+     *
+     * \return True(1) or false(0) if the request failed or not.
+     */
+    int requestObjectChildren(const std::string & address, std::vector<std::string>& children);
+
+    /*!
+     * Refresh the namespace, rebuilding the mirror
+     *
+     * \param application : the application's address. ex : /MinuitDevice1
+     * \param address : the object's address
+     */
+    void refreshNetworkNamespace(const std::string& application, const std::string& address = "/");
     
-    
+    /*!
+     * Load a namespace from a namespace file
+     *
+     * \param application : the application to setup
+     * \param filepath : the path to a namespace file
+     */
+    bool loadNetworkNamespace(const std::string &application, const std::string &filepath);
+
+    /*!
+     * Gets an integer parameter associated to the protocol and the device.
+     *
+     * \param protocol : the protocol's name. ex : Minuit
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param parameter : the parameter asked. ex: port
+     * \param integer : the integer returned. ex: 8002
+     * \return 0 if no error, else 1.
+     */
+    bool getDeviceIntegerParameter(const std::string device, const std::string protocol, const std::string parameter, unsigned int &integer);
+
+    bool getDeviceIntegerVectorParameter(const std::string device, const std::string protocol, const std::string parameter, std::vector<int> &integerVect);
+    /*!
+     * Gets a string parameter associated to the protocol and the device.
+     *
+     * \param protocol : the protocol's name. ex : Minuit
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param parameter : the parameter asked. ex: ip
+     * \param string : the integer returned. ex: 192.168.1.1
+     * \return 0 if no error, else 1.
+     */
+    bool getDeviceStringParameter(const std::string device, const std::string protocol, const std::string parameter, std::string &string);
+
+    /*!
+     * Gets the protocol name associated to the device.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param protocol : the protocol name returned. ex: Minuit
+     * \return 0 if no error, else 1.
+     */
+    bool getDeviceProtocol(std::string deviceName, std::string &protocol);
+
+    /*!
+     * Sets the device's name.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param newName : the newName. ex: MyMinuit
+     * \return 0 if no error, else 1.
+     */
+    bool setDeviceName(std::string deviceName, std::string newName);
+
+    /*!
+     * Sets the device's port.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param destinationPort : the port value. ex: 8002
+     * \param receptionPort : the port value. ex: 8002 (useful for OSC plugin)
+     * \return 0 if no error, else 1.
+     */
+    bool setDevicePort(std::string deviceName, int destinationPort, int receptionPort = 0);
+
+    /*!
+     * Sets the device's local host.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param port : the local host value. ex: 192.168.1.1
+     * \return 0 if no error, else 1.
+     */
+    bool setDeviceLocalHost(std::string deviceName, std::string localHost);
+
+    /*!
+     * Sets the device's protocol. (considering a device has only one)
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param port : the protocol name. ex: OSC
+     * \return 0 if no error, else 1.
+     */
+    bool setDeviceProtocol(std::string deviceName, std::string protocol);
+
 	//Store and load ////////////////////////////////////////////////////////////////////////////////////
     
 	/*!
@@ -835,8 +1127,9 @@ public:
 	void print();
     void printExecutionInLinuxConsole();
     
-	friend void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value);
-    friend void TimeProcessSchedulerRunningAttributeCallback(TTPtr baton, const TTValue& value);
+    friend void TimeEventStatusAttributeCallback(TTPtr baton, const TTValue& value);
+    friend void TimeProcessStartCallback(TTPtr baton, const TTValue& value);
+    friend void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
     friend void TransportDataValueCallback(TTPtr baton, const TTValue& value);
     friend void TriggerReceiverValueCallback(TTPtr baton, const TTValue& value);
     
@@ -861,21 +1154,27 @@ private:
 
 typedef Engine* EnginePtr;
 
-/** Any time event ready attribute callback
+/** time event status attribute callback
  @param	baton			a TTValuePtr containing an EnginePtr and an ConditionedProcessId
- @param	value			the time event ready state
+ @param	value			a time event
  @return                an error code */
-void TimeEventReadyAttributeCallback(TTPtr baton, const TTValue& value);
+void TimeEventStatusAttributeCallback(TTPtr baton, const TTValue& value);
 
-/** Any time process running state callback
+/** Callback used each time a process starts
+ @param	baton			a TTValuePtr containing an EnginePtr and an TimeProcessId
+ @param	value			nothing
+ @return                an error code */
+void TimeProcessStartCallback(TTPtr baton, const TTValue& value);
+
+/** Callback used each time a process ends
  @param	baton			a TTValuePtr containing an EnginePtr and an TimeProcessId
  @param	value			the time process running state
  @return                an error code */
-void TimeProcessSchedulerRunningAttributeCallback(TTPtr baton, const TTValue& value);
+void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
 
 /** Any transport data value callback
  @param	baton			a TTValuePtr containing an EnginePtr and a TTDataPtr
- @param	value			the value of the data
+ @param	value			nothing
  @return                an error code */
 void TransportDataValueCallback(TTPtr baton, const TTValue& value);
 
@@ -901,6 +1200,6 @@ TTErr TTModularRegisterObject(TTAddress address, TTObjectBasePtr object);
  @param	v1				a pointer to a value containing a pointer to a TTNode >
  @param	v2				a pointer to a value containing a pointer to a TTNode >
  @return				is the priority of v1 is smaller than v2 (except if equal 0) ? */
-TTBoolean TTModularCompareNodePriority(TTValue& v1, TTValue& v2);
+TTBoolean TTModularCompareNodePriorityThenNameThenInstance(TTValue& v1, TTValue& v2);
 
 #endif // __SCORE_ENGINE_H__

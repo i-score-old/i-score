@@ -105,7 +105,13 @@ class CurveWidget : public QWidget
                        const std::vector<short> &sectionType, const std::vector<float> &coeff);
 
     void setAttributes(AbstractCurve *abCurve);
+    void setAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition, const std::vector<float> &values, unsigned int sampleRate,
+                       bool redundancy, bool show, bool interpolate, const std::vector<std::string> &argType, const std::vector<float> &xPercents, const std::vector<float> &yValues,
+                       const std::vector<short> &sectionType, const std::vector<float> &coeff,const float minY,
+                       const float maxY);
     void setLowerStyle(bool state);
+    void setMaxY(float value);
+    void setMinY(float value);
 
     /*!
      * \brief Gets local coordinates of a point.
@@ -113,6 +119,8 @@ class CurveWidget : public QWidget
      * Y => translates, gets symmetrical and scales
      */
     QPointF relativeCoordinates(const QPointF &point);
+
+    void updateRangeClipMode();
 
   protected:
     /*!
@@ -152,7 +160,7 @@ class CurveWidget : public QWidget
      * \brief This event handler can be reimplemented in a subclass to receive widget resize events which are passed in the event parameter.
      * \param event : the resizing event
      */
-    virtual void resizeEvent(QResizeEvent * event);
+    virtual void resizeEvent(QResizeEvent * event);  
 
   private:
     /*!
@@ -179,6 +187,8 @@ class CurveWidget : public QWidget
 
     bool _clicked;            //!< Clicked state.
     bool _unactive;
+    bool _minYModified;
+    bool _maxYModified;
 
     QGridLayout *_layout; //!< Layout for widget.
 
@@ -188,8 +198,14 @@ class CurveWidget : public QWidget
     float _scaleMaxY;     //!< Value for maximum vertical scaling.
     float _minY;
     float _maxY;
-    float _xAxisPos;
+    float _xAxisPos;    
+    QRectF *_minYTextRect;
+    QRectF *_maxYTextRect;
+
+    bool _maxRangeBoundLocked;
+    bool _minRangeBoundLocked;
 
     bool _lastPointSelected;     //!< Last point selected.
+    float _lastPowSave;
 };
 #endif /* CURVE_WIDGET_HPP */

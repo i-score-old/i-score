@@ -362,16 +362,8 @@ class MaquetteScene : public QGraphicsScene
      * \param IP : the new IP for device
      * \param port : the new port for device
      */
-    void changeNetworkDevice(string deviceName, string pluginName, string IP, string port);
-    void setNetworDeviceConfig(string deviceName, string pluginName, string IP, string port);
-
-    /*!
-     * \brief Updates messages to send for a specific box.
-     *
-     * \param boxID : the box to modify messages sent from
-     * \return true if messages could be modified
-     */
-    bool updateMessagesToSend(unsigned int boxID);
+    void changeNetworkDevice(string deviceName, string pluginName, string IP, unsigned int port);
+    void setNetworDeviceConfig(string deviceName, string pluginName, string IP, unsigned int port);
 
     /*!
      * \brief Sends a specific message with current device.
@@ -463,6 +455,13 @@ class MaquetteScene : public QGraphicsScene
      * \return the box progress ratio.
      */
     float getProgression(unsigned int boxID);
+    
+    /*!
+     * \brief Gets the curent time offset.
+     *
+     * \return the current time offset.
+     */
+    unsigned int getTimeOffset();
 
     /*!
      * \brief Gets a set of temporal relations involving a particular entity.
@@ -518,14 +517,14 @@ class MaquetteScene : public QGraphicsScene
      *
      * \return the playing state
      */
-    bool playing() const;
+    bool playing();
 
     /*!
      * \brief Determines the paused state.
      *
      * \return the paused state
      */
-    bool paused() const;
+    bool paused();
 
     /*!
      * \brief Updates the boxes currently playing.
@@ -541,7 +540,7 @@ class MaquetteScene : public QGraphicsScene
     void setPlaying(unsigned int boxID, bool playing);
 
     //! Integer handling scene's maximal width.
-    static const int MAX_SCENE_WIDTH = 100000;
+    static const int MAX_SCENE_WIDTH = 300000;
 
     //! Integer handling scene's maximal height.
     static const int MAX_SCENE_HEIGHT = 1000;
@@ -578,19 +577,6 @@ class MaquetteScene : public QGraphicsScene
     void setMaxSceneWidth(float maxSceneWidth);
 
   protected:
-    /*!
-     * \brief Redifinition of QGraphicsScene::drawItems().
-     * This method is automatically called by QGraphicsScene::update().
-     *
-     * \param painter : the painter used to draw
-     * \param numItem : the number of items into the scene
-     * \param items : collection of the graphical items
-     * \param options : array of options
-     * \param widget : the widget that is being painting on
-     */
-    virtual void drawItems(QPainter *painter, int numItems, QGraphicsItem *items[],
-                           const QStyleOptionGraphicsItem options[],
-                           QWidget *widget);
 
     /*!
      * \brief Redefinition of QGraphicsScene::drawForeground().
@@ -637,12 +623,12 @@ class MaquetteScene : public QGraphicsScene
   signals:
     void stopPlaying();
     void accelerationValueChanged(double value);
-    void networkConfigChanged(std::string deviceName, std::string pluginName, std::string IP, std::string port);
+    void networkConfigChanged(std::string deviceName, std::string pluginName, std::string IP, unsigned int port);
     void playModeChanged();
 
   public slots:
     void verticalScroll(int value);
-    void gotoChanged(double value);
+    void changeTimeOffset(unsigned int timeOffset);
     void zoomChanged(float value);
     void speedChanged(double value);
 
@@ -674,25 +660,22 @@ class MaquetteScene : public QGraphicsScene
     void updateStartingTime(int value);
 
     /*!
-     * \brief Plays the whole composition.
+     * \brief Plays the whole composition or resume it depending of the context
      */
-    void play();
+    void playOrResume();
 
     /*!
      * \brief Stops playing the composition.
      */
-    void stop();
-    void stopGotoStart();
-    void stopWithGoto();
-
-    /*!
-     * \brief Pauses playing the composition.
-     */
-    void pause();
+    void stopOrPause();
+    void stopAndGoToStart();
+    void stopAndGoToTimeOffset(unsigned int timeOffset);
+    void stopAndGoToCurrentTime();
+    
     bool noBoxSelected();
-    inline void
-    resetSelection(){ clearSelection(); }
+    inline void resetSelection(){ clearSelection(); }
     void updateBoxesWidgets();
+    void unselectAll();
 
   private:
     /*!
@@ -770,8 +753,6 @@ class MaquetteScene : public QGraphicsScene
 
     unsigned int _resizeBox;           //!< During a resizing operation, the concerned box
     bool _clicked;                     //!< Handles if a click just occured.
-    bool _playing;                     //!< Handles playing state.
-    bool _paused;                      //!< Handles paused state.
 
     unsigned int _startingValue;       //!< Starting time in ms.
 

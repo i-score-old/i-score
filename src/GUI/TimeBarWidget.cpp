@@ -78,8 +78,8 @@ TimeBarWidget::~TimeBarWidget()
 void
 TimeBarWidget::mousePressEvent(QMouseEvent *event)
 {
-  int value = event->pos().x() * MaquetteScene::MS_PER_PIXEL;
-  emit gotoValueEntered(value);
+  unsigned int timeOffset = event->pos().x() * MaquetteScene::MS_PER_PIXEL;
+  emit timeOffsetEntered(timeOffset);
 }
 
 void
@@ -111,9 +111,9 @@ TimeBarWidget::drawBackground(QPainter *painter, QRect rect)
   const int HEIGHT = TIME_BAR_HEIGHT;
 
   float i_PXL;
-  QFont *font = new QFont();
-  font->setPointSize(NUMBERS_POINT_SIZE);
-  painter->setFont(*font);
+  QFont font;
+  font.setPointSize(NUMBERS_POINT_SIZE);
+  painter->setFont(font);
 
   float zoom = 16. / MaquetteScene::MS_PER_PIXEL;
   float factor = ((float)1.) / zoom;

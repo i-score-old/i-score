@@ -1,4 +1,4 @@
-/*
+    /*
  * Copyright: LaBRI / SCRIME
  *
  * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
@@ -75,6 +75,7 @@
 #include <QAbstractItemView>
 #include <QStyleOptionViewItem>
 #include <cmath>
+#include <QPixmapCache>
 
 using std::string;
 using std::vector;
@@ -98,13 +99,18 @@ const QColor BasicBox::TEXT_COLOR = QColor(0, 0, 0);
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
   : QGraphicsItem()
-{
+{    
+
   _scene = parent;
   _startMenu = NULL;
   _endMenu = NULL;
   _startMenuButton = NULL;
   _endMenuButton = NULL;
-
+  _boxContentWidget = NULL;
+  _boxWidget = NULL;
+  _comboBox = NULL;
+  _startMenuButton = NULL;
+  _endMenuButton = NULL;
 
   /// \todo : !! Problème d'arrondi, on cast en int des floats !! A étudier parce que crash (avec 0 notamment) si on remet en float. NH
   int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
@@ -133,14 +139,21 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 void
 BasicBox::centerWidget()
 {
-  _boxWidget->move(-(width()) / 2 + LINE_WIDTH, -(height()) / 2 + (1.2 * RESIZE_TOLERANCE));
-  _boxWidget->resize(width() - 2 * LINE_WIDTH, height() - 1.5 * RESIZE_TOLERANCE);
+    if(_boxWidget != NULL){
+        _boxWidget->move(-(width()) / 2 + LINE_WIDTH, -(height()) / 2 + (1.2 * RESIZE_TOLERANCE));
+        _boxWidget->resize(width() - 2 * LINE_WIDTH, height() - 1.5 * RESIZE_TOLERANCE);
+    }
 
-  _comboBox->move(0, -(height() / 2 + LINE_WIDTH));
-  _comboBox->resize((width() - 4 * LINE_WIDTH - BOX_MARGIN) / 2, COMBOBOX_HEIGHT);
+    if(_comboBox != NULL){
+        _comboBox->move(0, -(height() / 2 + LINE_WIDTH));
+        _comboBox->resize((width() - 4 * LINE_WIDTH - BOX_MARGIN) / 2, COMBOBOX_HEIGHT);
+    }
 
-  _startMenuButton->move(-(width()) / 2 + LINE_WIDTH, -(height()) / 2);
-  _endMenuButton->move((width()) / 2 + 2 * LINE_WIDTH - BOX_MARGIN, -(height()) / 2 + LINE_WIDTH);
+    if(_startMenuButton != NULL)
+        _startMenuButton->move(-(width()) / 2 + LINE_WIDTH, -(height()) / 2);
+
+    if(_endMenuButton != NULL)
+        _endMenuButton->move((width()) / 2 + 2 * LINE_WIDTH - BOX_MARGIN, -(height()) / 2 + LINE_WIDTH);
 }
 
 void
@@ -185,7 +198,8 @@ BasicBox::createMenus()
     "background-color: transparent;"
     "};"
     );
-  _boxContentWidget->setStartMenu(_startMenu);
+  if(_boxContentWidget != NULL)
+      _boxContentWidget->setStartMenu(_startMenu);
 
   //--- end button ---
   QIcon endMenuIcon(":/images/boxEndMenu.svg");
@@ -199,7 +213,8 @@ BasicBox::createMenus()
     "background-color: transparent;"
     "}"
     );
-  _boxContentWidget->setEndMenu(_endMenu);
+  if(_boxContentWidget != NULL)
+      _boxContentWidget->setEndMenu(_endMenu);
 
   QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
   startMenuProxy->setWidget(_startMenuButton);
@@ -243,7 +258,6 @@ BasicBox::createWidget()
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setAlignment(_boxWidget, Qt::AlignLeft);
   _boxWidget->setLayout(layout);
-  _boxContentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   _curveProxy = new QGraphicsProxyWidget(this);
 
@@ -289,7 +303,24 @@ BasicBox::~BasicBox()
       removeRelations(BOX_START);
       removeRelations(BOX_END);
       delete static_cast<AbstractBox*>(_abstract);
-    }
+  }
+  delete _recEffect;
+  delete _boxContentWidget;
+  delete _boxWidget;
+  delete _comboBox;
+
+  delete _startMenuButton;
+  delete _endMenuButton;
+
+  delete _jumpToStartCue;
+  delete _jumpToEndCue;
+  delete _updateStartCue;
+  delete _updateEndCue;
+
+//  delete _curveProxy;
+//  delete _comboBoxProxy;
+//  delete _startMenu;
+//  delete _endMenu;
 }
 
 QString
@@ -311,17 +342,29 @@ BasicBox::init()
   _hasContextMenu = false;
   _shift = false;
   _playing = false;
+  _recording = true;
   _low = false;
   _triggerPoints = new QMap<BoxExtremity, TriggerPoint*>();
   _comment = NULL;
+
   _color = QColor(BOX_COLOR);
   _colorUnselected = QColor(40, 40, 40);
+
+  _recEffect = new QGraphicsColorizeEffect(this);
+  _recEffect->setColor(Qt::red);
+  _recEffect->setEnabled(false);
+  setGraphicsEffect(_recEffect);
+
   _hover = false;
 
   updateBoxSize();
 
   setCacheMode(QGraphicsItem::ItemCoordinateCache);
   setFlag(QGraphicsItem::ItemIsMovable, true);
+
+  /// \todo Affiner la limite du cache. Cette ligne permet de résoudre le bug de latence (toutes les boîtes automatiquement repeintes au scroll/move/resize).
+  QPixmapCache::setCacheLimit(220000);
+
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setFlag(QGraphicsItem::ItemIsFocusable, true);
   setFlag(ItemSendsGeometryChanges, true);
@@ -343,21 +386,45 @@ BasicBox::changeColor(QColor color)
 void
 BasicBox::addToComboBox(QString address)
 {
-  _boxContentWidget->addToComboBox(address);
+    if(_boxContentWidget != NULL){
+        _boxContentWidget->addToComboBox(address);
+    }
 }
 
 void
 BasicBox::updateCurves()
 {
-  _boxContentWidget->updateMessages(_abstract->ID(), true);
-  update();
+    if(_boxContentWidget != NULL){
+        _boxContentWidget->updateMessages(_abstract->ID(), true);
+        update();
+    }
 }
 
 void
 BasicBox::updateCurve(string address, bool forceUpdate)
 {
-  _boxContentWidget->updateCurve(address, forceUpdate);
-  update();
+    if(_boxContentWidget != NULL){
+        _boxContentWidget->updateCurve(address, forceUpdate);                
+        update();
+    }
+}
+
+void
+BasicBox::updateCurveRangeBoundMin(string address, float value)
+{
+    if(_boxContentWidget != NULL){
+        _boxContentWidget->updateCurveRangeBoundMin(address, value);
+        update();
+    }
+}
+
+void
+BasicBox::updateCurveRangeBoundMax(string address, float value)
+{
+    if(_boxContentWidget != NULL){
+        _boxContentWidget->updateCurveRangeBoundMax(address, value);
+        update();
+    }
 }
 
 int
@@ -542,7 +609,6 @@ BasicBox::getFinalState()
           finalMessages.insert(*it, QPair<QString, unsigned int>(startMsgs.value(*it), date()));
         }
     }
-
   return finalMessages;
 }
 
@@ -564,6 +630,10 @@ BasicBox::getStartState()
   return finalMessages;
 }
 
+std::vector<std::string>
+BasicBox::getStartMessages(){
+    return _abstract->startMessages()->computeMessages();
+}
 
 void
 BasicBox::resizeWidthEdition(float width)
@@ -589,11 +659,7 @@ BasicBox::resizeWidthEdition(float width)
 void
 BasicBox::resizeHeightEdition(float height)
 {
-  _abstract->setHeight(height);
-
-  if (_comment != NULL) {
-      _comment->updatePos();
-    }
+  _abstract->setHeight(height); 
   centerWidget();
 }
 
@@ -613,8 +679,10 @@ BasicBox::name() const
 void
 BasicBox::setName(const QString & name)
 {
-  _abstract->setName(name.toStdString());
-  update();
+    std::string nameStr = name.toStdString();
+    _abstract->setName(nameStr);
+    Maquette::getInstance()->setBoxName(ID(),nameStr);
+    update();
 }
 
 QColor
@@ -630,6 +698,8 @@ BasicBox::setColor(const QColor & color)
   _abstract->setColor(color);
   _colorUnselected = color;
   _color = color;
+    
+  Maquette::getInstance()->setBoxColor(ID(), color);
 }
 
 void
@@ -925,12 +995,6 @@ BasicBox::triggerPointMessage(BoxExtremity extremity)
 }
 
 void
-BasicBox::setFirstMessagesToSend(const vector<string> &messages)
-{
-  _abstract->setFirstMsgs(messages);
-}
-
-void
 BasicBox::setStartMessages(NetworkMessages *messages)
 {
   _abstract->setStartMessages(messages);
@@ -966,11 +1030,6 @@ BasicBox::clearExpandedItemsList()
 {
   _abstract->clearNetworkTreeExpandedItems();
 }
-void
-BasicBox::setLastMessagesToSend(const vector<string> &messages)
-{
-  _abstract->setLastMsgs(messages);
-}
 
 void
 BasicBox::setEndMessages(NetworkMessages *messages)
@@ -1001,17 +1060,6 @@ BasicBox::setEndMessage(QTreeWidgetItem *item, QString address)
 {
   _abstract->setEndMessage(item, address);
 }
-vector<string>
-BasicBox::firstMessagesToSend() const
-{
-  return _abstract->firstMsgs();
-}
-
-vector<string>
-BasicBox::lastMessagesToSend() const
-{
-  return _abstract->lastMsgs();
-}
 
 AbstractCurve *
 BasicBox::getCurve(const std::string &address)
@@ -1031,8 +1079,9 @@ BasicBox::curveActivationChanged(string address, bool activated)
   if (!hasCurve(address)) {
       addCurve(address);
     }
-
-  _boxContentWidget->curveActivationChanged(QString::fromStdString(address), activated);
+  if(_boxContentWidget != NULL){
+      _boxContentWidget->curveActivationChanged(QString::fromStdString(address), activated);
+  }
 
   if (!activated) {
       removeCurve(address);
@@ -1260,7 +1309,7 @@ BasicBox::keyReleaseEvent(QKeyEvent *event)
 
 void
 BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
+{        
   QGraphicsItem::mousePressEvent(event);
 
   if (_startMenu != NULL) {
@@ -1272,14 +1321,6 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
   if (event->button() == Qt::LeftButton) {
       setSelected(true);
-
-//        if(_startMenuButton->is){
-//            std::cout<<"<<<<<CHECKED>>>>>"<<std::endl;
-//            if(event->modifiers()==Qt::ControlModifier){
-//                std::cout<<"<<<<<STARTMENU>>>>>"<<std::endl;
-//                _updateStartCue->trigger();
-//            }
-//        }
 
       if (cursor().shape() == Qt::OpenHandCursor) {
           setCursor(Qt::ClosedHandCursor);
@@ -1317,8 +1358,8 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
           _scene->setResizeMode(DIAGONAL_RESIZE);
           _scene->setResizeBox(_abstract->ID());
         }
-      update();
-    }
+//      update();
+    }    
 }
 
 void
@@ -1474,7 +1515,7 @@ BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 
   QRectF vertResize_bottom(_boxRect.bottomLeft() + QPointF(0, -RESIZE_ZONE_WIDTH), _boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, 0));
   QRectF diagResize_bottomRight(_boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, RESIZE_ZONE_WIDTH), _boxRect.bottomRight());
-//todo : horizontalResize_right
+  /// \todo : horizontalResize_right
 
 
   //bandeau zone (text rect) - top
@@ -1768,71 +1809,42 @@ BasicBox::drawHoverShape(QPainter *painter)
 void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-  Q_UNUSED(option);
-  Q_UNUSED(widget);
+    Q_UNUSED(widget);
+    painter->setClipRect(option->exposedRect);//To increase performance
+    bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
 
-//    QPen penR(Qt::lightGray,isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
-  QPen penR(isSelected() ? _color : _colorUnselected, isSelected() ? 1.5 * LINE_WIDTH : LINE_WIDTH); 
+    //draw hover shape
+    if ((isSelected() || _hover) && !_playing)
+        drawHoverShape(painter);
 
-  //************* pour afficher la shape *************
-  QPen penG(Qt::blue);
-  penG.setWidth(4);
-  if (isSelected() || _hover) {
-      drawHoverShape(painter);
+    //draw duration text on hover
+    if(_hover && !_playing){
+        QFont textFont;
+        textFont.setPointSize(10.);
+        painter->setPen(QPen(Qt::black));
+        painter->setFont(textFont);
+        painter->drawText(QPoint(_boxRect.bottomRight().x() -38, _boxRect.bottomRight().y()-2), QString("%1").arg(duration()/1000.));
     }
 
-//    painter->drawRect(_leftEar);
-//    painter->drawRect(_rightEar);
-//    painter->drawRect(_startTriggerGrip);
-//    painter->drawRect(_endTriggerGrip);
-//    painter->drawRect(boundingRect());
-  //***************************************************/
+    //draw boxRect
+    QPen penR(isSelected() ? _color : _colorUnselected, isSelected() ? 1.5 * LINE_WIDTH : LINE_WIDTH);
+    painter->setPen(penR);
+    painter->setBrush(QBrush(Qt::white, Qt::NoBrush));
+    painter->drawRect(_boxRect);
 
-  /************   Draw boxRect ************/
-  painter->setPen(penR);
-  painter->setBrush(QBrush(Qt::white, Qt::NoBrush));
-  painter->drawRect(_boxRect);
+    //draw gradient (start/end)
+    drawMsgsIndicators(painter);
 
-  //duration text
-  if(_hover){
-      painter->save();
-      QFont textFont;
-      textFont.setPointSize(10.);
-      painter->setPen(QPen(Qt::black));
-      painter->setFont(textFont);
-      painter->drawText(QPoint(_boxRect.bottomRight().x() -38, _boxRect.bottomRight().y()-2), QString("%1").arg(duration()/1000.));
-      painter->restore();
-  }
+    //draw relations' grips
+    drawInteractionGrips(painter);
 
-  drawMsgsIndicators(painter);
-  drawInteractionGrips(painter);
-  drawTriggerGrips(painter);
+    //draw triggers' grips
+    drawTriggerGrips(painter);
 
-  _comboBoxProxy->setVisible(_abstract->height() > RESIZE_TOLERANCE + LINE_WIDTH);
-  _curveProxy->setVisible(_abstract->height() > RESIZE_TOLERANCE + LINE_WIDTH);
-
-  QBrush brush(Qt::lightGray, isSelected() ? Qt::SolidPattern : Qt::SolidPattern);
-  QPen pen(color(), isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
-  painter->setPen(pen);
-  painter->setBrush(brush);
-  painter->setRenderHint(QPainter::Antialiasing, true);
-
-  QRectF textRect = QRectF(mapFromScene(getTopLeft()).x(), mapFromScene(getTopLeft()).y(), width(), RESIZE_TOLERANCE - LINE_WIDTH);
-
-  QFont font;
-  font.setCapitalization(QFont::SmallCaps);
-  painter->setFont(font);
-  painter->translate(textRect.topLeft());
-
-  if (_abstract->width() <= 3 * RESIZE_TOLERANCE) {
-      painter->translate(QPointF(RESIZE_TOLERANCE - LINE_WIDTH, 0));
-      painter->rotate(90);
-      textRect.setWidth(_abstract->height());
-    }
-
-  if (_abstract->width() <= 5 * RESIZE_TOLERANCE) {
-      _comboBoxProxy->setVisible(false);
-      _curveProxy->setVisible(false);
+    //curves' comboBox and widget
+    if (smallSize) {
+        _comboBoxProxy->setVisible(false);
+        _curveProxy->setVisible(false);
     }
 
   painter->fillRect(0, 0, textRect.width(), textRect.height(), isSelected() ? _color : _colorUnselected);
@@ -1846,34 +1858,56 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
   if (_abstract->width() <= 3 * RESIZE_TOLERANCE) {
       painter->rotate(-90);
       painter->translate(-QPointF(RESIZE_TOLERANCE - LINE_WIDTH, 0));
+    else{
+        _comboBoxProxy->setVisible(_abstract->height() > RESIZE_TOLERANCE + LINE_WIDTH);
+        _curveProxy->setVisible(_abstract->height() > RESIZE_TOLERANCE + LINE_WIDTH);
     }
 
+    //draw text rect
+    QBrush brush(Qt::lightGray, isSelected() ? Qt::SolidPattern : Qt::SolidPattern);
+    QPen pen(color(), isSelected() ? 2 * LINE_WIDTH : LINE_WIDTH);
+    painter->setPen(pen);
+    painter->setBrush(brush);
+    painter->setRenderHint(QPainter::Antialiasing, true);
 
-  painter->translate(QPointF(0, 0) - (textRect.topLeft()));
+    QRectF textRect = QRectF(mapFromScene(getTopLeft()).x(), mapFromScene(getTopLeft()).y(), width(), RESIZE_TOLERANCE - LINE_WIDTH);
+    QFont font;
+    font.setCapitalization(QFont::SmallCaps);
+    painter->setFont(font);
+    painter->translate(textRect.topLeft());
 
-  if (cursor().shape() == Qt::SizeHorCursor) {
-      static const float S_TO_MS = 1000.;
-      painter->drawText(_boxRect.bottomRight() - QPoint(2 * RESIZE_TOLERANCE, 0), QString("%1s").arg((double)duration() / S_TO_MS));
+    //rotate if small
+    if (_abstract->width() <= 3 * RESIZE_TOLERANCE) {
+        painter->translate(QPointF(RESIZE_TOLERANCE - LINE_WIDTH, 0));
+        painter->rotate(90);
+        textRect.setWidth(_abstract->height());
     }
-  painter->translate(_boxRect.topLeft());  
 
-  if (_playing) {
-      QPen pen = painter->pen();
-      pen.setColor(Qt::black);
-      pen.setWidth(3);
-      QBrush brush = painter->brush();
-      brush.setStyle(Qt::NoBrush);
-      painter->setPen(pen);
-      brush.setColor(Qt::blue);
-      painter->setBrush(brush);
-      const float progressPosX = _scene->getProgression(_abstract->ID()) * (_abstract->width());
-      painter->fillRect(0, _abstract->height() - RESIZE_TOLERANCE / 2., progressPosX, RESIZE_TOLERANCE / 2., Qt::darkGreen);
+    //fill header
+    painter->fillRect(0, 0, textRect.width(), textRect.height(), isSelected() ? _color : _colorUnselected);
+    painter->save();
+    painter->setPen(QPen(Qt::black));
 
-      painter->drawLine(QPointF(progressPosX, RESIZE_TOLERANCE), QPointF(progressPosX, _abstract->height()));
+    //draw name
+    painter->drawText(QRectF(BOX_MARGIN, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
+    painter->restore();
+
+    //draw progress bar during execution
+    if (_playing) {
+        QPen pen = painter->pen();
+        pen.setColor(Qt::black);
+        pen.setWidth(3);
+        QBrush brush = painter->brush();
+        brush.setStyle(Qt::NoBrush);
+        painter->setPen(pen);
+        brush.setColor(Qt::blue);
+        painter->setBrush(brush);
+        const float progressPosX = _scene->getProgression(_abstract->ID()) * (_abstract->width());
+        painter->fillRect(0, _abstract->height() - RESIZE_TOLERANCE / 2., progressPosX, RESIZE_TOLERANCE / 2., Qt::darkGreen);
+        painter->drawLine(QPointF(progressPosX, RESIZE_TOLERANCE), QPointF(progressPosX, _abstract->height()));
     }
-  painter->translate(QPointF(0, 0) - _boxRect.topLeft());
+    setOpacity(isSelected() ? 1 : 0.4);
 
-  setOpacity(isSelected() ? 1 : 0.4);
 }
 
 void
@@ -1908,4 +1942,41 @@ BasicBox::displayBoxDuration(){
     //Displays in the maquetteScene's bottom
     QString durationMsg = QString("box duration : %1").arg(duration);
     maquetteScene()->displayMessage(durationMsg.toStdString(),INDICATION_LEVEL);
+}
+void
+BasicBox::select(){
+    setSelected(true);
+    _scene->setAttributes(_abstract);
+    update();
+}
+
+void
+BasicBox::setRecMode(bool activated){
+    _recording = activated;
+    _recEffect->setEnabled(_recording);
+    update();
+}
+
+void
+BasicBox::addMessageToRecord(std::string address){
+    _abstract->addMessageToRecord(address);
+    setRecMode(!_abstract->messagesToRecord().isEmpty());
+    Maquette::getInstance()->setCurveRecording(_abstract->ID(), address, true);
+}
+
+void
+BasicBox::removeMessageToRecord(std::string address){
+    std::cout<<"remove "<<address<<std::endl;
+    _abstract->removeMessageToRecord(address);
+    setRecMode(!_abstract->messagesToRecord().isEmpty());
+    Maquette::getInstance()->setCurveRecording(_abstract->ID(), address, false);
+}
+
+void
+BasicBox::updateRecordingCurves(){
+    QList<std::string> recMsgs = _abstract->messagesToRecord();
+    for(int i=0 ; i<recMsgs.size() ; i++){
+        updateCurve(recMsgs[i],true);
+        removeMessageToRecord(recMsgs[i]);
+    }
 }
