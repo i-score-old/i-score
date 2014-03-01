@@ -10,7 +10,7 @@ HeaderPanelWidget::HeaderPanelWidget(QWidget *parent, MaquetteScene *scene)
     : QWidget(parent){
 
     _scene = scene;
-    _color = QColor(Qt::white);
+    _color = QColor(60,60,60);
     _sliderMoved = false;
     _valueEntered = false;
     _nameLabel = new QLabel;
@@ -56,6 +56,10 @@ HeaderPanelWidget::createAccelerationWidget()
   _accelerationSlider->setSizePolicy(*ignoredPolicy);
 
   _accelerationDisplay = new QDoubleSpinBox(this);
+  _accelerationDisplay->setStyleSheet("color: white;"
+                                      "background-color: gray;"
+                                      "selection-color: black;"
+                                      "selection-background-color: blue;");
   _accelerationDisplay->setStatusTip(tr("Acceleration"));
   _accelerationDisplay->setRange(0., 100.);
   _accelerationDisplay->setDecimals(2);
@@ -103,10 +107,10 @@ HeaderPanelWidget::createToolBar()
                           "border: none;"
                           "}"
                           "QToolBar:top, QToolBar:bottom {"
-                          "border :none; background :white;"
+                          "border :none; background :grey;"
                           "}"
                           "QToolBar:left, QToolBar:right {"
-                          "border :none;background :white;"
+                          "border :none;background :grey;"
                           "}"
                           );
 
@@ -124,6 +128,7 @@ HeaderPanelWidget::createNameLabel()
   QFont font;
   font.setPointSize(NAME_POINT_SIZE);
   _nameLabel->setFont(font);
+//  _nameLabel->setText("<font color='Blue'>Some text</font>");
   _nameLabel->setText("Scenario");
 }
 
@@ -218,6 +223,7 @@ HeaderPanelWidget::updatePlayMode(){
 void
 HeaderPanelWidget::setName(QString name)
 {
+  _nameLabel->setStyleSheet("QLabel { color : gray; } ");
   _nameLabel->setText(name);
 }
 

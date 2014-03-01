@@ -258,6 +258,13 @@ BasicBox::createWidget()
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setAlignment(_boxWidget, Qt::AlignLeft);
   _boxWidget->setLayout(layout);
+  _boxWidget->setStyleSheet(
+              "QWidget {"
+              "border: none;"
+              "border-radius: none;"
+              "background-color: transparent;"
+              "}"
+              );
 
   _curveProxy = new QGraphicsProxyWidget(this);
 
@@ -278,6 +285,16 @@ BasicBox::createWidget()
   QFont font;
   font.setPointSize(10);
   _comboBox->setFont(font);
+  _comboBox->setStyleSheet(
+              "QComboBox {"
+              "color: grey;"
+              "border: none;"
+              "border-radius: none;"
+              "background-color: transparent;"
+              "selection-color: black;"
+              "selection-background-color: transparent;"
+              "}"
+              );
 
   _comboBoxProxy = new QGraphicsProxyWidget(this);
   _comboBoxProxy->setWidget(_comboBox);
@@ -1791,7 +1808,8 @@ BasicBox::drawHoverShape(QPainter *painter)
 
   painter->save();
 
-  QPen penBlue(Qt::blue);
+  QPen penBlue(QColor(60,60,255));
+// QPen penBlue(Qt::blue);
   penBlue.setWidth(width);
   painter->setPen(penBlue);
 
@@ -1877,6 +1895,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     painter->setPen(QPen(Qt::black));
 
     //draw name
+    painter->setPen(QPen(Qt::gray));
     painter->drawText(QRectF(BOX_MARGIN, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
     painter->restore();
 

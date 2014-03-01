@@ -63,6 +63,8 @@ TimeBarWidget::TimeBarWidget(QWidget *parent, MaquetteScene *scene)
   setFixedHeight(height());  
   init();    
   setUpdatesEnabled(false);
+  setPalette(Qt::gray);
+
 }
 
 void

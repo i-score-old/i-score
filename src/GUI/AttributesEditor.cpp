@@ -32,7 +32,7 @@
  * encouraged to load and test the software's suitability as regards their
  * requirements in conditions enabling the security of their systems and/or
  * data to be ensured and,  more generally, to use and operate it in the
- * same conditions as regards security.
+ * same conditions as regards security. 
  *
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
@@ -81,8 +81,13 @@ AttributesEditor::init()
   noBoxEdited();
     
   setStyleSheet(            "QDockWidget {"
-                "background-color: yellow;"
+                "background-color: gray;"
                         "}");
+
+  QPalette pal = palette();
+  pal.setColor( QPalette::Background, QColor( 170, 0, 0 ) );
+  setPalette( pal );
+  setAutoFillBackground( true );
 }
 
 AttributesEditor::~AttributesEditor()
@@ -153,6 +158,10 @@ AttributesEditor::createWidgets()
 
   //Box name
   _boxName = new QLineEdit;
+  _boxName->setStyleSheet("color: white;"
+                          "background-color: gray;"
+                          "selection-color: black;"
+                          "selection-background-color: blue;");
   _boxSettingsLayout = new QHBoxLayout;
 
   //Start&End buttons

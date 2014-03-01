@@ -57,7 +57,7 @@
 #include <QPushButton>
 
 static const int SCROLL_BAR_INCREMENT = 1000 / MaquetteScene::MS_PER_PIXEL;
-const QColor MaquetteView::BACKGROUND_COLOR = QColor(90, 90, 90);
+const QColor MaquetteView::BACKGROUND_COLOR = QColor(60, 60, 60);
 
 MaquetteView::MaquetteView(MainWindow *mw)
   : QGraphicsView(mw)
@@ -71,7 +71,7 @@ MaquetteView::MaquetteView(MainWindow *mw)
   setTransformationAnchor(QGraphicsView::NoAnchor);
   setCacheMode(QGraphicsView::CacheBackground);
 
-  setBackgroundBrush(QColor(160, 160, 160));  
+  setBackgroundBrush(QColor(90, 90, 90));
 
   setWindowTitle(tr("Maquette"));
 

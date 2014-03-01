@@ -69,6 +69,10 @@ main(int argc, char *argv[])
   translator.load("acousmoscribe_en");
   app.installTranslator(&translator);
 
+  app.setStyleSheet(            "QMainWindow {"
+                                  "background-color: rgba(60, 60, 60, 100%);"
+                                          "}");
+
   MainWindow *win = new MainWindow();
   win->show();
   return app.exec();
