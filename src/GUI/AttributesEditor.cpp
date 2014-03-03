@@ -166,7 +166,54 @@ AttributesEditor::createWidgets()
 
   //Start&End buttons
   _snapshotAssignStart = new QPushButton;
+  _snapshotAssignStart->setStyleSheet(
+  " QPushButton {"
+  "border: 2px solid #6f6f80;"
+  "border-radius: 6px;"
+              "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+              "stop: 0 #808080, stop: 1 #909090);"
+
+  "min-width: 80px;"
+  "}"
+
+  "QPushButton:pressed {"
+              "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+              "stop: 0 #606060, stop: 1 #808080);"
+  "}"
+
+  "QPushButton:flat {"
+  "border: none; /* no border for a flat push button */"
+  "}"
+
+  "QPushButton:default {"
+  "border-color: navy; /* make the default button prominent */"
+  "}"
+              );
+
   _snapshotAssignEnd = new QPushButton;
+  _snapshotAssignEnd->setStyleSheet(
+  " QPushButton {"
+  "border: 2px solid #6f6f80;"
+  "border-radius: 6px;"
+              "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+              "stop: 0 #808080, stop: 1 #909090);"
+
+  "min-width: 80px;"
+  "}"
+
+  "QPushButton:pressed {"
+              "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+              "stop: 0 #606060, stop: 1 #808080);"
+  "}"
+
+  "QPushButton:flat {"
+  "border: none; /* no border for a flat push button */"
+  "}"
+
+  "QPushButton:default {"
+  "border-color: navy; /* make the default button prominent */"
+  "}"
+);
 
   //NetworkTree
   _networkTree = new NetworkTree(this);
