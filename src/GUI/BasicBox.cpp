@@ -294,6 +294,9 @@ BasicBox::createWidget()
               "selection-color: black;"
               "selection-background-color: transparent;"
               "}"
+              "QComboBox::drop-down {"
+              "border: none;"
+              "}"
               );
 
   _comboBoxProxy = new QGraphicsProxyWidget(this);
