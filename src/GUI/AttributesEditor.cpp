@@ -156,6 +156,16 @@ AttributesEditor::createWidgets()
   _colorButtonPixmap->fill(QColor(Qt::gray));
   _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
 
+  _generalColorButton->setStyleSheet(
+  " QPushButton {"
+  "border: 2px solid #6f6f80;"
+  "border-radius: 6px;"
+              "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+              "stop: 0 #909090, stop: 1 #909090);"
+
+  "}"
+              );
+
   //Box name
   _boxName = new QLineEdit;
   _boxName->setStyleSheet("color: white;"
