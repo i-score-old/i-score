@@ -364,9 +364,6 @@ BasicBox::init()
   _triggerPoints = new QMap<BoxExtremity, TriggerPoint*>();
   _comment = NULL;
 
-  _color = QColor(BOX_COLOR);
-  _colorUnselected = QColor(40, 40, 40);
-
   _recEffect = new QGraphicsColorizeEffect(this);
   _recEffect->setColor(Qt::red);
   _recEffect->setEnabled(false);
@@ -390,6 +387,10 @@ BasicBox::init()
   _currentZvalue = 0;
   setZValue(_currentZvalue);
   updateFlexibility();
+
+  _abstract->setColor(QColor(BOX_COLOR));
+  _color = QColor(BOX_COLOR);
+  _colorUnselected = QColor(40, 40, 40);
 }
 
 void

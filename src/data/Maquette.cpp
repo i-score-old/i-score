@@ -295,6 +295,8 @@ Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const s
       _engines->setBoxVerticalPosition(newBoxID, firstCorner.y());
       _engines->setBoxVerticalSize(newBoxID, secondCorner.y() - firstCorner.y());
 
+      setBoxColor(newBoxID,newBox->color());
+
       _boxes[newBoxID] = newBox;
       _parentBoxes[newBoxID] = newBox;
       newBox->setID(newBoxID);
