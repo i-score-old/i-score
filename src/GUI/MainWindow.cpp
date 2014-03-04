@@ -302,8 +302,12 @@ MainWindow::open()
             break;
         }
     }
-  QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("XML Files (*.score)"));
+
+  QString fileName = QFileDialog::
+          getOpenFileName(this, tr("Open File"), "", tr("XML Files (*.score)"));
+
   if (!fileName.isEmpty()) {
+      QCoreApplication::processEvents();
       loadFile(fileName);
     }
 }
