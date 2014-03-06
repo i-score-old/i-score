@@ -56,10 +56,14 @@ HeaderPanelWidget::createAccelerationWidget()
   _accelerationSlider->setSizePolicy(*ignoredPolicy);
 
   _accelerationDisplay = new QDoubleSpinBox(this);
-  _accelerationDisplay->setStyleSheet("color: white;"
-                                      "background-color: gray;"
-                                      "selection-color: black;"
-                                      "selection-background-color: blue;");
+  _accelerationDisplay->setStyleSheet(
+              "QDoubleSpinBox{"
+              "color: white;"
+              "background-color: gray;"
+              "selection-color: black;"
+              "selection-background-color: blue;"
+              "}"
+              );
   _accelerationDisplay->setStatusTip(tr("Acceleration"));
   _accelerationDisplay->setRange(0., 100.);
   _accelerationDisplay->setDecimals(2);
