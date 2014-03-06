@@ -62,7 +62,7 @@ AttributesEditor::AttributesEditor(QWidget* parent) : QDockWidget(tr("Inspector"
 {
   _boxEdited = NO_ID;
   setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-  setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+  setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);  
 }
 
 void
@@ -80,9 +80,17 @@ AttributesEditor::init()
 
   noBoxEdited();
     
-  setStyleSheet(            "QDockWidget {"
-                "background-color: gray;"
-                        "}");
+  setStyleSheet(
+              "QDockWidget  {"
+              "border: 1px solid lightgray;"
+              "background: gray;"
+                  "}"
+              "QDockWidget::title  {"
+              "text-align: center;"
+              "background: gray;"
+              "padding-left: 5px;"
+              "}"
+              );
 
   QPalette pal = palette();
   pal.setColor( QPalette::Background, QColor( 170, 0, 0 ) );
