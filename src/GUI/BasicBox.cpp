@@ -393,7 +393,7 @@ BasicBox::init()
 
   _abstract->setColor(QColor(BOX_COLOR));
   _color = QColor(BOX_COLOR);
-  _colorUnselected = QColor(40, 40, 40);
+  _colorUnselected = QColor(BOX_COLOR);
 }
 
 void
@@ -1917,7 +1917,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         painter->fillRect(0, _abstract->height() - RESIZE_TOLERANCE / 2., progressPosX, RESIZE_TOLERANCE / 2., Qt::darkGreen);
         painter->drawLine(QPointF(progressPosX, RESIZE_TOLERANCE), QPointF(progressPosX, _abstract->height()));
     }
-    setOpacity(isSelected() ? 1 : 0.4);
+//    setOpacity(isSelected() ? 1 : 0.4);
 
 }
 
