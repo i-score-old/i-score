@@ -154,7 +154,7 @@ NetworkTree::init()
     "}"
 
     "QTreeView::item {"
-    "border-right: 1px solid #6c6c6c;"
+    "border-right: 1px solid #000000;"
     "border-top-color: transparent;"
     "border-bottom-color: transparent;"
     "}"
@@ -182,11 +182,11 @@ NetworkTree::init()
 
               "  QHeaderView::section {"
               "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-              "stop:0 #616161, stop: 0.5 #505050,"
-              "stop: 0.6 #434343, stop:1 #656565);"
-              "color: lightgray;"
-              "padding-left: 4px;"
-              "border: 1px solid #6c6c6c;"
+              "stop:0 #a1a1a1, stop: 0.5 #909090,"
+              "stop: 0.6 #808080, stop:1 #a3a3a3);"
+              "color: black;"
+              "padding-left: 1px;"
+              "border: 1px solid #606060;"
               "}"
     );
 }
