@@ -1813,7 +1813,8 @@ BasicBox::drawHoverShape(QPainter *painter)
 
   painter->save();
 
-  QPen penBlue(QColor(60,60,255));
+  QPen penBlue(QColor(160,160,160));
+//   QPen penBlue(QColor(60,60,255)); // blue color value
 // QPen penBlue(Qt::blue);
   penBlue.setWidth(width);
   painter->setPen(penBlue);
