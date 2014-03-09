@@ -176,10 +176,10 @@ AttributesEditor::createWidgets()
 
   //Box name
   _boxName = new QLineEdit;
-  _boxName->setStyleSheet("color: white;"
+  _boxName->setStyleSheet("color: lightgray;"
                           "background-color: gray;"
                           "selection-color: black;"
-                          "selection-background-color: blue;");
+                          "selection-background-color: (170,100,100);");
   _boxSettingsLayout = new QHBoxLayout;
 
   //Start&End buttons

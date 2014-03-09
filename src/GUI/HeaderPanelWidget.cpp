@@ -50,7 +50,7 @@ HeaderPanelWidget::createAccelerationWidget()
   QSizePolicy *ignoredPolicy = new QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored);
 
   _accelerationSlider = new LogarithmicSlider(Qt::Horizontal, this);
-  _accelerationSlider->setStatusTip(tr("Acceleration"));
+  _accelerationSlider->setStatusTip(tr("Speed"));
   _accelerationSlider->setFixedWidth(200);
   _accelerationSlider->setSliderPosition(50);
   _accelerationSlider->setSizePolicy(*ignoredPolicy);
@@ -58,13 +58,13 @@ HeaderPanelWidget::createAccelerationWidget()
   _accelerationDisplay = new QDoubleSpinBox(this);
   _accelerationDisplay->setStyleSheet(
               "QDoubleSpinBox{"
-              "color: white;"
+              "color: lightgray;"
               "background-color: gray;"
               "selection-color: black;"
-              "selection-background-color: blue;"
+              "selection-background-color: (170,100,100);"
               "}"
               );
-  _accelerationDisplay->setStatusTip(tr("Acceleration"));
+  _accelerationDisplay->setStatusTip(tr("Speed"));
   _accelerationDisplay->setRange(0., 100.);
   _accelerationDisplay->setDecimals(2);
   _accelerationDisplay->setValue(_accelerationSlider->accelerationValue(_accelerationSlider->value()));
