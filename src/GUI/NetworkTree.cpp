@@ -154,7 +154,7 @@ NetworkTree::init()
     "}"
 
     "QTreeView::item {"
-    "border-right: 1px solid #d9d9d9;"
+    "border-right: 1px solid #6c6c6c;"
     "border-top-color: transparent;"
     "border-bottom-color: transparent;"
     "}"
