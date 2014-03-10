@@ -279,6 +279,7 @@ DeviceEdit::updateNetworkConfiguration()
     else if (_changed) {
         if (_nameChanged) {
             Maquette::getInstance()->setDeviceName(_currentDevice.toStdString(), _nameEdit->text().toStdString());
+            emit(deviceNameChanged(_currentDevice, _nameEdit->text()));
             _currentDevice = _nameEdit->text();
         }
         if (_localHostChanged) {
@@ -291,9 +292,6 @@ DeviceEdit::updateNetworkConfiguration()
             Maquette::getInstance()->setDeviceProtocol(_currentDevice.toStdString(), _protocolsComboBox->currentText().toStdString());
             //          emit(deviceProtocolChanged(_protocolsComboBox->currentText()));
         }
-
-        if (_nameChanged) //have to be after setting all parameters
-            emit(deviceNameChanged(_currentDevice, _nameEdit->text()));
     }
 
 
