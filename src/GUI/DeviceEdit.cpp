@@ -292,6 +292,7 @@ DeviceEdit::updateNetworkConfiguration()
             Maquette::getInstance()->setDeviceProtocol(_currentDevice.toStdString(), _protocolsComboBox->currentText().toStdString());
             //          emit(deviceProtocolChanged(_protocolsComboBox->currentText()));
         }
+        emit(deviceChanged(_currentDevice));
     }
 
 

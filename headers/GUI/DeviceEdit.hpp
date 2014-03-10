@@ -43,6 +43,7 @@ class DeviceEdit : public QDialog
 
 
   signals:
+    void deviceChanged(QString);
     void deviceNameChanged(QString,QString);
     void deviceProtocolChanged(QString);
     void newDeviceAdded(QString);
