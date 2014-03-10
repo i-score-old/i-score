@@ -1816,8 +1816,6 @@ BasicBox::drawHoverShape(QPainter *painter)
   painter->save();
 
   QPen penBlue(QColor(160,160,160));
-//   QPen penBlue(QColor(60,60,255)); // blue color value
-// QPen penBlue(Qt::blue);
   penBlue.setWidth(width);
   painter->setPen(penBlue);
 
@@ -1833,6 +1831,29 @@ BasicBox::drawHoverShape(QPainter *painter)
 }
 
 void
+BasicBox::drawSelectShape(QPainter *painter){
+    float interspace = 2.;
+    int width = 2;
+
+    painter->save();
+
+     QPen penBlue(QColor(60,60,255)); // blue color value
+
+    penBlue.setWidth(width);
+    painter->setPen(penBlue);
+
+    QPainterPath path;
+    path.addRect(_boxRect);
+    QRect hoverRect(QPoint(_boxRect.topLeft().x() - interspace, _boxRect.topLeft().y() - interspace),
+                    QPoint(_boxRect.bottomRight().x() + interspace, _boxRect.bottomRight().y() + interspace));
+
+    path.addRect(hoverRect);
+    painter->drawPath(path);
+
+    painter->restore();
+}
+
+void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(widget);
@@ -1840,8 +1861,11 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
 
     //draw hover shape
-    if ((isSelected() || _hover) && !_playing)
+    if (_hover && !isSelected() && !_playing)
         drawHoverShape(painter);
+
+    if (isSelected() && !_playing)
+        drawSelectShape(painter);
 
     //draw duration text on hover
     if(_hover && !_playing){

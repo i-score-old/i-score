@@ -679,6 +679,7 @@ class BasicBox : public QObject, public QGraphicsItem
     void drawInteractionGrips(QPainter *painter);
     void drawTriggerGrips(QPainter *painter);
     void drawHoverShape(QPainter *painter);
+    void drawSelectShape(QPainter *painter);
 
     void updateBoxSize();
     inline QRectF
