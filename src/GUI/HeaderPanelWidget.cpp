@@ -47,6 +47,8 @@ void
 HeaderPanelWidget::createAccelerationWidget()
 {
   QHBoxLayout *layout = new QHBoxLayout;
+  layout->setSpacing(0);
+
   QSizePolicy *ignoredPolicy = new QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored);
 
   _accelerationSlider = new LogarithmicSlider(Qt::Horizontal, this);
@@ -56,9 +58,16 @@ HeaderPanelWidget::createAccelerationWidget()
   _accelerationSlider->setSizePolicy(*ignoredPolicy);
 
   _accelerationDisplay = new QDoubleSpinBox(this);
+_accelerationDisplay->setFixedHeight(17);
+_accelerationDisplay->setAlignment(Qt::AlignVCenter);
+
+QFont font;
+font.setPointSize(9);
+_accelerationDisplay->setFont(font);
 
   _accelerationDisplay->setStyleSheet(
               "QDoubleSpinBox{"
+              "height: 13px;"
               "color: lightgray;"
               "background-color: gray;"
               "selection-color: black;"
@@ -81,7 +90,7 @@ HeaderPanelWidget::createAccelerationWidget()
   _accelerationDisplay->setSizePolicy(*ignoredPolicy);
 
   layout->addWidget(_accelerationSlider);
-  layout->addWidget(_accelerationDisplay);
+  layout->addWidget(_accelerationDisplay);  
   _accelerationWidget->setLayout(layout);
 
   connect(_accelerationSlider, SIGNAL(valueChanged(int)), this, SLOT(accelerationValueModified(int)));

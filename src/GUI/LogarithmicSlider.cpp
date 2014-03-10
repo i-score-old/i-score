@@ -53,7 +53,7 @@ LogarithmicSlider::LogarithmicSlider(Qt::Orientation orientation, QWidget *paren
   setStyleSheet(
               "QSlider::groove:horizontal  {"
               "border: 1px solid #999999;"
-              "height: 8px;"
+              "height: 13px;"
               "background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, stop:1 #c4c4c4);"
               "margin: 2px 0;"
               "}"
