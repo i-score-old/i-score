@@ -112,6 +112,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   connect(this, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(valueChanged(QTreeWidgetItem*, int)));
   connect(this, SIGNAL(startValueChanged(QTreeWidgetItem*, QString)), this, SLOT(changeStartValue(QTreeWidgetItem*, QString)));
   connect(this, SIGNAL(endValueChanged(QTreeWidgetItem*, QString)), this, SLOT(changeEndValue(QTreeWidgetItem*, QString)));
+  connect(_deviceEdit, SIGNAL(deviceChanged(QString)), this, SLOT(refreshCurrentItemNamespace()));
   connect(_deviceEdit, SIGNAL(deviceNameChanged(QString,QString)), this, SLOT(updateDeviceName(QString, QString)));
   connect(_deviceEdit, SIGNAL(deviceProtocolChanged(QString)), this, SLOT(updateDeviceProtocol(QString)));
   connect(_deviceEdit, SIGNAL(newDeviceAdded(QString)), this, SLOT(addNewDevice(QString)));
