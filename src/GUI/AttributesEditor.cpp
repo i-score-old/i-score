@@ -82,7 +82,7 @@ AttributesEditor::init()
     
   setStyleSheet(
               "QDockWidget  {"
-              "background-color: darkgray;"
+              "background-color: black;"
               "border: 1px solid lightgray;"
                   "}"
               "QDockWidget::title  {"
