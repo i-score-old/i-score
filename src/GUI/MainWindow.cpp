@@ -125,6 +125,10 @@ MainWindow::MainWindow()
   createActions();
   createMenus();
   createStatusBar();
+  setStyleSheet(" QStatusBar {"
+                "color: lightgray;"
+                "}"
+               );
 
   setCurrentFile("");
   setAcceptDrops(false);

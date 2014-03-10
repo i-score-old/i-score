@@ -293,10 +293,12 @@ BasicBox::createWidget()
               "background-color: transparent;"
               "selection-color: black;"
               "selection-background-color: gray;"
+              "text-align: right;"
               "}"
               "QComboBox::drop-down {"
               "border-color: gray;"
               "color: black;"
+              "text-align: right;"
               "}"
               );
 

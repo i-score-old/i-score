@@ -73,6 +73,16 @@ MaquetteView::MaquetteView(MainWindow *mw)
 
   setBackgroundBrush(QColor(90, 90, 90));
 
+  setStyleSheet(
+                "QScrollBar {"
+                "color: lightgray;"
+                            "}"
+                );
+/*              including the next line brings an ugly Windows-looking scroll bar
+                  "background-color: darkgray;"
+*/
+
+
   setWindowTitle(tr("Maquette"));
 
   setAlignment(Qt::AlignLeft | Qt::AlignTop);

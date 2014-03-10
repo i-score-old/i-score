@@ -82,13 +82,13 @@ AttributesEditor::init()
     
   setStyleSheet(
               "QDockWidget  {"
-              "border: 1px solid lightgray;"
               "background-color: darkgray;"
+              "border: 1px solid lightgray;"
                   "}"
               "QDockWidget::title  {"
               "text-align: center;"
               "background-color: darkgray;"
-              "padding-left: 2px;"
+              "padding-left: 0px;"
               "}"
               );
 
