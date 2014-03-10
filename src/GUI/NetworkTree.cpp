@@ -76,10 +76,11 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 {
   init();
 
-  setColumnCount(9);
+  setColumnCount(10);
   QStringList list;
-  list << "Address" << "Value" << "Start" << " ~ " << "End" << " = " << " % "<<" type "<<"min "<<"max "<<"priority ";
-  setColumnWidth(NAME_COLUMN, 118);
+  list << "Address" << "Value" << "Start" << " ~ " << "End" << " = " << " % "<<" type "<<"min "<<"max ";
+  // removed <<"priority " and column
+  setColumnWidth(NAME_COLUMN, 115);
   setColumnWidth(VALUE_COLUMN, 63);
   setColumnWidth(START_COLUMN, 60);
   setColumnWidth(END_COLUMN, 60);
@@ -154,7 +155,7 @@ NetworkTree::init()
     "}"
 
     "QTreeView::item {"
-    "border-right: 1px solid #d9d9d9;"
+    "border-right: 1px solid #000000;"
     "border-top-color: transparent;"
     "border-bottom-color: transparent;"
     "}"
@@ -182,11 +183,13 @@ NetworkTree::init()
 
               "  QHeaderView::section {"
               "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-              "stop:0 #616161, stop: 0.5 #505050,"
-              "stop: 0.6 #434343, stop:1 #656565);"
-              "color: lightgray;"
-              "padding-left: 4px;"
-              "border: 1px solid #6c6c6c;"
+              "stop:0 #a1a1a1, stop: 0.5 #909090,"
+              "stop: 0.6 #808080, stop:1 #a3a3a3);"
+              "color: black;"
+              "padding-left: 1px;"
+              "padding-top: 2px;"
+              "padding-bottom: 1px;"
+              "border: 1px solid #606060;"
               "}"
     );
 }

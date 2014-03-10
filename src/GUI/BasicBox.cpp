@@ -287,15 +287,18 @@ BasicBox::createWidget()
   _comboBox->setFont(font);
   _comboBox->setStyleSheet(
               "QComboBox {"
-              "color: grey;"
+              "color: lightgray;"
               "border: none;"
               "border-radius: none;"
               "background-color: transparent;"
               "selection-color: black;"
-              "selection-background-color: transparent;"
+              "selection-background-color: gray;"
+              "text-align: right;"
               "}"
               "QComboBox::drop-down {"
-              "border: none;"
+              "border-color: gray;"
+              "color: black;"
+              "text-align: right;"
               "}"
               );
 
@@ -1812,7 +1815,8 @@ BasicBox::drawHoverShape(QPainter *painter)
 
   painter->save();
 
-  QPen penBlue(QColor(60,60,255));
+  QPen penBlue(QColor(160,160,160));
+//   QPen penBlue(QColor(60,60,255)); // blue color value
 // QPen penBlue(Qt::blue);
   penBlue.setWidth(width);
   painter->setPen(penBlue);
@@ -1899,6 +1903,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     painter->setPen(QPen(Qt::black));
 
     //draw name
+    painter->translate(0,4);
     painter->setPen(QPen(Qt::gray));
     painter->drawText(QRectF(BOX_MARGIN, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
     painter->restore();

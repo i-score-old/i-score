@@ -49,11 +49,11 @@ static const int ENGLISH = 0;
 static const int FRENCH = 1;
 static const float S_TO_MS = 1000.;
 
-static const int TOP_MARGIN = 5;
-static const int BOTTOM_MARGIN = 5;
-static const int LEFT_MARGIN = 5;
-static const int RIGHT_MARGIN = 5;
-static const int MINIMUM_WIDTH = 400;
+static const int TOP_MARGIN = 8;
+static const int BOTTOM_MARGIN = 0;
+static const int LEFT_MARGIN = 1;
+static const int RIGHT_MARGIN = 1;
+static const int MINIMUM_WIDTH = 500;
 static const int COLOR_ICON_SIZE = 21;
 static const int CENTRAL_LAYOUT_VERTICAL_SPACING = 0;
 static const int BOX_SETTING_LAYOUT_SPACING = 15;
@@ -62,7 +62,7 @@ AttributesEditor::AttributesEditor(QWidget* parent) : QDockWidget(tr("Inspector"
 {
   _boxEdited = NO_ID;
   setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-  setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);  
+  setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetVerticalTitleBar | QDockWidget::DockWidgetClosable	);
 }
 
 void
@@ -82,13 +82,13 @@ AttributesEditor::init()
     
   setStyleSheet(
               "QDockWidget  {"
+              "background-color: black;"
               "border: 1px solid lightgray;"
-              "background: darkgray;"
                   "}"
               "QDockWidget::title  {"
               "text-align: center;"
-              "background: darkgray;"
-              "padding-left: 5px;"
+              "background-color: darkgray;"
+              "padding-left: 0px;"
               "}"
               );
 
@@ -176,10 +176,10 @@ AttributesEditor::createWidgets()
 
   //Box name
   _boxName = new QLineEdit;
-  _boxName->setStyleSheet("color: white;"
+  _boxName->setStyleSheet("color: lightgray;"
                           "background-color: gray;"
                           "selection-color: black;"
-                          "selection-background-color: blue;");
+                          "selection-background-color: (170,100,100);");
   _boxSettingsLayout = new QHBoxLayout;
 
   //Start&End buttons
@@ -190,6 +190,8 @@ AttributesEditor::createWidgets()
   "border-radius: 6px;"
               "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
               "stop: 0 #808080, stop: 1 #909090);"
+              "padding-bottom: 3px;"
+              "padding-top: 3px;"
 
   "min-width: 80px;"
   "}"
@@ -215,6 +217,8 @@ AttributesEditor::createWidgets()
   "border-radius: 6px;"
               "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
               "stop: 0 #808080, stop: 1 #909090);"
+              "padding-bottom: 3px;"
+              "padding-top: 3px;"
 
   "min-width: 80px;"
   "}"
@@ -247,7 +251,7 @@ AttributesEditor::addWidgetsToLayout()
 {
   static const unsigned int BOX_EXTREMITY_PRECISION = 3;
   const int verticalSpacing = 0;
-  const int horizontalSpacing = 15;
+  const int horizontalSpacing = 27;
 
   _boxStartValue->setRange(0., _scene->getMaxSceneWidth() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
   _boxStartValue->setDecimals(BOX_EXTREMITY_PRECISION);
@@ -264,7 +268,7 @@ AttributesEditor::addWidgetsToLayout()
 
   // Set Central Widget
   _centralLayout->addLayout(_boxSettingsLayout, 0, 1, Qt::AlignTop);
-  _centralLayout->addWidget(_networkTree, 1, 0, 1, 5);
+  _centralLayout->addWidget(_networkTree, 1, 0, 1, 3);
   _centralWidget->setLayout(_centralLayout);
   _centralLayout->setVerticalSpacing(verticalSpacing);
 
