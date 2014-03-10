@@ -90,7 +90,11 @@ AttributesEditor::init()
               "background-color: darkgray;"
               "padding-left: 0px;"
               "}"
+              "QDockWidget::float-button  {"
+              "left: 0px"
+              "}"
               );
+
 
   QPalette pal = palette();
   pal.setColor( QPalette::Background, QColor( 170, 0, 0 ) );
@@ -179,7 +183,9 @@ AttributesEditor::createWidgets()
   _boxName->setStyleSheet("color: lightgray;"
                           "background-color: gray;"
                           "selection-color: black;"
-                          "selection-background-color: (170,100,100);");
+                          "selection-background-color: (170,100,100);"
+                          );
+  _boxName->setMinimumHeight(25);
   _boxSettingsLayout = new QHBoxLayout;
 
   //Start&End buttons
@@ -260,10 +266,10 @@ AttributesEditor::addWidgetsToLayout()
   _boxLengthValue->setDecimals(BOX_EXTREMITY_PRECISION);
   _boxLengthValue->setKeyboardTracking(false);
 
-  _boxSettingsLayout->addWidget(_snapshotAssignStart);
-  _boxSettingsLayout->addWidget(_boxName);
-  _boxSettingsLayout->addWidget(_generalColorButton);
-  _boxSettingsLayout->addWidget(_snapshotAssignEnd);
+  _boxSettingsLayout->addWidget(_snapshotAssignStart,Qt::AlignTop);
+  _boxSettingsLayout->addWidget(_boxName,Qt::AlignBottom);
+  _boxSettingsLayout->addWidget(_generalColorButton,Qt::AlignTop);
+  _boxSettingsLayout->addWidget(_snapshotAssignEnd,Qt::AlignTop);
   _boxSettingsLayout->setSpacing(horizontalSpacing);
 
   // Set Central Widget
