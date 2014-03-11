@@ -184,8 +184,7 @@ AttributesEditor::createWidgets()
                           "background-color: gray;"
                           "selection-color: black;"
                           "selection-background-color: (170,100,100);"
-                          );
-  _boxName->setMinimumHeight(25);
+                          );  
   _boxSettingsLayout = new QHBoxLayout;
 
   //Start&End buttons
