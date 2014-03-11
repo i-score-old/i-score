@@ -77,6 +77,9 @@ MaquetteView::MaquetteView(MainWindow *mw)
                 "QScrollBar {"
                 "color: lightgray;"
                             "}"
+              "QGraphicsView{"
+              "border: none;"
+              "}"
                 );
 /*              including the next line brings an ugly Windows-looking scroll bar
                   "background-color: darkgray;"
