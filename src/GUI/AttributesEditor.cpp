@@ -277,6 +277,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
       _scene->view()->setScenarioSelected(false);
       _networkTree->updateCurves(_boxEdited);
       updateWidgets(boxModified);
+
   }
 }
 

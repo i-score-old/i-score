@@ -2017,7 +2017,7 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
               vector<string> argTypes;
               vector<short> sectionType;
 
-              bool getCurveSuccess = !Maquette::getInstance()->getCurveAttributes(boxID, address, 0, sampleRate, redundancy, interpolate, values, argTypes, xPercents, yValues, sectionType, coeff);
+              bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID, address, 0, sampleRate, redundancy, interpolate, values, argTypes, xPercents, yValues, sectionType, coeff);
               if (getCurveSuccess) {
                   if (forceUpdate) {
                       if (interpolate) {
@@ -2041,7 +2041,7 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
       return false;
     }
 
-  return true;
+  return false;
 }
 
 void
