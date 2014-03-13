@@ -404,6 +404,7 @@ BasicBox::changeColor(QColor color)
 {
   _color = color;
   _colorUnselected = color;
+  Maquette::getInstance()->setBoxColor(ID(),_color);
   update();
 }
 
