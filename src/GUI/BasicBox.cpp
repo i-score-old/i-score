@@ -1950,8 +1950,7 @@ BasicBox::addMessageToRecord(std::string address){
 }
 
 void
-BasicBox::removeMessageToRecord(std::string address){
-    std::cout<<"remove "<<address<<std::endl;
+BasicBox::removeMessageToRecord(std::string address){    
     _abstract->removeMessageToRecord(address);
     setRecMode(!_abstract->messagesToRecord().isEmpty());
     Maquette::getInstance()->setCurveRecording(_abstract->ID(), address, false);
