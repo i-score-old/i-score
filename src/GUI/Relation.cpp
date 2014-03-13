@@ -394,7 +394,7 @@ Relation::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
           changeBounds(_abstract->minBound(), NO_BOUND);
           _scene->changeRelationBounds(_abstract->ID(), NO_LENGTH, _abstract->minBound(), NO_BOUND);
         }
-
+      update();
 //        else{
 //          RelationEdit * relEdit = new RelationEdit(_scene,_abstract->ID(),_scene->views().first());
 //          relEdit->move(mapToScene(boundingRect().topLeft()).x(),mapToScene(boundingRect().topLeft()).y());
