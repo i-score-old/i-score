@@ -10,7 +10,7 @@ HeaderPanelWidget::HeaderPanelWidget(QWidget *parent, MaquetteScene *scene)
     : QWidget(parent){
 
     _scene = scene;
-    _color = QColor(Qt::white);
+    _color = QColor(60,60,60);
     _sliderMoved = false;
     _valueEntered = false;
     _nameLabel = new QLabel;
@@ -47,24 +47,50 @@ void
 HeaderPanelWidget::createAccelerationWidget()
 {
   QHBoxLayout *layout = new QHBoxLayout;
+  layout->setSpacing(0);
+
   QSizePolicy *ignoredPolicy = new QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored);
 
   _accelerationSlider = new LogarithmicSlider(Qt::Horizontal, this);
-  _accelerationSlider->setStatusTip(tr("Acceleration"));
+  _accelerationSlider->setStatusTip(tr("Speed"));
   _accelerationSlider->setFixedWidth(200);
   _accelerationSlider->setSliderPosition(50);
   _accelerationSlider->setSizePolicy(*ignoredPolicy);
 
   _accelerationDisplay = new QDoubleSpinBox(this);
-  _accelerationDisplay->setStatusTip(tr("Acceleration"));
-  _accelerationDisplay->setRange(0., 100.);
+_accelerationDisplay->setFixedHeight(17);
+_accelerationDisplay->setAlignment(Qt::AlignVCenter);
+
+QFont font;
+font.setPointSize(9);
+_accelerationDisplay->setFont(font);
+
+  _accelerationDisplay->setStyleSheet(
+              "QDoubleSpinBox{"
+              "height: 13px;"
+              "color: lightgray;"
+              "background-color: gray;"
+              "selection-color: black;"
+              "selection-background-color: (170,100,100);"
+              "}"
+              "QDoubleSpinBox::up-button  {"
+              "width: 0px;"
+              "height: 0px;"
+              "}"
+              "QDoubleSpinBox::down-button {"
+              "width: 0px;"
+              "height: 0px;"
+              "}"
+              );
+  _accelerationDisplay->setStatusTip(tr("Speed"));
+  _accelerationDisplay->setRange(0., 5.);  
   _accelerationDisplay->setDecimals(2);
   _accelerationDisplay->setValue(_accelerationSlider->accelerationValue(_accelerationSlider->value()));
   _accelerationDisplay->setKeyboardTracking(false);
   _accelerationDisplay->setSizePolicy(*ignoredPolicy);
 
   layout->addWidget(_accelerationSlider);
-  layout->addWidget(_accelerationDisplay);
+  layout->addWidget(_accelerationDisplay);  
   _accelerationWidget->setLayout(layout);
 
   connect(_accelerationSlider, SIGNAL(valueChanged(int)), this, SLOT(accelerationValueModified(int)));
@@ -103,10 +129,10 @@ HeaderPanelWidget::createToolBar()
                           "border: none;"
                           "}"
                           "QToolBar:top, QToolBar:bottom {"
-                          "border :none; background :white;"
+                          "border :none; background :grey;"
                           "}"
                           "QToolBar:left, QToolBar:right {"
-                          "border :none;background :white;"
+                          "border :none;background :grey;"
                           "}"
                           );
 
@@ -124,6 +150,7 @@ HeaderPanelWidget::createNameLabel()
   QFont font;
   font.setPointSize(NAME_POINT_SIZE);
   _nameLabel->setFont(font);
+//  _nameLabel->setText("<font color='Blue'>Some text</font>");
   _nameLabel->setText("Scenario");
 }
 
@@ -218,6 +245,7 @@ HeaderPanelWidget::updatePlayMode(){
 void
 HeaderPanelWidget::setName(QString name)
 {
+  _nameLabel->setStyleSheet("QLabel { color : gray; } ");
   _nameLabel->setText(name);
 }
 

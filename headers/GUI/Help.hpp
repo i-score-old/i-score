@@ -57,7 +57,7 @@ class QTabWidget;
 /*!
  * \class Help
  *
- * \brief Dialog displaying Acousmoscribe's help.
+ * \brief Dialog displaying i-score's help.
  */
 
 class Help : public QDialog
@@ -74,10 +74,7 @@ class Help : public QDialog
     QLabel *_toolBarLabel;        //!< Toolbar help tab.
     QLabel *_contextLabel;        //!< Contextual menu help tab.
     QLabel *_editorGeneralLabel;  //!< Attributes editor help tab.
-    QLabel *_editorProfilesLabel; //!< Attributes editor help tab.
-    QLabel *_editorMessagesLabel; //!< Attributes editor help tab.
     QLabel *_editorSnapshotLabel; //!< Attributes editor help tab.
-    QLabel *_editorCurvesLabel;   //!< Attributes editor help tab.
     QTabWidget *_editorTabs;      //!< Editor subtabs.
     QLabel *_interactionLabel;    //!< Widgets interaction help tab.
 };

@@ -102,6 +102,9 @@ class BasicBox : public QObject, public QGraphicsItem
      * \brief Enum used to define Basic Box's item type.
      */
     enum { BASIC_BOX_TYPE = QGraphicsItem::UserType + 1 };
+    
+    static const QColor BOX_COLOR;
+    static const QColor TEXT_COLOR;
 
     /*!
      * \brief Redefinition of QGraphicsItem::type(). Used for Item casting.
@@ -676,6 +679,7 @@ class BasicBox : public QObject, public QGraphicsItem
     void drawInteractionGrips(QPainter *painter);
     void drawTriggerGrips(QPainter *painter);
     void drawHoverShape(QPainter *painter);
+    void drawSelectShape(QPainter *painter);
 
     void updateBoxSize();
     inline QRectF

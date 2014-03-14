@@ -94,6 +94,8 @@ const float BasicBox::EAR_HEIGHT = 30;
 const float BasicBox::GRIP_CIRCLE_SIZE = 5;
 unsigned int BasicBox::BOX_MARGIN = 25;
 const QString BasicBox::SUB_SCENARIO_MODE_TEXT = tr("Scenario");
+const QColor BasicBox::BOX_COLOR = QColor(60, 60, 60);
+const QColor BasicBox::TEXT_COLOR = QColor(0, 0, 0);
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
   : QGraphicsItem()
@@ -256,6 +258,13 @@ BasicBox::createWidget()
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setAlignment(_boxWidget, Qt::AlignLeft);
   _boxWidget->setLayout(layout);
+  _boxWidget->setStyleSheet(
+              "QWidget {"
+              "border: none;"
+              "border-radius: none;"
+              "background-color: transparent;"
+              "}"
+              );
 
   _curveProxy = new QGraphicsProxyWidget(this);
 
@@ -276,6 +285,22 @@ BasicBox::createWidget()
   QFont font;
   font.setPointSize(10);
   _comboBox->setFont(font);
+  _comboBox->setStyleSheet(
+              "QComboBox {"
+              "color: lightgray;"
+              "border: none;"
+              "border-radius: none;"
+              "background-color: transparent;"
+              "selection-color: black;"
+              "selection-background-color: gray;"
+              "text-align: right;"
+              "}"
+              "QComboBox::drop-down {"
+              "border-color: gray;"
+              "color: black;"
+              "text-align: right;"
+              "}"
+              );
 
   _comboBoxProxy = new QGraphicsProxyWidget(this);
   _comboBoxProxy->setWidget(_comboBox);
@@ -344,8 +369,6 @@ BasicBox::init()
   _low = false;
   _triggerPoints = new QMap<BoxExtremity, TriggerPoint*>();
   _comment = NULL;
-  _color = QColor(Qt::white);
-  _colorUnselected = QColor(Qt::white);
 
   _recEffect = new QGraphicsColorizeEffect(this);
   _recEffect->setColor(Qt::red);
@@ -370,6 +393,10 @@ BasicBox::init()
   _currentZvalue = 0;
   setZValue(_currentZvalue);
   updateFlexibility();
+
+  _abstract->setColor(QColor(BOX_COLOR));
+  _color = QColor(BOX_COLOR);
+  _colorUnselected = QColor(BOX_COLOR);
 }
 
 void
@@ -377,6 +404,7 @@ BasicBox::changeColor(QColor color)
 {
   _color = color;
   _colorUnselected = color;
+  Maquette::getInstance()->setBoxColor(ID(),_color);
   update();
 }
 
@@ -1788,7 +1816,7 @@ BasicBox::drawHoverShape(QPainter *painter)
 
   painter->save();
 
-  QPen penBlue(Qt::blue);
+  QPen penBlue(QColor(160,160,160));
   penBlue.setWidth(width);
   painter->setPen(penBlue);
 
@@ -1804,6 +1832,29 @@ BasicBox::drawHoverShape(QPainter *painter)
 }
 
 void
+BasicBox::drawSelectShape(QPainter *painter){
+    float interspace = 2.;
+    int width = 2;
+
+    painter->save();
+
+     QPen penBlue(QColor(60,60,255)); // blue color value
+
+    penBlue.setWidth(width);
+    painter->setPen(penBlue);
+
+    QPainterPath path;
+    path.addRect(_boxRect);
+    QRect hoverRect(QPoint(_boxRect.topLeft().x() - interspace, _boxRect.topLeft().y() - interspace),
+                    QPoint(_boxRect.bottomRight().x() + interspace, _boxRect.bottomRight().y() + interspace));
+
+    path.addRect(hoverRect);
+    painter->drawPath(path);
+
+    painter->restore();
+}
+
+void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(widget);
@@ -1811,8 +1862,11 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
 
     //draw hover shape
-    if ((isSelected() || _hover) && !_playing)
+    if (_hover && !isSelected() && !_playing)
         drawHoverShape(painter);
+
+    if (isSelected() && !_playing)
+        drawSelectShape(painter);
 
     //draw duration text on hover
     if(_hover && !_playing){
@@ -1874,6 +1928,8 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     painter->setPen(QPen(Qt::black));
 
     //draw name
+    painter->translate(0,4);
+    painter->setPen(QPen(Qt::gray));
     painter->drawText(QRectF(BOX_MARGIN, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
     painter->restore();
 
@@ -1891,7 +1947,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         painter->fillRect(0, _abstract->height() - RESIZE_TOLERANCE / 2., progressPosX, RESIZE_TOLERANCE / 2., Qt::darkGreen);
         painter->drawLine(QPointF(progressPosX, RESIZE_TOLERANCE), QPointF(progressPosX, _abstract->height()));
     }
-    setOpacity(isSelected() ? 1 : 0.4);
+//    setOpacity(isSelected() ? 1 : 0.4);
 
 }
 

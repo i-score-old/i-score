@@ -81,6 +81,7 @@ class MaquetteView : public QGraphicsView
     mainWindow(){ return _mainWindow; }
     void triggerShortcut(int shortcut);
     void emitPlayModeChanged();
+    static const QColor BACKGROUND_COLOR;
 
   signals:
     void zoomChanged(float newValue);

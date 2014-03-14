@@ -57,18 +57,34 @@
 #include <QPushButton>
 
 static const int SCROLL_BAR_INCREMENT = 1000 / MaquetteScene::MS_PER_PIXEL;
+const QColor MaquetteView::BACKGROUND_COLOR = QColor(60, 60, 60);
 
 MaquetteView::MaquetteView(MainWindow *mw)
   : QGraphicsView(mw)
 {
   _mainWindow = mw;
+
   setRenderHint(QPainter::Antialiasing);
+  setBackgroundBrush(QColor(BACKGROUND_COLOR));
   setOptimizationFlags(QGraphicsView::DontSavePainterState);
   setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
   setTransformationAnchor(QGraphicsView::NoAnchor);
   setCacheMode(QGraphicsView::CacheBackground);
 
-  setBackgroundBrush(QColor(160, 160, 160));  
+  setBackgroundBrush(QColor(90, 90, 90));
+
+  setStyleSheet(
+                "QScrollBar {"
+                "color: lightgray;"
+                            "}"
+              "QGraphicsView{"
+              "border: none;"
+              "}"
+                );
+/*              including the next line brings an ugly Windows-looking scroll bar
+                  "background-color: darkgray;"
+*/
+
 
   setWindowTitle(tr("Maquette"));
 
@@ -139,16 +155,19 @@ MaquetteView::updateScene()
 void
 MaquetteView::drawStartIndicator(QPainter *painter)
 {
+  QPen pen(BACKGROUND_COLOR);
+  //was QPen pen(QColor(145, 145, 145));
     AbstractBox *scenarioAbstract = static_cast<AbstractBox *>(Maquette::getInstance()->getBox(ROOT_BOX_ID)->abstract());
 
     if(scenarioAbstract->hasFirstMsgs()){
+        painter->setPen(pen);
         painter->save();
         painter->setOpacity(_scenarioSelected ? 1 : 0.6);
         QRectF gradientRect(0,0,GRADIENT_WIDTH,MaquetteScene::MAX_SCENE_HEIGHT);
         QLinearGradient lgradient(gradientRect.topLeft(),gradientRect.topRight());
 
         /// \todo : lgradient.setColorAt(0,scenarioAbstract->color()); (rootBox color white for the moment)
-        lgradient.setColorAt(0,Qt::white);
+        lgradient.setColorAt(0, Qt::black);
         lgradient.setColorAt(1, Qt::transparent);
 
         painter->fillRect(gradientRect, lgradient);

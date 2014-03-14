@@ -295,6 +295,8 @@ Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const s
       _engines->setBoxVerticalPosition(newBoxID, firstCorner.y());
       _engines->setBoxVerticalSize(newBoxID, secondCorner.y() - firstCorner.y());
 
+      setBoxColor(newBoxID,newBox->color());
+
       _boxes[newBoxID] = newBox;
       _parentBoxes[newBoxID] = newBox;
       newBox->setID(newBoxID);
@@ -1310,6 +1312,7 @@ Maquette::generateTriggerQueue()
 void
 Maquette::initSceneState()
 {
+    std::cout<<">>>InitSceneState<<<"<<std::endl;
   //Pour palier au bug du moteur (qui envoie tous les messages début et fin de toutes les boîtes < time offset)
 
   double timeOffset = (double)_engines->getTimeOffset();
@@ -1465,7 +1468,8 @@ void
 Maquette::stopPlayingAndGoToTimeOffset(unsigned int timeOffset)
 {
   turnExecutionOff();    
-  setTimeOffset(timeOffset);
+  setTimeOffset(timeOffset,YES);
+  initSceneState();
 }
 
 void
@@ -1475,7 +1479,7 @@ Maquette::stopPlayingAndGoToCurrentTime()
     
     turnExecutionOff();
     
-    setTimeOffset(timeOffset);
+    setTimeOffset(timeOffset,YES);
 }
 
 void

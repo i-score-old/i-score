@@ -2,8 +2,10 @@
 <!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
 <plist version="0.9">
 <dict>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
 	<key>CFBundleIconFile</key>
-	<string>acousmoscribe.icns</string>
+	<string>i-score.icns</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
  	<key>CFBundleGetInfoString</key>

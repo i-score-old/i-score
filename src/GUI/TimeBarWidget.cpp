@@ -63,6 +63,18 @@ TimeBarWidget::TimeBarWidget(QWidget *parent, MaquetteScene *scene)
   setFixedHeight(height());  
   init();    
   setUpdatesEnabled(false);
+  setPalette(Qt::gray);
+  setStyleSheet(
+                "TimeBarWidget {"
+                "border: 1px solid #6f6f80;"
+                "border-radius: 6px;"
+              "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+              "stop:0 #a1a1a1, stop: 0.5 #909090,"
+              "stop: 0.6 #808080, stop:1 #a3a3a3);"
+
+                "}"
+    );
+
 }
 
 void

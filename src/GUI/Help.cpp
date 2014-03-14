@@ -109,26 +109,6 @@ Help::Help(QWidget *parent)
     }
   _editorGeneralLabel = new QLabel(editorGeneralString);
 
-  QString editorProfilesString;
-  QFile editorProfiles(":/documentation/editorProfiles.htm");
-  if (editorProfiles.open(QIODevice::ReadOnly)) {
-      editorProfilesString = QString(editorProfiles.readAll());
-    }
-  else {
-      editorProfilesString = tr("No Help Found");
-    }
-  _editorProfilesLabel = new QLabel(editorProfilesString);
-
-  QString editorMessagesString;
-  QFile editorMessages(":/documentation/editorMessages.htm");
-  if (editorMessages.open(QIODevice::ReadOnly)) {
-      editorMessagesString = QString(editorMessages.readAll());
-    }
-  else {
-      editorMessagesString = tr("No Help Found");
-    }
-  _editorMessagesLabel = new QLabel(editorMessagesString);
-
   QString editorSnapshotString;
   QFile editorSnapshot(":/documentation/editorSnapshot.htm");
   if (editorSnapshot.open(QIODevice::ReadOnly)) {
@@ -138,16 +118,6 @@ Help::Help(QWidget *parent)
       editorSnapshotString = tr("No Help Found");
     }
   _editorSnapshotLabel = new QLabel(editorSnapshotString);
-
-  QString editorCurvesString;
-  QFile editorCurves(":/documentation/editorCurves.htm");
-  if (editorCurves.open(QIODevice::ReadOnly)) {
-      editorCurvesString = QString(editorCurves.readAll());
-    }
-  else {
-      editorCurvesString = tr("No Help Found");
-    }
-  _editorCurvesLabel = new QLabel(editorCurvesString);
 
   QScrollArea *fileScrollArea = new QScrollArea;
   fileScrollArea->setWidget(_fileLabel);
@@ -170,23 +140,11 @@ Help::Help(QWidget *parent)
   editorGeneralScrollArea->setWidget(_editorGeneralLabel);
   _editorTabs->addTab(editorGeneralScrollArea, tr("General"));
 
-  QScrollArea *editorProfilesScrollArea = new QScrollArea;
-  editorProfilesScrollArea->setWidget(_editorProfilesLabel);
-  _editorTabs->addTab(editorProfilesScrollArea, tr("Profiles"));
-
-  QScrollArea *editorMessagesScrollArea = new QScrollArea;
-  editorMessagesScrollArea->setWidget(_editorMessagesLabel);
-  _editorTabs->addTab(editorMessagesScrollArea, tr("Messages"));
-
   QScrollArea *editorSnapshotScrollArea = new QScrollArea;
   editorSnapshotScrollArea->setWidget(_editorSnapshotLabel);
   _editorTabs->addTab(editorSnapshotScrollArea, tr("Snapshot"));
 
-  QScrollArea *editorCurvesScrollArea = new QScrollArea;
-  editorCurvesScrollArea->setWidget(_editorCurvesLabel);
-  _editorTabs->addTab(editorCurvesScrollArea, tr("Curves"));
-
-  _tabs->addTab(_editorTabs, tr("Attributes Editor"));
+  _tabs->addTab(_editorTabs, tr("Devices Inspector"));
 
   _layout->addWidget(_tabs);
 
