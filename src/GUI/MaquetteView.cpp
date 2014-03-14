@@ -167,7 +167,7 @@ MaquetteView::drawStartIndicator(QPainter *painter)
         QLinearGradient lgradient(gradientRect.topLeft(),gradientRect.topRight());
 
         /// \todo : lgradient.setColorAt(0,scenarioAbstract->color()); (rootBox color white for the moment)
-        lgradient.setColorAt(0,Qt::white);
+        lgradient.setColorAt(0, Qt::black);
         lgradient.setColorAt(1, Qt::transparent);
 
         painter->fillRect(gradientRect, lgradient);
