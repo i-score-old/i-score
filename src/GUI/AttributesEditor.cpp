@@ -467,8 +467,13 @@ AttributesEditor::changeColor()
 
 void
 AttributesEditor::startMessagesChanged(bool forceUpdate)
-{    
+{        
   BasicBox * box = _scene->getBox(_boxEdited);
+
+  if (_scene->paused()) {
+        _scene->stopAndGoToCurrentTime();
+    }
+
   if (_boxEdited != NO_ID) {
       QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
       Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
@@ -483,12 +488,6 @@ AttributesEditor::startMessagesChanged(bool forceUpdate)
           _networkTree->updateCurves(_boxEdited, forceUpdate);
           box->updateCurves();
       }
-
-      if (_scene->paused()) {
-          /// \todo Modifier setTimeOffset pour ne pas faire de dump (dans ce cas là par exemple). NH
-//          _scene->stopAndGoToCurrentTime();
-          _scene->stopOrPause();
-      }
     }
   else{
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
@@ -498,6 +497,10 @@ AttributesEditor::startMessagesChanged(bool forceUpdate)
 void
 AttributesEditor::endMessagesChanged(bool forceUpdate)
 {
+    if (_scene->paused()) {
+          _scene->stopAndGoToCurrentTime();
+      }
+
   if (_boxEdited != NO_ID) {
 
       BasicBox * box = _scene->getBox(_boxEdited);
@@ -511,11 +514,7 @@ AttributesEditor::endMessagesChanged(bool forceUpdate)
           _networkTree->updateEndMsgsDisplay();
           _networkTree->updateCurves(_boxEdited, forceUpdate);
           box->updateCurves();
-      }
-      if (_scene->paused()) {
-//          _scene->stopAndGoToCurrentTime();
-          _scene->stopOrPause();
-        }
+      }      
     }
   else {
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
@@ -525,6 +524,9 @@ AttributesEditor::endMessagesChanged(bool forceUpdate)
 void
 AttributesEditor::startMessageChanged(QTreeWidgetItem *item)
 {
+    if (_scene->paused()) {
+          _scene->stopAndGoToCurrentTime();
+      }
   if (_boxEdited != NO_ID) {
 
       //PAS OPTIMAL, NE DEVRAIT MODIFIER QU'UN SEUL ITEM
@@ -541,11 +543,6 @@ AttributesEditor::startMessageChanged(QTreeWidgetItem *item)
           BasicBox * box = _scene->getBox(_boxEdited);
           box->updateCurve(_networkTree->getAbsoluteAddress(item).toStdString(), true);
       }
-
-      if (_scene->paused()) {
-//          _scene->stopAndGoToCurrentTime();
-          _scene->stopOrPause();
-        }
   }
 
   else {
@@ -557,6 +554,10 @@ AttributesEditor::startMessageChanged(QTreeWidgetItem *item)
 void
 AttributesEditor::endMessageChanged(QTreeWidgetItem *item)
 {
+    if (_scene->paused()) {
+        _scene->stopAndGoToCurrentTime();
+    }
+
   if (_boxEdited != NO_ID) {
       QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
       Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
@@ -567,11 +568,6 @@ AttributesEditor::endMessageChanged(QTreeWidgetItem *item)
 
       BasicBox * box = _scene->getBox(_boxEdited);
       box->updateCurve(_networkTree->getAbsoluteAddress(item).toStdString(), true);
-
-      if (_scene->paused()) {
-//          _scene->stopAndGoToCurrentTime();
-          _scene->stopOrPause();
-        }
     }
   else {
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
@@ -582,6 +578,10 @@ AttributesEditor::endMessageChanged(QTreeWidgetItem *item)
 void
 AttributesEditor::startMessageRemoved(const string &address)
 {
+    if (_scene->paused()) {
+        _scene->stopAndGoToCurrentTime();
+    }
+
   if (_boxEdited != NO_ID) {
       if(_boxEdited == ROOT_BOX_ID)
           _scene->view()->resetCachedContent();
@@ -591,11 +591,6 @@ AttributesEditor::startMessageRemoved(const string &address)
           Maquette::getInstance()->setStartMessagesToSend(_boxEdited, _networkTree->startMessages());
           Maquette::getInstance()->removeCurve(_boxEdited, address);
       }
-
-      if (_scene->paused()) {
-//          _scene->stopAndGoToCurrentTime();
-          _scene->stopOrPause();
-        }
     }
   else {
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
@@ -605,17 +600,16 @@ AttributesEditor::startMessageRemoved(const string &address)
 void
 AttributesEditor::endMessageRemoved(const string &address)
 {
-  if (_boxEdited != NO_ID) {
-      Maquette::getInstance()->setEndMessagesToSend(_boxEdited, _networkTree->endMessages());
-      Maquette::getInstance()->removeCurve(_boxEdited, address);
-
-      if (_scene->paused()) {
-//          _scene->stopAndGoToCurrentTime();
-          _scene->stopOrPause();
-        }
+    if (_scene->paused()) {
+        _scene->stopAndGoToCurrentTime();
     }
-  else {
-      _scene->displayMessage("No box selected", INDICATION_LEVEL);
+
+    if (_boxEdited != NO_ID) {
+        Maquette::getInstance()->setEndMessagesToSend(_boxEdited, _networkTree->endMessages());
+        Maquette::getInstance()->removeCurve(_boxEdited, address);
+    }
+    else {
+        _scene->displayMessage("No box selected", INDICATION_LEVEL);
     }
 }
 
@@ -625,6 +619,10 @@ AttributesEditor::deployMessageChanged(QTreeWidgetItem *item, QString newName)
   std::map<unsigned int, BasicBox *>::iterator it;
   std::map<unsigned int, BasicBox *> boxesMap = Maquette::getInstance()->getBoxes();
   unsigned int boxID;
+
+  if (_scene->paused()) {
+        _scene->stopAndGoToCurrentTime();
+    }
 
   for (it = boxesMap.begin(); it != boxesMap.end(); it++) {
       boxID = (*it).first;
@@ -642,10 +640,6 @@ AttributesEditor::deployMessageChanged(QTreeWidgetItem *item, QString newName)
           messagesToSend->changeMessage(item, newName);
           Maquette::getInstance()->setEndMessagesToSend(boxID, messagesToSend);
         }
-    }
-  if (_scene->paused()) {
-//          _scene->stopAndGoToCurrentTime();
-      _scene->stopOrPause();
     }
 }
 
@@ -657,6 +651,10 @@ AttributesEditor::deployDeviceChanged(QString oldName, QString newName)
 
   unsigned int boxID;
 
+  if (_scene->paused()) {
+        _scene->stopAndGoToCurrentTime();
+    }
+
   for (it = boxesMap.begin(); it != boxesMap.end(); it++) {
       boxID = (*it).first;
 
@@ -673,10 +671,6 @@ AttributesEditor::deployDeviceChanged(QString oldName, QString newName)
           messagesToSend->changeDevice(oldName, newName);
           Maquette::getInstance()->setEndMessagesToSend(boxID, messagesToSend);
         }
-    }
-  if (_scene->paused()) {
-//          _scene->stopAndGoToCurrentTime();
-      _scene->stopOrPause();
     }
 }
 
