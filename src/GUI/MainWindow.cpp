@@ -168,17 +168,13 @@ MainWindow::~MainWindow()
 
     delete _zoomInAct;
     delete _zoomOutAct;
-    delete _networkAct;
     delete _editorAct;
 
     delete _cutAct;
     delete _copyAct;
     delete _pasteAct;
     delete _selectAllAct;
-    delete _modeAct;
-    delete _selectModeAct;
-    delete _PBModeAct;
-    delete _commentModeAct;
+//    delete _commentModeAct;
 
     delete _helpDialog;
     delete _networkConfig;
@@ -547,9 +543,9 @@ MainWindow::createActions()
   _zoomOutAct->setStatusTip(tr("Zoom out"));
   connect(_zoomOutAct, SIGNAL(triggered()), _view, SLOT(zoomOut()));
 
-  _editorAct = new QAction(QIcon(":/images/edit.svg"), tr("Edit attributes"), this);
-  _editorAct->setShortcut(QString("Ctrl+E"));
-  _editorAct->setStatusTip(tr("Edit box attributes"));
+  _editorAct = new QAction(QIcon(":/images/edit.svg"), tr("Devices Inspector"), this);
+  _editorAct->setShortcut(QString("Ctrl+I"));
+  _editorAct->setStatusTip(tr("Devices Inspector"));
   _editorAct->setCheckable(true);
   _editorAct->setChecked(true);
   connect(_editorAct, SIGNAL(triggered()), this, SLOT(updateEditor()));
@@ -623,11 +619,7 @@ MainWindow::createMenus()
   _editMenu->addAction(_copyAct);
   _editMenu->addAction(_cutAct);
   _editMenu->addAction(_pasteAct);
-  _editMenu->addSeparator();
-  _editMenu->addAction(_networkAct);
-  _editMenu->addAction(_selectModeAct);
-  _editMenu->addAction(_PBModeAct);
-  _editMenu->addAction(_commentModeAct);
+//  _editMenu->addAction(_commentModeAct);
   _editMenu->addSeparator();
   _editMenu->addAction(_selectAllAct);
 
