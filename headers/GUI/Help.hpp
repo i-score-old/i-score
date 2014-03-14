@@ -57,7 +57,7 @@ class QTabWidget;
 /*!
  * \class Help
  *
- * \brief Dialog displaying Acousmoscribe's help.
+ * \brief Dialog displaying i-score's help.
  */
 
 class Help : public QDialog
