@@ -1,15 +1,16 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ *iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesnâ€™t produce any media, 
+ * but controls other environmentsâ€™ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -306,7 +307,7 @@ AttributesEditor::connectSlots()
   connect(_networkTree, SIGNAL(recModeChanged(QTreeWidgetItem*)), this, SLOT(changeRecMode(QTreeWidgetItem*)));
 
 
-  /// \todo Ajouter les spinBox ci-dessous. Attention problème : ces signaux sont automatiquement appelés lorsque l'on sélectionne simplement une boite (setAttributes (...) updateWidgets()). Une erreur d'arrondi (certainement) fait que la date de start de plusieurs boite est modifié au simple click...
+  /// \todo Ajouter les spinBox ci-dessous. Attention problÃ¨me : ces signaux sont automatiquement appelÃ©s lorsque l'on sÃ©lectionne simplement une boite (setAttributes (...) updateWidgets()). Une erreur d'arrondi (certainement) fait que la date de start de plusieurs boite est modifiÃ© au simple click...
   //  connect(_boxStartValue, SIGNAL(valueChanged(double)), this, SLOT(startChanged()));
   //  connect(_boxLengthValue, SIGNAL(valueChanged(double)), this, SLOT(lengthChanged()));
 }
@@ -683,16 +684,16 @@ AttributesEditor::snapshotStartAssignment()
 
   if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 
-      //--- Pour réassigner les items des autres devices (qui n'ont pas été supprimés) ---
+      //--- Pour rÃ©assigner les items des autres devices (qui n'ont pas Ã©tÃ© supprimÃ©s) ---
       QList<QTreeWidgetItem *> itemsNotModified = _networkTree->startMessages()->getItems();
 
       if (!treeSnapshot.first.empty()) {
           _networkTree->startMessages()->setMessages(treeSnapshot.first);
 
-          //clear tous les messages assignés et set les nouveaux
+          //clear tous les messages assignÃ©s et set les nouveaux
           _networkTree->assignItems(treeSnapshot.first);
 
-          //ajoute les messages sauvegardés dans les assignés
+          //ajoute les messages sauvegardÃ©s dans les assignÃ©s
           _networkTree->assignItems(itemsNotModified);
 
           startMessagesChanged(true);
@@ -715,7 +716,7 @@ AttributesEditor::snapshotEndAssignment()
 
   if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
 
-      //--- Pour réassigner les items des autres devices (qui n'ont pas été supprimés) ---
+      //--- Pour rÃ©assigner les items des autres devices (qui n'ont pas Ã©tÃ© supprimÃ©s) ---
       QList<QTreeWidgetItem *> itemsNotModified = _networkTree->endMessages()->getItems();
 
       if (!treeSnapshot.first.empty()) {
@@ -723,7 +724,7 @@ AttributesEditor::snapshotEndAssignment()
 
           _networkTree->assignItems(treeSnapshot.first);
 
-          //ajoute les messages sauvegardés dans les assignés
+          //ajoute les messages sauvegardÃ©s dans les assignÃ©s
           _networkTree->assignItems(itemsNotModified);
 
           endMessagesChanged(true);
