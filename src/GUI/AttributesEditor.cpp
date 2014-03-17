@@ -809,7 +809,7 @@ AttributesEditor::changeRangeBoundMax(QTreeWidgetItem *item, float value){
 
 void
 AttributesEditor::changeRecMode(QTreeWidgetItem* item){    
-    /// \toto Should be better to ask messagesToRecord list to score (instead of abstractBox). As start/end messages. NH
+    /// \todo Should be better to ask messagesToRecord list to score (instead of abstractBox). As start/end messages. NH
 
     if (_boxEdited != NO_ID) {
           BasicBox * box = _scene->getBox(_boxEdited);          
