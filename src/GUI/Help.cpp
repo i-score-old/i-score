@@ -59,7 +59,7 @@ Help::Help(QWidget *parent)
   _editorTabs = new QTabWidget(this);
 
   QString fileString;
-  QFile file(":/documentation/file.htm");
+  QFile file(":/resources/documentation/file.htm");
   if (file.open(QIODevice::ReadOnly)) {
       fileString = QString(file.readAll());
     }
@@ -70,7 +70,7 @@ Help::Help(QWidget *parent)
   _fileLabel = new QLabel(fileString);
 
   QString toolbarString;
-  QFile toolbar(":/documentation/toolbar.htm");
+  QFile toolbar(":/resources/documentation/toolbar.htm");
   if (toolbar.open(QIODevice::ReadOnly)) {
       toolbarString = QString(toolbar.readAll());
     }
@@ -80,7 +80,7 @@ Help::Help(QWidget *parent)
   _toolBarLabel = new QLabel(toolbarString);
 
   QString contextString;
-  QFile context(":/documentation/contextual.htm");
+  QFile context(":/resources/documentation/contextual.htm");
   if (context.open(QIODevice::ReadOnly)) {
       contextString = QString(context.readAll());
     }
@@ -90,7 +90,7 @@ Help::Help(QWidget *parent)
   _contextLabel = new QLabel(contextString);
 
   QString interactionString;
-  QFile interaction(":/documentation/interaction.htm");
+  QFile interaction(":/resources/documentation/interaction.htm");
   if (interaction.open(QIODevice::ReadOnly)) {
       interactionString = QString(interaction.readAll());
     }
@@ -100,7 +100,7 @@ Help::Help(QWidget *parent)
   _interactionLabel = new QLabel(interactionString);
 
   QString editorGeneralString;
-  QFile editorGeneral(":/documentation/editorGeneral.htm");
+  QFile editorGeneral(":/resources/documentation/editorGeneral.htm");
   if (editorGeneral.open(QIODevice::ReadOnly)) {
       editorGeneralString = QString(editorGeneral.readAll());
     }
@@ -110,7 +110,7 @@ Help::Help(QWidget *parent)
   _editorGeneralLabel = new QLabel(editorGeneralString);
 
   QString editorSnapshotString;
-  QFile editorSnapshot(":/documentation/editorSnapshot.htm");
+  QFile editorSnapshot(":/resources/documentation/editorSnapshot.htm");
   if (editorSnapshot.open(QIODevice::ReadOnly)) {
       editorSnapshotString = QString(editorSnapshot.readAll());
     }

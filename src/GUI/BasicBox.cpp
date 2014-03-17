@@ -186,7 +186,7 @@ BasicBox::createMenus()
   _endMenu->addAction(_updateEndCue);
 
   //--- start button ---
-  QIcon startMenuIcon(":/images/boxStartMenu.svg");
+  QIcon startMenuIcon(":/resources/images/boxStartMenu.svg");
   _startMenuButton = new QPushButton();
   _startMenuButton->setIcon(startMenuIcon);
   _startMenuButton->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -202,7 +202,7 @@ BasicBox::createMenus()
       _boxContentWidget->setStartMenu(_startMenu);
 
   //--- end button ---
-  QIcon endMenuIcon(":/images/boxEndMenu.svg");
+  QIcon endMenuIcon(":/resources/images/boxEndMenu.svg");
   _endMenuButton = new QPushButton();
   _endMenuButton->setIcon(endMenuIcon);
   _endMenuButton->setShortcutEnabled(1, false);

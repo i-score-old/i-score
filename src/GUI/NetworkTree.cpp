@@ -499,7 +499,7 @@ NetworkTree::createOCSBranch(QTreeWidgetItem *curItem)
 {
   QTreeWidgetItem *addANodeItem = new QTreeWidgetItem(QStringList(OSC_ADD_NODE_TEXT), addOSCNode);
   addANodeItem->setFlags(Qt::ItemIsEnabled);
-  addANodeItem->setIcon(0, QIcon(":/images/addANode.png"));
+  addANodeItem->setIcon(0, QIcon(":/resources/images/addANode.png"));
   curItem->addChild(addANodeItem);
   curItem->setFlags(Qt::ItemIsEnabled);
 }
@@ -509,7 +509,7 @@ NetworkTree::addADeviceNode()
 {
   QTreeWidgetItem *addADeviceNode = new QTreeWidgetItem(QStringList(ADD_A_DEVICE_TEXT), addDeviceNode);
   addADeviceNode->setFlags(Qt::ItemIsEnabled);
-  addADeviceNode->setIcon(0, QIcon(":/images/addANode.png"));
+  addADeviceNode->setIcon(0, QIcon(":/resources/images/addANode.png"));
   return addADeviceNode;
 }
 
@@ -2254,7 +2254,7 @@ NetworkTree::setRecMode(std::string address){
     if(!_recMessages.contains(item)){
         _recMessages<<item;
         item->setData(INTERPOLATION_COLUMN, Qt::CheckStateRole, QVariant());
-        item->setIcon(INTERPOLATION_COLUMN,QIcon(":/images/record.svg"));
+        item->setIcon(INTERPOLATION_COLUMN,QIcon(":/resources/images/record.svg"));
     }
     else{
         _recMessages.removeAll(item);

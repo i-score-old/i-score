@@ -104,15 +104,15 @@ HeaderPanelWidget::createActions()
   QPixmap pix = QPixmap(35, 35);
   pix.fill(Qt::transparent);
 
-  QIcon playIcon(":/images/playSimple.svg");
+  QIcon playIcon(":/resources/images/playSimple.svg");
   _playAction = new QAction(playIcon, tr("Play"), this);
   _playAction->setStatusTip(tr("Play scenario"));
 
-  QIcon stopIcon(":/images/stopSimple.svg");
+  QIcon stopIcon(":/resources/images/stopSimple.svg");
   _stopAction = new QAction(stopIcon, tr("Stop"), this);
   _stopAction->setStatusTip(tr("Stop scenario"));
 
-  QIcon rewindIcon(":/images/boxStartMenu.svg");
+  QIcon rewindIcon(":/resources/images/boxStartMenu.svg");
   _rewindAction = new QAction(rewindIcon, tr("Rewind"), this);
   _rewindAction->setStatusTip(tr("Rewind scenario"));
 

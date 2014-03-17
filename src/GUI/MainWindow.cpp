@@ -517,19 +517,19 @@ MainWindow::createActions()
   _quitAct->setStatusTip(tr("Quit the application"));
   connect(_quitAct, SIGNAL(triggered()), this, SLOT(close()));
 
-  _aboutAct = new QAction(QIcon(":/images/about.svg"), tr("&About"), this);
+  _aboutAct = new QAction(QIcon(":/resources/images/about.svg"), tr("&About"), this);
   _aboutAct->setShortcut(QKeySequence::WhatsThis);
   _aboutAct->setStatusTip(tr("Show the application's About box"));
   connect(_aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
   _helpDialog = new Help(this);
 
-  _helpAct = new QAction(QIcon(":/images/help.svg"), tr("&Help"), this);
+  _helpAct = new QAction(QIcon(":/resources/images/help.svg"), tr("&Help"), this);
   _helpAct->setShortcut(QKeySequence::HelpContents);
   _helpAct->setStatusTip(tr("Show the application's Help"));
   connect(_helpAct, SIGNAL(triggered()), this, SLOT(help()));
 
-  _networkAct = new QAction(QIcon(":/images/network.svg"), tr("&Network"), this);
+  _networkAct = new QAction(QIcon(":/resources/images/network.svg"), tr("&Network"), this);
   _networkAct->setStatusTip(tr("Configure network preferences"));
   connect(_networkAct, SIGNAL(triggered()), this, SLOT(networkConfig()));
 
@@ -543,7 +543,7 @@ MainWindow::createActions()
   _zoomOutAct->setStatusTip(tr("Zoom out"));
   connect(_zoomOutAct, SIGNAL(triggered()), _view, SLOT(zoomOut()));
 
-  _editorAct = new QAction(QIcon(":/images/edit.svg"), tr("Devices Inspector"), this);
+  _editorAct = new QAction(QIcon(":/resources/images/edit.svg"), tr("Devices Inspector"), this);
   _editorAct->setShortcut(QString("Ctrl+I"));
   _editorAct->setStatusTip(tr("Devices Inspector"));
   _editorAct->setCheckable(true);
@@ -569,21 +569,21 @@ MainWindow::createActions()
   _selectAllAct->setStatusTip(tr("Select every item"));
   connect(_selectAllAct, SIGNAL(triggered()), this, SLOT(selectAll()));
 
-  _selectModeAct = new QAction(QIcon(":/images/select.svg"), tr("Select"), this);
+  _selectModeAct = new QAction(QIcon(":/resources/images/select.svg"), tr("Select"), this);
   _selectModeAct->setStatusTip(tr("Switch mode to selection"));
   _selectModeAct->setShortcut(QString("Ctrl+Shift+E"));
   _selectModeAct->setCheckable(true);
   _selectModeAct->setChecked(false);
   connect(_selectModeAct, SIGNAL(triggered()), this, SLOT(selectMode()));
 
-  _PBModeAct = new QAction(QIcon(":/images/parentBox.svg"), tr("Box"), this);
+  _PBModeAct = new QAction(QIcon(":/resources/images/parentBox.svg"), tr("Box"), this);
   _PBModeAct->setStatusTip(tr("Switch mode to Parent Box creation"));
   _PBModeAct->setShortcut(QString("Ctrl+Shift+P"));
   _PBModeAct->setCheckable(true);
   _PBModeAct->setChecked(true);
   connect(_PBModeAct, SIGNAL(triggered()), this, SLOT(selectMode()));
 
-  _commentModeAct = new QAction(QIcon(":/images/comment.svg"), tr("Comment"), this);
+  _commentModeAct = new QAction(QIcon(":/resources/images/comment.svg"), tr("Comment"), this);
   _commentModeAct->setStatusTip(tr("Adds a Comment"));
   _commentModeAct->setShortcut(QString("Ctrl+Shift+T"));
   _commentModeAct->setCheckable(true);
