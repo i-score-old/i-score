@@ -335,7 +335,7 @@ class Maquette : public QObject
                             bool &redundancy, bool &interpolate, std::vector<float>& values, std::vector<std::string> & argTypes, std::vector<float> &xPercents,
                             std::vector<float> &yValues, std::vector<short> &sectionType, std::vector<float> &coeff);
 
-
+    bool getCurveValues(unsigned int boxID, const std::string &address, unsigned int argPosition, std::vector<float> &values);
 
     /*!
      * \brief Raised when execution is finished

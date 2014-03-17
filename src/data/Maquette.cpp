@@ -1074,9 +1074,16 @@ Maquette::getCurveAttributes(unsigned int boxID, const std::string &address, uns
           interpolate = !_engines->getCurveMuteState(boxID, address);
           return true;
         }
+      return true;
     }
 
   return false;
+}
+
+bool
+Maquette::getCurveValues(unsigned int boxID, const std::string &address, unsigned int argPosition, std::vector<float> &values)
+{
+    return _engines->getCurveValues(boxID,address,argPosition,values);
 }
 
 void
