@@ -1,7 +1,7 @@
 ==  INSTALLATION INSTRUCTIONS  ==
 
     
-	==<[ MacOS (10.4+/10.9) ]>==
+   ==<[ MacOS (10.4+/10.9) ]>==
 
        . Download and install libraries from :
               Qt (LGPL) : http://qt-project.org/downloads
@@ -16,9 +16,18 @@
        . cd into i-score folder with your terminal.
   
        . Compile by running the script : ./build.sh
+       
+       
+       
+   ==<[ Linux ]>==
 
 
-	==<[ Doxygen Documentation ]>==
+
+
+
+
+
+   ==<[ Doxygen Documentation ]>==
 	
   
 In order to have documentation of the sources you have to install Doxygen (www.doxygen.org),
