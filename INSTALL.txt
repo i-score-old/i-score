@@ -1,9 +1,5 @@
 ==  INSTALLATION INSTRUCTIONS  ==
 
-In order to have documentation of the sources you have to install Doxygen (www.doxygen.org),
-and the Graphviz package to generate graph with Doxygen (www.graphviz.org).
-To generate documentation,
-load ./doxygen/Doxyfile with Doxygen and run it.
     
 	==<[ MacOS (10.4+/10.9) ]>==
 
@@ -22,4 +18,10 @@ load ./doxygen/Doxyfile with Doxygen and run it.
        . Compile by running the script : ./build.sh
 
 
+	==<[ Doxygen Documentation ]>==
+	
   
+In order to have documentation of the sources you have to install Doxygen (www.doxygen.org),
+and the Graphviz package to generate graph with Doxygen (www.graphviz.org).
+To generate documentation,
+load ./doxygen/Doxyfile with Doxygen and run it.
