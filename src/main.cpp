@@ -66,8 +66,12 @@ main(int argc, char *argv[])
   app.setApplicationName("i-score");
 
   QTranslator translator;
-  translator.load("acousmoscribe_en");
+  translator.load("i-score_en");
   app.installTranslator(&translator);
+
+  app.setStyleSheet(            "QMainWindow {"
+                                  "background-color: rgba(60, 60, 60, 100%);"
+                                          "}");
 
   MainWindow *win = new MainWindow();
   win->show();

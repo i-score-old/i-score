@@ -1,15 +1,17 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
+ *
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -171,11 +173,11 @@ NetworkConfig::deviceSelected(int indexSelected)
 }
 
 void
-NetworkConfig::setNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, std::string port)
+NetworkConfig::setNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, unsigned int port)
 {
   Q_UNUSED(deviceName); Q_UNUSED(pluginName);
 
-  _devices["OSCDevice"].networkPort = atoi(port.c_str());
+  _devices["OSCDevice"].networkPort = port;
   _devices["OSCDevice"].networkHost = IP;
   updateNetworkConfiguration();
 }
@@ -187,7 +189,7 @@ NetworkConfig::updateNetworkConfiguration()
       QHostAddress hostAddress(_IPBox->text());
       if (!hostAddress.isNull()) {
           _scene->changeNetworkDevice(_devicesComboBox->currentText().toStdString(), _pluginsComboBox->currentText().toStdString(),
-                                      _IPBox->text().toStdString(), _portOutputBox->text().toStdString());
+                                      _IPBox->text().toStdString(), _portOutputBox->value());
           accept();
         }
       else {

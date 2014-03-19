@@ -1,15 +1,16 @@
     /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -94,6 +95,8 @@ const float BasicBox::EAR_HEIGHT = 30;
 const float BasicBox::GRIP_CIRCLE_SIZE = 5;
 unsigned int BasicBox::BOX_MARGIN = 25;
 const QString BasicBox::SUB_SCENARIO_MODE_TEXT = tr("Scenario");
+const QColor BasicBox::BOX_COLOR = QColor(60, 60, 60);
+const QColor BasicBox::TEXT_COLOR = QColor(0, 0, 0);
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
   : QGraphicsItem()
@@ -184,7 +187,7 @@ BasicBox::createMenus()
   _endMenu->addAction(_updateEndCue);
 
   //--- start button ---
-  QIcon startMenuIcon(":/images/boxStartMenu.svg");
+  QIcon startMenuIcon(":/resources/images/boxStartMenu.svg");
   _startMenuButton = new QPushButton();
   _startMenuButton->setIcon(startMenuIcon);
   _startMenuButton->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -200,7 +203,7 @@ BasicBox::createMenus()
       _boxContentWidget->setStartMenu(_startMenu);
 
   //--- end button ---
-  QIcon endMenuIcon(":/images/boxEndMenu.svg");
+  QIcon endMenuIcon(":/resources/images/boxEndMenu.svg");
   _endMenuButton = new QPushButton();
   _endMenuButton->setIcon(endMenuIcon);
   _endMenuButton->setShortcutEnabled(1, false);
@@ -256,6 +259,13 @@ BasicBox::createWidget()
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setAlignment(_boxWidget, Qt::AlignLeft);
   _boxWidget->setLayout(layout);
+  _boxWidget->setStyleSheet(
+              "QWidget {"
+              "border: none;"
+              "border-radius: none;"
+              "background-color: transparent;"
+              "}"
+              );
 
   _curveProxy = new QGraphicsProxyWidget(this);
 
@@ -276,6 +286,22 @@ BasicBox::createWidget()
   QFont font;
   font.setPointSize(10);
   _comboBox->setFont(font);
+  _comboBox->setStyleSheet(
+              "QComboBox {"
+              "color: lightgray;"
+              "border: none;"
+              "border-radius: none;"
+              "background-color: transparent;"
+              "selection-color: black;"
+              "selection-background-color: gray;"
+              "text-align: right;"
+              "}"
+              "QComboBox::drop-down {"
+              "border-color: gray;"
+              "color: black;"
+              "text-align: right;"
+              "}"
+              );
 
   _comboBoxProxy = new QGraphicsProxyWidget(this);
   _comboBoxProxy->setWidget(_comboBox);
@@ -344,8 +370,6 @@ BasicBox::init()
   _low = false;
   _triggerPoints = new QMap<BoxExtremity, TriggerPoint*>();
   _comment = NULL;
-  _color = QColor(Qt::white);
-  _colorUnselected = QColor(Qt::white);
 
   _recEffect = new QGraphicsColorizeEffect(this);
   _recEffect->setColor(Qt::red);
@@ -370,6 +394,10 @@ BasicBox::init()
   _currentZvalue = 0;
   setZValue(_currentZvalue);
   updateFlexibility();
+
+  _abstract->setColor(QColor(BOX_COLOR));
+  _color = QColor(BOX_COLOR);
+  _colorUnselected = QColor(BOX_COLOR);
 }
 
 void
@@ -377,6 +405,7 @@ BasicBox::changeColor(QColor color)
 {
   _color = color;
   _colorUnselected = color;
+  Maquette::getInstance()->setBoxColor(ID(),_color);
   update();
 }
 
@@ -656,7 +685,7 @@ BasicBox::resizeWidthEdition(float width)
 
 void
 BasicBox::resizeHeightEdition(float height)
-{
+{    
   _abstract->setHeight(height); 
   centerWidget();
 }
@@ -1459,7 +1488,7 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             break;
 
           case VERTICAL_RESIZE:
-            resizeHeightEdition(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y());
+          resizeHeightEdition(std::max(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y() , (double)BOX_MARGIN));
             break;
 
           case DIAGONAL_RESIZE:          
@@ -1789,7 +1818,7 @@ BasicBox::drawHoverShape(QPainter *painter)
 
   painter->save();
 
-  QPen penBlue(Qt::blue);
+  QPen penBlue(QColor(160,160,160));
   penBlue.setWidth(width);
   painter->setPen(penBlue);
 
@@ -1805,6 +1834,29 @@ BasicBox::drawHoverShape(QPainter *painter)
 }
 
 void
+BasicBox::drawSelectShape(QPainter *painter){
+    float interspace = 2.;
+    int width = 2;
+
+    painter->save();
+
+     QPen penBlue(QColor(60,60,255)); // blue color value
+
+    penBlue.setWidth(width);
+    painter->setPen(penBlue);
+
+    QPainterPath path;
+    path.addRect(_boxRect);
+    QRect hoverRect(QPoint(_boxRect.topLeft().x() - interspace, _boxRect.topLeft().y() - interspace),
+                    QPoint(_boxRect.bottomRight().x() + interspace, _boxRect.bottomRight().y() + interspace));
+
+    path.addRect(hoverRect);
+    painter->drawPath(path);
+
+    painter->restore();
+}
+
+void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(widget);
@@ -1812,8 +1864,11 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
 
     //draw hover shape
-    if ((isSelected() || _hover) && !_playing)
+    if (_hover && !isSelected() && !_playing)
         drawHoverShape(painter);
+
+    if (isSelected() && !_playing)
+        drawSelectShape(painter);
 
     //draw duration text on hover
     if(_hover && !_playing){
@@ -1875,6 +1930,8 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     painter->setPen(QPen(Qt::black));
 
     //draw name
+    painter->translate(0,4);
+    painter->setPen(QPen(Qt::gray));
     painter->drawText(QRectF(BOX_MARGIN, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
     painter->restore();
 
@@ -1892,7 +1949,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         painter->fillRect(0, _abstract->height() - RESIZE_TOLERANCE / 2., progressPosX, RESIZE_TOLERANCE / 2., Qt::darkGreen);
         painter->drawLine(QPointF(progressPosX, RESIZE_TOLERANCE), QPointF(progressPosX, _abstract->height()));
     }
-    setOpacity(isSelected() ? 1 : 0.4);
+//    setOpacity(isSelected() ? 1 : 0.4);
 
 }
 
@@ -1951,8 +2008,7 @@ BasicBox::addMessageToRecord(std::string address){
 }
 
 void
-BasicBox::removeMessageToRecord(std::string address){
-    std::cout<<"remove "<<address<<std::endl;
+BasicBox::removeMessageToRecord(std::string address){    
     _abstract->removeMessageToRecord(address);
     setRecMode(!_abstract->messagesToRecord().isEmpty());
     Maquette::getInstance()->setCurveRecording(_abstract->ID(), address, false);

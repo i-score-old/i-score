@@ -31,9 +31,9 @@ RESOURCES += i-score.qrc
 # qmake adds the values of this variable as compiler C preprocessor macros (-D option).
 DEFINES += __Types__
 
-ICON = images/acousmoscribe.icns
+ICON = resources/images/i-score.icns
 
-TRANSLATIONS = acousmoscribe_en.ts acousmoscribe_fr.ts
+resources/translations = i-score_en.ts i-score_fr.ts
 
 # Support for conditional structures is made available via these scopes
 linux-g++ {

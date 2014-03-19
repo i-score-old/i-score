@@ -50,6 +50,22 @@ LogarithmicSlider::LogarithmicSlider(Qt::Orientation orientation, QWidget *paren
   setSingleStep((MAXIMUM_VALUE - MINIMUM_VALUE) / 100);
   setPageStep((MAXIMUM_VALUE - MINIMUM_VALUE) / 10);
   setTickPosition(QSlider::TicksBelow);
+  setStyleSheet(
+              "QSlider::groove:horizontal  {"
+              "border: 1px solid #999999;"
+              "height: 13px;"
+              "background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, stop:1 #c4c4c4);"
+              "margin: 2px 0;"
+              "}"
+
+              "QSlider::handle:horizontal  {"
+              "background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);"
+              "border: 1px solid #5c5c5c;"
+              "width: 18px;"
+              "margin: -2px 0;"
+              "border-radius: 3px;"
+              "}"
+              );
 }
 
 void

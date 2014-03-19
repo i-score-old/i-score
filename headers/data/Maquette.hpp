@@ -1,15 +1,16 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -200,7 +201,7 @@ class Maquette : public QObject
      * \return the current network device used
      */
     std::string getNetworkDevice();
-    void addNetworkDevice(string deviceName, string plugin, string ip, string port);
+    void addNetworkDevice(string deviceName, string plugin, string ip, unsigned int destinationPort, unsigned int receptionPort = 0);
 
     /*!
      * \brief Gets a set of the available network devices.
@@ -238,7 +239,7 @@ class Maquette : public QObject
      * \param IP : the new IP to use
      * \param port : the new port to use
      */
-    void changeNetworkDevice(const std::string &deviceName, const std::string &pluginName, const std::string &IP, const std::string &port);
+    void changeNetworkDevice(const std::string &deviceName, const std::string &pluginName, const std::string &IP, const unsigned int &port);
 
     /*!
      * \brief Gets the set of devices and their respective requestability.
@@ -334,7 +335,7 @@ class Maquette : public QObject
                             bool &redundancy, bool &interpolate, std::vector<float>& values, std::vector<std::string> & argTypes, std::vector<float> &xPercents,
                             std::vector<float> &yValues, std::vector<short> &sectionType, std::vector<float> &coeff);
 
-
+    bool getCurveValues(unsigned int boxID, const std::string &address, unsigned int argPosition, std::vector<float> &values);
 
     /*!
      * \brief Raised when execution is finished
@@ -730,6 +731,26 @@ class Maquette : public QObject
     inline MaquetteScene *
     scene(){ return _scene; }
     static const unsigned int SIZE;
+
+    bool getDeviceLocalHost(std::string deviceName, std::string protocol, std::string &localHost);
+    bool getDeviceLocalHost(std::string deviceName, std::string &localHost);
+
+    bool getDevicePort(std::string deviceName,  std::string protocol, unsigned int &port);
+    bool getDevicePort(std::string deviceName, unsigned int &port);
+    bool getDevicePorts(std::string deviceName, std::string protocol, std::vector<int> &portVector);
+
+    int getOSCInputPort();
+    int getMinuitInputPort();
+
+    bool getDeviceProtocol(std::string deviceName, std::string &protocol);
+    std::vector<std::string> getProtocolsName();
+
+    bool setDeviceName(std::string device, std::string newName);
+    bool setDevicePort(std::string device, int destinationPort, int receptionPort = 0);
+    bool setDeviceLocalHost(std::string device, std::string localHost);
+    bool setDeviceProtocol(std::string device, std::string protocol);
+
+    bool loadNetworkNamespace(const string &application, const string &filepath);
 
   public slots:
     

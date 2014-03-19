@@ -44,6 +44,8 @@ Engine::Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, boo
     
     m_mainScenario = NULL;
     
+    iscore = "i-score";
+    
     if (!pathToTheJamomaFolder.empty())
         initModular(pathToTheJamomaFolder.c_str());
     else
@@ -54,26 +56,34 @@ Engine::Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, boo
 
 void Engine::initModular(const char* pathToTheJamomaFolder)
 {
-    TTErr           err;
-    TTValue         args, v;
-    TTString        applicationName = "i-score";                  // TODO : declare as global variable
-    TTObjectBasePtr iscore;                                       // TODO : declare as global variable
-    TTString        configFile = "/usr/local/include/IScore/i-scoreConfiguration.xml";
-    TTHashPtr       hashParameters;
-    
+    TTErr    err;
+    TTValue  args;
+                      // TODO : declare as global variable
+    TTString configFile = "/usr/local/include/IScore/i-scoreConfiguration.xml";
+
     // this initializes the Modular framework and loads protocol plugins
     TTModularInit(pathToTheJamomaFolder);
     
     // create a local application named i-score
-    TTModularCreateLocalApplication(applicationName, configFile);
-    
-    // get i-score application
-    iscore = getLocalApplication;
+    TTModularCreateLocalApplication(iscore, configFile);
     
     // set the application in debug mode
-    iscore->setAttributeValue(TTSymbol("debug"), YES);
+    getLocalApplication->setAttributeValue(TTSymbol("debug"), YES);
     
-    // create TTData for tranport service and expose them
+    // Create a sender to send message to any application
+    m_sender = NULL;
+    args.clear();
+    TTObjectBaseInstantiate(kTTSym_Sender, &m_sender, args);
+    
+    registerIscoreTransportData();
+    registerIscoreToProtocols();
+}
+
+void Engine::registerIscoreTransportData()
+{
+    TTValue args, v, none;
+    
+    // create TTData for transport service and expose them
     
     // Play
     TTValuePtr batonPlay = new TTValue(TTPtr(this));
@@ -136,39 +146,24 @@ void Engine::initModular(const char* pathToTheJamomaFolder)
     m_dataSpeed->setAttributeValue(kTTSym_description, TTSymbol("change i-score speed rate execution"));
     
     TTModularRegisterObject(TTAddress("/Transport/Speed"), m_dataSpeed);
+}
+
+void Engine::registerIscoreToProtocols()
+{
+    TTErr     err;
+    TTValue   args, v, none;
+    TTHashPtr hashParameters;
     
-    // Create a sender to send message to any application
-    m_sender = NULL;
-    args.clear();
-    TTObjectBaseInstantiate(kTTSym_Sender, &m_sender, args);
-    
-    
-    ////////////
-    // Example : Create a distant application
-    ////////////
-    TTObjectBasePtr anApplication = NULL;
-    TTSymbol        MinuitApplicationName;
-    
-    // create an application called MinuitDevice1
-    MinuitApplicationName = TTSymbol("MinuitDevice1");
-    args = TTValue(MinuitApplicationName);
-    TTObjectBaseInstantiate(kTTSym_Application, TTObjectBaseHandle(&anApplication), args);
-    
-    // set application type : here 'mirror' because it use Minuit protocol
-    anApplication->setAttributeValue(kTTSym_type, TTSymbol("mirror"));
-    
-    ////////////
-    // Example : Register i-score and MinuitDevice1 to the Minuit protocol
-    ////////////
+    // Register i-score to the Minuit and OSC protocol
     
     // check if the Minuit protocol has been loaded
     if (getProtocol(TTSymbol("Minuit"))) {
         
         // register the local application to the Minuit protocol
-        getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), TTSymbol(applicationName), kTTValNONE);
+        getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), TTSymbol(iscore), none);
         
         // get parameter's table
-        v = TTSymbol(applicationName);
+        v = TTSymbol(iscore);
         err = getProtocol(TTSymbol("Minuit"))->getAttributeValue(TTSymbol("applicationParameters"), v);
         
         if (!err) {
@@ -177,79 +172,45 @@ void Engine::initModular(const char* pathToTheJamomaFolder)
         
             // replace the Minuit parameters for the local application
             hashParameters->remove(TTSymbol("port"));
-            hashParameters->append(TTSymbol("port"), 8002);
+            hashParameters->append(TTSymbol("port"), MINUIT_INPUT_PORT);
             
             hashParameters->remove(TTSymbol("ip"));
             hashParameters->append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
         
-            v = TTSymbol(applicationName);
+            v = TTSymbol(iscore);
             v.append((TTPtr)hashParameters);
             getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
         }
+    }
+    
+    // check if the OSC protocol has been loaded
+    if (getProtocol(TTSymbol("OSC"))) {
         
-        // register this application to the Minuit protocol
-        getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), MinuitApplicationName, kTTValNONE);
+        // register the local application to the Minuit protocol
+        getProtocol(TTSymbol("OSC"))->sendMessage(TTSymbol("registerApplication"), TTSymbol(iscore), none);
         
         // get parameter's table
-        v = TTSymbol(MinuitApplicationName);
-        err = getProtocol(TTSymbol("Minuit"))->getAttributeValue(TTSymbol("applicationParameters"), v);
+        v = TTSymbol(iscore);
+        err = getProtocol(TTSymbol("OSC"))->getAttributeValue(TTSymbol("applicationParameters"), v);
         
         if (!err) {
             
             hashParameters = TTHashPtr((TTPtr)v[0]);
-        
-            // replace the Minuit parameters for the distant application
+            
+            // replace the Minuit parameters for the local application
             hashParameters->remove(TTSymbol("port"));
-            hashParameters->append(TTSymbol("port"), 9998);
+            
+            v = TTValue(OSC_INPUT_PORT, OSC_OUTPUT_PORT);
+            hashParameters->append(TTSymbol("port"), OSC_INPUT_PORT);
             
             hashParameters->remove(TTSymbol("ip"));
             hashParameters->append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
-        
-            v = TTValue(MinuitApplicationName);
+            
+            v = TTSymbol(iscore);
             v.append((TTPtr)hashParameters);
-            getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
+            getProtocol(TTSymbol("OSC"))->setAttributeValue(TTSymbol("applicationParameters"), v);
         }
-        
-        // run the Minuit protocol
-        TTModularApplications->sendMessage(TTSymbol("ProtocolRun"), TTSymbol("Minuit"), kTTValNONE);
-        
-        ////////////
-        // Example : Build the namespace of MinuitDevice1 using discovery feature (if the protocol provides it)
-        ////////////
-        
-        // you can create an OSC receive on the 9998 port to see that a namespace request is sent by i-score (using Pure Data for example)
-        anApplication->sendMessage(TTSymbol("DirectoryBuild"));
     }
-/*
-    ////////////
-    // Example : Read the namespace of MinuitDevice1 from a namespace file
-    ////////////
-    
-    // create a TTXmlHandler class to parse a xml namespace file
-    TTXmlHandlerPtr myXmlHandler = NULL;
-    TTObjectBaseInstantiate(kTTSym_XmlHandler, TTObjectBaseHandle(&myXmlHandler), kTTValNONE);
-    
-    // prepare the TTXmlHandler to pass the result of the parsing to MinuitDevice1
-    v = TTValue(anApplication);
-    myXmlHandler->setAttributeValue(TTSymbol("object"), v);
-    
-    // read a namespace file
-    err = myXmlHandler->sendMessage(TTSymbol("Read"), TTSymbol("/Users/WALL-E/Documents/Jamoma/Modules/Modular/implementations/MaxMSP/jcom.modular/remoteApp - namespace.xml"), kTTValNONE);
-    
-    if (!err) {
-        // get the root of the TNodeDirectory of MinuitDevice1
-        // note : the TTNodeDirectory is a tree structure used to registered and retrieve TTObjects using TTAddress
-        TTNodeDirectoryPtr anApplicationDirectory = getApplicationDirectory(TTSymbol("MinuitDevice1"));
-        
-        // return all addresses of the TTNodeDirectory
-        std::cout << "__ Dump MinuitDevice1 directory __" << std::endl;
-        
-        // start to dump addresses recursilvely from the root of the directory
-        dumpAddressBelow(anApplicationDirectory->getRoot());
-        
-        std::cout << "__________________________________" << std::endl;
-    }
-*/    
 }
 
 void Engine::initScore()
@@ -2040,13 +2001,14 @@ void Engine::trigger(ConditionedProcessId triggerId)
     timeEvent->sendMessage(kTTSym_Trigger);
 }
 
-void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const std::string & DevicePort)
+void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort)
 {
-    TTValue         v;
+    TTValue         v, portValue, none;
     TTSymbol        applicationName(deviceName);
     TTSymbol        protocolName(pluginToUse);
     TTObjectBasePtr anApplication = NULL;
-    TTHash          hashParameters;
+    TTHashPtr       hashParameters;
+    TTErr           err;
     
     // if the application doesn't already exist
     if (!getApplication(applicationName)) {
@@ -2055,33 +2017,52 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
         v = applicationName;
         TTObjectBaseInstantiate(kTTSym_Application, TTObjectBaseHandle(&anApplication), v);
         
+        // set application type : here 'mirror' because it use Minuit protocol
+        // note : this should be done for all protocols which have a discovery feature
+        if (protocolName == TTSymbol("Minuit"))
+            anApplication->setAttributeValue(kTTSym_type, TTSymbol("mirror"));
+        
         // check if the protocol has been loaded
 		if (getProtocol(protocolName)) {
             
+            // stop the protocol
+            getProtocol(protocolName)->sendMessage(TTSymbol("Stop"));
+            
             // register the application to the protocol
             v = applicationName;
-            getProtocol(protocolName)->sendMessage(TTSymbol("registerApplication"), v, kTTValNONE);
+            getProtocol(protocolName)->sendMessage(TTSymbol("registerApplication"), v, none);
             
-            // set plugin parameters (OSC or Minuit Plugin)
-            hashParameters.append(TTSymbol("ip"), TTSymbol(DeviceIp));
+            err = getProtocol(protocolName)->getAttributeValue(TTSymbol("applicationParameters"), v);
             
-            v = TTSymbol(DevicePort);
-            v.fromString();
-            hashParameters.append(TTSymbol("port"), v);
+            if (!err) {
+                
+                hashParameters = TTHashPtr((TTPtr)v[0]);
             
-            v = applicationName;
-            v.append(TTPtr(&hashParameters));
-            getProtocol(protocolName)->setAttributeValue(TTSymbol("applicationParameters"), v);
+                // set plugin parameters (OSC or Minuit Plugin)
+                hashParameters->remove(TTSymbol("ip"));
+                hashParameters->append(TTSymbol("ip"), TTSymbol(DeviceIp));
+                
+                portValue = destinationPort;
+                if (receptionPort != 0)
+                    portValue.append(receptionPort);
+                
+                hashParameters->remove(TTSymbol("port"));
+                hashParameters->append(TTSymbol("port"), portValue);
             
-            // run the protocol for this application
-            getProtocol(protocolName)->sendMessage(TTSymbol("Run"), applicationName, kTTValNONE);
+                v = applicationName;
+                v.append(TTPtr(hashParameters));
+                getProtocol(protocolName)->setAttributeValue(TTSymbol("applicationParameters"), v);
+            }
+            
+            // run the protocol
+            getProtocol(protocolName)->sendMessage(TTSymbol("Run"));
         }
     }
 }
 
 void Engine::removeNetworkDevice(const std::string & deviceName)
 {
-    TTValue         v;
+    TTValue         v, none;
     TTSymbol        applicationName(deviceName);
     TTSymbol        protocolName;
     TTObjectBasePtr anApplication = getApplication(applicationName);
@@ -2094,11 +2075,10 @@ void Engine::removeNetworkDevice(const std::string & deviceName)
         protocolName = v[0]; // we register application to 1 protocol only
         
         // stop the protocol for this application
-        getProtocol(protocolName)->sendMessage(TTSymbol("Stop"), applicationName, kTTValNONE);
+        getProtocol(protocolName)->sendMessage(TTSymbol("Stop"));
         
         // unregister the application to the protocol
-        v = TTValue(applicationName);
-        getProtocol(protocolName)->sendMessage(TTSymbol("unregisterApplication"), v, kTTValNONE);
+        getProtocol(protocolName)->sendMessage(TTSymbol("unregisterApplication"), applicationName, none);
         
         // delete the application
         TTObjectBaseRelease(TTObjectBaseHandle(&anApplication));
@@ -2178,11 +2158,9 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
 {
     vector<string>      snapshot;
     TTAddress           anAddress = toTTAddress(address);
-    TTSymbol            type;
     TTNodeDirectoryPtr  aDirectory;
     TTNodePtr           aNode;
-    TTMirrorPtr         aMirror;
-    TTList              nodeList;
+    TTObjectBasePtr     anObject;
     TTString            s;
     TTValue             v;
     
@@ -2195,15 +2173,16 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
         if (!aDirectory->getTTNode(anAddress, &aNode)) {
             
             // get object attributes
-            aMirror = TTMirrorPtr(aNode->getObject());
-            if (aMirror) {
+            anObject = aNode->getObject();
+            
+            if (anObject) {
                 
-                type = aMirror->getName();
-                
-                if (type == TTSymbol("Data")) {
-                    
+                // in case of proxy data or mirror object
+                if (anObject->getName() == TTSymbol("Data") ||
+                    (anObject->getName() == kTTSym_Mirror && TTMirrorPtr(anObject)->getName() == TTSymbol("Data")))
+                {
                     // get the value attribute
-                    aMirror->getAttributeValue(TTSymbol("value"), v);
+                    anObject->getAttributeValue(TTSymbol("value"), v);
                     v.toString();
                     s = TTString(v[0]);
                     
@@ -2356,6 +2335,20 @@ void Engine::refreshNetworkNamespace(const string &application, const string &ad
     getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryBuild"));
 }
 
+bool Engine::loadNetworkNamespace(const string &application, const string &filepath)
+{
+    // Create a TTXmlHandler
+    TTObject aXmlHandler(kTTSym_XmlHandler);
+    
+    // Read the file to setup an application
+    TTValue none, v = TTObjectBasePtr(getApplication(TTSymbol(application)));
+    aXmlHandler.set(kTTSym_object, v);
+    
+    TTErr err = aXmlHandler.send(kTTSym_Read, TTSymbol(filepath), none);    
+
+    return err != kTTErrNone;
+}
+
 bool Engine::getDeviceIntegerParameter(const string device, const string protocol, const string parameter, unsigned int &integer){
     TTSymbol        applicationName;
     TTErr           err;
@@ -2372,6 +2365,30 @@ bool Engine::getDeviceIntegerParameter(const string device, const string protoco
         hashParameters = TTHashPtr((TTPtr)v[0]);
         hashParameters->lookup(TTSymbol(parameter),p);
         integer = TTUInt32(p[0]);
+        return 0;
+    }
+    return 1;
+}
+
+bool Engine::getDeviceIntegerVectorParameter(const string device, const string protocol, const string parameter, vector<int>& integerVect){
+    TTSymbol        applicationName;
+    TTErr           err;
+    TTValue         p, v;
+    TTHashPtr       hashParameters;
+
+    applicationName = TTSymbol(device);
+
+    // get parameter's table
+    v = TTSymbol(applicationName);
+    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
+
+    if (!err) {
+        hashParameters = TTHashPtr((TTPtr)v[0]);
+        hashParameters->lookup(TTSymbol(parameter),p);
+
+        for (TTUInt32 i = 0 ; i < p.size() ; i++)
+            integerVect.push_back(TTUInt16(p[i]));
+
         return 0;
     }
     return 1;
@@ -2398,6 +2415,158 @@ bool Engine::getDeviceStringParameter(const string device, const string protocol
         return 0;
     }
     return 1;
+}
+
+bool
+Engine::getDeviceProtocol(std::string deviceName, std::string &protocol)
+{
+    TTValue         v;
+    TTSymbol        applicationName(deviceName);
+    TTSymbol        protocolName;
+    TTObjectBasePtr anApplication = getApplication(applicationName);
+
+    // if the application exists
+    if (anApplication) {
+        // get the protocols of the application
+        v = getApplicationProtocols(applicationName);
+        protocolName = v[0]; // we register application to 1 protocol only
+        protocol = protocolName.c_str();
+        return 0;
+    }
+    return 1;
+}
+
+bool
+Engine::setDeviceName(string deviceName, string newName)
+{
+    string          protocol,
+                    localHost;
+    unsigned int    port;
+
+    //get protocol name
+    if(getDeviceProtocol(deviceName,protocol) != 0)
+        return 1;
+
+    //get port
+    if(getDeviceIntegerParameter(deviceName,protocol,"port",port) != 0)
+        return 1;
+
+    //get ip
+    if(getDeviceStringParameter(deviceName,protocol,"ip",localHost) != 0)
+        return 1;
+
+    addNetworkDevice(newName,protocol,localHost,port);
+    removeNetworkDevice(deviceName);
+
+    return 0;
+}
+
+bool
+Engine::setDevicePort(string deviceName, int destinationPort, int receptionPort)
+{
+    TTValue         v, portValue;
+    TTSymbol        applicationName(deviceName);
+    TTHashPtr       hashParameters;
+    TTErr           err;
+    std::string     protocol;
+
+    v = TTSymbol(applicationName);
+
+    if (getDeviceProtocol(deviceName,protocol) != 0)
+        return 1;
+
+    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
+
+    if (!err) {
+        
+        // stop the protocol
+        getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Stop"));
+        
+        hashParameters = TTHashPtr((TTPtr)v[0]);
+
+        hashParameters->remove(TTSymbol("port"));
+        
+        portValue = destinationPort;
+        if (receptionPort != 0)
+            portValue.append(receptionPort);
+        
+        hashParameters->append(TTSymbol("port"), portValue);
+
+        v = TTSymbol(applicationName);
+        v.append((TTPtr)hashParameters);
+        getProtocol(TTSymbol(protocol))->setAttributeValue(TTSymbol("applicationParameters"), v);
+        
+        // run the protocol
+        getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Run"));
+
+        return 0;
+    }
+
+    return 1;
+}
+
+bool
+Engine::setDeviceLocalHost(string deviceName, string localHost)
+{
+    TTValue         v;
+    TTSymbol        applicationName(deviceName);
+    TTHashPtr       hashParameters;
+    TTErr           err;
+    std::string     protocol;
+
+    v = TTSymbol(applicationName);
+
+    if(getDeviceProtocol(deviceName,protocol) != 0)
+        return 1;
+
+    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
+
+    if (!err) {
+        
+        // stop the protocol
+        getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Stop"));
+        
+        hashParameters = TTHashPtr((TTPtr)v[0]);
+
+        hashParameters->remove(TTSymbol("ip"));
+        hashParameters->append(TTSymbol("ip"), TTSymbol(localHost));
+
+        v = TTSymbol(applicationName);
+        v.append((TTPtr)hashParameters);
+        getProtocol(TTSymbol(protocol))->setAttributeValue(TTSymbol("applicationParameters"), v);
+        
+        // run the protocol
+        getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Run"));
+
+        return 0;
+    }
+
+    return 1;
+}
+
+bool
+Engine::setDeviceProtocol(string deviceName, string protocol)
+{
+    string              oldProtocol,
+                        localHost;
+    unsigned int        port;
+
+    //get protocol name
+    if(getDeviceProtocol(deviceName,oldProtocol) != 0)
+        return 1;
+
+    //get ip
+    if(getDeviceStringParameter(deviceName,oldProtocol,"ip",localHost) != 0)
+        return 1;
+
+    //get port
+    if(getDeviceIntegerParameter(deviceName,oldProtocol,"port",port) != 0)
+        return 1;
+
+    removeNetworkDevice(deviceName);
+    addNetworkDevice(deviceName,protocol,localHost,port);    
+
+    return 0;
 }
 
 int Engine::requestNetworkNamespace(const std::string & address, std::string & nodeType, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)

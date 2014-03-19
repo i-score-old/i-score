@@ -134,6 +134,8 @@ class Engine
     
 private:
     
+    TTString            iscore;                                         /// application name
+    
     TTTimeProcessPtr    m_mainScenario;                                 /// The top scenario
     TTTimeEventPtr      m_mainStartEvent;                               /// The top scenario start event
     TTTimeEventPtr      m_mainEndEvent;                                 /// The top scenario end event
@@ -168,6 +170,15 @@ private:
 
 public:
 
+    // to receive Minuit messages : used to receive query or answers from any other applications
+    const int MINUIT_INPUT_PORT = 13579;
+    
+    // to receive OSC messages : used to control i-score
+    const int OSC_INPUT_PORT = 13580;
+    
+    // to emit OSC messages : used by i-score to send feedbacks or notifications
+    const int OSC_OUTPUT_PORT = 13581;
+
     Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
            void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
            void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
@@ -175,6 +186,9 @@ public:
     
     void initModular(const char* pathToTheJamomaFolder = NULL);
     void initScore();
+    
+    void registerIscoreTransportData();
+    void registerIscoreToProtocols();
     
     void dumpAddressBelow(TTNodePtr aNode);
     
@@ -893,7 +907,7 @@ public:
 	 * \param deviceIp : the ip of the network device.
 	 * \param devicePort : the port of the network device.
 	 */
-	void addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & deviceIp, const std::string & devicePort);
+    void addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & deviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort = 0);
     
 	/*!
 	 * Removes a network device.
@@ -1013,6 +1027,14 @@ public:
      * \param address : the object's address
      */
     void refreshNetworkNamespace(const std::string& application, const std::string& address = "/");
+    
+    /*!
+     * Load a namespace from a namespace file
+     *
+     * \param application : the application to setup
+     * \param filepath : the path to a namespace file
+     */
+    bool loadNetworkNamespace(const std::string &application, const std::string &filepath);
 
     /*!
      * Gets an integer parameter associated to the protocol and the device.
@@ -1025,6 +1047,7 @@ public:
      */
     bool getDeviceIntegerParameter(const std::string device, const std::string protocol, const std::string parameter, unsigned int &integer);
 
+    bool getDeviceIntegerVectorParameter(const std::string device, const std::string protocol, const std::string parameter, std::vector<int> &integerVect);
     /*!
      * Gets a string parameter associated to the protocol and the device.
      *
@@ -1035,6 +1058,52 @@ public:
      * \return 0 if no error, else 1.
      */
     bool getDeviceStringParameter(const std::string device, const std::string protocol, const std::string parameter, std::string &string);
+
+    /*!
+     * Gets the protocol name associated to the device.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param protocol : the protocol name returned. ex: Minuit
+     * \return 0 if no error, else 1.
+     */
+    bool getDeviceProtocol(std::string deviceName, std::string &protocol);
+
+    /*!
+     * Sets the device's name.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param newName : the newName. ex: MyMinuit
+     * \return 0 if no error, else 1.
+     */
+    bool setDeviceName(std::string deviceName, std::string newName);
+
+    /*!
+     * Sets the device's port.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param destinationPort : the port value. ex: 8002
+     * \param receptionPort : the port value. ex: 8002 (useful for OSC plugin)
+     * \return 0 if no error, else 1.
+     */
+    bool setDevicePort(std::string deviceName, int destinationPort, int receptionPort = 0);
+
+    /*!
+     * Sets the device's local host.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param port : the local host value. ex: 192.168.1.1
+     * \return 0 if no error, else 1.
+     */
+    bool setDeviceLocalHost(std::string deviceName, std::string localHost);
+
+    /*!
+     * Sets the device's protocol. (considering a device has only one)
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param port : the protocol name. ex: OSC
+     * \return 0 if no error, else 1.
+     */
+    bool setDeviceProtocol(std::string deviceName, std::string protocol);
 
 	//Store and load ////////////////////////////////////////////////////////////////////////////////////
     

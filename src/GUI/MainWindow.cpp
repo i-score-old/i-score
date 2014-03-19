@@ -1,15 +1,16 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ *iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -125,11 +126,15 @@ MainWindow::MainWindow()
   createActions();
   createMenus();
   createStatusBar();
+  setStyleSheet(" QStatusBar {"
+                "color: lightgray;"
+                "}"
+               );
 
   setCurrentFile("");
   setAcceptDrops(false);
 
-  connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, std::string)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, std::string)));  
+  connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, unsigned int)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, unsigned int)));
   connect(_view->verticalScrollBar(), SIGNAL(valueChanged(int)), _scene, SLOT(verticalScroll(int)));  //TimeBar is painted on MaquetteScene, so a vertical scroll has to move the timeBar.
   connect(_scene, SIGNAL(stopPlaying()), _headerPanelWidget, SLOT(stop()));
   connect(_view, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
@@ -164,17 +169,13 @@ MainWindow::~MainWindow()
 
     delete _zoomInAct;
     delete _zoomOutAct;
-    delete _networkAct;
     delete _editorAct;
 
     delete _cutAct;
     delete _copyAct;
     delete _pasteAct;
     delete _selectAllAct;
-    delete _modeAct;
-    delete _selectModeAct;
-    delete _PBModeAct;
-    delete _commentModeAct;
+//    delete _commentModeAct;
 
     delete _helpDialog;
     delete _networkConfig;
@@ -302,8 +303,12 @@ MainWindow::open()
             break;
         }
     }
-  QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("XML Files (*.score)"));
+
+  QString fileName = QFileDialog::
+          getOpenFileName(this, tr("Open File"), "", tr("XML Files (*.score)"));
+
   if (!fileName.isEmpty()) {
+      QCoreApplication::processEvents();
       loadFile(fileName);
     }
 }
@@ -513,19 +518,19 @@ MainWindow::createActions()
   _quitAct->setStatusTip(tr("Quit the application"));
   connect(_quitAct, SIGNAL(triggered()), this, SLOT(close()));
 
-  _aboutAct = new QAction(QIcon(":/images/about.svg"), tr("&About"), this);
+  _aboutAct = new QAction(QIcon(":/resources/images/about.svg"), tr("&About"), this);
   _aboutAct->setShortcut(QKeySequence::WhatsThis);
   _aboutAct->setStatusTip(tr("Show the application's About box"));
   connect(_aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
   _helpDialog = new Help(this);
 
-  _helpAct = new QAction(QIcon(":/images/help.svg"), tr("&Help"), this);
+  _helpAct = new QAction(QIcon(":/resources/images/help.svg"), tr("&Help"), this);
   _helpAct->setShortcut(QKeySequence::HelpContents);
   _helpAct->setStatusTip(tr("Show the application's Help"));
   connect(_helpAct, SIGNAL(triggered()), this, SLOT(help()));
 
-  _networkAct = new QAction(QIcon(":/images/network.svg"), tr("&Network"), this);
+  _networkAct = new QAction(QIcon(":/resources/images/network.svg"), tr("&Network"), this);
   _networkAct->setStatusTip(tr("Configure network preferences"));
   connect(_networkAct, SIGNAL(triggered()), this, SLOT(networkConfig()));
 
@@ -539,9 +544,9 @@ MainWindow::createActions()
   _zoomOutAct->setStatusTip(tr("Zoom out"));
   connect(_zoomOutAct, SIGNAL(triggered()), _view, SLOT(zoomOut()));
 
-  _editorAct = new QAction(QIcon(":/images/edit.svg"), tr("Edit attributes"), this);
-  _editorAct->setShortcut(QString("Ctrl+E"));
-  _editorAct->setStatusTip(tr("Edit box attributes"));
+  _editorAct = new QAction(QIcon(":/resources/images/edit.svg"), tr("Devices Inspector"), this);
+  _editorAct->setShortcut(QString("Ctrl+I"));
+  _editorAct->setStatusTip(tr("Devices Inspector"));
   _editorAct->setCheckable(true);
   _editorAct->setChecked(true);
   connect(_editorAct, SIGNAL(triggered()), this, SLOT(updateEditor()));
@@ -565,21 +570,21 @@ MainWindow::createActions()
   _selectAllAct->setStatusTip(tr("Select every item"));
   connect(_selectAllAct, SIGNAL(triggered()), this, SLOT(selectAll()));
 
-  _selectModeAct = new QAction(QIcon(":/images/select.svg"), tr("Select"), this);
+  _selectModeAct = new QAction(QIcon(":/resources/images/select.svg"), tr("Select"), this);
   _selectModeAct->setStatusTip(tr("Switch mode to selection"));
   _selectModeAct->setShortcut(QString("Ctrl+Shift+E"));
   _selectModeAct->setCheckable(true);
   _selectModeAct->setChecked(false);
   connect(_selectModeAct, SIGNAL(triggered()), this, SLOT(selectMode()));
 
-  _PBModeAct = new QAction(QIcon(":/images/parentBox.svg"), tr("Box"), this);
+  _PBModeAct = new QAction(QIcon(":/resources/images/parentBox.svg"), tr("Box"), this);
   _PBModeAct->setStatusTip(tr("Switch mode to Parent Box creation"));
   _PBModeAct->setShortcut(QString("Ctrl+Shift+P"));
   _PBModeAct->setCheckable(true);
   _PBModeAct->setChecked(true);
   connect(_PBModeAct, SIGNAL(triggered()), this, SLOT(selectMode()));
 
-  _commentModeAct = new QAction(QIcon(":/images/comment.svg"), tr("Comment"), this);
+  _commentModeAct = new QAction(QIcon(":/resources/images/comment.svg"), tr("Comment"), this);
   _commentModeAct->setStatusTip(tr("Adds a Comment"));
   _commentModeAct->setShortcut(QString("Ctrl+Shift+T"));
   _commentModeAct->setCheckable(true);
@@ -615,11 +620,7 @@ MainWindow::createMenus()
   _editMenu->addAction(_copyAct);
   _editMenu->addAction(_cutAct);
   _editMenu->addAction(_pasteAct);
-  _editMenu->addSeparator();
-  _editMenu->addAction(_networkAct);
-  _editMenu->addAction(_selectModeAct);
-  _editMenu->addAction(_PBModeAct);
-  _editMenu->addAction(_commentModeAct);
+//  _editMenu->addAction(_commentModeAct);
   _editMenu->addSeparator();
   _editMenu->addAction(_selectAllAct);
 
@@ -759,7 +760,7 @@ MainWindow::strippedName(const QString &fullFileName)
 }
 
 void
-MainWindow::changeNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, std::string port)
+MainWindow::changeNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, unsigned int port)
 {
   _networkConfig->setNetworkConfig(deviceName, pluginName, IP, port);
 }

@@ -1,15 +1,16 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -295,6 +296,8 @@ Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const s
       _engines->setBoxVerticalPosition(newBoxID, firstCorner.y());
       _engines->setBoxVerticalSize(newBoxID, secondCorner.y() - firstCorner.y());
 
+      setBoxColor(newBoxID,newBox->color());
+
       _boxes[newBoxID] = newBox;
       _parentBoxes[newBoxID] = newBox;
       newBox->setID(newBoxID);
@@ -338,22 +341,13 @@ Maquette::refreshNetworkNamespace(const std::string &application){
 }
 
 void
-Maquette::changeNetworkDevice(const string &deviceName, const string &pluginName, const string &IP, const string &port)
+Maquette::changeNetworkDevice(const string &deviceName, const string &pluginName, const string &IP, const unsigned int &port)
 {
   if (_devices.find(deviceName) != _devices.end()) {
       removeNetworkDevice(deviceName);
     }
 
   addNetworkDevice(deviceName, pluginName, IP, port);
-
-  std::istringstream iss(port);
-  unsigned int portInt;
-  iss >> portInt;
-
-//    MyDevice newDevice(deviceName,pluginName,portInt,IP);
-//    _devices[deviceName] = newDevice;
-
-//    _engines->addNetworkDevice(deviceName,pluginName,IP,port);
   _currentDevice = deviceName;
 }
 
@@ -1080,9 +1074,16 @@ Maquette::getCurveAttributes(unsigned int boxID, const std::string &address, uns
           interpolate = !_engines->getCurveMuteState(boxID, address);
           return true;
         }
+      return true;
     }
 
   return false;
+}
+
+bool
+Maquette::getCurveValues(unsigned int boxID, const std::string &address, unsigned int argPosition, std::vector<float> &values)
+{
+    return _engines->getCurveValues(boxID,address,argPosition,values);
 }
 
 void
@@ -1319,6 +1320,7 @@ Maquette::generateTriggerQueue()
 void
 Maquette::initSceneState()
 {
+    std::cout<<">>>InitSceneState<<<"<<std::endl;
   //Pour palier au bug du moteur (qui envoie tous les messages début et fin de toutes les boîtes < time offset)
 
   double timeOffset = (double)_engines->getTimeOffset();
@@ -1474,7 +1476,8 @@ void
 Maquette::stopPlayingAndGoToTimeOffset(unsigned int timeOffset)
 {
   turnExecutionOff();    
-  setTimeOffset(timeOffset);
+  setTimeOffset(timeOffset,YES);
+  initSceneState();
 }
 
 void
@@ -1484,7 +1487,7 @@ Maquette::stopPlayingAndGoToCurrentTime()
     
     turnExecutionOff();
     
-    setTimeOffset(timeOffset);
+    setTimeOffset(timeOffset,YES);
 }
 
 void
@@ -1842,15 +1845,11 @@ Maquette::load(const string &fileName)
 }
 
 void
-Maquette::addNetworkDevice(string deviceName, string plugin, string ip, string port)
+Maquette::addNetworkDevice(string deviceName, string plugin, string ip, unsigned int destinationPort, unsigned int receptionPort)
 {
-  std::istringstream iss(port);
-  unsigned int portInt;
-  iss >> portInt;
-
-  MyDevice newDevice(deviceName, plugin, portInt, ip);
+  MyDevice newDevice(deviceName, plugin, destinationPort, ip);
   _devices[deviceName] = newDevice;
-  _engines->addNetworkDevice(deviceName, plugin, ip, port);
+  _engines->addNetworkDevice(deviceName, plugin, ip, destinationPort, receptionPort);
 }
 
 double
@@ -2059,4 +2058,108 @@ Maquette::setCurveRecording(unsigned int boxID, const string address, bool activ
         _recordingBoxes<<getBox(boxID);
     else
         _recordingBoxes.removeAll(getBox(boxID));
+}
+
+bool
+Maquette::getDeviceLocalHost(std::string deviceName, std::string protocol, string &localHost)
+{
+    if(_engines->getDeviceStringParameter(deviceName,protocol,"ip",localHost) == 0)
+        return 0;
+    else{
+        std::cerr << "Maquette::getLocalHost : cannot find for device : "<<deviceName << std::endl;
+        return 1;
+    }
+}
+
+bool
+Maquette::getDeviceLocalHost(std::string deviceName, std::string &localHost)
+{
+    std::string protocol;
+    if(getDeviceProtocol(deviceName, protocol) == 0){
+        return getDeviceLocalHost(deviceName,protocol,localHost);
+
+    }
+}
+
+bool
+Maquette::getDevicePort(std::string deviceName, std::string protocol, unsigned int &port){
+
+    if(_engines->getDeviceIntegerParameter(deviceName,protocol,"port",port) == 0)
+        return 0;
+    else{
+        std::cerr << "Maquette::getPort : cannot find port for the device : "<<deviceName << std::endl;
+        return 1;
+    }
+}
+
+bool
+Maquette::getDevicePorts(std::string deviceName, std::string protocol, vector<int> &portVector){
+
+    if(_engines->getDeviceIntegerVectorParameter(deviceName,protocol,"port",portVector) == 0)
+        return 0;
+    else{
+        std::cerr << "Maquette::getDevicePorts : cannot find ports for the device : "<<deviceName << std::endl;
+        return 1;
+    }
+}
+
+bool
+Maquette::getDevicePort(std::string deviceName, unsigned int &port)
+{
+    string protocol;
+    if (_engines->getDeviceProtocol(deviceName,protocol) == 0)
+        return getDevicePort(deviceName,protocol,port);
+}
+
+int
+Maquette::getOSCInputPort(){
+    return _engines->OSC_INPUT_PORT;
+}
+
+int
+Maquette::getMinuitInputPort(){
+    return _engines->MINUIT_INPUT_PORT;
+}
+
+bool
+Maquette::getDeviceProtocol(std::string deviceName, std::string &protocol){
+
+    if (_engines->getDeviceProtocol(deviceName,protocol) == 0)
+        return 0;
+    else{
+        std::cerr << "Maquette::getProtocol : cannot find protocol name for the device : "<<deviceName << std::endl;
+        return 1;
+    }
+}
+
+std::vector<std::string>
+Maquette::getProtocolsName(){
+    std::vector<std::string> protocols;
+    _engines->getProtocolNames(protocols);
+    return protocols;
+}
+
+bool
+Maquette::setDeviceName(std::string device, std::string newName){
+    return _engines->setDeviceName(device, newName);
+}
+
+bool
+Maquette::setDevicePort(std::string device, int destinationPort, int receptionPort){
+    return _engines->setDevicePort(device, destinationPort, receptionPort);
+}
+
+bool
+Maquette::setDeviceLocalHost(std::string device, std::string localHost){
+    return _engines->setDeviceLocalHost(device, localHost);
+}
+
+bool
+Maquette::setDeviceProtocol(std::string device, std::string protocol){
+    return _engines->setDeviceProtocol(device, protocol);
+}
+
+bool
+Maquette::loadNetworkNamespace(const string &application, const string &filepath){
+    return _engines->loadNetworkNamespace(application,filepath);
 }

@@ -1,15 +1,16 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ *iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -199,14 +200,14 @@ MaquetteScene::getNetworkDevices()
 }
 
 void
-MaquetteScene::changeNetworkDevice(std::string deviceName, std::string pluginName, std::string IP, std::string port)
+MaquetteScene::changeNetworkDevice(std::string deviceName, std::string pluginName, std::string IP, unsigned int port)
 {
   _maquette->changeNetworkDevice(deviceName, pluginName, IP, port);
   setModified(true);
 }
 
 void
-MaquetteScene::setNetworDeviceConfig(string deviceName, string pluginName, string IP, string port)
+MaquetteScene::setNetworDeviceConfig(string deviceName, string pluginName, string IP, unsigned int port)
 {
   emit(networkConfigChanged(deviceName, pluginName, IP, port));
 }
@@ -467,7 +468,8 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
   QGraphicsScene::mousePressEvent(mouseEvent);
   _clicked = true;
  
-
+  if (paused())
+      stopAndGoToCurrentTime();
 
   if (_tempBox) {
       removeItem(_tempBox);
@@ -538,14 +540,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
       case BOX_EDIT_MODE:
         break;
-    }
-
-  if (paused())
-      stopOrPause();
-//      stopAndGoToCurrentTime();
-
-
-  /// \todo Remettre le stopAndGoToCurrentTime, mais cela ne doit pas renvoyer tout la cue. Modifier setTimeOffset pour ne pas envoyer de dump. NH
+    } 
 }
 
 void

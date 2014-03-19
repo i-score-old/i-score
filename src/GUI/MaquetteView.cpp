@@ -1,15 +1,16 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ *iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -57,18 +58,34 @@
 #include <QPushButton>
 
 static const int SCROLL_BAR_INCREMENT = 1000 / MaquetteScene::MS_PER_PIXEL;
+const QColor MaquetteView::BACKGROUND_COLOR = QColor(60, 60, 60);
 
 MaquetteView::MaquetteView(MainWindow *mw)
   : QGraphicsView(mw)
 {
   _mainWindow = mw;
+
   setRenderHint(QPainter::Antialiasing);
+  setBackgroundBrush(QColor(BACKGROUND_COLOR));
   setOptimizationFlags(QGraphicsView::DontSavePainterState);
   setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
   setTransformationAnchor(QGraphicsView::NoAnchor);
   setCacheMode(QGraphicsView::CacheBackground);
 
-  setBackgroundBrush(QColor(160, 160, 160));  
+  setBackgroundBrush(QColor(90, 90, 90));
+
+  setStyleSheet(
+                "QScrollBar {"
+                "color: lightgray;"
+                            "}"
+              "QGraphicsView{"
+              "border: none;"
+              "}"
+                );
+/*              including the next line brings an ugly Windows-looking scroll bar
+                  "background-color: darkgray;"
+*/
+
 
   setWindowTitle(tr("Maquette"));
 
@@ -139,16 +156,19 @@ MaquetteView::updateScene()
 void
 MaquetteView::drawStartIndicator(QPainter *painter)
 {
+  QPen pen(BACKGROUND_COLOR);
+  //was QPen pen(QColor(145, 145, 145));
     AbstractBox *scenarioAbstract = static_cast<AbstractBox *>(Maquette::getInstance()->getBox(ROOT_BOX_ID)->abstract());
 
     if(scenarioAbstract->hasFirstMsgs()){
+        painter->setPen(pen);
         painter->save();
         painter->setOpacity(_scenarioSelected ? 1 : 0.6);
         QRectF gradientRect(0,0,GRADIENT_WIDTH,MaquetteScene::MAX_SCENE_HEIGHT);
         QLinearGradient lgradient(gradientRect.topLeft(),gradientRect.topRight());
 
         /// \todo : lgradient.setColorAt(0,scenarioAbstract->color()); (rootBox color white for the moment)
-        lgradient.setColorAt(0,Qt::white);
+        lgradient.setColorAt(0, Qt::black);
         lgradient.setColorAt(1, Qt::transparent);
 
         painter->fillRect(gradientRect, lgradient);
