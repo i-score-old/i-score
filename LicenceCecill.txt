@@ -1,9 +1,9 @@
 /*
-Copyright: LaBRI / SCRIME
+Copyright: LaBRI / SCRIME / L'Arboretum
 
-Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
 
-luc.vercellin@labri.fr
+iscore.contact@gmail.com
 
 This software is a computer program whose purpose is to provide
 notation/composition combining synthesized as well as recorded 
