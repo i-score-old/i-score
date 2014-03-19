@@ -1,25 +1,36 @@
 ==  INSTALLATION INSTRUCTIONS  ==
 
-In order to have documentation of the sources you have to install Doxygen (www.doxygen.org),
-and the Graphviz package to generate graph with Doxygen (www.graphviz.org).
-To generate documentation,
-load ./doxygen/Doxyfile with Doxygen and run it.
     
-	==<[ MacOS (10.4+/10.9) ]>==
+   ==<[ MacOS (10.4+/10.9) ]>==
 
        . Download and install libraries from :
-             Qt (LGPL) : http://qt-project.org/downloads
+              Qt (LGPL) : http://qt-project.org/downloads
        	      Gecode 3.2.0 : http://www.gecode.org/download/Gecode-3.2.0.dmg
 	      LibXml2 : http://www.explain.com.au/download/combo-2007-10-07.dmg.gz -> copy libxml.framework to /Library/Frameworks
 
        . Get git repositories by downloading (or cloning) :
        	      Score : https://github.com/OSSIA/Score
 
-       . Build Score, following the README associated.
+       . Build Score, following the setps in the README.
 
-       . Go into i-score folder with your terminal.
+       . cd into i-score folder with your terminal.
   
-       . Compile running the script : ./build.sh
+       . Compile by running the script : ./build.sh
+       
+       
+       
+   ==<[ Linux ]>==
 
 
+
+
+
+
+
+   ==<[ Doxygen Documentation ]>==
+	
   
+In order to have documentation of the sources you have to install Doxygen (www.doxygen.org),
+and the Graphviz package to generate graph with Doxygen (www.graphviz.org).
+To generate documentation,
+load ./doxygen/Doxyfile with Doxygen and run it.
