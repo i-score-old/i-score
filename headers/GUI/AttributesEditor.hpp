@@ -44,7 +44,7 @@
 /*!
  * \file AttributesEditor.hpp
  * \author Luc Vercellin
- * \date 30 september 2009
+ * \date March 14th 2014
  */
 
 #include <QDockWidget>

@@ -43,8 +43,8 @@
 
 /*!
  * \file Maquette.h
- * \author Luc Vercellin, Bruno Valeze
- * \date 30 september 2009
+ * \author Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine 
+ * \date March 14th 2014
  */
 
 #include <QObject>

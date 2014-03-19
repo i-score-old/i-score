@@ -45,7 +45,7 @@
 /*!
  * \file ViewRelations.h
  *
- * \author Luc Vercellin, Bruno Valeze
+ * \author Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine 
  */
 #include <QDialog>
 #include <QListWidget>
