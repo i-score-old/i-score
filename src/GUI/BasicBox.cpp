@@ -684,7 +684,7 @@ BasicBox::resizeWidthEdition(float width)
 
 void
 BasicBox::resizeHeightEdition(float height)
-{
+{    
   _abstract->setHeight(height); 
   centerWidget();
 }
@@ -1487,7 +1487,7 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             break;
 
           case VERTICAL_RESIZE:
-            resizeHeightEdition(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y());
+          resizeHeightEdition(std::max(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y() , (double)BOX_MARGIN));
             break;
 
           case DIAGONAL_RESIZE:          
