@@ -320,6 +320,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
           vector<short> sectionType;
 
           bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID, address, 0, sampleRate, redundancy, interpolate, values, argTypes, xPercents, yValues, sectionType, coeff);
+          bool getCurveValuesSuccess = Maquette::getInstance()->getCurveValues(_boxID, address, 0, yValues);
 
           //--- PRINT ---
 //            std::cout<<"values : "<<std::endl;
@@ -329,7 +330,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
 //            std::cout<<std::endl;
           //-------------
 
-          if (getCurveSuccess) {
+          if (getCurveSuccess || getCurveValuesSuccess) {
               /********** Abstract Curve found ***********/
               if (abCurve != NULL) {
                   if (curveFound) {
@@ -378,6 +379,9 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
               /******* Abstract Curve not found ********/
               else {
                   bool show = true;
+
+                  if(getCurveValuesSuccess)
+                      interpolate = true;
 
 //                    interpolate = !Maquette::getInstance()->getCurveMuteState(_boxID,address);
 //                    if (xPercents.empty() && yValues.empty() && values.size() >= 2) {

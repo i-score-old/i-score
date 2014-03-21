@@ -1073,8 +1073,7 @@ Maquette::getCurveAttributes(unsigned int boxID, const std::string &address, uns
           redundancy = _engines->getCurveRedundancy(boxID, address);
           interpolate = !_engines->getCurveMuteState(boxID, address);
           return true;
-        }
-      return true;
+        }     
     }
 
   return false;
