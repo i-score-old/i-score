@@ -6,16 +6,18 @@ QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
 QMAKE_CXXFLAGS += -O0 -fPIC -msse3
 
 # This variable specifies the #include directories which should be searched when compiling the project.
-INCLUDEPATH += headers/GUI headers/data /usr/local/include/IScore /usr/include/libxml2 \
-		/home/doom/stage/soft/Jamoma/Core/Score/library/tests/ \
-		/home/doom/stage/soft/Jamoma/Core/Modular/library/PeerObject \
-		/home/doom/stage/soft/Jamoma/Core/Modular/library/ProtocolLib \
-		/home/doom/stage/soft/Jamoma/Core/Modular/library/SchedulerLib \
-		/home/doom/stage/soft/Jamoma/Core/DSP/library/includes \
-		/home/doom/stage/soft/Jamoma/Core/Modular/library/includes \
-		/home/doom/stage/soft/Jamoma/Core/Score/library/includes \
-		/home/doom/stage/soft/Jamoma/Core/Foundation/library/includes
+INCLUDEPATH += headers/GUI headers/data /usr/local/include/IScore /usr/include/libxml2
 
+linux {
+INCLUDEPATH +=	$$(JAMOMA_INCLUDE_PATH)/Score/library/tests/ \
+		$$(JAMOMA_INCLUDE_PATH)/Modular/library/PeerObject \
+		$$(JAMOMA_INCLUDE_PATH)/Modular/library/ProtocolLib \
+		$$(JAMOMA_INCLUDE_PATH)/Modular/library/SchedulerLib \
+		$$(JAMOMA_INCLUDE_PATH)/DSP/library/includes \
+		$$(JAMOMA_INCLUDE_PATH)/Modular/library/includes \
+		$$(JAMOMA_INCLUDE_PATH)/Score/library/includes \
+		$$(JAMOMA_INCLUDE_PATH)/Foundation/library/includes
+}
 # This variable contains a general set of flags that are passed to the linker.
 QMAKE_LFLAGS += -L/usr/local/lib/
 
@@ -50,6 +52,7 @@ QMAKE_CXX = /usr/bin/g++
 }
 linux-clang {
     QMAKE_CXXFLAGS += -Wno-unused-parameter
+    LIBS += -L/usr/local/lib/jamoma/lib
     LIBS += -lJamomaFoundation -lJamomaDSP -lJamomaScore -lJamomaModular  -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodeset -lgecodesupport
 }
 macx-g++ {
