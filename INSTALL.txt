@@ -20,7 +20,24 @@
        
        
    ==<[ Linux ]>==
+   
+        These explanations are for Debian and Debian-related (Mint, Ubuntu...) distributions.
+        
+        . Download and install the latest Qt from http://qt-project.org/downloads
+        
+        . Install other libraries and required tools from a package manager : 
+        	# apt-get install libgecode-dev libxml2-dev libsndfile-dev libportaudio-dev libportmidi-dev ruby git clang3.4
+        	
+        . Build JamomaCore : https://github.com/jamoma/JamomaCore on the feature/linux branch
+        	% git clone https://github.com/jamoma/JamomaCore
+        	% git checkout feature/linux
+        	% ruby build.rb Development clean
+        	
+        	Jamoma shared libraries are installed in /usr/local/lib/jamoma/, so the root password will be asked.
+        	
+        . Build Score : https://github.com/OSSIA/Score on branch feature/linux, by following the same steps than for Jamoma.
 
+       [TBC]
 
 
 
