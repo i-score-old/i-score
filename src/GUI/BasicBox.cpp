@@ -301,6 +301,9 @@ BasicBox::createWidget()
               "color: black;"
               "text-align: right;"
               "}"
+              "QComboBox QAbstractItemView{"
+              "background: gray;"
+              "}"
               );
 
   _comboBoxProxy = new QGraphicsProxyWidget(this);

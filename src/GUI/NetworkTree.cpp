@@ -2039,23 +2039,32 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
               vector<short> sectionType;
 
               bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID, address, 0, sampleRate, redundancy, interpolate, values, argTypes, xPercents, yValues, sectionType, coeff);
-              if (getCurveSuccess) {
-                  if (forceUpdate) {
-                      if (interpolate) {
-                          interpolate = !(values.front() == values.back());
-                          Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
+              bool getCurveValuesSuccess = Maquette::getInstance()->getCurveValues(boxID, address, 0, yValues);
+
+              if (getCurveSuccess || getCurveValuesSuccess) {
+                  if(getCurveSuccess){
+                      if (forceUpdate) {
                           if (interpolate) {
-//                                std::cout<<"networkTree -> interpolate devient true"<<std::endl;
-                            }
-                          else {
-                              ;
-                            }
-//                                std::cout<<"networkTree -> interpolate devient false"<<std::endl;
-                        }
-                    }
+                              interpolate = !(values.front() == values.back());
+                              Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
+                              if (interpolate) {
+                                  //                                std::cout<<"networkTree -> interpolate devient true"<<std::endl;
+                              }
+                              else {
+                                  ;
+                              }
+                              //                                std::cout<<"networkTree -> interpolate devient false"<<std::endl;
+                          }
+                      }
+                  }
+
+                  else if (getCurveValuesSuccess){
+                      interpolate = true;
+                  }
+
                   updateLine(item, interpolate, sampleRate, redundancy);
-                }
-            }
+              }
+          }
         }
     }
   else { // Box Not Found
