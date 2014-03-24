@@ -121,7 +121,8 @@ headers/GUI/BoxWidget.hpp \
 headers/GUI/BoxCurveEdit.hpp \
 headers/GUI/TimeBarWidget.hpp \
 headers/GUI/DeviceEdit.hpp \
-headers/GUI/HeaderPanelWidget.hpp
+headers/GUI/HeaderPanelWidget.hpp \
+headers/GUI/ConditionalRelation.hpp
 
 SOURCES += src/main.cpp \
 src/data/Abstract.cpp \
@@ -164,4 +165,5 @@ src/GUI/BoxWidget.cpp \
 src/GUI/BoxCurveEdit.cpp \
 src/GUI/TimeBarWidget.cpp \
 src/GUI/DeviceEdit.cpp \
-src/GUI/HeaderPanelWidget.cpp
+src/GUI/HeaderPanelWidget.cpp \
+src/GUI/ConditionalRelation.cpp
