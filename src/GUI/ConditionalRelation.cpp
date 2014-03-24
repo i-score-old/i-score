@@ -57,12 +57,59 @@ ConditionalRelation::updateCoordinates()
 }
 
 void
-ConditionalRelation::attachBox(QList<BasicBox *> conditionedBox){
+ConditionalRelation::attachBoxes(QList<BasicBox *> conditionedBox)
+{
+//check if not already attached
+}
+
+void
+ConditionalRelation::detachBoxes(QList<BasicBox *> conditionedBox){
 
 }
 
 void
-ConditionalRelation::detachBox(QList<BasicBox *> conditionedBox){
+ConditionalRelation::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
+{
+}
+
+void
+ConditionalRelation::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
+{
+}
+
+void
+ConditionalRelation::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
+{
+}
+
+void
+ConditionalRelation::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
+{
+}
+
+void
+ConditionalRelation::mousePressEvent(QGraphicsSceneMouseEvent * event)
+{
+}
+
+void
+ConditionalRelation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
+{
+}
+
+void
+ConditionalRelation::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
+{
+}
+
+QRectF
+ConditionalRelation::boundingRect() const
+{
+}
+
+QPainterPath
+ConditionalRelation::shape() const
+{
 
 }
 

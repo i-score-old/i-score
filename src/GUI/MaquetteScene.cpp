@@ -54,6 +54,7 @@
 #include "MaquetteView.hpp"
 #include "MainWindow.hpp"
 #include "Relation.hpp"
+#include "ConditionalRelation.hpp"
 #include "Comment.hpp"
 #include "TriggerPoint.hpp"
 #include "ViewRelations.hpp"
@@ -481,9 +482,12 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
   if (mouseEvent->modifiers() == Qt::ShiftModifier) {
       setCurrentMode(SELECTION_MODE);
     }
+  else if (mouseEvent->modifiers() == Qt::AltModifier) {
+      setCurrentMode(CONDITIONAL_RELATION_MODE);
+  }
   else if (noBoxSelected() || subScenarioMode(mouseEvent)) {
       setCurrentMode(CREATION_MODE);
-    }
+    }  
   else {
       setCurrentMode(SELECTION_MODE);
     }
@@ -503,6 +507,9 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         break;
 
       case SELECTION_MODE:
+        break;
+
+      case CONDITIONAL_RELATION_MODE:
         break;
 
       case TEXT_MODE:
@@ -632,27 +639,38 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
         if (itemAt(mouseEvent->scenePos()) != 0) {
             int type = itemAt(mouseEvent->scenePos())->type();
             if (type == PARENT_BOX_TYPE) {
-                BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
 
+                BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
                 BasicBox *firstBox = getBox(_relation->firstBox());
-                if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE)) {
-                    setRelationSecondBox(secondBox->ID(), BOX_START);
-                    addPendingRelation();
-                    firstBox->setSelected(true);
-                  }
-                else if (mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
-                    setRelationSecondBox(secondBox->ID(), BOX_END);
-                    addPendingRelation();
-                    firstBox->setSelected(true);
-                  }
-                else {
-                    if (selectedItems().empty()) {
-                      }
+
+                if(mouseEvent->modifiers() == Qt::AltModifier){ //case conditional relation
+                    std::cout<<"condition "<<firstBox->ID()<<" & "<<secondBox->ID()<<std::endl;
+                    QList<BasicBox *> boxesToCondition;
+                    boxesToCondition<<firstBox;
+                    boxesToCondition<<secondBox;
+                    conditionBoxes(boxesToCondition);
+                }
+                else{
+
+                    if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE)) {
+                        setRelationSecondBox(secondBox->ID(), BOX_START);
+                        addPendingRelation();
+                        firstBox->setSelected(true);
+                    }
+                    else if (mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
+                        setRelationSecondBox(secondBox->ID(), BOX_END);
+                        addPendingRelation();
+                        firstBox->setSelected(true);
+                    }
                     else {
-                        selectionMoved();
-                      }
-                  }
-              }
+                        if (selectedItems().empty()) {
+                        }
+                        else {
+                            selectionMoved();
+                        }
+                    }
+                }
+            }
             else {
                 _relationBoxFound = false;
                 delete _relation;
@@ -1760,6 +1778,38 @@ MaquetteScene::setMaxSceneWidth(float maxSceneWidth){
 float
 MaquetteScene::getMaxSceneWidth(){
   return _maxSceneWidth;
+}
+
+void
+MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
+{
+    QList<BasicBox *>::iterator it;
+    BasicBox *box;
+    bool conditionalRelationFound = false;
+    ConditionalRelation *condRel;
+
+    for(it = boxesToCondition.begin() ; it!=boxesToCondition.end() ; it++)
+    {
+        box = *it;
+
+        if(!box->hasTriggerPoint(BOX_START)) //Force trigger point creation
+            box->addTriggerPoint(BOX_START);
+
+        if(box->attachedToConditionalRelation()) // Check if a conditional relation is already attached to a box, to create or not a new one.
+        {
+            conditionalRelationFound = true;
+            condRel = box->getConditionalRelations().first();
+        }
+    }
+
+    if(conditionalRelationFound) //just attach boxes to existing relation
+    {
+        condRel->attachBoxes(boxesToCondition);
+    }
+    else //create a new one
+    {
+        condRel = new ConditionalRelation(boxesToCondition, this);
+    }
 }
 
 void

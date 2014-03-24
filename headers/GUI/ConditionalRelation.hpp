@@ -28,14 +28,88 @@ public :
      *
      * \param conditionedBoxes : the boxes to attach.
      */
-    void attachBox(QList<BasicBox *> conditionedBox);
+    void attachBoxes(QList<BasicBox *> conditionedBox);
 
     /*!
      * \brief detach a box or a group of boxes of the conditional relation.
      *
      * \param conditionedBoxes : the boxes to detach.
      */
-    void detachBox(QList<BasicBox *> conditionedBox);
+    void detachBoxes(QList<BasicBox *> conditionedBox);
+
+protected:
+  /*!
+   * \brief This method must be overloaded for QGraphicsItem derived classes.
+   * The center of the bounding rectangle is (0,0)
+   *
+   * \return the bounding rectangle in items coordinates
+   */
+  virtual QRectF boundingRect() const;
+
+  /*!
+   * \brief Redefinition of QGraphicsItem::hoverEnterEvent().
+   * Occurs when the mouse pointer enters in the box's bounding box.
+   *
+   * \param event : the variable containing information about the event
+   */
+  virtual void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
+
+  /*!
+   * \brief Redefinition of QGraphicsItem::hoverMoveEvent().
+   * Occurs when the mouse pointer moves in the box's bounding box.
+   *
+   * \param event : the variable containing information about the event
+   */
+  virtual void hoverMoveEvent(QGraphicsSceneHoverEvent * event);
+
+  /*!
+   * \brief Redefinition of QGraphicsItem::hoverLeaveEvent().
+   * Occurs when the mouse pointer leaves the box's bounding box.
+   *
+   * \param event : the variable containing information about the event
+   */
+  virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent * event);
+
+  /*!
+   * \brief This method is overloaded from QGraphicsItem.
+   * The center of the shape is (0,0)
+   *
+   * \return the shape in items coordinates
+   */
+  virtual QPainterPath shape() const;
+
+  /*!
+   * \brief Redefinition of QGraphicsItem::mousePressEvent().
+   * Occurs when a mouse button is pressed.
+   *
+   * \param event : the variable containing information about the event
+   */
+  virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+
+  /*!
+   * \brief Redefinition of QGraphicsItem::mouseMoveEvent().
+   * Occurs when the mouse moves over the box.
+   *
+   * \param event : the variable containing information about the event
+   */
+  virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+
+  /*!
+   * \brief Redefinition of QGraphicsItem::mouseReleaseEvent().
+   * Occurs when a mouse button is released.
+   *
+   * \param event : the variable containing information about the event
+   */
+  virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
+  /*!
+   * \brief Redefinition of QGraphicsItem mouseDoubleClickEvent method.
+   * Raised when a double click occurs.
+   *
+   * \param event : the information about the event
+   */
+  virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event);
+
     /*!
      * \brief Painting method, redefinition of QGraphicsItem::paint().
      *

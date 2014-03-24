@@ -373,6 +373,7 @@ BasicBox::init()
   _low = false;
   _triggerPoints = new QMap<BoxExtremity, TriggerPoint*>();
   _comment = NULL;
+  _conditioned = false;
 
   _recEffect = new QGraphicsColorizeEffect(this);
   _recEffect->setColor(Qt::red);

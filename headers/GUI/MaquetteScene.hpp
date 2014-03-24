@@ -72,6 +72,7 @@ class SoundBox;
 class BoundingBox;
 class MaquetteContextMenu;
 class Relation;
+class ConditionalRelation;
 class Comment;
 class TriggerPoint;
 class PlayingThread;
@@ -89,7 +90,7 @@ class NetworkTree;
  * \brief Enum handling various user interaction modes.
  */
 typedef enum InteractionMode { SELECTION_MODE = 0, CREATION_MODE = 1,
-                               RELATION_MODE = 3, TEXT_MODE = 5, TRIGGER_MODE = 6, BOX_EDIT_MODE = 7 } InteractionMode;
+                               RELATION_MODE = 3, TEXT_MODE = 5, TRIGGER_MODE = 6, BOX_EDIT_MODE = 7, CONDITIONAL_RELATION_MODE = 8 } InteractionMode;
 
 /*!
  * \brief Enum handling various box creation modes.
@@ -576,6 +577,12 @@ class MaquetteScene : public QGraphicsScene
 
     float getMaxSceneWidth();
     void setMaxSceneWidth(float maxSceneWidth);
+
+    /*!
+     * \brief Attach boxes to a conditional relation.
+     * \param boxesToCondition : the boxes to attach
+     */
+    void conditionBoxes(QList<BasicBox *> boxesToCondition);
 
   protected:
 

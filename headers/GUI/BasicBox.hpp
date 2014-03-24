@@ -74,6 +74,7 @@ class Comment;
 class TriggerPoint;
 class TextEdit;
 class Relation;
+class ConditionalRelation;
 class AbstractCurve;
 class QObject;
 
@@ -722,6 +723,9 @@ class BasicBox : public QObject, public QGraphicsItem
     void select();
     void setRecMode(bool activated);
     inline bool recording(){return _recording;}
+    inline bool attachedToConditionalRelation(){return !_conditionalRelation.isEmpty();}
+    inline QList<ConditionalRelation *> getConditionalRelations(){return _conditionalRelation;}
+
     void updateRecordingCurves();
 
     /*!
@@ -826,7 +830,8 @@ class BasicBox : public QObject, public QGraphicsItem
     Comment *_comment;                                                          //!< The box comment.
     QMap<BoxExtremity, TriggerPoint*> *_triggerPoints;                          //!< The trigger points.
     std::map < BoxExtremity, std::map < unsigned int, Relation* > > _relations; //!< The relations.
-    std::map<std::string, AbstractCurve*> _abstractCurves;                      //!< The Curves
+    QList<ConditionalRelation *> _conditionalRelation;                          //!< The conditional relations attached.
+    std::map<std::string, AbstractCurve*> _abstractCurves;                      //!< The Curves.
     BoxWidget *_boxContentWidget;
 
     QRectF _boxRect;
@@ -861,5 +866,6 @@ class BasicBox : public QObject, public QGraphicsItem
 
     QPushButton *_startMenuButton;
     QPushButton *_endMenuButton;
+
 };
 #endif
