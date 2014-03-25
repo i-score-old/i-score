@@ -90,7 +90,7 @@ class NetworkTree;
  * \brief Enum handling various user interaction modes.
  */
 typedef enum InteractionMode { SELECTION_MODE = 0, CREATION_MODE = 1,
-                               RELATION_MODE = 3, TEXT_MODE = 5, TRIGGER_MODE = 6, BOX_EDIT_MODE = 7, CONDITIONAL_RELATION_MODE = 8 } InteractionMode;
+                               RELATION_MODE = 3, TEXT_MODE = 5, TRIGGER_MODE = 6, BOX_EDIT_MODE = 7 } InteractionMode;
 
 /*!
  * \brief Enum handling various box creation modes.

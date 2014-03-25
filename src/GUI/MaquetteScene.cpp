@@ -482,9 +482,6 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
   if (mouseEvent->modifiers() == Qt::ShiftModifier) {
       setCurrentMode(SELECTION_MODE);
     }
-  else if (mouseEvent->modifiers() == Qt::AltModifier) {
-      setCurrentMode(CONDITIONAL_RELATION_MODE);
-  }
   else if (noBoxSelected() || subScenarioMode(mouseEvent)) {
       setCurrentMode(CREATION_MODE);
     }  
@@ -507,9 +504,6 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         break;
 
       case SELECTION_MODE:
-        break;
-
-      case CONDITIONAL_RELATION_MODE:
         break;
 
       case TEXT_MODE:
