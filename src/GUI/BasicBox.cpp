@@ -50,6 +50,7 @@
 #include "TextEdit.hpp"
 #include "MainWindow.hpp"
 #include "Relation.hpp"
+#include "ConditionalRelation.hpp"
 #include "CurveWidget.hpp"
 #include "BoxCurveEdit.hpp"
 
@@ -768,11 +769,17 @@ BasicBox::updateStuff()
           relIt->second->updateCoordinates();
         }
     }
+
   QList<BoxExtremity> list = _triggerPoints->keys();
   QList<BoxExtremity>::iterator it2;
   for (it2 = list.begin(); it2 != list.end(); it2++) {
       _triggerPoints->value(*it2)->updatePosition();
     }
+
+  QList<ConditionalRelation *>::iterator it3;
+  for(it3 = _conditionalRelation.begin() ; it3 != _conditionalRelation.end() ; it3++)
+      (*it3)->updateCoordinates();
+
   setFlag(QGraphicsItem::ItemIsMovable, true);
 }
 

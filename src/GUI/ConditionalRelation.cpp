@@ -44,6 +44,7 @@
 
 const QColor ConditionalRelation::CONDITIONAL_RELATION_COLOR = QColor(0, 0, 0);
 const QColor ConditionalRelation::CONDITIONAL_RELATION_SELECTED_COLOR = QColor(Qt::blue);
+const float ConditionalRelation::HANDLE_WIDTH = 10.;
 
 ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, MaquetteScene *parent)
     : QGraphicsItem(), _scene(parent), _boxesAttached(boxesAttached)
@@ -51,6 +52,13 @@ ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, Maquet
 //    _id = Maquette::getInstance()->createCondition(boxesAttached);
     _color = CONDITIONAL_RELATION_COLOR;
     _selectedColor = CONDITIONAL_RELATION_SELECTED_COLOR;
+
+    setFlag(QGraphicsItem::ItemIsSelectable, true);
+    setFlag(QGraphicsItem::ItemIsFocusable, true);
+    setFlag(QGraphicsItem::ItemIsMovable, false);
+    setVisible(true);
+    setZValue(1);
+
     updateCoordinates();
 }
 
@@ -62,6 +70,9 @@ ConditionalRelation::updateCoordinates()
     _start = lowestHighestBoxes.first->getLeftGripPoint();
     _end = lowestHighestBoxes.second->getLeftGripPoint();
 
+    std::cout<<"lowest : "<<lowestHighestBoxes.first->ID()<<std::endl;
+    std::cout<<"highest : "<<lowestHighestBoxes.second->ID()<<std::endl;
+    std::cout<<"\n"<<std::endl;
     update();
 }
 
@@ -78,6 +89,7 @@ ConditionalRelation::attachBoxes(QList<BasicBox *> conditionedBox)
             //Maquette::getInstance()->attachToCondition(_id,(*it)->ID());
         }
     }
+    updateCoordinates();
 }
 
 void
@@ -90,30 +102,37 @@ ConditionalRelation::detachBoxes(QList<BasicBox *> conditionedBox)
         _boxesAttached.removeAll(*it);
         //Maquette::getInstance()->detachFromCondition(_id,(*it)->ID());
     }
+    updateCoordinates();
 }
 
 QPair<BasicBox *, BasicBox *>
 ConditionalRelation::getLowestHighestBoxes()
 {
     BasicBox                        *curBox,
-                                    *lowestBox = _boxesAttached.first(),
+                                    *lowestBox  = _boxesAttached.first(),
                                     *highestBox = _boxesAttached.first();
 
     qreal                           curY,
-                                    lowestY = lowestBox->getLeftGripPoint().y(),
-                                    highestY = lowestBox->getLeftGripPoint().y();
+                                    lowestY     = lowestBox->getLeftGripPoint().y(),
+                                    highestY    = lowestBox->getLeftGripPoint().y();
 
-    QList<BasicBox *>::iterator     it = _boxesAttached.begin()++;
+    QList<BasicBox *>::iterator     it;
 
-    for(it ; it!=_boxesAttached.end() ; it++)
+    for(it = _boxesAttached.begin() ; it!=_boxesAttached.end() ; it++)
     {
+
         curBox = *it;
         curY = curBox->getLeftGripPoint().y();
+        std::cout<<"> "<<curBox->ID()<<" "<<curY<<std::endl;
 
-        if(curY < lowestY)
+        if(curY > lowestY){
             lowestBox = curBox;
-        else if(curY > highestY)
+            lowestY = curY;
+        }
+        else if(curY < highestY){
             highestBox = curBox;
+            highestY = curY;
+        }
     }
 
     return qMakePair(lowestBox,highestBox);
@@ -122,48 +141,55 @@ ConditionalRelation::getLowestHighestBoxes()
 void
 ConditionalRelation::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 {
+    QGraphicsItem::hoverEnterEvent(event);
 }
 
 void
 ConditionalRelation::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {
+    QGraphicsItem::hoverMoveEvent(event);
 }
 
 void
 ConditionalRelation::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
 {
+    QGraphicsItem::hoverLeaveEvent(event);
 }
 
 void
 ConditionalRelation::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
 {
+    QGraphicsItem::mouseDoubleClickEvent(event);
 }
 
 void
 ConditionalRelation::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
+    QGraphicsItem::mousePressEvent(event);
 }
 
 void
 ConditionalRelation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 {
+    QGraphicsItem::mouseMoveEvent(event);
 }
 
 void
 ConditionalRelation::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 {
+    QGraphicsItem::mouseReleaseEvent(event);
 }
 
 QRectF
 ConditionalRelation::boundingRect() const
 {
+    QPointF     topLeft = QPointF(_start.x()-HANDLE_WIDTH,_start.y()),
+                bottomRight = QPointF(_end.x()+HANDLE_WIDTH,_end.y());
+
+    return QRectF(topLeft,bottomRight);
 }
 
-QPainterPath
-ConditionalRelation::shape() const
-{
 
-}
 
 void
 ConditionalRelation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -171,10 +197,13 @@ ConditionalRelation::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
+
+    std::cout<<"paint "<<_start.y()<<" to "<<_end.y()<<std::endl;
     QPen dashLinePen = QPen(Qt::DashLine);
     dashLinePen.setColor(isSelected() ? _selectedColor : _color);
     painter->setPen(dashLinePen);
 
     painter->drawLine(_start , _end);
+    painter->drawRect(boundingRect());
 }
 

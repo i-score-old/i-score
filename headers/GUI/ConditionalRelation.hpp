@@ -80,14 +80,6 @@ protected:
   virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent * event);
 
   /*!
-   * \brief This method is overloaded from QGraphicsItem.
-   * The center of the shape is (0,0)
-   *
-   * \return the shape in items coordinates
-   */
-  virtual QPainterPath shape() const;
-
-  /*!
    * \brief Redefinition of QGraphicsItem::mousePressEvent().
    * Occurs when a mouse button is pressed.
    *
@@ -131,6 +123,7 @@ protected:
 
     static const QColor CONDITIONAL_RELATION_COLOR;
     static const QColor CONDITIONAL_RELATION_SELECTED_COLOR;
+    static const float  HANDLE_WIDTH;
 
 private :
 
