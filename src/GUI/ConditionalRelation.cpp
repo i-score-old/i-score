@@ -43,28 +43,80 @@
 #include "ConditionalRelation.hpp"
 
 const QColor ConditionalRelation::CONDITIONAL_RELATION_COLOR = QColor(0, 0, 0);
+const QColor ConditionalRelation::CONDITIONAL_RELATION_SELECTED_COLOR = QColor(Qt::blue);
 
 ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, MaquetteScene *parent)
     : QGraphicsItem(), _scene(parent), _boxesAttached(boxesAttached)
 {
+//    _id = Maquette::getInstance()->createCondition(boxesAttached);
     _color = CONDITIONAL_RELATION_COLOR;
+    _selectedColor = CONDITIONAL_RELATION_SELECTED_COLOR;
+    updateCoordinates();
 }
 
 void
 ConditionalRelation::updateCoordinates()
 {
+    QPair<BasicBox *, BasicBox *> lowestHighestBoxes = getLowestHighestBoxes();
 
+    _start = lowestHighestBoxes.first->getLeftGripPoint();
+    _end = lowestHighestBoxes.second->getLeftGripPoint();
+
+    update();
 }
 
 void
 ConditionalRelation::attachBoxes(QList<BasicBox *> conditionedBox)
 {
-//check if not already attached
+    QList<BasicBox *>::iterator it;
+
+    for(it=conditionedBox.begin() ; it!=conditionedBox.end() ; it++)
+    {
+        if(!_boxesAttached.contains(*it))
+        {
+            _boxesAttached<<(*it);
+            //Maquette::getInstance()->attachToCondition(_id,(*it)->ID());
+        }
+    }
 }
 
 void
-ConditionalRelation::detachBoxes(QList<BasicBox *> conditionedBox){
+ConditionalRelation::detachBoxes(QList<BasicBox *> conditionedBox)
+{
+    QList<BasicBox *>::iterator it;
 
+    for(it=conditionedBox.begin() ; it!=conditionedBox.end() ; it++)
+    {
+        _boxesAttached.removeAll(*it);
+        //Maquette::getInstance()->detachFromCondition(_id,(*it)->ID());
+    }
+}
+
+QPair<BasicBox *, BasicBox *>
+ConditionalRelation::getLowestHighestBoxes()
+{
+    BasicBox                        *curBox,
+                                    *lowestBox = _boxesAttached.first(),
+                                    *highestBox = _boxesAttached.first();
+
+    qreal                           curY,
+                                    lowestY = lowestBox->getLeftGripPoint().y(),
+                                    highestY = lowestBox->getLeftGripPoint().y();
+
+    QList<BasicBox *>::iterator     it = _boxesAttached.begin()++;
+
+    for(it ; it!=_boxesAttached.end() ; it++)
+    {
+        curBox = *it;
+        curY = curBox->getLeftGripPoint().y();
+
+        if(curY < lowestY)
+            lowestBox = curBox;
+        else if(curY > highestY)
+            highestBox = curBox;
+    }
+
+    return qMakePair(lowestBox,highestBox);
 }
 
 void
@@ -116,6 +168,13 @@ ConditionalRelation::shape() const
 void
 ConditionalRelation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 
+    QPen dashLinePen = QPen(Qt::DashLine);
+    dashLinePen.setColor(isSelected() ? _selectedColor : _color);
+    painter->setPen(dashLinePen);
+
+    painter->drawLine(_start , _end);
 }
 

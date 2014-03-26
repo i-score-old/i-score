@@ -8,6 +8,8 @@
  */
 
 #include <QGraphicsItem>
+#include <QPainter>
+#include "Maquette.hpp"
 
 class MaquetteScene;
 class BasicBox;
@@ -36,6 +38,13 @@ public :
      * \param conditionedBoxes : the boxes to detach.
      */
     void detachBoxes(QList<BasicBox *> conditionedBox);
+
+    /*!
+     * \brief Sorts all attached boxes to get the lowest and highest.
+     *
+     * \return A pair : first the lowest, second the highest.
+     */
+    QPair<BasicBox *, BasicBox *> getLowestHighestBoxes();
 
 protected:
   /*!
@@ -121,14 +130,17 @@ protected:
                        QWidget *widget = 0);
 
     static const QColor CONDITIONAL_RELATION_COLOR;
+    static const QColor CONDITIONAL_RELATION_SELECTED_COLOR;
 
 private :
 
-    QList<BasicBox *> _boxesAttached;   //!< Conditioned boxes attached to the relation.
-    MaquetteScene * _scene;             //!< The scene containing relation.
-    QPointF _start;                     //!< The starting point of the relation.
-    QPointF _end;                       //!< The ending point of the relation.
-    QColor _color;                      //!< Color of the relation.
+    unsigned int        _id;                //!< Time condition id.
+    QList<BasicBox *>   _boxesAttached;     //!< Conditioned boxes attached to the relation.
+    MaquetteScene *     _scene;             //!< The scene containing relation.
+    QPointF             _start;             //!< The starting point of the relation.
+    QPointF             _end;               //!< The ending point of the relation.
+    QColor              _color;             //!< Color of the relation.
+    QColor              _selectedColor;     //!< Color of the relation when selected.
 };
 
 #endif // CONDITIONALRELATION_HPP
