@@ -54,6 +54,7 @@ ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, Maquet
     _color = CONDITIONAL_RELATION_COLOR;
     _selectedColor = CONDITIONAL_RELATION_SELECTED_COLOR;
 
+    setAcceptsHoverEvents(true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
     setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -145,18 +146,21 @@ void
 ConditionalRelation::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 {
     QGraphicsItem::hoverEnterEvent(event);
+    setCursor(Qt::PointingHandCursor);
 }
 
 void
 ConditionalRelation::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {
     QGraphicsItem::hoverMoveEvent(event);
+    setCursor(Qt::PointingHandCursor);
 }
 
 void
 ConditionalRelation::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
 {
     QGraphicsItem::hoverLeaveEvent(event);
+    setCursor(Qt::ArrowCursor);
 }
 
 void
