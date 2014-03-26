@@ -1664,6 +1664,35 @@ void Engine::removeTriggerPoint(ConditionedProcessId triggerId)
     uncacheTimeCondition(triggerId);
 }
 
+TimeConditionId Engine::createCondition(std::vector<ConditionedProcessId> triggerIds)
+{
+    std::vector<ConditionedProcessId>::iterator it = triggerIds.begin();
+    TTTimeConditionPtr timeCondition = getTimeCondition(*it);
+    TTTimeConditionPtr currentCondition;
+    TTValue v;
+
+    for(++it ; it != triggerIds.end() ; ++it) {
+
+        currentCondition = getTimeCondition(*it);
+
+        if (currentCondition != timeCondition) {
+
+            // Release the time condition
+            m_mainScenario->sendMessage(TTSymbol("TimeConditionRelease"), currentCondition, v);
+
+            // Modify the cache
+            uncacheTimeCondition(*it);
+            cacheTimeCondition(*it, timeCondition);
+        }
+    }
+
+    // Create an id for the condition and cache it (from ConditionedProcessId because it is mixed with timeConditionMap)
+    TimeConditionId conditionId = m_nextConditionedProcessId++;
+    cacheTimeCondition(conditionId, timeCondition);
+
+    return conditionId;
+}
+
 void Engine::setTriggerPointMessage(ConditionedProcessId triggerId, std::string triggerMessage)
 {
     TimeEventIndex      controlPointIndex;

@@ -49,6 +49,9 @@ typedef unsigned int IntervalId;
 /** a temporary type dedicated to retreive a process with an Conditioned TimeEvent inside (this is related to TriggerPoint notion) */
 typedef unsigned int ConditionedProcessId;
 
+/** a temporary type dedicated to retreive a Condition */
+typedef unsigned int TimeConditionId;
+
 /** a class used to cache TTObject and some observers */
 class EngineCacheElement {
 
@@ -708,6 +711,13 @@ public:
 	 * \param triggerId : the ID of the trigger to be removed.
 	 */
 	void removeTriggerPoint(ConditionedProcessId triggerId);
+
+    /*!
+     * Mix multiple triggerPoints into one TimeCondition.
+     *
+     * \return the created condition ID
+     */
+    TimeConditionId createCondition(std::vector<ConditionedProcessId> triggerIds);
     
 	/*!
 	 * Sets the triggerPoint (given by ID) message.
