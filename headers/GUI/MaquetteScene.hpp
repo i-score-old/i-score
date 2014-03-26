@@ -304,6 +304,13 @@ class MaquetteScene : public QGraphicsScene
     void removeRelation(unsigned int relID);
 
     /*!
+     * \brief Removes a conditional relation.
+     *
+     * \param condRel : the relation to be removed
+     */
+    void removeConditionalRelation(ConditionalRelation *condRel);
+
+    /*!
      * \brief Gets a QString describing a specific relation.
      *
      * \param relID : the relation to get a string from

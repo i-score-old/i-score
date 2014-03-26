@@ -1366,6 +1366,13 @@ MaquetteScene::removeRelation(unsigned int relID)
 }
 
 void
+MaquetteScene::removeConditionalRelation(ConditionalRelation *condRel)
+{
+    /// \todo NH
+}
+
+
+void
 MaquetteScene::setRelationFirstBox(unsigned int ID, BoxExtremity extremumType)
 {
   _relation->setFirstBox(ID);
@@ -1680,6 +1687,9 @@ MaquetteScene::removeSelectedItems()
         }
       else if ((*it)->type() == TRIGGER_POINT_TYPE) {
           removeTriggerPoint(static_cast<TriggerPoint*>(*it)->ID());
+        }
+      else if ((*it)->type() == CONDITIONAL_RELATION_TYPE) {
+          removeConditionalRelation(static_cast<ConditionalRelation*>(*it));
         }
     }
   map<unsigned int, BasicBox*>::iterator boxIt;

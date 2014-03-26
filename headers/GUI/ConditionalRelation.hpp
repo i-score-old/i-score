@@ -15,6 +15,11 @@
 class MaquetteScene;
 class BasicBox;
 
+/*!
+ * \brief Enum used to define Relation's item type.
+ */
+enum { CONDITIONAL_RELATION_TYPE = QGraphicsItem::UserType + 7 };
+
 class ConditionalRelation : public QGraphicsItem
 {
 
@@ -121,6 +126,14 @@ protected:
      */
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                        QWidget *widget = 0);
+
+    /*!
+     * \brief Redefinition of QGraphicsItem::type(). Used for Item casting.
+     *
+     * \return the item's type of the relation
+     */
+    virtual int type() const;
+
 
     static const QColor CONDITIONAL_RELATION_COLOR;
     static const QColor CONDITIONAL_RELATION_SELECTED_COLOR;

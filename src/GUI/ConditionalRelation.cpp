@@ -120,9 +120,9 @@ ConditionalRelation::getLowestHighestBoxes()
                                     lowestY     = lowestBox->getLeftGripPoint().y(),
                                     highestY    = lowestBox->getLeftGripPoint().y();
 
-    QList<BasicBox *>::iterator     it;
+    QList<BasicBox *>::iterator     it = _boxesAttached.begin();
 
-    for(it = _boxesAttached.begin() ; it!=_boxesAttached.end() ; it++)
+    for(++it ; it!=_boxesAttached.end() ; it++)
     {
 
         curBox = *it;
