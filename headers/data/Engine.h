@@ -718,6 +718,22 @@ public:
      * \return the created condition ID
      */
     TimeConditionId createCondition(std::vector<ConditionedProcessId> triggerIds);
+
+    /*!
+     * Add a trigger point to the condition.
+     *
+     * \param conditionId : the ID of the condition
+     * \param triggerId : the ID of the trigger to add
+     */
+    void attachToCondition(TimeConditionId conditionId, ConditionedProcessId triggerId);
+
+    /*!
+     * Remove a trigger point from the condition.
+     *
+     * \param conditionId : the ID of the condition
+     * \param triggerId : the ID of the trigger to remove
+     */
+    void detachFromCondition(TimeConditionId conditionId, ConditionedProcessId triggerId);
     
 	/*!
 	 * Sets the triggerPoint (given by ID) message.

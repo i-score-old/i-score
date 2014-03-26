@@ -1668,29 +1668,55 @@ TimeConditionId Engine::createCondition(std::vector<ConditionedProcessId> trigge
 {
     std::vector<ConditionedProcessId>::iterator it = triggerIds.begin();
     TTTimeConditionPtr timeCondition = getTimeCondition(*it);
-    TTTimeConditionPtr currentCondition;
-    TTValue v;
-
-    for(++it ; it != triggerIds.end() ; ++it) {
-
-        currentCondition = getTimeCondition(*it);
-
-        if (currentCondition != timeCondition) {
-
-            // Release the time condition
-            m_mainScenario->sendMessage(TTSymbol("TimeConditionRelease"), currentCondition, v);
-
-            // Modify the cache
-            uncacheTimeCondition(*it);
-            cacheTimeCondition(*it, timeCondition);
-        }
-    }
 
     // Create an id for the condition and cache it (from ConditionedProcessId because it is mixed with timeConditionMap)
     TimeConditionId conditionId = m_nextConditionedProcessId++;
     cacheTimeCondition(conditionId, timeCondition);
 
+    for(++it ; it != triggerIds.end() ; ++it) {
+        attachToCondition(conditionId, *it);
+    }
+
     return conditionId;
+}
+
+void Engine::attachToCondition(TimeConditionId conditionId, ConditionedProcessId triggerId)
+{
+    TTTimeConditionPtr timeCondition = getTimeCondition(conditionId);
+    TTTimeConditionPtr otherCondition = getTimeCondition(triggerId);
+    TTValue v;
+
+    // Should be different conditions before the merge
+    if (otherCondition != timeCondition) {
+
+        // Release the time condition
+        m_mainScenario->sendMessage(TTSymbol("TimeConditionRelease"), otherCondition, v);
+
+        // Modify the cache
+        m_timeConditionMap[triggerId]->object = timeCondition;
+    }
+}
+
+void Engine::detachFromCondition(TimeConditionId conditionId, ConditionedProcessId triggerId)
+{
+    TTTimeConditionPtr timeCondition = getTimeCondition(conditionId);
+    TTTimeConditionPtr otherCondition = getTimeCondition(triggerId);
+    TTValue args, v;
+
+    // Should be the same condition before the separation
+    if (otherCondition == timeCondition) {
+
+        // Create a new TTTimeCondition
+        m_mainScenario->sendMessage(TTSymbol("TimeConditionCreate"), args, v);
+        otherCondition = TTTimeConditionPtr(TTObjectBasePtr(v[0]));
+
+        // Add the event to the condition with no associated expression
+//        args = TTObjectBasePtr(timeEvent);
+//        timeCondition->sendMessage(TTSymbol("EventAdd"), args, v);
+
+        // Modify cache
+        m_timeConditionMap[triggerId]->object = otherCondition;
+    }
 }
 
 void Engine::setTriggerPointMessage(ConditionedProcessId triggerId, std::string triggerMessage)
