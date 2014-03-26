@@ -10,6 +10,7 @@
 #include <QGraphicsItem>
 #include <QPainter>
 #include "Maquette.hpp"
+#include "MaquetteScene.hpp"
 
 class MaquetteScene;
 class BasicBox;
@@ -123,7 +124,8 @@ protected:
 
     static const QColor CONDITIONAL_RELATION_COLOR;
     static const QColor CONDITIONAL_RELATION_SELECTED_COLOR;
-    static const float  HANDLE_WIDTH;
+    static const float  BOUNDING_RECT_WIDTH;
+    static const float  GRIP_SHIFT;
 
 private :
 

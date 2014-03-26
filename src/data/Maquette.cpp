@@ -1327,7 +1327,7 @@ Maquette::initSceneState()
   unsigned int boxID;
   QMap<QString, QPair<QString, unsigned int> > msgs, boxMsgs;
   QList<QString> boxAddresses;
-  BasicBox *currentBox;
+  BasicBox *currentBox;  
   std::vector<string> curvesList;
 
   //Pour toutes les boîtes avant le goto, on récupère leur état final (on simule leur exécution)

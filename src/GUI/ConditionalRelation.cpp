@@ -44,7 +44,8 @@
 
 const QColor ConditionalRelation::CONDITIONAL_RELATION_COLOR = QColor(0, 0, 0);
 const QColor ConditionalRelation::CONDITIONAL_RELATION_SELECTED_COLOR = QColor(Qt::blue);
-const float ConditionalRelation::HANDLE_WIDTH = 10.;
+const float ConditionalRelation::BOUNDING_RECT_WIDTH = 10.;
+const float ConditionalRelation::GRIP_SHIFT = 4.;
 
 ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, MaquetteScene *parent)
     : QGraphicsItem(), _scene(parent), _boxesAttached(boxesAttached)
@@ -56,8 +57,9 @@ ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, Maquet
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
     setFlag(QGraphicsItem::ItemIsMovable, false);
-    setVisible(true);
     setZValue(1);
+
+    _scene->addItem(this);
 
     updateCoordinates();
 }
@@ -67,12 +69,13 @@ ConditionalRelation::updateCoordinates()
 {
     QPair<BasicBox *, BasicBox *> lowestHighestBoxes = getLowestHighestBoxes();
 
-    _start = lowestHighestBoxes.first->getLeftGripPoint();
-    _end = lowestHighestBoxes.second->getLeftGripPoint();
+    _start = lowestHighestBoxes.first->getLeftGripPoint() - QPointF(GRIP_SHIFT,0);
+    _end = lowestHighestBoxes.second->getLeftGripPoint() - QPointF(GRIP_SHIFT,0);
 
     std::cout<<"lowest : "<<lowestHighestBoxes.first->ID()<<std::endl;
     std::cout<<"highest : "<<lowestHighestBoxes.second->ID()<<std::endl;
     std::cout<<"\n"<<std::endl;
+
     update();
 }
 
@@ -183,8 +186,8 @@ ConditionalRelation::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 QRectF
 ConditionalRelation::boundingRect() const
 {
-    QPointF     topLeft = QPointF(_start.x()-HANDLE_WIDTH,_start.y()),
-                bottomRight = QPointF(_end.x()+HANDLE_WIDTH,_end.y());
+    QPointF     bottomRight = QPointF(_start.x() , _start.y()),
+                topLeft = QPointF(_end.x() - BOUNDING_RECT_WIDTH/2 , _end.y());
 
     return QRectF(topLeft,bottomRight);
 }
@@ -197,13 +200,15 @@ ConditionalRelation::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-
-    std::cout<<"paint "<<_start.y()<<" to "<<_end.y()<<std::endl;
     QPen dashLinePen = QPen(Qt::DashLine);
     dashLinePen.setColor(isSelected() ? _selectedColor : _color);
+    dashLinePen.setWidth(2);
     painter->setPen(dashLinePen);
 
     painter->drawLine(_start , _end);
+
+    dashLinePen.setWidth(0.5);
+    painter->setPen(dashLinePen);
     painter->drawRect(boundingRect());
 }
 
