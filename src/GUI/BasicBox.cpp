@@ -802,6 +802,19 @@ BasicBox::removeRelation(BoxExtremity extremity, unsigned int relID)
     }
 }
 
+void
+BasicBox::addConditionalRelation(ConditionalRelation *condRel)
+{
+    if(!_conditionalRelation.contains(condRel))
+        _conditionalRelation<<condRel;
+}
+
+void
+BasicBox::removeConditionalRelation(ConditionalRelation *condRel)
+{
+    _conditionalRelation.removeAll(condRel);
+}
+
 QList<Relation *>
 BasicBox::getStartBoxRelations()
 {

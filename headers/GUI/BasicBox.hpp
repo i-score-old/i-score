@@ -202,6 +202,14 @@ class BasicBox : public QObject, public QGraphicsItem
      * \param relation : the relation to store
      */
     void addRelation(BoxExtremity extremity, Relation *relation);
+
+    /*!
+     * \brief Adds a conditional relation to the start extremity
+     *
+     * \param condRel : the conditional relation to store
+     */
+    void addConditionalRelation(ConditionalRelation *condRel);
+
     /*!
      * \brief Removes a relation from an extremity
      *
@@ -210,6 +218,14 @@ class BasicBox : public QObject, public QGraphicsItem
      */
     void removeRelation(BoxExtremity extremity, unsigned int relID);
     void removeRelations(BoxExtremity extremity);
+
+    /*!
+     * \brief Removes a conditional relation from the start extremity
+     *
+     * \param condRelID : the conditional relation ID to remove
+     */
+    void removeConditionalRelation(ConditionalRelation *condRel);
+
     /*!
      * \brief Returns Relations associated to the start box extremity.
      */

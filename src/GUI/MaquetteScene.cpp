@@ -1782,6 +1782,8 @@ MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
     bool conditionalRelationFound = false;
     ConditionalRelation *condRel;
 
+    //Check if all boxes have a trigger point on start
+    //Check if boxes have to be simply attached to an existing conditional relation, else create a new one
     for(it = boxesToCondition.begin() ; it!=boxesToCondition.end() ; it++)
     {
         box = *it;
@@ -1798,12 +1800,18 @@ MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
 
     if(conditionalRelationFound) //just attach boxes to existing relation
     {
+        std::cout<<"MaquetteScene: existing relation -> ATTACH"<<std::endl;
         condRel->attachBoxes(boxesToCondition);
     }
     else //create a new one
     {
+        std::cout<<"MaquetteScene: no existing relation -> CREATE"<<std::endl;
         condRel = new ConditionalRelation(boxesToCondition, this);
     }
+
+    //add conditional relation to each box
+    for(it = boxesToCondition.begin() ; it!=boxesToCondition.end() ; it++)
+        (*it)->addConditionalRelation(condRel);
 }
 
 void
