@@ -1831,7 +1831,8 @@ MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
         }
     }
 
-    //Force boxes to move to the earliest box date
+    //Force boxes to move to the earliest box date.
+    /// \todo This is provisional, has to be done automatically by the CSP NH
     for(it=boxesToCondition.begin() ; it!=boxesToCondition.end() ; it++)
     {
         box = *it;
