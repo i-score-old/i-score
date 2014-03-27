@@ -995,6 +995,30 @@ Maquette::setTriggerPointMessage(unsigned int trgID, const string &message)
   return ret;
 }
 
+unsigned int
+Maquette::createCondition(QList<BasicBox *> boxes)
+{
+    //Engine needs a vector with start trigger points' ids.
+    std::vector<unsigned int>       triggerIds;
+    QList<BasicBox *>::iterator     it = boxes.begin();
+    BasicBox                        *curBox;
+    TriggerPoint                    *curTriggerPoint;
+    unsigned int                    curTriggerId;
+
+    for(it ; it!=boxes.end() ; it++)
+    {
+        curBox = *it;
+        curTriggerPoint = curBox->getTriggerPoint(BOX_START);
+
+        if(curTriggerPoint != NULL){
+            curTriggerId = curTriggerPoint->ID();
+            triggerIds.push_back(curTriggerId);
+        }
+    }
+
+    return _engines->createCondition(triggerIds);
+}
+
 void
 Maquette::addCurve(unsigned int boxID, const string &address)
 {

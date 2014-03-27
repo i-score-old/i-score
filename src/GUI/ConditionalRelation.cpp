@@ -50,7 +50,9 @@ const float ConditionalRelation::GRIP_SHIFT = 4.;
 ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, MaquetteScene *parent)
     : QGraphicsItem(), _scene(parent), _boxesAttached(boxesAttached)
 {
-//    _id = Maquette::getInstance()->createCondition(boxesAttached);
+    _id = Maquette::getInstance()->createCondition(boxesAttached);
+    std::cout<<"ID = "<<_id<<std::endl;
+
     _color = CONDITIONAL_RELATION_COLOR;
     _selectedColor = CONDITIONAL_RELATION_SELECTED_COLOR;
 
@@ -216,3 +218,8 @@ ConditionalRelation::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     painter->drawRect(boundingRect());
 }
 
+int
+ConditionalRelation::type() const
+{
+    return CONDITIONAL_RELATION_TYPE;
+}

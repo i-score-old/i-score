@@ -1043,6 +1043,18 @@ BasicBox::triggerPointMessage(BoxExtremity extremity)
     }
 }
 
+TriggerPoint *
+BasicBox::getTriggerPoint(BoxExtremity extremity)
+{
+    if(_triggerPoints->contains(extremity)){
+        return _triggerPoints->value(extremity);
+    }
+    else{
+        std::cerr<<"BasicBox::getTriggerPoint : Cannot find trigger point on this extremity"<<std::endl;
+        return NULL;
+    }
+}
+
 void
 BasicBox::setStartMessages(NetworkMessages *messages)
 {

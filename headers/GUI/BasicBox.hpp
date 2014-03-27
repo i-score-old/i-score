@@ -345,6 +345,13 @@ class BasicBox : public QObject, public QGraphicsItem
      */
     std::string triggerPointMessage(BoxExtremity extremity);
 
+    /*!
+     * \brief Gets trigger point on the extremity.
+     *
+     * \param extremity : the box extremity to get trigger point from.
+     */
+    TriggerPoint *getTriggerPoint(BoxExtremity extremity);
+
     AbstractCurve *getCurve(const std::string &address);
     void setCurve(const std::string &address, AbstractCurve *curve);
     void removeCurve(const std::string &address);

@@ -592,6 +592,13 @@ class Maquette : public QObject
     bool setTriggerPointMessage(unsigned int trgID, const std::string &message);
 
     /*!
+     * \brief Create a time condition between boxes.
+     *
+     * \param boxes : the boxes to condition.
+     */
+    unsigned int createCondition(QList<BasicBox *> boxes);
+
+    /*!
      * \brief Perform moving or resizing for a set of boxes.
      *
      * \param boxes : the boxes that have to be transformed with their new coordinates
