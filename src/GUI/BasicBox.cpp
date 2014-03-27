@@ -1578,9 +1578,13 @@ BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
   QRectF diagResize_bottomRight(_boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, RESIZE_ZONE_WIDTH), _boxRect.bottomRight());
   /// \todo : horizontalResize_right
 
+  /// \todo Fix in Score : CSP has to move all boxes attached to a TimeCondition. Provisional : forbid to move when attached to a conditional relation.
+  if (textRect.contains(event->pos()) && attachedToConditionalRelation()) {
+      setCursor(Qt::PointingHandCursor);
+    }
 
-  //bandeau zone (text rect) - top
-  if (textRect.contains(event->pos())) {
+  //bandeau zone (text rect) - top  
+  else if (textRect.contains(event->pos())) {
       setCursor(Qt::OpenHandCursor);
     }
 
@@ -1647,10 +1651,15 @@ BasicBox::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
   QRectF vertResize_bottom(_boxRect.bottomLeft() + QPointF(0, -RESIZE_ZONE_WIDTH), _boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, 0));
   QRectF diagResize_bottomRight(_boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, RESIZE_ZONE_WIDTH), _boxRect.bottomRight());
 
-  //bandeau zone (text rect) - top
-  if (textRect.contains(event->pos())) {
-      setCursor(Qt::OpenHandCursor);
+  /// \todo Fix in Score : CSP has to move all boxes attached to a TimeCondition. Provisional : forbid to move when attached to a conditional relation.
+  if (textRect.contains(event->pos()) && attachedToConditionalRelation()) {
+      setCursor(Qt::PointingHandCursor);
     }
+
+  //bandeau zone (text rect) - top  
+  else if (textRect.contains(event->pos())) {
+      setCursor(Qt::OpenHandCursor);
+    }  
 
   //Trigger zone - left
   else if (triggerGripLeft.contains(event->pos())) {

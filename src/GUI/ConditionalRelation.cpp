@@ -58,7 +58,7 @@ ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, Maquet
     setAcceptsHoverEvents(true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
-    setFlag(QGraphicsItem::ItemIsMovable, false);
+    setFlag(QGraphicsItem::ItemIsMovable, true);
     setZValue(1);
 
     _scene->addItem(this);
@@ -142,14 +142,14 @@ void
 ConditionalRelation::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 {
     QGraphicsItem::hoverEnterEvent(event);
-    setCursor(Qt::PointingHandCursor);
+    setCursor(Qt::OpenHandCursor);
 }
 
 void
 ConditionalRelation::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {
     QGraphicsItem::hoverMoveEvent(event);
-    setCursor(Qt::PointingHandCursor);
+    setCursor(Qt::OpenHandCursor);
 }
 
 void
@@ -169,12 +169,33 @@ void
 ConditionalRelation::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mousePressEvent(event);
+    if (cursor().shape() == Qt::OpenHandCursor)
+    {
+        setCursor(Qt::ClosedHandCursor);
+
+        //select all attached boxes. Astuce pour bouger toutes les boîtes dans que le CSP ne le fait pas. NH
+
+        QList<BasicBox *>::iterator               itBox;
+        QList<BasicBox *>                         relatedBoxes;
+        BasicBox                                  *curBox;
+
+        relatedBoxes = getBoxes();
+
+        //move each box attached
+        for(itBox=relatedBoxes.begin() ; itBox!=relatedBoxes.end() ; itBox++){
+            curBox = *itBox;
+            curBox->setSelected(true);
+        }
+      }
 }
 
 void
 ConditionalRelation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mouseMoveEvent(event);
+    if(cursor().shape() == Qt::ClosedHandCursor){
+        _scene->selectionMoved();
+    }
 }
 
 void

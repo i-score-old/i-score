@@ -1433,6 +1433,9 @@ MaquetteScene::selectionMoved()
           BasicBox *curBox = static_cast<BasicBox*>(curItem);
           boxMoved(curBox->ID());
         }
+      else if (type == CONDITIONAL_RELATION_TYPE){
+        ;
+      }
     }
 }
 
@@ -1456,18 +1459,12 @@ MaquetteScene::boxMoved(unsigned int boxID)
 //      std::cout<<"Y = "<<coord.sizeX* MaquetteScene::MS_PER_PIXEL<<std::endl;
       coord.sizeY = box->boxRect().size().height();
     }
+
   bool ret = _maquette->updateBox(boxID, coord);
 
   if (ret) {
       update();
       setModified(true);
-
-/*		std::cerr << "Box top left coordinates : " << box->mapToScene(box->boundingRect().topLeft()).x() + box->boundingRect().size().width() << std::endl;
- *              std::cerr << "View right max coordinates :" << _view->sceneRect().topLeft().x() + _view->sceneRect().width() << std::endl;*/
-
-      //if (box->mapToScene(box->boundingRect().topLeft()).x() + box->boundingRect().size().width() >= (_view->sceneRect().topLeft().x() + _view->sceneRect().width() - 100)) {
-      //_view->fitInView(box,Qt::KeepAspectRatio);
-      //}
     }
 
   return ret;
