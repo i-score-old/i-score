@@ -1324,7 +1324,7 @@ MaquetteScene::changeRelationBounds(unsigned int relID, const float &length, con
           AbstractRelation *abRel = static_cast<AbstractRelation*>(rel->abstract());
           float oldLength = abRel->length();
           BasicBox *secondBox = getBox(abRel->secondBox());
-          if (secondBox != NULL) {
+          if (secondBox != NULL) {              
               secondBox->moveBy(length - oldLength, 0.);
               vector<unsigned int> boxMoved;
               boxMoved.push_back(secondBox->ID());
@@ -1801,14 +1801,17 @@ MaquetteScene::getMaxSceneWidth(){
 void
 MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
 {
-    QList<BasicBox *>::iterator it;
-    BasicBox *box;
-    bool conditionalRelationFound = false;
-    ConditionalRelation *condRel;
+    QList<BasicBox *>::iterator     it = boxesToCondition.begin();
+    BasicBox                        *box,
+                                    *earliestBox = *it;
+    unsigned int                    earliestDate = earliestBox->date();
+    bool                            conditionalRelationFound = false;
+    ConditionalRelation             *condRel;
 
-    //Check if all boxes have a trigger point on start
-    //Check if boxes have to be simply attached to an existing conditional relation, else create a new one
-    for(it = boxesToCondition.begin() ; it!=boxesToCondition.end() ; it++)
+
+    //Check if all boxes have a trigger point on start and force to move to the same date.
+    //Check if boxes have to be simply attached to an existing conditional relation, else create a new one.
+    for(it ; it!=boxesToCondition.end() ; it++)
     {
         box = *it;
 
@@ -1820,6 +1823,20 @@ MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
             conditionalRelationFound = true;
             condRel = box->getConditionalRelations().first();
         }
+
+        //Find the earliest box
+        if(box->date()<earliestDate){
+            earliestBox = box;
+            earliestDate = box->date();
+        }
+    }
+
+    //Force boxes to move to the earliest box date
+    for(it=boxesToCondition.begin() ; it!=boxesToCondition.end() ; it++)
+    {
+        box = *it;
+        box->moveBy((qreal)(earliestDate/MS_PER_PIXEL) -(qreal)(box->date() / MS_PER_PIXEL), 0.);
+        boxMoved(box->ID());
     }
 
     if(conditionalRelationFound) //just attach boxes to existing relation
