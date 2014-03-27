@@ -1689,13 +1689,25 @@ void Engine::attachToCondition(TimeConditionId conditionId, ConditionedProcessId
 {
     TTTimeConditionPtr timeCondition = getTimeCondition(conditionId);
     TTTimeConditionPtr otherCondition = getTimeCondition(triggerId);
-    TTValue v;
+    // Because a condition is always at the start of a box :
+    TimeEventIndex idx = BEGIN_CONTROL_POINT_INDEX;
+    TTTimeEventPtr timeEvent;
+    TTScoreTimeProcessGetStartEvent(getConditionedProcess(triggerId, idx), &timeEvent);
+    TTValue args, v;
 
     // Should be different conditions before the merge
     if (otherCondition != timeCondition) {
 
-        // Release the time condition
+        // Save the expression
+        std::string expr = getTriggerPointMessage(triggerId);
+
+        // Release the other time condition
         m_mainScenario->sendMessage(TTSymbol("TimeConditionRelease"), otherCondition, v);
+
+        // Add the event to the chosen time condition with the saved expression
+        args = TTObjectBasePtr(timeEvent);
+        timeCondition->sendMessage(TTSymbol("EventAdd"), args, v);
+        setTriggerPointMessage(triggerId, expr);
 
         // Modify the cache
         m_timeConditionMap[triggerId]->object = timeCondition;
@@ -1706,22 +1718,70 @@ void Engine::detachFromCondition(TimeConditionId conditionId, ConditionedProcess
 {
     TTTimeConditionPtr timeCondition = getTimeCondition(conditionId);
     TTTimeConditionPtr otherCondition = getTimeCondition(triggerId);
+    // Because a condition is always at the start of a box :
+    TimeEventIndex idx = BEGIN_CONTROL_POINT_INDEX;
+    TTTimeEventPtr timeEvent;
+    TTScoreTimeProcessGetStartEvent(getConditionedProcess(triggerId, idx), &timeEvent);
     TTValue args, v;
 
     // Should be the same condition before the separation
     if (otherCondition == timeCondition) {
 
+        // Save the expression
+        std::string expr = getTriggerPointMessage(triggerId);
+
+        // Remove the event from the chosen time condition
+        args = TTObjectBasePtr(timeEvent);
+        timeCondition->sendMessage(TTSymbol("EventRemove"), args, v);
+
         // Create a new TTTimeCondition
         m_mainScenario->sendMessage(TTSymbol("TimeConditionCreate"), args, v);
         otherCondition = TTTimeConditionPtr(TTObjectBasePtr(v[0]));
 
-        // Add the event to the condition with no associated expression
-//        args = TTObjectBasePtr(timeEvent);
-//        timeCondition->sendMessage(TTSymbol("EventAdd"), args, v);
+        // Add the event to the new condition with the saved expression
+        timeCondition->sendMessage(TTSymbol("EventAdd"), args, v);
+        setTriggerPointMessage(triggerId, expr);
 
         // Modify cache
         m_timeConditionMap[triggerId]->object = otherCondition;
     }
+}
+
+void Engine::deleteCondition(TimeConditionId conditionId, std::vector<ConditionedProcessId> triggerIds)
+{
+    std::vector<ConditionedProcessId>::iterator it;
+    TTTimeConditionPtr timeCondition = getTimeCondition(conditionId);
+    TTValue v;
+
+    for(it = triggerIds.begin() ; it != triggerIds.end() ; ++it) {
+        detachFromCondition(conditionId, *it);
+    }
+
+    // Release the condition
+    m_mainScenario->sendMessage(TTSymbol("TimeConditionRelease"), timeCondition, v);
+
+    // Uncache the condition
+    uncacheTimeCondition(conditionId);
+}
+
+void Engine::setConditionMessage(TimeConditionId conditionId, std::string disposeMessage)
+{
+    TTTimeConditionPtr timeCondition = getTimeCondition(conditionId);
+    TTValue v;
+
+    v.append(TTSymbol(disposeMessage));
+    timeCondition->setAttributeValue(TTSymbol("disposeMessage"), v);
+}
+
+std::string Engine::getConditionMessage(TimeConditionId conditionId)
+{
+    TTTimeConditionPtr timeCondition = getTimeCondition(conditionId);
+    TTValue out;
+
+    timeCondition->getAttributeValue(TTSymbol("disposeMessage"), out);
+
+    TTSymbol expr = out[0];
+    return expr.c_str();
 }
 
 void Engine::setTriggerPointMessage(ConditionedProcessId triggerId, std::string triggerMessage)
@@ -1766,6 +1826,54 @@ std::string Engine::getTriggerPointMessage(ConditionedProcessId triggerId)
     else {
         
         string empty;
+        return empty;
+    }
+}
+
+//!\ Crappy copy
+void Engine::setTriggerPointDefault(ConditionedProcessId triggerId, bool dflt)
+{
+    TimeEventIndex      controlPointIndex;
+    TTTimeProcessPtr    timeProcess = getConditionedProcess(triggerId, controlPointIndex);
+    TTTimeEventPtr      timeEvent;
+    TTValue             v, out;
+
+    // Get start or end time event
+    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+        TTScoreTimeProcessGetStartEvent(timeProcess, &timeEvent);
+    else
+        TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
+
+    // edit the default comportment associated to this event
+    v = TTObjectBasePtr(timeEvent);
+    v.append(dflt);
+    getTimeCondition(triggerId)->sendMessage(TTSymbol("EventDefault"), v, out);
+}
+
+//!\ Crappy copy
+bool Engine::getTriggerPointDefault(ConditionedProcessId triggerId)
+{
+    TimeEventIndex          controlPointIndex;
+    TTTimeProcessPtr        timeProcess = getConditionedProcess(triggerId, controlPointIndex);
+    TTTimeEventPtr          timeEvent;
+    bool                    dflt;
+    TTValue                 v, out;
+
+    // Get start or end time event
+    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+        TTScoreTimeProcessGetStartEvent(timeProcess, &timeEvent);
+    else
+        TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
+
+    // Get the default comportment associated to this event
+    if (!getTimeCondition(triggerId)->sendMessage(TTSymbol("ExpressionFind"), v, out)) {
+
+        dflt = out[0];
+        return dflt;
+    }
+    else {
+
+        bool empty;
         return empty;
     }
 }

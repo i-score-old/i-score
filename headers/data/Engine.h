@@ -734,7 +734,21 @@ public:
      * \param triggerId : the ID of the trigger to remove
      */
     void detachFromCondition(TimeConditionId conditionId, ConditionedProcessId triggerId);
+
+    /*!
+     * Delete the specified TimeCondition.
+     *
+     * \param conditionId : the ID of the condition to delete
+     * \param triggerIds : the IDs of all the triggers in the condition
+     */
+    void deleteCondition(TimeConditionId conditionId, std::vector<ConditionedProcessId> triggerIds);
     
+    // Sick of useless doc
+    void setConditionMessage(TimeConditionId conditionId, std::string disposeMessage);
+
+    // Sick of useless doc
+    std::string getConditionMessage(TimeConditionId conditionId);
+
 	/*!
 	 * Sets the triggerPoint (given by ID) message.
 	 *
@@ -755,6 +769,12 @@ public:
 	 * \return the trigger message
 	 */
 	std::string getTriggerPointMessage(ConditionedProcessId triggerId);
+
+    // Sick of useless doc
+    void setTriggerPointDefault(ConditionedProcessId triggerId, bool dflt);
+
+    // Sick of useless doc
+    bool getTriggerPointDefault(ConditionedProcessId triggerId);
     
 	/*!
 	 * Gets the id of the box linked to the given trigger point.
