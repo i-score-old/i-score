@@ -11,6 +11,7 @@
 #include <QPainter>
 #include "Maquette.hpp"
 #include "MaquetteScene.hpp"
+#include "QGraphicsSceneMouseEvent"
 
 class MaquetteScene;
 class BasicBox;
@@ -58,6 +59,10 @@ public :
      * \return The list of attached boxes.
      */
     inline QList<BasicBox *> getBoxes(){return _boxesAttached;}
+
+    QInputDialog *disposeMessageInputDialog();
+
+    inline unsigned int ID(){return _id;}
 
 protected:
   /*!

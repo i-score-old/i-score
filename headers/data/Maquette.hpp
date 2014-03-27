@@ -614,6 +614,17 @@ class Maquette : public QObject
      */
     void detachFromCondition(unsigned int conditionId, BasicBox *box);
 
+    void setConditionMessage(unsigned int conditionId, std::string disposeMessage);
+    std::string getConditionMessage(TimeConditionId conditionId);
+
+    /*!
+     * Delete the specified TimeCondition.
+     *
+     * \param conditionId : the ID of the condition to delete
+     * \param boxes : the boxes attached.
+     */
+    void deleteCondition(TimeConditionId conditionId, QList<BasicBox *> boxes);
+
     /*!
      * \brief Perform moving or resizing for a set of boxes.
      *
