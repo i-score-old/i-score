@@ -52,6 +52,13 @@ public :
      */
     QPair<BasicBox *, BasicBox *> getLowestHighestBoxes();
 
+    /*!
+     * \brief Gets attached boxes.
+     *
+     * \return The list of attached boxes.
+     */
+    inline QList<BasicBox *> getBoxes(){return _boxesAttached;}
+
 protected:
   /*!
    * \brief This method must be overloaded for QGraphicsItem derived classes.

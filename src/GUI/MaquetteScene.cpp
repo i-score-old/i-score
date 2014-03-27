@@ -1368,7 +1368,21 @@ MaquetteScene::removeRelation(unsigned int relID)
 void
 MaquetteScene::removeConditionalRelation(ConditionalRelation *condRel)
 {
-    /// \todo NH
+    if(condRel != NULL)
+    {
+        QList<BasicBox *>::iterator     it;
+        QList<BasicBox *>               boxes = condRel->getBoxes();
+        BasicBox                        *curBox;
+
+        for(it = boxes.begin() ; it!=boxes.end() ; it++)
+        {
+            curBox = *it;
+            curBox->removeConditionalRelation(condRel);
+        }
+
+        removeItem(condRel);
+        setModified(true);
+    }
 }
 
 
