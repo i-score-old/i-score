@@ -51,7 +51,6 @@ ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, Maquet
     : QGraphicsItem(), _scene(parent), _boxesAttached(boxesAttached)
 {
     _id = Maquette::getInstance()->createCondition(boxesAttached);
-    std::cout<<"ID = "<<_id<<std::endl;
 
     _color = CONDITIONAL_RELATION_COLOR;
     _selectedColor = CONDITIONAL_RELATION_SELECTED_COLOR;
@@ -75,10 +74,6 @@ ConditionalRelation::updateCoordinates()
     _start = lowestHighestBoxes.first->getLeftGripPoint() - QPointF(GRIP_SHIFT,0);
     _end = lowestHighestBoxes.second->getLeftGripPoint() - QPointF(GRIP_SHIFT,0);
 
-    std::cout<<"lowest : "<<lowestHighestBoxes.first->ID()<<std::endl;
-    std::cout<<"highest : "<<lowestHighestBoxes.second->ID()<<std::endl;
-    std::cout<<"\n"<<std::endl;
-
     update();
 }
 
@@ -92,7 +87,7 @@ ConditionalRelation::attachBoxes(QList<BasicBox *> conditionedBox)
         if(!_boxesAttached.contains(*it))
         {
             _boxesAttached<<(*it);
-            //Maquette::getInstance()->attachToCondition(_id,(*it)->ID());
+            Maquette::getInstance()->attachToCondition(_id,*it);
         }
     }
     updateCoordinates();
@@ -106,7 +101,7 @@ ConditionalRelation::detachBoxes(QList<BasicBox *> conditionedBox)
     for(it=conditionedBox.begin() ; it!=conditionedBox.end() ; it++)
     {
         _boxesAttached.removeAll(*it);
-        //Maquette::getInstance()->detachFromCondition(_id,(*it)->ID());
+        Maquette::getInstance()->detachFromCondition(_id,*it);
     }
     updateCoordinates();
 }
@@ -129,7 +124,6 @@ ConditionalRelation::getLowestHighestBoxes()
 
         curBox = *it;
         curY = curBox->getLeftGripPoint().y();
-        std::cout<<"> "<<curBox->ID()<<" "<<curY<<std::endl;
 
         if(curY > lowestY){
             lowestBox = curBox;

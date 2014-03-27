@@ -599,6 +599,22 @@ class Maquette : public QObject
     unsigned int createCondition(QList<BasicBox *> boxes);
 
     /*!
+     * Add a box to the condition.
+     *
+     * \param conditionId : the ID of the condition
+     * \param box : the box to add
+     */
+    void attachToCondition(unsigned int conditionId, BasicBox *box);
+
+    /*!
+     * Dettach a box from the condition.
+     *
+     * \param conditionId : the ID of the condition
+     * \param box : the box to detach
+     */
+    void detachFromCondition(unsigned int conditionId, BasicBox *box);
+
+    /*!
      * \brief Perform moving or resizing for a set of boxes.
      *
      * \param boxes : the boxes that have to be transformed with their new coordinates

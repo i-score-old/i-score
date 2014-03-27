@@ -1020,6 +1020,20 @@ Maquette::createCondition(QList<BasicBox *> boxes)
 }
 
 void
+Maquette::attachToCondition(unsigned int conditionId, BasicBox *box)
+{
+    unsigned int triggerId = box->getTriggerPoint(BOX_START)->ID();
+    _engines->attachToCondition(conditionId,triggerId);
+}
+
+void
+Maquette::detachFromCondition(unsigned int conditionId, BasicBox *box)
+{
+    unsigned int triggerId = box->getTriggerPoint(BOX_START)->ID();
+    _engines->detachFromCondition(conditionId,triggerId);
+}
+
+void
 Maquette::addCurve(unsigned int boxID, const string &address)
 {
   _engines->addCurve(boxID, address);
