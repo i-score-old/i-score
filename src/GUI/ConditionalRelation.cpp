@@ -121,7 +121,6 @@ ConditionalRelation::getLowestHighestBoxes()
 
     for(++it ; it!=_boxesAttached.end() ; it++)
     {
-
         curBox = *it;
         curY = curBox->getLeftGripPoint().y();
 
@@ -192,29 +191,26 @@ ConditionalRelation::mousePressEvent(QGraphicsSceneMouseEvent * event)
     if (cursor().shape() == Qt::OpenHandCursor)
     {
         setCursor(Qt::ClosedHandCursor);
-
-        //select all attached boxes. Astuce pour bouger toutes les boîtes dans que le CSP ne le fait pas. NH
-
-        QList<BasicBox *>::iterator               itBox;
-        QList<BasicBox *>                         relatedBoxes;
-        BasicBox                                  *curBox;
-
-        relatedBoxes = getBoxes();
-
-        //move each box attached
-        for(itBox=relatedBoxes.begin() ; itBox!=relatedBoxes.end() ; itBox++){
-            curBox = *itBox;
-            curBox->setSelected(true);
-        }
-      }
+        _mousePosSave = event->pos();
+    }
 }
 
 void
 ConditionalRelation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mouseMoveEvent(event);
+
     if(cursor().shape() == Qt::ClosedHandCursor){
-        _scene->selectionMoved();
+
+        /// \todo CSP has to do that.
+        QList<BasicBox *>::iterator     it;
+        BasicBox                        *box;
+        for(it=_boxesAttached.begin() ; it!=_boxesAttached.end() ; it++)
+        {
+            box = *it;
+            box->moveBy(event->pos().x()-_mousePosSave.x() , event->pos().y()-_mousePosSave.y());
+            _scene->boxMoved(box->ID());
+        }
     }
 }
 
@@ -246,7 +242,7 @@ ConditionalRelation::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     dashLinePen.setWidth(2);
     painter->setPen(dashLinePen);
 
-    painter->drawLine(_start , _end);
+    painter->drawLine(_start,_end);
 
     dashLinePen.setWidth(0.5);
     painter->setPen(dashLinePen);

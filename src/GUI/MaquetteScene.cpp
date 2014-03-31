@@ -1435,7 +1435,7 @@ MaquetteScene::selectionMoved()
           boxMoved(curBox->ID());
         }
       else if (type == CONDITIONAL_RELATION_TYPE){
-        ;
+          std::cout<<"relX : "<<curItem->boundingRect().topLeft().x()<<std::endl;
       }
     }
 }
@@ -1447,9 +1447,10 @@ MaquetteScene::boxMoved(unsigned int boxID)
   Coords coord;
   BasicBox * box = _maquette->getBox(boxID);
   if (box != NULL) {
+
       if (!box->hasMother()) {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x();
-//          std::cout<<"X = "<<coord.topLeftX* MaquetteScene::MS_PER_PIXEL<<std::endl;
+          std::cout<<"X = "<<coord.topLeftX<<std::endl;
         }
       else {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x()

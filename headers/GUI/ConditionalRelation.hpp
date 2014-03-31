@@ -158,6 +158,7 @@ private :
     QList<BasicBox *>   _boxesAttached;     //!< Conditioned boxes attached to the relation.
     MaquetteScene *     _scene;             //!< The scene containing relation.
     QPointF             _start;             //!< The starting point of the relation.
+    QPointF             _mousePosSave;
     QPointF             _end;               //!< The ending point of the relation.
     QColor              _color;             //!< Color of the relation.
     QColor              _selectedColor;     //!< Color of the relation when selected.
