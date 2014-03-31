@@ -3,7 +3,7 @@ TARGET = i-score
 CONFIG += x86_64
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
 
-QMAKE_CXXFLAGS += -O0 -fPIC -msse3
+QMAKE_CXXFLAGS += -O3 -fPIC -msse3 -std=c++11
 
 # This variable specifies the #include directories which should be searched when compiling the project.
 INCLUDEPATH += headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2
@@ -28,17 +28,22 @@ ICON = resources/images/i-score.icns
 resources/translations = i-score_en.ts i-score_fr.ts
 
 # Support for conditional structures is made available via these scopes
-linux-g++ {
-    # This variable specifies the C++ compiler that will be used when building projects containing C++ source code
-    QMAKE_CXX = /usr/bin/g++
+unix:!macx {
+message("Linux build")
+INCLUDEPATH +=	$$(JAMOMA_INCLUDE_PATH)/Score/library/tests/ \
+		$$(JAMOMA_INCLUDE_PATH)/Modular/library/PeerObject \
+		$$(JAMOMA_INCLUDE_PATH)/Modular/library/ProtocolLib \
+		$$(JAMOMA_INCLUDE_PATH)/Modular/library/SchedulerLib \
+		$$(JAMOMA_INCLUDE_PATH)/DSP/library/includes \
+		$$(JAMOMA_INCLUDE_PATH)/Modular/library/includes \
+		$$(JAMOMA_INCLUDE_PATH)/Score/library/includes \
+		$$(JAMOMA_INCLUDE_PATH)/Foundation/library/includes
 
-    LIBS += -lIscore -lDeviceManager -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodescheduling -lgecodeset -lgecodesupport -lgecodegraph
-}
+INCLUDEPATH += /usr/include/libxml2
 
-linux-g++-64 {
-QMAKE_CXX = /usr/bin/g++
-
-    LIBS += -lIscore -lDeviceManager -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodescheduling -lgecodeset -lgecodesupport -lgecodegraph
+QMAKE_CXXFLAGS += -Wno-unused-parameter
+LIBS += -L/usr/local/lib/jamoma/lib
+LIBS += -lJamomaFoundation -lJamomaDSP -lJamomaScore -lJamomaModular -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodeset -lgecodesupport
 }
 
 macx-g++ {

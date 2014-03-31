@@ -56,3 +56,5 @@ doxygen/html/
 /qrc_i-score.cpp
 /DerivedData/i-score/Index/i-score.hmap
 /i-score/Index/i-score.hmap
+
+/src/.DS_Store
