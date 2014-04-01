@@ -55,6 +55,8 @@ ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, Maquet
     _color = CONDITIONAL_RELATION_COLOR;
     _selectedColor = CONDITIONAL_RELATION_SELECTED_COLOR;
 
+    _mousePressed = false;
+
     setAcceptsHoverEvents(true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
@@ -69,10 +71,22 @@ ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, Maquet
 void
 ConditionalRelation::updateCoordinates()
 {
+    /// \todo Maquette::getInstance()->getConditionDate(ID()); then update start/end;
+
     QPair<BasicBox *, BasicBox *> lowestHighestBoxes = getLowestHighestBoxes();
 
     _start = lowestHighestBoxes.first->getLeftGripPoint() - QPointF(GRIP_SHIFT,0);
     _end = lowestHighestBoxes.second->getLeftGripPoint() - QPointF(GRIP_SHIFT,0);
+
+    // CRASH
+    //    QList<BasicBox *>::iterator     it;
+    //    BasicBox                        *box;
+    //    for(it=_boxesAttached.begin() ; it!=_boxesAttached.end() ; it++)
+    //    {
+    //        box = *it;
+    //        box->setPos(_start.x()+box->width()/2, box->getCenter().y());
+    //        _scene->boxMoved(box->ID());
+    //    }
 
     update();
 }
@@ -192,6 +206,7 @@ ConditionalRelation::mousePressEvent(QGraphicsSceneMouseEvent * event)
     {
         setCursor(Qt::ClosedHandCursor);
         _mousePosSave = event->pos();
+        _mousePressed = true;
     }
 }
 
@@ -202,7 +217,7 @@ ConditionalRelation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 
     if(cursor().shape() == Qt::ClosedHandCursor){
 
-        /// \todo CSP has to do that.
+        /// \todo Score has to do that.
         QList<BasicBox *>::iterator     it;
         BasicBox                        *box;
         for(it=_boxesAttached.begin() ; it!=_boxesAttached.end() ; it++)
@@ -218,6 +233,7 @@ void
 ConditionalRelation::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mouseReleaseEvent(event);
+    _mousePressed = false;
 }
 
 QRectF

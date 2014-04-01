@@ -756,7 +756,6 @@ void
 BasicBox::updateStuff()
 {
 //  std::cout<<"--- updateStuff ---"<<std::endl;
-
   updateBoxSize();
   if (_comment != NULL) {
       _comment->updatePos();
@@ -1576,15 +1575,10 @@ BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 
   QRectF vertResize_bottom(_boxRect.bottomLeft() + QPointF(0, -RESIZE_ZONE_WIDTH), _boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, 0));
   QRectF diagResize_bottomRight(_boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, RESIZE_ZONE_WIDTH), _boxRect.bottomRight());
-  /// \todo : horizontalResize_right
-
-  /// \todo Fix in Score : CSP has to move all boxes attached to a TimeCondition. Provisional : forbid to move when attached to a conditional relation.
-  if (textRect.contains(event->pos()) && attachedToConditionalRelation()) {
-      setCursor(Qt::PointingHandCursor);
-    }
+  /// \todo : horizontalResize_right  
 
   //bandeau zone (text rect) - top  
-  else if (textRect.contains(event->pos())) {
+  if (textRect.contains(event->pos())) {
       setCursor(Qt::OpenHandCursor);
     }
 
@@ -1649,15 +1643,10 @@ BasicBox::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
   QRectF relationGripRight = _rightEar;
 
   QRectF vertResize_bottom(_boxRect.bottomLeft() + QPointF(0, -RESIZE_ZONE_WIDTH), _boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, 0));
-  QRectF diagResize_bottomRight(_boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, RESIZE_ZONE_WIDTH), _boxRect.bottomRight());
-
-  /// \todo Fix in Score : CSP has to move all boxes attached to a TimeCondition. Provisional : forbid to move when attached to a conditional relation.
-  if (textRect.contains(event->pos()) && attachedToConditionalRelation()) {
-      setCursor(Qt::PointingHandCursor);
-    }
+  QRectF diagResize_bottomRight(_boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, RESIZE_ZONE_WIDTH), _boxRect.bottomRight());  
 
   //bandeau zone (text rect) - top  
-  else if (textRect.contains(event->pos())) {
+  if (textRect.contains(event->pos())) {
       setCursor(Qt::OpenHandCursor);
     }  
 

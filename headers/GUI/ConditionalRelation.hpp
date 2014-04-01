@@ -162,6 +162,7 @@ private :
     QPointF             _end;               //!< The ending point of the relation.
     QColor              _color;             //!< Color of the relation.
     QColor              _selectedColor;     //!< Color of the relation when selected.
+    bool                _mousePressed;      //!< State of mouse click.
 };
 
 #endif // CONDITIONALRELATION_HPP
