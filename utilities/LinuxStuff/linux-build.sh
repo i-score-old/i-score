@@ -1,6 +1,5 @@
 #!/bin/sh
-# Install the required stuff
-sudo apt-get install libqt4-dev qt4-qmake libgl1-mesa-dev libgecode-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev ruby git clang-3.4 cmake libstdc++-4.8-dev
+# First install the required stuff (cf. INSTALL.txt)
 
 # Clone Jamoma and Score
 git clone -b feature/cmake git://github.com/jamoma/JamomaCore.git --depth=1
