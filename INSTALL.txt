@@ -20,46 +20,13 @@
 
 
    ==<[ Linux ]>==
-	
-	Building : 
-	
-			# Install the required stuff
-			sudo apt-get install libqt4-dev qt4-qmake libgl1-mesa-dev libgecode-dev libxml2-dev libsndfile-dev libportaudio-dev libportmidi-dev ruby git clang-3.4
-			
-			# Build Jamoma
-			git clone https://github.com/jamoma/Jamoma.git --depth=1
-			cd Jamoma
-			git submodule update --init
-			cd Core
-			git checkout feature/linux
-			ruby build.rb Development clean
-			
-			# Build Score
-			git clone -b feature/linux https://github.com/OSSIA/Score.git
-			cd Score
-			ruby build.rb Development clean
-			
-			# Build i-score
-			cd ../../..
-			git clone -b dev https://github.com/i-score/i-score.git --depth=1
-			export JAMOMA_INCLUDE_PATH=`pwd`/Jamoma/Core
-			cd i-score
-			qmake -spec unsupported/linux-clang
-			make
-			
-			# Create Jamoma symlinks
-			cd /usr/lib
-			sudo ln -s /usr/local/lib/jamoma/lib/* -t .
-		
-		
-		. Running :
-			% cd i-score
+	   . Building :
+			Run the script utilities/LinuxStuff/linux-build.sh on an empty folder
+			(You only need that file, it will clone the i-score repository).
+
+	   . Running :
+			% cd build/i-score
 			% ./i-score
-
-
-
-
-
 
 
    ==<[ Doxygen Documentation ]>==
