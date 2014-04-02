@@ -38,6 +38,11 @@ public :
     void updateCoordinates(unsigned int boxId);
 
     /*!
+     * \brief Forces attached boxes to move to the boxId coordinates.
+     */
+    void updateBoxesCoordinates(unsigned int boxId);
+
+    /*!
      * \brief Attach a box or a group of boxes to the conditional relation.
      *
      * \param conditionedBoxes : the boxes to attach.

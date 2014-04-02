@@ -575,7 +575,7 @@ BasicBox::setSize(const QPointF & size)
 {
   _abstract->setWidth(std::max((float)size.x(), MaquetteScene::MS_PRECISION / MaquetteScene::MS_PER_PIXEL));
   _abstract->setHeight(size.y());
-//  std::cout<<"setSize ------> "<< _abstract->ID()<<" "<<_abstract->width()*MaquetteScene::MS_PER_PIXEL<<std::endl;
+
   updateStuff();
 }
 
@@ -755,7 +755,6 @@ BasicBox::updateRelations(BoxExtremity extremity)
 void
 BasicBox::updateStuff()
 {
-  std::cout<<"--- updateStuff ---"<<ID()<<std::endl;
   updateBoxSize();
   if (_comment != NULL) {
       _comment->updatePos();

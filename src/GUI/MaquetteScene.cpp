@@ -158,9 +158,7 @@ MaquetteScene::updateProgressBar()
 void
 MaquetteScene::zoomChanged(float value)
 {
-    std::cout<<value<<std::endl;
   setMaxSceneWidth(MaquetteScene::MAX_SCENE_WIDTH*value);
-  std::cout<<" > "<<MaquetteScene::MAX_SCENE_WIDTH*value<<std::endl;
   updateProgressBar();
   _timeBar->updateZoom(value);
     
@@ -638,7 +636,6 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
                 BasicBox *firstBox = getBox(_relation->firstBox());
 
                 if(mouseEvent->modifiers() == Qt::AltModifier){ //case conditional relation
-                    std::cout<<"condition "<<firstBox->ID()<<" & "<<secondBox->ID()<<std::endl;
                     QList<BasicBox *> boxesToCondition;
                     boxesToCondition<<firstBox;
                     boxesToCondition<<secondBox;
@@ -1435,7 +1432,6 @@ MaquetteScene::selectionMoved()
           boxMoved(curBox->ID());
         }
       else if (type == CONDITIONAL_RELATION_TYPE){
-          std::cout<<"relX : "<<curItem->boundingRect().topLeft().x()<<std::endl;
       }
     }
 }
@@ -1450,7 +1446,6 @@ MaquetteScene::boxMoved(unsigned int boxID)
 
       if (!box->hasMother()) {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x();
-          std::cout<<"X = "<<coord.topLeftX<<std::endl;
         }
       else {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x()
@@ -1841,12 +1836,10 @@ MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
 
     if(conditionalRelationFound) //just attach boxes to existing relation
     {
-        std::cout<<"MaquetteScene: existing relation -> ATTACH"<<std::endl;
         condRel->attachBoxes(boxesToCondition);
     }
     else //create a new one
     {
-        std::cout<<"MaquetteScene: no existing relation -> CREATE"<<std::endl;
         condRel = new ConditionalRelation(boxesToCondition, this);
     }
 

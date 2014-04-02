@@ -60,7 +60,7 @@ ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, Maquet
     setAcceptsHoverEvents(true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
-    setFlag(QGraphicsItem::ItemIsMovable, true);
+    setFlag(QGraphicsItem::ItemIsMovable, false); /// \todo Implement the relation move on mousePressed && moving
     setZValue(1);
 
     _scene->addItem(this);
@@ -84,9 +84,14 @@ ConditionalRelation::updateCoordinates()
 void
 ConditionalRelation::updateCoordinates(unsigned int boxId)
 {
-    /// \todo Maquette::getInstance()->getConditionDate(ID()); then update start/end;
-    std::cout<<"updateCoord"<<std::endl;
+    /// \todo Maquette::getInstance()->getConditionDate(ID()); then update start/end;    
 
+    updateBoxesCoordinates(boxId);
+    updateCoordinates();
+}
+
+void
+ConditionalRelation::updateBoxesCoordinates(unsigned int boxId){
     // Move related boxes, except boxId's box (already moved by user)
     QList<BasicBox *>::iterator     it;
     BasicBox                        *box = _scene->getBox(boxId),
@@ -104,24 +109,13 @@ ConditionalRelation::updateCoordinates(unsigned int boxId)
             curBoxX = curBox->getLeftGripPoint().x();
 
             if(boxX != curBoxX)
-            {                
+            {
                 curBox->moveBy(boxX - curBoxX, 0.);
                 _scene->boxMoved(curBox->ID());
             }
         }
     }
-
-    QPair<BasicBox *, BasicBox *> lowestHighestBoxes = getLowestHighestBoxes();
-    _start = lowestHighestBoxes.first->getLeftGripPoint() - QPointF(GRIP_SHIFT,0);
-    _end = lowestHighestBoxes.second->getLeftGripPoint() - QPointF(GRIP_SHIFT,0);
-
-    update();
 }
-
-//void
-//ConditionalRelation::updateBoxesCoordinates(){
-
-//}
 
 void
 ConditionalRelation::attachBoxes(QList<BasicBox *> conditionedBox)
@@ -246,11 +240,10 @@ void
 ConditionalRelation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mouseMoveEvent(event);
-updateCoordinates();
-    if(cursor().shape() == Qt::ClosedHandCursor){
 
-
-    }
+//    if(cursor().shape() == Qt::ClosedHandCursor){
+        /// \todo
+//    }
 }
 
 void

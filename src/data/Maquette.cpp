@@ -791,7 +791,6 @@ Maquette::updateBox(unsigned int boxID, const Coords &coord)
 
             _engines->setBoxVerticalPosition(boxID, coord.topLeftY);
             _engines->setBoxVerticalSize(boxID, coord.sizeY);
-            std::cout<<">>>>>>> "<<boxID<<" "<<coord.topLeftX<<std::endl;
             box->setRelativeTopLeft(QPoint((int)coord.topLeftX, (int)coord.topLeftY));
             box->setSize(QPoint((int)coord.sizeX, (int)coord.sizeY));
             box->setPos(box->getCenter());
