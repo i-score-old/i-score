@@ -78,18 +78,50 @@ ConditionalRelation::updateCoordinates()
     _start = lowestHighestBoxes.first->getLeftGripPoint() - QPointF(GRIP_SHIFT,0);
     _end = lowestHighestBoxes.second->getLeftGripPoint() - QPointF(GRIP_SHIFT,0);
 
-    // CRASH
-    //    QList<BasicBox *>::iterator     it;
-    //    BasicBox                        *box;
-    //    for(it=_boxesAttached.begin() ; it!=_boxesAttached.end() ; it++)
-    //    {
-    //        box = *it;
-    //        box->setPos(_start.x()+box->width()/2, box->getCenter().y());
-    //        _scene->boxMoved(box->ID());
-    //    }
+    update();
+}
+
+void
+ConditionalRelation::updateCoordinates(unsigned int boxId)
+{
+    /// \todo Maquette::getInstance()->getConditionDate(ID()); then update start/end;
+    std::cout<<"updateCoord"<<std::endl;
+
+    // Move related boxes, except boxId's box (already moved by user)
+    QList<BasicBox *>::iterator     it;
+    BasicBox                        *box = _scene->getBox(boxId),
+                                    *curBox;
+    unsigned int                    curId;
+    float                           curBoxX,
+                                    boxX = box->getLeftGripPoint().x();
+
+    for(it=_boxesAttached.begin() ; it!=_boxesAttached.end() ; it++)
+    {
+        curBox = *it;
+
+        if(curBox->ID() != box->ID())
+        {
+            curBoxX = curBox->getLeftGripPoint().x();
+
+            if(boxX != curBoxX)
+            {                
+                curBox->moveBy(boxX - curBoxX, 0.);
+                _scene->boxMoved(curBox->ID());
+            }
+        }
+    }
+
+    QPair<BasicBox *, BasicBox *> lowestHighestBoxes = getLowestHighestBoxes();
+    _start = lowestHighestBoxes.first->getLeftGripPoint() - QPointF(GRIP_SHIFT,0);
+    _end = lowestHighestBoxes.second->getLeftGripPoint() - QPointF(GRIP_SHIFT,0);
 
     update();
 }
+
+//void
+//ConditionalRelation::updateBoxesCoordinates(){
+
+//}
 
 void
 ConditionalRelation::attachBoxes(QList<BasicBox *> conditionedBox)
@@ -214,18 +246,10 @@ void
 ConditionalRelation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mouseMoveEvent(event);
-
+updateCoordinates();
     if(cursor().shape() == Qt::ClosedHandCursor){
 
-        /// \todo Score has to do that.
-        QList<BasicBox *>::iterator     it;
-        BasicBox                        *box;
-        for(it=_boxesAttached.begin() ; it!=_boxesAttached.end() ; it++)
-        {
-            box = *it;
-            box->moveBy(event->pos().x()-_mousePosSave.x() , event->pos().y()-_mousePosSave.y());
-            _scene->boxMoved(box->ID());
-        }
+
     }
 }
 

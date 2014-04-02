@@ -33,6 +33,11 @@ public :
     void updateCoordinates();
 
     /*!
+     * \brief Update relation extremities' coordinates and move boxes related except the boxId's box.
+     */
+    void updateCoordinates(unsigned int boxId);
+
+    /*!
      * \brief Attach a box or a group of boxes to the conditional relation.
      *
      * \param conditionedBoxes : the boxes to attach.

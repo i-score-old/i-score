@@ -755,7 +755,7 @@ BasicBox::updateRelations(BoxExtremity extremity)
 void
 BasicBox::updateStuff()
 {
-//  std::cout<<"--- updateStuff ---"<<std::endl;
+  std::cout<<"--- updateStuff ---"<<ID()<<std::endl;
   updateBoxSize();
   if (_comment != NULL) {
       _comment->updatePos();
@@ -775,9 +775,9 @@ BasicBox::updateStuff()
       _triggerPoints->value(*it2)->updatePosition();
     }
 
-//  QList<ConditionalRelation *>::iterator it3;
-//  for(it3 = _conditionalRelation.begin() ; it3 != _conditionalRelation.end() ; it3++)
-//      (*it3)->updateCoordinates();
+  QList<ConditionalRelation *>::iterator it3;
+  for(it3 = _conditionalRelation.begin() ; it3 != _conditionalRelation.end() ; it3++)
+      (*it3)->updateCoordinates(ID());
 
   setFlag(QGraphicsItem::ItemIsMovable, true);
 }
