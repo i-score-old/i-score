@@ -65,6 +65,11 @@ ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, Maquet
 
     _scene->addItem(this);
 
+    //set conditional relation to each box
+    QList<BasicBox *>::iterator     it;
+    for(it = _boxesAttached.begin() ; it!=_boxesAttached.end() ; it++)
+        (*it)->addConditionalRelation(this);
+
     updateCoordinates();
 }
 
@@ -128,6 +133,9 @@ ConditionalRelation::attachBoxes(QList<BasicBox *> conditionedBox)
         {
             _boxesAttached<<(*it);
             Maquette::getInstance()->attachToCondition(_id,*it);
+
+            //set conditional relation to each box
+            (*it)->addConditionalRelation(this);
         }
     }
     updateCoordinates();
@@ -142,6 +150,7 @@ ConditionalRelation::detachBoxes(QList<BasicBox *> conditionedBox)
     {
         _boxesAttached.removeAll(*it);
         Maquette::getInstance()->detachFromCondition(_id,*it);
+        (*it)->removeConditionalRelation(this);
     }
     updateCoordinates();
 }

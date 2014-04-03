@@ -1841,11 +1841,7 @@ MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
     else //create a new one
     {
         condRel = new ConditionalRelation(boxesToCondition, this);
-    }
-
-    //add conditional relation to each box
-    for(it = boxesToCondition.begin() ; it!=boxesToCondition.end() ; it++)
-        (*it)->addConditionalRelation(condRel);
+    }    
 }
 
 void
