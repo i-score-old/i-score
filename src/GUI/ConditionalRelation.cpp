@@ -190,14 +190,14 @@ void
 ConditionalRelation::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 {
     QGraphicsItem::hoverEnterEvent(event);
-    setCursor(Qt::OpenHandCursor);
+    setCursor(Qt::PointingHandCursor);
 }
 
 void
 ConditionalRelation::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {
     QGraphicsItem::hoverMoveEvent(event);
-    setCursor(Qt::OpenHandCursor);
+    setCursor(Qt::PointingHandCursor);
 }
 
 void
@@ -237,6 +237,9 @@ void
 ConditionalRelation::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mousePressEvent(event);
+    if(cursor().shape() == Qt::PointingHandCursor)
+        setSelected(true);
+
     if (cursor().shape() == Qt::OpenHandCursor)
     {
         setCursor(Qt::ClosedHandCursor);
