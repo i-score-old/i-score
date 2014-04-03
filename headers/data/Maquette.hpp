@@ -625,9 +625,9 @@ class Maquette : public QObject
      */
     void deleteCondition(TimeConditionId conditionId, QList<BasicBox *> boxes);
 
-    int getConditionsIds(std::vector<unsigned int> conditionsIds);
+    int getConditionsIds(std::vector<unsigned int> &conditionsIds);
 
-    int getBoxesIdsFromCondition(TimeConditionId conditionId, std::vector<unsigned int> boxesIds);
+    int getBoxesIdsFromCondition(TimeConditionId conditionId, std::vector<unsigned int> &boxesIds);
 
 
     /*!

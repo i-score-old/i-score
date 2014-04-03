@@ -1069,13 +1069,16 @@ Maquette::deleteCondition(TimeConditionId conditionId, QList<BasicBox *> boxes)
 }
 
 int
-Maquette::getConditionsIds(std::vector<unsigned int> conditionsIds){
+Maquette::getConditionsIds(std::vector<unsigned int> &conditionsIds){
     /// \todo
 }
 
 int
-Maquette::getBoxesIdsFromCondition(TimeConditionId conditionId, std::vector<unsigned int> boxesIds){
-    /// \todo
+Maquette::getBoxesIdsFromCondition(TimeConditionId conditionId, std::vector<unsigned int> &boxesIds){
+    std::vector<unsigned int> triggerPointsIds;
+//    _engines->getTPIds(triggerPointsIds);
+    for(int i=0 ; i<triggerPointsIds.size() ; i++)
+        boxesIds.push_back(getTriggerPoint(triggerPointsIds.at(i))->boxID());
 }
 
 void
@@ -1939,7 +1942,7 @@ Maquette::load(const string &fileName)
                 //transform in list of BasicBox
                 for(int i=0 ; i<boxesIds.size() ; i++)
                     boxes<<getBox(boxesIds.at(i));
-
+                TriggerPoint *tp;
                 new ConditionalRelation(boxes,_scene);
             }
         }
