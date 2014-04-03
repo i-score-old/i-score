@@ -1490,12 +1490,12 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             break;
 
           case VERTICAL_RESIZE:
-          resizeHeightEdition(std::max(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y() , (double)BOX_MARGIN));
+          resizeHeightEdition(std::max(double(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y()) , (double)BOX_MARGIN));
             break;
 
           case DIAGONAL_RESIZE:          
-            resizeAllEdition(_abstract->width() + event->pos().x() - _boxRect.topRight().x(),
-                             _abstract->height() + event->pos().y() - _boxRect.bottomRight().y());
+            resizeAllEdition(double(_abstract->width() + event->pos().x() - _boxRect.topRight().x()),
+                             double(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y()));
             break;
         }
       QPainterPath nullPath;
