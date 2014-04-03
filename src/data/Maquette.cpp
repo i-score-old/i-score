@@ -54,6 +54,7 @@
 #include "AbstractRelation.hpp"
 #include "Relation.hpp"
 #include "TriggerPoint.hpp"
+#include "ConditionalRelation.hpp"
 #include <algorithm>
 #include <QTextStream>
 #include "AttributesEditor.hpp"
@@ -1067,6 +1068,16 @@ Maquette::deleteCondition(TimeConditionId conditionId, QList<BasicBox *> boxes)
     _engines->deleteCondition(conditionId,triggerIds);
 }
 
+int
+Maquette::getConditionsIds(std::vector<unsigned int> conditionsIds){
+    /// \todo
+}
+
+int
+Maquette::getBoxesIdsFromCondition(TimeConditionId conditionId, std::vector<unsigned int> boxesIds){
+    /// \todo
+}
+
 void
 Maquette::addCurve(unsigned int boxID, const string &address)
 {
@@ -1913,6 +1924,28 @@ Maquette::load(const string &fileName)
             }
         }
     }
+
+    // CONDITIONAL RELATIONS
+    std::vector<unsigned int> conditionsIds;
+    if(getConditionsIds(conditionsIds) == 0)
+    {
+        std::vector<unsigned int> boxesIds;
+        QList<BasicBox *> boxes;
+        for(int i=0 ; i<conditionsIds.size() ; i++)
+        {
+            //get boxes' ids
+            if(getBoxesIdsFromCondition(conditionsIds.at(i),boxesIds) == 0)
+            {
+                //transform in list of BasicBox
+                for(int i=0 ; i<boxesIds.size() ; i++)
+                    boxes<<getBox(boxesIds.at(i));
+
+                new ConditionalRelation(boxes,_scene);
+            }
+        }
+    }
+
+
 }
 
 void

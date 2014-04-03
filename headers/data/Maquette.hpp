@@ -625,6 +625,11 @@ class Maquette : public QObject
      */
     void deleteCondition(TimeConditionId conditionId, QList<BasicBox *> boxes);
 
+    int getConditionsIds(std::vector<unsigned int> conditionsIds);
+
+    int getBoxesIdsFromCondition(TimeConditionId conditionId, std::vector<unsigned int> boxesIds);
+
+
     /*!
      * \brief Perform moving or resizing for a set of boxes.
      *
