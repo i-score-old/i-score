@@ -2,6 +2,7 @@
 # First install the required stuff (cf. INSTALL.txt)
 
 # Clone Jamoma and Score
+export GIT_SSL_NO_VERIFY=1
 git clone -b feature/cmake git://github.com/jamoma/JamomaCore.git --depth=1
 git clone -b dev https://github.com/i-score/i-score.git --depth=1
 git clone -b feature/cmake git://github.com/OSSIA/Score.git JamomaCore/Score --depth=1
