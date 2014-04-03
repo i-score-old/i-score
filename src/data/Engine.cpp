@@ -1707,7 +1707,7 @@ void Engine::attachToCondition(TimeConditionId conditionId, ConditionedProcessId
         // Add the event to the chosen time condition with the saved expression
         args = TTObjectBasePtr(timeEvent);
         timeCondition->sendMessage(TTSymbol("EventAdd"), args, v);
-//        setTriggerPointMessage(triggerId, expr);
+        setTriggerPointMessage(triggerId, expr);
 
         // Modify the cache
         m_timeConditionMap[triggerId]->object = timeCondition;
