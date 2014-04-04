@@ -25,5 +25,5 @@ cd ..
 mkdir i-score
 export JAMOMA_INCLUDE_PATH=`pwd`/../JamomaCore
 cd i-score
-qmake ../../i-score -spec unsupported/linux-clang
+qtchooser -run-tool=qmake -qt=qt4 ../../i-score -spec unsupported/linux-clang
 make
