@@ -1666,10 +1666,12 @@ void Engine::removeTriggerPoint(ConditionedProcessId triggerId)
 
 TimeConditionId Engine::createCondition(std::vector<ConditionedProcessId> triggerIds)
 {
+    // DEBUG
     std::cout<<"Engine::createCondition::"<<std::endl;
-    for(int i=0 ; i<triggerIds.size() ; i++)
+    for(unsigned i=0 ; i<triggerIds.size() ; i++)
         std::cout<<triggerIds.at(i)<<" ";
     std::cout<<std::endl;
+    // \DEBUG
 
     std::vector<ConditionedProcessId>::iterator it = triggerIds.begin();
     TTTimeConditionPtr timeCondition = getTimeCondition(*it);
@@ -1711,6 +1713,7 @@ void Engine::attachToCondition(TimeConditionId conditionId, ConditionedProcessId
 
         // Modify the cache
         m_timeConditionMap[triggerId]->object = timeCondition;
+        m_conditionsMap[conditionId].push_back(triggerId);
     }
 }
 
@@ -1744,12 +1747,14 @@ void Engine::detachFromCondition(TimeConditionId conditionId, ConditionedProcess
 
         // Modify cache
         m_timeConditionMap[triggerId]->object = otherCondition;
+        m_conditionsMap[conditionId].remove(triggerId);
     }
 }
 
-void Engine::deleteCondition(TimeConditionId conditionId, std::vector<ConditionedProcessId> triggerIds)
+void Engine::deleteCondition(TimeConditionId conditionId)
 {
-    std::vector<ConditionedProcessId>::iterator it;
+    std::list<ConditionedProcessId> & triggerIds = m_conditionsMap[conditionId];
+    std::list<ConditionedProcessId>::iterator it;
     TTTimeConditionPtr timeCondition = getTimeCondition(conditionId);
     TTValue v;
 
@@ -1762,6 +1767,12 @@ void Engine::deleteCondition(TimeConditionId conditionId, std::vector<Conditione
 
     // Uncache the condition
     uncacheTimeCondition(conditionId);
+    m_conditionsMap.erase(conditionId);
+}
+
+void Engine::getConditionTriggerIds(TimeConditionId conditionId, std::vector<TimeProcessId>& triggerIds)
+{
+    triggerIds.assign(m_conditionsMap[conditionId].begin(), m_conditionsMap[conditionId].end());
 }
 
 void Engine::setConditionMessage(TimeConditionId conditionId, std::string disposeMessage)
@@ -1931,6 +1942,17 @@ void Engine::getTriggersPointId(vector<ConditionedProcessId>& triggersID)
     
     for (it = m_conditionedProcessMap.begin(); it != m_conditionedProcessMap.end(); ++it)
         triggersID.push_back(it->first);
+}
+
+void Engine::getConditionsId(vector<TimeConditionId>& conditionsID)
+{
+    std::map<TimeConditionId, std::list<ConditionedProcessId>>::iterator it;
+
+    conditionsID.clear();
+
+    for(it = m_conditionsMap.begin() ; it != m_conditionsMap.end() ; ++it) {
+        conditionsID.push_back(it->first);
+    }
 }
 
 void Engine::setViewZoom(QPointF zoom)
@@ -2890,11 +2912,14 @@ void Engine::store(std::string fileName)
 void Engine::load(std::string fileName)
 {
     TTValue             v, objects, none;
-    TTObjectBasePtr     timeProcess, timeEvent, timeCondition;
+    TTTimeProcessPtr    timeProcess;
+    TTTimeEventPtr      timeEvent;
+    TTTimeConditionPtr  timeCondition;
     TTSymbol            name;
     TimeProcessId       timeProcessId;
     IntervalId          relationId;
     ConditionedProcessId triggerId;
+    TimeConditionId     timeConditionId;
     
     // Clear all the EngineCacheMaps
     // note : this should be useless because all elements are removed by the maquette
@@ -2902,6 +2927,7 @@ void Engine::load(std::string fileName)
     clearInterval();
     clearConditionedProcess();
     clearTimeCondition();
+    m_conditionsMap.clear();
     
     // Create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
@@ -2917,6 +2943,32 @@ void Engine::load(std::string fileName)
     aXmlHandler.send(kTTSym_Read, TTSymbol(fileName), none);
     
     // Rebuild all the EngineCacheMaps from the main scenario content
+
+    // temporary map from TTTimeConditionPtr to TimeConditionId
+    std::map<TTTimeConditionPtr, TimeConditionId> TTCondToID;
+
+    // get all TTTimeConditions
+    m_mainScenario->getAttributeValue(TTSymbol("timeConditions"), objects);
+
+    // for all time conditions
+    for (TTUInt32 i = 0 ; i < objects.size() ; ++i) {
+
+        // check if it's a condition for i-score (2-plus events)
+        timeCondition->getAttributeValue(TTSymbol("events"), v);
+        if (v.size() >= 2) {
+
+            timeCondition = TTTimeConditionPtr(TTObjectBasePtr(objects[i]));
+
+            // get a unique ID for the condition
+            timeConditionId = m_nextConditionedProcessId++;
+
+            // cache it
+            cacheTimeCondition(timeConditionId, timeCondition);
+
+            // fill the temporary map
+            TTCondToID[timeCondition] = timeConditionId;
+        }
+    }
     
     // get all TTTimeProcesses
     m_mainScenario->getAttributeValue(TTSymbol("timeProcesses"), objects);
@@ -2924,7 +2976,7 @@ void Engine::load(std::string fileName)
     // for all time process
     for (TTUInt32 i = 0; i < objects.size(); i++) {
         
-        timeProcess = objects[i];
+        timeProcess = TTTimeProcessPtr(TTObjectBasePtr(objects[i]));
         
         // for each Automation process
         if (timeProcess->getName() == TTSymbol("Automation")) {
@@ -2933,7 +2985,7 @@ void Engine::load(std::string fileName)
             name = v[0];
             
             // Cache it and get an unique id for this process
-            timeProcessId = cacheTimeProcess((TTTimeProcessPtr)timeProcess, name.c_str());
+            timeProcessId = cacheTimeProcess(timeProcess, name.c_str());
             
             // if the Start event of the Automation process is conditioned
             timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
@@ -2948,7 +3000,15 @@ void Engine::load(std::string fileName)
                 triggerId = cacheConditionedProcess(timeProcessId, BEGIN_CONTROL_POINT_INDEX);
             
                 // We cache the TTTimeCondition
-                cacheTimeCondition(triggerId, (TTTimeConditionPtr)timeCondition);
+                cacheTimeCondition(triggerId, timeCondition);
+
+                // if it is a condition for i-score
+                std::map<TTTimeConditionPtr, TimeConditionId>::iterator it = TTCondToID.find(timeCondition);
+                if (it != TTCondToID.end()) {
+
+                    // add it in the conditions map
+                    m_conditionsMap[it->second].push_back(triggerId);
+                }
             }
             
             // if the End event of the Automation process is conditioned
@@ -2964,7 +3024,7 @@ void Engine::load(std::string fileName)
                 triggerId = cacheConditionedProcess(timeProcessId, END_CONTROL_POINT_INDEX);
             
                 // We cache the TTTimeCondition
-                cacheTimeCondition(triggerId, (TTTimeConditionPtr)timeCondition);
+                cacheTimeCondition(triggerId, timeCondition);
             }
         }
         
@@ -2972,7 +3032,7 @@ void Engine::load(std::string fileName)
         else if (timeProcess->getName() == TTSymbol("Interval")) {
             
             // Cache it and get an unique id for this process
-            relationId = cacheInterval((TTTimeProcessPtr)timeProcess);
+            relationId = cacheInterval(timeProcess);
         }
     }
 }

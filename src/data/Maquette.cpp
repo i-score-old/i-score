@@ -1046,26 +1046,9 @@ Maquette::getConditionMessage(TimeConditionId conditionId)
 }
 
 void
-Maquette::deleteCondition(TimeConditionId conditionId, QList<BasicBox *> boxes)
+Maquette::deleteCondition(TimeConditionId conditionId)
 {
-    //Engine needs a vector with start trigger points' ids.
-    std::vector<unsigned int>       triggerIds;
-    QList<BasicBox *>::iterator     it = boxes.begin();
-    BasicBox                        *curBox;
-    TriggerPoint                    *curTriggerPoint;
-    unsigned int                    curTriggerId;
-
-    for(it ; it!=boxes.end() ; it++)
-    {
-        curBox = *it;
-        curTriggerPoint = curBox->getTriggerPoint(BOX_START);
-
-        if(curTriggerPoint != NULL){
-            curTriggerId = curTriggerPoint->ID();
-            triggerIds.push_back(curTriggerId);
-        }
-    }
-    _engines->deleteCondition(conditionId,triggerIds);
+    _engines->deleteCondition(conditionId);
 }
 
 int

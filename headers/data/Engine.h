@@ -76,6 +76,9 @@ typedef	EngineCacheMap*	EngineCacheMapPtr;
 
 typedef std::map<unsigned int, EngineCacheElementPtr>::iterator EngineCacheMapIterator;
 
+/** a temporary type to define a map to store and retreive the triggerIds associated with a conditionId */
+typedef std::map<unsigned int, std::list<unsigned int>> EngineConditionsMap;
+
 #define NO_BOUND -1
 
 #define NO_ID 0
@@ -152,10 +155,12 @@ private:
     EngineCacheMap      m_timeConditionMap;                             /// All condition stored using an unique id
     EngineCacheMap      m_conditionedProcessMap;                        /// All conditioned time process with an conditioned event stored using an unique id
     
+    EngineConditionsMap m_conditionsMap;                                /// All conditions Ids (in i-score point of view) mapped to corresponding triggers id
+
     EngineCacheMap      m_startCallbackMap;                             /// All callback to observe when a time process starts stored using a time process id
     EngineCacheMap      m_endCallbackMap;                               /// All callback to observe when a time process ends stored using a time process id
     
-    EngineCacheMap      m_statusCallbackMap;                             /// All callback to observe time event ready state stored using using a trigger id
+    EngineCacheMap      m_statusCallbackMap;                            /// All callback to observe time event ready state stored using using a trigger id
     EngineCacheMap      m_triggerDataMap;                               /// All TTData to expose conditioned event on the network stored using using a trigger id
 
     TTObjectBasePtr     m_dataPlay;                                     /// A Modular TTData to expose Play transport service
@@ -739,9 +744,10 @@ public:
      * Delete the specified TimeCondition.
      *
      * \param conditionId : the ID of the condition to delete
-     * \param triggerIds : the IDs of all the triggers in the condition
      */
-    void deleteCondition(TimeConditionId conditionId, std::vector<ConditionedProcessId> triggerIds);
+    void deleteCondition(TimeConditionId conditionId);
+
+    void getConditionTriggerIds(TimeConditionId conditionId, std::vector<TimeProcessId>& triggerIds);
     
     // Sick of useless doc
     void setConditionMessage(TimeConditionId conditionId, std::string disposeMessage);
@@ -819,6 +825,14 @@ public:
 	 * \param triggersID : the vector to fill with all triggers ID used.
 	 */
 	void getTriggersPointId(std::vector<ConditionedProcessId>& triggersID);
+
+    /*!
+     * Fills the given vector with all the conditions ID used in the editor.
+     * Useful after a load.
+     *
+     * \param conditionsID : the vector to fill with all conditions ID used.
+     */
+    void getConditionsId(std::vector<TimeConditionId>& conditionsID);
     
     /*!
 	 * Set the zoom factor of the view of the main scenario

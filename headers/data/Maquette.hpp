@@ -621,9 +621,8 @@ class Maquette : public QObject
      * Delete the specified TimeCondition.
      *
      * \param conditionId : the ID of the condition to delete
-     * \param boxes : the boxes attached.
      */
-    void deleteCondition(TimeConditionId conditionId, QList<BasicBox *> boxes);
+    void deleteCondition(TimeConditionId conditionId);
 
     int getConditionsIds(std::vector<unsigned int> &conditionsIds);
 

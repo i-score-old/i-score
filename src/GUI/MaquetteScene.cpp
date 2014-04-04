@@ -1378,7 +1378,7 @@ MaquetteScene::removeConditionalRelation(ConditionalRelation *condRel)
         }
 
         removeItem(condRel);
-        Maquette::getInstance()->deleteCondition(condRel->ID(),condRel->getBoxes());
+        Maquette::getInstance()->deleteCondition(condRel->ID());
         setModified(true);
     }
 }
