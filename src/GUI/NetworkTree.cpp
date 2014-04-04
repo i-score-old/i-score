@@ -2060,6 +2060,7 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
 
                   else if (getCurveValuesSuccess){
                       interpolate = true;
+                      Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
                   }
 
                   updateLine(item, interpolate, sampleRate, redundancy);
