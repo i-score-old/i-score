@@ -11,7 +11,7 @@
 	   . Get git repositories by downloading (or cloning) :
 	   		  Score : https://github.com/OSSIA/Score
 
-	   . Build Score, following the setps in the README.
+	   . Build Score, following the steps in the README.
 
 	   . cd into i-score folder with your terminal.
 
