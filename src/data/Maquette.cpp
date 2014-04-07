@@ -1918,24 +1918,24 @@ Maquette::load(const string &fileName)
     std::vector<unsigned int>   conditionsId,
                                 boxesId;
     QList<BasicBox *>           boxes;
+    unsigned int                conditionId;
 
     getConditionsId(conditionsId);
 
     for(int i=0 ; i<conditionsId.size() ; i++)
     {
+        conditionId = conditionsId.at(i);
+
         //get boxes' ids
-        getBoxesIdFromCondition(conditionsId.at(i),boxesId);
+        getBoxesIdFromCondition(conditionId,boxesId);
 
         //transform in list of BasicBox
+        boxes.clear();
         for(int i=0 ; i<boxesId.size() ; i++)
             boxes<<getBox(boxesId.at(i));
 
-        new ConditionalRelation(boxes,_scene);
-
+        new ConditionalRelation(conditionId, boxes,_scene);
     }
-
-
-
 }
 
 void

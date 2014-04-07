@@ -50,7 +50,36 @@ const float ConditionalRelation::GRIP_SHIFT = 4.;
 ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, MaquetteScene *parent)
     : QGraphicsItem(), _scene(parent), _boxesAttached(boxesAttached)
 {
+    init();
+
     _id = Maquette::getInstance()->createCondition(boxesAttached);
+
+    //set conditional relation to each box
+    QList<BasicBox *>::iterator     it;
+    for(it = _boxesAttached.begin() ; it!=_boxesAttached.end() ; it++)
+        (*it)->addConditionalRelation(this);
+
+    updateCoordinates();
+}
+
+ConditionalRelation::ConditionalRelation(unsigned int id, QList<BasicBox *> boxesAttached, MaquetteScene *parent)
+    : QGraphicsItem(), _id(id), _scene(parent), _boxesAttached(boxesAttached)
+{
+    init();
+
+    _scene->addItem(this);
+
+    //set conditional relation to each box
+    QList<BasicBox *>::iterator     it;
+    for(it = _boxesAttached.begin() ; it!=_boxesAttached.end() ; it++)
+        (*it)->addConditionalRelation(this);
+
+    updateCoordinates();
+}
+
+void
+ConditionalRelation::init (){
+
     _color = CONDITIONAL_RELATION_COLOR;
     _selectedColor = CONDITIONAL_RELATION_SELECTED_COLOR;
 
@@ -63,13 +92,6 @@ ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, Maquet
     setZValue(1);
 
     _scene->addItem(this);
-
-    //set conditional relation to each box
-    QList<BasicBox *>::iterator     it;
-    for(it = _boxesAttached.begin() ; it!=_boxesAttached.end() ; it++)
-        (*it)->addConditionalRelation(this);
-
-    updateCoordinates();
 }
 
 void

@@ -26,6 +26,7 @@ class ConditionalRelation : public QGraphicsItem
 
 public :
     ConditionalRelation(QList<BasicBox *> boxesAttached, MaquetteScene *parent);
+    ConditionalRelation(unsigned int id, QList<BasicBox *> boxesAttached, MaquetteScene *parent);
 
     /*!
      * \brief Update relation extremities' coordinates.
@@ -163,6 +164,8 @@ protected:
     static const float  GRIP_SHIFT;
 
 private :
+
+    void init();
 
     unsigned int        _id;                //!< Time condition id.
     QList<BasicBox *>   _boxesAttached;     //!< Conditioned boxes attached to the relation.
