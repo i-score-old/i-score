@@ -2953,11 +2953,11 @@ void Engine::load(std::string fileName)
     // for all time conditions
     for (TTUInt32 i = 0 ; i < objects.size() ; ++i) {
 
+        timeCondition = TTTimeConditionPtr(TTObjectBasePtr(objects[i]));
+
         // check if it's a condition for i-score (2-plus events)
         timeCondition->getAttributeValue(TTSymbol("events"), v);
         if (v.size() >= 2) {
-
-            timeCondition = TTTimeConditionPtr(TTObjectBasePtr(objects[i]));
 
             // get a unique ID for the condition
             timeConditionId = m_nextConditionedProcessId++;
