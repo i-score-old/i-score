@@ -624,9 +624,9 @@ class Maquette : public QObject
      */
     void deleteCondition(TimeConditionId conditionId);
 
-    int getConditionsIds(std::vector<unsigned int> &conditionsIds);
+    void getConditionsId(std::vector<unsigned int> &conditionsId);
 
-    int getBoxesIdsFromCondition(TimeConditionId conditionId, std::vector<unsigned int> &boxesIds);
+    void getBoxesIdFromCondition(TimeConditionId conditionId, std::vector<unsigned int> &boxesId);
 
 
     /*!

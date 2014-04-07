@@ -1051,17 +1051,20 @@ Maquette::deleteCondition(TimeConditionId conditionId)
     _engines->deleteCondition(conditionId);
 }
 
-int
-Maquette::getConditionsIds(std::vector<unsigned int> &conditionsIds){
-    /// \todo
+void
+Maquette::getConditionsId(std::vector<unsigned int> &conditionsId){
+    _engines->getConditionsId(conditionsId);
 }
 
-int
-Maquette::getBoxesIdsFromCondition(TimeConditionId conditionId, std::vector<unsigned int> &boxesIds){
+void
+Maquette::getBoxesIdFromCondition(TimeConditionId conditionId, std::vector<unsigned int> &boxesId)
+{
     std::vector<unsigned int> triggerPointsIds;
-//    _engines->getTPIds(triggerPointsIds);
+
+    _engines->getConditionTriggerIds(conditionId,triggerPointsIds);
+
     for(int i=0 ; i<triggerPointsIds.size() ; i++)
-        boxesIds.push_back(getTriggerPoint(triggerPointsIds.at(i))->boxID());
+        boxesId.push_back(getTriggerPoint(triggerPointsIds.at(i))->boxID());
 }
 
 void
@@ -1912,24 +1915,25 @@ Maquette::load(const string &fileName)
     }
 
     // CONDITIONAL RELATIONS
-    std::vector<unsigned int> conditionsIds;
-    if(getConditionsIds(conditionsIds) == 0)
+    std::vector<unsigned int>   conditionsId,
+                                boxesId;
+    QList<BasicBox *>           boxes;
+
+    getConditionsId(conditionsId);
+
+    for(int i=0 ; i<conditionsId.size() ; i++)
     {
-        std::vector<unsigned int> boxesIds;
-        QList<BasicBox *> boxes;
-        for(int i=0 ; i<conditionsIds.size() ; i++)
-        {
-            //get boxes' ids
-            if(getBoxesIdsFromCondition(conditionsIds.at(i),boxesIds) == 0)
-            {
-                //transform in list of BasicBox
-                for(int i=0 ; i<boxesIds.size() ; i++)
-                    boxes<<getBox(boxesIds.at(i));
-                TriggerPoint *tp;
-                new ConditionalRelation(boxes,_scene);
-            }
-        }
+        //get boxes' ids
+        getBoxesIdFromCondition(conditionsId.at(i),boxesId);
+
+        //transform in list of BasicBox
+        for(int i=0 ; i<boxesId.size() ; i++)
+            boxes<<getBox(boxesId.at(i));
+
+        new ConditionalRelation(boxes,_scene);
+
     }
+
 
 
 }

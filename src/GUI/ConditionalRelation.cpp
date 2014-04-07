@@ -51,7 +51,6 @@ ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, Maquet
     : QGraphicsItem(), _scene(parent), _boxesAttached(boxesAttached)
 {
     _id = Maquette::getInstance()->createCondition(boxesAttached);
-
     _color = CONDITIONAL_RELATION_COLOR;
     _selectedColor = CONDITIONAL_RELATION_SELECTED_COLOR;
 
