@@ -3,13 +3,16 @@ TARGET = i-score
 CONFIG += x86_64
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
 
-QMAKE_CXXFLAGS += -Wno-deprecated-register -O3 -fPIC -msse3 -std=c++11 -stdlib=libc++ -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
-
+QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -msse3 -std=c++11
+macx {
+QMAKE_CXXFLAGS += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET -stdlib=libc++
+QMAKE_LFLAGS += -stdlib=libc++ -lc++
+}
 # This variable specifies the #include directories which should be searched when compiling the project.
 INCLUDEPATH += headers/GUI headers/data /usr/local/include/libxml2  /usr/include/libxml2
 
 # This variable contains a general set of flags that are passed to the linker.
-QMAKE_LFLAGS += -lc++ -L/usr/local/lib/ -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
+QMAKE_LFLAGS += -L/usr/local/lib/ -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
 
 QT += network xml svg
 
@@ -39,7 +42,6 @@ INCLUDEPATH +=	$$(JAMOMA_INCLUDE_PATH)/Score/library/tests/ \
 		$$(JAMOMA_INCLUDE_PATH)/Score/library/includes \
 		$$(JAMOMA_INCLUDE_PATH)/Foundation/library/includes
 
-QMAKE_CXXFLAGS += -Wno-unused-parameter
 LIBS += -L/usr/local/jamoma/lib -lJamomaFoundation -lJamomaDSP -lJamomaScore -lJamomaModular
 LIBS += -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodeset -lgecodesupport
 }
