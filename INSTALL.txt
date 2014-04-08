@@ -17,7 +17,13 @@
 
 	   . Compile by running the script : ./build.sh
 
+   ==<[ Mac OS (Using homebrew / macports / …) ]>==
+	   . Examples given with brew
+	   . Download and install libraries :
+		brew install cmake gecode portaudio portmidi libsndfile qt
 
+ 
+		
 
    ==<[ Linux ]>==
    	   . Prerequisites : 
