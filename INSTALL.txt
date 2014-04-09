@@ -22,8 +22,9 @@
 	   . Download and install libraries :
 		brew install cmake gecode portaudio portmidi libsndfile qt
 
- 
-		
+  	   . Run utilities/scripts/MacBuild.sh on an empty directory
+	   . The built application is i-score.app, it should be portable to other Macs which had the required libraries installed by brew.
+
 
    ==<[ Linux ]>==
    	   . Prerequisites : 
