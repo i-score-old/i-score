@@ -55,7 +55,7 @@ BoxContextMenu::BoxContextMenu(BasicBox *box)
 {
   _box = box;
 
-  setWindowModality(Qt::ApplicationModal);
+//  setWindowModality(Qt::ApplicationModal);
 
   _changeNameAct = new QAction(tr("Change name"), this);
   addAction(_changeNameAct);
@@ -83,6 +83,10 @@ BoxContextMenu::BoxContextMenu(BasicBox *box)
   addAction(_viewRelationAct);
   connect(_viewRelationAct, SIGNAL(triggered()), this, SLOT(viewRelations()));
 
+  _detachAct = new QAction(tr("Detach from condition"), this);
+  addAction(_detachAct);
+  connect(_detachAct, SIGNAL(triggered()), this, SLOT(detachFromCondition()));
+
   _nameDialog = new QDialog(this);
   _nameDialog->setWindowModality(Qt::WindowModal);
   _nameLayout = new QGridLayout(this);
@@ -98,6 +102,11 @@ BoxContextMenu::~BoxContextMenu()
   delete _changeNameAct;
   delete _changeColorAct;
   delete _viewRelationAct;
+}
+
+void
+BoxContextMenu::setDetachActionEnabled(bool enabled){
+    _detachAct->setEnabled(enabled);
 }
 
 void
@@ -143,4 +152,9 @@ BoxContextMenu::viewRelations()
 {
   ViewRelations viewRelations(_box->ID(), static_cast<MaquetteScene*>(_box->scene()), NULL);
   viewRelations.exec();
+}
+
+void
+BoxContextMenu::detachFromCondition(){
+    _box->detachFromCondition();
 }

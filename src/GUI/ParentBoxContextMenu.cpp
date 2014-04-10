@@ -48,8 +48,6 @@ ParentBoxContextMenu::ParentBoxContextMenu(ParentBox *box) :
   BoxContextMenu((BasicBox*)box)
 {
   _box = box;
-
-  setWindowModality(Qt::ApplicationModal);
 }
 
 ParentBoxContextMenu::~ParentBoxContextMenu()

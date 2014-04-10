@@ -53,6 +53,7 @@
 #include "ConditionalRelation.hpp"
 #include "CurveWidget.hpp"
 #include "BoxCurveEdit.hpp"
+#include "BoxContextMenu.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -820,6 +821,24 @@ BasicBox::removeConditionalRelation(ConditionalRelation *condRel)
     _conditionalRelation.removeAll(condRel);
 }
 
+void
+BasicBox::removeConditionalRelations()
+{
+    QList<ConditionalRelation *>::iterator it=_conditionalRelation.begin();
+
+    for(it ; it!=_conditionalRelation.end() ; it++)
+        removeConditionalRelation(*it);
+}
+
+void
+BasicBox::detachFromCondition()
+{
+    QList<ConditionalRelation *>::iterator it=_conditionalRelation.begin();
+
+    for(it ; it!=_conditionalRelation.end() ; it++)
+        (*it)->detachBox(this);
+}
+
 QList<Relation *>
 BasicBox::getStartBoxRelations()
 {
@@ -1388,7 +1407,7 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
           lock();
         }
       else if (cursor().shape() == Qt::CrossCursor) {
-          lock();
+          lock();          
           if (event->pos().x() < _boxRect.topLeft().x() + RESIZE_TOLERANCE) {
               _scene->setRelationFirstBox(_abstract->ID(), BOX_START);
             }
@@ -1447,6 +1466,7 @@ BasicBox::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 
   if (_hasContextMenu) {
       setSelected(false);
+      static_cast<BoxContextMenu *>(_contextMenu)->setDetachActionEnabled(attachedToConditionalRelation());
       _contextMenu->exec(event->screenPos());
     }
 }

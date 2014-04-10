@@ -56,6 +56,7 @@ public :
      * \param conditionedBoxes : the boxes to detach.
      */
     void detachBoxes(QList<BasicBox *> conditionedBox);
+    void detachBox(BasicBox * box);
 
     /*!
      * \brief Sorts all attached boxes to get the lowest and highest.

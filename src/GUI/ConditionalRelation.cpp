@@ -163,17 +163,22 @@ ConditionalRelation::attachBoxes(QList<BasicBox *> conditionedBox)
 }
 
 void
+ConditionalRelation::detachBox(BasicBox * box)
+{
+    Maquette::getInstance()->detachFromCondition(_id,box);
+    box->removeConditionalRelation(this);
+    _boxesAttached.removeAll(box);
+
+    updateCoordinates();
+}
+
+void
 ConditionalRelation::detachBoxes(QList<BasicBox *> conditionedBox)
 {
     QList<BasicBox *>::iterator it;
 
     for(it=conditionedBox.begin() ; it!=conditionedBox.end() ; it++)
-    {
-        _boxesAttached.removeAll(*it);
-        Maquette::getInstance()->detachFromCondition(_id,*it);
-        (*it)->removeConditionalRelation(this);
-    }
-    updateCoordinates();
+        detachBox(*it);
 }
 
 QPair<BasicBox *, BasicBox *>

@@ -225,6 +225,9 @@ class BasicBox : public QObject, public QGraphicsItem
      * \param condRelID : the conditional relation ID to remove
      */
     void removeConditionalRelation(ConditionalRelation *condRel);
+    void removeConditionalRelations();
+
+    void detachFromCondition();
 
     /*!
      * \brief Returns Relations associated to the start box extremity.
