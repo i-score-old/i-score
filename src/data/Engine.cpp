@@ -2344,7 +2344,10 @@ bool Engine::loadNetworkNamespace(const string &application, const string &filep
     TTValue none, v = TTObjectBasePtr(getApplication(TTSymbol(application)));
     aXmlHandler.set(kTTSym_object, v);
     
-    TTErr err = aXmlHandler.send(kTTSym_Read, TTSymbol(filepath), none);    
+    TTErr err = aXmlHandler.send(kTTSym_Read, TTSymbol(filepath), none);
+    
+    // Init the application
+    getApplication(TTSymbol(application))->sendMessage(TTSymbol("Init"));
 
     return err != kTTErrNone;
 }
