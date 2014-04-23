@@ -612,6 +612,15 @@ NetworkTree::hasStartEndMsg(QTreeWidgetItem *item)
   return(_startMessages->getMessages().contains(item) || _endMessages->getMessages().contains(item));
 }
 
+bool
+NetworkTree::hasStartMsg(QTreeWidgetItem *item){
+    return _startMessages->getMessages().contains(item);
+}
+
+bool
+NetworkTree::hasEndMsg(QTreeWidgetItem *item){
+    return _endMessages->getMessages().contains(item);
+}
 
 /****************************************************************************
 *                          General display tools
@@ -1728,23 +1737,35 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
               emit recModeChanged(item);
           }
           else{
-              if (isAssigned(item) && hasCurve(item)) {
+              if (isAssigned(item) && hasStartMsg(item) && hasEndMsg(item)) {
                   bool activated = item->checkState(column) == Qt::Checked;
                   emit(curveActivationChanged(item, activated));
               }
               else {
-                  //Creates curve with start=minBound and end=maxBound (default 0 1)
+                  float start = 0., end = 1.;
                   vector<float> rangeBounds;
-                  float min = 0., max = 1.;
                   std::string address = getAbsoluteAddress(item).toStdString();
-                  if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0){
-                      min = rangeBounds[0];
-                      max = rangeBounds[1];
+
+                  if(!Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0)
+                    return;
+
+                  if(!hasStartEndMsg(item)){ //Creates curve with start=minBound and end=maxBound (default 0 1)
+                          start = rangeBounds[0];
+                          end = rangeBounds[1];
                   }
+                  else if (hasStartMsg(item)){
+                      start = _startMessages->getMessage(item).value.toFloat();
+                      end = rangeBounds[1];
+                  }
+                  else if(hasEndMsg(item)){
+                      start = rangeBounds[0];
+                      end = _endMessages->getMessage(item).value.toFloat();
+                  }
+
                   VALUE_MODIFIED = true;
-                  item->setText(START_COLUMN,QString("%1").arg(min));
+                  item->setText(START_COLUMN,QString("%1").arg(start));
                   VALUE_MODIFIED = true;
-                  item->setText(END_COLUMN,QString("%1").arg(max));
+                  item->setText(END_COLUMN,QString("%1").arg(end));
               }
           }
       }
