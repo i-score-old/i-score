@@ -255,4 +255,5 @@ HeaderPanelWidget::mouseReleaseEvent(QMouseEvent *event){
 
     //Set attributes of the main scenario
     _scene->setAttributes(static_cast<AbstractBox *>(Maquette::getInstance()->getBox(1)->abstract()));
+    _scene->unselectAll();
 }
