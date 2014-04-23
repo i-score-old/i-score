@@ -2057,6 +2057,10 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
             // run the protocol
             getProtocol(protocolName)->sendMessage(TTSymbol("Run"));
         }
+        
+        // set the priority, service, tag and rangeBounds attributes as a cached attributes
+        v = TTValue(kTTSym_priority, kTTSym_service, kTTSym_tag, kTTSym_rangeBounds);
+        anApplication->setAttributeValue(TTSymbol("cachedAttributes"), v);
     }
 }
 
@@ -2331,6 +2335,8 @@ Engine::requestObjectChildren(const std::string & address, vector<string>& child
 
 void Engine::refreshNetworkNamespace(const string &application, const string &address)
 {
+    TTValue none;
+    
     getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryClear"));
     getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryBuild"));
 }
