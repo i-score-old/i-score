@@ -1146,7 +1146,7 @@ MaquetteScene::addBox(BoxCreationMode mode)
         }
     }
   if (boxID != NO_ID) {
-      setAttributes(static_cast<AbstractBox*>(getBox(boxID)->abstract()));
+      getBox(boxID)->select();
     }
 }
 
