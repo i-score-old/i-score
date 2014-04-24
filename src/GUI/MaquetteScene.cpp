@@ -1583,6 +1583,7 @@ MaquetteScene::stopOrPause()
         _playThread->quit();
         _maquette->turnExecutionOff();
         emit(playModeChanged());
+        emit(updateRecordingBoxes());
         _playingBoxes.clear();        
     }        
 }
@@ -1606,6 +1607,7 @@ MaquetteScene::stopAndGoToCurrentTime()
     _maquette->stopPlayingAndGoToCurrentTime();
     _playThread->quit();
     emit(playModeChanged());
+    emit(updateRecordingBoxes());
     _playingBoxes.clear();           
 }
 
@@ -1626,6 +1628,10 @@ MaquetteScene::speedChanged(double value)
 void
 MaquetteScene::stopAndGoToStart()
 {
+    bool updateRecBoxes = false;
+    if(_maquette->isExecutionOn())
+        updateRecBoxes = true;
+
     displayMessage(tr("Stopped and go to start").toStdString(), INDICATION_LEVEL);
     
     _maquette->setAccelerationFactor(1.);
@@ -1642,6 +1648,9 @@ MaquetteScene::stopAndGoToStart()
     update();
     
     emit(playModeChanged());
+
+    if(updateRecBoxes)
+        emit(updateRecordingBoxes());
 }
 
 void
@@ -1685,6 +1694,7 @@ MaquetteScene::timeEndReached()
     update();
     
     emit(playModeChanged());
+    emit(updateRecordingBoxes());
 }
 
 bool

@@ -261,6 +261,7 @@ DeviceEdit::setChanged()
 void
 DeviceEdit::updateNetworkConfiguration()
 {
+    setModal(false);
     if(_newDevice){
         string          name = _nameEdit->text().toStdString(),
                         ip   = _localHostBox->text().toStdString(),
