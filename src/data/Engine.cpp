@@ -2060,7 +2060,11 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
         }
         
         // set the priority, service, tag and rangeBounds attributes as a cached attributes
-        v = TTValue(kTTSym_priority, kTTSym_service, kTTSym_tag, kTTSym_rangeBounds);
+        v = kTTSym_priority;
+        v.append(kTTSym_service);
+        v.append(kTTSym_tag);
+        v.append(kTTSym_rangeBounds);
+        v.append(kTTSym_rangeClipmode);
         anApplication->setAttributeValue(TTSymbol("cachedAttributes"), v);
     }
 }
