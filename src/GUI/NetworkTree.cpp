@@ -2051,7 +2051,7 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
 
   BasicBox *box = Maquette::getInstance()->getBox(boxID);
   if (box != NULL) { // Box Found
-      if (box->hasCurve(address)) {
+      if (box->hasCurve(address) && !_recMessages.contains(item) ) {
           if (_assignedItems.value(item).hasCurve) {
               unsigned int sampleRate;
               bool redundancy, interpolate;
@@ -2115,8 +2115,8 @@ NetworkTree::updateCurves(unsigned int boxID, bool forceUpdate)
       QTreeWidgetItem *item;
       QList<QTreeWidgetItem *>list = _assignedItems.keys();
       QList<QTreeWidgetItem *>::iterator it;
-      for (it = list.begin(); it != list.end(); it++) {
-          item = *it;
+      for (it = list.begin(); it != list.end(); it++) {          
+          item = *it;          
           updateCurve(item, boxID, forceUpdate);
         }
     }
@@ -2283,12 +2283,13 @@ void
 NetworkTree::setRecMode(std::string address){
     QTreeWidgetItem *item = getItemFromAddress(address);
 
-    if(!_recMessages.contains(item)){
+    if(!_recMessages.contains(item)){        
         _recMessages<<item;
+
         item->setData(INTERPOLATION_COLUMN, Qt::CheckStateRole, QVariant());
         item->setIcon(INTERPOLATION_COLUMN,QIcon(":/resources/images/record.svg"));
     }
-    else{
+    else{        
         _recMessages.removeAll(item);
         item->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
     }
