@@ -1679,8 +1679,8 @@ MaquetteScene::removeSelectedItems()
 
 void
 MaquetteScene::timeEndReached()
-{    
-    _maquette->stopPlayingAndGoToStart();
+{
+    view()->updateTimeOffsetView();
     
     update();
     
