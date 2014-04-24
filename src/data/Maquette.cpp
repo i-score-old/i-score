@@ -1468,6 +1468,10 @@ Maquette::stopPlayingAndGoToStart()
     /// \todo Check this. NH
 //NH : commenté car est fait automatiquement (il semblerait)
 //     et provoquait un problème au timeEndReached (l'updatePlayMode ne se faisait plus)
+
+    //Quand ce sera réparé dans score, virer cet update :
+    _scene->view()->updateTimeOffsetView();
+    //Puis décomenter ça :
 //    setTimeOffset(0);
 }
 
