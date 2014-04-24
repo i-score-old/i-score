@@ -2283,7 +2283,7 @@ void
 NetworkTree::setRecMode(std::string address){
     QTreeWidgetItem *item = getItemFromAddress(address);
 
-    if(!_recMessages.contains(item)){        
+    if(!_recMessages.contains(item)){
         _recMessages<<item;
 
         item->setData(INTERPOLATION_COLUMN, Qt::CheckStateRole, QVariant());

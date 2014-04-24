@@ -141,6 +141,7 @@ MainWindow::MainWindow()
   connect(_scene, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
   connect(_view, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
   connect(_scene, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
+  connect(_scene, SIGNAL(updateRecordingBoxes()), this, SLOT(updateRecordingBoxes()));
 }
 
 MainWindow::~MainWindow()
@@ -773,9 +774,6 @@ MainWindow::updatePlayMode(){
     _scene->unselectAll();
     _editor->noBoxEdited();
     _editor->setDisabled(_scene->playing());
-
-    if(!_scene->playing())
-        updateRecordingBoxes();
 }
 
 void
