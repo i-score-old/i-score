@@ -1464,7 +1464,7 @@ void
 Maquette::stopPlayingAndGoToStart()
 {    
     turnExecutionOff();
-    std::cout<<"stop"<<std::endl;
+
     _scene->view()->updateTimeOffsetView();
 }
 
