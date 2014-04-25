@@ -282,7 +282,7 @@ BasicBox::createWidget()
   _comboBox = new QComboBox;
   _comboBox->view()->setTextElideMode(Qt::ElideMiddle);
   _comboBox->setInsertPolicy(QComboBox::InsertAtTop);
-  _comboBox->setBaseSize(_comboBox->width(), COMBOBOX_HEIGHT);
+//  _comboBox->setBaseSize(_comboBox->width(), COMBOBOX_HEIGHT);
   QFont font;
   font.setPointSize(10);
   _comboBox->setFont(font);

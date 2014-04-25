@@ -626,6 +626,7 @@ class MaquetteScene : public QGraphicsScene
     void accelerationValueChanged(double value);
     void networkConfigChanged(std::string deviceName, std::string pluginName, std::string IP, unsigned int port);
     void playModeChanged();
+    void updateRecordingBoxes();
 
   public slots:
     void verticalScroll(int value);

@@ -98,7 +98,7 @@ AttributesEditor::init()
 
 
   QPalette pal = palette();
-  pal.setColor( QPalette::Background, QColor( 170, 0, 0 ) );
+  pal.setColor( QPalette::Background, QColor(60,60,60) );
   setPalette( pal );
   setAutoFillBackground( true );
 }
