@@ -306,7 +306,7 @@ MainWindow::open()
     }
 
   QString fileName = QFileDialog::
-          getOpenFileName(this, tr("Open File"), "", tr("XML Files (*.score)"));
+          getOpenFileName(this, tr("Open File"), 0, tr("XML Files (*.score)"));
 
 
 
