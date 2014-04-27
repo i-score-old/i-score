@@ -4,6 +4,7 @@ ISCORE_CMAKE_DEBUG=""
 ISCORE_QMAKE_DEBUG=""
 ISCORE_CMAKE_TOOLCHAIN=""
 ISCORE_QMAKE_TOOLCHAIN=""
+INSTALL_DEPS=0
 
 
 
@@ -20,12 +21,12 @@ do
 				ISCORE_QMAKE_TOOLCHAIN="unsupported/linux-clang"
 			fi
 			;;
-		--android) echo "Android cross-build (only Jamoma for now, i-score needs to be ported in Qt5.2)"
+		--android) echo "Android cross-build (only Jamoma for now, i-score needs to be ported to Qt5.x)"
 			OSTYPE="android"
 			ISCORE_CMAKE_TOOLCHAIN="-DCMAKE_TOOLCHAIN_FILE=../../JamomaCore/Shared/toolchains/android.cmake"
 			ISCORE_QMAKE_TOOLCHAIN="android-clang"
 			;;
-		--install-deps echo "Required dependencies will be installed"
+		--install-deps) echo "Required dependencies will be installed"
 			INSTALL_DEPS=1
 			;;
 		--*) echo "Wrong option : $1"
@@ -36,6 +37,15 @@ do
 	esac
 	shift
 done
+
+# Install dependencies
+if [[ "$INSTALL_DEPS" == 1 ]]; then
+	if [[ "$OSTYPE" == "linux-gnu" ]]; then # Desktop & Embedded Linux
+		sudo apt-get install cmake git libqt4-dev qt4-qmake libgl1-mesa-dev libgecode-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev git clang-3.4 cmake libstdc++-4.8-dev
+	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
+		brew install cmake gecode portaudio portmidi libsndfile qt
+	fi
+fi
 
 # Clone Jamoma and Score
 export GIT_SSL_NO_VERIFY=1
@@ -50,11 +60,6 @@ cmake ../../JamomaCore $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN
 cmake ../../JamomaCore $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN
 
 if [[ "$OSTYPE" == "linux-gnu" ]]; then # Desktop & Embedded Linux
-
-	if [[ -z "$INSTALL_DEPS" ]]; then
-		sudo apt-get install libqt4-dev qt4-qmake libgl1-mesa-dev libgecode-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev git clang-3.4 cmake libstdc++-4.8-dev
-	fi
-
 	make package
 
 	# Install
@@ -91,11 +96,6 @@ elif [[ "$OSTYPE" == "android" ]]; then # Android
 	# make
 
 elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
-
-	if [[ -z "$INSTALL_DEPS" ]]; then
-		brew install cmake gecode portaudio portmidi libsndfile qt
-	fi
-
 	make install
 
 	cd ..
