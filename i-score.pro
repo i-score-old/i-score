@@ -14,7 +14,7 @@ QMAKE_LFLAGS += -stdlib=libc++ -lc++
 INCLUDEPATH += headers/GUI headers/data /usr/local/include/libxml2  /usr/include/libxml2
 
 # This variable contains a general set of flags that are passed to the linker.
-QMAKE_LFLAGS += -L/usr/local/lib/ -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
+QMAKE_LFLAGS += -L/usr/local/lib/jamoma/lib -L/usr/local/lib/ -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
 
 QT += core network xml svg
 
