@@ -20,12 +20,14 @@ Options :
 	--help			Shows this message
 	--debug			Builds everything with debug informations.
 	--use-clang		Builds everything with the Clang compiler. Only useful on Linux systems.
-	--android		Cross-build for Android. Only i-score 0.3. Requires the NDK & a toolchain with compiled libs. See AndroidBuild.txt.
 	--install-deps		Installs dependencies using apt-get on Linux and Brew on OS X.
 	--fetch-all		Fetches the full git repositories instead of the tip of the feature/cmake branch.
 	--iscore-recast 	Builds i-score 0.3 instead of 0.2.
 	--only-jamoma		Does not build i-score, only Jamoma & Score.
 	--install-jamoma	Installs Jamoma on the system folders.
+	--android		Cross-build for Android. Only i-score 0.3. Requires the NDK & a toolchain with compiled libs. See AndroidBuild.txt.
+					To cross-build, please set ANDROID_NDK_ROOT to your NDK path and ANDROID_QT_BIN to the corresponding qmake executable folder.
+	--clean			Removes the build folder.
 "
 while test $# -gt 0
 do
@@ -59,6 +61,9 @@ do
 			;;
 		--install-jamoma) echo "Will install Jamoma in the system folders"
 			ISCORE_INSTALL_JAMOMA=1
+			;;
+		--clean) "Removal of the build folder"
+			rm -rf build
 			;;
 		--*) echo "Wrong option : $1"
 			 echo "$HELP_MESSAGE"
@@ -170,26 +175,24 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then # Desktop & Embedded Linux
 elif [[ "$OSTYPE" == "android" ]]; then # Android
 	make
 
-	# TODO put in CMake
-	for file in *.ttso; do
-		mv "$file" "`basename $file .ttso`.so"
-	done
-
 	if [[ "$ISCORE_INSTALL_JAMOMA" == 1 ]]; then
 		sudo cp *.so /opt/android-toolchain/arm-linux-androideabi/lib/jamoma
 	fi
 
 	if [[ "$ISCORE_ONLY_JAMOMA" == 0 ]]; then
-		ANDROID_LIBS=/opt/android-toolchain/android-toolchain/arm-linux-androideabi/lib/jamoma/*.so
-
 		cd ..
 		mkdir $ISCORE_FOLDER
 		export JAMOMA_INCLUDE_PATH=`pwd`/../JamomaCore
 		cd $ISCORE_FOLDER
+		mkdir android_build_output
 
-		#TODO
-		# qmake-android ../../i-score $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG "ANDROID_EXTRA_LIBS=$ANDROID_LIBS"
-		# make
+		echo "Using following NDK root : $ANDROID_NDK_ROOT."
+		$ANDROID_QT_BIN/qmake -r $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG ../../$ISCORE_FOLDER
+		make
+		make install INSTALL_ROOT=android_build_output
+		$ANDROID_QT_BIN/androiddeployqt --output android_build_output --input android-libi-scoreRecast.so-deployment-settings.json
+
+		cp android_build_output/bin/QtApp-debug.apk ../../i-score-debug.apk
 	fi
 
 elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
