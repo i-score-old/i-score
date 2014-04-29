@@ -206,13 +206,20 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		make
 
 		cd ../..
-		cp -rf build/$ISCORE_FOLDER/i-score.app .
-		mkdir -p i-score.app/Contents/Frameworks/
-		cp -rf /usr/local/jamoma* i-score.app/Contents/Frameworks/
+		if [[ "$ISCORE_RECAST" == 1 ]]; then
+			ISCORE_EXECUTABLE_NAME=i-scoreRecast
+		else
+			ISCORE_EXECUTABLE_NAME=i-score
+		fi
+
+		rm -rf $ISCORE_EXECUTABLE_NAME.app
+		cp -rf build/$ISCORE_FOLDER/$ISCORE_EXECUTABLE_NAME.app .
+		mkdir -p $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/
+		cp -rf /usr/local/jamoma* $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/
 
 		# Jamoma rpath
-		install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/lib i-score.app/Contents/MacOS/i-score
-		install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/extensions i-score.app/Contents/MacOS/i-score
+		install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/lib $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/$ISCORE_EXECUTABLE_NAME
+		install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/extensions $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/$ISCORE_EXECUTABLE_NAME
 	fi
 else
 	echo "Not supported yet."
