@@ -1471,9 +1471,14 @@ Maquette::stopPlayingAndGoToStart()
 void
 Maquette::stopPlayingAndGoToTimeOffset(unsigned int timeOffset)
 {
-  turnExecutionOff();    
-  setTimeOffset(timeOffset,NO);
-  //initSceneState();
+    turnExecutionOff();
+    
+#ifdef MUTE_GOTO_SCORE
+    setTimeOffset(timeOffset, YES);
+    initSceneState(); // and use the goto Nico's algorithm Nico
+#else
+    setTimeOffset(timeOffset, NO);
+#endif
 }
 
 void
@@ -1483,7 +1488,11 @@ Maquette::stopPlayingAndGoToCurrentTime()
     
     turnExecutionOff();
     
-    setTimeOffset(timeOffset,NO);
+#ifdef MUTE_GOTO_SCORE
+    setTimeOffset(timeOffset, YES);
+#else
+    setTimeOffset(timeOffset, NO);
+#endif
 }
 
 void
