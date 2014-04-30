@@ -58,3 +58,7 @@ doxygen/html/
 /i-score/Index/i-score.hmap
 
 /src/.DS_Store
+
+# Eclipse
+.cproject
+.project
