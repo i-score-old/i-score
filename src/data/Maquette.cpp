@@ -1537,18 +1537,20 @@ Maquette::stopPlayingAndGoToStart()
 {    
     turnExecutionOff();
 
-    /// \todo Check this. NH
-//NH : commenté car est fait automatiquement (il semblerait)
-//     et provoquait un problème au timeEndReached (l'updatePlayMode ne se faisait plus)
-//    setTimeOffset(0);
+    _scene->view()->updateTimeOffsetView();
 }
 
 void
 Maquette::stopPlayingAndGoToTimeOffset(unsigned int timeOffset)
 {
-  turnExecutionOff();    
-  setTimeOffset(timeOffset,YES);
-  initSceneState();
+    turnExecutionOff();
+    
+#ifdef MUTE_GOTO_SCORE
+    setTimeOffset(timeOffset, YES);
+    initSceneState(); // and use the goto Nico's algorithm Nico
+#else
+    setTimeOffset(timeOffset, NO);
+#endif
 }
 
 void
@@ -1558,7 +1560,11 @@ Maquette::stopPlayingAndGoToCurrentTime()
     
     turnExecutionOff();
     
-    setTimeOffset(timeOffset,YES);
+#ifdef MUTE_GOTO_SCORE
+    setTimeOffset(timeOffset, YES);
+#else
+    setTimeOffset(timeOffset, NO);
+#endif
 }
 
 void

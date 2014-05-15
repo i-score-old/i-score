@@ -185,6 +185,16 @@ TriggerPoint::nameInputDialog()
   int MMwidth = _scene->views().first()->parentWidget()->width();
   nameDialog->move(position.x() + MMwidth / 2, position.y());
 
+  nameDialog->setStyleSheet(
+              "QInputDialog {"
+              "font-weight: bold;"
+              "border: 2px solid gray;"
+              "border-width: 2px;"
+              "border-color: #606060;"
+              "background-color: darkgray;"
+              "}"
+              );
+
   return nameDialog;
 }
 
@@ -216,6 +226,7 @@ TriggerPoint::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
  *                      break;
  *      }
  */
+      trgPntMsgEdit->move(event->screenPos());
       bool ok = trgPntMsgEdit->exec();
       if (ok) {
           if (_scene->setTriggerPointMessage(_abstract->ID(), trgPntMsgEdit->textValue().toStdString())) {

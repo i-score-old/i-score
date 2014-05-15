@@ -263,21 +263,16 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
       case Qt::ShiftModifier:
       {
         map<float, pair<float, float> >::iterator it;
-        QPointF relativePoint = relativeCoordinates(event->pos());
-        QPointF absolutePoint = absoluteCoordinates(relativePoint);
-        if (fabs(((_abstract->_curve.size() - 1) * _interspace * _scaleX) - absolutePoint.x()) <= 2) {
-            _lastPointSelected = true;
-          }
-        else {
-            _lastPointSelected = false;
-            for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
-                if (fabs(it->first - relativePoint.x()) < 0.01) {
-                    _movingBreakpointX = it->first;
-                    _movingBreakpointY = -1;
-                    break;
-                  }
-              }
-          }
+        QPointF relativePoint = relativeCoordinates(event->pos());        
+
+        for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
+            if (fabs(it->first - relativePoint.x()) < 0.01) {
+                _movingBreakpointX = it->first;
+                _movingBreakpointY = -1;
+                break;
+            }
+        }
+
         break;
       }
 
@@ -289,7 +284,7 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
       case Qt::NoModifier:
       {
         map<float, pair<float, float> >::iterator it;
-        bool found;
+        bool found =  false;
         QPointF relativePoint = relativeCoordinates(event->pos());
 
         for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
@@ -375,7 +370,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
                     float min = 100;
                     float div;
                     float rigidity = 2;
-                    float ratio = fabs(std::log(it->second.first));
+                    float ratio = std::max(0.1, fabs(std::log(it->second.first)));
 
                     if (mousePosY > it->second.first) { // mouse under : pow between 0 and 1
                         div = std::min((double)min, (double)std::max(fabs(_maxY), fabs(_minY)));

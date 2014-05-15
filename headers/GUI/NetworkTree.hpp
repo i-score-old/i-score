@@ -178,11 +178,13 @@ class NetworkTree : public QTreeWidget
     void clearDevicesEndMsgs(QList<QString> devices);
 
     /*!
-     * \brief Checks item's messages, to knows if start and end messages are set.
+     * \brief Checks item's messages, to knows if start or end messages are set.
      * \param The item we want to check.
      * \return True if start and end messages are set.
      */
     bool hasStartEndMsg(QTreeWidgetItem *item);
+    bool hasStartMsg(QTreeWidgetItem *item);
+    bool hasEndMsg(QTreeWidgetItem *item);
 
     
     /***********************************************************************

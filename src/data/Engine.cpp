@@ -1829,6 +1829,7 @@ std::string Engine::getTriggerPointMessage(ConditionedProcessId triggerId)
         TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
     
     // Get the expression associated to this event
+    v = TTObjectBasePtr(timeEvent);
     if (!getTimeCondition(triggerId)->sendMessage(TTSymbol("ExpressionFind"), v, out)) {
         
         expression = out[0];
@@ -2247,6 +2248,14 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
             // run the protocol
             getProtocol(protocolName)->sendMessage(TTSymbol("Run"));
         }
+        
+        // set the priority, service, tag and rangeBounds attributes as a cached attributes
+        v = kTTSym_priority;
+        v.append(kTTSym_service);
+        v.append(kTTSym_tag);
+        v.append(kTTSym_rangeBounds);
+        v.append(kTTSym_rangeClipmode);
+        anApplication->setAttributeValue(TTSymbol("cachedAttributes"), v);
     }
 }
 
@@ -2521,6 +2530,8 @@ Engine::requestObjectChildren(const std::string & address, vector<string>& child
 
 void Engine::refreshNetworkNamespace(const string &application, const string &address)
 {
+    TTValue none;
+    
     getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryClear"));
     getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryBuild"));
 }
@@ -2534,7 +2545,10 @@ bool Engine::loadNetworkNamespace(const string &application, const string &filep
     TTValue none, v = TTObjectBasePtr(getApplication(TTSymbol(application)));
     aXmlHandler.set(kTTSym_object, v);
     
-    TTErr err = aXmlHandler.send(kTTSym_Read, TTSymbol(filepath), none);    
+    TTErr err = aXmlHandler.send(kTTSym_Read, TTSymbol(filepath), none);
+    
+    // Init the application
+    getApplication(TTSymbol(application))->sendMessage(TTSymbol("Init"));
 
     return err != kTTErrNone;
 }
