@@ -1353,6 +1353,8 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item){
         if(item->type()==DeviceNode){
             string application = getAbsoluteAddress(item).toStdString();
             item->takeChildren();
+
+            /// \todo récupérer la valeur de retour. Qui peut être false en cas de OSC (traitement différent dans ce cas là).
             Maquette::getInstance()->refreshNetworkNamespace(application);
             treeRecursiveExploration(item,true);
             Maquette::getInstance()->updateBoxesAttributes();
@@ -2066,7 +2068,9 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
                   if(getCurveSuccess){
                       if (forceUpdate) {
                           if (interpolate) {
-                              interpolate = !(values.front() == values.back());
+
+                              interpolate = !(startMessages()->getMessage(item).value == endMessages()->getMessage(item).value);
+
                               Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
                               if (interpolate) {
                                   //                                std::cout<<"networkTree -> interpolate devient true"<<std::endl;
