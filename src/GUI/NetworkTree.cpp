@@ -2068,17 +2068,8 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
                   if(getCurveSuccess){
                       if (forceUpdate) {
                           if (interpolate) {
-
                               interpolate = !(startMessages()->getMessage(item).value == endMessages()->getMessage(item).value);
-
-                              Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
-                              if (interpolate) {
-                                  //                                std::cout<<"networkTree -> interpolate devient true"<<std::endl;
-                              }
-                              else {
-                                  ;
-                              }
-                              //                                std::cout<<"networkTree -> interpolate devient false"<<std::endl;
+                              Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);                              
                           }
                       }
                   }
