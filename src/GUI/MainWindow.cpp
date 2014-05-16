@@ -547,9 +547,9 @@ MainWindow::createActions()
   _zoomOutAct->setStatusTip(tr("Zoom out"));
   connect(_zoomOutAct, SIGNAL(triggered()), _view, SLOT(zoomOut()));
 
-  _editorAct = new QAction(QIcon(":/resources/images/edit.svg"), tr("Devices Inspector"), this);
-  _editorAct->setShortcut(QString("Ctrl+I"));
-  _editorAct->setStatusTip(tr("Devices Inspector"));
+  _editorAct = new QAction(QIcon(":/resources/images/edit.svg"), tr("Devices Explorer"), this);
+  _editorAct->setShortcut(QString("Ctrl+E"));
+  _editorAct->setStatusTip(tr("Devices Explorer"));
   _editorAct->setCheckable(true);
   _editorAct->setChecked(true);
   connect(_editorAct, SIGNAL(triggered()), this, SLOT(updateEditor()));
