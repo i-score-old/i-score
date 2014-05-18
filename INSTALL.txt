@@ -40,7 +40,7 @@
 	. Build i-score : 
 		First set the path for i-score to find the jamoma includes 
 		% export JAMOMA_INCLUDE_PATH=(put here the path to the Jamoma/Core folder)
-		% qmake -spec=linux-clang
+		% qmake -spec linux-clang
 		% make
 		
 	. Running (could be put in a .sh) : 
