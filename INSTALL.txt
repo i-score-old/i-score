@@ -17,39 +17,24 @@
 
 	   . Compile by running the script : ./build.sh
 
-
-
+   ==<[ Mac OS (Using homebrew / macports) ]>==
+	   . Run : ./FullBuild.sh jamoma iscore --clone --install-deps
+	   
    ==<[ Linux ]>==
-   	   . Prerequisites : 
-   	   	. Debian Jessie, Ubuntu 14.04 : 
-   	   	sudo apt-get install libqt4-dev qt4-qmake libgl1-mesa-dev libgecode-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev git clang-3.4 cmake libstdc++-4.8-dev
-
-
-		. Ubuntu 13.10 :
-		  	sudo apt-get install libgmp-dev libqt4-dev qt4-qmake libgl1-mesa-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev git clang-3.4 cmake libstdc++-4.8-dev
-
-			And install the following packages from the Trusty archive in this order: 
-			http://packages.ubuntu.com/trusty/libmpfr4
-			http://packages.ubuntu.com/trusty/libmpfr-dev
-			http://packages.ubuntu.com/trusty/libgecode36
-			http://packages.ubuntu.com/trusty/libgecodegist36
-			http://packages.ubuntu.com/trusty/libgecodeflatzinc36
-			http://packages.ubuntu.com/trusty/libgecode-dev
+   	   . Tested on Debian Jessia, Ubuntu 14.04, Fedora 19
+	   . Run : ./FullBuild.sh jamoma iscore --clone --install-deps
+	   
+   	   . For Ubuntu 13.10, the following packages must be installed manually
+		And install the following packages from the Trusty archive in this order: 
+		http://packages.ubuntu.com/trusty/libmpfr4
+		http://packages.ubuntu.com/trusty/libmpfr-dev
+		http://packages.ubuntu.com/trusty/libgecode36
+		http://packages.ubuntu.com/trusty/libgecodegist36
+		http://packages.ubuntu.com/trusty/libgecodeflatzinc36
+		http://packages.ubuntu.com/trusty/libgecode-dev
 			
-			(Using dpkg -i ThePackageName.deb)
+		(Using dpkg -i ThePackageName.deb)
 		
-		. Fedora 20 : 
-		 [TBC]
-			
-	   . Building :
-			Run the script utilities/LinuxStuff/linux-build.sh on an empty folder
-			(You only need that file, it will clone the i-score repository).
-
-	   . Running :
-			% cd build/i-score
-			% ./i-score
-
-
    ==<[ Doxygen Documentation ]>==
 
 
