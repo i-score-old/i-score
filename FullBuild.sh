@@ -109,7 +109,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 fi
 
 ###### Set compiler toolchains ######
-if [[ -v ISCORE_USE_CLANG ]]; then
+if [[ $ISCORE_USE_CLANG ]]; then
 	if [[ "$OSTYPE" == "android"* ]]; then
 	ISCORE_CMAKE_TOOLCHAIN="-DCMAKE_TOOLCHAIN_FILE=../../JamomaCore/Shared/CMake/toolchains/android-clang.cmake"
 	ISCORE_QMAKE_TOOLCHAIN="-spec android-clang"
@@ -125,30 +125,30 @@ else
 fi
 
 ###### Install dependencies ######
-if [[ -v ISCORE_INSTALL_DEPS ]]; then
+if [[ $ISCORE_INSTALL_DEPS ]]; then
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then # Desktop & Embedded Linux
-		if [[ -v ISCORE_RECAST ]]; then # Install dependencies required for iscore 0.3
-			if [[ -v ISCORE_FEDORA ]]; then
+		if [[ $ISCORE_RECAST ]]; then # Install dependencies required for iscore 0.3
+			if [[ $ISCORE_FEDORA ]]; then
 				su -c 'yum install qt5-qtbase qt5-qtbase-devel qt5-qttools qt5-qtsvg qt5-qtsvg-devel cmake git gecode-devel libxml2-devel libsndfile-devel portaudio-devel portmidi portmidi-tools portmidi-devel libstdc++-devel'
-			elif [[ -v ISCORE_DEBIAN ]]; then
-				sudo apt-get install qtchooser qt5-qmake qtbase5-dev qtbase5-dev-tools libqt5svg5-dev qtdeclarative5-dev libqt5svg5-dev cmake git libgl1-mesa-dev libgecode-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev clang-3.4 libstdc++-4.8-dev
+			elif [[ $ISCORE_DEBIAN ]]; then
+				sudo apt-get install qtchooser qt5-default qt5-qmake qtbase5-dev qtbase5-dev-tools libqt5svg5-dev qtdeclarative5-dev libqt5svg5-dev cmake git libgl1-mesa-dev libgecode-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev clang-3.4 libstdc++-4.8-dev
 			fi
 		else								 # Install dependencies required for iscore 0.2
-			if [[ -v ISCORE_FEDORA ]]; then
+			if [[ $ISCORE_FEDORA ]]; then
 				su -c 'yum install cmake git qt qt-devel gecode-devel libxml2-devel libsndfile-devel portaudio-devel portmidi portmidi-tools portmidi-devel libstdc++-devel'
-			elif [[ -v ISCORE_DEBIAN ]]; then
+			elif [[ $ISCORE_DEBIAN ]]; then
 				sudo apt-get install qtchooser cmake git libqt4-dev qt4-qmake libgl1-mesa-dev libgecode-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev git clang-3.4 cmake libstdc++-4.8-dev
 			fi
 		fi
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
-		if command -v brew > /dev/null; then # Brew
-			if [[ -v ISCORE_RECAST ]]; then
+		if command $brew > /dev/null; then # Brew
+			if [[ $ISCORE_RECAST ]]; then
 				brew install cmake gecode portaudio portmidi libsndfile qt5
 			else
 				brew install cmake gecode portaudio portmidi libsndfile qt
 			fi
-		elif command -v port > /dev/null; then # MacPorts
-			if [[ -v ISCORE_RECAST ]]; then
+		elif command $port > /dev/null; then # MacPorts
+			if [[ $ISCORE_RECAST ]]; then
 				port install cmake gecode portaudio portmidi libsndfile qt5
 			else
 				port install cmake gecode portaudio portmidi libsndfile qt
@@ -164,10 +164,10 @@ fi
 ###### Configure qmake ######
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	if [[ -z $ISCORE_QMAKE ]]; then
-		if [[ -v ISCORE_FEDORA ]]; then
+		if [[ $ISCORE_FEDORA ]]; then
 			qmake4=qmake-qt4
 			qmake5=qmake-qt5
-		elif command -v qtchooser > /dev/null; then
+		elif command $qtchooser > /dev/null; then
 			qmake4="qtchooser -run-tool=qmake -qt=qt4"
 			qmake5="qtchooser -run-tool=qmake -qt=qt5"
 		else
@@ -183,7 +183,7 @@ fi
 ########################################
 
 ##### Cloning #####
-if [[ -v ISCORE_CLONE_GIT ]]; then
+if [[ $ISCORE_CLONE_GIT ]]; then
 	# Jamoma
 	export GIT_SSL_NO_VERIFY=1
 
@@ -191,13 +191,13 @@ if [[ -v ISCORE_CLONE_GIT ]]; then
 	git clone -b feature/cmake https://github.com/OSSIA/Score.git JamomaCore/Score $ISCORE_DEPTH_GIT
 
 	# i-score
-	if [[ -v ISCORE_RECAST ]]; then
+	if [[ $ISCORE_RECAST ]]; then
 		git clone -b master https://github.com/OSSIA/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
 	else
 		git clone -b feature/cmake https://github.com/i-score/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
 	fi
 
-	if [[ -v ISCORE_FETCH_GIT ]]; then
+	if [[ $ISCORE_FETCH_GIT ]]; then
 		cd JamomaCore
 		git fetch
 		cd Score
@@ -213,19 +213,19 @@ mkdir -p build/jamoma
 cd build/jamoma
 
 ##### Build Jamoma #####
-if [[ -v ISCORE_INSTALL_JAMOMA ]]; then
+if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 	cmake ../../JamomaCore $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN
 
 	# Creation of Jamoma packages
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then # Desktop & Embedded Linux
-		if [[ -v ISCORE_FEDORA ]]; then # RPM
+		if [[ $ISCORE_FEDORA ]]; then # RPM
 			cpack -G RPM
 
 			# Install
 			su -c 'rpm -Uvh --force JamomaCore-0.6-dev-Linux.rpm'
 			su -c 'ln -s /usr/local/lib/jamoma/lib/* -t /usr/lib'
 
-		elif [[ -v ISCORE_DEBIAN ]]; then # DEB
+		elif [[ $ISCORE_DEBIAN ]]; then # DEB
 			make package
 
 			# Install
@@ -247,7 +247,7 @@ fi
 
 
 ##### Build i-score #####
-if [[ -v ISCORE_INSTALL_ISCORE ]]; then
+if [[ $ISCORE_INSTALL_ISCORE ]]; then
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then # Desktop & Embedded Linux
 		# Build i-score
 		cd ..
@@ -255,7 +255,7 @@ if [[ -v ISCORE_INSTALL_ISCORE ]]; then
 		export JAMOMA_INCLUDE_PATH=`pwd`/../JamomaCore
 		cd $ISCORE_FOLDER
 
-		if [[ -v ISCORE_RECAST ]]; then
+		if [[ $ISCORE_RECAST ]]; then
 			${qmake5} ../../$ISCORE_FOLDER $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
 			make
 			cp i-scoreRecast ../../i-score
@@ -290,7 +290,7 @@ if [[ -v ISCORE_INSTALL_ISCORE ]]; then
 		make
 
 		cd ../..
-		if [[ -v ISCORE_RECAST ]]; then
+		if [[ $ISCORE_RECAST ]]; then
 			ISCORE_EXECUTABLE_NAME=i-scoreRecast
 		else
 			ISCORE_EXECUTABLE_NAME=i-score
