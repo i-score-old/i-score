@@ -80,7 +80,7 @@ do
 		ISCORE_DEPTH_GIT=""
 		;;
 	--jamoma-path=*)
-		ISCORE_JAMOMA_PATH="${1#*=}"
+		ISCORE_JAMOMA_PATH=$(cd "${1#*=}"; pwd)
 		echo "Will use the Jamoma installation located in ${ISCORE_JAMOMA_PATH}"
 		;;
 	iscore-recast) echo "Will build i-score v0.3 instead of v0.2"
@@ -105,9 +105,9 @@ do
 	shift
 done
 
-###### Check of the Linux distribution ######
+###### Check of the Linux distribution ######
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-	if [ -f /etc/fedora-release ] ; then # yum
+	if [ -f /etc/fedora-release ] ; then # yum
 		ISCORE_FEDORA=1
 	elif [[ `lsb_release -si` = 'Debian' || `lsb_release -si` = 'Ubuntu' ]]; then # apt
 		ISCORE_DEBIAN=1
@@ -272,7 +272,7 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 fi
 
 
-##### Build i-score #####
+##### Build i-score #####
 if [[ $ISCORE_INSTALL_ISCORE ]]; then
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then # Desktop & Embedded Linux
 		# Build i-score
