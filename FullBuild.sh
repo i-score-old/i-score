@@ -31,6 +31,8 @@ Options :
 --install-deps
   Installs dependencies using apt-get / yum on Linux and brew / port on OS X.
 
+--jamoma-path=/some/path
+  Uses an existing Jamoma installation. Note : it has to be on a branch with CMake (currently feature/cmake).
 --debug
   Builds everything with debug informations.
 --use-clang
@@ -76,6 +78,10 @@ do
 	--fetch-all) echo "Will fetch the entire repositories. Useful for development".
 		ISCORE_FETCH_GIT=1
 		ISCORE_DEPTH_GIT=""
+		;;
+	--jamoma-path=*)
+		ISCORE_JAMOMA_PATH="${1#*=}"
+		echo "Will use the Jamoma installation located in ${ISCORE_JAMOMA_PATH}"
 		;;
 	iscore-recast) echo "Will build i-score v0.3 instead of v0.2"
 		ISCORE_INSTALL_ISCORE=1
@@ -187,13 +193,33 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 	# Jamoma
 	export GIT_SSL_NO_VERIFY=1
 
-	git clone -b feature/cmake https://github.com/jamoma/JamomaCore.git $ISCORE_DEPTH_GIT
-	git clone -b feature/cmake https://github.com/OSSIA/Score.git JamomaCore/Score $ISCORE_DEPTH_GIT
+	if [[ $ISCORE_JAMOMA_PATH ]]; then
+		if [[ -e $ISCORE_JAMOMA_PATH/CMakeLists.txt ]]; then
+			if [[ -e $ISCORE_JAMOMA_PATH/Score ]]; then
+				if [[ -e $ISCORE_JAMOMA_PATH/Score/CMakeLists.txt ]]; then
+					echo "Building using the existing installation"
+				else
+					echo "Please switch OSSIA/Score to the feature/cmake branch"
+					exit 1
+				fi
+			else
+				git clone -b feature/cmake https://github.com/OSSIA/Score.git $ISCORE_JAMOMA_PATH/Score $ISCORE_DEPTH_GIT
+			fi
+		else
+			echo "Please switch Jamoma/JamomaCore to the feature/cmake branch"
+			exit 1
+		fi
+	else
+		git clone -b feature/cmake https://github.com/jamoma/JamomaCore.git $ISCORE_DEPTH_GIT
+		git clone -b feature/cmake https://github.com/OSSIA/Score.git JamomaCore/Score $ISCORE_DEPTH_GIT
+		export ISCORE_JAMOMA_PATH=`pwd`/JamomaCore
+	fi
+	export JAMOMA_INCLUDE_PATH=$ISCORE_JAMOMA_PATH
 
 	# i-score
 	if [[ $ISCORE_RECAST ]]; then
 		git clone -b master https://github.com/OSSIA/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
-	else
+	elif [[ $ISCORE_INSTALL_ISCORE ]]; then
 		git clone -b dev https://github.com/i-score/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
 	fi
 
@@ -214,7 +240,7 @@ cd build/jamoma
 
 ##### Build Jamoma #####
 if [[ $ISCORE_INSTALL_JAMOMA ]]; then
-	cmake ../../JamomaCore $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN
+	cmake $ISCORE_JAMOMA_PATH $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN
 
 	# Creation of Jamoma packages
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then # Desktop & Embedded Linux
@@ -252,7 +278,7 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		# Build i-score
 		cd ..
 		mkdir $ISCORE_FOLDER
-		export JAMOMA_INCLUDE_PATH=`pwd`/../JamomaCore
+
 		cd $ISCORE_FOLDER
 
 		if [[ $ISCORE_RECAST ]]; then
@@ -269,7 +295,6 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 	elif [[ "$OSTYPE" == "android" ]]; then # Android
 		cd ..
 		mkdir $ISCORE_FOLDER
-		export JAMOMA_INCLUDE_PATH=`pwd`/../JamomaCore
 		cd $ISCORE_FOLDER
 		mkdir android_build_output
 
@@ -284,7 +309,6 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		cd ..
 		mkdir $ISCORE_FOLDER
-		export JAMOMA_INCLUDE_PATH=`pwd`/../JamomaCore
 		cd $ISCORE_FOLDER
 		qmake ../../$ISCORE_FOLDER $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
 		make
@@ -305,6 +329,6 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/lib $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/$ISCORE_EXECUTABLE_NAME
 		install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/extensions $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/$ISCORE_EXECUTABLE_NAME
 	else
-		echo "Not supported yet."
+		echo "System not supported yet."
 	fi
 fi
