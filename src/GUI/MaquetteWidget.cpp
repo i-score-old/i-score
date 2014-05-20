@@ -240,7 +240,7 @@ MaquetteWidget::accelerationValueModified(int value)
 void
 MaquetteWidget::play()
 {
-  _scene->play();
+  _scene->playOrResume();
   updateHeader();
 }
 
@@ -248,10 +248,10 @@ void
 MaquetteWidget::stop()
 {
   if (_scene->playing()) {
-      _scene->pause();
+      _scene->stopOrPause();
     }
   else {
-      _scene->stopGotoStart();
+      _scene->stopAndGoToStart();
     }
   updateHeader();
 }
@@ -259,14 +259,14 @@ MaquetteWidget::stop()
 void
 MaquetteWidget::pause()
 {
-  _scene->pause();
+  _scene->stopOrPause();
   updateHeader();
 }
 
 void
 MaquetteWidget::rewind()
 {
-  _scene->stopGotoStart();
+  _scene->stopAndGoToStart();
   updateHeader();
 }
 
