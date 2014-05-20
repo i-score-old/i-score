@@ -194,7 +194,7 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 	if [[ $ISCORE_RECAST ]]; then
 		git clone -b master https://github.com/OSSIA/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
 	else
-		git clone -b feature/cmake https://github.com/i-score/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
+		git clone -b dev https://github.com/i-score/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
 	fi
 
 	if [[ $ISCORE_FETCH_GIT ]]; then
