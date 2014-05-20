@@ -314,7 +314,7 @@ CurvesWidget::updateCurve(const string &address, bool forceUpdate)
                   if (forceUpdate) { // Force updating through engines
                       bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID, address, 0, sampleRate, redundancy, interpolate, values, argTypes, xPercents, yValues, sectionType, coeff);
                       if (getCurveSuccess) {
-                          if (values.front() != values.back()) {
+                          if (values.front() != values.back()) {                              
                               curveTab->setAttributes(_boxID, address, 0, values, sampleRate, redundancy, FORCE_SHOW, interpolate, argTypes, xPercents, yValues, sectionType, coeff);
                             }
                           else {

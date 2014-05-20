@@ -1,17 +1,22 @@
 TEMPLATE = app
 TARGET = i-score
-CONFIG += x86_64
-QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
 
-QMAKE_CXXFLAGS += -O3 -fPIC -msse3 -std=c++11
+QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -msse3 -std=c++11
+
+macx {
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
+CONFIG += x86_64
+QMAKE_CXXFLAGS += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET -stdlib=libc++
+QMAKE_LFLAGS   += -stdlib=libc++ -lc++
+}
 
 # This variable specifies the #include directories which should be searched when compiling the project.
-INCLUDEPATH += headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2
+INCLUDEPATH += headers/GUI headers/data /usr/local/include/libxml2  /usr/include/libxml2
 
 # This variable contains a general set of flags that are passed to the linker.
-QMAKE_LFLAGS += -L/usr/local/lib/
+QMAKE_LFLAGS += -L/usr/local/lib/jamoma/lib -L/usr/local/lib/ -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
 
-QT += network xml svg
+QT += core network xml svg
 
 # This variable specifies the directory where all intermediate objetcts and moc files should be placed.
 OBJECTS_DIR = bin
@@ -28,9 +33,10 @@ ICON = resources/images/i-score.icns
 resources/translations = i-score_en.ts i-score_fr.ts
 
 # Support for conditional structures is made available via these scopes
-unix:!macx {
-message("Linux build")
-INCLUDEPATH +=	$$(JAMOMA_INCLUDE_PATH)/Score/library/tests/ \
+unix {
+message("Unix build")
+INCLUDEPATH +=	/usr/local/jamoma/includes \
+		$$(JAMOMA_INCLUDE_PATH)/Score/library/tests/ \
 		$$(JAMOMA_INCLUDE_PATH)/Modular/library/PeerObject \
 		$$(JAMOMA_INCLUDE_PATH)/Modular/library/ProtocolLib \
 		$$(JAMOMA_INCLUDE_PATH)/Modular/library/SchedulerLib \
@@ -39,53 +45,17 @@ INCLUDEPATH +=	$$(JAMOMA_INCLUDE_PATH)/Score/library/tests/ \
 		$$(JAMOMA_INCLUDE_PATH)/Score/library/includes \
 		$$(JAMOMA_INCLUDE_PATH)/Foundation/library/includes
 
-INCLUDEPATH += /usr/include/libxml2
-
-QMAKE_CXXFLAGS += -Wno-unused-parameter
-LIBS += -L/usr/local/lib/jamoma/lib
-LIBS += -lJamomaFoundation -lJamomaDSP -lJamomaScore -lJamomaModular -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodeset -lgecodesupport
+linux-clang:contains(QMAKE_HOST.arch, x86):{
+	INCLUDEPATH += /usr/include/i386-linux-gnu/c++/4.8/
 }
 
-macx-g++ {
-    QMAKE_CXX = /usr/bin/g++
-    #QMAKE_CXXFLAGS += -std=c++11  #have to update g++ to v2.4
+LIBS += -L/usr/local/jamoma/lib -lJamomaFoundation -lJamomaDSP -lJamomaScore -lJamomaModular
+LIBS += -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodeset -lgecodesupport
 
-    QMAKE_LFLAGS += -L/System/Library/Frameworks/ -L/Library/Frameworks/
-    QMAKE_CXXFLAGS_X86_64 = -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
-
-    LIBS += -lIscore -lDeviceManager -framework gecode -lxml2
-}
-
-macx-clang {
-
-    QMAKE_CXX = /usr/bin/clang++
-
-    QMAKE_CXXFLAGS += -std=c++11
-    QMAKE_CXXFLAGS += -stdlib=libc++
-    QMAKE_CXXFLAGS += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET
-
-    QMAKE_LFLAGS += -stdlib=libc++
-    QMAKE_LFLAGS += -L/usr/local/lib/ -L/usr/local/jamoma/lib -L/System/Library/Frameworks/ -L/Library/Frameworks/
-
-    INCLUDEPATH += .
-    INCLUDEPATH += headers/GUI
-    INCLUDEPATH += headers/data
-    INCLUDEPATH += /Library/Frameworks/
-    INCLUDEPATH += /usr/local/jamoma/includes
-    INCLUDEPATH += /usr/include/libxml2
-
-    LIBS += /usr/local/jamoma/lib/JamomaFoundation.dylib
-    LIBS += /usr/local/jamoma/lib/JamomaDSP.dylib
-    LIBS += /usr/local/jamoma/lib/JamomaScore.dylib
-    LIBS += /usr/local/jamoma/lib/JamomaModular.dylib
-    LIBS += -framework gecode
-    LIBS += -lxml2
 }
 
 # Input
-HEADERS += /usr/local/jamoma/includes/TTScoreAPI.h \
-/usr/local/jamoma/includes/TTModular.h \
-/usr/local/jamoma/includes/TTDSP.h \
+HEADERS += \
 headers/data/Abstract.hpp \
 headers/data/AbstractBox.hpp \
 headers/data/AbstractComment.hpp \
