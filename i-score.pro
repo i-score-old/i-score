@@ -7,7 +7,7 @@ macx {
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
 CONFIG += x86_64
 QMAKE_CXXFLAGS += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET -stdlib=libc++
-QMAKE_LFLAGS += -stdlib=libc++ -lc++
+QMAKE_LFLAGS   += -stdlib=libc++ -lc++
 }
 
 # This variable specifies the #include directories which should be searched when compiling the project.
@@ -35,7 +35,8 @@ resources/translations = i-score_en.ts i-score_fr.ts
 # Support for conditional structures is made available via these scopes
 unix {
 message("Unix build")
-INCLUDEPATH +=	$$(JAMOMA_INCLUDE_PATH)/Score/library/tests/ \
+INCLUDEPATH +=	/usr/local/jamoma/includes \
+		$$(JAMOMA_INCLUDE_PATH)/Score/library/tests/ \
 		$$(JAMOMA_INCLUDE_PATH)/Modular/library/PeerObject \
 		$$(JAMOMA_INCLUDE_PATH)/Modular/library/ProtocolLib \
 		$$(JAMOMA_INCLUDE_PATH)/Modular/library/SchedulerLib \
