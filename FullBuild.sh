@@ -20,7 +20,7 @@ iscore-recast
   Builds i-score 0.3 instead of 0.2. Overrides iscore.
 
 jamoma
-  Installs Jamoma on the system folders.
+  Builds and installs Jamoma on the system folders.
 
 Options :
 --clone
@@ -31,7 +31,7 @@ Options :
 --install-deps
   Installs dependencies using apt-get / yum on Linux and brew / port on OS X.
 
---jamoma-path=/some/path
+--jamoma-path=/some/path/to/Jamoma/Core folder
   Uses an existing Jamoma installation. Note : it has to be on a branch with CMake (currently feature/cmake).
 --debug
   Builds everything with debug informations.
@@ -153,6 +153,7 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 			else
 				brew install cmake gecode portaudio portmidi libsndfile qt
 			fi
+			brew link gecode
 		elif command $port > /dev/null; then # MacPorts
 			if [[ $ISCORE_RECAST ]]; then
 				port install cmake gecode portaudio portmidi libsndfile qt5
