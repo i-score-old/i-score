@@ -141,6 +141,7 @@ MainWindow::MainWindow()
   connect(_scene, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
   connect(_view, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
   connect(_scene, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
+  connect(_scene, SIGNAL(updateRecordingBoxes()), this, SLOT(updateRecordingBoxes()));
 }
 
 MainWindow::~MainWindow()
@@ -305,11 +306,13 @@ MainWindow::open()
     }
 
   QString fileName = QFileDialog::
-          getOpenFileName(this, tr("Open File"), "", tr("XML Files (*.score)"));
+          getOpenFileName(this, tr("Open File"), 0, tr("XML Files (*.score)"));
 
-  if (!fileName.isEmpty()) {
-      QCoreApplication::processEvents();
-      loadFile(fileName);
+
+
+  if (!fileName.isEmpty()) {                  
+      QCoreApplication::processEvents();//permet de fermer la fenêtre de dialogue avant de lancer le chargement.
+      loadFile(fileName);      
     }
 }
 
@@ -544,9 +547,9 @@ MainWindow::createActions()
   _zoomOutAct->setStatusTip(tr("Zoom out"));
   connect(_zoomOutAct, SIGNAL(triggered()), _view, SLOT(zoomOut()));
 
-  _editorAct = new QAction(QIcon(":/resources/images/edit.svg"), tr("Devices Inspector"), this);
-  _editorAct->setShortcut(QString("Ctrl+I"));
-  _editorAct->setStatusTip(tr("Devices Inspector"));
+  _editorAct = new QAction(QIcon(":/resources/images/edit.svg"), tr("Devices Explorer"), this);
+  _editorAct->setShortcut(QString("Ctrl+E"));
+  _editorAct->setStatusTip(tr("Devices Explorer"));
   _editorAct->setCheckable(true);
   _editorAct->setChecked(true);
   connect(_editorAct, SIGNAL(triggered()), this, SLOT(updateEditor()));
@@ -671,6 +674,7 @@ MainWindow::writeSettings()
 void
 MainWindow::loadFile(const QString &fileName)
 {
+    QCoreApplication::processEvents();//permet de fermer la fenêtre de dialogue avant de lancer le chargement.
   QApplication::setOverrideCursor(Qt::WaitCursor);
   _scene->clear();
   _editor->clear();
@@ -770,9 +774,6 @@ MainWindow::updatePlayMode(){
     _scene->unselectAll();
     _editor->noBoxEdited();
     _editor->setDisabled(_scene->playing());
-
-    if(!_scene->playing())
-        updateRecordingBoxes();
 }
 
 void
@@ -797,9 +798,10 @@ MainWindow::updateRecordingBoxes(){
         QMap<QTreeWidgetItem*, Data> itemsToAssign;
         Data data;
         data.hasCurve = true;
-        data.curveActivated = true;
-        for(int i=0; i<startItemsAndMsgs.size(); i++)
+        data.curveActivated = true;        
+        for(int i=0; i<startItemsAndMsgs.size(); i++){
             itemsToAssign.insert(startItemsAndMsgs[i].first,data);
+        }
 
         Maquette::getInstance()->setSelectedItemsToSend((*it)->ID(), itemsToAssign);
 

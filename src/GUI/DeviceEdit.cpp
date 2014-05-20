@@ -261,6 +261,7 @@ DeviceEdit::setChanged()
 void
 DeviceEdit::updateNetworkConfiguration()
 {
+    setModal(false);
     if(_newDevice){
         string          name = _nameEdit->text().toStdString(),
                         ip   = _localHostBox->text().toStdString(),
@@ -290,7 +291,7 @@ DeviceEdit::updateNetworkConfiguration()
         }
         if (_protocolChanged) {
             Maquette::getInstance()->setDeviceProtocol(_currentDevice.toStdString(), _protocolsComboBox->currentText().toStdString());
-            //          emit(deviceProtocolChanged(_protocolsComboBox->currentText()));
+//            emit(deviceProtocolChanged(_protocolsComboBox->currentText()));
         }
         emit(deviceChanged(_currentDevice));
     }

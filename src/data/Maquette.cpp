@@ -1537,18 +1537,15 @@ Maquette::stopPlayingAndGoToStart()
 {    
     turnExecutionOff();
 
-    /// \todo Check this. NH
-//NH : commenté car est fait automatiquement (il semblerait)
-//     et provoquait un problème au timeEndReached (l'updatePlayMode ne se faisait plus)
-//    setTimeOffset(0);
+    _scene->view()->updateTimeOffsetView();
 }
 
 void
 Maquette::stopPlayingAndGoToTimeOffset(unsigned int timeOffset)
 {
   turnExecutionOff();    
-  setTimeOffset(timeOffset,YES);
-  initSceneState();
+  setTimeOffset(timeOffset,NO);
+  //initSceneState();
 }
 
 void
@@ -1558,7 +1555,7 @@ Maquette::stopPlayingAndGoToCurrentTime()
     
     turnExecutionOff();
     
-    setTimeOffset(timeOffset,YES);
+    setTimeOffset(timeOffset,NO);
 }
 
 void

@@ -298,16 +298,16 @@ ParentBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                                                  || cursor().shape() == Qt::SizeHorCursor || cursor().shape() == Qt::SizeFDiagCursor)) {
       switch (_scene->resizeMode()) {
           case HORIZONTAL_RESIZE:
-          resizeWidthEdition(std::max(_abstract->width() + event->pos().x() - boxRect().topRight().x(), (double)BOX_MARGIN));
+          resizeWidthEdition(std::max(double(_abstract->width() + event->pos().x() - boxRect().topRight().x()), (double)BOX_MARGIN));
             break;
 
           case VERTICAL_RESIZE:
-            resizeHeightEdition(std::max(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y() , (double)BOX_MARGIN));
+            resizeHeightEdition(std::max(double(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y()), (double)BOX_MARGIN));
             break;
 
           case DIAGONAL_RESIZE:
-            resizeAllEdition(std::max(_abstract->width() + event->pos().x() - boxRect().topRight().x(), (double)BOX_MARGIN),
-                             std::max(_abstract->height() + event->pos().y() - boxRect().bottomRight().y(), (double)BOX_MARGIN));
+            resizeAllEdition(std::max(double(_abstract->width() + event->pos().x() - boxRect().topRight().x()), (double)BOX_MARGIN),
+                             std::max(double(_abstract->height() + event->pos().y() - boxRect().bottomRight().y()), (double)BOX_MARGIN));
         }
       QPainterPath nullPath;
       nullPath.addRect(QRectF(QPointF(0., 0.), QSizeF(0., 0.)));

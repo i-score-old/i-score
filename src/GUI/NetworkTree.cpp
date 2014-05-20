@@ -497,7 +497,7 @@ NetworkTree::loadNetworkTree(AbstractBox *abBox)
 
 void
 NetworkTree::createOCSBranch(QTreeWidgetItem *curItem)
-{
+{    
   QTreeWidgetItem *addANodeItem = new QTreeWidgetItem(QStringList(OSC_ADD_NODE_TEXT), addOSCNode);
   addANodeItem->setFlags(Qt::ItemIsEnabled);
   addANodeItem->setIcon(0, QIcon(":/resources/images/addANode.png"));
@@ -612,6 +612,15 @@ NetworkTree::hasStartEndMsg(QTreeWidgetItem *item)
   return(_startMessages->getMessages().contains(item) || _endMessages->getMessages().contains(item));
 }
 
+bool
+NetworkTree::hasStartMsg(QTreeWidgetItem *item){
+    return _startMessages->getMessages().contains(item);
+}
+
+bool
+NetworkTree::hasEndMsg(QTreeWidgetItem *item){
+    return _endMessages->getMessages().contains(item);
+}
 
 /****************************************************************************
 *                          General display tools
@@ -1344,6 +1353,8 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item){
         if(item->type()==DeviceNode){
             string application = getAbsoluteAddress(item).toStdString();
             item->takeChildren();
+
+            /// \todo récupérer la valeur de retour. Qui peut être false en cas de OSC (traitement différent dans ce cas là).
             Maquette::getInstance()->refreshNetworkNamespace(application);
             treeRecursiveExploration(item,true);
             Maquette::getInstance()->updateBoxesAttributes();
@@ -1728,23 +1739,35 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
               emit recModeChanged(item);
           }
           else{
-              if (isAssigned(item) && hasCurve(item)) {
+              if (isAssigned(item) && hasStartMsg(item) && hasEndMsg(item)) {
                   bool activated = item->checkState(column) == Qt::Checked;
                   emit(curveActivationChanged(item, activated));
               }
               else {
-                  //Creates curve with start=minBound and end=maxBound (default 0 1)
+                  float start = 0., end = 1.;
                   vector<float> rangeBounds;
-                  float min = 0., max = 1.;
                   std::string address = getAbsoluteAddress(item).toStdString();
-                  if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0){
-                      min = rangeBounds[0];
-                      max = rangeBounds[1];
+
+                  if(!Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0)
+                    return;
+
+                  if(!hasStartEndMsg(item)){ //Creates curve with start=minBound and end=maxBound (default 0 1)
+                          start = rangeBounds[0];
+                          end = rangeBounds[1];
                   }
+                  else if (hasStartMsg(item)){
+                      start = _startMessages->getMessage(item).value.toFloat();
+                      end = rangeBounds[1];
+                  }
+                  else if(hasEndMsg(item)){
+                      start = rangeBounds[0];
+                      end = _endMessages->getMessage(item).value.toFloat();
+                  }
+
                   VALUE_MODIFIED = true;
-                  item->setText(START_COLUMN,QString("%1").arg(min));
+                  item->setText(START_COLUMN,QString("%1").arg(start));
                   VALUE_MODIFIED = true;
-                  item->setText(END_COLUMN,QString("%1").arg(max));
+                  item->setText(END_COLUMN,QString("%1").arg(end));
               }
           }
       }
@@ -2030,7 +2053,7 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
 
   BasicBox *box = Maquette::getInstance()->getBox(boxID);
   if (box != NULL) { // Box Found
-      if (box->hasCurve(address)) {
+      if (box->hasCurve(address) && !_recMessages.contains(item) ) {
           if (_assignedItems.value(item).hasCurve) {
               unsigned int sampleRate;
               bool redundancy, interpolate;
@@ -2045,21 +2068,15 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
                   if(getCurveSuccess){
                       if (forceUpdate) {
                           if (interpolate) {
-                              interpolate = !(values.front() == values.back());
-                              Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
-                              if (interpolate) {
-                                  //                                std::cout<<"networkTree -> interpolate devient true"<<std::endl;
-                              }
-                              else {
-                                  ;
-                              }
-                              //                                std::cout<<"networkTree -> interpolate devient false"<<std::endl;
+                              interpolate = !(startMessages()->getMessage(item).value == endMessages()->getMessage(item).value);
+                              Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);                              
                           }
                       }
                   }
 
                   else if (getCurveValuesSuccess){
                       interpolate = true;
+                      Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
                   }
 
                   updateLine(item, interpolate, sampleRate, redundancy);
@@ -2093,8 +2110,8 @@ NetworkTree::updateCurves(unsigned int boxID, bool forceUpdate)
       QTreeWidgetItem *item;
       QList<QTreeWidgetItem *>list = _assignedItems.keys();
       QList<QTreeWidgetItem *>::iterator it;
-      for (it = list.begin(); it != list.end(); it++) {
-          item = *it;
+      for (it = list.begin(); it != list.end(); it++) {          
+          item = *it;          
           updateCurve(item, boxID, forceUpdate);
         }
     }
@@ -2205,14 +2222,19 @@ NetworkTree::updateDeviceName(QString oldName, QString newName)
 }
 
 void
-NetworkTree::addNewDevice(QString deviceName){
-    QTreeWidgetItem *newItem = addDeviceItem(deviceName);
+NetworkTree::addNewDevice(QString deviceName)
+{
+    QTreeWidgetItem *newItem = addDeviceItem(deviceName);    
     refreshItemNamespace(newItem);
+    string protocol;
+    Maquette::getInstance()->getDeviceProtocol(deviceName.toStdString(),protocol);
+    if(protocol=="OSC")
+        createOCSBranch(newItem);
 }
 
 void
 NetworkTree::updateDeviceProtocol(QString newName)
-{
+{           
   QString deviceName = currentItem()->text(NAME_COLUMN);
   QTreeWidgetItem *item = currentItem();
   if (newName == "OSC") {
@@ -2263,10 +2285,11 @@ NetworkTree::setRecMode(std::string address){
 
     if(!_recMessages.contains(item)){
         _recMessages<<item;
+
         item->setData(INTERPOLATION_COLUMN, Qt::CheckStateRole, QVariant());
         item->setIcon(INTERPOLATION_COLUMN,QIcon(":/resources/images/record.svg"));
     }
-    else{
+    else{        
         _recMessages.removeAll(item);
         item->setCheckState(INTERPOLATION_COLUMN,Qt::Unchecked);
     }
