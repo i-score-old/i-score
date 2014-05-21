@@ -352,11 +352,11 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		cd $ISCORE_FOLDER
 
 		if [[ $ISCORE_RECAST ]]; then
-			${qmake5} ../../$ISCORE_FOLDER $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
+			${qmake5} ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
 			make
 			cp i-scoreRecast ../../i-score
 		else
-			${qmake4} ../../$ISCORE_FOLDER $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
+			${qmake4} ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
 			make
 			cp i-score ../../i-score
 		fi
@@ -369,7 +369,7 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		mkdir android_build_output
 
 		echo "Using following NDK root : $ANDROID_NDK_ROOT."
-		$ANDROID_QT_BIN/qmake -r $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG ../../$ISCORE_FOLDER
+		$ANDROID_QT_BIN/qmake -r $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG ../../$ISCORE_FOLDER/i-scoreNew.pro
 		make
 		make install INSTALL_ROOT=android_build_output
 		$ANDROID_QT_BIN/androiddeployqt --output android_build_output --input android-libi-scoreRecast.so-deployment-settings.json
@@ -380,7 +380,7 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		cd ..
 		mkdir $ISCORE_FOLDER
 		cd $ISCORE_FOLDER
-		qmake ../../$ISCORE_FOLDER $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
+		qmake ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
 		make
 
 		cd ../..
