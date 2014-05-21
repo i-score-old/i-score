@@ -115,7 +115,7 @@ if [[ $ISCORE_CLASSIC_BUILD ]]; then
 	if [[ $ISCORE_INSTALL_DEPS ]]; then
 		## Qt ##
 		echo "Installing Qt..."
-		curl -O http://download.qt-project.org/official_releases/qt/4.8/4.8.6/qt-opensource-mac-4.8.6.dmg
+		curl -O http://www.mirrorservice.org/sites/download.qt-project.org/official_releases/qt/4.8/4.8.6/qt-opensource-mac-4.8.6.dmg
 		hdiutil mount qt-opensource-mac-4.8.6.dmg
 		sudo installer -pkg "/Volumes/Qt 4.8.6/Qt.mpkg" -target /
 
@@ -147,10 +147,10 @@ if [[ $ISCORE_CLASSIC_BUILD ]]; then
 				echo "Will build using the existing Jamoma & Score installations"
 			else
 				echo "Will clone Score in the Jamoma/Core folder"
-				git clone https://github.com/OSSIA/Score $ISCORE_JAMOMA_PATH/Score $ISCORE_DEPTH_GIT
+				git clone https://github.com/OSSIA/Score $ISCORE_JAMOMA_PATH/Score 
 			fi
 		else
-			git clone https://github.com/OSSIA/Score $ISCORE_DEPTH_GIT
+			git clone https://github.com/OSSIA/Score 
 		fi
 		(cd $ISCORE_SCORE_PATH; git checkout dev)
 
@@ -159,9 +159,11 @@ if [[ $ISCORE_CLASSIC_BUILD ]]; then
 	fi 
 
 	if [[ $ISCORE_INSTALL_JAMOMA ]]; then
-		sudo mkdir -p /usr/local/jamoma -m 777
-		sudo chmod 777 /usr/local/lib
-		ruby $ISCORE_SCORE_PATH/build.rb dev clean
+		sudo mkdir -p /usr/local/jamoma
+		sudo chmod -R 777 /usr/local/jamoma
+		sudo chmod -R 777 /usr/local/lib
+		cp -rf $ISCORE_SCORE_PATH/support/jamoma/ /usr/local/jamoma/
+		(cd $ISCORE_SCORE_PATH; ruby build.rb dev clean)
 	fi
 
 	if [[ $ISCORE_INSTALL_ISCORE ]]; then
