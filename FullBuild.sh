@@ -33,6 +33,8 @@ Options :
 
 --jamoma-path=/some/path/to/Jamoma/Core folder
   Uses an existing Jamoma installation. Note : it has to be on a branch with CMake (currently feature/cmake).
+--classic (transitional)
+  Uses the ruby.rb script to build Jamoma.
 --debug
   Builds everything with debug informations.
 --use-clang
@@ -79,6 +81,9 @@ do
 		ISCORE_FETCH_GIT=1
 		ISCORE_DEPTH_GIT=""
 		;;
+	--classic) echo "Will build using the Ruby script"
+		ISCORE_CLASSIC_BUILD=1
+		;;
 	--jamoma-path=*)
 		ISCORE_JAMOMA_PATH=$(cd "${1#*=}"; pwd)
 		echo "Will use the Jamoma installation located in ${ISCORE_JAMOMA_PATH}"
@@ -104,6 +109,68 @@ do
 	esac
 	shift
 done
+
+########## CLASSIC BUILD ###########
+if [[ $ISCORE_CLASSIC_BUILD ]]; then
+	if [[ $ISCORE_INSTALL_DEPS ]]; then
+		## Qt ##
+		echo "Installing Qt..."
+		curl -O http://download.qt-project.org/official_releases/qt/4.8/4.8.6/qt-opensource-mac-4.8.6.dmg
+		hdiutil mount qt-opensource-mac-4.8.6.dmg
+		sudo installer -pkg "/Volumes/Qt 4.8.6/Qt.mpkg" -target /
+
+		## Gecode ##
+		echo "Installing Gecode..."
+		curl -O http://www.gecode.org/download/Gecode-3.7.3.dmg
+		hdiutil mount Gecode-3.7.3.dmg
+		sudo installer -pkg "/Volumes/Gecode/Install Gecode 3.7.3.pkg" -target /
+		hdiutil unmount /Volumes/Gecode
+	
+		## libXml
+		echo "Installing libXml..."
+		curl -O http://www.explain.com.au/download/combo-2007-10-07.dmg.gz
+		gunzip combo-2007-10-07.dmg.gz
+		hdiutil mount combo-2007-10-07.dmg
+		sudo cp /Volumes/gnome-combo-2007-10-07-rw/libxml.framework /Library/Frameworks
+		hdiutil unmount /Volumes/gnome-combo-2007-10-07-rw
+	fi
+
+	if [[ $ISCORE_JAMOMA_PATH ]]; then
+		export ISCORE_SCORE_PATH=$ISCORE_JAMOMA_PATH/Score
+	else
+		export ISCORE_SCORE_PATH=`pwd`/Score
+	fi
+
+	if [[ $ISCORE_CLONE_GIT ]]; then
+		if [[ $ISCORE_JAMOMA_PATH ]]; then
+			if [[ -e $ISCORE_JAMOMA_PATH/Score ]]; then
+				echo "Will build using the existing Jamoma & Score installations"
+			else
+				echo "Will clone Score in the Jamoma/Core folder"
+				git clone https://github.com/OSSIA/Score $ISCORE_JAMOMA_PATH/Score $ISCORE_DEPTH_GIT
+			fi
+		else
+			git clone https://github.com/OSSIA/Score $ISCORE_DEPTH_GIT
+		fi
+		(cd $ISCORE_SCORE_PATH; git checkout dev)
+
+		git clone https://github.com/i-score/i-score iscore0.2
+		(cd iscore0.2; git checkout dev)
+	fi 
+
+	if [[ $ISCORE_INSTALL_JAMOMA ]]; then
+		sudo mkdir -p /usr/local/jamoma -m 777
+		sudo chmod 777 /usr/local/lib
+		ruby $ISCORE_SCORE_PATH/build.rb dev clean
+	fi
+
+	if [[ $ISCORE_INSTALL_ISCORE ]]; then
+		cd iscore0.2
+		./build.sh
+	fi
+	exit 0
+fi
+#####################################
 
 ###### Check of the Linux distribution ######
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
