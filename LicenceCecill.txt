@@ -5,11 +5,8 @@ Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Cat
 
 iscore.contact@gmail.com
 
-This software is a computer program whose purpose is to provide
-notation/composition combining synthesized as well as recorded 
-sounds, providing answers to the problem of notation and, drawing, 
-from its very design, on benefits from state of the art research 
-in musicology and sound/music computing.
+i-score is an intermedia sequencer for the precise and flexible scripting of interactive scenarios.
+In contrast to most sequencers, i-score doesn’t produce any media, but controls other environments’ parameters, by creating  snapshots and automations, and organizing them in time in a multi-linear way.
 
 This software is governed by the CeCILL license under French law and
 abiding by the rules of distribution of free software.  You can  use, 
