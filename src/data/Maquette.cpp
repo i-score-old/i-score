@@ -1907,7 +1907,7 @@ Maquette::load(const string &fileName)
                 
                 //maxBoundMS == 0 and minBoundMS > 0 means there is no max bound (we have to return -1)
                 if(!(maxBoundMS == 0 && minBoundPXL > 0)){
-                    if (maxBoundMS != NO_BOUND)
+                    if (maxBoundMS != 0 ) /// \todo La valeur de NO_BOUND de Score est 0, celle de i-score -1. NH
                         maxBoundPXL = (float)maxBoundMS / (MaquetteScene::MS_PER_PIXEL * zoom);
                 }
                 
