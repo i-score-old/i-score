@@ -141,4 +141,5 @@ src/GUI/BoxWidget.cpp \
 src/GUI/BoxCurveEdit.cpp \
 src/GUI/TimeBarWidget.cpp \
 src/GUI/DeviceEdit.cpp \
-src/GUI/HeaderPanelWidget.cpp
+src/GUI/HeaderPanelWidget.cpp \
+src/GUI/ConditionalRelation.cpp 
