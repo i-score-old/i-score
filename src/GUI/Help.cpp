@@ -146,7 +146,7 @@ Help::Help(QWidget *parent)
   editorSnapshotScrollArea->setWidget(_editorSnapshotLabel);
   _editorTabs->addTab(editorSnapshotScrollArea, tr("Snapshot"));
 
-  _tabs->addTab(_editorTabs, tr("Devices Inspector"));
+  _tabs->addTab(_editorTabs, tr("Devices Explorer"));
 
   _layout->addWidget(_tabs);
 

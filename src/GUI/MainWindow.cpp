@@ -153,11 +153,14 @@ MainWindow::~MainWindow()
     delete _centralLayout;
     delete _centralWidget;
 
+#ifdef __APPLE__
     delete _menuBar;
     delete _fileMenu;
     delete _editMenu;
-    delete _viewMenu;
+	delete _viewMenu;
     //  delete _helpMenu;
+#endif
+
     delete _newAct;
     delete _openAct;
     delete _saveAct;
@@ -166,11 +169,10 @@ MainWindow::~MainWindow()
     delete _printAct;
     delete _quitAct;
     delete _aboutAct;
-    delete _helpAct;
-
+	delete _helpAct;
     delete _zoomInAct;
     delete _zoomOutAct;
-    delete _editorAct;
+	delete _editorAct;
 
     delete _cutAct;
     delete _copyAct;
@@ -547,9 +549,9 @@ MainWindow::createActions()
   _zoomOutAct->setStatusTip(tr("Zoom out"));
   connect(_zoomOutAct, SIGNAL(triggered()), _view, SLOT(zoomOut()));
 
-  _editorAct = new QAction(QIcon(":/resources/images/edit.svg"), tr("Devices Inspector"), this);
-  _editorAct->setShortcut(QString("Ctrl+I"));
-  _editorAct->setStatusTip(tr("Devices Inspector"));
+  _editorAct = new QAction(QIcon(":/resources/images/edit.svg"), tr("Devices Explorer"), this);
+  _editorAct->setShortcut(QString("Ctrl+E"));
+  _editorAct->setStatusTip(tr("Devices Explorer"));
   _editorAct->setCheckable(true);
   _editorAct->setChecked(true);
   connect(_editorAct, SIGNAL(triggered()), this, SLOT(updateEditor()));
@@ -606,7 +608,11 @@ MainWindow::createActions()
 void
 MainWindow::createMenus()
 {
+#ifdef __APPLE__
   _menuBar = new QMenuBar();
+#else
+  _menuBar = this->menuBar();
+#endif
 
   _fileMenu = _menuBar->addMenu(tr("&File"));
 
