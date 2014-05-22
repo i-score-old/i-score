@@ -7,7 +7,9 @@ See system-specific instructions below before attempting to install/build.
 In order to download all necessary elements, run the following command in the Terminal :
 ./FullBuild.sh jamoma iscore --clone --install-deps
 
-This will clone all necessary repositories to your computer, and install the required dependencies
+This will clone all necessary repositories to your computer, and install the required dependencies.
+If you already have Jamoma installed, or wish other options, run 
+./FullBuild.sh --help to know about them
 
 ## Building
 
