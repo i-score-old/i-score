@@ -6,6 +6,7 @@
 	objectVersion = 46;
 	objects = {
 <<<<<<< HEAD
+<<<<<<< HEAD
 		D7BA7D76DAB5DD13389D6332 = {
 			buildActionMask = 2147483647;
 			files = (
@@ -1634,6 +1635,8 @@
 		};
 		B8CE95BC93CD239AC5022A7B = {
 =======
+=======
+>>>>>>> 26d6db2699fec1228914c4685f193b0b1523c976
 
 /* Begin PBXFileReference section */
 		4671DCB919071A1F009265F7 /* Abstract.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Abstract.hpp; sourceTree = "<group>"; };
@@ -1739,7 +1742,10 @@
 
 /* Begin PBXGroup section */
 		4671DCB719071A1F009265F7 /* headers */ = {
+<<<<<<< HEAD
 >>>>>>> refs/heads/dev
+=======
+>>>>>>> 26d6db2699fec1228914c4685f193b0b1523c976
 			isa = PBXGroup;
 			children = (
 				4671DCB819071A1F009265F7 /* data */,
@@ -1769,12 +1775,15 @@
 			isa = PBXGroup;
 			children = (
 <<<<<<< HEAD
+<<<<<<< HEAD
 				"06674E1DE8D3EB6E763DFFDA",
 				"B06B937E4E5DB1B571475081");
 			name = "Sources";
 			refType = 4;
 			sourceTree = "<Group>";
 =======
+=======
+>>>>>>> 26d6db2699fec1228914c4685f193b0b1523c976
 				4671DCC719071A1F009265F7 /* AttributesEditor.hpp */,
 				4671DCC819071A1F009265F7 /* AttributesEditor.hpp.orig */,
 				4671DCC919071A1F009265F7 /* BasicBox.hpp */,
@@ -1824,7 +1833,10 @@
 			);
 			path = GUI;
 			sourceTree = "<group>";
+<<<<<<< HEAD
 >>>>>>> refs/heads/dev
+=======
+>>>>>>> 26d6db2699fec1228914c4685f193b0b1523c976
 		};
 		4671DCF519071A28009265F7 /* src */ = {
 			isa = PBXGroup;
@@ -1856,6 +1868,7 @@
 		4671DD0119071A28009265F7 /* GUI */ = {
 			isa = PBXGroup;
 			children = (
+<<<<<<< HEAD
 <<<<<<< HEAD
 				"198F590C93BDB8DF52CC1017",
 				"5A224ABC9D6D75C7D981C029");
@@ -2189,6 +2202,8 @@
 			files = (
 				CF6CD39B04A69C6927D8A612,
 =======
+=======
+>>>>>>> 26d6db2699fec1228914c4685f193b0b1523c976
 				4671DD0219071A28009265F7 /* AttributesEditor.cpp */,
 				4671DD0319071A28009265F7 /* BasicBox.cpp */,
 				4671DD0419071A28009265F7 /* BoxContextMenu.cpp */,
@@ -2221,13 +2236,17 @@
 				4671DD1F19071A28009265F7 /* TreeMapElement.cpp */,
 				4671DD2019071A28009265F7 /* TriggerPoint.cpp */,
 				4671DD2119071A28009265F7 /* ViewRelations.cpp */,
+<<<<<<< HEAD
 >>>>>>> refs/heads/dev
+=======
+>>>>>>> 26d6db2699fec1228914c4685f193b0b1523c976
 			);
 			path = GUI;
 			sourceTree = "<group>";
 		};
 		469CE013190582F9006B7C34 = {
 			isa = PBXGroup;
+<<<<<<< HEAD
 <<<<<<< HEAD
 			name = "i-score";
 			path = "";
@@ -2309,6 +2328,8 @@
 </plist>
 ";
 =======
+=======
+>>>>>>> 26d6db2699fec1228914c4685f193b0b1523c976
 			children = (
 				4671DCB719071A1F009265F7 /* headers */,
 				4671DCF519071A28009265F7 /* src */,
@@ -2328,7 +2349,10 @@
 			buildWorkingDirectory = "";
 			dependencies = (
 			);
+<<<<<<< HEAD
 >>>>>>> refs/heads/dev
+=======
+>>>>>>> 26d6db2699fec1228914c4685f193b0b1523c976
 			name = "i-score";
 			passBuildSettingsInEnvironment = 1;
 			productName = "i-score";
@@ -2468,6 +2492,7 @@
 			);
 			defaultConfigurationIsVisible = 0;
 <<<<<<< HEAD
+<<<<<<< HEAD
 			defaultConfigurationIsName = "Debug";
 		};
 		91B15E841AA80083484172DE = {
@@ -2484,6 +2509,9 @@
 =======
 			defaultConfigurationName = Release;
 >>>>>>> refs/heads/dev
+=======
+			defaultConfigurationName = Release;
+>>>>>>> 26d6db2699fec1228914c4685f193b0b1523c976
 		};
 /* End XCConfigurationList section */
 	};
