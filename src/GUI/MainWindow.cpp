@@ -153,11 +153,14 @@ MainWindow::~MainWindow()
     delete _centralLayout;
     delete _centralWidget;
 
+#ifdef __APPLE__
     delete _menuBar;
     delete _fileMenu;
     delete _editMenu;
-    delete _viewMenu;
+	delete _viewMenu;
     //  delete _helpMenu;
+#endif
+
     delete _newAct;
     delete _openAct;
     delete _saveAct;
@@ -166,11 +169,10 @@ MainWindow::~MainWindow()
     delete _printAct;
     delete _quitAct;
     delete _aboutAct;
-    delete _helpAct;
-
+	delete _helpAct;
     delete _zoomInAct;
     delete _zoomOutAct;
-    delete _editorAct;
+	delete _editorAct;
 
     delete _cutAct;
     delete _copyAct;
@@ -606,7 +608,11 @@ MainWindow::createActions()
 void
 MainWindow::createMenus()
 {
+#ifdef __APPLE__
   _menuBar = new QMenuBar();
+#else
+  _menuBar = this->menuBar();
+#endif
 
   _fileMenu = _menuBar->addMenu(tr("&File"));
 
