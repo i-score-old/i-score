@@ -43,6 +43,7 @@
 #include <iostream>
 #include <QInputDialog>
 #include <QtGui>
+#include <QMessageBox>
 #include <QColor>
 #include <QGraphicsTextItem>
 #include <QGraphicsSceneDragDropEvent>

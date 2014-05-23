@@ -11,7 +11,7 @@ INCLUDEPATH += headers/GUI headers/data /usr/local/include/IScore /usr/local/inc
 # This variable contains a general set of flags that are passed to the linker.
 QMAKE_LFLAGS += -L/usr/local/lib/
 
-QT += network xml svg
+QT += network xml svg printsupport
 
 # This variable specifies the directory where all intermediate objetcts and moc files should be placed.
 OBJECTS_DIR = bin
@@ -21,7 +21,7 @@ MOC_DIR = moc
 RESOURCES += i-score.qrc
 
 # qmake adds the values of this variable as compiler C preprocessor macros (-D option).
-DEFINES += __Types__
+DEFINES += __Types__ QT_DISABLE_DEPRECATED_BEFORE=0x000000
 
 ICON = resources/images/i-score.icns
 

@@ -1,7 +1,17 @@
 TEMPLATE = app
 TARGET = i-score
+QT += core network xml svg printsupport
+
+DEFINES += __Types__ QT_DISABLE_DEPRECATED_BEFORE=0x000000
+INCLUDEPATH += headers/GUI headers/data /usr/local/include/libxml2  /usr/include/libxml2
 
 QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -msse3 -std=c++11
+QMAKE_LFLAGS += -L/usr/local/lib/jamoma/lib -L/usr/local/lib/ -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
+
+RESOURCES += i-score.qrc
+
+ICON = resources/images/i-score.icns
+resources/translations = i-score_en.ts i-score_fr.ts
 
 macx {
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
@@ -10,29 +20,6 @@ QMAKE_CXXFLAGS += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET -stdlib=
 QMAKE_LFLAGS   += -stdlib=libc++ -lc++
 }
 
-# This variable specifies the #include directories which should be searched when compiling the project.
-INCLUDEPATH += headers/GUI headers/data /usr/local/include/libxml2  /usr/include/libxml2
-
-# This variable contains a general set of flags that are passed to the linker.
-QMAKE_LFLAGS += -L/usr/local/lib/jamoma/lib -L/usr/local/lib/ -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
-
-QT += core network xml svg
-
-# This variable specifies the directory where all intermediate objetcts and moc files should be placed.
-OBJECTS_DIR = bin
-MOC_DIR = moc
-
-# This variable contains the name of the resource collection file (qrc) for the application.
-RESOURCES += i-score.qrc
-
-# qmake adds the values of this variable as compiler C preprocessor macros (-D option).
-DEFINES += __Types__
-
-ICON = resources/images/i-score.icns
-
-resources/translations = i-score_en.ts i-score_fr.ts
-
-# Support for conditional structures is made available via these scopes
 unix {
 message("Unix build")
 INCLUDEPATH +=	/usr/local/jamoma/includes \

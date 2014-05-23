@@ -1806,19 +1806,19 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
     data.address = qaddress;
 
     if (item->type() == LeaveType && column == START_COLUMN && VALUE_MODIFIED) {
-        VALUE_MODIFIED = FALSE;
+        VALUE_MODIFIED = false;
         assignItem(item, data);
         emit(startValueChanged(item, item->text(START_COLUMN)));
     }
 
     if (item->type() == LeaveType && column == END_COLUMN && VALUE_MODIFIED) {
-        VALUE_MODIFIED = FALSE;
+        VALUE_MODIFIED = false;
         assignItem(item, data);
         emit(endValueChanged(item, item->text(END_COLUMN)));
     }
 
     if (item->type() == LeaveType && column == SR_COLUMN && SR_MODIFIED) {
-        SR_MODIFIED = FALSE;
+        SR_MODIFIED = false;
         emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
     }
 
@@ -1832,26 +1832,26 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
         emit(rangeBoundMaxChanged(item,item->text(MAX_COLUMN).toFloat()));
     }
     if (item->type() == OSCNode && column == NAME_COLUMN && NAME_MODIFIED) {
-        NAME_MODIFIED = FALSE;
+        NAME_MODIFIED = false;
         changeNameValue(item, item->text(NAME_COLUMN));
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
     if (item->type() == OSCNode && column == START_COLUMN && VALUE_MODIFIED) {
-        VALUE_MODIFIED = FALSE;
+        VALUE_MODIFIED = false;
         assignItem(item, data);
         emit(startValueChanged(item, item->text(START_COLUMN)));
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
 
     if (item->type() == OSCNode && column == END_COLUMN && VALUE_MODIFIED) {
-        VALUE_MODIFIED = FALSE;
+        VALUE_MODIFIED = false;
         assignItem(item, data);
         emit(endValueChanged(item, item->text(END_COLUMN)));
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
     }
 
     if (item->type() == OSCNode && column == SR_COLUMN && SR_MODIFIED) {
-        SR_MODIFIED = FALSE;
+        SR_MODIFIED = false;
         emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
@@ -1859,13 +1859,13 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
     //Case message
     if(item->whatsThis(NAME_COLUMN)=="Message"){
         if (column == START_COLUMN && VALUE_MODIFIED) {
-            VALUE_MODIFIED = FALSE;
+            VALUE_MODIFIED = false;
             assignItem(item, data);
             emit(startValueChanged(item, item->text(START_COLUMN)));
             item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
         }
         else if (column == END_COLUMN && VALUE_MODIFIED) {
-            VALUE_MODIFIED = FALSE;
+            VALUE_MODIFIED = false;
             assignItem(item, data);
             emit(endValueChanged(item, item->text(START_COLUMN)));
             item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
@@ -1873,14 +1873,14 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
     }
 
     else if (column == END_COLUMN && VALUE_MODIFIED) {
-        VALUE_MODIFIED = FALSE;
+        VALUE_MODIFIED = false;
         assignItem(item, data);
         emit(endValueChanged(item, item->text(END_COLUMN)));
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
     }
 
     else if (column == SR_COLUMN && SR_MODIFIED) {
-        SR_MODIFIED = FALSE;
+        SR_MODIFIED = false;
         emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }

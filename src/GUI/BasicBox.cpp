@@ -274,7 +274,7 @@ BasicBox::createWidget()
   _curveProxy->setFlag(QGraphicsItem::ItemIsMovable, false);
   _curveProxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
   _curveProxy->setVisible(true);
-  _curveProxy->setAcceptsHoverEvents(true);
+  _curveProxy->setAcceptHoverEvents(true);
   _curveProxy->setWidget(_boxWidget);
   _curveProxy->setPalette(palette);
 
@@ -393,7 +393,7 @@ BasicBox::init()
   setFlag(QGraphicsItem::ItemIsFocusable, true);
   setFlag(ItemSendsGeometryChanges, true);
   setVisible(true);
-  setAcceptsHoverEvents(true);
+  setAcceptHoverEvents(true);
   _currentZvalue = 0;
   setZValue(_currentZvalue);
   updateFlexibility();

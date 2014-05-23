@@ -57,7 +57,7 @@
 using std::string;
 
 Comment::Comment(const string &text, unsigned int boxID, MaquetteScene *parent)
-  : QGraphicsTextItem(QString::fromStdString(text), parent->focusItem(), parent)
+  : QGraphicsTextItem(QString::fromStdString(text)/*, parent->focusItem(), parent*/)
 {
   _scene = parent;
 
@@ -67,7 +67,7 @@ Comment::Comment(const string &text, unsigned int boxID, MaquetteScene *parent)
 }
 
 Comment::Comment(const AbstractComment &abstract, MaquetteScene *parent)
-  : QGraphicsTextItem(QString::fromStdString(abstract.text()), parent->focusItem(), parent)
+  : QGraphicsTextItem(QString::fromStdString(abstract.text())/*, parent->focusItem(), parent*/)
 {
   _scene = parent;
   _abstract = new AbstractComment(abstract);

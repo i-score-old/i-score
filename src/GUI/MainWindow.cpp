@@ -64,8 +64,8 @@
 #include <QErrorMessage>
 #include <QStatusBar>
 #include <QFileDialog>
-#include <QPrintDialog>
-#include <QPrinter>
+#include <QtPrintSupport/QPrintDialog>
+#include <QtPrintSupport/QPrinter>
 #include <QSettings>
 #include <QApplication>
 #include <QCloseEvent>
