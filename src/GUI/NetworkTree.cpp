@@ -497,7 +497,7 @@ NetworkTree::loadNetworkTree(AbstractBox *abBox)
 
 void
 NetworkTree::createOCSBranch(QTreeWidgetItem *curItem)
-{
+{    
   QTreeWidgetItem *addANodeItem = new QTreeWidgetItem(QStringList(OSC_ADD_NODE_TEXT), addOSCNode);
   addANodeItem->setFlags(Qt::ItemIsEnabled);
   addANodeItem->setIcon(0, QIcon(":/resources/images/addANode.png"));
@@ -2222,14 +2222,19 @@ NetworkTree::updateDeviceName(QString oldName, QString newName)
 }
 
 void
-NetworkTree::addNewDevice(QString deviceName){
-    QTreeWidgetItem *newItem = addDeviceItem(deviceName);
+NetworkTree::addNewDevice(QString deviceName)
+{
+    QTreeWidgetItem *newItem = addDeviceItem(deviceName);    
     refreshItemNamespace(newItem);
+    string protocol;
+    Maquette::getInstance()->getDeviceProtocol(deviceName.toStdString(),protocol);
+    if(protocol=="OSC")
+        createOCSBranch(newItem);
 }
 
 void
 NetworkTree::updateDeviceProtocol(QString newName)
-{
+{           
   QString deviceName = currentItem()->text(NAME_COLUMN);
   QTreeWidgetItem *item = currentItem();
   if (newName == "OSC") {
