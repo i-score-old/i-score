@@ -314,10 +314,6 @@ ConditionalRelation::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     painter->setPen(dashLinePen);
 
     painter->drawLine(_start,_end);
-
-    dashLinePen.setWidth(0.5);
-    painter->setPen(dashLinePen);
-    painter->drawRect(boundingRect());
 }
 
 int

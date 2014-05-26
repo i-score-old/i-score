@@ -1666,13 +1666,6 @@ void Engine::removeTriggerPoint(ConditionedProcessId triggerId)
 
 TimeConditionId Engine::createCondition(std::vector<ConditionedProcessId> triggerIds)
 {
-    // DEBUG
-    std::cout<<"Engine::createCondition::"<<std::endl;
-    for(unsigned i=0 ; i<triggerIds.size() ; i++)
-        std::cout<<triggerIds.at(i)<<" ";
-    std::cout<<std::endl;
-    // \DEBUG
-
     std::vector<ConditionedProcessId>::iterator it = triggerIds.begin();
     TTTimeConditionPtr timeCondition = getTimeCondition(*it);
 
