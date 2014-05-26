@@ -1023,6 +1023,8 @@ void
 BasicBox::removeTriggerPoint(BoxExtremity extremity)
 {
   if(_triggerPoints->contains(extremity)){
+      if (extremity == BOX_START)
+          detachFromCondition();
 
       TriggerPoint *trgPoint = _triggerPoints->value(extremity);
       _triggerPoints->remove(extremity);
