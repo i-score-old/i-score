@@ -3060,15 +3060,42 @@ void Engine::load(std::string fileName)
         // for each Scenario process
         else if (timeProcess->getName() == TTSymbol("Scenario")) {
             
-            // TODO : link each sub scenario to a time process (the one with the same end and start events)
-            ;
+            // get end and start events
+            TTTimeEventPtr startSubScenario, endSubScenario;
+            
+            timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+            startSubScenario = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+            
+            timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
+            endSubScenario = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+
+            // retreive the time process with the same end and start events
+            EngineCacheMapIterator it;
+            
+            for (it = m_timeProcessMap.begin(); it != m_timeProcessMap.end(); ++it) {
+                
+                TTTimeEventPtr  start, end;
+                
+                it->second->object->getAttributeValue(TTSymbol("startEvent"), v);
+                start = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+                
+                it->second->object->getAttributeValue(TTSymbol("endEvent"), v);
+                end = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+                
+                // set the scenario as the subScenario related to this time process
+                if (start == startSubScenario && end == endSubScenario) {
+                    
+                    it->second->subScenario = TTObjectBasePtr(timeProcess);
+                    break;
+                }
+            }
         }
     }
 }
 
 // NETWORK
 void Engine::print() {
-#ifdef TODO_ENGINE    
+#ifdef TODO_ENGINE
 	m_executionMachine->getPetriNet()->print();
 #endif
 }
