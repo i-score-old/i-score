@@ -49,6 +49,9 @@ typedef unsigned int IntervalId;
 /** a temporary type dedicated to retreive a process with an Conditioned TimeEvent inside (this is related to TriggerPoint notion) */
 typedef unsigned int ConditionedProcessId;
 
+/** a temporary type dedicated to retreive a Condition */
+typedef unsigned int TimeConditionId;
+
 /** a class used to cache TTObject and some observers */
 class EngineCacheElement {
 
@@ -56,6 +59,7 @@ public:
     TTObjectBasePtr object;
     unsigned int    index;
     std::string     name;
+    TTObjectBasePtr subScenario;
     
     EngineCacheElement();
     ~EngineCacheElement();
@@ -72,6 +76,9 @@ typedef std::map<unsigned int, EngineCacheElementPtr> EngineCacheMap;
 typedef	EngineCacheMap*	EngineCacheMapPtr;
 
 typedef std::map<unsigned int, EngineCacheElementPtr>::iterator EngineCacheMapIterator;
+
+/** a temporary type to define a map to store and retreive the triggerIds associated with a conditionId */
+typedef std::map<unsigned int, std::list<unsigned int>> EngineConditionsMap;
 
 #define NO_BOUND -1
 
@@ -149,10 +156,12 @@ private:
     EngineCacheMap      m_timeConditionMap;                             /// All condition stored using an unique id
     EngineCacheMap      m_conditionedProcessMap;                        /// All conditioned time process with an conditioned event stored using an unique id
     
+    EngineConditionsMap m_conditionsMap;                                /// All conditions Ids (in i-score point of view) mapped to corresponding triggers id
+
     EngineCacheMap      m_startCallbackMap;                             /// All callback to observe when a time process starts stored using a time process id
     EngineCacheMap      m_endCallbackMap;                               /// All callback to observe when a time process ends stored using a time process id
     
-    EngineCacheMap      m_statusCallbackMap;                             /// All callback to observe time event ready state stored using using a trigger id
+    EngineCacheMap      m_statusCallbackMap;                            /// All callback to observe time event ready state stored using using a trigger id
     EngineCacheMap      m_triggerDataMap;                               /// All TTData to expose conditioned event on the network stored using using a trigger id
 
     TTObjectBasePtr     m_dataPlay;                                     /// A Modular TTData to expose Play transport service
@@ -196,8 +205,9 @@ public:
     
     // Id management //////////////////////////////////////////////////////////////////
     
-    TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::string & name);
+    TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::string & name, TTTimeContainerPtr subScenario = NULL);
     TTTimeProcessPtr    getTimeProcess(TimeProcessId boxId);
+    TTTimeContainerPtr  getSubScenario(TimeProcessId boxId);
     void                uncacheTimeProcess(TimeProcessId boxId);
     void                clearTimeProcess();
     
@@ -236,19 +246,20 @@ public:
 	 * \param boxBeginPos : the begin value in ms.
 	 * \param boxLength : the length value in ms.
      * \param name : the name of the box
-	 * \param motherId : mother box ID if any, NO_ID if the box to create has no mother.
+	 * \param motherId : mother box ID (default : root scenario)
 	 *
 	 * \return the newly created box ID.
 	 */
-	TimeProcessId addBox(TimeValue boxBeginPos, TimeValue boxLength, const std::string & name, TimeProcessId motherId);
+	TimeProcessId addBox(TimeValue boxBeginPos, TimeValue boxLength, const std::string & name, TimeProcessId motherId = ROOT_BOX_ID);
     
 	/*!
 	 * Removes a box from the CSP : removes the relation implicating it and the
 	 * box's variables.
 	 *
 	 * \param boxId : the ID of the box to remove.
+     * \param motherId : mother box ID (default : root scenario)
 	 */
-	void removeBox(TimeProcessId boxId);
+	void removeBox(TimeProcessId boxId, TimeProcessId motherId = ROOT_BOX_ID);
     
 	/*!
 	 * Adds a AntPostRelation between two controlPoints.
@@ -259,19 +270,21 @@ public:
 	 * \param controlPoint2 : the index of the point in the second box to put in relation
 	 * \param type : the relation type
 	 * \param movedBoxes : empty vector, will be filled with the ID of the boxes moved by this new relation
+     * \param motherId : mother box ID (default : root scenario)
 	 *
 	 * \return the newly created relation id (NO_ID if the creation is impossible).
 	 */
 	IntervalId addTemporalRelation(TimeProcessId boxId1, TimeEventIndex controlPoint1,
                                      TimeProcessId boxId2, TimeEventIndex controlPoint2, TemporalRelationType type,
-                                     std::vector<TimeProcessId>& movedBoxes);
+                                     std::vector<TimeProcessId>& movedBoxes, TimeProcessId motherId = ROOT_BOX_ID);
     
     /*!
 	 * Removes the temporal relation using given id.
 	 *
-	 * \param relationId : the ID of the relation to remove.
+	 * \param relationId : the ID of the relation to remove
+     * \param motherId : mother box ID (default : root scenario)
 	 */
-	void removeTemporalRelation(IntervalId relationId);
+	void removeTemporalRelation(IntervalId relationId, TimeProcessId motherId = ROOT_BOX_ID);
     
 	/*!
 	 * Changes min bound and max bound for the relation length.
@@ -695,10 +708,13 @@ public:
     
 	/*!
 	 * Adds a new triggerPoint in CSP.
+     *
+     * \param containingBoxId :
+     * \param motherId : mother box ID (default : root scenario)
 	 *
 	 * \return the created trigger ID
 	 */
-	ConditionedProcessId addTriggerPoint(TimeProcessId containingBoxId, TimeEventIndex controlPointIndex);
+	ConditionedProcessId addTriggerPoint(TimeProcessId containingBoxId, TimeEventIndex controlPointIndex, TimeProcessId motherId = ROOT_BOX_ID);
     
 	/*!
 	 * Removes the triggerPoint from the CSP.
@@ -707,8 +723,49 @@ public:
 	 *
 	 * \param triggerId : the ID of the trigger to be removed.
 	 */
-	void removeTriggerPoint(ConditionedProcessId triggerId);
+	void removeTriggerPoint(ConditionedProcessId triggerId, TimeProcessId motherId = ROOT_BOX_ID);
+
+    /*!
+     * Mix multiple triggerPoints into one TimeCondition.
+     *
+     * \return the created condition ID
+     */
+    TimeConditionId createCondition(std::vector<ConditionedProcessId> triggerIds);
+
+    /*!
+     * Add a trigger point to the condition.
+     *
+     * \param conditionId : the ID of the condition
+     * \param triggerId : the ID of the trigger to add
+     * \param motherId : mother box ID (default : root scenario)
+     */
+    void attachToCondition(TimeConditionId conditionId, ConditionedProcessId triggerId, TimeProcessId motherId = ROOT_BOX_ID);
+
+    /*!
+     * Remove a trigger point from the condition.
+     *
+     * \param conditionId : the ID of the condition
+     * \param triggerId : the ID of the trigger to remove
+     * \param motherId : mother box ID (default : root scenario)
+     */
+    void detachFromCondition(TimeConditionId conditionId, ConditionedProcessId triggerId, TimeProcessId motherId = ROOT_BOX_ID);
+
+    /*!
+     * Delete the specified TimeCondition.
+     *
+     * \param conditionId : the ID of the condition to delete
+     * \param motherId : mother box ID (default : root scenario)
+     */
+    void deleteCondition(TimeConditionId conditionId, TimeProcessId motherId = ROOT_BOX_ID);
+
+    void getConditionTriggerIds(TimeConditionId conditionId, std::vector<TimeProcessId>& triggerIds);
     
+    // Sick of useless doc
+    void setConditionMessage(TimeConditionId conditionId, std::string disposeMessage);
+
+    // Sick of useless doc
+    std::string getConditionMessage(TimeConditionId conditionId);
+
 	/*!
 	 * Sets the triggerPoint (given by ID) message.
 	 *
@@ -729,6 +786,12 @@ public:
 	 * \return the trigger message
 	 */
 	std::string getTriggerPointMessage(ConditionedProcessId triggerId);
+
+    // Sick of useless doc
+    void setTriggerPointDefault(ConditionedProcessId triggerId, bool dflt);
+
+    // Sick of useless doc
+    bool getTriggerPointDefault(ConditionedProcessId triggerId);
     
 	/*!
 	 * Gets the id of the box linked to the given trigger point.
@@ -773,6 +836,14 @@ public:
 	 * \param triggersID : the vector to fill with all triggers ID used.
 	 */
 	void getTriggersPointId(std::vector<ConditionedProcessId>& triggersID);
+
+    /*!
+     * Fills the given vector with all the conditions ID used in the editor.
+     * Useful after a load.
+     *
+     * \param conditionsID : the vector to fill with all conditions ID used.
+     */
+    void getConditionsId(std::vector<TimeConditionId>& conditionsID);
     
     /*!
 	 * Set the zoom factor of the view of the main scenario

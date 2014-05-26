@@ -54,6 +54,7 @@
 #include "MaquetteView.hpp"
 #include "MainWindow.hpp"
 #include "Relation.hpp"
+#include "ConditionalRelation.hpp"
 #include "Comment.hpp"
 #include "TriggerPoint.hpp"
 #include "ViewRelations.hpp"
@@ -157,9 +158,7 @@ MaquetteScene::updateProgressBar()
 void
 MaquetteScene::zoomChanged(float value)
 {
-    std::cout<<value<<std::endl;
   setMaxSceneWidth(MaquetteScene::MAX_SCENE_WIDTH*value);
-  std::cout<<" > "<<MaquetteScene::MAX_SCENE_WIDTH*value<<std::endl;
   updateProgressBar();
   _timeBar->updateZoom(value);
     
@@ -483,7 +482,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     }
   else if (noBoxSelected() || subScenarioMode(mouseEvent)) {
       setCurrentMode(CREATION_MODE);
-    }
+    }  
   else {
       setCurrentMode(SELECTION_MODE);
     }
@@ -632,27 +631,37 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
         if (itemAt(mouseEvent->scenePos()) != 0) {
             int type = itemAt(mouseEvent->scenePos())->type();
             if (type == PARENT_BOX_TYPE) {
-                BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
 
+                BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
                 BasicBox *firstBox = getBox(_relation->firstBox());
-                if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE)) {
-                    setRelationSecondBox(secondBox->ID(), BOX_START);
-                    addPendingRelation();
-                    firstBox->setSelected(true);
-                  }
-                else if (mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
-                    setRelationSecondBox(secondBox->ID(), BOX_END);
-                    addPendingRelation();
-                    firstBox->setSelected(true);
-                  }
-                else {
-                    if (selectedItems().empty()) {
-                      }
+
+                if(mouseEvent->modifiers() == Qt::AltModifier){ //case conditional relation
+                    QList<BasicBox *> boxesToCondition;
+                    boxesToCondition<<firstBox;
+                    boxesToCondition<<secondBox;
+                    conditionBoxes(boxesToCondition);
+                }
+                else{
+
+                    if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE)) {
+                        setRelationSecondBox(secondBox->ID(), BOX_START);
+                        addPendingRelation();
+                        firstBox->setSelected(true);
+                    }
+                    else if (mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
+                        setRelationSecondBox(secondBox->ID(), BOX_END);
+                        addPendingRelation();
+                        firstBox->setSelected(true);
+                    }
                     else {
-                        selectionMoved();
-                      }
-                  }
-              }
+                        if (selectedItems().empty()) {
+                        }
+                        else {
+                            selectionMoved();
+                        }
+                    }
+                }
+            }
             else {
                 _relationBoxFound = false;
                 delete _relation;
@@ -1312,7 +1321,7 @@ MaquetteScene::changeRelationBounds(unsigned int relID, const float &length, con
           AbstractRelation *abRel = static_cast<AbstractRelation*>(rel->abstract());
           float oldLength = abRel->length();
           BasicBox *secondBox = getBox(abRel->secondBox());
-          if (secondBox != NULL) {
+          if (secondBox != NULL) {              
               secondBox->moveBy(length - oldLength, 0.);
               vector<unsigned int> boxMoved;
               boxMoved.push_back(secondBox->ID());
@@ -1352,6 +1361,28 @@ MaquetteScene::removeRelation(unsigned int relID)
       setModified(true);
     }
 }
+
+void
+MaquetteScene::removeConditionalRelation(ConditionalRelation *condRel)
+{
+    if(condRel != NULL)
+    {
+        QList<BasicBox *>::iterator     it;
+        QList<BasicBox *>               boxes = condRel->getBoxes();
+        BasicBox                        *curBox;
+
+        for(it = boxes.begin() ; it!=boxes.end() ; it++)
+        {
+            curBox = *it;
+            curBox->removeConditionalRelation(condRel);
+        }
+
+        removeItem(condRel);
+        Maquette::getInstance()->deleteCondition(condRel->ID());
+        setModified(true);
+    }
+}
+
 
 void
 MaquetteScene::setRelationFirstBox(unsigned int ID, BoxExtremity extremumType)
@@ -1400,6 +1431,8 @@ MaquetteScene::selectionMoved()
           BasicBox *curBox = static_cast<BasicBox*>(curItem);
           boxMoved(curBox->ID());
         }
+      else if (type == CONDITIONAL_RELATION_TYPE){
+      }
     }
 }
 
@@ -1410,9 +1443,9 @@ MaquetteScene::boxMoved(unsigned int boxID)
   Coords coord;
   BasicBox * box = _maquette->getBox(boxID);
   if (box != NULL) {
+
       if (!box->hasMother()) {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x();
-//          std::cout<<"X = "<<coord.topLeftX* MaquetteScene::MS_PER_PIXEL<<std::endl;
         }
       else {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x()
@@ -1423,18 +1456,12 @@ MaquetteScene::boxMoved(unsigned int boxID)
 //      std::cout<<"Y = "<<coord.sizeX* MaquetteScene::MS_PER_PIXEL<<std::endl;
       coord.sizeY = box->boxRect().size().height();
     }
+
   bool ret = _maquette->updateBox(boxID, coord);
 
   if (ret) {
       update();
       setModified(true);
-
-/*		std::cerr << "Box top left coordinates : " << box->mapToScene(box->boundingRect().topLeft()).x() + box->boundingRect().size().width() << std::endl;
- *              std::cerr << "View right max coordinates :" << _view->sceneRect().topLeft().x() + _view->sceneRect().width() << std::endl;*/
-
-      //if (box->mapToScene(box->boundingRect().topLeft()).x() + box->boundingRect().size().width() >= (_view->sceneRect().topLeft().x() + _view->sceneRect().width() - 100)) {
-      //_view->fitInView(box,Qt::KeepAspectRatio);
-      //}
     }
 
   return ret;
@@ -1678,6 +1705,9 @@ MaquetteScene::removeSelectedItems()
       else if ((*it)->type() == TRIGGER_POINT_TYPE) {
           removeTriggerPoint(static_cast<TriggerPoint*>(*it)->ID());
         }
+      else if ((*it)->type() == CONDITIONAL_RELATION_TYPE) {
+          removeConditionalRelation(static_cast<ConditionalRelation*>(*it));
+        }
     }
   map<unsigned int, BasicBox*>::iterator boxIt;
   for (boxIt = boxesToRemove.begin(); boxIt != boxesToRemove.end(); ++boxIt) {
@@ -1770,6 +1800,58 @@ MaquetteScene::setMaxSceneWidth(float maxSceneWidth){
 float
 MaquetteScene::getMaxSceneWidth(){
   return _maxSceneWidth;
+}
+
+void
+MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
+{
+    QList<BasicBox *>::iterator     it = boxesToCondition.begin();
+    BasicBox                        *box,
+                                    *earliestBox = *it;
+    unsigned int                    earliestDate = earliestBox->date();
+    bool                            conditionalRelationFound = false;
+    ConditionalRelation             *condRel;
+
+
+    //Check if all boxes have a trigger point on start and force to move to the same date.
+    //Check if boxes have to be simply attached to an existing conditional relation, else create a new one.
+    for(it ; it!=boxesToCondition.end() ; it++)
+    {
+        box = *it;
+
+        if(!box->hasTriggerPoint(BOX_START)) //Force trigger point creation
+            box->addTriggerPoint(BOX_START);
+
+        if(box->attachedToConditionalRelation()) // Check if a conditional relation is already attached to a box, to create or not a new one.
+        {
+            conditionalRelationFound = true;
+            condRel = box->getConditionalRelations().first();
+        }
+
+        //Find the earliest box
+        if(box->date()<earliestDate){
+            earliestBox = box;
+            earliestDate = box->date();
+        }
+    }
+
+    //Force boxes to move to the earliest box date.
+    /// \todo This is provisional, has to be done automatically by Score. NH
+    for(it=boxesToCondition.begin() ; it!=boxesToCondition.end() ; it++)
+    {
+        box = *it;
+        box->moveBy((qreal)(earliestDate/MS_PER_PIXEL) -(qreal)(box->date() / MS_PER_PIXEL), 0.);
+        boxMoved(box->ID());
+    }
+
+    if(conditionalRelationFound) //just attach boxes to existing relation
+    {
+        condRel->attachBoxes(boxesToCondition);
+    }
+    else //create a new one
+    {
+        condRel = new ConditionalRelation(boxesToCondition, this);
+    }    
 }
 
 void

@@ -235,7 +235,7 @@ void Engine::initScore()
     //TTScoreTimeProcessEndCallbackCreate(m_mainScenario, &m_mainEndCallback, endCallbackFunction);
 
     // Store the main scenario (so ROOT_BOX_ID is 1)
-    cacheTimeProcess(m_mainScenario, "root");
+    cacheTimeProcess(m_mainScenario, "root", TTTimeContainerPtr(m_mainScenario));
 }
 
 void Engine::dumpAddressBelow(TTNodePtr aNode)
@@ -283,7 +283,7 @@ Engine::~Engine()
     TTObjectBaseRelease(&m_sender);
 }
 
-TimeProcessId Engine::cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::string & name)
+TimeProcessId Engine::cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::string & name, TTTimeContainerPtr subScenario)
 {
     TimeProcessId id;
     EngineCacheElementPtr e;
@@ -291,6 +291,7 @@ TimeProcessId Engine::cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::
     e = new EngineCacheElement();
     e->object = TTObjectBasePtr(timeProcess);
     e->name = name;
+    e->subScenario = subScenario;
     
     id = m_nextTimeProcessId;
     m_timeProcessMap[id] = e;
@@ -305,6 +306,11 @@ TimeProcessId Engine::cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::
 TTTimeProcessPtr Engine::getTimeProcess(TimeProcessId boxId)
 {
     return TTTimeProcessPtr(TTObjectBasePtr(m_timeProcessMap[boxId]->object));
+}
+
+TTTimeContainerPtr Engine::getSubScenario(TimeProcessId boxId)
+{
+    return TTTimeContainerPtr(TTObjectBasePtr(m_timeProcessMap[boxId]->subScenario));
 }
 
 void Engine::uncacheTimeProcess(TimeProcessId boxId)
@@ -687,49 +693,57 @@ void Engine::uncacheTriggerDataCallback(ConditionedProcessId triggerId)
 TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const std::string & name, TimeProcessId motherId)
 {
     TTTimeEventPtr      startEvent, endEvent;
-    TTTimeProcessPtr    timeProcess;
+    TTTimeProcessPtr    timeProcess, subScenario;
     TimeProcessId       boxId;
     
-    // Create a time event for the start into the main scenario
-    TTScoreTimeEventCreate(&startEvent, boxBeginPos, TTTimeContainerPtr(m_mainScenario));
+    // Create a time event for the start into the mother scenario
+    TTScoreTimeEventCreate(&startEvent, boxBeginPos, getSubScenario(motherId));
 
-    // Create a time event for the end into the main scenario
-    TTScoreTimeEventCreate(&endEvent, boxBeginPos+boxLength, TTTimeContainerPtr(m_mainScenario));
+    // Create a time event for the end into the mother scenario
+    TTScoreTimeEventCreate(&endEvent, boxBeginPos+boxLength, getSubScenario(motherId));
     
-    // Create a new automation time process into the main scenario
-    TTScoreTimeProcessCreate(&timeProcess, "Automation", startEvent, endEvent, TTTimeContainerPtr(m_mainScenario));
+    // Create a new automation time process into the mother scenario
+    TTScoreTimeProcessCreate(&timeProcess, "Automation", startEvent, endEvent, getSubScenario(motherId));
     TTScoreTimeProcessSetName(timeProcess, name);
     
+    // Create a new sub scenario time process into the mother scenario
+    TTScoreTimeProcessCreate(&subScenario, "Scenario", startEvent, endEvent, getSubScenario(motherId));
+    
     // Cache it and get an unique id for this process
-    boxId = cacheTimeProcess(timeProcess, name);
+    boxId = cacheTimeProcess(timeProcess, name, TTTimeContainerPtr(subScenario));
     
     iscoreEngineDebug TTLogMessage("TimeProcess %ld created at %ld ms for a duration of %ld ms\n", boxId, boxBeginPos, boxLength);
     
 	return boxId;
 }
 
-void Engine::removeBox(TimeProcessId boxId)
+void Engine::removeBox(TimeProcessId boxId, TimeProcessId motherId)
 {
     TTTimeProcessPtr    timeProcess;
+    TTTimeContainerPtr   subScenario;
     TTTimeEventPtr      startEvent, endEvent;
     TTErr               err;
     
     // Retreive the time process using the boxId
     timeProcess = getTimeProcess(boxId);
+    subScenario = getSubScenario(boxId);
     
     // Remove the time process from the cache
     uncacheTimeProcess(boxId);
     
-    // Release the time process from the main scenario
-    TTScoreTimeProcessRelease(&timeProcess, TTTimeContainerPtr(m_mainScenario), &startEvent, &endEvent);
+    // Release the time process from the mother scenario
+    TTScoreTimeProcessRelease(&timeProcess, getSubScenario(motherId), &startEvent, &endEvent);
     
-    // Release start event from the main scenario
-    err = TTScoreTimeEventRelease(&startEvent, TTTimeContainerPtr(m_mainScenario));
+    // Release the sub scenario from the mother scenario
+    TTScoreTimeProcessRelease(&timeProcess, getSubScenario(motherId), &startEvent, &endEvent);
+    
+    // Release start event from the mother scenario
+    err = TTScoreTimeEventRelease(&startEvent, getSubScenario(motherId));
     if (err)
         iscoreEngineDebug TTLogMessage("Box %ld cannot release his start event\n", boxId);
     
-    // Release end event from the main scenario
-    err = TTScoreTimeEventRelease(&endEvent, TTTimeContainerPtr(m_mainScenario));
+    // Release end event from the mother scenario
+    err = TTScoreTimeEventRelease(&endEvent, getSubScenario(motherId));
     if (err)
         iscoreEngineDebug TTLogMessage("Box %ld cannot release his end event\n", boxId);
 }
@@ -739,7 +753,8 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
                                        TimeProcessId boxId2,
                                        TimeEventIndex controlPoint2,
                                        TemporalRelationType type,
-                                       vector<TimeProcessId>& movedBoxes)
+                                       vector<TimeProcessId>& movedBoxes,
+                                       TimeProcessId motherId)
 {
     TTTimeProcessPtr        timeProcess = NULL;
     TTTimeProcessPtr        tp1, tp2;
@@ -763,7 +778,7 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
         TTScoreTimeProcessGetEndEvent(tp2, &endEvent);
 
     // Create a new interval time process into the main scenario
-    err = TTScoreTimeProcessCreate(&timeProcess, "Interval", startEvent, endEvent, TTTimeContainerPtr(m_mainScenario));
+    err = TTScoreTimeProcessCreate(&timeProcess, "Interval", startEvent, endEvent, getSubScenario(motherId));
 
     // an error can append if the start is after the end
     if (!err) {
@@ -786,7 +801,7 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
         return NO_ID;
 }
 
-void Engine::removeTemporalRelation(IntervalId relationId)
+void Engine::removeTemporalRelation(IntervalId relationId, TimeProcessId motherId)
 {
     TTTimeProcessPtr    timeProcess;
     TTTimeEventPtr      startEvent, endEvent;
@@ -795,16 +810,16 @@ void Engine::removeTemporalRelation(IntervalId relationId)
     // Retreive the interval using the relationId
     timeProcess = getInterval(relationId);
     
-    // Release the time process from the main scenario
-    TTScoreTimeProcessRelease(&timeProcess, TTTimeContainerPtr(m_mainScenario), &startEvent, &endEvent);
+    // Release the time process from the mother scenario
+    TTScoreTimeProcessRelease(&timeProcess, getSubScenario(motherId), &startEvent, &endEvent);
 
-    // Release start event from the main scenario
-    err = TTScoreTimeEventRelease(&startEvent, TTTimeContainerPtr(m_mainScenario));
+    // Release start event from the mother scenario
+    err = TTScoreTimeEventRelease(&startEvent, getSubScenario(motherId));
     if (err)
         iscoreEngineDebug TTLogMessage("Relation %ld cannot release his start event\n", relationId);
 
-    // Release end event from the main scenario
-    err = TTScoreTimeEventRelease(&endEvent, TTTimeContainerPtr(m_mainScenario));
+    // Release end event from the mother scenario
+    err = TTScoreTimeEventRelease(&endEvent, getSubScenario(motherId));
     if (err)
         iscoreEngineDebug TTLogMessage("Relation %ld cannot release his end event\n", relationId);
 
@@ -1617,7 +1632,7 @@ bool Engine::getCurveValues(TimeProcessId boxId, const std::string & address, un
 	return err == kTTErrNone;
 }
 
-ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, TimeEventIndex controlPointIndex)
+ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, TimeEventIndex controlPointIndex, TimeProcessId motherId)
 {
     TTTimeProcessPtr        timeProcess = getTimeProcess(containingBoxId);
     TTTimeEventPtr          timeEvent;
@@ -1632,7 +1647,7 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
         TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
     
     // Create a TTTimeCondition
-    m_mainScenario->sendMessage(TTSymbol("TimeConditionCreate"), args, v);
+    getSubScenario(motherId)->sendMessage(TTSymbol("TimeConditionCreate"), args, v);
     timeCondition = TTTimeConditionPtr(TTObjectBasePtr(v[0]));
     
     // Add the event to the condition with no associated expression
@@ -1650,18 +1665,142 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
 	return triggerId;
 }
 
-void Engine::removeTriggerPoint(ConditionedProcessId triggerId)
+void Engine::removeTriggerPoint(ConditionedProcessId triggerId, TimeProcessId motherId)
 {
     TTValue             v, out;
     
     // Release the time condition
     v = TTObjectBasePtr(getTimeCondition(triggerId));
-    m_mainScenario->sendMessage(TTSymbol("TimeConditionRelease"), v, out);
+    getSubScenario(motherId)->sendMessage(TTSymbol("TimeConditionRelease"), v, out);
     
     // Uncache
     uncacheConditionedProcess(triggerId);
     
     uncacheTimeCondition(triggerId);
+}
+
+TimeConditionId Engine::createCondition(std::vector<ConditionedProcessId> triggerIds)
+{
+    std::vector<ConditionedProcessId>::iterator it = triggerIds.begin();
+    TTTimeConditionPtr timeCondition = getTimeCondition(*it);
+
+    // Create an id for the condition and cache it (from ConditionedProcessId because it is mixed with timeConditionMap)
+    TimeConditionId conditionId = m_nextConditionedProcessId++;
+    cacheTimeCondition(conditionId, timeCondition);
+
+    for(++it ; it != triggerIds.end() ; ++it) {
+        attachToCondition(conditionId, *it);
+    }
+
+    return conditionId;
+}
+
+void Engine::attachToCondition(TimeConditionId conditionId, ConditionedProcessId triggerId, TimeProcessId motherId)
+{
+    TTTimeConditionPtr timeCondition = getTimeCondition(conditionId);
+    TTTimeConditionPtr otherCondition = getTimeCondition(triggerId);
+    // Because a condition is always at the start of a box :
+    TimeEventIndex idx = BEGIN_CONTROL_POINT_INDEX;
+    TTTimeEventPtr timeEvent;
+    TTScoreTimeProcessGetStartEvent(getConditionedProcess(triggerId, idx), &timeEvent);
+    TTValue args, v;
+
+    // Should be different conditions before the merge
+    if (otherCondition != timeCondition) {
+
+        // Save the expression
+        std::string expr = getTriggerPointMessage(triggerId);
+
+        // Release the other time condition
+        getSubScenario(motherId)->sendMessage(TTSymbol("TimeConditionRelease"), otherCondition, v);
+
+        // Add the event to the chosen time condition with the saved expression
+        args = TTObjectBasePtr(timeEvent);
+        timeCondition->sendMessage(TTSymbol("EventAdd"), args, v);
+//        setTriggerPointMessage(triggerId, expr);
+
+        // Modify the cache
+        m_timeConditionMap[triggerId]->object = timeCondition;
+        m_conditionsMap[conditionId].push_back(triggerId);
+    }
+}
+
+void Engine::detachFromCondition(TimeConditionId conditionId, ConditionedProcessId triggerId, TimeProcessId motherId)
+{
+    TTTimeConditionPtr timeCondition = getTimeCondition(conditionId);
+    TTTimeConditionPtr otherCondition = getTimeCondition(triggerId);
+    // Because a condition is always at the start of a box :
+    TimeEventIndex idx = BEGIN_CONTROL_POINT_INDEX;
+    TTTimeEventPtr timeEvent;
+    TTScoreTimeProcessGetStartEvent(getConditionedProcess(triggerId, idx), &timeEvent);
+    TTValue args, v;
+
+    // Should be the same condition before the separation
+    if (otherCondition == timeCondition) {
+
+        // Save the expression
+        std::string expr = getTriggerPointMessage(triggerId);
+
+        // Remove the event from the chosen time condition
+        args = TTObjectBasePtr(timeEvent);
+        timeCondition->sendMessage(TTSymbol("EventRemove"), args, v);
+
+        // Create a new TTTimeCondition
+        getSubScenario(motherId)->sendMessage(TTSymbol("TimeConditionCreate"), args, v);
+        otherCondition = TTTimeConditionPtr(TTObjectBasePtr(v[0]));
+
+        // Add the event to the new condition with the saved expression
+        timeCondition->sendMessage(TTSymbol("EventAdd"), args, v);
+        setTriggerPointMessage(triggerId, expr);
+
+        // Modify cache
+        m_timeConditionMap[triggerId]->object = otherCondition;
+        m_conditionsMap[conditionId].remove(triggerId);
+    }
+}
+
+void Engine::deleteCondition(TimeConditionId conditionId, TimeProcessId motherId)
+{
+    std::list<ConditionedProcessId> & triggerIds = m_conditionsMap[conditionId];
+    std::list<ConditionedProcessId>::iterator it;
+    TTTimeConditionPtr timeCondition = getTimeCondition(conditionId);
+    TTValue v;
+
+    for(it = triggerIds.begin() ; it != triggerIds.end() ; ++it) {
+        detachFromCondition(conditionId, *it);
+    }
+
+    // Release the condition
+    getSubScenario(motherId)->sendMessage(TTSymbol("TimeConditionRelease"), timeCondition, v);
+
+    // Uncache the condition
+    uncacheTimeCondition(conditionId);
+    m_conditionsMap.erase(conditionId);
+}
+
+void Engine::getConditionTriggerIds(TimeConditionId conditionId, std::vector<TimeProcessId>& triggerIds)
+{
+    triggerIds.assign(m_conditionsMap[conditionId].begin(), m_conditionsMap[conditionId].end());
+}
+
+void Engine::setConditionMessage(TimeConditionId conditionId, std::string disposeMessage)
+{
+    TTTimeConditionPtr timeCondition = getTimeCondition(conditionId);
+    TTValue v;
+
+    v.append(TTSymbol(disposeMessage));
+    timeCondition->setAttributeValue(TTSymbol("disposeMessage"), v);
+}
+
+std::string Engine::getConditionMessage(TimeConditionId conditionId)
+{
+    TTTimeConditionPtr timeCondition = getTimeCondition(conditionId);
+    TTValue out;
+
+    timeCondition->getAttributeValue(TTSymbol("disposeMessage"), out);
+
+    TTSymbol expr = out[0];
+    return expr.c_str();
 }
 
 void Engine::setTriggerPointMessage(ConditionedProcessId triggerId, std::string triggerMessage)
@@ -1707,6 +1846,54 @@ std::string Engine::getTriggerPointMessage(ConditionedProcessId triggerId)
     else {
         
         string empty;
+        return empty;
+    }
+}
+
+//!\ Crappy copy
+void Engine::setTriggerPointDefault(ConditionedProcessId triggerId, bool dflt)
+{
+    TimeEventIndex      controlPointIndex;
+    TTTimeProcessPtr    timeProcess = getConditionedProcess(triggerId, controlPointIndex);
+    TTTimeEventPtr      timeEvent;
+    TTValue             v, out;
+
+    // Get start or end time event
+    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+        TTScoreTimeProcessGetStartEvent(timeProcess, &timeEvent);
+    else
+        TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
+
+    // edit the default comportment associated to this event
+    v = TTObjectBasePtr(timeEvent);
+    v.append(dflt);
+    getTimeCondition(triggerId)->sendMessage(TTSymbol("EventDefault"), v, out);
+}
+
+//!\ Crappy copy
+bool Engine::getTriggerPointDefault(ConditionedProcessId triggerId)
+{
+    TimeEventIndex          controlPointIndex;
+    TTTimeProcessPtr        timeProcess = getConditionedProcess(triggerId, controlPointIndex);
+    TTTimeEventPtr          timeEvent;
+    bool                    dflt;
+    TTValue                 v, out;
+
+    // Get start or end time event
+    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+        TTScoreTimeProcessGetStartEvent(timeProcess, &timeEvent);
+    else
+        TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
+
+    // Get the default comportment associated to this event
+    if (!getTimeCondition(triggerId)->sendMessage(TTSymbol("ExpressionFind"), v, out)) {
+
+        dflt = out[0];
+        return dflt;
+    }
+    else {
+
+        bool empty;
         return empty;
     }
 }
@@ -1764,6 +1951,17 @@ void Engine::getTriggersPointId(vector<ConditionedProcessId>& triggersID)
     
     for (it = m_conditionedProcessMap.begin(); it != m_conditionedProcessMap.end(); ++it)
         triggersID.push_back(it->first);
+}
+
+void Engine::getConditionsId(vector<TimeConditionId>& conditionsID)
+{
+    std::map<TimeConditionId, std::list<ConditionedProcessId>>::iterator it;
+
+    conditionsID.clear();
+
+    for(it = m_conditionsMap.begin() ; it != m_conditionsMap.end() ; ++it) {
+        conditionsID.push_back(it->first);
+    }
 }
 
 void Engine::setViewZoom(QPointF zoom)
@@ -2736,11 +2934,14 @@ void Engine::store(std::string fileName)
 void Engine::load(std::string fileName)
 {
     TTValue             v, objects, none;
-    TTObjectBasePtr     timeProcess, timeEvent, timeCondition;
+    TTTimeProcessPtr    timeProcess;
+    TTTimeEventPtr      timeEvent;
+    TTTimeConditionPtr  timeCondition;
     TTSymbol            name;
     TimeProcessId       timeProcessId;
     IntervalId          relationId;
     ConditionedProcessId triggerId;
+    TimeConditionId     timeConditionId;
     
     // Clear all the EngineCacheMaps
     // note : this should be useless because all elements are removed by the maquette
@@ -2748,6 +2949,7 @@ void Engine::load(std::string fileName)
     clearInterval();
     clearConditionedProcess();
     clearTimeCondition();
+    m_conditionsMap.clear();
     
     // Create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
@@ -2763,6 +2965,32 @@ void Engine::load(std::string fileName)
     aXmlHandler.send(kTTSym_Read, TTSymbol(fileName), none);
     
     // Rebuild all the EngineCacheMaps from the main scenario content
+
+    // temporary map from TTTimeConditionPtr to TimeConditionId
+    std::map<TTTimeConditionPtr, TimeConditionId> TTCondToID;
+
+    // get all TTTimeConditions
+    m_mainScenario->getAttributeValue(TTSymbol("timeConditions"), objects);
+
+    // for all time conditions
+    for (TTUInt32 i = 0 ; i < objects.size() ; ++i) {
+
+        timeCondition = TTTimeConditionPtr(TTObjectBasePtr(objects[i]));
+
+        // check if it's a condition for i-score (2-plus events)
+        timeCondition->getAttributeValue(TTSymbol("events"), v);
+        if (v.size() >= 2) {
+
+            // get a unique ID for the condition
+            timeConditionId = m_nextConditionedProcessId++;
+
+            // cache it
+            cacheTimeCondition(timeConditionId, timeCondition);
+
+            // fill the temporary map
+            TTCondToID[timeCondition] = timeConditionId;
+        }
+    }
     
     // get all TTTimeProcesses
     m_mainScenario->getAttributeValue(TTSymbol("timeProcesses"), objects);
@@ -2770,7 +2998,7 @@ void Engine::load(std::string fileName)
     // for all time process
     for (TTUInt32 i = 0; i < objects.size(); i++) {
         
-        timeProcess = objects[i];
+        timeProcess = TTTimeProcessPtr(TTObjectBasePtr(objects[i]));
         
         // for each Automation process
         if (timeProcess->getName() == TTSymbol("Automation")) {
@@ -2779,7 +3007,7 @@ void Engine::load(std::string fileName)
             name = v[0];
             
             // Cache it and get an unique id for this process
-            timeProcessId = cacheTimeProcess((TTTimeProcessPtr)timeProcess, name.c_str());
+            timeProcessId = cacheTimeProcess(timeProcess, name.c_str());
             
             // if the Start event of the Automation process is conditioned
             timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
@@ -2794,7 +3022,15 @@ void Engine::load(std::string fileName)
                 triggerId = cacheConditionedProcess(timeProcessId, BEGIN_CONTROL_POINT_INDEX);
             
                 // We cache the TTTimeCondition
-                cacheTimeCondition(triggerId, (TTTimeConditionPtr)timeCondition);
+                cacheTimeCondition(triggerId, timeCondition);
+
+                // if it is a condition for i-score
+                std::map<TTTimeConditionPtr, TimeConditionId>::iterator it = TTCondToID.find(timeCondition);
+                if (it != TTCondToID.end()) {
+
+                    // add it in the conditions map
+                    m_conditionsMap[it->second].push_back(triggerId);
+                }
             }
             
             // if the End event of the Automation process is conditioned
@@ -2810,7 +3046,7 @@ void Engine::load(std::string fileName)
                 triggerId = cacheConditionedProcess(timeProcessId, END_CONTROL_POINT_INDEX);
             
                 // We cache the TTTimeCondition
-                cacheTimeCondition(triggerId, (TTTimeConditionPtr)timeCondition);
+                cacheTimeCondition(triggerId, timeCondition);
             }
         }
         
@@ -2818,7 +3054,14 @@ void Engine::load(std::string fileName)
         else if (timeProcess->getName() == TTSymbol("Interval")) {
             
             // Cache it and get an unique id for this process
-            relationId = cacheInterval((TTTimeProcessPtr)timeProcess);
+            relationId = cacheInterval(timeProcess);
+        }
+        
+        // for each Scenario process
+        else if (timeProcess->getName() == TTSymbol("Scenario")) {
+            
+            // TODO : link each sub scenario to a time process (the one with the same end and start events)
+            ;
         }
     }
 }

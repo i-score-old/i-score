@@ -72,6 +72,7 @@ class SoundBox;
 class BoundingBox;
 class MaquetteContextMenu;
 class Relation;
+class ConditionalRelation;
 class Comment;
 class TriggerPoint;
 class PlayingThread;
@@ -301,6 +302,13 @@ class MaquetteScene : public QGraphicsScene
      * \param relID : the relation to be removed
      */
     void removeRelation(unsigned int relID);
+
+    /*!
+     * \brief Removes a conditional relation.
+     *
+     * \param condRel : the relation to be removed
+     */
+    void removeConditionalRelation(ConditionalRelation *condRel);
 
     /*!
      * \brief Gets a QString describing a specific relation.
@@ -576,6 +584,12 @@ class MaquetteScene : public QGraphicsScene
 
     float getMaxSceneWidth();
     void setMaxSceneWidth(float maxSceneWidth);
+
+    /*!
+     * \brief Attach boxes to a conditional relation.
+     * \param boxesToCondition : the boxes to attach
+     */
+    void conditionBoxes(QList<BasicBox *> boxesToCondition);
 
   protected:
 

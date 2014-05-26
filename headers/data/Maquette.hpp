@@ -592,6 +592,44 @@ class Maquette : public QObject
     bool setTriggerPointMessage(unsigned int trgID, const std::string &message);
 
     /*!
+     * \brief Create a time condition between boxes.
+     *
+     * \param boxes : the boxes to condition.
+     */
+    unsigned int createCondition(QList<BasicBox *> boxes);
+
+    /*!
+     * Add a box to the condition.
+     *
+     * \param conditionId : the ID of the condition
+     * \param box : the box to add
+     */
+    void attachToCondition(unsigned int conditionId, BasicBox *box);
+
+    /*!
+     * Dettach a box from the condition.
+     *
+     * \param conditionId : the ID of the condition
+     * \param box : the box to detach
+     */
+    void detachFromCondition(unsigned int conditionId, BasicBox *box);
+
+    void setConditionMessage(unsigned int conditionId, std::string disposeMessage);
+    std::string getConditionMessage(TimeConditionId conditionId);
+
+    /*!
+     * Delete the specified TimeCondition.
+     *
+     * \param conditionId : the ID of the condition to delete
+     */
+    void deleteCondition(TimeConditionId conditionId);
+
+    void getConditionsId(std::vector<unsigned int> &conditionsId);
+
+    void getBoxesIdFromCondition(TimeConditionId conditionId, std::vector<unsigned int> &boxesId);
+
+
+    /*!
      * \brief Perform moving or resizing for a set of boxes.
      *
      * \param boxes : the boxes that have to be transformed with their new coordinates

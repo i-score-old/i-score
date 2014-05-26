@@ -74,6 +74,7 @@ class Comment;
 class TriggerPoint;
 class TextEdit;
 class Relation;
+class ConditionalRelation;
 class AbstractCurve;
 class QObject;
 
@@ -201,6 +202,14 @@ class BasicBox : public QObject, public QGraphicsItem
      * \param relation : the relation to store
      */
     void addRelation(BoxExtremity extremity, Relation *relation);
+
+    /*!
+     * \brief Adds a conditional relation to the start extremity
+     *
+     * \param condRel : the conditional relation to store
+     */
+    void addConditionalRelation(ConditionalRelation *condRel);
+
     /*!
      * \brief Removes a relation from an extremity
      *
@@ -209,6 +218,17 @@ class BasicBox : public QObject, public QGraphicsItem
      */
     void removeRelation(BoxExtremity extremity, unsigned int relID);
     void removeRelations(BoxExtremity extremity);
+
+    /*!
+     * \brief Removes a conditional relation from the start extremity
+     *
+     * \param condRelID : the conditional relation ID to remove
+     */
+    void removeConditionalRelation(ConditionalRelation *condRel);
+    void removeConditionalRelations();
+
+    void detachFromCondition();
+
     /*!
      * \brief Returns Relations associated to the start box extremity.
      */
@@ -327,6 +347,13 @@ class BasicBox : public QObject, public QGraphicsItem
      * \param extremity : the box extremity to get message from
      */
     std::string triggerPointMessage(BoxExtremity extremity);
+
+    /*!
+     * \brief Gets trigger point on the extremity.
+     *
+     * \param extremity : the box extremity to get trigger point from.
+     */
+    TriggerPoint *getTriggerPoint(BoxExtremity extremity);
 
     AbstractCurve *getCurve(const std::string &address);
     void setCurve(const std::string &address, AbstractCurve *curve);
@@ -722,6 +749,9 @@ class BasicBox : public QObject, public QGraphicsItem
     void select();
     void setRecMode(bool activated);
     inline bool recording(){return _recording;}
+    inline bool attachedToConditionalRelation(){return !_conditionalRelation.isEmpty();}
+    inline QList<ConditionalRelation *> getConditionalRelations(){return _conditionalRelation;}
+
     void updateRecordingCurves();
 
     /*!
@@ -826,7 +856,8 @@ class BasicBox : public QObject, public QGraphicsItem
     Comment *_comment;                                                          //!< The box comment.
     QMap<BoxExtremity, TriggerPoint*> *_triggerPoints;                          //!< The trigger points.
     std::map < BoxExtremity, std::map < unsigned int, Relation* > > _relations; //!< The relations.
-    std::map<std::string, AbstractCurve*> _abstractCurves;                      //!< The Curves
+    QList<ConditionalRelation *> _conditionalRelation;                          //!< The conditional relations attached.
+    std::map<std::string, AbstractCurve*> _abstractCurves;                      //!< The Curves.
     BoxWidget *_boxContentWidget;
 
     QRectF _boxRect;
@@ -861,5 +892,6 @@ class BasicBox : public QObject, public QGraphicsItem
 
     QPushButton *_startMenuButton;
     QPushButton *_endMenuButton;
+
 };
 #endif
