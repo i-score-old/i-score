@@ -88,64 +88,65 @@ void Engine::registerIscoreTransportData()
     // Play
     TTValuePtr batonPlay = new TTValue(TTPtr(this));
     batonPlay->append(TTSymbol("Play"));
-    TTModularCreateData(kTTSym_message, batonPlay, &TransportDataValueCallback, &m_dataPlay);
+    createData(kTTSym_message, batonPlay, &TransportDataValueCallback, &m_dataPlay);
     
     m_dataPlay->setAttributeValue(kTTSym_type, kTTSym_none);
     m_dataPlay->setAttributeValue(kTTSym_description, TTSymbol("start i-score execution"));
     
-    TTModularRegisterObject(TTAddress("/Transport/Play"), m_dataPlay);
+    registerObject(TTAddress("/Transport/Play"), m_dataPlay);
     
     // Stop
     TTValuePtr batonStop = new TTValue(TTPtr(this));
     batonStop->append(TTSymbol("Stop"));
-    TTModularCreateData(kTTSym_message, batonStop, &TransportDataValueCallback, &m_dataStop);
+    createData(kTTSym_message, batonStop, &TransportDataValueCallback, &m_dataStop);
     
     m_dataStop->setAttributeValue(kTTSym_type, kTTSym_none);
     m_dataStop->setAttributeValue(kTTSym_description, TTSymbol("stop i-score execution"));
     
-    TTModularRegisterObject(TTAddress("/Transport/Stop"), m_dataStop);
+    registerObject(TTAddress("/Transport/Stop"), m_dataStop);
     
     // Pause
     TTValuePtr batonPause = new TTValue(TTPtr(this));
     batonPause->append(TTSymbol("Pause"));
-    TTModularCreateData(kTTSym_message, batonPause, &TransportDataValueCallback, &m_dataPause);
+    createData(kTTSym_message, batonPause, &TransportDataValueCallback, &m_dataPause);
     
     m_dataPause->setAttributeValue(kTTSym_type, kTTSym_none);
     m_dataPause->setAttributeValue(kTTSym_description, TTSymbol("pause i-score execution"));
     
-    TTModularRegisterObject(TTAddress("/Transport/Pause"), m_dataPause);
+    registerObject(TTAddress("/Transport/Pause"), m_dataPause);
+    
     
     // Rewind
     TTValuePtr batonRewind = new TTValue(TTPtr(this));
     batonRewind->append(TTSymbol("Rewind"));
-    TTModularCreateData(kTTSym_message, batonRewind, &TransportDataValueCallback, &m_dataRewind);
+    createData(kTTSym_message, batonRewind, &TransportDataValueCallback, &m_dataRewind);
     
     m_dataRewind->setAttributeValue(kTTSym_type, kTTSym_none);
     m_dataRewind->setAttributeValue(kTTSym_description, TTSymbol("return to the beginning of the scenario"));
     
-    TTModularRegisterObject(TTAddress("/Transport/Rewind"), m_dataRewind);
+    registerObject(TTAddress("/Transport/Rewind"), m_dataRewind);
     
     // StartPoint
     TTValuePtr batonStartPoint = new TTValue(TTPtr(this));
     batonStartPoint->append(TTSymbol("StartPoint"));
-    TTModularCreateData(kTTSym_message, batonStartPoint, &TransportDataValueCallback, &m_dataStartPoint);
+    createData(kTTSym_message, batonStartPoint, &TransportDataValueCallback, &m_dataStartPoint);
     
     m_dataStartPoint->setAttributeValue(kTTSym_type, kTTSym_integer);
     m_dataStartPoint->setAttributeValue(kTTSym_description, TTSymbol("set the time where to start i-score execution (in ms)"));
     
-    TTModularRegisterObject(TTAddress("/Transport/StartPoint"), m_dataStartPoint);
+    registerObject(TTAddress("/Transport/StartPoint"), m_dataStartPoint);
     
     // Speed
     TTValuePtr batonSpeed = new TTValue(TTPtr(this));
     batonSpeed->append(TTSymbol("Speed"));
-    TTModularCreateData(kTTSym_message, batonSpeed, &TransportDataValueCallback, &m_dataSpeed);
+    createData(kTTSym_message, batonSpeed, &TransportDataValueCallback, &m_dataSpeed);
     
     m_dataSpeed->setAttributeValue(kTTSym_type, kTTSym_decimal);
     v = TTValue(0., 10.);
     m_dataSpeed->setAttributeValue(kTTSym_rangeBounds, v);
     m_dataSpeed->setAttributeValue(kTTSym_description, TTSymbol("change i-score speed rate execution"));
     
-    TTModularRegisterObject(TTAddress("/Transport/Speed"), m_dataSpeed);
+    registerObject(TTAddress("/Transport/Speed"), m_dataSpeed);
 }
 
 void Engine::registerIscoreToProtocols()
@@ -181,6 +182,8 @@ void Engine::registerIscoreToProtocols()
             v.append((TTPtr)hashParameters);
             getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
         }
+        
+        getProtocol(TTSymbol("Minuit"))->sendMessage("Run");
     }
     
     // check if the OSC protocol has been loaded
@@ -210,6 +213,8 @@ void Engine::registerIscoreToProtocols()
             v.append((TTPtr)hashParameters);
             getProtocol(TTSymbol("OSC"))->setAttributeValue(TTSymbol("applicationParameters"), v);
         }
+        
+        getProtocol(TTSymbol("OSC"))->sendMessage("Run");
     }
 }
 
@@ -664,7 +669,7 @@ void Engine::cacheTriggerDataCallback(ConditionedProcessId triggerId, TimeProces
     e->index = boxId;
     
     // Create a TTData
-    TTModularCreateData(kTTSym_message, NULL, NULL, &e->object);
+    createData(kTTSym_message, NULL, NULL, &e->object);
     
     e->object->setAttributeValue(kTTSym_type, kTTSym_none);
     e->object->setAttributeValue(kTTSym_description, TTSymbol("trigger an event"));
@@ -678,7 +683,7 @@ void Engine::cacheTriggerDataCallback(ConditionedProcessId triggerId, TimeProces
     else
         address += "/end";
     
-    TTModularRegisterObject(TTAddress(address), e->object);
+    registerObject(TTAddress(address), e->object);
     
     m_triggerDataMap[triggerId] = e;
 }
@@ -3322,14 +3327,16 @@ void TransportDataValueCallback(TTPtr baton, const TTValue& value)
 	// unpack baton (engine, transport)
 	b = (TTValuePtr)baton;
 	engine = EnginePtr((TTPtr)(*b)[0]);
-    transport = (*b)[0];
+    transport = (*b)[1];
 	
-    if (transport == TTSymbol("Play"))
-        engine->play();
-    
-    else if (transport == TTSymbol("Stop"))
-        engine->stop();
-    
+    if (transport == TTSymbol("Play")) {
+        if (!engine->isPlaying())
+            engine->play();
+    }
+    else if (transport == TTSymbol("Stop")) {
+        if (engine->isPlaying())
+            engine->stop();
+    }
     else if (transport == TTSymbol("Pause"))
         engine->pause(!engine->isPaused());
     
@@ -3340,14 +3347,14 @@ void TransportDataValueCallback(TTPtr baton, const TTValue& value)
     else if (transport == TTSymbol("StartPoint")) {
         
         if (value.size() == 1)
-            if (value[0].type() == kTypeUInt32)
+            if (value[0].type() == kTypeInt32)
                 engine->setTimeOffset(value[0]);
         
     }
     else if (transport == TTSymbol("Speed")) {
         
         if (value.size() == 1)
-            if (value[0].type() == kTypeFloat32)
+            if (value[0].type() == kTypeFloat64)
                 engine->setExecutionSpeedFactor(value[0]);
     }
     
@@ -3387,8 +3394,7 @@ std::string Engine::toNetworkTreeAddress(TTAddress aTTAddress)
 #pragma mark Miscellaneous Methods
 #endif
 
-// TODO : this should move into a TTModularAPI file
-TTErr TTModularCreateData(TTSymbol service, TTValuePtr baton, TTFunctionWithBatonAndValue valueCallback, TTObjectBasePtr *returnedData)
+TTErr Engine::createData(TTSymbol service, TTValuePtr baton, TTFunctionWithBatonAndValue valueCallback, TTObjectBasePtr *returnedData)
 {
     TTValue			args;
 	TTObjectBasePtr	returnValueCallback;
@@ -3411,8 +3417,7 @@ TTErr TTModularCreateData(TTSymbol service, TTValuePtr baton, TTFunctionWithBato
 	return kTTErrNone;
 }
 
-// TODO : this should move into a TTModularAPI file
-TTErr TTModularRegisterObject(TTAddress address, TTObjectBasePtr object)
+TTErr Engine::registerObject(TTAddress address, TTObjectBasePtr object)
 {
     TTNodePtr returnedTTNode;
     TTBoolean nodeCreated;

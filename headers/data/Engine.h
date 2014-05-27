@@ -1215,6 +1215,20 @@ private:
      * \return networktreeAddress : an address managed by i-score
      */
     std::string toNetworkTreeAddress(TTAddress aTTAddress);
+    
+    /** Create a #TTData object
+     @param	service			a symbol to tell if the data have to be a "parameter", a "message" or a "return"
+     @param	TTValuePtr      a value pointer to return back
+     @param valueCallback   a pointer to a void function(TTPtr baton, TTValue& value) to return the value back
+     @param returnedData    a new data object
+     @return                an error code if the creation fails */
+    TTErr createData(TTSymbol service, TTValuePtr baton, TTFunctionWithBatonAndValue valueCallback, TTObjectBasePtr *returnedData);
+    
+    /** Register a #TTObject
+     @param	address			the absolute address where to register the object
+     @param	object          the object to register
+     @return                an error code if the registration fails */
+    TTErr registerObject(TTAddress address, TTObjectBasePtr object);
 };
 
 typedef Engine* EnginePtr;
@@ -1242,23 +1256,6 @@ void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
  @param	value			nothing
  @return                an error code */
 void TransportDataValueCallback(TTPtr baton, const TTValue& value);
-
-
-// TODO : this should move into a TTModularAPI file
-/** Create a TTData object
- @param	service			a symbol to tell if the data have to be a "parameter", a "message" or a "return"
- @param	TTValuePtr      a value pointer to return back
- @param valueCallback   a pointer to a void function(TTPtr baton, TTValue& value) to return the value back
- @param returnedData    a new data object
- @return                an error code if the creation fails */
-TTErr TTModularCreateData(TTSymbol service, TTValuePtr baton, TTFunctionWithBatonAndValue valueCallback, TTObjectBasePtr *returnedData);
-
-// TODO : this should move into a TTModularAPI file
-/** Register a TTObject
- @param	address			the absolute address where to register the object
- @param	object          the object to register
- @return                an error code if the registration fails */
-TTErr TTModularRegisterObject(TTAddress address, TTObjectBasePtr object);
 
 // TODO : this should move into a TTModularAPI file
 /** compare priority attribute of object's node
