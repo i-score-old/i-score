@@ -2243,6 +2243,7 @@ void Engine::trigger(ConditionedProcessId triggerId)
 {
     TimeEventIndex      controlPointIndex;
     TTTimeProcessPtr    timeProcess = getConditionedProcess(triggerId, controlPointIndex);
+    TTTimeConditionPtr  timeCondition;
     TTTimeEventPtr      timeEvent;
     TTValue             v, out;
     
@@ -2251,8 +2252,14 @@ void Engine::trigger(ConditionedProcessId triggerId)
         TTScoreTimeProcessGetStartEvent(timeProcess, &timeEvent);
     else
         TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
-            
-    timeEvent->sendMessage(kTTSym_Trigger);
+    
+    // Get event condition
+    timeEvent->getAttributeValue("condition", v);
+    timeCondition = TTTimeConditionPtr(TTObjectBasePtr(v[0]));
+    
+    // Tell the condition to trigger this event (and dispose the others)
+    v = TTObjectBasePtr(timeEvent);
+    timeCondition->sendMessage("Trigger", v, out);
 }
 
 void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort)
