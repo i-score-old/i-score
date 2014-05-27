@@ -173,9 +173,9 @@ private:
     
     TTObjectBasePtr     m_sender;                                       /// A Modular TTSender to send message to any application
     
-	void (*m_TimeEventStatusAttributeCallback)(ConditionedProcessId, bool);
-    void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);
-    void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);
+	void (*m_TimeEventStatusAttributeCallback)(ConditionedProcessId, bool);         // allow to notify the Maquette if a triggerpoint is pending
+    void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);    // allow to notify the Maquette if a box is running or not
+    void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);                // allow to notify the Maquette if the transport features have been used remotly (via OSC messages for example)
 
 public:
 
@@ -257,9 +257,8 @@ public:
 	 * box's variables.
 	 *
 	 * \param boxId : the ID of the box to remove.
-     * \param motherId : mother box ID (default : root scenario)
 	 */
-	void removeBox(TimeProcessId boxId, TimeProcessId motherId = ROOT_BOX_ID);
+	void removeBox(TimeProcessId boxId);
     
 	/*!
 	 * Adds a AntPostRelation between two controlPoints.
@@ -270,21 +269,19 @@ public:
 	 * \param controlPoint2 : the index of the point in the second box to put in relation
 	 * \param type : the relation type
 	 * \param movedBoxes : empty vector, will be filled with the ID of the boxes moved by this new relation
-     * \param motherId : mother box ID (default : root scenario)
 	 *
 	 * \return the newly created relation id (NO_ID if the creation is impossible).
 	 */
 	IntervalId addTemporalRelation(TimeProcessId boxId1, TimeEventIndex controlPoint1,
                                      TimeProcessId boxId2, TimeEventIndex controlPoint2, TemporalRelationType type,
-                                     std::vector<TimeProcessId>& movedBoxes, TimeProcessId motherId = ROOT_BOX_ID);
+                                     std::vector<TimeProcessId>& movedBoxes);
     
     /*!
 	 * Removes the temporal relation using given id.
 	 *
 	 * \param relationId : the ID of the relation to remove
-     * \param motherId : mother box ID (default : root scenario)
 	 */
-	void removeTemporalRelation(IntervalId relationId, TimeProcessId motherId = ROOT_BOX_ID);
+	void removeTemporalRelation(IntervalId relationId);
     
 	/*!
 	 * Changes min bound and max bound for the relation length.
@@ -710,11 +707,10 @@ public:
 	 * Adds a new triggerPoint in CSP.
      *
      * \param containingBoxId :
-     * \param motherId : mother box ID (default : root scenario)
 	 *
 	 * \return the created trigger ID
 	 */
-	ConditionedProcessId addTriggerPoint(TimeProcessId containingBoxId, TimeEventIndex controlPointIndex, TimeProcessId motherId = ROOT_BOX_ID);
+	ConditionedProcessId addTriggerPoint(TimeProcessId containingBoxId, TimeEventIndex controlPointIndex);
     
 	/*!
 	 * Removes the triggerPoint from the CSP.
@@ -723,7 +719,7 @@ public:
 	 *
 	 * \param triggerId : the ID of the trigger to be removed.
 	 */
-	void removeTriggerPoint(ConditionedProcessId triggerId, TimeProcessId motherId = ROOT_BOX_ID);
+	void removeTriggerPoint(ConditionedProcessId triggerId);
 
     /*!
      * Mix multiple triggerPoints into one TimeCondition.
@@ -737,26 +733,23 @@ public:
      *
      * \param conditionId : the ID of the condition
      * \param triggerId : the ID of the trigger to add
-     * \param motherId : mother box ID (default : root scenario)
      */
-    void attachToCondition(TimeConditionId conditionId, ConditionedProcessId triggerId, TimeProcessId motherId = ROOT_BOX_ID);
+    void attachToCondition(TimeConditionId conditionId, ConditionedProcessId triggerId);
 
     /*!
      * Remove a trigger point from the condition.
      *
      * \param conditionId : the ID of the condition
      * \param triggerId : the ID of the trigger to remove
-     * \param motherId : mother box ID (default : root scenario)
      */
-    void detachFromCondition(TimeConditionId conditionId, ConditionedProcessId triggerId, TimeProcessId motherId = ROOT_BOX_ID);
+    void detachFromCondition(TimeConditionId conditionId, ConditionedProcessId triggerId);
 
     /*!
      * Delete the specified TimeCondition.
      *
      * \param conditionId : the ID of the condition to delete
-     * \param motherId : mother box ID (default : root scenario)
      */
-    void deleteCondition(TimeConditionId conditionId, TimeProcessId motherId = ROOT_BOX_ID);
+    void deleteCondition(TimeConditionId conditionId);
 
     void getConditionTriggerIds(TimeConditionId conditionId, std::vector<TimeProcessId>& triggerIds);
     
@@ -1191,6 +1184,7 @@ public:
 	 * \param fileName : the fileName to load.
 	 */
 	void load(std::string fileName);
+    void buildEngineCaches(TTTimeProcessPtr scenario);
     
 	/*!
 	 * Prints on standard output both engines. Useful only for debug purpose.

@@ -73,9 +73,7 @@
 		466B9E8019338DCC00EC8460 /* AbstractRelation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractRelation.cpp; sourceTree = "<group>"; };
 		466B9E8119338DCC00EC8460 /* AbstractTriggerPoint.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractTriggerPoint.cpp; sourceTree = "<group>"; };
 		466B9E8219338DCC00EC8460 /* Engine.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Engine.cpp; sourceTree = "<group>"; };
-		466B9E8319338DCC00EC8460 /* Engine.cpp.orig */ = {isa = PBXFileReference; lastKnownFileType = text; path = Engine.cpp.orig; sourceTree = "<group>"; };
 		466B9E8419338DCC00EC8460 /* Maquette.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Maquette.cpp; sourceTree = "<group>"; };
-		466B9E8519338DCC00EC8460 /* Maquette.cpp.orig */ = {isa = PBXFileReference; lastKnownFileType = text; path = Maquette.cpp.orig; sourceTree = "<group>"; };
 		466B9E8619338DCC00EC8460 /* NetworkMessages.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkMessages.cpp; sourceTree = "<group>"; };
 		466B9E8819338DCC00EC8460 /* AttributesEditor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AttributesEditor.cpp; sourceTree = "<group>"; };
 		466B9E8919338DCC00EC8460 /* BasicBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BasicBox.cpp; sourceTree = "<group>"; };
@@ -111,7 +109,6 @@
 		466B9EA719338DCC00EC8460 /* TriggerPoint.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TriggerPoint.cpp; sourceTree = "<group>"; };
 		466B9EA819338DCC00EC8460 /* ViewRelations.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ViewRelations.cpp; sourceTree = "<group>"; };
 		466B9EA919338DCC00EC8460 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		466B9EAA19338DE100EC8460 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -119,7 +116,6 @@
 			isa = PBXGroup;
 			children = (
 				466B9E3C19338DBC00EC8460 /* Makefile */,
-				466B9EAA19338DE100EC8460 /* main.cpp */,
 				466B9E3D19338DC700EC8460 /* headers */,
 				466B9E7919338DCC00EC8460 /* src */,
 			);
@@ -226,9 +222,7 @@
 				466B9E8019338DCC00EC8460 /* AbstractRelation.cpp */,
 				466B9E8119338DCC00EC8460 /* AbstractTriggerPoint.cpp */,
 				466B9E8219338DCC00EC8460 /* Engine.cpp */,
-				466B9E8319338DCC00EC8460 /* Engine.cpp.orig */,
 				466B9E8419338DCC00EC8460 /* Maquette.cpp */,
-				466B9E8519338DCC00EC8460 /* Maquette.cpp.orig */,
 				466B9E8619338DCC00EC8460 /* NetworkMessages.cpp */,
 			);
 			path = data;
