@@ -349,6 +349,27 @@ TimeProcessId Engine::getParentId(TimeProcessId boxId)
     return parentId;
 }
 
+void Engine::getChildrenId(TimeProcessId boxId, vector<TimeProcessId>& childrenId)
+{
+    EngineCacheMapIterator it;
+    TTTimeContainerPtr  subScenario = getSubScenario(boxId);
+    TTTimeContainerPtr  parentScenario;
+    TTValue             v;
+    
+    // Get all boxes id that have the subScenario as parent
+    for (it = m_timeProcessMap.begin(); it != m_timeProcessMap.end(); ++it) {
+        
+        if (it->first == boxId)
+            continue;
+        
+        it->second->object->getAttributeValue(TTSymbol("container"), v);
+        parentScenario = TTTimeContainerPtr(TTObjectBasePtr(v[0]));
+        
+        if (parentScenario != NULL && parentScenario == subScenario)
+            childrenId.push_back(it->first);
+    }
+}
+
 void Engine::uncacheTimeProcess(TimeProcessId boxId)
 {
     EngineCacheElementPtr e = m_timeProcessMap[boxId];
@@ -1227,10 +1248,22 @@ void Engine::setBoxMuteState(TimeProcessId boxId, bool muteState)
 void Engine::setBoxName(TimeProcessId boxId, string name)
 {
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTSymbol            boxName;
-
-    boxName = TTSymbol(name);
-    timeProcess->setAttributeValue(kTTSym_name, boxName);
+    TTSymbol            v;
+    TTSymbol            oldName, newName;
+    
+    timeProcess->getAttributeValue(kTTSym_name, v);
+    oldName = v[0];
+    
+    newName = TTSymbol(name);
+    
+    // filter repetitions
+    if (newName != oldName) {
+        
+        timeProcess->setAttributeValue(kTTSym_name, newName);
+        
+        // register the time process with the new name
+        //unregisterObject(getAdddress(boxId));
+    }
 }
 
 TimeValue Engine::getBoxBeginTime(TimeProcessId boxId)

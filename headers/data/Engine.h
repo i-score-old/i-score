@@ -213,6 +213,7 @@ public:
     void                clearTimeProcess();
     
     TimeProcessId       getParentId(TimeProcessId boxId);
+    void                getChildrenId(TimeProcessId boxId, std::vector<TimeProcessId>& childrenId);
     
     IntervalId          cacheInterval(TTTimeProcessPtr timeProcess);
     TTTimeProcessPtr    getInterval(IntervalId relationId);
