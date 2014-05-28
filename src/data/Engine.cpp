@@ -622,9 +622,9 @@ void Engine::uncacheStatusCallback(ConditionedProcessId triggerId, TimeEventInde
     
     // Get start or end time event
     if (controlPointId == BEGIN_CONTROL_POINT_INDEX)
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+        timeProcess->getAttributeValue("startEvent", v);
     else
-        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
+        timeProcess->getAttributeValue("endEvent", v);
     
     timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
     
