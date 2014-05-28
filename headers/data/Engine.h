@@ -58,7 +58,8 @@ class EngineCacheElement {
 public:
     TTObjectBasePtr object;
     unsigned int    index;
-    std::string     name;
+    TTAddress       address;
+    TTObjectBasePtr subScenario;
     
     EngineCacheElement();
     ~EngineCacheElement();
@@ -172,9 +173,9 @@ private:
     
     TTObjectBasePtr     m_sender;                                       /// A Modular TTSender to send message to any application
     
-	void (*m_TimeEventStatusAttributeCallback)(ConditionedProcessId, bool);
-    void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);
-    void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);
+	void (*m_TimeEventStatusAttributeCallback)(ConditionedProcessId, bool);         // allow to notify the Maquette if a triggerpoint is pending
+    void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);    // allow to notify the Maquette if a box is running or not
+    void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);                // allow to notify the Maquette if the transport features have been used remotly (via OSC messages for example)
 
 public:
 
@@ -195,7 +196,6 @@ public:
     void initModular(const char* pathToTheJamomaFolder = NULL);
     void initScore();
     
-    void registerIscoreTransportData();
     void registerIscoreToProtocols();
     
     void dumpAddressBelow(TTNodePtr aNode);
@@ -204,10 +204,15 @@ public:
     
     // Id management //////////////////////////////////////////////////////////////////
     
-    TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::string & name);
+    TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess, TTAddress& anAddress, TTTimeContainerPtr subScenario = NULL);
     TTTimeProcessPtr    getTimeProcess(TimeProcessId boxId);
+    TTAddress&          getAddress(TimeProcessId boxId);
+    TTTimeContainerPtr  getSubScenario(TimeProcessId boxId);
     void                uncacheTimeProcess(TimeProcessId boxId);
     void                clearTimeProcess();
+    
+    TimeProcessId       getParentId(TimeProcessId boxId);
+    void                getChildrenId(TimeProcessId boxId, std::vector<TimeProcessId>& childrenId);
     
     IntervalId          cacheInterval(TTTimeProcessPtr timeProcess);
     TTTimeProcessPtr    getInterval(IntervalId relationId);
@@ -244,11 +249,11 @@ public:
 	 * \param boxBeginPos : the begin value in ms.
 	 * \param boxLength : the length value in ms.
      * \param name : the name of the box
-	 * \param motherId : mother box ID if any, NO_ID if the box to create has no mother.
+	 * \param motherId : mother box ID (default : root scenario)
 	 *
 	 * \return the newly created box ID.
 	 */
-	TimeProcessId addBox(TimeValue boxBeginPos, TimeValue boxLength, const std::string & name, TimeProcessId motherId);
+	TimeProcessId addBox(TimeValue boxBeginPos, TimeValue boxLength, const std::string & name, TimeProcessId motherId = ROOT_BOX_ID);
     
 	/*!
 	 * Removes a box from the CSP : removes the relation implicating it and the
@@ -277,7 +282,7 @@ public:
     /*!
 	 * Removes the temporal relation using given id.
 	 *
-	 * \param relationId : the ID of the relation to remove.
+	 * \param relationId : the ID of the relation to remove
 	 */
 	void removeTemporalRelation(IntervalId relationId);
     
@@ -703,6 +708,8 @@ public:
     
 	/*!
 	 * Adds a new triggerPoint in CSP.
+     *
+     * \param containingBoxId :
 	 *
 	 * \return the created trigger ID
 	 */
@@ -1180,6 +1187,7 @@ public:
 	 * \param fileName : the fileName to load.
 	 */
 	void load(std::string fileName);
+    void buildEngineCaches(TTTimeProcessPtr scenario, TTAddress& scenarioAddress);
     
 	/*!
 	 * Prints on standard output both engines. Useful only for debug purpose.
@@ -1210,6 +1218,26 @@ private:
      * \return networktreeAddress : an address managed by i-score
      */
     std::string toNetworkTreeAddress(TTAddress aTTAddress);
+    
+    /** Create a #TTData object
+     @param	service			a symbol to tell if the data have to be a "parameter", a "message" or a "return"
+     @param	TTValuePtr      a value pointer to return back
+     @param valueCallback   a pointer to a void function(TTPtr baton, TTValue& value) to return the value back
+     @param returnedData    a new data object
+     @return                an error code if the creation fails */
+    TTErr createData(TTSymbol service, TTValuePtr baton, TTFunctionWithBatonAndValue valueCallback, TTObjectBasePtr *returnedData);
+    
+    /** Register a #TTObject
+     @param	address			the absolute address where to register the object
+     @param	object          the object to register
+     @return                an error code if the registration fails */
+    TTErr registerObject(TTAddress address, TTObjectBasePtr object);
+    
+    /** Register a #TTObject
+     @param	address			the absolute address to unregister
+     @param	object          the unregistered object
+     @return                an error code if the registration fails */
+    TTErr unregisterObject(TTAddress address, TTObjectBasePtr *object = NULL);
 };
 
 typedef Engine* EnginePtr;
@@ -1237,23 +1265,6 @@ void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
  @param	value			nothing
  @return                an error code */
 void TransportDataValueCallback(TTPtr baton, const TTValue& value);
-
-
-// TODO : this should move into a TTModularAPI file
-/** Create a TTData object
- @param	service			a symbol to tell if the data have to be a "parameter", a "message" or a "return"
- @param	TTValuePtr      a value pointer to return back
- @param valueCallback   a pointer to a void function(TTPtr baton, TTValue& value) to return the value back
- @param returnedData    a new data object
- @return                an error code if the creation fails */
-TTErr TTModularCreateData(TTSymbol service, TTValuePtr baton, TTFunctionWithBatonAndValue valueCallback, TTObjectBasePtr *returnedData);
-
-// TODO : this should move into a TTModularAPI file
-/** Register a TTObject
- @param	address			the absolute address where to register the object
- @param	object          the object to register
- @return                an error code if the registration fails */
-TTErr TTModularRegisterObject(TTAddress address, TTObjectBasePtr object);
 
 // TODO : this should move into a TTModularAPI file
 /** compare priority attribute of object's node

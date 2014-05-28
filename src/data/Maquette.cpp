@@ -77,6 +77,8 @@ typedef map<unsigned int, TriggerPoint*> TrgPntMap;
 
 #define NO_PAINT false
 
+#define MUTE_GOTO_SCORE 
+
 void
 Maquette::init()
 {
@@ -1544,7 +1546,7 @@ void
 Maquette::stopPlayingAndGoToTimeOffset(unsigned int timeOffset)
 {
     turnExecutionOff();
-    
+  
 #ifdef MUTE_GOTO_SCORE
     setTimeOffset(timeOffset, YES);
     initSceneState(); // and use the goto Nico's algorithm Nico
@@ -1747,11 +1749,11 @@ Maquette::load(const string &fileName)
     
     // BOXES
     {
-        vector<unsigned int>    boxesID;
-        unsigned int            boxID;
-        string                  name;
-        QColor                  color;
-        unsigned int            date, duration, topLeftY, sizeY;
+        vector<unsigned int>                        boxesID;
+        unsigned int                                boxID, parentID;
+        string                                      name;
+        QColor                                      color;
+        unsigned int                                date, duration, topLeftY, sizeY;        
         
         // get all boxes ID
         _engines->getBoxesId(boxesID);
@@ -1770,6 +1772,7 @@ Maquette::load(const string &fileName)
             topLeftY = _engines->getBoxVerticalPosition(boxID);
             sizeY = _engines->getBoxVerticalSize(boxID);
             color = _engines->getBoxColor(boxID);
+            parentID = _engines->getParentId(boxID);
             
             QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
             QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);           
@@ -1780,8 +1783,14 @@ Maquette::load(const string &fileName)
             newBox->setName(QString::fromStdString(name));
             newBox->setColor(color);
 
-            _boxes[boxID] = newBox;
+            _boxes[boxID] = newBox;            
             _parentBoxes[boxID] = newBox;
+
+            if(parentID != ROOT_BOX_ID){
+                newBox->setMother(parentID);
+                ((ParentBox *)getBox(parentID))->addChild(boxID);
+                _scene->boxMoved(boxID);
+            }
 
             if(!NO_PAINT)
                 _scene->addParentBox(boxID);
