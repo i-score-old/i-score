@@ -14,11 +14,14 @@ class TriggerPointEdit : public QDialog
     Q_OBJECT
 
 public :
-    TriggerPointEdit(QWidget *parent, AbstractTriggerPoint *abstract);
+    TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *parent = 0);
     ~TriggerPointEdit();
 
 public slots :
     void updateStuff();
+    void expressionChanged();
+    void autoTriggerChanged();
+    void edit();
 
 private :
     AbstractTriggerPoint    *_abstract;

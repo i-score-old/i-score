@@ -87,6 +87,7 @@ TriggerPoint::TriggerPoint(const AbstractTriggerPoint &abstract, MaquetteScene *
 TriggerPoint::~TriggerPoint()
 {
   delete _abstract;
+    delete _edit;
 }
 
 void
@@ -97,6 +98,8 @@ TriggerPoint::init()
   setFlag(QGraphicsItem::ItemIsMovable, false);
   setVisible(true);
   setZValue(1);
+
+  _edit = new TriggerPointEdit(_abstract);
 }
 
 Abstract *
@@ -208,7 +211,7 @@ TriggerPoint::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
        * TextEdit * trgPntMsgEdit = new TextEdit(_scene->views().first(),
        *      QObject::tr("Enter the trigger point message :").toStdString(),_abstract->message());
        */
-      QInputDialog *trgPntMsgEdit = nameInputDialog();
+//      QInputDialog *trgPntMsgEdit = nameInputDialog();
 
 /*
  *              switch (_abstract->boxExtremity()) {
@@ -226,19 +229,22 @@ TriggerPoint::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
  *                      break;
  *      }
  */
-      trgPntMsgEdit->move(event->screenPos());
-      bool ok = trgPntMsgEdit->exec();
-      if (ok) {
-          if (_scene->setTriggerPointMessage(_abstract->ID(), trgPntMsgEdit->textValue().toStdString())) {
-              _abstract->setMessage(trgPntMsgEdit->textValue().toStdString());
-              _scene->displayMessage(QObject::tr("Trigger point's message successfully updated").toStdString(), INDICATION_LEVEL);
-            }
-          else {
-              _scene->displayMessage(QObject::tr("Trigger point's message unchanged").toStdString(), ERROR_LEVEL);
-            }
-        }
+//      trgPntMsgEdit->move(event->screenPos());
+      _edit->move(event->screenPos());
+      _edit->edit();
 
-      delete trgPntMsgEdit;
+//      bool ok = trgPntMsgEdit->exec();
+//      if (ok) {
+//          if (_scene->setTriggerPointMessage(_abstract->ID(), trgPntMsgEdit->textValue().toStdString())) {
+//              _abstract->setMessage(trgPntMsgEdit->textValue().toStdString());
+//              _scene->displayMessage(QObject::tr("Trigger point's message successfully updated").toStdString(), INDICATION_LEVEL);
+//            }
+//          else {
+//              _scene->displayMessage(QObject::tr("Trigger point's message unchanged").toStdString(), ERROR_LEVEL);
+//            }
+//        }
+
+//      delete trgPntMsgEdit;
     }
 }
 

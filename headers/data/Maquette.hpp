@@ -863,6 +863,9 @@ class Maquette : public QObject
      * \param trgID : trigger point ID
      */
     void updateTriggerPointActiveStatus(unsigned int trgID, bool active);
+
+    void setTriggerPointDefault(unsigned int triggerId, bool dflt);
+    bool getTriggerPointDefault(unsigned int triggerId);
     
     inline std::map<unsigned int, BasicBox*> getBoxes(){ return _boxes; }
     inline QList<BasicBox *> getRecordingBoxes(){return _recordingBoxes ;}

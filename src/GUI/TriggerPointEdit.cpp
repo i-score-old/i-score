@@ -2,7 +2,7 @@
 #include "Maquette.hpp"
 
 
-TriggerPointEdit::TriggerPointEdit(QWidget *parent, AbstractTriggerPoint *abstract)
+TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *parent)
     : QDialog(parent)
 {
     setModal(true);
@@ -21,9 +21,13 @@ TriggerPointEdit::TriggerPointEdit(QWidget *parent, AbstractTriggerPoint *abstra
     _layout->addWidget(_expressionEdit, 1, 0, 0, 0);
 
     _okButton = new QPushButton(tr("OK"), this);
-    _layout->addWidget(_okButton, 6, 3, 1, 1);
+    _layout->addWidget(_okButton, 2, 3, 1, 1);
     _cancelButton = new QPushButton(tr("Cancel"), this);
-    _layout->addWidget(_cancelButton, 6, 4, 1, 1);
+    _layout->addWidget(_cancelButton, 2, 4, 1, 1);
+
+    connect(_expressionEdit,SIGNAL(textChanged(QString)),this,SLOT(expressionChanged()));
+    connect(_okButton, SIGNAL(released()), this, SLOT(updateStuff()));
+    connect(_cancelButton, SIGNAL(released()), this, SLOT(reject()));
 }
 
 TriggerPointEdit::~TriggerPointEdit()
@@ -37,11 +41,38 @@ TriggerPointEdit::~TriggerPointEdit()
 }
 
 void
+TriggerPointEdit::edit()
+{
+    _expressionEdit->setText(QString::fromStdString(_abstract->message()));
+    _expressionEdit->selectAll();
+    _autoTriggerCheckBox->setChecked(Maquette::getInstance()->getTriggerPointDefault(_abstract->ID()));
+    exec();
+}
+
+void
+TriggerPointEdit::expressionChanged()
+{
+    _expressionChanged = true;
+}
+
+void
+TriggerPointEdit::autoTriggerChanged()
+{
+    _autoTriggerChanged = true;
+}
+
+void
 TriggerPointEdit::updateStuff()
 {
     if(_expressionChanged){
         if (Maquette::getInstance()->setTriggerPointMessage(_abstract->ID(), _expressionEdit->text().toStdString()))
             _abstract->setMessage(_expressionEdit->text().toStdString());
     }
+    if(_autoTriggerChanged){
+        Maquette::getInstance()->setTriggerPointDefault(_abstract->ID(), _autoTriggerCheckBox->isChecked());
+    }
+
+    _autoTriggerChanged = false;
+    _expressionChanged = false;
 }
 
