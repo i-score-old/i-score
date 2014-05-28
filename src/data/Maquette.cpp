@@ -1771,7 +1771,7 @@ Maquette::load(const string &fileName)
             topLeftY = _engines->getBoxVerticalPosition(boxID);
             sizeY = _engines->getBoxVerticalSize(boxID);
             color = _engines->getBoxColor(boxID);
-            parentID;// = _engines->getParentID(boxID);
+            parentID = _engines->getParentId(boxID);
             
             QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
             QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);           
