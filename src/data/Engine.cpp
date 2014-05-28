@@ -2192,16 +2192,11 @@ bool Engine::stop()
 
 TimeValue Engine::getCurrentExecutionTime()
 {
-    TTValue         v;
-    TTUInt32        time;
-    TTObjectBasePtr aScheduler;
+    TTValue     v;
+    TTUInt32    time;
     
     // TODO : TTTimeProcess should extend Scheduler class
-    // get the scheduler object of the main scenario
-    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
-    aScheduler = TTObjectBasePtr(v[0]);
-    
-    aScheduler->getAttributeValue(TTSymbol("realTime"), v);
+    m_mainScenario->getAttributeValue("realTime", v);
     time = TTFloat64(v[0]);
         
     return time;
@@ -2225,17 +2220,12 @@ float Engine::getExecutionSpeedFactor()
 
 float Engine::getProcessProgression(TimeProcessId processId)
 {
-    TTValue         v;
-    TTFloat64       time;
+    TTValue     v;
+    TTFloat64   time;
     TTTimeProcessPtr  timeProcess = getTimeProcess(processId);
-    TTObjectBasePtr aScheduler;
     
     // TODO : TTTimeProcess should extend Scheduler class
-    // get the scheduler object of the time process
-    timeProcess->getAttributeValue(TTSymbol("scheduler"), v);
-    aScheduler = TTObjectBasePtr(v[0]);
-    
-    aScheduler->getAttributeValue(TTSymbol("progression"), v);
+    timeProcess->getAttributeValue("progression", v);
     time = TTFloat64(v[0]);
     
     return time;
