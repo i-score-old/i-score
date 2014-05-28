@@ -50,8 +50,10 @@
 #include "TextEdit.hpp"
 #include "MainWindow.hpp"
 #include "Relation.hpp"
+#include "ConditionalRelation.hpp"
 #include "CurveWidget.hpp"
 #include "BoxCurveEdit.hpp"
+#include "BoxContextMenu.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -574,7 +576,7 @@ BasicBox::setSize(const QPointF & size)
 {
   _abstract->setWidth(std::max((float)size.x(), MaquetteScene::MS_PRECISION / MaquetteScene::MS_PER_PIXEL));
   _abstract->setHeight(size.y());
-//  std::cout<<"setSize ------> "<< _abstract->ID()<<" "<<_abstract->width()*MaquetteScene::MS_PER_PIXEL<<std::endl;
+
   updateStuff();
 }
 
@@ -754,8 +756,6 @@ BasicBox::updateRelations(BoxExtremity extremity)
 void
 BasicBox::updateStuff()
 {
-//  std::cout<<"--- updateStuff ---"<<std::endl;
-
   updateBoxSize();
   if (_comment != NULL) {
       _comment->updatePos();
@@ -768,11 +768,17 @@ BasicBox::updateStuff()
           relIt->second->updateCoordinates();
         }
     }
+
   QList<BoxExtremity> list = _triggerPoints->keys();
   QList<BoxExtremity>::iterator it2;
   for (it2 = list.begin(); it2 != list.end(); it2++) {
       _triggerPoints->value(*it2)->updatePosition();
     }
+
+  QList<ConditionalRelation *>::iterator it3;
+  for(it3 = _conditionalRelation.begin() ; it3 != _conditionalRelation.end() ; it3++)
+      (*it3)->updateCoordinates(ID());
+
   setFlag(QGraphicsItem::ItemIsMovable, true);
 }
 
@@ -800,6 +806,37 @@ BasicBox::removeRelation(BoxExtremity extremity, unsigned int relID)
             }
         }
     }
+}
+
+void
+BasicBox::addConditionalRelation(ConditionalRelation *condRel)
+{
+    if(!_conditionalRelation.contains(condRel))
+        _conditionalRelation<<condRel;
+}
+
+void
+BasicBox::removeConditionalRelation(ConditionalRelation *condRel)
+{
+    _conditionalRelation.removeAll(condRel);
+}
+
+void
+BasicBox::removeConditionalRelations()
+{
+    QList<ConditionalRelation *>::iterator it=_conditionalRelation.begin();
+
+    for(it ; it!=_conditionalRelation.end() ; it++)
+        removeConditionalRelation(*it);
+}
+
+void
+BasicBox::detachFromCondition()
+{
+    QList<ConditionalRelation *>::iterator it=_conditionalRelation.begin();
+
+    for(it ; it!=_conditionalRelation.end() ; it++)
+        (*it)->detachBox(this);
 }
 
 QList<Relation *>
@@ -1020,6 +1057,18 @@ BasicBox::triggerPointMessage(BoxExtremity extremity)
 
   else {
       return "";
+    }
+}
+
+TriggerPoint *
+BasicBox::getTriggerPoint(BoxExtremity extremity)
+{
+    if(_triggerPoints->contains(extremity)){
+        return _triggerPoints->value(extremity);
+    }
+    else{
+        std::cerr<<"BasicBox::getTriggerPoint : Cannot find trigger point on this extremity"<<std::endl;
+        return NULL;
     }
 }
 
@@ -1358,7 +1407,7 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
           lock();
         }
       else if (cursor().shape() == Qt::CrossCursor) {
-          lock();
+          lock();          
           if (event->pos().x() < _boxRect.topLeft().x() + RESIZE_TOLERANCE) {
               _scene->setRelationFirstBox(_abstract->ID(), BOX_START);
             }
@@ -1417,6 +1466,7 @@ BasicBox::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 
   if (_hasContextMenu) {
       setSelected(false);
+      static_cast<BoxContextMenu *>(_contextMenu)->setDetachActionEnabled(attachedToConditionalRelation());
       _contextMenu->exec(event->screenPos());
     }
 }
@@ -1544,10 +1594,9 @@ BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 
   QRectF vertResize_bottom(_boxRect.bottomLeft() + QPointF(0, -RESIZE_ZONE_WIDTH), _boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, 0));
   QRectF diagResize_bottomRight(_boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, RESIZE_ZONE_WIDTH), _boxRect.bottomRight());
-  /// \todo : horizontalResize_right
+  /// \todo : horizontalResize_right  
 
-
-  //bandeau zone (text rect) - top
+  //bandeau zone (text rect) - top  
   if (textRect.contains(event->pos())) {
       setCursor(Qt::OpenHandCursor);
     }
@@ -1613,12 +1662,12 @@ BasicBox::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
   QRectF relationGripRight = _rightEar;
 
   QRectF vertResize_bottom(_boxRect.bottomLeft() + QPointF(0, -RESIZE_ZONE_WIDTH), _boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, 0));
-  QRectF diagResize_bottomRight(_boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, RESIZE_ZONE_WIDTH), _boxRect.bottomRight());
+  QRectF diagResize_bottomRight(_boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, RESIZE_ZONE_WIDTH), _boxRect.bottomRight());  
 
-  //bandeau zone (text rect) - top
+  //bandeau zone (text rect) - top  
   if (textRect.contains(event->pos())) {
       setCursor(Qt::OpenHandCursor);
-    }
+    }  
 
   //Trigger zone - left
   else if (triggerGripLeft.contains(event->pos())) {

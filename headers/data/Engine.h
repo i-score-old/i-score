@@ -49,13 +49,17 @@ typedef unsigned int IntervalId;
 /** a temporary type dedicated to retreive a process with an Conditioned TimeEvent inside (this is related to TriggerPoint notion) */
 typedef unsigned int ConditionedProcessId;
 
+/** a temporary type dedicated to retreive a Condition */
+typedef unsigned int TimeConditionId;
+
 /** a class used to cache TTObject and some observers */
 class EngineCacheElement {
 
 public:
     TTObjectBasePtr object;
     unsigned int    index;
-    std::string     name;
+    TTAddress       address;
+    TTObjectBasePtr subScenario;
     
     EngineCacheElement();
     ~EngineCacheElement();
@@ -72,6 +76,9 @@ typedef std::map<unsigned int, EngineCacheElementPtr> EngineCacheMap;
 typedef	EngineCacheMap*	EngineCacheMapPtr;
 
 typedef std::map<unsigned int, EngineCacheElementPtr>::iterator EngineCacheMapIterator;
+
+/** a temporary type to define a map to store and retreive the triggerIds associated with a conditionId */
+typedef std::map<unsigned int, std::list<unsigned int>> EngineConditionsMap;
 
 #define NO_BOUND -1
 
@@ -149,10 +156,12 @@ private:
     EngineCacheMap      m_timeConditionMap;                             /// All condition stored using an unique id
     EngineCacheMap      m_conditionedProcessMap;                        /// All conditioned time process with an conditioned event stored using an unique id
     
+    EngineConditionsMap m_conditionsMap;                                /// All conditions Ids (in i-score point of view) mapped to corresponding triggers id
+
     EngineCacheMap      m_startCallbackMap;                             /// All callback to observe when a time process starts stored using a time process id
     EngineCacheMap      m_endCallbackMap;                               /// All callback to observe when a time process ends stored using a time process id
     
-    EngineCacheMap      m_statusCallbackMap;                             /// All callback to observe time event ready state stored using using a trigger id
+    EngineCacheMap      m_statusCallbackMap;                            /// All callback to observe time event ready state stored using using a trigger id
     EngineCacheMap      m_triggerDataMap;                               /// All TTData to expose conditioned event on the network stored using using a trigger id
 
     TTObjectBasePtr     m_dataPlay;                                     /// A Modular TTData to expose Play transport service
@@ -164,9 +173,9 @@ private:
     
     TTObjectBasePtr     m_sender;                                       /// A Modular TTSender to send message to any application
     
-	void (*m_TimeEventStatusAttributeCallback)(ConditionedProcessId, bool);
-    void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);
-    void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);
+	void (*m_TimeEventStatusAttributeCallback)(ConditionedProcessId, bool);         // allow to notify the Maquette if a triggerpoint is pending
+    void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);    // allow to notify the Maquette if a box is running or not
+    void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);                // allow to notify the Maquette if the transport features have been used remotly (via OSC messages for example)
 
 public:
 
@@ -196,10 +205,14 @@ public:
     
     // Id management //////////////////////////////////////////////////////////////////
     
-    TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::string & name);
+    TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess, TTAddress& anAddress, TTTimeContainerPtr subScenario = NULL);
     TTTimeProcessPtr    getTimeProcess(TimeProcessId boxId);
+    TTAddress&          getAdddress(TimeProcessId boxId);
+    TTTimeContainerPtr  getSubScenario(TimeProcessId boxId);
     void                uncacheTimeProcess(TimeProcessId boxId);
     void                clearTimeProcess();
+    
+    TimeProcessId       getParentId(TimeProcessId boxId);
     
     IntervalId          cacheInterval(TTTimeProcessPtr timeProcess);
     TTTimeProcessPtr    getInterval(IntervalId relationId);
@@ -236,11 +249,11 @@ public:
 	 * \param boxBeginPos : the begin value in ms.
 	 * \param boxLength : the length value in ms.
      * \param name : the name of the box
-	 * \param motherId : mother box ID if any, NO_ID if the box to create has no mother.
+	 * \param motherId : mother box ID (default : root scenario)
 	 *
 	 * \return the newly created box ID.
 	 */
-	TimeProcessId addBox(TimeValue boxBeginPos, TimeValue boxLength, const std::string & name, TimeProcessId motherId);
+	TimeProcessId addBox(TimeValue boxBeginPos, TimeValue boxLength, const std::string & name, TimeProcessId motherId = ROOT_BOX_ID);
     
 	/*!
 	 * Removes a box from the CSP : removes the relation implicating it and the
@@ -269,7 +282,7 @@ public:
     /*!
 	 * Removes the temporal relation using given id.
 	 *
-	 * \param relationId : the ID of the relation to remove.
+	 * \param relationId : the ID of the relation to remove
 	 */
 	void removeTemporalRelation(IntervalId relationId);
     
@@ -695,6 +708,8 @@ public:
     
 	/*!
 	 * Adds a new triggerPoint in CSP.
+     *
+     * \param containingBoxId :
 	 *
 	 * \return the created trigger ID
 	 */
@@ -708,7 +723,45 @@ public:
 	 * \param triggerId : the ID of the trigger to be removed.
 	 */
 	void removeTriggerPoint(ConditionedProcessId triggerId);
+
+    /*!
+     * Mix multiple triggerPoints into one TimeCondition.
+     *
+     * \return the created condition ID
+     */
+    TimeConditionId createCondition(std::vector<ConditionedProcessId> triggerIds);
+
+    /*!
+     * Add a trigger point to the condition.
+     *
+     * \param conditionId : the ID of the condition
+     * \param triggerId : the ID of the trigger to add
+     */
+    void attachToCondition(TimeConditionId conditionId, ConditionedProcessId triggerId);
+
+    /*!
+     * Remove a trigger point from the condition.
+     *
+     * \param conditionId : the ID of the condition
+     * \param triggerId : the ID of the trigger to remove
+     */
+    void detachFromCondition(TimeConditionId conditionId, ConditionedProcessId triggerId);
+
+    /*!
+     * Delete the specified TimeCondition.
+     *
+     * \param conditionId : the ID of the condition to delete
+     */
+    void deleteCondition(TimeConditionId conditionId);
+
+    void getConditionTriggerIds(TimeConditionId conditionId, std::vector<TimeProcessId>& triggerIds);
     
+    // Sick of useless doc
+    void setConditionMessage(TimeConditionId conditionId, std::string disposeMessage);
+
+    // Sick of useless doc
+    std::string getConditionMessage(TimeConditionId conditionId);
+
 	/*!
 	 * Sets the triggerPoint (given by ID) message.
 	 *
@@ -729,6 +782,12 @@ public:
 	 * \return the trigger message
 	 */
 	std::string getTriggerPointMessage(ConditionedProcessId triggerId);
+
+    // Sick of useless doc
+    void setTriggerPointDefault(ConditionedProcessId triggerId, bool dflt);
+
+    // Sick of useless doc
+    bool getTriggerPointDefault(ConditionedProcessId triggerId);
     
 	/*!
 	 * Gets the id of the box linked to the given trigger point.
@@ -773,6 +832,14 @@ public:
 	 * \param triggersID : the vector to fill with all triggers ID used.
 	 */
 	void getTriggersPointId(std::vector<ConditionedProcessId>& triggersID);
+
+    /*!
+     * Fills the given vector with all the conditions ID used in the editor.
+     * Useful after a load.
+     *
+     * \param conditionsID : the vector to fill with all conditions ID used.
+     */
+    void getConditionsId(std::vector<TimeConditionId>& conditionsID);
     
     /*!
 	 * Set the zoom factor of the view of the main scenario
@@ -1120,6 +1187,7 @@ public:
 	 * \param fileName : the fileName to load.
 	 */
 	void load(std::string fileName);
+    void buildEngineCaches(TTTimeProcessPtr scenario, TTAddress& scenarioAddress);
     
 	/*!
 	 * Prints on standard output both engines. Useful only for debug purpose.
@@ -1150,6 +1218,26 @@ private:
      * \return networktreeAddress : an address managed by i-score
      */
     std::string toNetworkTreeAddress(TTAddress aTTAddress);
+    
+    /** Create a #TTData object
+     @param	service			a symbol to tell if the data have to be a "parameter", a "message" or a "return"
+     @param	TTValuePtr      a value pointer to return back
+     @param valueCallback   a pointer to a void function(TTPtr baton, TTValue& value) to return the value back
+     @param returnedData    a new data object
+     @return                an error code if the creation fails */
+    TTErr createData(TTSymbol service, TTValuePtr baton, TTFunctionWithBatonAndValue valueCallback, TTObjectBasePtr *returnedData);
+    
+    /** Register a #TTObject
+     @param	address			the absolute address where to register the object
+     @param	object          the object to register
+     @return                an error code if the registration fails */
+    TTErr registerObject(TTAddress address, TTObjectBasePtr object);
+    
+    /** Register a #TTObject
+     @param	address			the absolute address to unregister
+     @param	object          the unregistered object
+     @return                an error code if the registration fails */
+    TTErr unregisterObject(TTAddress address, TTObjectBasePtr *object = NULL);
 };
 
 typedef Engine* EnginePtr;
@@ -1177,23 +1265,6 @@ void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
  @param	value			nothing
  @return                an error code */
 void TransportDataValueCallback(TTPtr baton, const TTValue& value);
-
-
-// TODO : this should move into a TTModularAPI file
-/** Create a TTData object
- @param	service			a symbol to tell if the data have to be a "parameter", a "message" or a "return"
- @param	TTValuePtr      a value pointer to return back
- @param valueCallback   a pointer to a void function(TTPtr baton, TTValue& value) to return the value back
- @param returnedData    a new data object
- @return                an error code if the creation fails */
-TTErr TTModularCreateData(TTSymbol service, TTValuePtr baton, TTFunctionWithBatonAndValue valueCallback, TTObjectBasePtr *returnedData);
-
-// TODO : this should move into a TTModularAPI file
-/** Register a TTObject
- @param	address			the absolute address where to register the object
- @param	object          the object to register
- @return                an error code if the registration fails */
-TTErr TTModularRegisterObject(TTAddress address, TTObjectBasePtr object);
 
 // TODO : this should move into a TTModularAPI file
 /** compare priority attribute of object's node

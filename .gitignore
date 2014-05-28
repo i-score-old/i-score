@@ -4,6 +4,7 @@ moc_*
 i-score.app/
 i-score.pro.user #ne faut-il pas plutot les partager pour avoir les meme configurations Qt Creator
 i-score.pro.user.* #ne faut-il pas plutot les partager pour avoir les meme configurations Qt Creator
+i-score.pro.user.3.0-pre1
 compiler_*
 *~
 \#*
@@ -57,3 +58,7 @@ doxygen/html/
 /i-score/Index/i-score.hmap
 
 /src/.DS_Store
+
+# Eclipse
+.cproject
+.project
