@@ -2209,28 +2209,16 @@ TimeValue Engine::getCurrentExecutionTime()
 
 void Engine::setExecutionSpeedFactor(float factor)
 {
-    TTValue         v;
-    TTObjectBasePtr aScheduler;
-
     // TODO : TTTimeProcess should extend Scheduler class
-    // get the scheduler object of the main scenario
-    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
-    aScheduler = TTObjectBasePtr(v[0]);
-    
-    aScheduler->setAttributeValue(kTTSym_speed, TTFloat64(factor));
+    m_mainScenario->setAttributeValue(kTTSym_speed, TTFloat64(factor));
 }
 
 float Engine::getExecutionSpeedFactor()
 {
-    TTValue         v;
-    TTObjectBasePtr aScheduler;
+    TTValue v;
     
     // TODO : TTTimeProcess should extend Scheduler class
-    // get the scheduler object of the main scenario
-    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
-    aScheduler = TTObjectBasePtr(v[0]);
-    
-    aScheduler->getAttributeValue(kTTSym_speed, v);
+    m_mainScenario->getAttributeValue(kTTSym_speed, v);
     
     return TTFloat64(v[0]);
 }
