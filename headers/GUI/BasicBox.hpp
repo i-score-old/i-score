@@ -749,7 +749,7 @@ class BasicBox : public QObject, public QGraphicsItem
     void select();
     void setRecMode(bool activated);
     inline bool recording(){return _recording;}
-    inline bool attachedToConditionalRelation(){return !_conditionalRelation.isEmpty();}
+    inline bool isConditioned(){return !_conditionalRelation.isEmpty();}
     inline QList<ConditionalRelation *> getConditionalRelations(){return _conditionalRelation;}
 
     void updateRecordingCurves();

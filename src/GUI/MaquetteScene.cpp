@@ -1822,7 +1822,7 @@ MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
         if(!box->hasTriggerPoint(BOX_START)) //Force trigger point creation
             box->addTriggerPoint(BOX_START);
 
-        if(box->attachedToConditionalRelation()) // Check if a conditional relation is already attached to a box, to create or not a new one.
+        if(box->isConditioned()) // Check if a conditional relation is already attached to a box, to create or not a new one.
         {
             conditionalRelationFound = true;
             condRel = box->getConditionalRelations().first();
