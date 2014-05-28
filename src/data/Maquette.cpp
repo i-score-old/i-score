@@ -1786,6 +1786,7 @@ Maquette::load(const string &fileName)
 
             if(parentID != ROOT_BOX_ID){
                 newBox->setMother(parentID);
+                ((ParentBox *)getBox(parentID))->addChild(boxID);
                 _scene->boxMoved(boxID);
             }
 
