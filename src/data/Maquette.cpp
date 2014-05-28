@@ -77,6 +77,8 @@ typedef map<unsigned int, TriggerPoint*> TrgPntMap;
 
 #define NO_PAINT false
 
+#define MUTE_GOTO_SCORE 
+
 void
 Maquette::init()
 {
@@ -1544,7 +1546,7 @@ void
 Maquette::stopPlayingAndGoToTimeOffset(unsigned int timeOffset)
 {
     turnExecutionOff();
-    
+  
 #ifdef MUTE_GOTO_SCORE
     setTimeOffset(timeOffset, YES);
     initSceneState(); // and use the goto Nico's algorithm Nico
