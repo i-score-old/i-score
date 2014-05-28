@@ -58,7 +58,7 @@ class EngineCacheElement {
 public:
     TTObjectBasePtr object;
     unsigned int    index;
-    std::string     name;
+    TTAddress       address;
     TTObjectBasePtr subScenario;
     
     EngineCacheElement();
@@ -205,11 +205,14 @@ public:
     
     // Id management //////////////////////////////////////////////////////////////////
     
-    TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::string & name, TTTimeContainerPtr subScenario = NULL);
+    TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess, TTAddress& anAddress, TTTimeContainerPtr subScenario = NULL);
     TTTimeProcessPtr    getTimeProcess(TimeProcessId boxId);
+    TTAddress&          getAdddress(TimeProcessId boxId);
     TTTimeContainerPtr  getSubScenario(TimeProcessId boxId);
     void                uncacheTimeProcess(TimeProcessId boxId);
     void                clearTimeProcess();
+    
+    TimeProcessId       getParentId(TimeProcessId boxId);
     
     IntervalId          cacheInterval(TTTimeProcessPtr timeProcess);
     TTTimeProcessPtr    getInterval(IntervalId relationId);
@@ -1184,7 +1187,7 @@ public:
 	 * \param fileName : the fileName to load.
 	 */
 	void load(std::string fileName);
-    void buildEngineCaches(TTTimeProcessPtr scenario);
+    void buildEngineCaches(TTTimeProcessPtr scenario, TTAddress& scenarioAddress);
     
 	/*!
 	 * Prints on standard output both engines. Useful only for debug purpose.
@@ -1229,6 +1232,12 @@ private:
      @param	object          the object to register
      @return                an error code if the registration fails */
     TTErr registerObject(TTAddress address, TTObjectBasePtr object);
+    
+    /** Register a #TTObject
+     @param	address			the absolute address to unregister
+     @param	object          the unregistered object
+     @return                an error code if the registration fails */
+    TTErr unregisterObject(TTAddress address, TTObjectBasePtr *object = NULL);
 };
 
 typedef Engine* EnginePtr;
