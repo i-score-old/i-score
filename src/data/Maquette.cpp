@@ -1354,9 +1354,9 @@ Maquette::getCurrentTime() const
 }
 
 float
-Maquette::getProgression(unsigned int boxID)
+Maquette::getPosition(unsigned int boxID)
 {
-  return (float)_engines->getProcessProgression(boxID);
+  return (float)_engines->getProcessPosition(boxID);
 }
 
 void

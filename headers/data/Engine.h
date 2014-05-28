@@ -946,12 +946,12 @@ public:
 	float getExecutionSpeedFactor();
     
 	/*!
-	 * Gets the progression of a process (in percent).
+	 * Gets the position of a process (normalized between 0. :: 1.).
 	 *
 	 * \param processId: the id of the process.
-	 * \return the progression inpercent.
+	 * \return the normalized position.
 	 */
-	float getProcessProgression(TimeProcessId boxId);
+	float getProcessPosition(TimeProcessId boxId);
     
     
 	//Network //////////////////////////////////////////////////////////////////////////////////////////////

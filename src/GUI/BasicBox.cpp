@@ -1998,7 +1998,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         painter->setPen(pen);
         brush.setColor(Qt::blue);
         painter->setBrush(brush);
-        const float progressPosX = _scene->getProgression(_abstract->ID()) * (_abstract->width());
+        const float progressPosX = _scene->getPosition(_abstract->ID()) * (_abstract->width());
         painter->fillRect(0, _abstract->height() - RESIZE_TOLERANCE / 2., progressPosX, RESIZE_TOLERANCE / 2., Qt::darkGreen);
         painter->drawLine(QPointF(progressPosX, RESIZE_TOLERANCE), QPointF(progressPosX, _abstract->height()));
     }

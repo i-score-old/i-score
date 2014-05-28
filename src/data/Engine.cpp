@@ -2196,7 +2196,7 @@ TimeValue Engine::getCurrentExecutionTime()
     TTUInt32    time;
     
     // TODO : TTTimeProcess should extend Scheduler class
-    m_mainScenario->getAttributeValue("realTime", v);
+    m_mainScenario->getAttributeValue("date", v);
     time = TTFloat64(v[0]);
         
     return time;
@@ -2218,14 +2218,14 @@ float Engine::getExecutionSpeedFactor()
     return TTFloat64(v[0]);
 }
 
-float Engine::getProcessProgression(TimeProcessId processId)
+float Engine::getProcessPosition(TimeProcessId processId)
 {
     TTValue     v;
     TTFloat64   time;
     TTTimeProcessPtr  timeProcess = getTimeProcess(processId);
     
     // TODO : TTTimeProcess should extend Scheduler class
-    timeProcess->getAttributeValue("progression", v);
+    timeProcess->getAttributeValue("position", v);
     time = TTFloat64(v[0]);
     
     return time;
@@ -3294,7 +3294,7 @@ void Engine::printExecutionInLinuxConsole()
 				for (unsigned int i = 0; i < boxesId.size(); ++i) {
 					unsigned int processPercent;
                     
-					processPercent = getProcessProgression(boxesId[i]);
+					processPercent = getProcessPosition(boxesId[i]);
                     
 					if ((processPercent > 0) && (processPercent < 99)) {
 						std::cout << "[*";

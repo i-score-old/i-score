@@ -728,7 +728,7 @@ class Maquette : public QObject
      *
      * \return the box progress ratio
      */
-    float getProgression(unsigned int boxID);
+    float getPosition(unsigned int boxID);
 
     /*!
      * \brief Requests a snapshot of the network on a namespace.

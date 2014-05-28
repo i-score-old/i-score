@@ -254,9 +254,9 @@ MaquetteScene::getCurrentTime()
 }
 
 float
-MaquetteScene::getProgression(unsigned int boxID)
+MaquetteScene::getPosition(unsigned int boxID)
 {
-  return _maquette->getProgression(boxID);
+  return _maquette->getPosition(boxID);
 }
 
 unsigned int

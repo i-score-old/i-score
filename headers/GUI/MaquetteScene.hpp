@@ -463,7 +463,7 @@ class MaquetteScene : public QGraphicsScene
      *
      * \return the box progress ratio.
      */
-    float getProgression(unsigned int boxID);
+    float getPosition(unsigned int boxID);
     
     /*!
      * \brief Gets the curent time offset.
