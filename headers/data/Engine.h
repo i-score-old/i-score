@@ -207,7 +207,7 @@ public:
     
     TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess, TTAddress& anAddress, TTTimeContainerPtr subScenario = NULL);
     TTTimeProcessPtr    getTimeProcess(TimeProcessId boxId);
-    TTAddress&          getAdddress(TimeProcessId boxId);
+    TTAddress&          getAddress(TimeProcessId boxId);
     TTTimeContainerPtr  getSubScenario(TimeProcessId boxId);
     void                uncacheTimeProcess(TimeProcessId boxId);
     void                clearTimeProcess();

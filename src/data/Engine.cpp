@@ -316,7 +316,7 @@ TTTimeProcessPtr Engine::getTimeProcess(TimeProcessId boxId)
     return TTTimeProcessPtr(TTObjectBasePtr(m_timeProcessMap[boxId]->object));
 }
 
-TTAddress& Engine::getAdddress(TimeProcessId boxId)
+TTAddress& Engine::getAddress(TimeProcessId boxId)
 {
     return m_timeProcessMap[boxId]->address;
 }
@@ -751,6 +751,7 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const s
     TTTimeEventPtr      startEvent, endEvent;
     TTTimeProcessPtr    timeProcess, subScenario;
     TimeProcessId       boxId;
+    TTAddress           address;
     TTValue             v;
     
     // Create a time event for the start into the mother scenario
@@ -767,7 +768,11 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const s
     TTScoreTimeProcessCreate(&subScenario, "Scenario", startEvent, endEvent, getSubScenario(motherId));
     
     // Cache it and get an unique id for this process
-    TTAddress address = getAdddress(motherId).appendAddress(TTAddress(name.data()));
+    if (motherId == ROOT_BOX_ID)
+        address = kTTAdrsRoot.appendAddress(TTAddress(name.data()));
+    else
+        address = getAddress(motherId).appendAddress(TTAddress(name.data()));
+    
     boxId = cacheTimeProcess(timeProcess, address, TTTimeContainerPtr(subScenario));
     
     iscoreEngineDebug TTLogMessage("TimeProcess %ld created at %ld ms for a duration of %ld ms\n", boxId, boxBeginPos, boxLength);
@@ -1262,7 +1267,7 @@ void Engine::setBoxName(TimeProcessId boxId, string name)
         timeProcess->setAttributeValue(kTTSym_name, newName);
         
         // register the time process with the new name
-        //unregisterObject(getAdddress(boxId));
+        //unregisterObject(getAddress(boxId));
     }
 }
 
@@ -3101,7 +3106,7 @@ void Engine::load(std::string fileName)
     aXmlHandler.send(kTTSym_Read, TTSymbol(fileName), none);
     
     // Rebuild all the EngineCacheMaps from the main scenario content
-    buildEngineCaches(m_mainScenario, getAdddress(ROOT_BOX_ID));
+    buildEngineCaches(m_mainScenario, kTTAdrsRoot);
 }
 
 void Engine::buildEngineCaches(TTTimeProcessPtr scenario, TTAddress& scenarioAddress)
