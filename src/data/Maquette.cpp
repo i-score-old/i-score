@@ -1751,8 +1751,7 @@ Maquette::load(const string &fileName)
         unsigned int                                boxID, parentID;
         string                                      name;
         QColor                                      color;
-        unsigned int                                date, duration, topLeftY, sizeY;
-        QList< QPair<ParentBox *, unsigned int> >  childParentList;
+        unsigned int                                date, duration, topLeftY, sizeY;        
         
         // get all boxes ID
         _engines->getBoxesId(boxesID);
@@ -1785,15 +1784,13 @@ Maquette::load(const string &fileName)
             _boxes[boxID] = newBox;            
             _parentBoxes[boxID] = newBox;
 
-            if(parentID != ROOT_BOX_ID)
-                childParentList << qMakePair(newBox,parentID); //On mémorise ici pour le faire à la fin.
+            if(parentID != ROOT_BOX_ID){
+                newBox->setMother(parentID);
+                _scene->boxMoved(boxID);
+            }
 
             if(!NO_PAINT)
                 _scene->addParentBox(boxID);
-        }
-
-        for(int i=0; i<childParentList.size(); i++){
-             childParentList.at(i).first->setMother(childParentList.at(i).second);
         }
     }
 
