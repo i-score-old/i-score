@@ -90,6 +90,12 @@ TriggerPoint::~TriggerPoint()
     delete _edit;
 }
 
+bool
+TriggerPoint::isConditioned()
+{
+    return _scene->getBox(_abstract->boxID())->isConditioned();
+}
+
 void
 TriggerPoint::init()
 {

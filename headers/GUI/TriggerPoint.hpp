@@ -76,6 +76,8 @@ class TriggerPoint : public QGraphicsItem
 
     TriggerPoint(const AbstractTriggerPoint &abstract, MaquetteScene *parent);
 
+    bool isConditioned();
+
     virtual
     ~TriggerPoint();
 
