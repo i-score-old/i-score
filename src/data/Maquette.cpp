@@ -1666,11 +1666,12 @@ Maquette::load(const string &fileName)
     
     // BOXES
     {
-        vector<unsigned int>    boxesID;
-        unsigned int            boxID;
-        string                  name;
-        QColor                  color;
-        unsigned int            date, duration, topLeftY, sizeY;
+        vector<unsigned int>                        boxesID;
+        unsigned int                                boxID, parentID;
+        string                                      name;
+        QColor                                      color;
+        unsigned int                                date, duration, topLeftY, sizeY;
+        QList< QPair<ParentBox *, unsigned int> >  childParentList;
         
         // get all boxes ID
         _engines->getBoxesId(boxesID);
@@ -1689,6 +1690,7 @@ Maquette::load(const string &fileName)
             topLeftY = _engines->getBoxVerticalPosition(boxID);
             sizeY = _engines->getBoxVerticalSize(boxID);
             color = _engines->getBoxColor(boxID);
+            parentID;// = _engines->getParentID(boxID);
             
             QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
             QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);           
@@ -1699,11 +1701,18 @@ Maquette::load(const string &fileName)
             newBox->setName(QString::fromStdString(name));
             newBox->setColor(color);
 
-            _boxes[boxID] = newBox;
+            _boxes[boxID] = newBox;            
             _parentBoxes[boxID] = newBox;
+
+            if(parentID != ROOT_BOX_ID)
+                childParentList << qMakePair(newBox,parentID); //On mémorise ici pour le faire à la fin.
 
             if(!NO_PAINT)
                 _scene->addParentBox(boxID);
+        }
+
+        for(int i=0; i<childParentList.size(); i++){
+             childParentList.at(i).first->setMother(childParentList.at(i).second);
         }
     }
 
