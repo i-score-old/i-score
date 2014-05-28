@@ -166,10 +166,7 @@ void
 TriggerPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
   QGraphicsItem::mousePressEvent(event);
-  setSelected(false);
-  if (_abstract->waiting()) {
-      _scene->trigger(this);
-    }
+
 }
 
 void
@@ -256,10 +253,10 @@ TriggerPoint::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
 
 void
 TriggerPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-  QGraphicsItem::mouseReleaseEvent(event);
-  if (_abstract->waiting()) {
-      setSelected(false);
+{    
+    QGraphicsItem::mouseReleaseEvent(event);
+    if (_abstract->waiting() && event->modifiers()!=Qt::ControlModifier) {
+        _scene->trigger(this);
     }
 }
 

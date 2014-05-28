@@ -289,6 +289,16 @@ void
 MaquetteView::keyReleaseEvent(QKeyEvent *event)
 {
   QGraphicsView::keyReleaseEvent(event);
+  if(event->key() == Qt::Key_Control)
+  {
+      QList<TriggerPoint *> triggerPointsSelected;
+      QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+      QList<QGraphicsItem *>::iterator it;
+      for(it = selectedItems.begin() ; it!=selectedItems.end() ; it++){
+          if((*it)->type() == TRIGGER_POINT_TYPE)
+              triggerPointsSelected<<static_cast<TriggerPoint *>(*it);
+      }
+  }
 }
 
 QList<TriggerPoint *> *
