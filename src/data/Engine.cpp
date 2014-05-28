@@ -2458,8 +2458,8 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
 }
 
 int
-Engine::requestObjectAttributeValue(const std::string & address, const std::string & attribute, vector<string>& value){
-
+Engine::requestObjectAttributeValue(const std::string & address, const std::string & attribute, vector<string>& value)
+{
     TTAddress           anAddress = toTTAddress(address);
     TTNodeDirectoryPtr  aDirectory;
     TTNodePtr           aNode;
@@ -2485,6 +2485,37 @@ Engine::requestObjectAttributeValue(const std::string & address, const std::stri
                 value.push_back(s.c_str());
                 return 1;
             }
+        }
+    }
+    return 0;
+}
+
+int Engine::setObjectAttributeValue(const std::string & address, const std::string & attribute, std::string & value)
+{
+    TTAddress           anAddress = toTTAddress(address);
+    TTNodeDirectoryPtr  aDirectory;
+    TTNodePtr           aNode;
+    TTMirrorPtr         aMirror;
+    TTValue             v;
+    
+    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    value.clear();
+    
+    if (!aDirectory)
+        return 1;
+    
+    if (!aDirectory->getTTNode(anAddress, &aNode)) {
+        
+        // set object attributes
+        aMirror = TTMirrorPtr(aNode->getObject());
+        
+        if (aMirror) {
+            
+            v = TTString(value);
+            v.fromString();
+      
+            if(!aMirror->setAttributeValue(TTSymbol(attribute), v))
+                return 1;
         }
     }
     return 0;
@@ -2965,6 +2996,86 @@ int Engine::requestNetworkNamespace(const std::string & address, std::string & n
     return 0;
 }
 
+int Engine::appendToNetWorkNamespace(const std::string & address, const std::string & service, const std::string & type, const std::string & priority, const std::string & description, const std::string & range, const std::string & clipmode, const std::string & tags)
+{
+    TTAddress           anAddress = toTTAddress(address);
+    TTNodeDirectoryPtr  aDirectory;
+    TTObjectBasePtr     aMirror;
+    TTNodePtr           returnedTTNode;
+    TTBoolean           nodeCreated;
+    TTString            s;
+    TTValue             v;
+    
+    // get the application directory
+    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    
+    if (!aDirectory)
+        return 0;
+    
+    // don't register anything into the local directory
+    if (aDirectory == getLocalDirectory)
+        return 0;
+    
+    // create a Mirror object for Data
+    TTObjectBaseInstantiate("Mirror", &aMirror, kTTSym_Data);
+    
+    // register the Mirror object into the directory
+    if (!aDirectory->TTNodeCreate(anAddress, aMirror, NULL, &returnedTTNode, &nodeCreated)) {
+        
+        aMirror->setAttributeValue("service", TTSymbol(service.data()));
+        aMirror->setAttributeValue("type", TTSymbol(type.data()));
+        
+        v = TTString(priority);
+        v.fromString();
+        aMirror->setAttributeValue("priority", v);
+        
+        aMirror->setAttributeValue("description", TTSymbol(description.data()));
+        
+        v = TTString(range);
+        v.fromString();
+        aMirror->setAttributeValue("range", v);
+        
+        aMirror->setAttributeValue("clipmode", TTSymbol(clipmode.data()));
+        
+        v = TTString(tags);
+        v.fromString();
+        aMirror->setAttributeValue("tag", v);
+        
+        return 1;
+    }
+    
+    return 0;
+}
+
+int Engine::removeFromNetWorkNamespace(const std::string & address)
+{
+    TTAddress           anAddress = toTTAddress(address);
+    TTNodeDirectoryPtr  aDirectory;
+    TTNodePtr           aNode;
+    TTObjectBasePtr     aMirror;
+    
+    // get the application directory
+    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    
+    if (!aDirectory)
+        return 0;
+    
+    // explore the directory at this address
+    // notice the tree is already built (see in initModular)
+    if (!aDirectory->getTTNode(anAddress, &aNode)) {
+        
+        // get object attributes
+        aMirror = TTMirrorPtr(aNode->getObject());
+        if (aMirror) {
+            
+            aDirectory->TTNodeRemove(anAddress);
+            
+            TTObjectBaseRelease(&aMirror);
+            
+            return 1;
+        }
+    }
+}
 
 
 // LOAD AND STORE

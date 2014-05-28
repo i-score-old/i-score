@@ -1056,6 +1056,17 @@ public:
      * \return True(1) or false(0) if the request failed or not.
      */
     int requestObjectAttributeValue(const std::string & address, const std::string & attribute, std::vector<std::string>& value);
+    
+    /*!
+     * Set an attribute value.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param attribute : the attribute's name we request. ex : "service", "rangeBounds"...etc
+     * \param attributeValue : the attribute values.
+     *
+     * \return True(1) or false(0) if the set have failed or not.
+     */
+    int setObjectAttributeValue(const std::string & address, const std::string & attribute, std::string & value);
 
     /*!
      * Sends a request to get the type of an object.
@@ -1102,6 +1113,27 @@ public:
      * \param filepath : the path to a namespace file
      */
     bool loadNetworkNamespace(const std::string &application, const std::string &filepath);
+    
+    /*!
+     * append a new address to a network device
+     *
+     * \param address : the address to add
+     * \param service : service provided by the address (parameter, message, return)
+     * \param type : type of the value handled by the address (none, generic, boolean, decimal, integer, string, array)
+     * \param priority : the priority order of this address
+     * \param description : description of the address
+     * \param range : for numericla value it is the min and the max, for string value it could be an enumeration
+     * \param clipmode : the behavior of the value at min or max bounds (none, low, high, both, wrap, fold)
+     * \param tags : any words
+     */
+    int appendToNetWorkNamespace(const std::string & address, const std::string & service = "parameter", const std::string & type = "decimal", const std::string & priority = "0", const std::string & description = "", const std::string & range = "0. 1.", const std::string & clipmode = "none", const std::string & tags = "");
+    
+    /*!
+     * remove an new address from a network device
+     *
+     * \param address : the address to remove
+     */
+    int removeFromNetWorkNamespace(const std::string & address);
 
     /*!
      * Gets an integer parameter associated to the protocol and the device.
