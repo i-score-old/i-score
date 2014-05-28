@@ -1988,6 +1988,16 @@ Maquette::updateTriggerPointActiveStatus(unsigned int trgID, bool active)
     }
 }
 
+void Maquette::setTriggerPointDefault(unsigned int triggerId, bool dflt)
+{
+    _engines->setTriggerPointDefault(triggerId, dflt);
+}
+
+bool Maquette::getTriggerPointDefault(unsigned int triggerId)
+{
+    _engines->getTriggerPointDefault(triggerId);
+}
+
 void Maquette::setViewZoom(const QPointF zoom)
 {
     _engines->setViewZoom(zoom);

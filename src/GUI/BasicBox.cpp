@@ -1023,6 +1023,8 @@ void
 BasicBox::removeTriggerPoint(BoxExtremity extremity)
 {
   if(_triggerPoints->contains(extremity)){
+      if (extremity == BOX_START)
+          detachFromCondition();
 
       TriggerPoint *trgPoint = _triggerPoints->value(extremity);
       _triggerPoints->remove(extremity);
@@ -1387,7 +1389,7 @@ BasicBox::keyReleaseEvent(QKeyEvent *event)
 
 void
 BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{        
+{
   QGraphicsItem::mousePressEvent(event);
 
   if (_startMenu != NULL) {
@@ -1466,7 +1468,7 @@ BasicBox::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 
   if (_hasContextMenu) {
       setSelected(false);
-      static_cast<BoxContextMenu *>(_contextMenu)->setDetachActionEnabled(attachedToConditionalRelation());
+      static_cast<BoxContextMenu *>(_contextMenu)->setDetachActionEnabled(isConditioned());
       _contextMenu->exec(event->screenPos());
     }
 }
