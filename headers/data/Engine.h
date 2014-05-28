@@ -196,7 +196,6 @@ public:
     void initModular(const char* pathToTheJamomaFolder = NULL);
     void initScore();
     
-    void registerIscoreTransportData();
     void registerIscoreToProtocols();
     
     void dumpAddressBelow(TTNodePtr aNode);
@@ -207,7 +206,7 @@ public:
     
     TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess, TTAddress& anAddress, TTTimeContainerPtr subScenario = NULL);
     TTTimeProcessPtr    getTimeProcess(TimeProcessId boxId);
-    TTAddress&          getAdddress(TimeProcessId boxId);
+    TTAddress&          getAddress(TimeProcessId boxId);
     TTTimeContainerPtr  getSubScenario(TimeProcessId boxId);
     void                uncacheTimeProcess(TimeProcessId boxId);
     void                clearTimeProcess();
