@@ -75,78 +75,7 @@ void Engine::initModular(const char* pathToTheJamomaFolder)
     args.clear();
     TTObjectBaseInstantiate(kTTSym_Sender, &m_sender, args);
     
-    registerIscoreTransportData();
     registerIscoreToProtocols();
-}
-
-void Engine::registerIscoreTransportData()
-{
-    TTValue args, v, none;
-    
-    // create TTData for transport service and expose them
-    
-    // Play
-    TTValuePtr batonPlay = new TTValue(TTPtr(this));
-    batonPlay->append(TTSymbol("Play"));
-    createData(kTTSym_message, batonPlay, &TransportDataValueCallback, &m_dataPlay);
-    
-    m_dataPlay->setAttributeValue(kTTSym_type, kTTSym_none);
-    m_dataPlay->setAttributeValue(kTTSym_description, TTSymbol("start i-score execution"));
-    
-    registerObject(TTAddress("/Transport/Play"), m_dataPlay);
-    
-    // Stop
-    TTValuePtr batonStop = new TTValue(TTPtr(this));
-    batonStop->append(TTSymbol("Stop"));
-    createData(kTTSym_message, batonStop, &TransportDataValueCallback, &m_dataStop);
-    
-    m_dataStop->setAttributeValue(kTTSym_type, kTTSym_none);
-    m_dataStop->setAttributeValue(kTTSym_description, TTSymbol("stop i-score execution"));
-    
-    registerObject(TTAddress("/Transport/Stop"), m_dataStop);
-    
-    // Pause
-    TTValuePtr batonPause = new TTValue(TTPtr(this));
-    batonPause->append(TTSymbol("Pause"));
-    createData(kTTSym_message, batonPause, &TransportDataValueCallback, &m_dataPause);
-    
-    m_dataPause->setAttributeValue(kTTSym_type, kTTSym_none);
-    m_dataPause->setAttributeValue(kTTSym_description, TTSymbol("pause i-score execution"));
-    
-    registerObject(TTAddress("/Transport/Pause"), m_dataPause);
-    
-    
-    // Rewind
-    TTValuePtr batonRewind = new TTValue(TTPtr(this));
-    batonRewind->append(TTSymbol("Rewind"));
-    createData(kTTSym_message, batonRewind, &TransportDataValueCallback, &m_dataRewind);
-    
-    m_dataRewind->setAttributeValue(kTTSym_type, kTTSym_none);
-    m_dataRewind->setAttributeValue(kTTSym_description, TTSymbol("return to the beginning of the scenario"));
-    
-    registerObject(TTAddress("/Transport/Rewind"), m_dataRewind);
-    
-    // StartPoint
-    TTValuePtr batonStartPoint = new TTValue(TTPtr(this));
-    batonStartPoint->append(TTSymbol("StartPoint"));
-    createData(kTTSym_message, batonStartPoint, &TransportDataValueCallback, &m_dataStartPoint);
-    
-    m_dataStartPoint->setAttributeValue(kTTSym_type, kTTSym_integer);
-    m_dataStartPoint->setAttributeValue(kTTSym_description, TTSymbol("set the time where to start i-score execution (in ms)"));
-    
-    registerObject(TTAddress("/Transport/StartPoint"), m_dataStartPoint);
-    
-    // Speed
-    TTValuePtr batonSpeed = new TTValue(TTPtr(this));
-    batonSpeed->append(TTSymbol("Speed"));
-    createData(kTTSym_message, batonSpeed, &TransportDataValueCallback, &m_dataSpeed);
-    
-    m_dataSpeed->setAttributeValue(kTTSym_type, kTTSym_decimal);
-    v = TTValue(0., 10.);
-    m_dataSpeed->setAttributeValue(kTTSym_rangeBounds, v);
-    m_dataSpeed->setAttributeValue(kTTSym_description, TTSymbol("change i-score speed rate execution"));
-    
-    registerObject(TTAddress("/Transport/Speed"), m_dataSpeed);
 }
 
 void Engine::registerIscoreToProtocols()
@@ -1768,20 +1697,7 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
     
     // We cache the TTTimeCondition
     cacheTimeCondition(triggerId, timeCondition);
-/*
-    // Register the TTTimeCondition
-    v = TTInt32(containingBoxId);
-    v.toString();
-    instance = TTString(v[0]);
-    TTAddress triggerAddress = TTAddress("/Box").appendInstance(instance);
-    
-    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        triggerAddress = triggerAddress.appendAddress("Start");
-    else
-        triggerAddress = triggerAddress.appendAddress("End");
-    
-    registerObject(triggerAddress, TTObjectBasePtr(timeCondition));
-*/
+
     // note : see in setTriggerPointMessage to see how the expression associated to an event is edited
     
 	return triggerId;
@@ -1789,6 +1705,10 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
 
 void Engine::removeTriggerPoint(ConditionedProcessId triggerId)
 {
+    // check existence before because they could have been destroyed in deleteCondition
+    if (m_conditionsMap.find(triggerId) == m_conditionsMap.end())
+        return;
+    
     TTValue             v, out;
     TTTimeConditionPtr  timeCondition = getTimeCondition(triggerId);
     TTTimeContainerPtr  parentScenario;
@@ -1860,6 +1780,13 @@ void Engine::attachToCondition(TimeConditionId conditionId, ConditionedProcessId
 
 void Engine::detachFromCondition(TimeConditionId conditionId, ConditionedProcessId triggerId)
 {
+    // check existence before because they could have been destroyed in removeTriggerPoint
+    if (m_conditionsMap.find(conditionId) == m_conditionsMap.end())
+        return;
+    
+    if (m_conditionsMap.find(triggerId) == m_conditionsMap.end())
+        return;
+    
     TTTimeConditionPtr  timeCondition = getTimeCondition(conditionId);
     TTTimeConditionPtr  otherCondition = getTimeCondition(triggerId);
     TimeEventIndex      idx = BEGIN_CONTROL_POINT_INDEX;                 // Because a condition is always at the start of a box

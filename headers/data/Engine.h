@@ -196,7 +196,6 @@ public:
     void initModular(const char* pathToTheJamomaFolder = NULL);
     void initScore();
     
-    void registerIscoreTransportData();
     void registerIscoreToProtocols();
     
     void dumpAddressBelow(TTNodePtr aNode);
