@@ -2114,11 +2114,8 @@ bool Engine::play()
     TTLogMessage("***************************************\n");
     TTLogMessage("Engine::play\n");
     
-    // compile the main scenario
-    m_mainScenario->sendMessage(TTSymbol("Compile"));
-    
     // make the start event to happen
-    return !m_mainScenario->sendMessage(TTSymbol("Start"));
+    return !m_mainScenario->sendMessage("Start");
 }
 
 bool Engine::isPlaying()
@@ -2128,10 +2125,10 @@ bool Engine::isPlaying()
     
     // TODO : TTTimeProcess should extend Scheduler class
     // get the scheduler object of the main scenario
-    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
+    m_mainScenario->getAttributeValue("scheduler", v);
     aScheduler = TTObjectBasePtr(v[0]);
     
-    aScheduler->getAttributeValue(TTSymbol("running"), v);
+    aScheduler->getAttributeValue("running", v);
     
     return TTBoolean(v[0]);
 }
@@ -3417,49 +3414,6 @@ void TimeProcessEndCallback(TTPtr baton, const TTValue& value)
     if (engine->m_TimeProcessSchedulerRunningAttributeCallback != NULL)
         engine->m_TimeProcessSchedulerRunningAttributeCallback(boxId, NO);
     
-}
-
-void TransportDataValueCallback(TTPtr baton, const TTValue& value)
-{
-    TTValuePtr          b;
-    EnginePtr           engine;
-    TTSymbol            transport;
-	
-	// unpack baton (engine, transport)
-	b = (TTValuePtr)baton;
-	engine = EnginePtr((TTPtr)(*b)[0]);
-    transport = (*b)[1];
-	
-    if (transport == TTSymbol("Play")) {
-        if (!engine->isPlaying())
-            engine->play();
-    }
-    else if (transport == TTSymbol("Stop")) {
-        if (engine->isPlaying())
-            engine->stop();
-    }
-    else if (transport == TTSymbol("Pause"))
-        engine->pause(!engine->isPaused());
-    
-    else if (transport == TTSymbol("Rewind")) {
-        engine->stop();
-        engine->setTimeOffset(0);
-    }
-    else if (transport == TTSymbol("StartPoint")) {
-        
-        if (value.size() == 1)
-            if (value[0].type() == kTypeInt32)
-                engine->setTimeOffset(value[0]);
-        
-    }
-    else if (transport == TTSymbol("Speed")) {
-        
-        if (value.size() == 1)
-            if (value[0].type() == kTypeFloat64)
-                engine->setExecutionSpeedFactor(value[0]);
-    }
-    
-    engine->m_TransportDataValueCallback(transport, value);
 }
 
 TTAddress Engine::toTTAddress(string networktreeAddress)

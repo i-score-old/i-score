@@ -1230,7 +1230,6 @@ public:
     friend void TimeEventStatusAttributeCallback(TTPtr baton, const TTValue& value);
     friend void TimeProcessStartCallback(TTPtr baton, const TTValue& value);
     friend void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
-    friend void TransportDataValueCallback(TTPtr baton, const TTValue& value);
     friend void TriggerReceiverValueCallback(TTPtr baton, const TTValue& value);
     
 private:
@@ -1291,12 +1290,6 @@ void TimeProcessStartCallback(TTPtr baton, const TTValue& value);
  @param	value			the time process running state
  @return                an error code */
 void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
-
-/** Any transport data value callback
- @param	baton			a TTValuePtr containing an EnginePtr and a TTDataPtr
- @param	value			nothing
- @return                an error code */
-void TransportDataValueCallback(TTPtr baton, const TTValue& value);
 
 // TODO : this should move into a TTModularAPI file
 /** compare priority attribute of object's node
