@@ -1,7 +1,11 @@
 TEMPLATE = app
 TARGET = i-score
 
-QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -msse3 -std=c++11
+QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -std=c++11
+
+!contains(QMAKE_HOST.arch, armv7l){
+	QMAKE_CXXFLAGS += -msse3
+}
 
 macx {
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
