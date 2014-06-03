@@ -49,6 +49,10 @@ INCLUDEPATH +=	/usr/local/jamoma/includes \
 		$$(JAMOMA_INCLUDE_PATH)/Score/library/includes \
 		$$(JAMOMA_INCLUDE_PATH)/Foundation/library/includes
 
+linux-clang{
+	QMAKE_CXXFLAGS += -stdlib=libc++
+	QMAKE_LFLAGS += -stdlib=libc++
+}
 linux-clang:contains(QMAKE_HOST.arch, x86):{
 	INCLUDEPATH += /usr/include/i386-linux-gnu/c++/4.8/
 }
