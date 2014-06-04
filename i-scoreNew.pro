@@ -1,7 +1,11 @@
 TEMPLATE = app
 TARGET = i-score
 
-QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -msse3 -std=c++11
+QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -std=c++11
+
+!contains(QMAKE_HOST.arch, armv7l){
+	QMAKE_CXXFLAGS += -msse3
+}
 
 macx {
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
@@ -45,6 +49,10 @@ INCLUDEPATH +=	/usr/local/jamoma/includes \
 		$$(JAMOMA_INCLUDE_PATH)/Score/library/includes \
 		$$(JAMOMA_INCLUDE_PATH)/Foundation/library/includes
 
+linux-clang{
+	QMAKE_CXXFLAGS += -stdlib=libc++
+	QMAKE_LFLAGS += -stdlib=libc++
+}
 linux-clang:contains(QMAKE_HOST.arch, x86):{
 	INCLUDEPATH += /usr/include/i386-linux-gnu/c++/4.8/
 }
@@ -96,7 +104,9 @@ headers/GUI/BoxWidget.hpp \
 headers/GUI/BoxCurveEdit.hpp \
 headers/GUI/TimeBarWidget.hpp \
 headers/GUI/DeviceEdit.hpp \
-headers/GUI/HeaderPanelWidget.hpp
+headers/GUI/HeaderPanelWidget.hpp \
+headers/GUI/ConditionalRelation.hpp \
+headers/GUI/TriggerPointEdit.hpp
 
 SOURCES += src/main.cpp \
 src/data/Abstract.cpp \
@@ -139,4 +149,6 @@ src/GUI/BoxWidget.cpp \
 src/GUI/BoxCurveEdit.cpp \
 src/GUI/TimeBarWidget.cpp \
 src/GUI/DeviceEdit.cpp \
-src/GUI/HeaderPanelWidget.cpp
+src/GUI/HeaderPanelWidget.cpp \
+src/GUI/ConditionalRelation.cpp \
+src/GUI/TriggerPointEdit.cpp
