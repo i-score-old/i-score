@@ -49,9 +49,10 @@ TriggerPointEdit::edit()
     _expressionEdit->setText(QString::fromStdString(_abstract->message()));
     _expressionEdit->selectAll();
 
-    if(Maquette::getInstance()->getTriggerPoint(_abstract->ID())->isConditioned() && _abstract->boxExtremity() == BOX_START){
+    if(Maquette::getInstance()->getTriggerPoint(_abstract->ID())->isConditioned() && _abstract->boxExtremity() == BOX_START)
         _autoTriggerCheckBox->setChecked(Maquette::getInstance()->getTriggerPointDefault(_abstract->ID()));
-    }
+    else
+        _autoTriggerCheckBox->setEnabled(false);
 
     exec();
 }
