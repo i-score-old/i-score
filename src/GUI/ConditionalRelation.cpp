@@ -41,6 +41,7 @@
  */
 
 #include "ConditionalRelation.hpp"
+#include "TriggerPoint.hpp"
 
 const QColor ConditionalRelation::CONDITIONAL_RELATION_COLOR = QColor(0, 0, 0);
 const QColor ConditionalRelation::CONDITIONAL_RELATION_SELECTED_COLOR = QColor(Qt::blue);
@@ -52,12 +53,18 @@ ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, Maquet
 {
     init();
 
-    _id = Maquette::getInstance()->createCondition(boxesAttached);
+    _id = Maquette::getInstance()->createCondition(boxesAttached);        
+
 
     //set conditional relation to each box
     QList<BasicBox *>::iterator     it;
     for(it = _boxesAttached.begin() ; it!=_boxesAttached.end() ; it++)
+    {
         (*it)->addConditionalRelation(this);
+
+        //default : auto-trigger = false for all triggerPoints attached
+        Maquette::getInstance()->setTriggerPointDefault((*it)->getTriggerPoint(BOX_START)->ID(),false);
+    }
 
     updateCoordinates();
 }
@@ -157,6 +164,9 @@ ConditionalRelation::attachBoxes(QList<BasicBox *> conditionedBox)
 
             //set conditional relation to each box
             (*it)->addConditionalRelation(this);
+
+            //default : auto-trigger = false for all triggerPoints attached
+            Maquette::getInstance()->setTriggerPointDefault((*it)->getTriggerPoint(BOX_START)->ID(),false);
         }
     }
     updateCoordinates();
