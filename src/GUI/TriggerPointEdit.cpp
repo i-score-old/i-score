@@ -18,14 +18,14 @@ TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *pare
     _expressionLabel = new QLabel(tr("expression to evaluate :"));
     _autoTriggerCheckBox = new QCheckBox("auto-trigger");
 
-    _layout->addWidget(_expressionLabel, 0, 0, 1, 1);
-    _layout->addWidget(_expressionEdit, 1, 0, 1, 1);
-    _layout->addWidget(_autoTriggerCheckBox, 1, 1, 1, 1);
+    _layout->addWidget(_expressionLabel, 0, 0, 1, 2);
+    _layout->addWidget(_expressionEdit, 1, 0, 1, 2);
+    _layout->addWidget(_autoTriggerCheckBox, 2, 0, 1, 1);
 
     _okButton = new QPushButton(tr("OK"), this);
-    _layout->addWidget(_okButton, 3, 1, 1, 1);
+    _layout->addWidget(_okButton, 3, 0, 1, 1);
     _cancelButton = new QPushButton(tr("Cancel"), this);
-    _layout->addWidget(_cancelButton, 3, 2, 1, 1);
+    _layout->addWidget(_cancelButton, 3, 1, 1, 1);
 
     connect(_autoTriggerCheckBox,SIGNAL(clicked()),this,SLOT(autoTriggerChanged()));
     connect(_expressionEdit,SIGNAL(textChanged(QString)),this,SLOT(expressionChanged()));
@@ -49,8 +49,10 @@ TriggerPointEdit::edit()
     _expressionEdit->setText(QString::fromStdString(_abstract->message()));
     _expressionEdit->selectAll();
 
-    if(Maquette::getInstance()->getTriggerPoint(_abstract->ID())->isConditioned() && _abstract->boxExtremity() == BOX_START)
+    if(Maquette::getInstance()->getTriggerPoint(_abstract->ID())->isConditioned() && _abstract->boxExtremity() == BOX_START){
+        _autoTriggerCheckBox->setEnabled(true);
         _autoTriggerCheckBox->setChecked(Maquette::getInstance()->getTriggerPointDefault(_abstract->ID()));
+    }
     else
         _autoTriggerCheckBox->setEnabled(false);
 
