@@ -2004,7 +2004,7 @@ void Maquette::setTriggerPointDefault(unsigned int triggerId, bool dflt)
 
 bool Maquette::getTriggerPointDefault(unsigned int triggerId)
 {
-    _engines->getTriggerPointDefault(triggerId);
+    return _engines->getTriggerPointDefault(triggerId);
 }
 
 void Maquette::setViewZoom(const QPointF zoom)

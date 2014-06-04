@@ -1956,7 +1956,8 @@ bool Engine::getTriggerPointDefault(ConditionedProcessId triggerId)
         TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
 
     // Get the default comportment associated to this event
-    if (!getTimeCondition(triggerId)->sendMessage(TTSymbol("ExpressionFind"), v, out)) {
+    v = TTObjectBasePtr(timeEvent);
+    if (!getTimeCondition(triggerId)->sendMessage(TTSymbol("DefaultFind"), v, out)) {
 
         dflt = out[0];
         return dflt;

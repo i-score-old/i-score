@@ -27,6 +27,7 @@ TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *pare
     _cancelButton = new QPushButton(tr("Cancel"), this);
     _layout->addWidget(_cancelButton, 3, 2, 1, 1);
 
+    connect(_autoTriggerCheckBox,SIGNAL(clicked()),this,SLOT(autoTriggerChanged()));
     connect(_expressionEdit,SIGNAL(textChanged(QString)),this,SLOT(expressionChanged()));
     connect(_okButton, SIGNAL(released()), this, SLOT(updateStuff()));
     connect(_cancelButton, SIGNAL(released()), this, SLOT(reject()));
@@ -48,10 +49,9 @@ TriggerPointEdit::edit()
     _expressionEdit->setText(QString::fromStdString(_abstract->message()));
     _expressionEdit->selectAll();
 
-    if(Maquette::getInstance()->getTriggerPoint(_abstract->ID())->isConditioned() && _abstract->boxExtremity() == BOX_START)
+    if(Maquette::getInstance()->getTriggerPoint(_abstract->ID())->isConditioned() && _abstract->boxExtremity() == BOX_START){
         _autoTriggerCheckBox->setChecked(Maquette::getInstance()->getTriggerPointDefault(_abstract->ID()));
-    else
-        _autoTriggerCheckBox->setEnabled(false);
+    }
 
     exec();
 }
