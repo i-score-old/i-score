@@ -372,6 +372,7 @@ BasicBox::init()
   _shift = false;
   _playing = false;
   _recording = true;
+  _mute = false;
   _low = false;
   _triggerPoints = new QMap<BoxExtremity, TriggerPoint*>();
   _comment = NULL;
@@ -2002,8 +2003,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         painter->fillRect(0, _abstract->height() - RESIZE_TOLERANCE / 2., progressPosX, RESIZE_TOLERANCE / 2., Qt::darkGreen);
         painter->drawLine(QPointF(progressPosX, RESIZE_TOLERANCE), QPointF(progressPosX, _abstract->height()));
     }
-//    setOpacity(isSelected() ? 1 : 0.4);
-
+    setOpacity(_mute ? 0.4 : 1);
 }
 
 void
@@ -2050,6 +2050,13 @@ void
 BasicBox::setRecMode(bool activated){
     _recording = activated;
     _recEffect->setEnabled(_recording);
+    update();
+}
+
+void
+BasicBox::setMuteState(bool activated){
+    _mute = activated;
+    Maquette::getInstance()->setBoxMuteState(ID(),_mute);
     update();
 }
 

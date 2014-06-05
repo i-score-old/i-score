@@ -296,7 +296,8 @@ class Maquette : public QObject
 
     void setCurveMuteState(unsigned int boxID, const std::string &address, bool muteState);
     bool getCurveMuteState(unsigned int boxID, const std::string &address);
-
+    void setBoxMuteState(unsigned int boxID, bool muteState);
+    bool getBoxMuteState(unsigned int boxID);
 
     /*!
      * \brief Sets sections of a curve at a specific address in a box.

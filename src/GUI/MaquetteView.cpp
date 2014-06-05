@@ -277,6 +277,10 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
   else if (event->key() == Qt::Key_1 || event->key() == Qt::Key_2 || event->key() == Qt::Key_3) {
       triggerShortcut(event->key());
     }
+  else if(event->key() == Qt::Key_M ){
+      _scene->muteBoxes();
+      update();
+  }
 }
 
 void

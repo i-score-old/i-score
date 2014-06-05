@@ -972,6 +972,21 @@ MaquetteScene::pasteBoxes()
 }
 
 void
+MaquetteScene::muteBoxes()
+{
+    for (int i = 0; i < selectedItems().size(); i++)
+    {
+        QGraphicsItem *curItem = selectedItems().at(i);
+        int type = curItem->type();
+        BasicBox *curBox = static_cast<BasicBox*>(curItem);
+        if (type == PARENT_BOX_TYPE) {
+            curBox = static_cast<BasicBox*>(curItem);
+            curBox->setMuteState(!curBox->getMuteState());
+        }
+    }
+}
+
+void
 MaquetteScene::clear()
 {
   selectAll();

@@ -656,12 +656,17 @@ class MaquetteScene : public QGraphicsScene
     /*!
      * \brief Copies selected boxes.
      */
-    void copyBoxes(bool erasing = false);
+    void copyBoxes(bool erasing = false);    
 
     /*!
      * \brief Pastes copied boxes.
      */
     void pasteBoxes();
+
+    /*!
+     * \brief Mutes selected boxes.
+     */
+    void muteBoxes();
 
     /*!
      * \brief Called when the time reaches the end.
