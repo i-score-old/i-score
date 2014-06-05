@@ -1634,7 +1634,7 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
 }
 
 void
-NetworkTree::mouseClickEvent(QMouseEvent *event)
+NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
     if(currentItem()!=NULL){
