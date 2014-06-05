@@ -279,7 +279,6 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
     }
   else if(event->key() == Qt::Key_M ){
       _scene->muteBoxes();
-      update();
   }
 }
 

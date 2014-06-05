@@ -2057,6 +2057,8 @@ void
 BasicBox::setMuteState(bool activated){
     _mute = activated;
     Maquette::getInstance()->setBoxMuteState(ID(),_mute);
+    Maquette::getInstance()->setStartEventMuteState(ID(),_mute);
+    Maquette::getInstance()->setEndEventMuteState(ID(),_mute);
     update();
 }
 

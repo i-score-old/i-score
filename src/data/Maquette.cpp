@@ -1141,6 +1141,18 @@ Maquette::getBoxMuteState(unsigned int boxID)
 //  return _engines->getBoxMuteState(boxID); TODO
 }
 
+void
+Maquette::setStartEventMuteState(unsigned int boxID, bool muteState)
+{
+    _engines->setCtrlPointMutingState(boxID,BOX_START,muteState);
+}
+
+void
+Maquette::setEndEventMuteState(unsigned int boxID, bool muteState)
+{
+    _engines->setCtrlPointMutingState(boxID,BOX_END,muteState);
+}
+
 bool
 Maquette::setCurveSections(unsigned int boxID, const string &address, unsigned int argPosition,
                            const vector<float> &xPercents, const vector<float> &yValues, const vector<short> &sectionType, const vector<float> &coeff)

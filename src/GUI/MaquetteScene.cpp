@@ -984,6 +984,7 @@ MaquetteScene::muteBoxes()
             curBox->setMuteState(!curBox->getMuteState());
         }
     }
+    update();
 }
 
 void
