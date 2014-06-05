@@ -418,6 +418,9 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
   rootNode->insertChild(rootNode->childCount() - 1, newItem);
   QString address = getAbsoluteAddress(newItem);
   _OSCMessages.insert(newItem, address);
+
+  std::cout<<address.toStdString()<<std::endl;
+  Maquette::getInstance()->appendToNetWorkNamespace(address.toStdString());
 }
 
 void
@@ -1631,7 +1634,7 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
 }
 
 void
-NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
+NetworkTree::mouseClickEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
     if(currentItem()!=NULL){

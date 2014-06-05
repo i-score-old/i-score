@@ -2282,3 +2282,8 @@ bool
 Maquette::loadNetworkNamespace(const string &application, const string &filepath){
     return _engines->loadNetworkNamespace(application,filepath);
 }
+
+int
+Maquette::appendToNetWorkNamespace(const std::string & address, const std::string & service, const std::string & type, const std::string & priority, const std::string & description, const std::string & range, const std::string & clipmode, const std::string & tags){
+    return _engines->appendToNetWorkNamespace(address,service,type,priority,description,range,clipmode,tags);
+}
