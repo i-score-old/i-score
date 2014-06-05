@@ -408,7 +408,7 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
 
   QString number = QString("%1").arg(_OSCMessageCount++);
   QString name = QString("OSCMessage" + number);
-  QStringList OSCname = QStringList(name);
+  QStringList OSCname = QStringList(name);  
 
   QTreeWidgetItem *newItem = new QTreeWidgetItem(OSCname, OSCNode);
   newItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
@@ -419,8 +419,10 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
   QString address = getAbsoluteAddress(newItem);
   _OSCMessages.insert(newItem, address);
 
-  std::cout<<address.toStdString()<<std::endl;
-  Maquette::getInstance()->appendToNetWorkNamespace(address.toStdString());
+  //Edits automatically the new item's name.
+//  Maquette::getInstance()->appendToNetWorkNamespace(address.toStdString()); crash
+  NAME_MODIFIED = true;
+  editItem(newItem, NAME_COLUMN);
 }
 
 void
@@ -444,10 +446,15 @@ void
 NetworkTree::setOSCMessageName(QTreeWidgetItem *item, QString name)
 {
   QMap<QTreeWidgetItem *, QString> ::iterator it = _OSCMessages.find(item);
+  string oldAddress = getAbsoluteAddress(item).toStdString();
   item->setText(NAME_COLUMN, name);
+  QString newAddress = getAbsoluteAddress(item);
+
   if (it != _OSCMessages.end()) {
       _OSCMessages.erase(it);
-      _OSCMessages.insert(item, getAbsoluteAddress(item));
+      Maquette::getInstance()->removeFromNetWorkNamespace(oldAddress);
+      _OSCMessages.insert(item, newAddress);
+      Maquette::getInstance()->appendToNetWorkNamespace(newAddress.toStdString());
     }
 }
 
@@ -1802,11 +1809,11 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 
 void
 NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
-{    
+{                
     Data data;
     data.hasCurve = false;
     QString qaddress = getAbsoluteAddress(item);
-    data.address = qaddress;
+    data.address = qaddress;    
 
     if (item->type() == LeaveType && column == START_COLUMN && VALUE_MODIFIED) {
         VALUE_MODIFIED = FALSE;
@@ -1990,7 +1997,7 @@ void
 NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue)
 {
   if (item->type() == OSCNode) {
-      if (newValue.isEmpty()) {
+      if (newValue.isEmpty()) { //remove message
           _startMessages->removeMessage(item);
           _endMessages->removeMessage(item);
           _OSCEndMessages->removeMessage(item);
@@ -1998,6 +2005,7 @@ NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue)
           item->parent()->removeChild(item);
           _OSCMessages.remove(item);
           removeAssignItem(item);
+          Maquette::getInstance()->removeFromNetWorkNamespace(getAbsoluteAddress(item).toStdString());
         }
       else {
           setOSCMessageName(item, newValue);
