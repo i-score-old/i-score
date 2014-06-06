@@ -162,6 +162,9 @@ BasicBox::centerWidget()
 
     if(_playButton != NULL)
         _playButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN-4, -(height()) / 2);
+
+    if(_stopButton != NULL)
+        _stopButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN-4, -(height()) / 2);
 }
 
 void
@@ -177,9 +180,7 @@ BasicBox::createActions()
   connect(_jumpToStartCue, SIGNAL(triggered()), _boxContentWidget, SLOT(jumpToStartCue()));
   connect(_jumpToEndCue, SIGNAL(triggered()), _boxContentWidget, SLOT(jumpToEndCue()));
   connect(_updateStartCue, SIGNAL(triggered()), _boxContentWidget, SLOT(updateStartCue()));
-  connect(_updateEndCue, SIGNAL(triggered()), _boxContentWidget, SLOT(updateEndCue()));
-  connect(_play, SIGNAL(triggered()), _boxContentWidget, SLOT(play()));
-  connect(_stop, SIGNAL(triggered()), _boxContentWidget, SLOT(stop()));
+  connect(_updateEndCue, SIGNAL(triggered()), _boxContentWidget, SLOT(updateEndCue()));  
 }
 
 void
@@ -228,7 +229,7 @@ BasicBox::createMenus()
   if(_boxContentWidget != NULL)
       _boxContentWidget->setEndMenu(_endMenu);
 
-//  //play
+//  Play
   QIcon playIcon(":/resources/images/playSimple.svg");
   _playButton= new QPushButton();
   _playButton->setIcon(playIcon);
@@ -241,18 +242,35 @@ BasicBox::createMenus()
     "}"
     );
 
-  QGraphicsProxyWidget *playProxy = new QGraphicsProxyWidget(this);
-  playProxy->setWidget(_playButton);
+//  Stop
+    QIcon stopIcon(":/resources/images/stopSimple.svg");
+    _stopButton= new QPushButton();
+    _stopButton->setIcon(stopIcon);
+    _stopButton->setShortcutEnabled(1, false);
+    _stopButton->setStyleSheet(
+      "QPushButton {"
+      "border: none;"
+      "border-radius: none;"
+      "background-color: transparent;"
+      "}"
+      );
+
+
   QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
   startMenuProxy->setWidget(_startMenuButton);
   QGraphicsProxyWidget *endMenuProxy = new QGraphicsProxyWidget(this);
   endMenuProxy->setWidget(_endMenuButton);  
-
+  QGraphicsProxyWidget *playProxy = new QGraphicsProxyWidget(this);
+  playProxy->setWidget(_playButton);
+  QGraphicsProxyWidget *stopProxy = new QGraphicsProxyWidget(this);
+  stopProxy->setWidget(_stopButton);
 
   connect(_startMenuButton, SIGNAL(clicked()), _boxContentWidget, SLOT(execStartAction()));
   connect(_endMenuButton, SIGNAL(clicked()), _boxContentWidget, SLOT(execEndAction()));
   connect(_startMenuButton, SIGNAL(customContextMenuRequested(QPoint)), _boxContentWidget, SLOT(displayStartMenu(QPoint)));
   connect(_endMenuButton, SIGNAL(customContextMenuRequested(QPoint)), _boxContentWidget, SLOT(displayEndMenu(QPoint)));
+  connect(_playButton, SIGNAL(clicked()), _boxContentWidget, SLOT(play()));
+  connect(_stopButton, SIGNAL(clicked()), _boxContentWidget, SLOT(stop()));
 }
 
 void
@@ -1955,6 +1973,10 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     painter->setClipRect(option->exposedRect);//To increase performance
     bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
 
+    //Showing stop button when playing
+    if(_playing)
+    _stopButton->setVisible(_playing);
+
     //draw hover shape
     if (_hover && !isSelected() && !_playing)
         drawHoverShape(painter);
@@ -2128,5 +2150,6 @@ BasicBox::setButtonsVisible(bool value)
 {
     _startMenuButton->setVisible(value);
     _endMenuButton->setVisible(value);
-    _playButton->setVisible(value);
+    _playButton->setVisible(!_playing && value);
+    _stopButton->setVisible(_playing && value);
 }

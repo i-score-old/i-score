@@ -855,7 +855,7 @@ class BasicBox : public QObject, public QGraphicsItem
     bool _shift;                                                                //!< State of Shift Key.
     bool _playing;                                                              //!< State of playing.
     bool _recording;                                                            //!< State of recording.
-    bool _mute;                                                                 //!< State of mute.
+    bool _mute;                                                                 //!< State of mute.    
     TextEdit *_trgPntMsgEdit;                                                   //!< The trigger point editing dialog.
     Comment *_comment;                                                          //!< The box comment.
     QMap<BoxExtremity, TriggerPoint*> *_triggerPoints;                          //!< The trigger points.
