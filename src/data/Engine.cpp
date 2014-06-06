@@ -2998,7 +2998,7 @@ int Engine::appendToNetWorkNamespace(const std::string & address, const std::str
 {
     TTAddress           anAddress = toTTAddress(address);
     TTNodeDirectoryPtr  aDirectory;
-    TTObjectBasePtr     aMirror;
+    TTObjectBasePtr     aMirror = NULL;
     TTNodePtr           returnedTTNode;
     TTBoolean           nodeCreated;
     TTString            s;
@@ -3073,6 +3073,8 @@ int Engine::removeFromNetWorkNamespace(const std::string & address)
             return 1;
         }
     }
+    
+    return 0;
 }
 
 
