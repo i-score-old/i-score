@@ -301,7 +301,10 @@ BasicBox::createWidget()
               "QComboBox::drop-down {"
               "border-color: gray;"
               "color: black;"
-              "text-align: right;"
+              "}"
+
+              " QComboBox::down-arrow {"
+              "image: url(:/resources/images/1downarrow.png);"
               "}"
               "QComboBox QAbstractItemView{"
               "background: gray;"
