@@ -489,7 +489,9 @@ class NetworkTree : public QTreeWidget
     }
     void assignPartially(QTreeWidgetItem *item);
     void unassignPartially(QTreeWidgetItem *item);
-    void unassignItem(QTreeWidgetItem *item);
+    void unassignItem(QTreeWidgetItem *item, bool recursive=true);
+    void setUnassignedStyle(QTreeWidgetItem *item);
+
     inline void
     addNodeTotallyAssigned(QTreeWidgetItem *item)
     {
