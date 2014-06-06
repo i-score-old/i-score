@@ -408,7 +408,7 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
 
   QString number = QString("%1").arg(_OSCMessageCount++);
   QString name = QString("OSCMessage" + number);
-  QStringList OSCname = QStringList(name);  
+  QStringList OSCname = QStringList(name);
 
   QTreeWidgetItem *newItem = new QTreeWidgetItem(OSCname, OSCNode);
   newItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
@@ -1634,7 +1634,7 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
         if(event->button()==Qt::LeftButton){
             if(currentItem()->type() == addDeviceNode){                
                  _deviceEdit->edit();
-                 setCurrentItem(NULL);
+                 setCurrentItem(NULL);                 
             }
         }
     }

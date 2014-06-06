@@ -111,7 +111,9 @@ class AttributesEditor : public QDockWidget
      *
      * \return the box edited in the editor
      **/
-    unsigned int currentBox();    
+    unsigned int currentBox();
+
+    inline void setBoxEdited(unsigned int boxId){ _boxEdited = boxId; }
 
   public slots:
     void addToExpandedItemsList(QTreeWidgetItem *item);

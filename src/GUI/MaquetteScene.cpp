@@ -1775,13 +1775,16 @@ MaquetteScene::updateBoxesWidgets()
 {
   std::map<unsigned int, BasicBox*>::iterator it;
   std::map<unsigned int, BasicBox*> boxes = _maquette->getBoxes();
+  unsigned int currentBoxSave = _editor->currentBox();
+
   for (it = boxes.begin(); it != boxes.end(); it++) {
       unsigned int boxID = it->first;
-      static_cast<AbstractBox*>(getBox(boxID)->abstract())->clearMessages();
+      static_cast<AbstractBox*>(getBox(boxID)->abstract())->clearMessages();      
       if (boxID != NO_ID) {
           setAttributes(static_cast<AbstractBox*>(getBox(boxID)->abstract()));
         }
     }
+    _editor->setBoxEdited(currentBoxSave); //Because setAttributes changes currentBoxEdited value. And the edited box became an unselected one.
 }
 
 void
