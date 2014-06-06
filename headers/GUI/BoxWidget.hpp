@@ -82,6 +82,8 @@ class BoxWidget : public QWidget
     void jumpToEndCue();
     void updateStartCue();
     void updateEndCue();
+    void play();
+    void stop();
     void execStartAction();
     void execEndAction();
     void displayStartMenu(QPoint pos);

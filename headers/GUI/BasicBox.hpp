@@ -755,6 +755,7 @@ class BasicBox : public QObject, public QGraphicsItem
     inline QList<ConditionalRelation *> getConditionalRelations(){return _conditionalRelation;}
 
     void updateRecordingCurves();
+    void setButtonsVisible(bool value);
 
     /*!
      * \brief Return the messages list, like if the box just ended its execution.
@@ -889,12 +890,16 @@ class BasicBox : public QObject, public QGraphicsItem
     QAction *_jumpToEndCue;
     QAction *_updateStartCue;
     QAction *_updateEndCue;
+    QAction *_play;
+    QAction *_stop;
 
     QMenu *_startMenu;
     QMenu *_endMenu;
 
     QPushButton *_startMenuButton;
     QPushButton *_endMenuButton;
+    QPushButton *_playButton;
+    QPushButton *_stopButton;
 
 };
 #endif

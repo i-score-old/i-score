@@ -531,6 +531,18 @@ BoxWidget::updateEndCue()
 }
 
 void
+BoxWidget::play()
+{
+    std::cout<<"TODO : StartPlaying box"<<_boxID<<std::endl;
+}
+
+void
+BoxWidget::stop()
+{
+    std::cout<<"TODO : StopPlaying box"<<_boxID<<std::endl;
+}
+
+void
 BoxWidget::displayStartMenu(QPoint pos)
 {
   if (_startMenu != NULL) {
