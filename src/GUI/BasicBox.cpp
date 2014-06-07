@@ -339,16 +339,18 @@ BasicBox::createWidget()
               "background-color: transparent;"
               "selection-color: black;"
               "selection-background-color: gray;"
-              "text-align: right;"
               "}"
+
               "QComboBox::drop-down {"
               "border-color: gray;"
               "color: black;"
               "}"
 
-              " QComboBox::down-arrow {"
+              "QComboBox::down-arrow {"
               "image: url(:/resources/images/1downarrow.png);"
+              "padding-right: 10px;"
               "}"
+
               "QComboBox QAbstractItemView{"
               "background: gray;"
               "}"
