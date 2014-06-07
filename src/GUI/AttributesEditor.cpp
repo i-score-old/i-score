@@ -528,8 +528,8 @@ AttributesEditor::startMessageChanged(QTreeWidgetItem *item)
     if (_scene->paused()) {
           _scene->stopAndGoToCurrentTime();
       }
-  if (_boxEdited != NO_ID) {
-
+  if (_boxEdited != NO_ID)
+  {
       //PAS OPTIMAL, NE DEVRAIT MODIFIER QU'UN SEUL ITEM
       QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
       Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);

@@ -1145,16 +1145,46 @@ NetworkTree::assignItems(QMap<QTreeWidgetItem*, Data> selectedItems)
 }
 
 void
-NetworkTree::unassignItem(QTreeWidgetItem *item)
+NetworkTree::unassignItem(QTreeWidgetItem *item, bool recursive)
 {
-  QFont font = item->font(NAME_COLUMN);
-  font.setBold(false);
-  item->setFont(NAME_COLUMN, font);
+    if(isAssigned(item)){
+            item->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
+            emit(curveActivationChanged(item, false));
+            item->setText(START_COLUMN, "");
+            emit(startValueChanged(item, ""));
+            item->setText(END_COLUMN, "");
+            emit(endValueChanged(item, ""));
+            fatherColumnCheck(item, START_COLUMN);
+            fatherColumnCheck(item, END_COLUMN);
+    }
 
-//    item->setCheckState(0,Qt::Unchecked);
-  removeAssignItem(item);
+    int i;
+    QTreeWidgetItem *child;
 
-  //bold
+    if(recursive){
+        if (!item->isDisabled()) {
+            int childrenCount = item->childCount();
+            for (i = 0; i < childrenCount; i++) {
+                child = item->child(i);
+                if (child->type() == NodeNoNamespaceType) {
+                    unassignItem(child);
+                    recursiveChildrenSelection(child, select);
+                }
+                if (child->type() == LeaveType) {
+                    unassignItem(child);
+                }
+            }
+        }
+    }
+}
+
+void
+NetworkTree::setUnassignedStyle(QTreeWidgetItem *item)
+{
+    QFont font = item->font(NAME_COLUMN);
+    font.setBold(false);
+    item->setFont(NAME_COLUMN, font);
+    removeAssignItem(item);
 }
 
 void
@@ -1321,7 +1351,7 @@ NetworkTree::resetAssignedItems()
 
   for (it = assignedLeaves.begin(); it != assignedLeaves.end(); it++) {
       curItem = *it;
-      unassignItem(curItem);
+      setUnassignedStyle(curItem);
     }
 
   _assignedItems.clear();
@@ -1599,8 +1629,6 @@ NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select)
     }
 }
 
-
-
 /*************************************************************************
  *                         SLOTS - Virtual methods
  ************************************************************************/
@@ -1636,6 +1664,10 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
                  _deviceEdit->edit();
                  setCurrentItem(NULL);                 
             }
+            else if(event->modifiers()==Qt::AltModifier){
+                unassignItem(currentItem());
+            }
+
         }
     }
 }
@@ -1809,7 +1841,7 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 
 void
 NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
-{                
+{                    
     Data data;
     data.hasCurve = false;
     QString qaddress = getAbsoluteAddress(item);
