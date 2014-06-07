@@ -706,6 +706,8 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
              else{
                  curItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
                  curItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
+                 curItem->setCheckState(START_COLUMN, Qt::Unchecked);
+                 curItem->setCheckState(END_COLUMN, Qt::Unchecked);
 
                  //Case type return
                  if(attributesValues[0] == "return"){
@@ -914,6 +916,7 @@ NetworkTree::updateStartMsgsDisplay()
       curItem = *it;
       currentMsg = _startMessages->getMessages().value(curItem);            
       curItem->setText(START_COLUMN, currentMsg.value);
+      curItem->setCheckState(START_COLUMN, Qt::Checked);
       fatherColumnCheck(curItem, START_COLUMN);
     }
 }
@@ -951,7 +954,7 @@ NetworkTree::updateEndMsgsDisplay()
       curItem = *it;
       currentMsg = _endMessages->getMessages().value(curItem);
       curItem->setText(END_COLUMN, currentMsg.value);
-
+      curItem->setCheckState(END_COLUMN, Qt::Checked);
       fatherColumnCheck(curItem, END_COLUMN);
     }
 }
@@ -1661,7 +1664,7 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
             }
 
         }
-    }
+    }   
 }
 
 void
@@ -1755,10 +1758,20 @@ NetworkTree::keyPressEvent(QKeyEvent *event)
 void
 NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 {        
-  if (item != NULL) {      
+  if (item != NULL) {
       if (item->isSelected()) {
           recursiveChildrenSelection(item, true);
           recursiveFatherSelection(item, true);
+
+          //cmd+click in start/end column does a snapshot
+          if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
+              if(column == START_COLUMN){
+                  emit(requestSnapshotStart());
+              }
+              if(column == END_COLUMN){
+                  emit(requestSnapshotEnd());
+              }
+          }
         }
 
       if (!item->isSelected() && item->type() != OSCNode) {
@@ -1776,6 +1789,7 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
           else{
               for(int i = 0; i<selectedItems().size(); i++){
                   item = selectedItems().at(i);
+
                   if (isAssigned(item) && hasStartMsg(item) && hasEndMsg(item)) {
                       bool activated = item->checkState(column) == Qt::Checked;
                       emit(curveActivationChanged(item, activated));

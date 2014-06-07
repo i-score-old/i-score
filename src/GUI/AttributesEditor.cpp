@@ -293,6 +293,8 @@ AttributesEditor::connectSlots()
 
   connect(_snapshotAssignStart, SIGNAL(clicked()), this, SLOT(snapshotStartAssignment()));
   connect(_snapshotAssignEnd, SIGNAL(clicked()), this, SLOT(snapshotEndAssignment()));
+  connect(_networkTree, SIGNAL(requestSnapshotStart()), this, SLOT(snapshotStartAssignment()));
+  connect(_networkTree, SIGNAL(requestSnapshotEnd()), this, SLOT(snapshotEndAssignment()));
 
   connect(_networkTree, SIGNAL(itemExpanded(QTreeWidgetItem *)), this, SLOT(addToExpandedItemsList(QTreeWidgetItem*)));
   connect(_networkTree, SIGNAL(itemCollapsed(QTreeWidgetItem *)), this, SLOT(removeFromExpandedItemsList(QTreeWidgetItem*)));
