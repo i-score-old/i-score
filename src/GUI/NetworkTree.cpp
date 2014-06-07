@@ -138,8 +138,8 @@ NetworkTree::~NetworkTree(){
 void
 NetworkTree::init()
 {
-//   setSelectionMode(QAbstractItemView::MultiSelection);
-    setSelectionMode(QAbstractItemView::ExtendedSelection);
+   setSelectionMode(QAbstractItemView::MultiSelection);
+//    setSelectionMode(QAbstractItemView::ExtendedSelection);
 
    _treeFilterActive = true;
   _deviceEdit = new DeviceEdit(topLevelWidget());
@@ -1708,7 +1708,7 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
             }
             else if(event->modifiers()==Qt::AltModifier){
                 unassignItem(currentItem());
-            }            
+            }
         }
     }   
 }
@@ -1812,73 +1812,22 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
           recursiveFatherSelection(item, false);
         }
 
-      if ((item->type() == LeaveType || item->type() == OSCNode) && column == INTERPOLATION_COLUMN) {
 
-          if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
-              for(int i = 0; i<selectedItems().size(); i++)
-                  emit recModeChanged(selectedItems().at(i));
-          }
-          else{
-              for(int i = 0; i<selectedItems().size(); i++){
-                  item = selectedItems().at(i);
 
-                  if (isAssigned(item) && hasStartMsg(item) && hasEndMsg(item)) {
-                      bool activated = item->checkState(column) == Qt::Checked;
-                      emit(curveActivationChanged(item, activated));
-                  }
-                  else {
-                      float start = 0., end = 1.;
-                      vector<float> rangeBounds;
-                      std::string address = getAbsoluteAddress(item).toStdString();
-
-                      if(!Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0)
-                          return;
-
-                      if(!hasStartEndMsg(item)){ //Creates curve with start=minBound and end=maxBound (default 0 1)
-                          start = rangeBounds[0];
-                          end = rangeBounds[1];
-                      }
-                      else if (hasStartMsg(item)){
-                          start = _startMessages->getMessage(item).value.toFloat();
-                          end = rangeBounds[1];
-                      }
-                      else if(hasEndMsg(item)){
-                          start = rangeBounds[0];
-                          end = _endMessages->getMessage(item).value.toFloat();
-                      }
-
-                      VALUE_MODIFIED = true;
-                      item->setText(START_COLUMN,QString("%1").arg(start));
-                      VALUE_MODIFIED = true;
-                      item->setText(END_COLUMN,QString("%1").arg(end));
-                  }
-              }
+      if (selectionMode() == QAbstractItemView::ContiguousSelection) {
+          QList<QTreeWidgetItem*> selection = selectedItems();
+          QList<QTreeWidgetItem*>::iterator it;
+          QTreeWidgetItem *curIt;
+          for (it = selection.begin(); it != selection.end(); it++) {
+              curIt = *it;
+              recursiveChildrenSelection(curIt, true);
           }
       }
-      if ((item->type() == LeaveType || item->type() == OSCNode) && column == REDUNDANCY_COLUMN) {
-          if (isAssigned(item) && hasCurve(item)) {
-              bool activated = item->checkState(column) == Qt::Checked;
-              emit(curveRedundancyChanged(item, activated));
-          }
-          else {
-              item->setCheckState(column, Qt::Unchecked);
-          }
+
+      if (item->type() == addOSCNode) {
+          addOSCMessage(item->parent());
       }
   }
-
-  if (selectionMode() == QAbstractItemView::ContiguousSelection) {
-      QList<QTreeWidgetItem*> selection = selectedItems();
-      QList<QTreeWidgetItem*>::iterator it;
-      QTreeWidgetItem *curIt;
-      for (it = selection.begin(); it != selection.end(); it++) {
-          curIt = *it;
-          recursiveChildrenSelection(curIt, true);
-        }
-    }
-
-  if (item->type() == addOSCNode) {
-      addOSCMessage(item->parent());
-    }
 }
 
 void
@@ -2423,4 +2372,61 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
         else
             emit(requestSnapshotEnd(selectedItems));
     }
+
+    else if ((curItem->type() == LeaveType || curItem->type() == OSCNode) && column == INTERPOLATION_COLUMN) {
+        if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
+            for(int i = 0; i<selectedItems.size(); i++)
+                emit recModeChanged(selectedItems.at(i));
+        }
+        else{
+            for(int i = 0; i<selectedItems.size(); i++){
+                item = selectedItems.at(i);
+
+                if (isAssigned(item) && hasStartMsg(item) && hasEndMsg(item)) {
+                    bool activated = item->checkState(column) == Qt::Checked;
+                    emit(curveActivationChanged(item, activated));
+                }
+                else {
+                    float start = 0., end = 1.;
+                    vector<float> rangeBounds;
+                    std::string address = getAbsoluteAddress(item).toStdString();
+
+                    if(!Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0)
+                        return;
+
+                    if(!hasStartEndMsg(item)){ //Creates curve with start=minBound and end=maxBound (default 0 1)
+                        start = rangeBounds[0];
+                        end = rangeBounds[1];
+                    }
+                    else if (hasStartMsg(item)){
+                        start = _startMessages->getMessage(item).value.toFloat();
+                        end = rangeBounds[1];
+                    }
+                    else if(hasEndMsg(item)){
+                        start = rangeBounds[0];
+                        end = _endMessages->getMessage(item).value.toFloat();
+                    }
+
+                    VALUE_MODIFIED = true;
+                    item->setText(START_COLUMN,QString("%1").arg(start));
+                    VALUE_MODIFIED = true;
+                    item->setText(END_COLUMN,QString("%1").arg(end));
+                }
+            }
+        }
+    }
+    else if ((curItem->type() == LeaveType || curItem->type() == OSCNode) && column == REDUNDANCY_COLUMN) {
+        for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++){
+            item = *it;
+            if (isAssigned(item) && hasCurve(item)) {
+                bool activated = item->checkState(column) == Qt::Checked;
+                emit(curveRedundancyChanged(item, activated));
+            }
+            else {
+                item->setCheckState(column, Qt::Unchecked);
+            }
+        }
+    }
 }
+
+
