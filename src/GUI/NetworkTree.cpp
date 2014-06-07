@@ -138,9 +138,10 @@ NetworkTree::~NetworkTree(){
 void
 NetworkTree::init()
 {
-   setSelectionMode(QAbstractItemView:: MultiSelection);
+//   setSelectionMode(QAbstractItemView::MultiSelection);
+    setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-  _treeFilterActive = true;
+   _treeFilterActive = true;
   _deviceEdit = new DeviceEdit(topLevelWidget());
 
   _startMessages = new NetworkMessages;
@@ -1677,6 +1678,7 @@ void
 NetworkTree::mousePressEvent(QMouseEvent *event)
 {
     QTreeWidget::mousePressEvent(event);
+
     if(currentItem()!=NULL){
         if(event->button()==Qt::RightButton){
             if(currentItem()->type() == DeviceNode){
@@ -1706,8 +1708,7 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
             }
             else if(event->modifiers()==Qt::AltModifier){
                 unassignItem(currentItem());
-            }
-
+            }            
         }
     }   
 }
@@ -1779,18 +1780,12 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
 
 void
 NetworkTree::keyReleaseEvent(QKeyEvent *event)
-{
-  if (event->key() == Qt::Key_Shift) {
-      setSelectionMode(QAbstractItemView::MultiSelection);
-    }
+{  
 }
 
 void
 NetworkTree::keyPressEvent(QKeyEvent *event)
-{
-  if (event->key() == Qt::Key_Shift) {
-      setSelectionMode(QAbstractItemView::ContiguousSelection);
-    }
+{  
   if (event->key() == Qt::Key_Backtab) {
       if (VALUE_MODIFIED) {
           if (currentColumn() == START_COLUMN) {
@@ -1802,17 +1797,13 @@ NetworkTree::keyPressEvent(QKeyEvent *event)
 
 void
 NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
-{        
+{            
   if (item != NULL) {
       execClickAction(item, selectedItems(), column);
+
       if (item->isSelected()) {
           recursiveChildrenSelection(item, true);
           recursiveFatherSelection(item, true);
-
-          //cmd+click in start/end column does a snapshot
-//          if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
-//                  execCommandAction(item, selectedItems(), column);
-//          }
         }
 
       if (!item->isSelected() && item->type() != OSCNode) {
@@ -2400,9 +2391,9 @@ NetworkTree::setRecMode(QList<std::string> address){
 
 void
 NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> selectedItems, int column)
-{
+{    
     QTreeWidgetItem *item;
-    QList<QTreeWidgetItem *>::iterator it;
+    QList<QTreeWidgetItem *>::iterator it;    
 
     //si le curItem n'est pas sélectionné, on n'applique l'action seulement sur celui-ci (pas sur les items sélectionnés)
     if(!selectedItems.contains(curItem)){
@@ -2413,7 +2404,7 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
     if(column == START_COLUMN){
         if(hasStartMsg(curItem)){ //remove all start messages
             for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++){
-                item = *it;
+                item = *it;                
                 item->setText(START_COLUMN, "");
                 emit(startValueChanged(item, ""));
             }
