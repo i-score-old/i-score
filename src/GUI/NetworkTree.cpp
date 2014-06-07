@@ -2383,8 +2383,9 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
                 item = selectedItems.at(i);
 
                 if (isAssigned(item) && hasStartMsg(item) && hasEndMsg(item)) {
-                    bool activated = item->checkState(column) == Qt::Checked;
+                    bool activated = curItem->checkState(column) == Qt::Checked;
                     emit(curveActivationChanged(item, activated));
+                    item->setCheckState(INTERPOLATION_COLUMN, curItem->checkState(column) == Qt::Checked ? Qt::Checked : Qt::Unchecked);
                 }
                 else {
                     float start = 0., end = 1.;
