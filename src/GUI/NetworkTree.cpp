@@ -1092,14 +1092,7 @@ NetworkTree::resetNetworkTree()
 void
 NetworkTree::assignItem(QTreeWidgetItem *item, Data data)
 {
-  QFont font= item->font(NAME_COLUMN);
-  font.setBold(true);
-  if (item->type() == OSCNode) {
-      item->setFont(NAME_COLUMN, font);
-    }
-  else {
-      item->setSelected(true);
-    }
+    setTotallyAssignedStyle(item);
 
   if (hasStartEndMsg(item)) {
       data.hasCurve = true;
@@ -1116,7 +1109,6 @@ NetworkTree::assignItems(QList<QTreeWidgetItem*> selectedItems)
   QTreeWidgetItem *curItem;
   Data data;
   data.hasCurve = false;
-
 
   for (it = selectedItems.begin(); it != selectedItems.end(); ++it) {
       curItem = *it;
@@ -1188,13 +1180,13 @@ NetworkTree::setUnassignedStyle(QTreeWidgetItem *item)
 }
 
 void
-NetworkTree::assignTotally(QTreeWidgetItem *item)
+NetworkTree::setTotallyAssignedStyle(QTreeWidgetItem *item)
 {
 //  std::cout << getAbsoluteAddress(item).toStdString() << " > assignTotally" << std::endl;
   QFont font = item->font(NAME_COLUMN);
-  if (item->type() != OSCNode) {
-      item->setSelected(true);
-    }
+//  if (item->type() != OSCNode) {
+//      item->setSelected(true);
+//    }
   font.setBold(true);
   item->setFont(NAME_COLUMN, font);
 
@@ -1203,7 +1195,7 @@ NetworkTree::assignTotally(QTreeWidgetItem *item)
 }
 
 void
-NetworkTree::assignPartially(QTreeWidgetItem *item)
+NetworkTree::setPartiallyAssign(QTreeWidgetItem *item)
 {
 //  std::cout << getAbsoluteAddress(item).toStdString() << " > assignPartially" << std::endl;
 
@@ -1263,13 +1255,13 @@ NetworkTree::fathersAssignation(QTreeWidgetItem *item)
       father = item->parent();
 
       if (!allBrothersAssigned(item)) {
-          assignPartially(father);
+          setPartiallyAssign(father);
         }
       else
       if (allBrothersAssigned(item)) {
           QTreeWidgetItem *father;
           father = item->parent();
-          assignTotally(father);
+          setTotallyAssignedStyle(father);
         }
       fathersAssignation(father);
     }
@@ -1473,7 +1465,7 @@ NetworkTree::unselectPartially(QTreeWidgetItem *item)
 
 void
 NetworkTree::recursiveFatherSelection(QTreeWidgetItem *item, bool select)
-{
+{    
   if (item->parent() != NULL) {
       QTreeWidgetItem *father;
       father = item->parent();
@@ -1488,8 +1480,8 @@ NetworkTree::recursiveFatherSelection(QTreeWidgetItem *item, bool select)
               recursiveFatherSelection(father, true);
             }
 
-          else {
-              father->setSelected(true);
+          else {              
+              setTotallyAssignedStyle(father);
               recursiveFatherSelection(father, true);
             }
         }
@@ -1592,7 +1584,7 @@ NetworkTree::resetSelectedItems()
           curItem->setBackground(i, QBrush(Qt::NoBrush));
         }
 
-      curItem->setSelected(false);
+      curItem->setSelected(false);      
       curItem->setCheckState(START_COLUMN, Qt::Unchecked);
       curItem->setCheckState(END_COLUMN, Qt::Unchecked);
     }
@@ -1778,38 +1770,42 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
       if ((item->type() == LeaveType || item->type() == OSCNode) && column == INTERPOLATION_COLUMN) {
 
           if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
-              emit recModeChanged(item);
+              for(int i = 0; i<selectedItems().size(); i++)
+                  emit recModeChanged(selectedItems().at(i));
           }
           else{
-              if (isAssigned(item) && hasStartMsg(item) && hasEndMsg(item)) {
-                  bool activated = item->checkState(column) == Qt::Checked;
-                  emit(curveActivationChanged(item, activated));
-              }
-              else {
-                  float start = 0., end = 1.;
-                  vector<float> rangeBounds;
-                  std::string address = getAbsoluteAddress(item).toStdString();
+              for(int i = 0; i<selectedItems().size(); i++){
+                  item = selectedItems().at(i);
+                  if (isAssigned(item) && hasStartMsg(item) && hasEndMsg(item)) {
+                      bool activated = item->checkState(column) == Qt::Checked;
+                      emit(curveActivationChanged(item, activated));
+                  }
+                  else {
+                      float start = 0., end = 1.;
+                      vector<float> rangeBounds;
+                      std::string address = getAbsoluteAddress(item).toStdString();
 
-                  if(!Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0)
-                    return;
+                      if(!Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0)
+                          return;
 
-                  if(!hasStartEndMsg(item)){ //Creates curve with start=minBound and end=maxBound (default 0 1)
+                      if(!hasStartEndMsg(item)){ //Creates curve with start=minBound and end=maxBound (default 0 1)
                           start = rangeBounds[0];
                           end = rangeBounds[1];
-                  }
-                  else if (hasStartMsg(item)){
-                      start = _startMessages->getMessage(item).value.toFloat();
-                      end = rangeBounds[1];
-                  }
-                  else if(hasEndMsg(item)){
-                      start = rangeBounds[0];
-                      end = _endMessages->getMessage(item).value.toFloat();
-                  }
+                      }
+                      else if (hasStartMsg(item)){
+                          start = _startMessages->getMessage(item).value.toFloat();
+                          end = rangeBounds[1];
+                      }
+                      else if(hasEndMsg(item)){
+                          start = rangeBounds[0];
+                          end = _endMessages->getMessage(item).value.toFloat();
+                      }
 
-                  VALUE_MODIFIED = true;
-                  item->setText(START_COLUMN,QString("%1").arg(start));
-                  VALUE_MODIFIED = true;
-                  item->setText(END_COLUMN,QString("%1").arg(end));
+                      VALUE_MODIFIED = true;
+                      item->setText(START_COLUMN,QString("%1").arg(start));
+                      VALUE_MODIFIED = true;
+                      item->setText(END_COLUMN,QString("%1").arg(end));
+                  }
               }
           }
       }

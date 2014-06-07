@@ -487,7 +487,7 @@ class NetworkTree : public QTreeWidget
           _nodesWithSomeChildrenAssigned.removeAll(item);
         }
     }
-    void assignPartially(QTreeWidgetItem *item);
+    void setPartiallyAssign(QTreeWidgetItem *item);
     void unassignPartially(QTreeWidgetItem *item);
     void unassignItem(QTreeWidgetItem *item, bool recursive=true);
     void setUnassignedStyle(QTreeWidgetItem *item);
@@ -506,7 +506,8 @@ class NetworkTree : public QTreeWidget
           _nodesWithAllChildrenAssigned.removeAll(item);
         }
     }
-    void assignTotally(QTreeWidgetItem *item);
+
+    void setTotallyAssignedStyle(QTreeWidgetItem *item);
     void unassignTotally(QTreeWidgetItem *item);
     void assignItem(QTreeWidgetItem *item, Data data);
     void updateOSCAddresses();
