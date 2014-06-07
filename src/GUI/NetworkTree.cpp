@@ -1804,19 +1804,15 @@ void
 NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 {        
   if (item != NULL) {
+      execClickAction(item, selectedItems(), column);
       if (item->isSelected()) {
           recursiveChildrenSelection(item, true);
           recursiveFatherSelection(item, true);
 
           //cmd+click in start/end column does a snapshot
-          if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
-              if(column == START_COLUMN){
-                  emit(requestSnapshotStart(selectedItems()));
-              }
-              if(column == END_COLUMN){
-                  emit(requestSnapshotEnd(selectedItems()));
-              }
-          }
+//          if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
+//                  execCommandAction(item, selectedItems(), column);
+//          }
         }
 
       if (!item->isSelected() && item->type() != OSCNode) {
@@ -2005,7 +2001,8 @@ void
 NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue)
 {
   if (newValue.isEmpty()) {
-      _startMessages->removeMessage(item);
+      item->setCheckState(START_COLUMN,Qt::Unchecked);
+      _startMessages->removeMessage(item);      
       if (item->type() == OSCNode) {
           _OSCStartMessages->removeMessage(item);
         }
@@ -2048,6 +2045,7 @@ NetworkTree::changeEndValue(QTreeWidgetItem *item, QString newValue)
   //Prévoir un assert. Vérifier, le type, range...etc
 
   if (newValue.isEmpty()) {
+      item->setCheckState(START_COLUMN,Qt::Unchecked);
       _endMessages->removeMessage(item);
       if (item->type() == OSCNode) {
           _OSCEndMessages->removeMessage(item);
@@ -2398,4 +2396,40 @@ NetworkTree::setRecMode(QList<std::string> address){
     QList<std::string>::iterator it;
     for(it=address.begin() ; it!=address.end() ; it++)
         setRecMode(*it);
+}
+
+void
+NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> selectedItems, int column)
+{
+    QTreeWidgetItem *item;
+    QList<QTreeWidgetItem *>::iterator it;
+
+    //si le curItem n'est pas sélectionné, on n'applique l'action seulement sur celui-ci (pas sur les items sélectionnés)
+    if(!selectedItems.contains(curItem)){
+        selectedItems.clear();
+        selectedItems<<curItem;
+    }
+
+    if(column == START_COLUMN){
+        if(hasStartMsg(curItem)){ //remove all start messages
+            for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++){
+                item = *it;
+                item->setText(START_COLUMN, "");
+                emit(startValueChanged(item, ""));
+            }
+        }
+        else
+            emit(requestSnapshotStart(selectedItems));
+    }
+    else if(column == END_COLUMN){
+        if(hasEndMsg(curItem)){//remove all start messages
+            for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++){
+                item = *it;
+                item->setText(END_COLUMN, "");
+                emit(endValueChanged(item, ""));
+            }
+        }
+        else
+            emit(requestSnapshotEnd(selectedItems));
+    }
 }
