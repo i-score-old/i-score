@@ -616,6 +616,51 @@ NetworkTree::treeSnapshot(unsigned int boxID)
   return qMakePair(snapshots, devicesConcerned);
 }
 
+QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> >
+NetworkTree::treeSnapshot(unsigned int boxID, QList<QTreeWidgetItem *> itemsList)
+{
+  Q_UNUSED(boxID);
+
+  QMap<QTreeWidgetItem *, Data> snapshots;
+  QList<QString> devicesConcerned;
+
+  QList<QTreeWidgetItem*> selection = itemsList;
+  if (!selection.empty()) {
+      QList<QTreeWidgetItem*>::iterator it;
+      vector<string>::iterator it2;
+      QTreeWidgetItem *curItem;
+      for (it = selection.begin(); it != selection.end(); ++it) {
+          curItem = *it;
+          if (curItem->type() != DeviceNode && curItem->type() != NodeNoNamespaceType){
+              QString address = getAbsoluteAddress(*it);
+
+              //get device concerned
+              QString deviceName = getDeviceName(*it);
+              if (!devicesConcerned.contains(deviceName)) {
+                  devicesConcerned.append(deviceName);
+                }
+
+              QPair<QTreeWidgetItem *, Data> curPair;
+
+              if (!address.isEmpty()) {
+                  vector<string> snapshot = Maquette::getInstance()->requestNetworkSnapShot(address.toStdString());
+
+                  Data data;
+                  for (it2 = snapshot.begin(); it2 != snapshot.end(); it2++) {
+                      data.msg = QString::fromStdString(*it2);
+                      data.address = address;
+//                        data.sampleRate = Maquette::getInstance()->getCurveSampleRate(boxID,address.toStdString());
+                      data.hasCurve = false;
+                      snapshots.insert(*it, data);
+                    }
+                }
+            }
+        }
+    }
+
+  return qMakePair(snapshots, devicesConcerned);
+}
+
 bool
 NetworkTree::hasStartEndMsg(QTreeWidgetItem *item)
 {
@@ -1766,10 +1811,10 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
           //cmd+click in start/end column does a snapshot
           if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
               if(column == START_COLUMN){
-                  emit(requestSnapshotStart());
+                  emit(requestSnapshotStart(selectedItems()));
               }
               if(column == END_COLUMN){
-                  emit(requestSnapshotEnd());
+                  emit(requestSnapshotEnd(selectedItems()));
               }
           }
         }

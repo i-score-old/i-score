@@ -83,6 +83,7 @@ class NetworkTree : public QTreeWidget
     ***********************************************************************/
 
     QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot(unsigned int boxID);
+    QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot(unsigned int boxID, QList<QTreeWidgetItem *> itemsList);
 
     /*!
      * \brief Gets the absolute address of an item in the snapshot tree.
@@ -428,8 +429,8 @@ class NetworkTree : public QTreeWidget
     void rangeBoundMinChanged(QTreeWidgetItem *item, float newValue);
     void rangeBoundMaxChanged(QTreeWidgetItem *item, float newValue);
     void recModeChanged(QTreeWidgetItem *item);
-    void requestSnapshotStart();
-    void requestSnapshotEnd();
+    void requestSnapshotStart(QList<QTreeWidgetItem *> itemsList);
+    void requestSnapshotEnd(QList<QTreeWidgetItem *> itemsLists);
 
   private:
     void treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict);

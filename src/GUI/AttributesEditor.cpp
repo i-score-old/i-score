@@ -293,8 +293,8 @@ AttributesEditor::connectSlots()
 
   connect(_snapshotAssignStart, SIGNAL(clicked()), this, SLOT(snapshotStartAssignment()));
   connect(_snapshotAssignEnd, SIGNAL(clicked()), this, SLOT(snapshotEndAssignment()));
-  connect(_networkTree, SIGNAL(requestSnapshotStart()), this, SLOT(snapshotStartAssignment()));
-  connect(_networkTree, SIGNAL(requestSnapshotEnd()), this, SLOT(snapshotEndAssignment()));
+  connect(_networkTree, SIGNAL(requestSnapshotStart(QList<QTreeWidgetItem *>)), this, SLOT(snapshotStartAssignment(QList<QTreeWidgetItem *>)));
+  connect(_networkTree, SIGNAL(requestSnapshotEnd(QList<QTreeWidgetItem *>)), this, SLOT(snapshotEndAssignment(QList<QTreeWidgetItem *>)));
 
   connect(_networkTree, SIGNAL(itemExpanded(QTreeWidgetItem *)), this, SLOT(addToExpandedItemsList(QTreeWidgetItem*)));
   connect(_networkTree, SIGNAL(itemCollapsed(QTreeWidgetItem *)), this, SLOT(removeFromExpandedItemsList(QTreeWidgetItem*)));
@@ -709,9 +709,72 @@ AttributesEditor::snapshotStartAssignment()
       _scene->displayMessage("No box selected during treeSnapshot assignment", INDICATION_LEVEL);
     }
 }
+void
+AttributesEditor::snapshotStartAssignment(QList<QTreeWidgetItem *> itemsList)
+{
+    QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot = _networkTree->treeSnapshot(_boxEdited,itemsList);
+
+    _networkTree->clearDevicesStartMsgs(treeSnapshot.second);
+
+    if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
+
+        //--- Pour réassigner les items des autres devices (qui n'ont pas été supprimés) ---
+        QList<QTreeWidgetItem *> itemsNotModified = _networkTree->startMessages()->getItems();
+
+        if (!treeSnapshot.first.empty()) {
+            _networkTree->startMessages()->setMessages(treeSnapshot.first);
+
+            //clear tous les messages assignés et set les nouveaux
+            _networkTree->assignItems(treeSnapshot.first);
+
+            //ajoute les messages sauvegardés dans les assignés
+            _networkTree->assignItems(itemsNotModified);
+
+            startMessagesChanged(true);
+            _scene->displayMessage("treeSnapshot successfully captured and applied to box start", INDICATION_LEVEL);
+          }
+        else {
+            _scene->displayMessage("No treeSnapshot taken for selection", INDICATION_LEVEL);
+          }
+      }
+    else {
+        _scene->displayMessage("No box selected during treeSnapshot assignment", INDICATION_LEVEL);
+      }
+}
 
 void
 AttributesEditor::snapshotEndAssignment()
+{
+  QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot = _networkTree->treeSnapshot(_boxEdited);
+  _networkTree->clearDevicesEndMsgs(treeSnapshot.second);
+
+  if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
+
+      //--- Pour réassigner les items des autres devices (qui n'ont pas été supprimés) ---
+      QList<QTreeWidgetItem *> itemsNotModified = _networkTree->endMessages()->getItems();
+
+      if (!treeSnapshot.first.empty()) {
+          _networkTree->endMessages()->setMessages(treeSnapshot.first);
+
+          _networkTree->assignItems(treeSnapshot.first);
+
+          //ajoute les messages sauvegardés dans les assignés
+          _networkTree->assignItems(itemsNotModified);
+
+          endMessagesChanged(true);
+          _scene->displayMessage("treeSnapshot successfully captured and applied to box start", INDICATION_LEVEL);
+        }
+      else {
+          _scene->displayMessage("No treeSnapshot taken for selection", INDICATION_LEVEL);
+        }
+    }
+  else {
+      _scene->displayMessage("No box selected during treeSnapshot assignment", INDICATION_LEVEL);
+    }
+}
+
+void
+AttributesEditor::snapshotEndAssignment(QList<QTreeWidgetItem *> itemsList)
 {
   QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot = _networkTree->treeSnapshot(_boxEdited);
   _networkTree->clearDevicesEndMsgs(treeSnapshot.second);
