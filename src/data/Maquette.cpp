@@ -1138,7 +1138,7 @@ Maquette::setBoxMuteState(unsigned int boxID, bool muteState)
 bool
 Maquette::getBoxMuteState(unsigned int boxID)
 {
-//  return _engines->getBoxMuteState(boxID); TODO
+    return _engines->getBoxMuteState(boxID);
 }
 
 void
@@ -1798,7 +1798,7 @@ Maquette::load(const string &fileName)
             sizeY = _engines->getBoxVerticalSize(boxID);
             color = _engines->getBoxColor(boxID);
             parentID = _engines->getParentId(boxID);
-//MUTE BOXES            muteState = _engines->getBoxMuteState(boxID);
+            muteState = _engines->getBoxMuteState(boxID);
             
             QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
             QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);           
@@ -1808,7 +1808,7 @@ Maquette::load(const string &fileName)
             newBox->setID(boxID);
             newBox->setName(QString::fromStdString(name));
             newBox->setColor(color);
-//MUTE BOXES             newBox->setMuteState(musteSate);
+            newBox->setMuteState(muteState);
 
             _boxes[boxID] = newBox;            
             _parentBoxes[boxID] = newBox;
