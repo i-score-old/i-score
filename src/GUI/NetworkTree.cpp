@@ -55,15 +55,17 @@
 
 int NetworkTree::NAME_COLUMN = 0;
 int NetworkTree::VALUE_COLUMN = 1;
-int NetworkTree::START_COLUMN = 2;
-int NetworkTree::END_COLUMN = 4;
-int NetworkTree::INTERPOLATION_COLUMN = 3;
-int NetworkTree::REDUNDANCY_COLUMN = 5;
-int NetworkTree::SR_COLUMN = 6;
-int NetworkTree::TYPE_COLUMN = 7;
-int NetworkTree::MIN_COLUMN = 8;
-int NetworkTree::MAX_COLUMN = 9;
-unsigned int NetworkTree::PRIORITY_COLUMN = 10;
+int NetworkTree::START_ASSIGNATION_COLUMN = 2;
+int NetworkTree::START_COLUMN = 3;
+int NetworkTree::INTERPOLATION_COLUMN = 4;
+int NetworkTree::END_ASSIGNATION_COLUMN = 5;
+int NetworkTree::END_COLUMN = 6;
+int NetworkTree::REDUNDANCY_COLUMN = 7;
+int NetworkTree::SR_COLUMN = 8;
+int NetworkTree::TYPE_COLUMN = 9;
+int NetworkTree::MIN_COLUMN = 10;
+int NetworkTree::MAX_COLUMN = 11;
+unsigned int NetworkTree::PRIORITY_COLUMN = 12;
 
 const QColor NetworkTree::TEXT_COLOR = QColor(0, 0, 0);
 const QColor NetworkTree::TEXT_DISABLED_COLOR = QColor(100, 100, 100);
@@ -79,11 +81,13 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 
   setColumnCount(10);
   QStringList list;
-  list << "Address" << "Value" << "Start" << " ~ " << "End" << " = " << " % "<<" type "<<"min "<<"max ";
+  list << "Address" << "Value" << "v" <<"Start" << " ~ " << "v" <<"End" << " = " << " % "<<" type "<<"min "<<"max ";
   // removed <<"priority " and column
   setColumnWidth(NAME_COLUMN, 115);
   setColumnWidth(VALUE_COLUMN, 63);
+  setColumnWidth(START_ASSIGNATION_COLUMN, 30);
   setColumnWidth(START_COLUMN, 60);
+  setColumnWidth(END_ASSIGNATION_COLUMN, 30);
   setColumnWidth(END_COLUMN, 60);
   setColumnWidth(INTERPOLATION_COLUMN, 23);
   setColumnWidth(REDUNDANCY_COLUMN, 23);
