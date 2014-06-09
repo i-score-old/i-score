@@ -441,6 +441,16 @@ public:
      * \param muteState : the muteState of the box matching the given ID
      */
     void setBoxMuteState(TimeProcessId boxId, bool muteState);
+    
+    /*!
+     * Get the mute state of the box (process) matching the given ID
+     *
+     *
+     * \param boxId : the ID of the box
+     *
+     * \return the muteState of the box matching the given ID
+     */
+    bool getBoxMuteState(TimeProcessId boxId);
 
     /*!
      * Sets the name of the box matching the given ID
@@ -549,6 +559,15 @@ public:
 	 * \param mute : the mute state to set (true or false).
 	 */
 	void setCtrlPointMutingState(TimeProcessId boxId, TimeEventIndex controlPointIndex, bool mute);
+    
+    /*!
+	 * Gets the control point mute state.
+	 *
+	 * \param boxId : the ID of the box.
+	 * \param controlPointIndex : the index of the control point.
+	 * \return the mute state (true or false).
+	 */
+	bool getCtrlPointMutingState(TimeProcessId boxId, TimeEventIndex controlPointIndex);
     
 	//CURVES ////////////////////////////////////////////////////////////////////////////////////
     

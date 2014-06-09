@@ -1179,6 +1179,16 @@ void Engine::setBoxMuteState(TimeProcessId boxId, bool muteState)
     timeProcess->setAttributeValue(TTSymbol("mute"), v);
 }
 
+bool Engine::getBoxMuteState(TimeProcessId boxId)
+{
+    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
+    TTValue             v;
+    
+    timeProcess->getAttributeValue(TTSymbol("mute"), v);
+    
+    return TTBoolean(v[0]);
+}
+
 void Engine::setBoxName(TimeProcessId boxId, string name)
 {
     TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
@@ -1371,6 +1381,23 @@ void Engine::setCtrlPointMutingState(TimeProcessId boxId, TimeEventIndex control
         TTScoreTimeProcessGetEndEvent(timeProcess, &event);
     
     event->setAttributeValue(kTTSym_mute, TTBoolean(mute));
+}
+
+bool Engine::getCtrlPointMutingState(TimeProcessId boxId, TimeEventIndex controlPointIndex)
+{
+    TTValue             v;
+    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
+    TTTimeEventPtr      event;
+    
+    // Get the start or end event
+    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+        TTScoreTimeProcessGetStartEvent(timeProcess, &event);
+    else
+        TTScoreTimeProcessGetEndEvent(timeProcess, &event);
+    
+    event->getAttributeValue(kTTSym_mute, v);
+    
+    return TTBoolean(v[0]);
 }
 
 //CURVES ////////////////////////////////////////////////////////////////////////////////////
