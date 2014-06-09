@@ -2300,6 +2300,11 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
         if (protocolName == TTSymbol("Minuit"))
             anApplication->setAttributeValue(kTTSym_type, TTSymbol("mirror"));
         
+        // set application type : here 'proxy' because it use OSC protocol
+        // note : this should be done for all protocols which have no discovery feature
+        if (protocolName == TTSymbol("OSC"))
+            anApplication->setAttributeValue(kTTSym_type, TTSymbol("proxy"));
+        
         // check if the protocol has been loaded
 		if (getProtocol(protocolName)) {
             
@@ -3025,11 +3030,9 @@ int Engine::appendToNetWorkNamespace(const std::string & address, const std::str
 {
     TTAddress           anAddress = toTTAddress(address);
     TTNodeDirectoryPtr  aDirectory;
-    TTObjectBasePtr     aMirror = NULL;
-    TTNodePtr           returnedTTNode;
-    TTBoolean           nodeCreated;
+    TTObjectBasePtr     anObject;
     TTString            s;
-    TTValue             v;
+    TTValue             v, out;
     
     // get the application directory
     aDirectory = getApplicationDirectory(anAddress.getDirectory());
@@ -3041,30 +3044,29 @@ int Engine::appendToNetWorkNamespace(const std::string & address, const std::str
     if (aDirectory == getLocalDirectory)
         return 0;
     
-    // create a Mirror object for Data
-    TTObjectBaseInstantiate("Mirror", &aMirror, kTTSym_Data);
-    
-    // register the Mirror object into the directory
-    if (!aDirectory->TTNodeCreate(anAddress, aMirror, NULL, &returnedTTNode, &nodeCreated)) {
+    // create a proxy data
+    v = TTValue(anAddress, TTSymbol(service.data()));
+    if (!getApplication(anAddress.getDirectory())->sendMessage("ProxyDataInstantiate", v, out)) {
         
-        aMirror->setAttributeValue("service", TTSymbol(service.data()));
-        aMirror->setAttributeValue("type", TTSymbol(type.data()));
+        anObject = out[0];
+        
+        anObject->setAttributeValue("type", TTSymbol(type.data()));
         
         v = TTString(priority);
         v.fromString();
-        aMirror->setAttributeValue("priority", v);
+        anObject->setAttributeValue("priority", v);
         
-        aMirror->setAttributeValue("description", TTSymbol(description.data()));
+        anObject->setAttributeValue("description", TTSymbol(description.data()));
         
         v = TTString(range);
         v.fromString();
-        aMirror->setAttributeValue("range", v);
+        anObject->setAttributeValue("rangeBounds", v);
         
-        aMirror->setAttributeValue("clipmode", TTSymbol(clipmode.data()));
+        anObject->setAttributeValue("rangeClipmode", TTSymbol(clipmode.data()));
         
         v = TTString(tags);
         v.fromString();
-        aMirror->setAttributeValue("tag", v);
+        anObject->setAttributeValue("tag", v);
         
         return 1;
     }
