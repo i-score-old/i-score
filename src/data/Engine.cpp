@@ -579,7 +579,7 @@ void Engine::cacheStatusCallback(ConditionedProcessId triggerId, TimeEventIndex 
     EngineCacheElementPtr   e;
     TTTimeProcessPtr        timeProcess = getConditionedProcess(triggerId, controlPointId);
     TTTimeEventPtr          timeEvent;
-    TTValue                 v, out;
+    TTValue                 v, none;
     TTValuePtr              statusChangedBaton;
     TTErr                   err;
     
@@ -597,7 +597,7 @@ void Engine::cacheStatusCallback(ConditionedProcessId triggerId, TimeEventIndex 
     timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
     
     // Create a TTCallback to observe time event status attribute (using TimeEventStatusAttributeCallback)
-    TTObjectBaseInstantiate(TTSymbol("callback"), &e->object, kTTValNONE);
+    TTObjectBaseInstantiate(TTSymbol("callback"), &e->object, none);
     
     statusChangedBaton = new TTValue(TTPtr(this)); // statusChangedBaton will be deleted during the callback destruction
     statusChangedBaton->append(TTUInt32(triggerId));
