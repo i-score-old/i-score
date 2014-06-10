@@ -1519,7 +1519,6 @@ Maquette::turnExecutionOn()
 
 void
 Maquette::turnExecutionOn(unsigned int boxId){
-    std::cout<<"<i-score> Engine::play "<<boxId<<std::endl;
     _engines->play(boxId);
 }
 
@@ -1548,7 +1547,6 @@ Maquette::turnExecutionOff()
 
 void
 Maquette::turnExecutionOff(unsigned int boxId){
-    std::cout<<"<i-score> Engine::play "<<boxId<<std::endl;
     _engines->stop(boxId);
 }
 

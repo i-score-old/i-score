@@ -538,7 +538,6 @@ BoxWidget::play()
     boxesId << _boxID;    
 
     _box->maquetteScene()->playOrResume(boxesId);
-    std::cout<<"TODO : StartPlaying box"<<_boxID<<std::endl;
 }
 
 void
@@ -551,7 +550,6 @@ BoxWidget::stop()
         Maquette::getInstance()->getBox(*it)->setCrossedExtremity(BOX_END);
 
     _box->maquetteScene()->stopOrPause(boxesId);
-    std::cout<<"TODO : StopPlaying box"<<_boxID<<std::endl;
 }
 
 void

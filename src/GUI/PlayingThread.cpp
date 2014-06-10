@@ -62,4 +62,5 @@ PlayingThread::run()
 
       msleep(30);
     }
+  quit();
 }
