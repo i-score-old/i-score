@@ -579,7 +579,7 @@ void Engine::cacheStatusCallback(ConditionedProcessId triggerId, TimeEventIndex 
     EngineCacheElementPtr   e;
     TTTimeProcessPtr        timeProcess = getConditionedProcess(triggerId, controlPointId);
     TTTimeEventPtr          timeEvent;
-    TTValue                 v, out;
+    TTValue                 v, none;
     TTValuePtr              statusChangedBaton;
     TTErr                   err;
     
@@ -597,7 +597,7 @@ void Engine::cacheStatusCallback(ConditionedProcessId triggerId, TimeEventIndex 
     timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
     
     // Create a TTCallback to observe time event status attribute (using TimeEventStatusAttributeCallback)
-    TTObjectBaseInstantiate(TTSymbol("callback"), &e->object, kTTValNONE);
+    TTObjectBaseInstantiate(TTSymbol("callback"), &e->object, none);
     
     statusChangedBaton = new TTValue(TTPtr(this)); // statusChangedBaton will be deleted during the callback destruction
     statusChangedBaton->append(TTUInt32(triggerId));
@@ -2140,12 +2140,17 @@ TimeValue Engine::getTimeOffset()
 bool Engine::play(TimeProcessId processId)
 {
     TTTimeProcessPtr    timeProcess = getTimeProcess(processId);
+    TTTimeProcessPtr    subScenario = getSubScenario(processId);
     
     TTLogMessage("***************************************\n");
     TTLogMessage("Engine::play\n");
     
     // make the start event to happen
-    return !timeProcess->sendMessage("Start");
+    TTErr err = timeProcess->sendMessage("Start");
+    if (processId != ROOT_BOX_ID)
+        subScenario->sendMessage("Start");
+    
+    return err == kTTErrNone;
 }
 
 bool Engine::isPlaying(TimeProcessId processId)
@@ -2168,12 +2173,15 @@ bool Engine::stop(TimeProcessId processId)
 {
     TTValue             objects;
     TTTimeProcessPtr    timeProcess = getTimeProcess(processId);
+    TTTimeProcessPtr    subScenario = getSubScenario(processId);
     
     TTLogMessage("Engine::stop\n");
     
     // stop the main scenario execution
     // but the end event don't happen
     TTBoolean success = !timeProcess->sendMessage(kTTSym_Stop);
+    if (processId != ROOT_BOX_ID)
+        subScenario->sendMessage(kTTSym_Stop);
     
     if (processId == ROOT_BOX_ID) {
         // get all TTTimeProcesses
@@ -2196,14 +2204,19 @@ bool Engine::stop(TimeProcessId processId)
 void Engine::pause(bool pauseValue, TimeProcessId processId)
 {
     TTTimeProcessPtr  timeProcess = getTimeProcess(processId);
+    TTTimeProcessPtr  subScenario = getSubScenario(processId);
     
     if (pauseValue) {
         TTLogMessage("---------------------------------------\n");
         timeProcess->sendMessage(kTTSym_Pause);
+        if (processId != ROOT_BOX_ID)
+            subScenario->sendMessage(kTTSym_Pause);
     }
     else {
         TTLogMessage("+++++++++++++++++++++++++++++++++++++++\n");
         timeProcess->sendMessage(kTTSym_Resume);
+        if (processId != ROOT_BOX_ID)
+            subScenario->sendMessage(kTTSym_Resume);
     }
 }
 
@@ -2252,9 +2265,12 @@ float Engine::getCurrentExecutionPosition(TimeProcessId processId)
 void Engine::setExecutionSpeedFactor(float factor, TimeProcessId processId)
 {
     TTTimeProcessPtr    timeProcess = getTimeProcess(processId);
+    TTTimeProcessPtr    subScenario = getSubScenario(processId);
     
     // TODO : TTTimeProcess should extend Scheduler class
     timeProcess->setAttributeValue(kTTSym_speed, TTFloat64(factor));
+    if (processId != ROOT_BOX_ID)
+        subScenario->setAttributeValue(kTTSym_speed, TTFloat64(factor));
 }
 
 float Engine::getExecutionSpeedFactor(TimeProcessId processId)
