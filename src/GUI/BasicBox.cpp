@@ -174,8 +174,6 @@ BasicBox::createActions()
   _jumpToEndCue     = new QAction("Jump to cue", this);
   _updateStartCue   = new QAction("Update cue", this);
   _updateEndCue     = new QAction("Update cue", this);
-  _play             = new QAction("Play", this);
-  _stop             = new QAction("Stop", this);
 
   connect(_jumpToStartCue, SIGNAL(triggered()), _boxContentWidget, SLOT(jumpToStartCue()));
   connect(_jumpToEndCue, SIGNAL(triggered()), _boxContentWidget, SLOT(jumpToEndCue()));
@@ -388,15 +386,13 @@ BasicBox::~BasicBox()
 
   delete _startMenuButton;
   delete _endMenuButton;
-//  delete _playButton;
-//  delete _stopButton;
+  delete _playButton;
+  delete _stopButton;
 
   delete _jumpToStartCue;
   delete _jumpToEndCue;
   delete _updateStartCue;
   delete _updateEndCue;
-//  delete _play;
-//  delete _stop;
 
 //  delete _curveProxy;
 //  delete _comboBoxProxy;

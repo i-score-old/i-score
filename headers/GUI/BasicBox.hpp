@@ -891,8 +891,6 @@ class BasicBox : public QObject, public QGraphicsItem
     QAction *_jumpToEndCue;
     QAction *_updateStartCue;
     QAction *_updateEndCue;
-    QAction *_play;
-    QAction *_stop;
 
     QMenu *_startMenu;
     QMenu *_endMenu;
