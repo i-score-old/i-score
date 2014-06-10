@@ -985,7 +985,7 @@ BasicBox::playing() const
 void
 BasicBox::setCrossedExtremity(BoxExtremity extremity)
 {
-  if (extremity == BOX_START) {
+  if (extremity == BOX_START) {      
       _playing = true;
     }
   else if (extremity == BOX_END) {
@@ -1648,7 +1648,6 @@ void
 BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 {
   QGraphicsItem::hoverEnterEvent(event);
-
   _hover = true;
 
   const float RESIZE_ZONE_WIDTH = 3 * LINE_WIDTH;
@@ -1993,8 +1992,12 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
 
     //Showing stop button when playing
-    if(_playing)
-    _stopButton->setVisible(_playing);
+    if(_playing){
+        setButtonsVisible(false);
+        _stopButton->setVisible(_playing);
+    }
+    else
+        setButtonsVisible(_hover);
 
     //draw hover shape
     if (_hover && !isSelected() && !_playing)
@@ -2171,4 +2174,12 @@ BasicBox::setButtonsVisible(bool value)
     _endMenuButton->setVisible(value);
     _playButton->setVisible(!_playing && value);
     _stopButton->setVisible(_playing && value);
+}
+
+void
+BasicBox::updatePlayingModeButtons()
+{
+    _playButton->setVisible(!_playing);
+    _stopButton->setVisible(_playing);
+    update();
 }

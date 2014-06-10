@@ -1557,7 +1557,7 @@ MaquetteScene::updateStartingTime(int value)
 
 void
 MaquetteScene::setPlaying(unsigned int boxID, bool playing)
-{
+{    
   BasicBox *box = getBox(boxID); /// \todo Besoin d'un cast qt explicite ! (par jaime Chao)
   map<unsigned int, BasicBox*>::iterator it;
   if ((it = _playingBoxes.find(boxID)) != _playingBoxes.end()) {
@@ -1575,6 +1575,8 @@ MaquetteScene::setPlaying(unsigned int boxID, bool playing)
           if (box != NULL) {
               _playingBoxes[boxID] = box;
               box->update();
+              if(!_playThread->isRunning())
+                  _playThread->start();
             }
         }
     }
