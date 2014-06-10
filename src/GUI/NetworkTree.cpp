@@ -1989,7 +1989,7 @@ NetworkTree::changeEndValue(QTreeWidgetItem *item, QString newValue)
   //Prévoir un assert. Vérifier, le type, range...etc
 
   if (newValue.isEmpty()) {
-      item->setCheckState(START_ASSIGNATION_COLUMN,Qt::Unchecked);
+      item->setCheckState(END_ASSIGNATION_COLUMN,Qt::Unchecked);
       _endMessages->removeMessage(item);
       if (item->type() == OSCNode) {
           _OSCEndMessages->removeMessage(item);
@@ -2108,7 +2108,10 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
                   if(getCurveSuccess){
                       if (forceUpdate) {
                           if (interpolate) {
-                              interpolate = !(startMessages()->getMessage(item).value == endMessages()->getMessage(item).value);
+                              //if startValue!=endValue &&  startValue is not empty && endValue is not empty
+                              interpolate = !(startMessages()->getMessage(item).value == endMessages()->getMessage(item).value)
+                                      /*&& startMessages()->getItems().contains(item)
+                                      && endMessages()->getItems().contains(item); */;
                               Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);                              
                           }
                       }
@@ -2358,7 +2361,8 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
         std::cout<<selectedItems.at(i)->text(0).toStdString()<<std::endl;
 
     if(column == START_ASSIGNATION_COLUMN){
-        if(hasStartMsg(curItem)){ //remove all start messages
+        if(hasStartMsg(curItem)){
+            //remove all start messages
             for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++){
                 item = *it;                
                 item->setText(START_COLUMN, "");
@@ -2369,7 +2373,8 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
             emit(requestSnapshotStart(selectedItems));
     }
     else if(column == END_ASSIGNATION_COLUMN){
-        if(hasEndMsg(curItem)){//remove all start messages
+        if(hasEndMsg(curItem)){
+            //remove all start messages
             for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++){
                 item = *it;
                 item->setText(END_COLUMN, "");
@@ -2390,31 +2395,31 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
                 item = selectedItems.at(i);
 
                 if (isAssigned(item) && hasStartMsg(item) && hasEndMsg(item)) {
-                    bool activated = curItem->checkState(column) == Qt::Checked;
+                    //we set the curItem's state to item.
+                    bool activated = curItem->checkState(INTERPOLATION_COLUMN) == Qt::Checked;
                     emit(curveActivationChanged(item, activated));
-                    item->setCheckState(INTERPOLATION_COLUMN, curItem->checkState(column) == Qt::Checked ? Qt::Checked : Qt::Unchecked);
+                    item->setCheckState(INTERPOLATION_COLUMN, curItem->checkState(INTERPOLATION_COLUMN));
                 }
                 else {
                     float start = 0., end = 1.;
                     vector<float> rangeBounds;
                     std::string address = getAbsoluteAddress(item).toStdString();
 
-                    if(!Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0)
-                        return;
-
-                    if(!hasStartEndMsg(item)){ //Creates curve with start=minBound and end=maxBound (default 0 1)
-                        start = rangeBounds[0];
-                        end = rangeBounds[1];
+                    if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0)
+                    {
+                        if(!hasStartEndMsg(item)){ //Creates curve with start=minBound and end=maxBound (default 0 1)
+                            start = rangeBounds[0];
+                            end = rangeBounds[1];
+                        }
+                        else if (hasStartMsg(item)){
+                            start = _startMessages->getMessage(item).value.toFloat();
+                            end = rangeBounds[1];
+                        }
+                        else if(hasEndMsg(item)){
+                            start = rangeBounds[0];
+                            end = _endMessages->getMessage(item).value.toFloat();
+                        }
                     }
-                    else if (hasStartMsg(item)){
-                        start = _startMessages->getMessage(item).value.toFloat();
-                        end = rangeBounds[1];
-                    }
-                    else if(hasEndMsg(item)){
-                        start = rangeBounds[0];
-                        end = _endMessages->getMessage(item).value.toFloat();
-                    }
-
                     VALUE_MODIFIED = true;
                     item->setText(START_COLUMN,QString("%1").arg(start));
                     VALUE_MODIFIED = true;
