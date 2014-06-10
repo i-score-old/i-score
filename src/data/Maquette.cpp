@@ -77,7 +77,7 @@ typedef map<unsigned int, TriggerPoint*> TrgPntMap;
 
 #define NO_PAINT false
 
-#define MUTE_GOTO_SCORE 
+//#define MUTE_GOTO_SCORE
 
 void
 Maquette::init()
@@ -1374,13 +1374,13 @@ Maquette::duration()
 unsigned int
 Maquette::getCurrentTime() const
 {
-  return _engines->getCurrentExecutionTime();
+  return _engines->getCurrentExecutionDate();
 }
 
 float
 Maquette::getPosition(unsigned int boxID)
 {
-  return (float)_engines->getProcessPosition(boxID);
+  return (float)_engines->getCurrentExecutionPosition(boxID);
 }
 
 void
@@ -1582,7 +1582,7 @@ Maquette::stopPlayingAndGoToTimeOffset(unsigned int timeOffset)
 void
 Maquette::stopPlayingAndGoToCurrentTime()
 {
-    unsigned int timeOffset = _engines->getCurrentExecutionTime();
+    unsigned int timeOffset = _engines->getCurrentExecutionDate();
     
     turnExecutionOff();
     
