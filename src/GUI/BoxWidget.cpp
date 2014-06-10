@@ -533,12 +533,16 @@ BoxWidget::updateEndCue()
 void
 BoxWidget::play()
 {
+    QList<unsigned int> boxesId;
+    boxesId << _boxID;
+    //TOTO getSelectedItems
+    _box->maquetteScene()->playOrResume(boxesId);
     std::cout<<"TODO : StartPlaying box"<<_boxID<<std::endl;
 }
 
 void
 BoxWidget::stop()
-{
+{       
     std::cout<<"TODO : StopPlaying box"<<_boxID<<std::endl;
 }
 

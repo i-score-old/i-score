@@ -1616,6 +1616,15 @@ MaquetteScene::playOrResume()
 }
 
 void
+MaquetteScene::playOrResume(QList<unsigned int> boxesId)
+{
+    _playThread->start();
+    for(QList<unsigned int>::iterator it=boxesId.begin(); it!=boxesId.end(); it++){
+        ;//TODO
+    }
+}
+
+void
 MaquetteScene::stopOrPause()
 {
     if (!_maquette->isExecutionPaused()){
@@ -1629,6 +1638,16 @@ MaquetteScene::stopOrPause()
         emit(updateRecordingBoxes());
         _playingBoxes.clear();        
     }        
+}
+
+void
+MaquetteScene::stopOrPause(QList<unsigned int> boxesId){
+    _playThread->quit();
+    _playingBoxes.clear();
+
+    for(QList<unsigned int>::iterator it=boxesId.begin(); it!=boxesId.end(); it++){
+    ;//TODO
+    }
 }
 
 void
