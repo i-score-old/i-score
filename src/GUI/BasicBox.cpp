@@ -1993,7 +1993,8 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
     //Showing stop button when playing
     if(_playing){
-        setButtonsVisible(false);
+        _startMenuButton->setVisible(false);
+        _endMenuButton->setVisible(false);
         _stopButton->setVisible(_playing);
     }
     else

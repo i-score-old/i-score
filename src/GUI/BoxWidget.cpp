@@ -543,7 +543,7 @@ BoxWidget::play()
 
 void
 BoxWidget::stop()
-{       
+{
     QList<unsigned int> boxesId;
     boxesId << _boxID;
 
