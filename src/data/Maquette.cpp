@@ -1517,6 +1517,11 @@ Maquette::turnExecutionOn()
     _engines->play();
 }
 
+void
+Maquette::turnExecutionOn(unsigned int boxId){
+    _engines->play(boxId);
+}
+
 bool
 Maquette::isExecutionOn()
 {
@@ -1538,6 +1543,11 @@ Maquette::turnExecutionOff()
 
     // Clear the trigger queue list
     _scene->triggersQueueList()->clear();
+}
+
+void
+Maquette::turnExecutionOff(unsigned int boxId){
+    _engines->stop(boxId);
 }
 
 void

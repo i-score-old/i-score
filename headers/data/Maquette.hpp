@@ -808,6 +808,7 @@ class Maquette : public QObject
      * \brief Turn engine execution on depending on the context
      */
     void turnExecutionOn();
+    void turnExecutionOn(unsigned int boxId);
     
     /*!
      * \brief Is the engine running ?
@@ -821,6 +822,8 @@ class Maquette : public QObject
      * \brief Turn engine execution off depending on the context
      */
     void turnExecutionOff();
+    void turnExecutionOff(unsigned int boxId);
+
     void stopPlayingAndGoToStart();
     void stopPlayingAndGoToTimeOffset(unsigned int timeOffset);
     void stopPlayingAndGoToCurrentTime();
