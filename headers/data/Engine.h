@@ -992,6 +992,15 @@ public:
 	 */
 	void trigger(ConditionedProcessId triggerId);
     
+    /*!
+	 * Trigger several trigger point manually.
+	 *
+	 * Tells the ECOMachine that a trigger point is trggered.
+	 *
+	 * \param triggerIds : a vector of trigger point id to trigger.
+	 */
+	void trigger(std::vector<ConditionedProcessId> triggerIds);
+    
 	/*!
 	 * Adds a network device.
 	 *
