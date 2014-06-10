@@ -534,8 +534,12 @@ void
 BoxWidget::play()
 {
     QList<unsigned int> boxesId;
+    //TOTO get also SelectedItems
     boxesId << _boxID;
-    //TOTO getSelectedItems
+
+    for(QList<unsigned int>::iterator it=boxesId.begin(); it!=boxesId.end(); it++)
+        Maquette::getInstance()->getBox(*it)->setCrossedExtremity(BOX_START);
+
     _box->maquetteScene()->playOrResume(boxesId);
     std::cout<<"TODO : StartPlaying box"<<_boxID<<std::endl;
 }
@@ -543,6 +547,13 @@ BoxWidget::play()
 void
 BoxWidget::stop()
 {       
+    QList<unsigned int> boxesId;
+    boxesId << _boxID;
+
+    for(QList<unsigned int>::iterator it=boxesId.begin(); it!=boxesId.end(); it++)
+        Maquette::getInstance()->getBox(*it)->setCrossedExtremity(BOX_END);
+
+    _box->maquetteScene()->stopOrPause(boxesId);
     std::cout<<"TODO : StopPlaying box"<<_boxID<<std::endl;
 }
 

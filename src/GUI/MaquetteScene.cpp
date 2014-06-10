@@ -1586,6 +1586,7 @@ MaquetteScene::updatePlayingBoxes()
   map<unsigned int, BasicBox*>::iterator it;
 
   for (it = _playingBoxes.begin(); it != _playingBoxes.end(); ++it) {
+      std::cout<<"playingBox > "<<it->second->ID()<<std::endl;
       it->second->update();
 
       //Recording curves
@@ -1619,8 +1620,8 @@ void
 MaquetteScene::playOrResume(QList<unsigned int> boxesId)
 {
     _playThread->start();
-    for(QList<unsigned int>::iterator it=boxesId.begin(); it!=boxesId.end(); it++){
-        ;//TODO
+    for(QList<unsigned int>::iterator it=boxesId.begin(); it!=boxesId.end(); it++){        
+        _maquette->turnExecutionOn(*it);//TODO
     }
 }
 
@@ -1641,12 +1642,11 @@ MaquetteScene::stopOrPause()
 }
 
 void
-MaquetteScene::stopOrPause(QList<unsigned int> boxesId){
+MaquetteScene::stopOrPause(QList<unsigned int> boxesId)
+{
     _playThread->quit();
-    _playingBoxes.clear();
-
     for(QList<unsigned int>::iterator it=boxesId.begin(); it!=boxesId.end(); it++){
-    ;//TODO
+        _maquette->turnExecutionOff(*it);
     }
 }
 
