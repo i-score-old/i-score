@@ -1993,6 +1993,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
     //Showing stop button when playing
     if(_playing){
+        _comboBoxProxy->setVisible(false);
         _startMenuButton->setVisible(false);
         _endMenuButton->setVisible(false);
         _stopButton->setVisible(_playing);
@@ -2032,14 +2033,11 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     drawTriggerGrips(painter);
 
     //curves' comboBox and widget
-    if (smallSize) {
-        _comboBoxProxy->setVisible(false);
+    if (smallSize)
         _curveProxy->setVisible(false);
-    }
-    else{
-        _comboBoxProxy->setVisible(_abstract->height() > RESIZE_TOLERANCE + LINE_WIDTH);
+    else
         _curveProxy->setVisible(_abstract->height() > RESIZE_TOLERANCE + LINE_WIDTH);
-    }
+
 
     //draw text rect
     QBrush brush(Qt::lightGray, isSelected() ? Qt::SolidPattern : Qt::SolidPattern);
@@ -2171,6 +2169,7 @@ BasicBox::updateRecordingCurves(){
 void
 BasicBox::setButtonsVisible(bool value)
 {
+    _comboBoxProxy->setVisible(value);
     _startMenuButton->setVisible(value);
     _endMenuButton->setVisible(value);
     _playButton->setVisible(!_playing && value);
