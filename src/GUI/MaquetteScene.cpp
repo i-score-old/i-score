@@ -1586,7 +1586,6 @@ MaquetteScene::updatePlayingBoxes()
   map<unsigned int, BasicBox*>::iterator it;
 
   for (it = _playingBoxes.begin(); it != _playingBoxes.end(); ++it) {
-      std::cout<<"playingBox > "<<it->second->ID()<<std::endl;
       it->second->update();
 
       //Recording curves
