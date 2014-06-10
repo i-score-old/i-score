@@ -77,7 +77,7 @@ typedef map<unsigned int, TriggerPoint*> TrgPntMap;
 
 #define NO_PAINT false
 
-//#define MUTE_GOTO_SCORE
+#define MUTE_GOTO_SCORE
 
 void
 Maquette::init()
