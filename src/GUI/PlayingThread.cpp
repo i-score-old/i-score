@@ -56,7 +56,7 @@ PlayingThread::PlayingThread(MaquetteScene *scene)
 void
 PlayingThread::run()
 {
-  while (_scene->playing()) {
+  while (!_scene->getPlayingBoxes().empty() || _scene->playing()) {
       _scene->updatePlayingBoxes();
       _scene->updateProgressBar();
 

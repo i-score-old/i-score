@@ -535,10 +535,7 @@ BoxWidget::play()
 {
     QList<unsigned int> boxesId;
     //TOTO get also SelectedItems
-    boxesId << _boxID;
-
-    for(QList<unsigned int>::iterator it=boxesId.begin(); it!=boxesId.end(); it++)
-        Maquette::getInstance()->getBox(*it)->setCrossedExtremity(BOX_START);
+    boxesId << _boxID;    
 
     _box->maquetteScene()->playOrResume(boxesId);
     std::cout<<"TODO : StartPlaying box"<<_boxID<<std::endl;

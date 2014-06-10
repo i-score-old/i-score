@@ -1619,10 +1619,10 @@ MaquetteScene::playOrResume()
 void
 MaquetteScene::playOrResume(QList<unsigned int> boxesId)
 {
-    _playThread->start();
     for(QList<unsigned int>::iterator it=boxesId.begin(); it!=boxesId.end(); it++){        
         _maquette->turnExecutionOn(*it);//TODO
     }
+    _playThread->start();
 }
 
 void

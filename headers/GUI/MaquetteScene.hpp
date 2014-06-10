@@ -527,6 +527,7 @@ class MaquetteScene : public QGraphicsScene
      * \return the playing state
      */
     bool playing();
+    inline std::map<unsigned int, BasicBox*> getPlayingBoxes(){return _playingBoxes;}
 
     /*!
      * \brief Determines the paused state.
