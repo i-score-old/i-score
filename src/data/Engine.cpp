@@ -2307,6 +2307,48 @@ void Engine::trigger(ConditionedProcessId triggerId)
     timeCondition->sendMessage("Trigger", v, out);
 }
 
+void Engine::trigger(vector<ConditionedProcessId> triggerIds)
+{
+    vector<ConditionedProcessId>::iterator it;
+    TTTimeConditionPtr  lastTimeCondition = NULL;
+    TTValue             v, events, out;
+    
+    // get all time events
+    for (it = triggerIds.begin(); it != triggerIds.end(); ++it) {
+        
+        TimeEventIndex      controlPointIndex;
+        TTTimeProcessPtr    timeProcess = getConditionedProcess(*it, controlPointIndex);
+        TTTimeEventPtr      timeEvent;
+        TTTimeConditionPtr  timeCondition;
+        
+        // Get start or end time event
+        if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+            TTScoreTimeProcessGetStartEvent(timeProcess, &timeEvent);
+        else
+            TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
+        
+        // Get event condition
+        timeEvent->getAttributeValue("condition", v);
+        timeCondition = TTTimeConditionPtr(TTObjectBasePtr(v[0]));
+        
+        // check that all events are part of the same condition
+        if (!lastTimeCondition)
+            lastTimeCondition = timeCondition;
+        
+        if (lastTimeCondition != timeCondition) {
+            
+            lastTimeCondition = NULL;
+            break;
+        }
+        
+        events.append(TTObjectBasePtr(timeEvent));
+    }
+    
+    // if all events are part of the same time condition
+    if (lastTimeCondition)
+        lastTimeCondition->sendMessage("Trigger", events, out);
+}
+
 void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort)
 {
     TTValue         v, portValue, none;
