@@ -1053,4 +1053,11 @@ void transportCallback(TTSymbol& transport, const TTValue& value);
  * \brief Callback called when the execution is finished.
  */
 void executionFinishedCallback();
+
+/*!
+ * \brief Callback called when device namespace have to be refreshed
+ *
+ * \param deviceName : the name of the device to refresh
+ */
+void deviceCallback(TTSymbol& deviceName);
 #endif

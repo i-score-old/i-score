@@ -32,17 +32,21 @@ EngineCacheElement::~EngineCacheElement()
 Engine::Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
                void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
                void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
+               void (*networkDeviceNamespaceCallback)(TTSymbol&),
                std::string pathToTheJamomaFolder)
 {
     m_TimeEventStatusAttributeCallback = timeEventStatusAttributeCallback;
     m_TimeProcessSchedulerRunningAttributeCallback = timeProcessSchedulerRunningAttributeCallback;
     m_TransportDataValueCallback = transportDataValueCallback;
+    m_NetworkDeviceNamespaceCallback = networkDeviceNamespaceCallback;
     
     m_nextTimeProcessId = 1;
     m_nextIntervalId = 1;
     m_nextConditionedProcessId = 1;
     
     m_mainScenario = NULL;
+    
+    m_namespaceObserver = NULL;
     
     iscore = "i-score";
     
@@ -2969,6 +2973,33 @@ bool Engine::setDeviceLearn(std::string deviceName, bool newLearn)
     
     TTErr err = getApplication(applicationName)->setAttributeValue("learn", newLearn);
     
+    // enable namespace observation
+    if (newLearn && !m_namespaceObserver) {
+        
+        TTValue     none;
+        TTValuePtr  baton;
+        
+        // create a TTCallback to observe when a node is created (using NamespaceCallback)
+        TTObjectBaseInstantiate("callback", &m_namespaceObserver, none);
+        
+        baton = new TTValue(TTPtr(this)); // baton will be deleted during the callback destruction
+        baton->append(applicationName);
+        
+        m_namespaceObserver->setAttributeValue(kTTSym_baton, TTPtr(baton));
+        m_namespaceObserver->setAttributeValue(kTTSym_function, TTPtr(&NamespaceCallback));
+        //m_namespaceObserver->setAttributeValue(kTTSym_notification, ???);
+        
+        getApplicationDirectory(applicationName)->addObserverForNotifications(kTTAdrsRoot, TTCallbackPtr(m_namespaceObserver));
+    }
+    // disable namespace observation
+    else if (!newLearn && m_namespaceObserver) {
+        
+        getApplicationDirectory(applicationName)->removeObserverForNotifications(kTTAdrsRoot, TTCallbackPtr(m_namespaceObserver));
+        
+        TTObjectBaseRelease(&m_namespaceObserver);
+        m_namespaceObserver = NULL;
+    }
+    
     return err != kTTErrNone;
 }
 
@@ -3532,6 +3563,25 @@ void TimeProcessEndCallback(TTPtr baton, const TTValue& value)
     if (engine->m_TimeProcessSchedulerRunningAttributeCallback != NULL)
         engine->m_TimeProcessSchedulerRunningAttributeCallback(boxId, NO);
     
+}
+
+void NamespaceCallback(TTPtr baton, const TTValue& value)
+{
+    TTValuePtr  b;
+    EnginePtr   engine;
+    TTSymbol    applicationName;
+	TTUInt8     flag;
+	
+	// unpack baton (engine, applicationName)
+	b = (TTValuePtr)baton;
+	engine = EnginePtr((TTPtr)(*b)[0]);
+    applicationName = (*b)[1];
+    
+    // Unpack value (anAddress, aNode, flag, anObserver)
+	flag = value[2];
+    
+    if (flag == kAddressCreated)
+        engine->m_NetworkDeviceNamespaceCallback(applicationName);
 }
 
 TTAddress Engine::toTTAddress(string networktreeAddress)

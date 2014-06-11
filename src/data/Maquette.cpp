@@ -90,7 +90,7 @@ Maquette::init()
 
     // create a ScoreEngine instance
     // note : this is a temporary solution to test new Score framework easily
-    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, jamomaFolder);
+    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, &deviceCallback, jamomaFolder);
 
     //Creating rootBox as the mainScenario
     AbstractBox *scenarioAb = new AbstractBox();
@@ -2133,6 +2133,11 @@ transportCallback(TTSymbol& transport, const TTValue& value)
         std::cerr << "Maquette::enginesNetworkCallback : attribute _scene == NULL" << std::endl;
     }
 #endif
+}
+
+void deviceCallback(TTSymbol& deviceName)
+{
+    std::cerr << "Maquette::deviceCallback : " << deviceName.c_str() << std::endl;
 }
 
 void

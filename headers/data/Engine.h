@@ -173,9 +173,12 @@ private:
     
     TTObjectBasePtr     m_sender;                                       /// A Modular TTSender to send message to any application
     
+    TTObjectBasePtr     m_namespaceObserver;                            /// A Modular TTCallback to be notified when a node is created in learn mode
+    
 	void (*m_TimeEventStatusAttributeCallback)(ConditionedProcessId, bool);         // allow to notify the Maquette if a triggerpoint is pending
     void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);    // allow to notify the Maquette if a box is running or not
     void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);                // allow to notify the Maquette if the transport features have been used remotly (via OSC messages for example)
+    void (*m_NetworkDeviceNamespaceCallback)(TTSymbol&);                            // allow to notify the Maquette if a device's namespace have changed (see in setDeviceLearn)
 
 public:
 
@@ -191,6 +194,7 @@ public:
     Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
            void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
            void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
+           void (*networkDeviceNamespaceCallback)(TTSymbol&),
            std::string pathToTheJamomaFolder);
     
     void initModular(const char* pathToTheJamomaFolder = NULL);
@@ -1284,6 +1288,7 @@ public:
     friend void TimeProcessStartCallback(TTPtr baton, const TTValue& value);
     friend void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
     friend void TriggerReceiverValueCallback(TTPtr baton, const TTValue& value);
+    friend void NamespaceCallback(TTPtr baton, const TTValue& value);
     
 private:
     
@@ -1343,6 +1348,12 @@ void TimeProcessStartCallback(TTPtr baton, const TTValue& value);
  @param	value			the time process running state
  @return                an error code */
 void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
+
+/** Callback used for namespace observation
+ @param	baton			a TTValuePtr containing an EnginePtr and an application name
+ @param	value			...
+ @return                an error code */
+void NamespaceCallback(TTPtr baton, const TTValue& value);
 
 // TODO : this should move into a TTModularAPI file
 /** compare priority attribute of object's node
