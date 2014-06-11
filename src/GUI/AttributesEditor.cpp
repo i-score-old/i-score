@@ -776,7 +776,7 @@ AttributesEditor::snapshotEndAssignment()
 void
 AttributesEditor::snapshotEndAssignment(QList<QTreeWidgetItem *> itemsList)
 {
-  QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot = _networkTree->treeSnapshot(_boxEdited);
+  QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot = _networkTree->treeSnapshot(_boxEdited, itemsList);
   _networkTree->clearDevicesEndMsgs(treeSnapshot.second);
 
   if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {

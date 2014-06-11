@@ -388,7 +388,9 @@ class NetworkTree : public QTreeWidget
 
     static int NAME_COLUMN;
     static int VALUE_COLUMN;
+    static int START_ASSIGNATION_COLUMN;
     static int START_COLUMN;	
+    static int END_ASSIGNATION_COLUMN;
     static int END_COLUMN;
     static int INTERPOLATION_COLUMN;
     static int REDUNDANCY_COLUMN;
