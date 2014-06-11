@@ -195,7 +195,7 @@ BoxWidget::displayCurve(const QString &address)
       cur->setLowerStyle(true);      
     }
 
-  if (address != BasicBox::SUB_SCENARIO_MODE_TEXT) {
+  if (address != BasicBox::SCENARIO_MODE_TEXT && address != BasicBox::DEFAULT_MODE_TEXT) {
       setEnabled(true);
       curveIt = _curveMap->find(add);
       bool curveFound = (curveIt != _curveMap->end());
@@ -292,7 +292,11 @@ void
 BoxWidget::addToComboBox(const QString address)
 {
   if (_comboBox->findText(address, Qt::MatchExactly) == -1) {
-      _comboBox->addItem(address);
+      _comboBox->addItem(address);      
+
+      //push down the "scenario" item
+      _comboBox->removeItem(_comboBox->findText(BasicBox::SCENARIO_MODE_TEXT, Qt::MatchExactly));
+      _comboBox->addItem(BasicBox::SCENARIO_MODE_TEXT);
     }
 }
 

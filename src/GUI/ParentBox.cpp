@@ -92,7 +92,9 @@ ParentBox::init()
   BasicBox::init();
   _contextMenu = new ParentBoxContextMenu(this);
 
-  addToComboBox(BasicBox::SUB_SCENARIO_MODE_TEXT);
+  addToComboBox(BasicBox::DEFAULT_MODE_TEXT);
+  addToComboBox(BasicBox::SCENARIO_MODE_TEXT);
+
   _hasContextMenu = true;
 }
 
@@ -113,7 +115,7 @@ ParentBox::updateDisplay(QString displayMode)
 {    
   BasicBox *curBox;
   std::map<unsigned int, BasicBox*>::iterator it;
-  if (displayMode == SUB_SCENARIO_MODE_TEXT) {
+  if (displayMode == SCENARIO_MODE_TEXT) {
       for (it = _children.begin(); it != _children.end(); ++it) {
           curBox = it->second;
           curBox->lower(false);
