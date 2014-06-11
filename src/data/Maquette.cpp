@@ -90,7 +90,7 @@ Maquette::init()
 
     // create a ScoreEngine instance
     // note : this is a temporary solution to test new Score framework easily
-    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, jamomaFolder);
+    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, &deviceCallback, jamomaFolder);
 
     //Creating rootBox as the mainScenario
     AbstractBox *scenarioAb = new AbstractBox();
@@ -339,8 +339,8 @@ Maquette::requestNetworkNamespace(const string &address, string &nodeType, vecto
 }
 
 void
-Maquette::refreshNetworkNamespace(const std::string &application){
-    _engines->refreshNetworkNamespace(application);
+Maquette::rebuildNetworkNamespace(const std::string &application){
+    _engines->rebuildNetworkNamespace(application);
 }
 
 void
@@ -1572,6 +1572,13 @@ void
 Maquette::stopPlayingAndGoToStart()
 {    
     turnExecutionOff();
+    
+#ifdef MUTE_GOTO_SCORE
+    setTimeOffset(0, YES);
+    initSceneState(); // and use the goto Nico's algorithm Nico
+#else
+    setTimeOffset(0, NO);
+#endif
 
     _scene->view()->updateTimeOffsetView();
 }
@@ -2133,6 +2140,11 @@ transportCallback(TTSymbol& transport, const TTValue& value)
         std::cerr << "Maquette::enginesNetworkCallback : attribute _scene == NULL" << std::endl;
     }
 #endif
+}
+
+void deviceCallback(TTSymbol& deviceName)
+{
+    std::cerr << "Maquette::deviceCallback : " << deviceName.c_str() << std::endl;
 }
 
 void

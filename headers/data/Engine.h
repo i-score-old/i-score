@@ -80,6 +80,9 @@ typedef std::map<unsigned int, EngineCacheElementPtr>::iterator EngineCacheMapIt
 /** a temporary type to define a map to store and retreive the triggerIds associated with a conditionId */
 typedef std::map<unsigned int, std::list<unsigned int>> EngineConditionsMap;
 
+/** a map used to remember the namespace file path for each device */
+typedef std::map<std::string, std::string> EngineFilesMap;
+
 #define NO_BOUND -1
 
 #define NO_ID 0
@@ -143,6 +146,9 @@ private:
     
     TTString            iscore;                                         /// application name
     
+    TTSymbol            m_lastProjectFilePath;                          /// the last project file path
+    EngineFilesMap      m_namespaceFilesPath;                           /// the last namespace file used for each device
+    
     TTTimeProcessPtr    m_mainScenario;                                 /// The top scenario
     TTTimeEventPtr      m_mainStartEvent;                               /// The top scenario start event
     TTTimeEventPtr      m_mainEndEvent;                                 /// The top scenario end event
@@ -173,9 +179,12 @@ private:
     
     TTObjectBasePtr     m_sender;                                       /// A Modular TTSender to send message to any application
     
+    TTObjectBasePtr     m_namespaceObserver;                            /// A Modular TTCallback to be notified when a node is created in learn mode
+    
 	void (*m_TimeEventStatusAttributeCallback)(ConditionedProcessId, bool);         // allow to notify the Maquette if a triggerpoint is pending
     void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);    // allow to notify the Maquette if a box is running or not
     void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);                // allow to notify the Maquette if the transport features have been used remotly (via OSC messages for example)
+    void (*m_NetworkDeviceNamespaceCallback)(TTSymbol&);                            // allow to notify the Maquette if a device's namespace have changed (see in setDeviceLearn)
 
 public:
 
@@ -191,6 +200,7 @@ public:
     Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
            void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
            void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
+           void (*networkDeviceNamespaceCallback)(TTSymbol&),
            std::string pathToTheJamomaFolder);
     
     void initModular(const char* pathToTheJamomaFolder = NULL);
@@ -1135,20 +1145,21 @@ public:
     int requestObjectChildren(const std::string & address, std::vector<std::string>& children);
 
     /*!
-     * Refresh the namespace, rebuilding the mirror
+     * Refresh the namespace by rebuilding the mirror (Minuit protocol case) or reloading the namesapce from the last project file (OSC protocol case)
      *
-     * \param application : the application's address. ex : /MinuitDevice1
+     * \param deviceName : the device name to rebuild
      * \param address : the object's address
+     * \return 0 if no error, else 1.
      */
-    void refreshNetworkNamespace(const std::string& application, const std::string& address = "/");
+    bool rebuildNetworkNamespace(const std::string& deviceName, const std::string& address = "/");
     
     /*!
      * Load a namespace from a namespace file
      *
-     * \param application : the application to setup
+     * \param deviceName : the devine name to setup
      * \param filepath : the path to a namespace file
      */
-    bool loadNetworkNamespace(const std::string &application, const std::string &filepath);
+    bool loadNetworkNamespace(const std::string &deviceName, const std::string &filepath);
     
     /*!
      * append a new address to a network device
@@ -1239,22 +1250,39 @@ public:
      * \return 0 if no error, else 1.
      */
     bool setDeviceProtocol(std::string deviceName, std::string protocol);
+    
+    /*!
+     * Sets the device in learn mode.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param newLearn : a boolean to set the device in learn mode
+     * \return 0 if no error, else 1.
+     */
+    bool setDeviceLearn(std::string deviceName, bool newLearn);
+    
+    /*!
+     * Sets the device in learn mode.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \return the learn status of the device.
+     */
+    bool getDeviceLearn(std::string deviceName);
 
 	//Store and load ////////////////////////////////////////////////////////////////////////////////////
     
 	/*!
 	 * Store Engine.
 	 *
-	 * \param fileName : the fileName to store the engines.
+	 * \param filepath : the filepath to use.
 	 */
-	void store(std::string fileName);
+	void store(std::string filepath);
     
 	/*!
 	 * Load Engine.
 	 *
-	 * \param fileName : the fileName to load.
+	 * \param filepath : the filepath to use.
 	 */
-	void load(std::string fileName);
+	void load(std::string filepath);
     void buildEngineCaches(TTTimeProcessPtr scenario, TTAddress& scenarioAddress);
     
 	/*!
@@ -1267,6 +1295,7 @@ public:
     friend void TimeProcessStartCallback(TTPtr baton, const TTValue& value);
     friend void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
     friend void TriggerReceiverValueCallback(TTPtr baton, const TTValue& value);
+    friend void NamespaceCallback(TTPtr baton, const TTValue& value);
     
 private:
     
@@ -1326,6 +1355,12 @@ void TimeProcessStartCallback(TTPtr baton, const TTValue& value);
  @param	value			the time process running state
  @return                an error code */
 void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
+
+/** Callback used for namespace observation
+ @param	baton			a TTValuePtr containing an EnginePtr and an application name
+ @param	value			...
+ @return                an error code */
+void NamespaceCallback(TTPtr baton, const TTValue& value);
 
 // TODO : this should move into a TTModularAPI file
 /** compare priority attribute of object's node

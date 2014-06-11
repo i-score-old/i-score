@@ -748,7 +748,7 @@ class Maquette : public QObject
     /*!
      * \brief Refresh the network's namespace.
      */
-    void refreshNetworkNamespace(const std::string &application);
+    void rebuildNetworkNamespace(const std::string &application);
 
     /*!
      * \brief Requests a snapshot of the network on a namespace.
@@ -1053,4 +1053,11 @@ void transportCallback(TTSymbol& transport, const TTValue& value);
  * \brief Callback called when the execution is finished.
  */
 void executionFinishedCallback();
+
+/*!
+ * \brief Callback called when device namespace have to be refreshed
+ *
+ * \param deviceName : the name of the device to refresh
+ */
+void deviceCallback(TTSymbol& deviceName);
 #endif

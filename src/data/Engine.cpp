@@ -32,17 +32,21 @@ EngineCacheElement::~EngineCacheElement()
 Engine::Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
                void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
                void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
+               void (*networkDeviceNamespaceCallback)(TTSymbol&),
                std::string pathToTheJamomaFolder)
 {
     m_TimeEventStatusAttributeCallback = timeEventStatusAttributeCallback;
     m_TimeProcessSchedulerRunningAttributeCallback = timeProcessSchedulerRunningAttributeCallback;
     m_TransportDataValueCallback = transportDataValueCallback;
+    m_NetworkDeviceNamespaceCallback = networkDeviceNamespaceCallback;
     
     m_nextTimeProcessId = 1;
     m_nextIntervalId = 1;
     m_nextConditionedProcessId = 1;
     
     m_mainScenario = NULL;
+    
+    m_namespaceObserver = NULL;
     
     iscore = "i-score";
     
@@ -2721,27 +2725,68 @@ Engine::requestObjectChildren(const std::string & address, vector<string>& child
     return 0;
 }
 
-void Engine::refreshNetworkNamespace(const string &application, const string &address)
+bool Engine::rebuildNetworkNamespace(const string &deviceName, const string &address)
 {
-    TTValue none;
+    TTValue         v, none;
+    TTSymbol        applicationName(deviceName);
+    TTSymbol        protocolName;
+    TTObjectBasePtr anApplication = getApplication(applicationName);
     
-    getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryClear"));
-    getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryBuild"));
+    // if the application exists
+    if (anApplication) {
+        
+        // get the protocols of the application
+        v = getApplicationProtocols(applicationName);
+        protocolName = v[0]; // we register application to 1 protocol only
+        
+        // Minuit case : use discovery mechanism
+        if (protocolName == TTSymbol("Minuit")) {
+            
+            anApplication->sendMessage("DirectoryBuild");
+            return 0;
+        }
+        // OSC case : reload the namespace from the last project file if exist
+        else if (protocolName == TTSymbol("OSC")) {
+            
+            if (m_namespaceFilesPath.find(deviceName) == m_namespaceFilesPath.end())
+                return 1;
+            
+            TTSymbol namespaceFilePath = TTSymbol(m_namespaceFilesPath[deviceName]);
+            
+            // Create a TTXmlHandler
+            TTObject aXmlHandler(kTTSym_XmlHandler);
+            
+            // Read the file to setup TTModularApplications
+            v = TTObjectBasePtr(anApplication);
+            aXmlHandler.set(kTTSym_object, v);
+            aXmlHandler.send(kTTSym_Read, namespaceFilePath, none);
+            
+            return 0;
+        }
+    }
+    
+    return 1;
 }
 
-bool Engine::loadNetworkNamespace(const string &application, const string &filepath)
+bool Engine::loadNetworkNamespace(const string &deviceName, const string &filepath)
 {
     // Create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
     
     // Read the file to setup an application
-    TTValue none, v = TTObjectBasePtr(getApplication(TTSymbol(application)));
+    TTValue none, v = TTObjectBasePtr(getApplication(TTSymbol(deviceName)));
     aXmlHandler.set(kTTSym_object, v);
     
     TTErr err = aXmlHandler.send(kTTSym_Read, TTSymbol(filepath), none);
     
-    // Init the application
-    getApplication(TTSymbol(application))->sendMessage(TTSymbol("Init"));
+    if (! err) {
+    
+        // Init the application
+        getApplication(TTSymbol(deviceName))->sendMessage(TTSymbol("Init"));
+        
+        // store the namespace file for this device
+        m_namespaceFilesPath[deviceName] = filepath;
+    }
 
     return err != kTTErrNone;
 }
@@ -2966,6 +3011,52 @@ Engine::setDeviceProtocol(string deviceName, string protocol)
     return 0;
 }
 
+bool Engine::setDeviceLearn(std::string deviceName, bool newLearn)
+{
+    TTSymbol applicationName(deviceName);
+    
+    TTErr err = getApplication(applicationName)->setAttributeValue("learn", newLearn);
+    
+    // enable namespace observation
+    if (newLearn && !m_namespaceObserver) {
+        
+        TTValue     none;
+        TTValuePtr  baton;
+        
+        // create a TTCallback to observe when a node is created (using NamespaceCallback)
+        TTObjectBaseInstantiate("callback", &m_namespaceObserver, none);
+        
+        baton = new TTValue(TTPtr(this)); // baton will be deleted during the callback destruction
+        baton->append(applicationName);
+        
+        m_namespaceObserver->setAttributeValue(kTTSym_baton, TTPtr(baton));
+        m_namespaceObserver->setAttributeValue(kTTSym_function, TTPtr(&NamespaceCallback));
+        //m_namespaceObserver->setAttributeValue(kTTSym_notification, ???);
+        
+        getApplicationDirectory(applicationName)->addObserverForNotifications(kTTAdrsRoot, TTCallbackPtr(m_namespaceObserver));
+    }
+    // disable namespace observation
+    else if (!newLearn && m_namespaceObserver) {
+        
+        getApplicationDirectory(applicationName)->removeObserverForNotifications(kTTAdrsRoot, TTCallbackPtr(m_namespaceObserver));
+        
+        TTObjectBaseRelease(&m_namespaceObserver);
+        m_namespaceObserver = NULL;
+    }
+    
+    return err != kTTErrNone;
+}
+
+bool Engine::getDeviceLearn(std::string deviceName)
+{
+    TTSymbol    applicationName(deviceName);
+    TTValue     v;
+    
+    getApplication(applicationName)->getAttributeValue("learn", v);
+    
+    return TTBoolean(v[0]);
+}
+
 int Engine::requestNetworkNamespace(const std::string & address, std::string & nodeType, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)
 {
     TTAddress           anAddress = toTTAddress(address);
@@ -3179,9 +3270,11 @@ int Engine::removeFromNetWorkNamespace(const std::string & address)
 
 // LOAD AND STORE
 
-void Engine::store(std::string fileName)
+void Engine::store(std::string filepath)
 {
     TTValue v, none;
+    
+    m_lastProjectFilePath = TTSymbol(filepath);
     
     // Create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
@@ -3192,20 +3285,27 @@ void Engine::store(std::string fileName)
     aXmlHandler.set(kTTSym_object, v);
     
     // Write
-    aXmlHandler.send(kTTSym_Write, TTSymbol(fileName), none);
+    aXmlHandler.send(kTTSym_Write, m_lastProjectFilePath, none);
 }
 
-void Engine::load(std::string fileName)
+void Engine::load(std::string filepath)
 {
     TTValue v, none;
     
-    // Clear all the EngineCacheMaps
-    // note : this should be useless because all elements are removed by the maquette
-    clearTimeProcess();
-    clearInterval();
-    clearConditionedProcess();
-    clearTimeCondition();
-    m_conditionsMap.clear();
+    // Check that all Engine caches have been properly cleared before
+    if (m_timeProcessMap.size() > 1)
+        TTLogMessage("Engine::load : m_timeProcessMap not empty before the loading\n");
+    
+    if (!m_intervalMap.empty())
+        TTLogMessage("Engine::load : m_intervalMap not empty before the loading\n");
+    
+    if (!m_conditionedProcessMap.empty())
+        TTLogMessage("Engine::load : m_conditionedProcessMap not empty before the loading\n");
+    
+    if (!m_timeConditionMap.empty())
+        TTLogMessage("Engine::load : m_timeConditionMap not empty before the loading\n");
+    
+    m_lastProjectFilePath = TTSymbol(filepath);
     
     // Create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
@@ -3213,12 +3313,12 @@ void Engine::load(std::string fileName)
     // Read the file to setup TTModularApplications
     v = TTObjectBasePtr(TTModularApplications);
     aXmlHandler.set(kTTSym_object, v);
-    aXmlHandler.send(kTTSym_Read, TTSymbol(fileName), none);
+    aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, none);
     
     // Read the file to setup m_mainScenario
     v = TTObjectBasePtr(m_mainScenario);
     aXmlHandler.set(kTTSym_object, v);
-    aXmlHandler.send(kTTSym_Read, TTSymbol(fileName), none);
+    aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, none);
     
     // Rebuild all the EngineCacheMaps from the main scenario content
     buildEngineCaches(m_mainScenario, kTTAdrsRoot);
@@ -3516,6 +3616,25 @@ void TimeProcessEndCallback(TTPtr baton, const TTValue& value)
     if (engine->m_TimeProcessSchedulerRunningAttributeCallback != NULL)
         engine->m_TimeProcessSchedulerRunningAttributeCallback(boxId, NO);
     
+}
+
+void NamespaceCallback(TTPtr baton, const TTValue& value)
+{
+    TTValuePtr  b;
+    EnginePtr   engine;
+    TTSymbol    applicationName;
+	TTUInt8     flag;
+	
+	// unpack baton (engine, applicationName)
+	b = (TTValuePtr)baton;
+	engine = EnginePtr((TTPtr)(*b)[0]);
+    applicationName = (*b)[1];
+    
+    // Unpack value (anAddress, aNode, flag, anObserver)
+	flag = value[2];
+    
+    if (flag == kAddressCreated)
+        engine->m_NetworkDeviceNamespaceCallback(applicationName);
 }
 
 TTAddress Engine::toTTAddress(string networktreeAddress)
