@@ -170,12 +170,19 @@ BoxWidget::updateDisplay(const QString &address)
 }
 
 void
+BoxWidget::setCurveLowerStyle(std::string curveAddress, bool state){
+    CurveWidget *curCurve = getCurveWidget(curveAddress);
+    if(curCurve!=NULL){
+        curCurve->setLowerStyle(state);
+    }
+}
+
+void
 BoxWidget::displayCurve(const QString &address)
 {    
   std::string add = address.toStdString();
   QMap<string, CurveWidget *>::iterator curveIt;
   CurveWidget *curveWidget;
-
 
   //Unactive curves
   QList<CurveWidget *> values = _curveMap->values();
@@ -294,7 +301,9 @@ BoxWidget::getCurveWidget(std::string address){
     CurveWidget *curve = NULL;
     QMap<string, CurveWidget *>::iterator curveIt = _curveMap->find(address);
     bool curveFound = (curveIt != _curveMap->end());
-    curve = curveIt.value();
+    if(curveFound)
+        curve = curveIt.value();
+
     return curve;
 }
 
