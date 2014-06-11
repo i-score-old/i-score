@@ -135,6 +135,8 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
   createActions();
   createMenus();
 
+  setButtonsVisible(false); //only showed on hover
+
   update();
   connect(_comboBox, SIGNAL(currentIndexChanged(const QString &)), _boxContentWidget, SLOT(updateDisplay(const QString &)));
 }
@@ -157,20 +159,28 @@ BasicBox::centerWidget()
 
     if(_endMenuButton != NULL)
         _endMenuButton->move((width()) / 2 + 2 * LINE_WIDTH - BOX_MARGIN, -(height()) / 2 + LINE_WIDTH);
+
+    if(_playButton != NULL)
+        _playButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN-4, -(height()) / 2);
+
+    if(_stopButton != NULL)
+        _stopButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN-4, -(height()) / 2);
 }
 
 void
 BasicBox::createActions()
 {
-  _jumpToStartCue = new QAction("Jump to cue", this);
-  _jumpToEndCue = new QAction("Jump to cue", this);
-  _updateStartCue = new QAction("Update cue", this);
-  _updateEndCue = new QAction("Update cue", this);
+  _jumpToStartCue   = new QAction("Jump to cue", this);
+  _jumpToEndCue     = new QAction("Jump to cue", this);
+  _updateStartCue   = new QAction("Update cue", this);
+  _updateEndCue     = new QAction("Update cue", this);
+  _play             = new QAction("Play", this);
+  _stop             = new QAction("Stop", this);
 
   connect(_jumpToStartCue, SIGNAL(triggered()), _boxContentWidget, SLOT(jumpToStartCue()));
   connect(_jumpToEndCue, SIGNAL(triggered()), _boxContentWidget, SLOT(jumpToEndCue()));
   connect(_updateStartCue, SIGNAL(triggered()), _boxContentWidget, SLOT(updateStartCue()));
-  connect(_updateEndCue, SIGNAL(triggered()), _boxContentWidget, SLOT(updateEndCue()));
+  connect(_updateEndCue, SIGNAL(triggered()), _boxContentWidget, SLOT(updateEndCue()));  
 }
 
 void
@@ -219,15 +229,48 @@ BasicBox::createMenus()
   if(_boxContentWidget != NULL)
       _boxContentWidget->setEndMenu(_endMenu);
 
+//  Play
+  QIcon playIcon(":/resources/images/playSimple.svg");
+  _playButton= new QPushButton();
+  _playButton->setIcon(playIcon);
+  _playButton->setShortcutEnabled(1, false);
+  _playButton->setStyleSheet(
+    "QPushButton {"
+    "border: none;"
+    "border-radius: none;"
+    "background-color: transparent;"
+    "}"
+    );
+
+//  Stop
+    QIcon stopIcon(":/resources/images/stopSimple.svg");
+    _stopButton= new QPushButton();
+    _stopButton->setIcon(stopIcon);
+    _stopButton->setShortcutEnabled(1, false);
+    _stopButton->setStyleSheet(
+      "QPushButton {"
+      "border: none;"
+      "border-radius: none;"
+      "background-color: transparent;"
+      "}"
+      );
+
+
   QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
   startMenuProxy->setWidget(_startMenuButton);
   QGraphicsProxyWidget *endMenuProxy = new QGraphicsProxyWidget(this);
-  endMenuProxy->setWidget(_endMenuButton);
+  endMenuProxy->setWidget(_endMenuButton);  
+  QGraphicsProxyWidget *playProxy = new QGraphicsProxyWidget(this);
+  playProxy->setWidget(_playButton);
+  QGraphicsProxyWidget *stopProxy = new QGraphicsProxyWidget(this);
+  stopProxy->setWidget(_stopButton);
 
   connect(_startMenuButton, SIGNAL(clicked()), _boxContentWidget, SLOT(execStartAction()));
   connect(_endMenuButton, SIGNAL(clicked()), _boxContentWidget, SLOT(execEndAction()));
   connect(_startMenuButton, SIGNAL(customContextMenuRequested(QPoint)), _boxContentWidget, SLOT(displayStartMenu(QPoint)));
   connect(_endMenuButton, SIGNAL(customContextMenuRequested(QPoint)), _boxContentWidget, SLOT(displayEndMenu(QPoint)));
+  connect(_playButton, SIGNAL(clicked()), _boxContentWidget, SLOT(play()));
+  connect(_stopButton, SIGNAL(clicked()), _boxContentWidget, SLOT(stop()));
 }
 
 void
@@ -296,16 +339,18 @@ BasicBox::createWidget()
               "background-color: transparent;"
               "selection-color: black;"
               "selection-background-color: gray;"
-              "text-align: right;"
               "}"
+
               "QComboBox::drop-down {"
               "border-color: gray;"
               "color: black;"
               "}"
 
-              " QComboBox::down-arrow {"
+              "QComboBox::down-arrow {"
               "image: url(:/resources/images/1downarrow.png);"
+              "padding-right: 10px;"
               "}"
+
               "QComboBox QAbstractItemView{"
               "background: gray;"
               "}"
@@ -343,11 +388,15 @@ BasicBox::~BasicBox()
 
   delete _startMenuButton;
   delete _endMenuButton;
+//  delete _playButton;
+//  delete _stopButton;
 
   delete _jumpToStartCue;
   delete _jumpToEndCue;
   delete _updateStartCue;
   delete _updateEndCue;
+//  delete _play;
+//  delete _stop;
 
 //  delete _curveProxy;
 //  delete _comboBoxProxy;
@@ -1641,6 +1690,9 @@ BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
   else {
       setCursor(Qt::ArrowCursor);
     }
+
+  //Show actions' button
+  setButtonsVisible(true);
 }
 
 
@@ -1709,6 +1761,9 @@ BasicBox::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
   else {
       setCursor(Qt::ArrowCursor);
     }
+
+  //Show actions' button
+  setButtonsVisible(true);
 }
 
 void
@@ -1717,6 +1772,9 @@ BasicBox::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
   QGraphicsItem::hoverLeaveEvent(event);
   setCursor(Qt::ArrowCursor);
   _hover = false;
+
+  //Hide actions' button
+  setButtonsVisible(false);
 }
 
 void
@@ -1920,6 +1978,10 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     painter->setClipRect(option->exposedRect);//To increase performance
     bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
 
+    //Showing stop button when playing
+    if(_playing)
+    _stopButton->setVisible(_playing);
+
     //draw hover shape
     if (_hover && !isSelected() && !_playing)
         drawHoverShape(painter);
@@ -1989,7 +2051,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     //draw name
     painter->translate(0,4);
     painter->setPen(QPen(Qt::gray));
-    painter->drawText(QRectF(BOX_MARGIN, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
+    painter->drawText(QRectF(BOX_MARGIN*2, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
     painter->restore();
 
     //draw progress bar during execution
@@ -2086,4 +2148,13 @@ BasicBox::updateRecordingCurves(){
         updateCurve(recMsgs[i],true);
         removeMessageToRecord(recMsgs[i]);
     }
+}
+
+void
+BasicBox::setButtonsVisible(bool value)
+{
+    _startMenuButton->setVisible(value);
+    _endMenuButton->setVisible(value);
+    _playButton->setVisible(!_playing && value);
+    _stopButton->setVisible(_playing && value);
 }

@@ -755,6 +755,7 @@ class BasicBox : public QObject, public QGraphicsItem
     inline QList<ConditionalRelation *> getConditionalRelations(){return _conditionalRelation;}
 
     void updateRecordingCurves();
+    void setButtonsVisible(bool value);
 
     /*!
      * \brief Return the messages list, like if the box just ended its execution.
@@ -854,7 +855,7 @@ class BasicBox : public QObject, public QGraphicsItem
     bool _shift;                                                                //!< State of Shift Key.
     bool _playing;                                                              //!< State of playing.
     bool _recording;                                                            //!< State of recording.
-    bool _mute;                                                                 //!< State of mute.
+    bool _mute;                                                                 //!< State of mute.    
     TextEdit *_trgPntMsgEdit;                                                   //!< The trigger point editing dialog.
     Comment *_comment;                                                          //!< The box comment.
     QMap<BoxExtremity, TriggerPoint*> *_triggerPoints;                          //!< The trigger points.
@@ -889,12 +890,16 @@ class BasicBox : public QObject, public QGraphicsItem
     QAction *_jumpToEndCue;
     QAction *_updateStartCue;
     QAction *_updateEndCue;
+    QAction *_play;
+    QAction *_stop;
 
     QMenu *_startMenu;
     QMenu *_endMenu;
 
     QPushButton *_startMenuButton;
     QPushButton *_endMenuButton;
+    QPushButton *_playButton;
+    QPushButton *_stopButton;
 
 };
 #endif
