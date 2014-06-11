@@ -1753,7 +1753,7 @@ MaquetteScene::removeSelectedItems()
 }
 
 void
-MaquetteScene::timeEndReached()
+MaquetteScene::updatePlayModeView()
 {
     view()->updateTimeOffsetView();
     

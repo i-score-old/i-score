@@ -59,6 +59,7 @@
 #include <QTextStream>
 #include "AttributesEditor.hpp"
 #include "NetworkTree.hpp"
+#include <QThread>
 
 #include <stdio.h>
 #include <assert.h>
@@ -2068,7 +2069,12 @@ void
 Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
 {
     int type = getBox(boxID)->type();
-    BasicBox *box = static_cast<BasicBox*>(_boxes[boxID]);
+    BasicBox *box = static_cast<BasicBox*>(_boxes[boxID]);    
+
+    if(boxID == ROOT_BOX_ID){
+        if(!Maquette::getInstance()->scene()->thread()->isRunning())
+            Maquette::getInstance()->scene()->thread()->start();
+    }
 
     if (type == PARENT_BOX_TYPE) {        
         if (running){
@@ -2081,9 +2087,9 @@ Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
 }
 
 void
-Maquette::executionFinished()
+Maquette::udpatePlayModeView()
 {
-  _scene->timeEndReached();
+    _scene->updatePlayModeView();
 }
 
 void
@@ -2096,10 +2102,9 @@ void
 boxIsRunningCallback(unsigned int boxID, bool running)
 {
   Maquette::getInstance()->updateBoxRunningStatus(boxID, running);
-    
-    // if the execution of the upper box ends
-    if (boxID == ROOT_BOX_ID)
-        Maquette::getInstance()->executionFinished();
+
+  if(boxID==ROOT_BOX_ID)
+      Maquette::getInstance()->udpatePlayModeView();
 }
 
 void

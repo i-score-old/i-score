@@ -3591,9 +3591,8 @@ void TimeProcessStartCallback(TTPtr baton, const TTValue& value)
     
     iscoreEngineDebug 
         TTLogMessage("TimeProcess %ld starts at %ld ms\n", boxId, engine->getCurrentExecutionDate());
-    
-    // don't update main scenario running state
-    if (boxId > ROOT_BOX_ID && engine->m_TimeProcessSchedulerRunningAttributeCallback != NULL)
+        
+    if (engine->m_TimeProcessSchedulerRunningAttributeCallback != NULL)
         engine->m_TimeProcessSchedulerRunningAttributeCallback(boxId, YES);
 
 }
