@@ -43,6 +43,6 @@
         <file>resources/images/record.svg</file>
         <file>resources/translations/i-score_fr.qm</file>
         <file>resources/translations/i-score_en.qm</file>
-        <file>resources/images/1downarrow.png</file>
+        <file>resources/images/downArrow.png</file>
     </qresource>
 </RCC>

@@ -96,7 +96,8 @@ const float BasicBox::EAR_WIDTH = 9;
 const float BasicBox::EAR_HEIGHT = 30;
 const float BasicBox::GRIP_CIRCLE_SIZE = 5;
 unsigned int BasicBox::BOX_MARGIN = 25;
-const QString BasicBox::SUB_SCENARIO_MODE_TEXT = tr("Scenario");
+const QString BasicBox::SCENARIO_MODE_TEXT = tr("Scenario");
+const QString BasicBox::DEFAULT_MODE_TEXT = "";
 const QColor BasicBox::BOX_COLOR = QColor(60, 60, 60);
 const QColor BasicBox::TEXT_COLOR = QColor(0, 0, 0);
 
@@ -344,7 +345,7 @@ BasicBox::createWidget()
               "}"
 
               "QComboBox::down-arrow {"
-              "image: url(:/resources/images/1downarrow.png);"
+              "image: url(:/resources/images/downArrow.png);"
               "padding-right: 10px;"
               "}"
 
