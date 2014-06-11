@@ -1785,15 +1785,21 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
 void
 NetworkTree::keyReleaseEvent(QKeyEvent *event)
 {  
+    if (event->key() == Qt::Key_Shift) {
+          setSelectionMode(QAbstractItemView::MultiSelection);
+        }
 }
 
 void
 NetworkTree::keyPressEvent(QKeyEvent *event)
 {  
-  if (event->key() == Qt::Key_Backtab) {
-      if (VALUE_MODIFIED) {
-          if (currentColumn() == START_COLUMN) {
-              editItem(currentItem(), END_COLUMN);
+    if (event->key() == Qt::Key_Shift) {
+        setSelectionMode(QAbstractItemView::ContiguousSelection);
+    }
+    if (event->key() == Qt::Key_Backtab) {
+        if (VALUE_MODIFIED) {
+            if (currentColumn() == START_COLUMN) {
+                editItem(currentItem(), END_COLUMN);
             }
         }
     }
@@ -1815,8 +1821,6 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
           recursiveChildrenSelection(item, false);
           recursiveFatherSelection(item, false);
         }
-
-
 
       if (selectionMode() == QAbstractItemView::ContiguousSelection) {
           QList<QTreeWidgetItem*> selection = selectedItems();
