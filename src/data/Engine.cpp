@@ -3246,13 +3246,18 @@ void Engine::load(std::string fileName)
 {
     TTValue v, none;
     
-    // Clear all the EngineCacheMaps
-    // note : this should be useless because all elements are removed by the maquette
-    clearTimeProcess();
-    clearInterval();
-    clearConditionedProcess();
-    clearTimeCondition();
-    m_conditionsMap.clear();
+    // Check that all Engine caches have been properly cleared before
+    if (m_timeProcessMap.size() > 1)
+        TTLogMessage("Engine::load : m_timeProcessMap not empty before the loading\n");
+    
+    if (!m_intervalMap.empty())
+        TTLogMessage("Engine::load : m_intervalMap not empty before the loading\n");
+    
+    if (!m_conditionedProcessMap.empty())
+        TTLogMessage("Engine::load : m_conditionedProcessMap not empty before the loading\n");
+    
+    if (!m_timeConditionMap.empty())
+        TTLogMessage("Engine::load : m_timeConditionMap not empty before the loading\n");
     
     // Create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
