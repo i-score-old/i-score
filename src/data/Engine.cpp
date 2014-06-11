@@ -2725,24 +2725,68 @@ Engine::requestObjectChildren(const std::string & address, vector<string>& child
     return 0;
 }
 
-void Engine::rebuildNetworkNamespace(const string &application, const string &address)
+bool Engine::rebuildNetworkNamespace(const string &deviceName, const string &address)
 {
-    getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryBuild"));
+    TTValue         v, none;
+    TTSymbol        applicationName(deviceName);
+    TTSymbol        protocolName;
+    TTObjectBasePtr anApplication = getApplication(applicationName);
+    
+    // if the application exists
+    if (anApplication) {
+        
+        // get the protocols of the application
+        v = getApplicationProtocols(applicationName);
+        protocolName = v[0]; // we register application to 1 protocol only
+        
+        // Minuit case : use discovery mechanism
+        if (protocolName == TTSymbol("Minuit")) {
+            
+            anApplication->sendMessage("DirectoryBuild");
+            return 0;
+        }
+        // OSC case : reload the namespace from the last project file if exist
+        else if (protocolName == TTSymbol("OSC")) {
+            
+            if (m_namespaceFilesPath.find(deviceName) == m_namespaceFilesPath.end())
+                return 1;
+            
+            TTSymbol namespaceFilePath = TTSymbol(m_namespaceFilesPath[deviceName]);
+            
+            // Create a TTXmlHandler
+            TTObject aXmlHandler(kTTSym_XmlHandler);
+            
+            // Read the file to setup TTModularApplications
+            v = TTObjectBasePtr(anApplication);
+            aXmlHandler.set(kTTSym_object, v);
+            aXmlHandler.send(kTTSym_Read, namespaceFilePath, none);
+            
+            return 0;
+        }
+    }
+    
+    return 1;
 }
 
-bool Engine::loadNetworkNamespace(const string &application, const string &filepath)
+bool Engine::loadNetworkNamespace(const string &deviceName, const string &filepath)
 {
     // Create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
     
     // Read the file to setup an application
-    TTValue none, v = TTObjectBasePtr(getApplication(TTSymbol(application)));
+    TTValue none, v = TTObjectBasePtr(getApplication(TTSymbol(deviceName)));
     aXmlHandler.set(kTTSym_object, v);
     
     TTErr err = aXmlHandler.send(kTTSym_Read, TTSymbol(filepath), none);
     
-    // Init the application
-    getApplication(TTSymbol(application))->sendMessage(TTSymbol("Init"));
+    if (! err) {
+    
+        // Init the application
+        getApplication(TTSymbol(deviceName))->sendMessage(TTSymbol("Init"));
+        
+        // store the namespace file for this device
+        m_namespaceFilesPath[deviceName] = filepath;
+    }
 
     return err != kTTErrNone;
 }
@@ -3226,9 +3270,11 @@ int Engine::removeFromNetWorkNamespace(const std::string & address)
 
 // LOAD AND STORE
 
-void Engine::store(std::string fileName)
+void Engine::store(std::string filepath)
 {
     TTValue v, none;
+    
+    m_lastProjectFilePath = TTSymbol(filepath);
     
     // Create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
@@ -3239,10 +3285,10 @@ void Engine::store(std::string fileName)
     aXmlHandler.set(kTTSym_object, v);
     
     // Write
-    aXmlHandler.send(kTTSym_Write, TTSymbol(fileName), none);
+    aXmlHandler.send(kTTSym_Write, m_lastProjectFilePath, none);
 }
 
-void Engine::load(std::string fileName)
+void Engine::load(std::string filepath)
 {
     TTValue v, none;
     
@@ -3259,18 +3305,20 @@ void Engine::load(std::string fileName)
     if (!m_timeConditionMap.empty())
         TTLogMessage("Engine::load : m_timeConditionMap not empty before the loading\n");
     
+    m_lastProjectFilePath = TTSymbol(filepath);
+    
     // Create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
     
     // Read the file to setup TTModularApplications
     v = TTObjectBasePtr(TTModularApplications);
     aXmlHandler.set(kTTSym_object, v);
-    aXmlHandler.send(kTTSym_Read, TTSymbol(fileName), none);
+    aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, none);
     
     // Read the file to setup m_mainScenario
     v = TTObjectBasePtr(m_mainScenario);
     aXmlHandler.set(kTTSym_object, v);
-    aXmlHandler.send(kTTSym_Read, TTSymbol(fileName), none);
+    aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, none);
     
     // Rebuild all the EngineCacheMaps from the main scenario content
     buildEngineCaches(m_mainScenario, kTTAdrsRoot);

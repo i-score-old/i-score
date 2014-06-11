@@ -80,6 +80,9 @@ typedef std::map<unsigned int, EngineCacheElementPtr>::iterator EngineCacheMapIt
 /** a temporary type to define a map to store and retreive the triggerIds associated with a conditionId */
 typedef std::map<unsigned int, std::list<unsigned int>> EngineConditionsMap;
 
+/** a map used to remember the namespace file path for each device */
+typedef std::map<std::string, std::string> EngineFilesMap;
+
 #define NO_BOUND -1
 
 #define NO_ID 0
@@ -142,6 +145,9 @@ class Engine
 private:
     
     TTString            iscore;                                         /// application name
+    
+    TTSymbol            m_lastProjectFilePath;                          /// the last project file path
+    EngineFilesMap      m_namespaceFilesPath;                           /// the last namespace file used for each device
     
     TTTimeProcessPtr    m_mainScenario;                                 /// The top scenario
     TTTimeEventPtr      m_mainStartEvent;                               /// The top scenario start event
@@ -1139,20 +1145,21 @@ public:
     int requestObjectChildren(const std::string & address, std::vector<std::string>& children);
 
     /*!
-     * Refresh the namespace, rebuilding the mirror
+     * Refresh the namespace by rebuilding the mirror (Minuit protocol case) or reloading the namesapce from the last project file (OSC protocol case)
      *
-     * \param application : the application's address. ex : /MinuitDevice1
+     * \param deviceName : the device name to rebuild
      * \param address : the object's address
+     * \return 0 if no error, else 1.
      */
-    void rebuildNetworkNamespace(const std::string& application, const std::string& address = "/");
+    bool rebuildNetworkNamespace(const std::string& deviceName, const std::string& address = "/");
     
     /*!
      * Load a namespace from a namespace file
      *
-     * \param application : the application to setup
+     * \param deviceName : the devine name to setup
      * \param filepath : the path to a namespace file
      */
-    bool loadNetworkNamespace(const std::string &application, const std::string &filepath);
+    bool loadNetworkNamespace(const std::string &deviceName, const std::string &filepath);
     
     /*!
      * append a new address to a network device
@@ -1266,16 +1273,16 @@ public:
 	/*!
 	 * Store Engine.
 	 *
-	 * \param fileName : the fileName to store the engines.
+	 * \param filepath : the filepath to use.
 	 */
-	void store(std::string fileName);
+	void store(std::string filepath);
     
 	/*!
 	 * Load Engine.
 	 *
-	 * \param fileName : the fileName to load.
+	 * \param filepath : the filepath to use.
 	 */
-	void load(std::string fileName);
+	void load(std::string filepath);
     void buildEngineCaches(TTTimeProcessPtr scenario, TTAddress& scenarioAddress);
     
 	/*!
