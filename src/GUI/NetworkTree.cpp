@@ -1440,7 +1440,7 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item){
             item->takeChildren();
 
             /// \todo récupérer la valeur de retour. Qui peut être false en cas de OSC (traitement différent dans ce cas là).
-            Maquette::getInstance()->refreshNetworkNamespace(application);
+            Maquette::getInstance()->rebuildNetworkNamespace(application);
             treeRecursiveExploration(item,true);
             Maquette::getInstance()->updateBoxesAttributes();
         }
