@@ -1334,18 +1334,18 @@ void Engine::getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex cont
         TTScoreTimeProcessGetEndEvent(timeProcess, &event);
     
     // get the state of the event
-    event->getAttributeValue(TTSymbol("state"), v);
+    event->getAttributeValue("state", v);
     state = v[0];
     
     // check if the state is flattened
-    state->getAttributeValue(TTSymbol("flattened"), v);
+    state->getAttributeValue("flattened", v);
     flattened = v[0];
     
     if (!flattened)
-        state->sendMessage(TTSymbol("Flatten"));
+        state->sendMessage("Flatten");
     
     // get the state lines
-    state->getAttributeValue(TTSymbol("flattenedLines"), v);
+    state->getAttributeValue("flattenedLines", v);
     lines = TTListPtr((TTPtr)v[0]);
     
     if (lines) {
