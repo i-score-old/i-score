@@ -1140,7 +1140,7 @@ public:
      * \param application : the application's address. ex : /MinuitDevice1
      * \param address : the object's address
      */
-    void refreshNetworkNamespace(const std::string& application, const std::string& address = "/");
+    void rebuildNetworkNamespace(const std::string& application, const std::string& address = "/");
     
     /*!
      * Load a namespace from a namespace file
@@ -1239,6 +1239,23 @@ public:
      * \return 0 if no error, else 1.
      */
     bool setDeviceProtocol(std::string deviceName, std::string protocol);
+    
+    /*!
+     * Sets the device in learn mode.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param newLearn : a boolean to set the device in learn mode
+     * \return 0 if no error, else 1.
+     */
+    bool setDeviceLearn(std::string deviceName, bool newLearn);
+    
+    /*!
+     * Sets the device in learn mode.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \return the learn status of the device.
+     */
+    bool getDeviceLearn(std::string deviceName);
 
 	//Store and load ////////////////////////////////////////////////////////////////////////////////////
     

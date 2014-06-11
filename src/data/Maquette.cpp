@@ -339,8 +339,8 @@ Maquette::requestNetworkNamespace(const string &address, string &nodeType, vecto
 }
 
 void
-Maquette::refreshNetworkNamespace(const std::string &application){
-    _engines->refreshNetworkNamespace(application);
+Maquette::rebuildNetworkNamespace(const std::string &application){
+    _engines->rebuildNetworkNamespace(application);
 }
 
 void

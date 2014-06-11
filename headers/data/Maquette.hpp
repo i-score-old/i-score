@@ -748,7 +748,7 @@ class Maquette : public QObject
     /*!
      * \brief Refresh the network's namespace.
      */
-    void refreshNetworkNamespace(const std::string &application);
+    void rebuildNetworkNamespace(const std::string &application);
 
     /*!
      * \brief Requests a snapshot of the network on a namespace.

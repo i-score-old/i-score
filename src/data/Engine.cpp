@@ -2721,11 +2721,8 @@ Engine::requestObjectChildren(const std::string & address, vector<string>& child
     return 0;
 }
 
-void Engine::refreshNetworkNamespace(const string &application, const string &address)
+void Engine::rebuildNetworkNamespace(const string &application, const string &address)
 {
-    TTValue none;
-    
-    getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryClear"));
     getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryBuild"));
 }
 
@@ -2964,6 +2961,25 @@ Engine::setDeviceProtocol(string deviceName, string protocol)
     addNetworkDevice(deviceName,protocol,localHost,port);    
 
     return 0;
+}
+
+bool Engine::setDeviceLearn(std::string deviceName, bool newLearn)
+{
+    TTSymbol applicationName(deviceName);
+    
+    TTErr err = getApplication(applicationName)->setAttributeValue("learn", newLearn);
+    
+    return err != kTTErrNone;
+}
+
+bool Engine::getDeviceLearn(std::string deviceName)
+{
+    TTSymbol    applicationName(deviceName);
+    TTValue     v;
+    
+    getApplication(applicationName)->getAttributeValue("learn", v);
+    
+    return TTBoolean(v[0]);
 }
 
 int Engine::requestNetworkNamespace(const std::string & address, std::string & nodeType, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)
