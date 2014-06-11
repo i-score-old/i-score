@@ -441,6 +441,16 @@ public:
      * \param muteState : the muteState of the box matching the given ID
      */
     void setBoxMuteState(TimeProcessId boxId, bool muteState);
+    
+    /*!
+     * Get the mute state of the box (process) matching the given ID
+     *
+     *
+     * \param boxId : the ID of the box
+     *
+     * \return the muteState of the box matching the given ID
+     */
+    bool getBoxMuteState(TimeProcessId boxId);
 
     /*!
      * Sets the name of the box matching the given ID
@@ -549,6 +559,15 @@ public:
 	 * \param mute : the mute state to set (true or false).
 	 */
 	void setCtrlPointMutingState(TimeProcessId boxId, TimeEventIndex controlPointIndex, bool mute);
+    
+    /*!
+	 * Gets the control point mute state.
+	 *
+	 * \param boxId : the ID of the box.
+	 * \param controlPointIndex : the index of the control point.
+	 * \return the mute state (true or false).
+	 */
+	bool getCtrlPointMutingState(TimeProcessId boxId, TimeEventIndex controlPointIndex);
     
 	//CURVES ////////////////////////////////////////////////////////////////////////////////////
     
@@ -889,69 +908,77 @@ public:
 	TimeValue getTimeOffset();
     
 	/*!
-	 * Plays the main scenario (compiles and runs it).
+	 * Plays a box.
 	 *
-	 * \return true if the scenario execution starts fine.
+     * \param processId: the id of the process (default : the main scenario).
+	 * \return true if the box starts fine.
 	 */
-	bool play();
+	bool play(TimeProcessId processId = ROOT_BOX_ID);
     
     /*!
 	 * Tests if the main scenario is actually running.
 	 *
+     * \param processId: the id of the process (default : the main scenario).
 	 * \return true if the main scnerio is running. False if not.
 	 */
-	bool isPlaying();
+	bool isPlaying(TimeProcessId processId = ROOT_BOX_ID);
 
 	/*!
-	 * Stops the main scenario.
+	 * Stops a box.
 	 *
-	 * \return true if the main scenario will actually stop.
+     * \param processId: the id of the process (default : the main scenario).
+	 * \return true if the box will actually stop.
 	 */
-	bool stop();
+	bool stop(TimeProcessId processId = ROOT_BOX_ID);
     
     /*!
-	 * Pause the main scenrio execution
+	 * Pause a box.
      *
      * \param pause: new pause value
+     * \param processId: the id of the process (default : the main scenario).
 	 *
 	 */
-	void pause(bool pauseValue);
+	void pause(bool pauseValue, TimeProcessId processId = ROOT_BOX_ID);
  
     /*!
-	 * Tests if the main scenario is actually paused.
+	 * Tests if a box is actually paused.
 	 *
+     * \param processId: the id of the process (default : the main scenario).
 	 * \return true if the main scnerio is paused. False if not.
 	 */
-	bool isPaused();
+	bool isPaused(TimeProcessId processId = ROOT_BOX_ID);
     
 	/*!
-	 * Gets the main scenario current execution time in milliseconds.
+	 * Gets box current execution time (default : the main scenario).
 	 *
+     * \param processId: the id of the process.
 	 * \return the execution time in milliseconds.
 	 */
-	TimeValue getCurrentExecutionTime();
-    
-	/*!
-	 * Changes the execution speed.
-	 *
-	 * \param factor: the new speed factor.
-	 */
-	void setExecutionSpeedFactor(float factor);
+	TimeValue getCurrentExecutionDate(TimeProcessId processId = ROOT_BOX_ID);
     
     /*!
-	 * Gets the execution speed.
+	 * Gets box current execution position (default : the main scenario).
 	 *
-	 * \return the speed factor.
+     * \param processId: the id of the process.
+	 * \return the execution position (normalized [0::1]).
 	 */
-	float getExecutionSpeedFactor();
+	float getCurrentExecutionPosition(TimeProcessId processId = ROOT_BOX_ID);
     
 	/*!
-	 * Gets the position of a process (normalized between 0. :: 1.).
+	 * Changes the execution speed of a box (default : the main scenario).
 	 *
-	 * \param processId: the id of the process.
-	 * \return the normalized position.
+	 * \param factor: the new speed factor.
+     * \param processId: the id of the process.
 	 */
-	float getProcessPosition(TimeProcessId boxId);
+	void setExecutionSpeedFactor(float factor, TimeProcessId processId = ROOT_BOX_ID);
+    
+    /*!
+	 * Gets the execution speed of a box (default : the main scenario).
+	 *
+     * \param processId: the id of the process.
+	 * \return the speed factor.
+	 */
+	float getExecutionSpeedFactor(TimeProcessId processId = ROOT_BOX_ID);
     
     
 	//Network //////////////////////////////////////////////////////////////////////////////////////////////

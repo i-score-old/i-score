@@ -533,13 +533,25 @@ BoxWidget::updateEndCue()
 void
 BoxWidget::play()
 {
-    std::cout<<"TODO : StartPlaying box"<<_boxID<<std::endl;
+    QList<unsigned int> boxesId;
+    //TOTO get also SelectedItems
+    boxesId << _boxID;    
+
+    _box->maquetteScene()->playOrResume(boxesId);
+    _box->updatePlayingModeButtons();
 }
 
 void
 BoxWidget::stop()
 {
-    std::cout<<"TODO : StopPlaying box"<<_boxID<<std::endl;
+    QList<unsigned int> boxesId;
+    boxesId << _boxID;
+
+//    for(QList<unsigned int>::iterator it=boxesId.begin(); it!=boxesId.end(); it++)
+//        Maquette::getInstance()->getBox(*it)->setCrossedExtremity(BOX_END);
+
+    _box->maquetteScene()->stopOrPause(boxesId);
+    _box->updatePlayingModeButtons();
 }
 
 void

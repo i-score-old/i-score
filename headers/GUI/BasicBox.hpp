@@ -756,6 +756,7 @@ class BasicBox : public QObject, public QGraphicsItem
 
     void updateRecordingCurves();
     void setButtonsVisible(bool value);
+    void updatePlayingModeButtons();
 
     /*!
      * \brief Return the messages list, like if the box just ended its execution.
@@ -890,8 +891,6 @@ class BasicBox : public QObject, public QGraphicsItem
     QAction *_jumpToEndCue;
     QAction *_updateStartCue;
     QAction *_updateEndCue;
-    QAction *_play;
-    QAction *_stop;
 
     QMenu *_startMenu;
     QMenu *_endMenu;

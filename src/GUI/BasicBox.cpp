@@ -174,8 +174,6 @@ BasicBox::createActions()
   _jumpToEndCue     = new QAction("Jump to cue", this);
   _updateStartCue   = new QAction("Update cue", this);
   _updateEndCue     = new QAction("Update cue", this);
-  _play             = new QAction("Play", this);
-  _stop             = new QAction("Stop", this);
 
   connect(_jumpToStartCue, SIGNAL(triggered()), _boxContentWidget, SLOT(jumpToStartCue()));
   connect(_jumpToEndCue, SIGNAL(triggered()), _boxContentWidget, SLOT(jumpToEndCue()));
@@ -388,15 +386,13 @@ BasicBox::~BasicBox()
 
   delete _startMenuButton;
   delete _endMenuButton;
-//  delete _playButton;
-//  delete _stopButton;
+  delete _playButton;
+  delete _stopButton;
 
   delete _jumpToStartCue;
   delete _jumpToEndCue;
   delete _updateStartCue;
   delete _updateEndCue;
-//  delete _play;
-//  delete _stop;
 
 //  delete _curveProxy;
 //  delete _comboBoxProxy;
@@ -729,11 +725,11 @@ BasicBox::resizeWidthEdition(float width)
       if (motherBox != NULL) {
           if ((motherBox->getBottomRight().x() - width) <= _abstract->topLeft().x()) {
               if (_scene->resizeMode() == HORIZONTAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE) {   // Trying to escape by a resize to the right
-                  newWidth = motherBox->getBottomRight().x() - _abstract->topLeft().x();                                    
+                  newWidth = motherBox->getBottomRight().x() - _abstract->topLeft().x();
                 }
             }
         }
-    }  
+    }
   _abstract->setWidth(newWidth);
   if (_scene->resizeMode() == HORIZONTAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE)
       displayBoxDuration();
@@ -743,8 +739,22 @@ BasicBox::resizeWidthEdition(float width)
 void
 BasicBox::resizeHeightEdition(float height)
 {    
-  _abstract->setHeight(height); 
-  centerWidget();
+    float newHeight = std::max(height, MaquetteScene::MS_PRECISION / MaquetteScene::MS_PER_PIXEL);
+
+    if (hasMother()) {
+        BasicBox *motherBox = _scene->getBox(_abstract->mother());
+        if (motherBox != NULL) {
+            if ((motherBox->getBottomRight().y() - height) <= _abstract->topLeft().y()) {
+                if (_scene->resizeMode() == VERTICAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE) {   // Trying to escape by a resize to the right
+                    newHeight = motherBox->getBottomRight().y() - _abstract->topLeft().y();
+                  }
+              }
+          }
+      }
+    _abstract->setHeight(newHeight);
+    if (_scene->resizeMode() == VERTICAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE)
+        displayBoxDuration();
+    centerWidget();
 }
 
 void
@@ -971,7 +981,7 @@ BasicBox::playing() const
 void
 BasicBox::setCrossedExtremity(BoxExtremity extremity)
 {
-  if (extremity == BOX_START) {
+  if (extremity == BOX_START) {      
       _playing = true;
     }
   else if (extremity == BOX_END) {
@@ -1591,7 +1601,7 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
   else if (_scene->resizeMode() != NO_RESIZE && (cursor().shape() == Qt::SizeVerCursor || cursor().shape() == Qt::SizeHorCursor || cursor().shape() == Qt::SizeFDiagCursor)) {
       switch (_scene->resizeMode()) {
           case HORIZONTAL_RESIZE:
-            resizeWidthEdition(_abstract->width() + event->pos().x() - _boxRect.topRight().x());            
+            resizeWidthEdition(std::max(double(_abstract->width() + event->pos().x() - _boxRect.topRight().x()) , (double)BOX_MARGIN));
             break;
 
           case VERTICAL_RESIZE:
@@ -1599,8 +1609,8 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             break;
 
           case DIAGONAL_RESIZE:          
-            resizeAllEdition(double(_abstract->width() + event->pos().x() - _boxRect.topRight().x()),
-                             double(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y()));
+            resizeAllEdition(std::max(double(_abstract->width() + event->pos().x() - _boxRect.topRight().x()) , (double)BOX_MARGIN),
+                             std::max(double(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y()) , (double)BOX_MARGIN));
             break;
         }
       QPainterPath nullPath;
@@ -1634,7 +1644,6 @@ void
 BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 {
   QGraphicsItem::hoverEnterEvent(event);
-
   _hover = true;
 
   const float RESIZE_ZONE_WIDTH = 3 * LINE_WIDTH;
@@ -1979,8 +1988,14 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
 
     //Showing stop button when playing
-    if(_playing)
-    _stopButton->setVisible(_playing);
+    if(_playing){
+        _comboBoxProxy->setVisible(false);
+        _startMenuButton->setVisible(false);
+        _endMenuButton->setVisible(false);
+        _stopButton->setVisible(_playing);
+    }
+    else
+        setButtonsVisible(_hover);
 
     //draw hover shape
     if (_hover && !isSelected() && !_playing)
@@ -2014,14 +2029,11 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     drawTriggerGrips(painter);
 
     //curves' comboBox and widget
-    if (smallSize) {
-        _comboBoxProxy->setVisible(false);
+    if (smallSize)
         _curveProxy->setVisible(false);
-    }
-    else{
-        _comboBoxProxy->setVisible(_abstract->height() > RESIZE_TOLERANCE + LINE_WIDTH);
+    else
         _curveProxy->setVisible(_abstract->height() > RESIZE_TOLERANCE + LINE_WIDTH);
-    }
+
 
     //draw text rect
     QBrush brush(Qt::lightGray, isSelected() ? Qt::SolidPattern : Qt::SolidPattern);
@@ -2153,8 +2165,17 @@ BasicBox::updateRecordingCurves(){
 void
 BasicBox::setButtonsVisible(bool value)
 {
+    _comboBoxProxy->setVisible(value);
     _startMenuButton->setVisible(value);
     _endMenuButton->setVisible(value);
     _playButton->setVisible(!_playing && value);
     _stopButton->setVisible(_playing && value);
+}
+
+void
+BasicBox::updatePlayingModeButtons()
+{
+    _playButton->setVisible(!_playing);
+    _stopButton->setVisible(_playing);
+    update();
 }

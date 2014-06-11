@@ -77,7 +77,7 @@ typedef map<unsigned int, TriggerPoint*> TrgPntMap;
 
 #define NO_PAINT false
 
-#define MUTE_GOTO_SCORE 
+#define MUTE_GOTO_SCORE
 
 void
 Maquette::init()
@@ -1138,7 +1138,7 @@ Maquette::setBoxMuteState(unsigned int boxID, bool muteState)
 bool
 Maquette::getBoxMuteState(unsigned int boxID)
 {
-//  return _engines->getBoxMuteState(boxID); TODO
+    return _engines->getBoxMuteState(boxID);
 }
 
 void
@@ -1374,13 +1374,13 @@ Maquette::duration()
 unsigned int
 Maquette::getCurrentTime() const
 {
-  return _engines->getCurrentExecutionTime();
+  return _engines->getCurrentExecutionDate();
 }
 
 float
 Maquette::getPosition(unsigned int boxID)
 {
-  return (float)_engines->getProcessPosition(boxID);
+  return (float)_engines->getCurrentExecutionPosition(boxID);
 }
 
 void
@@ -1517,6 +1517,11 @@ Maquette::turnExecutionOn()
     _engines->play();
 }
 
+void
+Maquette::turnExecutionOn(unsigned int boxId){
+    _engines->play(boxId);
+}
+
 bool
 Maquette::isExecutionOn()
 {
@@ -1538,6 +1543,11 @@ Maquette::turnExecutionOff()
 
     // Clear the trigger queue list
     _scene->triggersQueueList()->clear();
+}
+
+void
+Maquette::turnExecutionOff(unsigned int boxId){
+    _engines->stop(boxId);
 }
 
 void
@@ -1582,7 +1592,7 @@ Maquette::stopPlayingAndGoToTimeOffset(unsigned int timeOffset)
 void
 Maquette::stopPlayingAndGoToCurrentTime()
 {
-    unsigned int timeOffset = _engines->getCurrentExecutionTime();
+    unsigned int timeOffset = _engines->getCurrentExecutionDate();
     
     turnExecutionOff();
     
@@ -1798,7 +1808,7 @@ Maquette::load(const string &fileName)
             sizeY = _engines->getBoxVerticalSize(boxID);
             color = _engines->getBoxColor(boxID);
             parentID = _engines->getParentId(boxID);
-//MUTE BOXES            muteState = _engines->getBoxMuteState(boxID);
+            muteState = _engines->getBoxMuteState(boxID);
             
             QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
             QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);           
@@ -1808,7 +1818,7 @@ Maquette::load(const string &fileName)
             newBox->setID(boxID);
             newBox->setName(QString::fromStdString(name));
             newBox->setColor(color);
-//MUTE BOXES             newBox->setMuteState(musteSate);
+            newBox->setMuteState(muteState);
 
             _boxes[boxID] = newBox;            
             _parentBoxes[boxID] = newBox;

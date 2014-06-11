@@ -43,6 +43,7 @@
 #include "BasicBox.hpp"
 #include "AttributesEditor.hpp"
 #include <QColorDialog>
+#include <QErrorMessage>
 #include "NetworkMessages.hpp"
 #include "NetworkTree.hpp"
 
@@ -443,6 +444,13 @@ void
 AttributesEditor::nameChanged()
 {
   BasicBox * box = _scene->getBox(_boxEdited);
+
+  //provisional : "<" ">" are forbidden, problem on .score writing.
+  if(_boxName->text().contains(">") || _boxName->text().contains("<")){
+      QString msg = "> and \< characters are forbidden";
+      QMessageBox::warning(this, "", msg);
+      _boxName->setText(box->name());
+  }
   if (box != NULL) {
       box->setName(_boxName->text());
       _scene->update(box->getTopLeft().x(), box->getTopLeft().y(), box->width(), box->height() + 10);
