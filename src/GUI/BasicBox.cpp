@@ -253,7 +253,6 @@ BasicBox::createMenus()
       "}"
       );
 
-
   QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
   startMenuProxy->setWidget(_startMenuButton);
   QGraphicsProxyWidget *endMenuProxy = new QGraphicsProxyWidget(this);
@@ -1982,10 +1981,14 @@ BasicBox::drawSelectShape(QPainter *painter){
 
 void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
+{    
     Q_UNUSED(widget);
     painter->setClipRect(option->exposedRect);//To increase performance
     bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
+
+    //Set disabled the curve proxy when box not selected.
+    _boxContentWidget->setCurveLowerStyle(_comboBox->currentText().toStdString(),!isSelected());
+
 
     //Showing stop button when playing
     if(_playing){
@@ -1995,7 +1998,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         _stopButton->setVisible(_playing);
     }
     else
-        setButtonsVisible(_hover);
+        setButtonsVisible(_hover || isSelected());
 
     //draw hover shape
     if (_hover && !isSelected() && !_playing)
