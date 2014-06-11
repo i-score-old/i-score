@@ -1995,7 +1995,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         _stopButton->setVisible(_playing);
     }
     else
-        setButtonsVisible(_hover);
+        setButtonsVisible(_hover || isSelected());
 
     //draw hover shape
     if (_hover && !isSelected() && !_playing)
