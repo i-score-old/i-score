@@ -2361,9 +2361,6 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
         selectedItems<<curItem;
     }
 
-    for(int i=0 ; i<selectedItems.size() ;i++)
-        std::cout<<selectedItems.at(i)->text(0).toStdString()<<std::endl;
-
     if(column == START_ASSIGNATION_COLUMN){
         if(hasStartMsg(curItem)){
             //remove all start messages
@@ -2398,6 +2395,7 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
             for(int i = 0; i<selectedItems.size(); i++){
                 item = selectedItems.at(i);
 
+                //INTERPOLATION
                 if (isAssigned(item) && hasStartMsg(item) && hasEndMsg(item)) {
                     //we set the curItem's state to item.
                     bool activated = curItem->checkState(INTERPOLATION_COLUMN) == Qt::Checked;
@@ -2432,12 +2430,15 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
             }
         }
     }
+
+    //REDUNDANCY
     else if ((curItem->type() == LeaveType || curItem->type() == OSCNode) && column == REDUNDANCY_COLUMN) {
         for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++){
             item = *it;
             if (isAssigned(item) && hasCurve(item)) {
-                bool activated = item->checkState(column) == Qt::Checked;
+                bool activated = curItem->checkState(column) == Qt::Checked;
                 emit(curveRedundancyChanged(item, activated));
+                item->setCheckState(REDUNDANCY_COLUMN, curItem->checkState(REDUNDANCY_COLUMN));
             }
             else {
                 item->setCheckState(column, Qt::Unchecked);
