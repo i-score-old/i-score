@@ -2059,11 +2059,11 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     painter->translate(textRect.topLeft());
 
     //rotate if small
-    if (_abstract->width() <= 3 * RESIZE_TOLERANCE) {
-        painter->translate(QPointF(RESIZE_TOLERANCE - LINE_WIDTH, 0));
-        painter->rotate(90);
-        textRect.setWidth(_abstract->height());
-    }
+//    if (_abstract->width() <= 3 * RESIZE_TOLERANCE) {
+//        painter->translate(QPointF(RESIZE_TOLERANCE - LINE_WIDTH, 0));
+//        painter->rotate(90);
+//        textRect.setWidth(_abstract->height());
+//    }
 
     //fill header
     painter->fillRect(0, 0, textRect.width(), textRect.height(), isSelected() ? _color : _colorUnselected);
