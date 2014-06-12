@@ -150,14 +150,21 @@ AttributesEditor::nameWidgets()
 
   length = tr("Length");
   assignStart = tr("Start");
+  assignEnd = tr("End");
+
   QFont font;
-  font.setPointSize(8);
+  font.setPointSize(10);
   _snapshotAssignStart->setFont(font);
   _snapshotAssignEnd->setFont(font);
-  assignEnd = tr("End");
+//  font.setPointSize(1);
+//  _updateLabel->setFont(font);
+  _updateLabel->setStyleSheet("QLabel { color : gray;"
+                              "font-size: 10pt;} "
+                              );
 
   _snapshotAssignStart->setText(assignStart);
   _snapshotAssignEnd->setText(assignEnd);
+  _updateLabel->setText("update");
 }
 
 void
@@ -168,7 +175,7 @@ AttributesEditor::createWidgets()
   _centralLayout->setContentsMargins(LEFT_MARGIN, TOP_MARGIN, RIGHT_MARGIN, BOTTOM_MARGIN);
 
   //udpate label
-  _updateLabel = new QLabel("Update");
+  _updateLabel = new QLabel;
 
   //Color button
   _generalColorButton = new QPushButton;
@@ -178,13 +185,12 @@ AttributesEditor::createWidgets()
   _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));  
 
   _generalColorButton->setStyleSheet(
-  " QPushButton {"
-  "border: 2px solid #6f6f80;"
-  "border-radius: 6px;"
+              " QPushButton {"
+              "border: 2px solid #6f6f80;"
+              "border-radius: 6px;"
               "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
               "stop: 0 #909090, stop: 1 #909090);"
-
-  "}"
+              "}"
               );
 
   //Box name
@@ -199,68 +205,56 @@ AttributesEditor::createWidgets()
   //Start&End buttons
   _snapshotAssignStart = new QPushButton;
   _snapshotAssignStart->setStyleSheet(
-  " QPushButton {"
-  "border: 2px solid #6f6f80;"
-  "border-radius: 6px;"
+              " QPushButton {"
+              "border: 2px solid #6f6f80;"
+              "border-radius: 6px;"
               "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
               "stop: 0 #808080, stop: 1 #909090);"
-              "padding-bottom: 3px;"
-              "padding-top: 3px;"
+              "padding-bottom: 1px;"
+              "padding-top: 1px;"
 
-              "min-width: 10px;"
+              "min-width: 22px;"
               "}"
-                          "max-width: 10px;"
-                          "}"
-                          "min-height: 5px;"
-                          "}"
-                                      "max-height: 5px;"
-                                      "}"
 
-  "QPushButton:pressed {"
+              "QPushButton:pressed {"
               "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
               "stop: 0 #606060, stop: 1 #808080);"
-  "}"
+              "}"
 
-  "QPushButton:flat {"
-  "border: none; /* no border for a flat push button */"
-  "}"
+              "QPushButton:flat {"
+              "border: none; /* no border for a flat push button */"
+              "}"
 
-  "QPushButton:default {"
-  "border-color: navy; /* make the default button prominent */"
-  "}"
+              "QPushButton:default {"
+              "border-color: navy; /* make the default button prominent */"
+              "}"
               );
 
   _snapshotAssignEnd = new QPushButton;
   _snapshotAssignEnd->setStyleSheet(
-  " QPushButton {"
-  "border: 2px solid #6f6f80;"
-  "border-radius: 6px;"
+              " QPushButton {"
+              "border: 2px solid #6f6f80;"
+              "border-radius: 6px;"
               "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
               "stop: 0 #808080, stop: 1 #909090);"
-              "padding-bottom: 3px;"
-              "padding-top: 3px;"
+              "padding-bottom: 1px;"
+              "padding-top: 1px;"
 
-  "min-width: 10px;"
-  "}"
-              "max-width: 10px;"
+              "min-width: 22px;"
               "}"
-              "min-height: 5px;"
-              "}"
-                          "max-height: 5px;"
-                          "}"
-  "QPushButton:pressed {"
+              "QPushButton:pressed {"
               "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
               "stop: 0 #606060, stop: 1 #808080);"
-  "}"
+              "}"
 
-  "QPushButton:flat {"
-  "border: none; /* no border for a flat push button */"
-  "}"
+              "QPushButton:flat {"
+              "border: none; /* no border for a flat push button */"
+              "}"
 
-  "QPushButton:default {"
-  "border-color: navy; /* make the default button prominent */"
-  "}"
-);
+              "QPushButton:default {"
+              "border-color: navy; /* make the default button prominent */"
+              "}"
+              );
 
   //NetworkTree
   _networkTree = new NetworkTree(this);
@@ -275,7 +269,7 @@ void
 AttributesEditor::addWidgetsToLayout()
 {
   static const unsigned int BOX_EXTREMITY_PRECISION = 3;
-  const int verticalSpacing = 0;
+  const int verticalSpacing = 6;
   const int horizontalSpacing = 27;
 
   _boxStartValue->setRange(0., _scene->getMaxSceneWidth() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
@@ -287,10 +281,10 @@ AttributesEditor::addWidgetsToLayout()
 
   _boxSettingsLayout->addWidget(_generalColorButton,0,0,2,1);
   _boxSettingsLayout->addWidget(_boxName,0,1,2,1);
-  _boxSettingsLayout->addWidget(_updateLabel,0,2,1,1);
+  _boxSettingsLayout->addWidget(_updateLabel,0,2,1,2,Qt::AlignCenter);
   _boxSettingsLayout->addWidget(_snapshotAssignStart,1,2,1,1);
   _boxSettingsLayout->addWidget(_snapshotAssignEnd,1,3,1,1);
-  _boxSettingsLayout->setVerticalSpacing(verticalSpacing);
+  _boxSettingsLayout->setVerticalSpacing(0);
   _boxSettingsLayout->setHorizontalSpacing(horizontalSpacing);
 
   // Set Central Widget
