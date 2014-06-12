@@ -343,7 +343,7 @@ class Maquette : public QObject
     /*!
      * \brief Raised when execution is finished
      */
-    void executionFinished();
+    void udpatePlayModeView();
 
     /*!
      * \brief Gets the set of messages to send for the beginning of a box.

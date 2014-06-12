@@ -681,7 +681,8 @@ class BasicBox : public QObject, public QGraphicsItem
     static const int COMBOBOX_HEIGHT;
     static const float MSGS_INDICATOR_WIDTH;
     static const float GRIP_CIRCLE_SIZE;
-    static const QString SUB_SCENARIO_MODE_TEXT;    
+    static const QString SCENARIO_MODE_TEXT;
+    static const QString DEFAULT_MODE_TEXT;
 
     /*!
      * \brief Painting method, redefinition of QGraphicsItem::paint().

@@ -59,6 +59,7 @@
 #include <QTextStream>
 #include "AttributesEditor.hpp"
 #include "NetworkTree.hpp"
+#include <QThread>
 
 #include <stdio.h>
 #include <assert.h>
@@ -1429,47 +1430,50 @@ Maquette::initSceneState()
   std::vector<string> curvesList;
 
   //Pour toutes les boîtes avant le goto, on récupère leur état final (on simule leur exécution)
-  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {     
+  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
       boxID = it->first;
       currentBox = (*it).second;
 
-      if (currentBox->date() < timeOffset && (currentBox->date() + currentBox->duration()) <= timeOffset) {
-          boxMsgs = currentBox->getFinalState();
-        }
-      else if (timeOffset > currentBox->date() && timeOffset < (currentBox->date() + currentBox->duration())) {
-          //goto au milieu d'une boîte : On envoie la valeur du début de boîte
-          boxMsgs = currentBox->getStartState();
-          curvesList = _engines->getCurvesAddress(boxID);
+      //Si la boîte n'est pas muted
+      if(!currentBox->getMuteState()){
 
-          //On supprime les messages si ils sont déjà associés à une courbe (le moteur les envoie automatiquement)
-          for (unsigned int i = 0; i < curvesList.size(); i++) {
-              //sauf si la courbe a été désactivée manuellement
-              if (!getCurveMuteState(boxID, curvesList[i])) {
-                  msgs.remove(QString::fromStdString(curvesList[i]));
-                }
-            }
-        }
-      else if (timeOffset == currentBox->date() && timeOffset > 0) { // <timeOffset to avoid rootBox cue duplication
-          boxMsgs = currentBox->getStartState();
-        }
-      boxAddresses = boxMsgs.keys();
+          if (currentBox->date() < timeOffset && (currentBox->date() + currentBox->duration()) <= timeOffset) {
+              boxMsgs = currentBox->getFinalState();
+          }
+          else if (timeOffset > currentBox->date() && timeOffset < (currentBox->date() + currentBox->duration())) {
+              //goto au milieu d'une boîte : On envoie la valeur du début de boîte
+              boxMsgs = currentBox->getStartState();
+              curvesList = _engines->getCurvesAddress(boxID);
 
-      //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
-      for (QList<QString>::iterator it2 = boxAddresses.begin(); it2 != boxAddresses.end(); it2++) {
-          if (msgs.contains(*it2)) {
-              if (msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second <= timeOffset) {
-                  msgs.insert(*it2, boxMsgs.value(*it2));
-                }
-            }
+              //On supprime les messages si ils sont déjà associés à une courbe (le moteur les envoie automatiquement)
+              for (unsigned int i = 0; i < curvesList.size(); i++) {
+                  //sauf si la courbe a été désactivée manuellement
+                  if (!getCurveMuteState(boxID, curvesList[i])) {
+                      msgs.remove(QString::fromStdString(curvesList[i]));
+                  }
+              }
+          }
+          else if (timeOffset == currentBox->date() && timeOffset > 0) { // <timeOffset to avoid rootBox cue duplication
+              boxMsgs = currentBox->getStartState();
+          }
+          boxAddresses = boxMsgs.keys();
 
-          //sinon on ajoute dans la liste de messages
-          else
-          if (boxMsgs.value(*it2).second <= timeOffset) {
-              msgs.insert(*it2, boxMsgs.value(*it2));
-            }
-        }
-    }
+          //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
+          for (QList<QString>::iterator it2 = boxAddresses.begin(); it2 != boxAddresses.end(); it2++) {
+              if (msgs.contains(*it2)) {
+                  if (msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second <= timeOffset) {
+                      msgs.insert(*it2, boxMsgs.value(*it2));
+                  }
+              }
 
+              //sinon on ajoute dans la liste de messages
+              else
+                  if (boxMsgs.value(*it2).second <= timeOffset) {
+                      msgs.insert(*it2, boxMsgs.value(*it2));
+                  }
+          }
+      }
+  }
   //traduction en QMap<QString,QString>, on supprime le champs date des messages
   QList<QString> addresses = msgs.keys();
 
@@ -2065,7 +2069,12 @@ void
 Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
 {
     int type = getBox(boxID)->type();
-    BasicBox *box = static_cast<BasicBox*>(_boxes[boxID]);
+    BasicBox *box = static_cast<BasicBox*>(_boxes[boxID]);    
+
+    if(boxID == ROOT_BOX_ID){
+        if(!Maquette::getInstance()->scene()->thread()->isRunning())
+            Maquette::getInstance()->scene()->thread()->start();
+    }
 
     if (type == PARENT_BOX_TYPE) {        
         if (running){
@@ -2078,9 +2087,9 @@ Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
 }
 
 void
-Maquette::executionFinished()
+Maquette::udpatePlayModeView()
 {
-  _scene->timeEndReached();
+    _scene->updatePlayModeView();
 }
 
 void
@@ -2093,10 +2102,9 @@ void
 boxIsRunningCallback(unsigned int boxID, bool running)
 {
   Maquette::getInstance()->updateBoxRunningStatus(boxID, running);
-    
-    // if the execution of the upper box ends
-    if (boxID == ROOT_BOX_ID)
-        Maquette::getInstance()->executionFinished();
+
+  if(boxID==ROOT_BOX_ID)
+      Maquette::getInstance()->udpatePlayModeView();
 }
 
 void

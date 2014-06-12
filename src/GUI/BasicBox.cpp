@@ -96,7 +96,8 @@ const float BasicBox::EAR_WIDTH = 9;
 const float BasicBox::EAR_HEIGHT = 30;
 const float BasicBox::GRIP_CIRCLE_SIZE = 5;
 unsigned int BasicBox::BOX_MARGIN = 25;
-const QString BasicBox::SUB_SCENARIO_MODE_TEXT = tr("Scenario");
+const QString BasicBox::SCENARIO_MODE_TEXT = tr("Scenario");
+const QString BasicBox::DEFAULT_MODE_TEXT = "";
 const QColor BasicBox::BOX_COLOR = QColor(60, 60, 60);
 const QColor BasicBox::TEXT_COLOR = QColor(0, 0, 0);
 
@@ -253,7 +254,6 @@ BasicBox::createMenus()
       "}"
       );
 
-
   QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
   startMenuProxy->setWidget(_startMenuButton);
   QGraphicsProxyWidget *endMenuProxy = new QGraphicsProxyWidget(this);
@@ -345,7 +345,7 @@ BasicBox::createWidget()
               "}"
 
               "QComboBox::down-arrow {"
-              "image: url(:/resources/images/1downarrow.png);"
+              "image: url(:/resources/images/downArrow.png);"
               "padding-right: 10px;"
               "}"
 
@@ -1982,10 +1982,14 @@ BasicBox::drawSelectShape(QPainter *painter){
 
 void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
+{    
     Q_UNUSED(widget);
     painter->setClipRect(option->exposedRect);//To increase performance
     bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
+
+    //Set disabled the curve proxy when box not selected.
+    _boxContentWidget->setCurveLowerStyle(_comboBox->currentText().toStdString(),!isSelected());
+
 
     //Showing stop button when playing
     if(_playing){
@@ -1995,7 +1999,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         _stopButton->setVisible(_playing);
     }
     else
-        setButtonsVisible(_hover);
+        setButtonsVisible(_hover || isSelected());
 
     //draw hover shape
     if (_hover && !isSelected() && !_playing)

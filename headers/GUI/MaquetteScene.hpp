@@ -672,7 +672,7 @@ class MaquetteScene : public QGraphicsScene
     /*!
      * \brief Called when the time reaches the end.
      */
-    void timeEndReached();
+    void updatePlayModeView();
 
     /*
      * \brief Called to update the next starting time.

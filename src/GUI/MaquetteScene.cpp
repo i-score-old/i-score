@@ -454,7 +454,7 @@ bool
 MaquetteScene::subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent)
 {
   if (getSelectedItem() != NULL && itemAt(mouseEvent->scenePos()) != 0) {
-      return(getSelectedItem()->type() == PARENT_BOX_TYPE && static_cast<BasicBox*>(getSelectedItem())->currentText() == BasicBox::SUB_SCENARIO_MODE_TEXT && static_cast<BasicBox*>(getSelectedItem())->boxBody().contains(mouseEvent->pos()) && itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::ArrowCursor);
+      return(getSelectedItem()->type() == PARENT_BOX_TYPE && static_cast<BasicBox*>(getSelectedItem())->currentText() == BasicBox::SCENARIO_MODE_TEXT && static_cast<BasicBox*>(getSelectedItem())->boxBody().contains(mouseEvent->pos()) && itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::ArrowCursor);
     }
   else {
       return false;
@@ -1753,7 +1753,7 @@ MaquetteScene::removeSelectedItems()
 }
 
 void
-MaquetteScene::timeEndReached()
+MaquetteScene::updatePlayModeView()
 {
     view()->updateTimeOffsetView();
     
