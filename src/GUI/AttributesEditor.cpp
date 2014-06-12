@@ -150,6 +150,10 @@ AttributesEditor::nameWidgets()
 
   length = tr("Length");
   assignStart = tr("Start");
+  QFont font;
+  font.setPointSize(8);
+  _snapshotAssignStart->setFont(font);
+  _snapshotAssignEnd->setFont(font);
   assignEnd = tr("End");
 
   _snapshotAssignStart->setText(assignStart);
@@ -163,12 +167,15 @@ AttributesEditor::createWidgets()
   _centralLayout = new QGridLayout;
   _centralLayout->setContentsMargins(LEFT_MARGIN, TOP_MARGIN, RIGHT_MARGIN, BOTTOM_MARGIN);
 
+  //udpate label
+  _updateLabel = new QLabel("Update");
+
   //Color button
   _generalColorButton = new QPushButton;
   _generalColorButton->setIconSize(QSize(COLOR_ICON_SIZE, COLOR_ICON_SIZE));
   _colorButtonPixmap = new QPixmap(4 * COLOR_ICON_SIZE / 3, 4 * COLOR_ICON_SIZE / 3);
   _colorButtonPixmap->fill(QColor(Qt::gray));
-  _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
+  _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));  
 
   _generalColorButton->setStyleSheet(
   " QPushButton {"
@@ -187,7 +194,7 @@ AttributesEditor::createWidgets()
                           "selection-color: black;"
                           "selection-background-color: (170,100,100);"
                           );  
-  _boxSettingsLayout = new QHBoxLayout;
+  _boxSettingsLayout = new QGridLayout;
 
   //Start&End buttons
   _snapshotAssignStart = new QPushButton;
@@ -200,8 +207,14 @@ AttributesEditor::createWidgets()
               "padding-bottom: 3px;"
               "padding-top: 3px;"
 
-  "min-width: 80px;"
-  "}"
+              "min-width: 10px;"
+              "}"
+                          "max-width: 10px;"
+                          "}"
+                          "min-height: 5px;"
+                          "}"
+                                      "max-height: 5px;"
+                                      "}"
 
   "QPushButton:pressed {"
               "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
@@ -227,9 +240,14 @@ AttributesEditor::createWidgets()
               "padding-bottom: 3px;"
               "padding-top: 3px;"
 
-  "min-width: 80px;"
+  "min-width: 10px;"
   "}"
-
+              "max-width: 10px;"
+              "}"
+              "min-height: 5px;"
+              "}"
+                          "max-height: 5px;"
+                          "}"
   "QPushButton:pressed {"
               "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
               "stop: 0 #606060, stop: 1 #808080);"
@@ -267,11 +285,13 @@ AttributesEditor::addWidgetsToLayout()
   _boxLengthValue->setDecimals(BOX_EXTREMITY_PRECISION);
   _boxLengthValue->setKeyboardTracking(false);
 
-  _boxSettingsLayout->addWidget(_snapshotAssignStart,Qt::AlignTop);
-  _boxSettingsLayout->addWidget(_boxName,Qt::AlignBottom);
-  _boxSettingsLayout->addWidget(_generalColorButton,Qt::AlignTop);
-  _boxSettingsLayout->addWidget(_snapshotAssignEnd,Qt::AlignTop);
-  _boxSettingsLayout->setSpacing(horizontalSpacing);
+  _boxSettingsLayout->addWidget(_generalColorButton,0,0,2,1);
+  _boxSettingsLayout->addWidget(_boxName,0,1,2,1);
+  _boxSettingsLayout->addWidget(_updateLabel,0,2,1,1);
+  _boxSettingsLayout->addWidget(_snapshotAssignStart,1,2,1,1);
+  _boxSettingsLayout->addWidget(_snapshotAssignEnd,1,3,1,1);
+  _boxSettingsLayout->setVerticalSpacing(verticalSpacing);
+  _boxSettingsLayout->setHorizontalSpacing(horizontalSpacing);
 
   // Set Central Widget
   _centralLayout->addLayout(_boxSettingsLayout, 0, 1, Qt::AlignTop);

@@ -219,7 +219,7 @@ class AttributesEditor : public QDockWidget
     QWidget * _centralWidget;   //!< Central widget.
     QGridLayout * _centralLayout; //!< Central layout
 
-    QHBoxLayout *_boxSettingsLayout; //!< Layout handling box settings (name, color, assignation...).
+    QGridLayout *_boxSettingsLayout; //!< Layout handling box settings (name, color, assignation...).
     NetworkTree *_networkTree; //!< NetworkTree (inspector).
 
     /// \todo Old TODO updated (by jC)
@@ -228,6 +228,7 @@ class AttributesEditor : public QDockWidget
 
     // boxEditLayout items
     QLineEdit * _boxName; //!< Color button.
+    QLabel * _updateLabel; //!< Color button.
     QPixmap *_colorButtonPixmap; //!< Color button.
     QPushButton *_generalColorButton;  //!< Color button.
     QPushButton *_snapshotAssignStart; //!< Start assignation button.
