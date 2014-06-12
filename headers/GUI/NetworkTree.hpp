@@ -516,6 +516,7 @@ class NetworkTree : public QTreeWidget
     void unassignTotally(QTreeWidgetItem *item);
     void assignItem(QTreeWidgetItem *item, Data data);
     void updateOSCAddresses();
+    void getChildren(QTreeWidgetItem *item, QList<QTreeWidgetItem *> &items);
     void execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> items, int column);
 
     QMap<QTreeWidgetItem *, string> _addressMap;

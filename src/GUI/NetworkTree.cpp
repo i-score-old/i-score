@@ -2350,16 +2350,50 @@ NetworkTree::setRecMode(QList<std::string> address){
 }
 
 void
+NetworkTree::getChildren(QTreeWidgetItem *item, QList<QTreeWidgetItem *> & items)
+{
+    QTreeWidgetItem *child;
+
+    if (!item->isDisabled()) {
+        int childrenCount = item->childCount();
+        for (int i = 0; i < childrenCount; i++) {
+            child = item->child(i);
+            if (child->type() == NodeNoNamespaceType) {
+                items<<child;
+                getChildren(child, items);
+            }
+            else
+                items<<child;
+        }
+    }
+}
+void
 NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> selectedItems, int column)
 {    
     QTreeWidgetItem *item;
     QList<QTreeWidgetItem *>::iterator it;    
 
     //si le curItem n'est pas sélectionné, on n'applique l'action seulement sur celui-ci (pas sur les items sélectionnés)
+//    getConcernedItems();
     if(!selectedItems.contains(curItem)){
         selectedItems.clear();
         selectedItems<<curItem;
     }
+
+    //adding children of each node
+    QList<QTreeWidgetItem *> children, allChildren;
+
+    for(it=selectedItems.begin(); it!=selectedItems.end(); it++){
+        item = *it;
+        std::cout<<item->text(0).toStdString()<<std::endl;
+        children.clear();
+        getChildren(item, children);
+        allChildren<<children;
+    }
+    selectedItems<<allChildren;
+
+    for(int i=0; i<selectedItems.size(); i++)
+        std::cout<<"> "<<selectedItems.at(i)->text(0).toStdString()<<std::endl;
 
     if(column == START_ASSIGNATION_COLUMN){
         if(hasStartMsg(curItem)){
