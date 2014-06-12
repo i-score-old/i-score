@@ -525,8 +525,7 @@ class NetworkTree : public QTreeWidget
 
     QMap<QTreeWidgetItem *, string> _addressMap;
     QList<QTreeWidgetItem*> _nodesWithSelectedChildren;
-    QMap<QTreeWidgetItem *, Data> _assignedItems;
-    QList<QTreeWidgetItem *> _selectedItems;
+    QMap<QTreeWidgetItem *, Data> _assignedItems;    
     QList<QTreeWidgetItem*> _nodesWithSomeChildrenAssigned;
     QList<QTreeWidgetItem*> _nodesWithAllChildrenAssigned;
 

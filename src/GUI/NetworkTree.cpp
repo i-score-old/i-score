@@ -1837,8 +1837,6 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
           }
       }
 
-      _selectedItems.clear();
-      _selectedItems<<selectedItems();
       emit(selectionChanged(selectedItems()));
 
       if (item->type() == addOSCNode) {
