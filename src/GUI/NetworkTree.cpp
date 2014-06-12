@@ -95,10 +95,11 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   setColumnWidth(TYPE_COLUMN, 34);
   setColumnWidth(MIN_COLUMN, 30);
   setColumnWidth(MAX_COLUMN, 30);
-  setColumnWidth(PRIORITY_COLUMN, 30);
+  setColumnWidth(PRIORITY_COLUMN, 30);  
 
   setIndentation(13);
   setHeaderLabels(list);
+
   list.clear();
   QFont font;
   font.setPointSize(TEXT_POINT_SIZE);
@@ -915,6 +916,10 @@ NetworkTree::displayBoxContent(AbstractBox *abBox)
   updateEndMsgsDisplay();
   assignItems(assignedItems());  
   setRecMode(abBox->messagesToRecord());
+
+  QList<QTreeWidgetItem *> selectedItems = abBox->getNetworkTreeSelectedItems();
+  for(int i=0; i<selectedItems.size(); i++)
+      setItemSelected(selectedItems.at(i),true);
 }
 
 void
@@ -1832,6 +1837,10 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
           }
       }
 
+      _selectedItems.clear();
+      _selectedItems<<selectedItems();
+      emit(selectionChanged(selectedItems()));
+
       if (item->type() == addOSCNode) {
           addOSCMessage(item->parent());
       }
@@ -2369,7 +2378,7 @@ NetworkTree::getChildren(QTreeWidgetItem *item, QList<QTreeWidgetItem *> & items
 }
 void
 NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> selectedItems, int column)
-{    
+{                
     QTreeWidgetItem *item;
     QList<QTreeWidgetItem *>::iterator it;    
 
@@ -2383,8 +2392,7 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
     QList<QTreeWidgetItem *> children, allChildren;
 
     for(it=selectedItems.begin(); it!=selectedItems.end(); it++){
-        item = *it;
-        std::cout<<item->text(0).toStdString()<<std::endl;
+        item = *it;        
         children.clear();
         getChildren(item, children);
         allChildren<<children;

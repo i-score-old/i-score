@@ -1163,6 +1163,13 @@ BasicBox::addToExpandedItemsList(QTreeWidgetItem *item)
 }
 
 void
+BasicBox::
+setSelectedTreeItems(QList<QTreeWidgetItem *> selectedItems)
+{
+    _abstract->setNetworkTreeSelectedItems(selectedItems);
+}
+
+void
 BasicBox::removeFromExpandedItemsList(QTreeWidgetItem *item)
 {
   _abstract->removeFromNetworkTreeExpandedItems(item);

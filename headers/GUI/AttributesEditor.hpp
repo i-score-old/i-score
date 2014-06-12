@@ -117,6 +117,7 @@ class AttributesEditor : public QDockWidget
 
   public slots:
     void addToExpandedItemsList(QTreeWidgetItem *item);
+    void addToSelectedItemsList(QList<QTreeWidgetItem *> selectedItems);
     void removeFromExpandedItemsList(QTreeWidgetItem *item);
 
     /*!

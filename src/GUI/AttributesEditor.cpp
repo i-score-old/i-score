@@ -312,6 +312,7 @@ AttributesEditor::connectSlots()
   connect(_networkTree, SIGNAL(requestSnapshotEnd(QList<QTreeWidgetItem *>)), this, SLOT(snapshotEndAssignment(QList<QTreeWidgetItem *>)));
 
   connect(_networkTree, SIGNAL(itemExpanded(QTreeWidgetItem *)), this, SLOT(addToExpandedItemsList(QTreeWidgetItem*)));
+  connect(_networkTree, SIGNAL(selectionChanged(QList<QTreeWidgetItem *>)), this, SLOT(addToSelectedItemsList(QList<QTreeWidgetItem *>)));
   connect(_networkTree, SIGNAL(itemCollapsed(QTreeWidgetItem *)), this, SLOT(removeFromExpandedItemsList(QTreeWidgetItem*)));
   connect(_networkTree, SIGNAL(curveActivationChanged(QTreeWidgetItem*, bool)), this, SLOT(curveActivationChanged(QTreeWidgetItem*, bool)));
   connect(_networkTree, SIGNAL(curveRedundancyChanged(QTreeWidgetItem*, bool)), this, SLOT(curveRedundancyChanged(QTreeWidgetItem*, bool)));
@@ -347,7 +348,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
             }
           else {
               _networkTree->setAssignedItems(abBox->networkTreeItems());
-              _networkTree->expandItems(abBox->networkTreeExpandedItems());              
+              _networkTree->expandItems(abBox->networkTreeExpandedItems());                            
             }
 
           _networkTree->displayBoxContent(abBox);
@@ -832,6 +833,16 @@ AttributesEditor::addToExpandedItemsList(QTreeWidgetItem *item)
   if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
       Maquette::getInstance()->addToExpandedItemsList(_boxEdited, item);
     }
+}
+
+void
+AttributesEditor::addToSelectedItemsList(QList<QTreeWidgetItem *> selectedItems)
+{
+    if(_boxEdited != NO_ID){
+        BasicBox * box = _scene->getBox(_boxEdited);
+        box->setSelectedTreeItems(selectedItems);
+    }
+
 }
 
 void

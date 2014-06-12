@@ -268,6 +268,18 @@ class AbstractBox : public Abstract
         }
     }
 
+    inline void
+    setNetworkTreeSelectedItems(QList<QTreeWidgetItem *> selectedItems)
+    {
+        _networkTreeSelectedItems = selectedItems;
+    }
+
+    inline QList<QTreeWidgetItem *>
+    getNetworkTreeSelectedItems()
+    {
+        return _networkTreeSelectedItems;
+    }
+
     /*!
      * \brief Remove the expanded items from the list.
      * \param item : the item to remove.
@@ -312,6 +324,7 @@ class AbstractBox : public Abstract
     NetworkMessages *_endMessages;       //!< pairs QTreeWidgetItem-Message
     QMap<QTreeWidgetItem *, Data> _networkTreeItems;
     QList<QTreeWidgetItem *> _networkTreeExpandedItems;
+    QList<QTreeWidgetItem *> _networkTreeSelectedItems;
     QList<std::string> _messagesToRecord;
 };
 #endif

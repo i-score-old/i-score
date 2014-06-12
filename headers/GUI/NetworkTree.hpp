@@ -436,6 +436,7 @@ class NetworkTree : public QTreeWidget
     void recModeChanged(QTreeWidgetItem *item);
     void requestSnapshotStart(QList<QTreeWidgetItem *> itemsList);
     void requestSnapshotEnd(QList<QTreeWidgetItem *> itemsLists);
+    void selectionChanged(QList<QTreeWidgetItem *> selectedItems);
 
   private:
     void treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict);
@@ -525,6 +526,7 @@ class NetworkTree : public QTreeWidget
     QMap<QTreeWidgetItem *, string> _addressMap;
     QList<QTreeWidgetItem*> _nodesWithSelectedChildren;
     QMap<QTreeWidgetItem *, Data> _assignedItems;
+    QList<QTreeWidgetItem *> _selectedItems;
     QList<QTreeWidgetItem*> _nodesWithSomeChildrenAssigned;
     QList<QTreeWidgetItem*> _nodesWithAllChildrenAssigned;
 
