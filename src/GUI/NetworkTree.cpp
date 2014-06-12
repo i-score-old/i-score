@@ -584,7 +584,7 @@ NetworkTree::treeSnapshot(unsigned int boxID)
   QMap<QTreeWidgetItem *, Data> snapshots;
   QList<QString> devicesConcerned;
 
-  QList<QTreeWidgetItem*> selection = selectedItems();
+  QList<QTreeWidgetItem*> selection = assignedItems().keys();
   if (!selection.empty()) {
       QList<QTreeWidgetItem*>::iterator it;
       vector<string>::iterator it2;

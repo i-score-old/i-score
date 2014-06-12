@@ -82,6 +82,9 @@ class NetworkTree : public QTreeWidget
     *                          General tools
     ***********************************************************************/
 
+    /*!
+     * \brief Gets all assigned items.
+     */
     QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot(unsigned int boxID);
     QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot(unsigned int boxID, QList<QTreeWidgetItem *> itemsList);
 
