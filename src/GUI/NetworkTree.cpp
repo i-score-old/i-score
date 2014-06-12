@@ -2374,7 +2374,6 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
     QList<QTreeWidgetItem *>::iterator it;    
 
     //si le curItem n'est pas sélectionné, on n'applique l'action seulement sur celui-ci (pas sur les items sélectionnés)
-//    getConcernedItems();
     if(!selectedItems.contains(curItem)){
         selectedItems.clear();
         selectedItems<<curItem;
@@ -2392,16 +2391,19 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
     }
     selectedItems<<allChildren;
 
-    for(int i=0; i<selectedItems.size(); i++)
-        std::cout<<"> "<<selectedItems.at(i)->text(0).toStdString()<<std::endl;
-
     if(column == START_ASSIGNATION_COLUMN){
         if(hasStartMsg(curItem)){
-            //remove all start messages
-            for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++){
-                item = *it;                
-                item->setText(START_COLUMN, "");
-                emit(startValueChanged(item, ""));
+            //cmd+click update values
+            if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
+                emit(requestSnapshotStart(selectedItems));
+            }
+            else{
+                //remove all start messages
+                for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++){
+                    item = *it;
+                    item->setText(START_COLUMN, "");
+                    emit(startValueChanged(item, ""));
+                }
             }
         }
         else
@@ -2409,11 +2411,17 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
     }
     else if(column == END_ASSIGNATION_COLUMN){
         if(hasEndMsg(curItem)){
-            //remove all start messages
-            for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++){
-                item = *it;
-                item->setText(END_COLUMN, "");
-                emit(endValueChanged(item, ""));
+            //cmd+click update values
+            if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
+                emit(requestSnapshotEnd(selectedItems));
+            }
+            else{
+                //remove all start messages
+                for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++){
+                    item = *it;
+                    item->setText(END_COLUMN, "");
+                    emit(endValueChanged(item, ""));
+                }
             }
         }
         else
