@@ -286,31 +286,6 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
               msg.message += curName.section('/', 1, nbSection);
             }
 
-          //--------------------PROVISOIRE--------------------
-//        Considère les noeuds avec un nombre fixe de parents, NB_PARENT_MAX. Mis en place pour le cas de l'ancienne version de jamoma où peut mettre des noms contenant des "/"
-//        int NB_PARENT_MAX = 2;
-//        int i;
-
-//        if(address.size()>NB_PARENT_MAX+1){
-//            std::cout<<"address concat :"<<address.size()<<std::endl;
-
-//            QString concat = address.at(NB_PARENT_MAX);
-//            for(i=NB_PARENT_MAX+1; i<address.size(); i++){
-//                concat+="/";
-//                concat+=address.at(i);
-//            }
-
-//            address.replace(NB_PARENT_MAX,concat);
-
-//            for(i=NB_PARENT_MAX+1; i<=address.size(); i++)
-//                address.pop_back();
-
-//            for(i=0;i<address.size();i++)
-//                std::cout<<address.at(i).toStdString()<<" ";
-//            std::cout<<std::endl<<std::endl;
-//         }
-          //--------------------------------------------------
-
           itemsFound = this->findItems(splitAddress.last(), Qt::MatchRecursive, 0);
           if (itemsFound.size() > 1) {
               QList<QTreeWidgetItem *>::iterator it3;
@@ -460,6 +435,8 @@ NetworkTree::setOSCMessageName(QTreeWidgetItem *item, QString name)
       Maquette::getInstance()->removeFromNetWorkNamespace(oldAddress);
       _OSCMessages.insert(item, newAddress);
       Maquette::getInstance()->appendToNetWorkNamespace(newAddress.toStdString());
+
+      /// \todo reload tree - Redemander à score le nouvel arbre (après ajout de cet item). Ainsi il ira se placer en fonction des / dans son nom comme fils ou parent des autres noeuds dans l'arbre.
     }
 }
 
