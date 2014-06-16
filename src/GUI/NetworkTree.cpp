@@ -228,6 +228,7 @@ NetworkTree::load()
   vector<string>::iterator nameIt;
   QList<QTreeWidgetItem*> itemsList;
   _addADeviceItem = addADeviceNode();
+  string protocol;
 
   for (nameIt = deviceNames.begin(); nameIt != deviceNames.end(); ++nameIt) {      
 
@@ -236,6 +237,10 @@ NetworkTree::load()
       curItem->setText(NAME_COLUMN , deviceName);
       treeRecursiveExploration(curItem, true);
       itemsList << curItem;
+
+      Maquette::getInstance()->getDeviceProtocol(deviceName.toStdString(),protocol);
+      if(protocol=="OSC")
+          createOCSBranch(curItem);
     }
 
   itemsList<<_addADeviceItem;
