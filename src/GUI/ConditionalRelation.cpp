@@ -176,7 +176,6 @@ void
 ConditionalRelation::detachBox(BasicBox * box)
 {
     Maquette::getInstance()->detachFromCondition(_id,box);
-    box->removeConditionalRelation(this);
     _boxesAttached.removeAll(box);
 
     updateCoordinates();

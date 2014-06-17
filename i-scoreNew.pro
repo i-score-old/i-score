@@ -2,8 +2,7 @@ TEMPLATE = app
 TARGET = i-score
 
 QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -std=c++11
-
-!contains(QMAKE_HOST.arch, armv7l){
+contains(QMAKE_HOST.arch, 86) {
 	QMAKE_CXXFLAGS += -msse3
 }
 

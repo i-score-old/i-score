@@ -887,10 +887,7 @@ BasicBox::removeConditionalRelation(ConditionalRelation *condRel)
 void
 BasicBox::removeConditionalRelations()
 {
-    QList<ConditionalRelation *>::iterator it=_conditionalRelation.begin();
-
-    for(it ; it!=_conditionalRelation.end() ; it++)
-        removeConditionalRelation(*it);
+    _conditionalRelation.clear();
 }
 
 void
@@ -898,8 +895,10 @@ BasicBox::detachFromCondition()
 {
     QList<ConditionalRelation *>::iterator it=_conditionalRelation.begin();
 
-    for(it ; it!=_conditionalRelation.end() ; it++)
+    for(; it!=_conditionalRelation.end() ; it++) {
         (*it)->detachBox(this);
+    }
+    removeConditionalRelations();
 }
 
 QList<Relation *>
@@ -981,14 +980,12 @@ BasicBox::playing() const
 void
 BasicBox::setCrossedExtremity(BoxExtremity extremity)
 {
-  if (extremity == BOX_START) {      
+  if (extremity == BOX_START)
       _playing = true;
-    }
-  else if (extremity == BOX_END) {
-      _playing = false;
-      setCrossedTriggerPoint(false, BOX_START);
-      setCrossedTriggerPoint(false, BOX_END);
-    }
+
+  else if (extremity == BOX_END)
+    _playing = false;
+
   _scene->setPlaying(_abstract->ID(), _playing);
 }
 

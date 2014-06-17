@@ -1737,7 +1737,7 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
 void Engine::removeTriggerPoint(ConditionedProcessId triggerId)
 {
     // check existence before because they could have been destroyed in deleteCondition
-    if (m_conditionsMap.find(triggerId) == m_conditionsMap.end())
+    if (m_conditionedProcessMap.find(triggerId) == m_conditionedProcessMap.end())
         return;
     
     TTValue             v, out;
@@ -1815,7 +1815,7 @@ void Engine::detachFromCondition(TimeConditionId conditionId, ConditionedProcess
     if (m_conditionsMap.find(conditionId) == m_conditionsMap.end())
         return;
     
-    if (m_conditionsMap.find(triggerId) == m_conditionsMap.end())
+    if (m_conditionedProcessMap.find(triggerId) == m_conditionedProcessMap.end())
         return;
     
     TTTimeConditionPtr  timeCondition = getTimeCondition(conditionId);
