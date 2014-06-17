@@ -2080,8 +2080,8 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
   if (box != NULL) { // Box Found
       if (box->hasCurve(address) && !_recMessages.contains(item) ) {
           if (_assignedItems.value(item).hasCurve) {
-              unsigned int sampleRate;
-              bool redundancy, interpolate;
+              unsigned int sampleRate = 0;
+              bool redundancy =  false, interpolate = false;
               vector<float> values, xPercents, yValues, coeff;
               vector<string> argTypes;
               vector<short> sectionType;
@@ -2104,8 +2104,9 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
                       Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
                   }
 
-                  updateLine(item, interpolate, sampleRate, redundancy);
+
               }
+              updateLine(item, interpolate, sampleRate, redundancy);
           }
         }
     }
@@ -2187,14 +2188,15 @@ NetworkTree::updateLine(QTreeWidgetItem *item, bool interpolationState, int samp
   setCurveActivated(item, interpolationState);
   if (interpolationState) {
       item->setCheckState(INTERPOLATION_COLUMN, Qt::Checked);
+      //SAMPLE RATE
+      setSampleRate(item, sampleRate);
+      item->setText(SR_COLUMN, QString::number(getSampleRate(item)));
     }
   else {
       item->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
+      item->setText(SR_COLUMN, "");
     }
 
-  //SAMPLE RATE
-  setSampleRate(item, sampleRate);
-  item->setText(SR_COLUMN, QString::number(getSampleRate(item)));
 
   //REDUNDANCY
   setRedundancy(item, redundancy);

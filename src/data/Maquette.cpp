@@ -447,20 +447,10 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
             }
         }
       endMessages.insert(currentAddress, currentValue);
+      std::cout<<"Insert "<<currentAddress<<std::endl;
     }
 
 
-  /************    Pour le cas open file   ************/
-  for (it = curvesAddresses.begin(); it != curvesAddresses.end(); ++it) {
-      currentMsg = *it;
-      getBox(boxID)->addCurveAddress(currentMsg);
-      if (startMessages.contains(currentMsg)) {
-          startMessages.remove(currentMsg);
-        }
-      if (endMessages.contains(currentMsg)) {
-          endMessages.remove(currentMsg);
-        }
-    }
 
 
   /************  addCurve if endAddress contains startAddress && endValue != startValue ************/
@@ -510,6 +500,20 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
             }
         }
     }
+
+  /************    Pour le cas open file   ************/
+  curvesAddresses = getCurvesAddresses(boxID);
+  for (it = curvesAddresses.begin(); it != curvesAddresses.end(); ++it) {
+      currentMsg = *it;
+      getBox(boxID)->addCurveAddress(currentMsg);
+      if (startMessages.contains(currentMsg)) {
+          startMessages.remove(currentMsg);
+        }
+      if (endMessages.contains(currentMsg)) {
+          endMessages.remove(currentMsg);
+        }
+    }
+
 }
 
 bool
@@ -531,7 +535,6 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages, 
       vector<string> lastMsgs;
       _engines->getCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, lastMsgs);
       updateCurves(boxID, firstMsgs, lastMsgs);
-
       return true;
     }
   return false;
