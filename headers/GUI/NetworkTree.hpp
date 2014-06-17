@@ -536,6 +536,7 @@ class NetworkTree : public QTreeWidget
     QList<QTreeWidgetItem *> _recMessages;
     QMap<QTreeWidgetItem *, QString> _OSCMessages;
     QTreeWidgetItem *_addADeviceItem;
+    QList<QTreeWidgetItem*> _expandedItems;
 
     int _OSCMessageCount;
     bool _treeFilterActive;
@@ -554,7 +555,7 @@ class NetworkTree : public QTreeWidget
     void itemCollapsed();
     void clickInNetworkTree(QTreeWidgetItem *item, int column);
     void valueChanged(QTreeWidgetItem* item, int column);
-    void changeStartValue(QTreeWidgetItem* item, QString newValue);
+    void changeStartValue(QTreeWidgetItem* item, QString newValue);    
     void changeEndValue(QTreeWidgetItem* item, QString newValue);
     void changeNameValue(QTreeWidgetItem* item, QString newValue);
     void updateDeviceName(QString oldName, QString newName);
@@ -563,6 +564,8 @@ class NetworkTree : public QTreeWidget
     void updateDeviceNamespace(QString deviceName);
     void setRecMode(std::string address);
     void setRecMode(QList<std::string> items);
+    void addToExpandedItems(QTreeWidgetItem *item);
+    void removeFromExpandedItems(QTreeWidgetItem *item);
 
     virtual void clear();
 };

@@ -347,8 +347,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
               endMessagesChanged();
             }
           else {
-              _networkTree->setAssignedItems(abBox->networkTreeItems());
-              _networkTree->expandItems(abBox->networkTreeExpandedItems());                            
+              _networkTree->setAssignedItems(abBox->networkTreeItems());             
             }
 
           _networkTree->displayBoxContent(abBox);
@@ -830,8 +829,9 @@ AttributesEditor::snapshotEndAssignment(QList<QTreeWidgetItem *> itemsList)
 void
 AttributesEditor::addToExpandedItemsList(QTreeWidgetItem *item)
 {
-  if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
-      Maquette::getInstance()->addToExpandedItemsList(_boxEdited, item);
+    BasicBox * box = _scene->getBox(_boxEdited);
+    if (box != NULL) {
+        box->addToExpandedItemsList(item);
     }
 }
 
@@ -848,8 +848,9 @@ AttributesEditor::addToSelectedItemsList(QList<QTreeWidgetItem *> selectedItems)
 void
 AttributesEditor::removeFromExpandedItemsList(QTreeWidgetItem *item)
 {
-  if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
-      Maquette::getInstance()->removeFromExpandedItemsList(_boxEdited, item);
+    BasicBox * box = _scene->getBox(_boxEdited);
+    if (box != NULL) {
+        box->removeFromExpandedItemsList(item);
     }
 }
 

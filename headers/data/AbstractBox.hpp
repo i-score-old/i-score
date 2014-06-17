@@ -252,6 +252,7 @@ class AbstractBox : public Abstract
     inline void
     setNetworkTreeExpandedItems(QList<QTreeWidgetItem*> &items)
     {
+        _justCreated = false;
       _networkTreeExpandedItems.clear();
       _networkTreeExpandedItems = items;
     }
@@ -263,6 +264,7 @@ class AbstractBox : public Abstract
     inline void
     addToNetworkTreeExpandedItems(QTreeWidgetItem *item)
     {
+        _justCreated = false;
       if (!_networkTreeExpandedItems.contains(item)) {
           _networkTreeExpandedItems << item;
         }
@@ -287,6 +289,7 @@ class AbstractBox : public Abstract
     inline void
     removeFromNetworkTreeExpandedItems(QTreeWidgetItem *item)
     {
+        _justCreated = false;
       _networkTreeExpandedItems.removeAt(_networkTreeExpandedItems.indexOf(item));
     }
     inline void
@@ -311,20 +314,22 @@ class AbstractBox : public Abstract
     void addMessageToRecord(std::string address);
     void removeMessageToRecord(std::string address);
     inline QList<std::string> messagesToRecord() const {return _messagesToRecord;}
+    inline bool justCreated(){return _justCreated;}
 
   protected:
-    QPointF _topLeft;                    //!< The local coordinates of the upper left corner.
-    float _width;                        //!< The width of the box.
-    float _height;                       //!< The height of the box.
-    std::string _name;                   //!< The name of the box.
-    QColor _color;                       //!< The color of the box.
-    unsigned int _ID;                    //!< The ID of the box.
-    unsigned int _motherID;              //!< The possible mother's ID    
-    NetworkMessages *_startMessages;     //!< pairs QTreeWidgetItem-Message
-    NetworkMessages *_endMessages;       //!< pairs QTreeWidgetItem-Message
+    QPointF _topLeft;                                   //!< The local coordinates of the upper left corner.
+    float _width;                                       //!< The width of the box.
+    float _height;                                      //!< The height of the box.
+    std::string _name;                                  //!< The name of the box.
+    QColor _color;                                      //!< The color of the box.
+    unsigned int _ID;                                   //!< The ID of the box.
+    unsigned int _motherID;                             //!< The possible mother's ID
+    NetworkMessages *_startMessages;                    //!< pairs QTreeWidgetItem-Message
+    NetworkMessages *_endMessages;                      //!< pairs QTreeWidgetItem-Message
     QMap<QTreeWidgetItem *, Data> _networkTreeItems;
     QList<QTreeWidgetItem *> _networkTreeExpandedItems;
     QList<QTreeWidgetItem *> _networkTreeSelectedItems;
     QList<std::string> _messagesToRecord;
+    bool _justCreated;                                  //!< Used just for expanded items. Special case if the box is just created. We set the tree current state.
 };
 #endif

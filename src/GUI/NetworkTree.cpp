@@ -118,6 +118,8 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   connect(this, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(valueChanged(QTreeWidgetItem*, int)));
   connect(this, SIGNAL(startValueChanged(QTreeWidgetItem*, QString)), this, SLOT(changeStartValue(QTreeWidgetItem*, QString)));
   connect(this, SIGNAL(endValueChanged(QTreeWidgetItem*, QString)), this, SLOT(changeEndValue(QTreeWidgetItem*, QString)));
+  connect(this,SIGNAL(itemExpanded(QTreeWidgetItem*)),this, SLOT(addToExpandedItems(QTreeWidgetItem*)));
+  connect(this,SIGNAL(itemCollapsed(QTreeWidgetItem*)),this, SLOT(removeFromExpandedItems(QTreeWidgetItem*)));
   connect(_deviceEdit, SIGNAL(deviceChanged(QString)), this, SLOT(refreshCurrentItemNamespace()));
   connect(_deviceEdit, SIGNAL(deviceNameChanged(QString,QString)), this, SLOT(updateDeviceName(QString, QString)));
   connect(_deviceEdit, SIGNAL(deviceProtocolChanged(QString)), this, SLOT(updateDeviceProtocol(QString)));
@@ -155,6 +157,7 @@ NetworkTree::init()
   _OSCStartMessages = new NetworkMessages;
   _OSCEndMessages = new NetworkMessages;
   _recMessages = QList<QTreeWidgetItem*>();
+  _expandedItems = QList<QTreeWidgetItem*>();
 
   setStyleSheet(
     "QTreeView {"
@@ -896,8 +899,17 @@ NetworkTree::displayBoxContent(AbstractBox *abBox)
   setEndMessages(abBox->endMessages());
   updateStartMsgsDisplay();
   updateEndMsgsDisplay();
-  assignItems(assignedItems());  
+  assignItems(assignedItems());
   setRecMode(abBox->messagesToRecord());
+
+  //Expand items
+  QList<QTreeWidgetItem *> expandedItems = abBox->networkTreeExpandedItems();
+  if(abBox->justCreated()){ //Items are not collapsed at each new box. We save the tree current state.
+      expandedItems = _expandedItems;
+      abBox->setNetworkTreeExpandedItems(expandedItems);
+  }
+  else
+      expandItems(expandedItems);
 
   QList<QTreeWidgetItem *> selectedItems = abBox->getNetworkTreeSelectedItems();
   for(int i=0; i<selectedItems.size(); i++)
@@ -1034,6 +1046,7 @@ NetworkTree::expandItems(QList<QTreeWidgetItem*> expandedItems)
   QList<QTreeWidgetItem *>::iterator it;
   QTreeWidgetItem *curItem;
 
+  collapseAll();
   for (it = expandedItems.begin(); it != expandedItems.end(); ++it) {
       curItem = *it;
       expandItem(curItem);
@@ -2338,6 +2351,17 @@ NetworkTree::setRecMode(QList<std::string> address){
     QList<std::string>::iterator it;
     for(it=address.begin() ; it!=address.end() ; it++)
         setRecMode(*it);
+}
+
+void
+NetworkTree::addToExpandedItems(QTreeWidgetItem *item){
+    _expandedItems<<item;
+}
+
+void
+NetworkTree::removeFromExpandedItems(QTreeWidgetItem *item){
+    if(_expandedItems.contains(item))
+        _expandedItems.removeAll(item);
 }
 
 void
