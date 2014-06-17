@@ -422,8 +422,12 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
                     }
                 }
             }
+          else{
+              removeCurve(address);
+              return false;
+          }
       }
-      else {
+      else {          
           return false;
       }
     }

@@ -228,6 +228,7 @@ NetworkTree::load()
   vector<string>::iterator nameIt;
   QList<QTreeWidgetItem*> itemsList;
   _addADeviceItem = addADeviceNode();
+  string protocol;
 
   for (nameIt = deviceNames.begin(); nameIt != deviceNames.end(); ++nameIt) {      
 
@@ -236,6 +237,10 @@ NetworkTree::load()
       curItem->setText(NAME_COLUMN , deviceName);
       treeRecursiveExploration(curItem, true);
       itemsList << curItem;
+
+      Maquette::getInstance()->getDeviceProtocol(deviceName.toStdString(),protocol);
+      if(protocol=="OSC")
+          createOCSBranch(curItem);
     }
 
   itemsList<<_addADeviceItem;
@@ -280,31 +285,6 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
               msg.message = tr("/");
               msg.message += curName.section('/', 1, nbSection);
             }
-
-          //--------------------PROVISOIRE--------------------
-//        Considère les noeuds avec un nombre fixe de parents, NB_PARENT_MAX. Mis en place pour le cas de l'ancienne version de jamoma où peut mettre des noms contenant des "/"
-//        int NB_PARENT_MAX = 2;
-//        int i;
-
-//        if(address.size()>NB_PARENT_MAX+1){
-//            std::cout<<"address concat :"<<address.size()<<std::endl;
-
-//            QString concat = address.at(NB_PARENT_MAX);
-//            for(i=NB_PARENT_MAX+1; i<address.size(); i++){
-//                concat+="/";
-//                concat+=address.at(i);
-//            }
-
-//            address.replace(NB_PARENT_MAX,concat);
-
-//            for(i=NB_PARENT_MAX+1; i<=address.size(); i++)
-//                address.pop_back();
-
-//            for(i=0;i<address.size();i++)
-//                std::cout<<address.at(i).toStdString()<<" ";
-//            std::cout<<std::endl<<std::endl;
-//         }
-          //--------------------------------------------------
 
           itemsFound = this->findItems(splitAddress.last(), Qt::MatchRecursive, 0);
           if (itemsFound.size() > 1) {
@@ -455,6 +435,8 @@ NetworkTree::setOSCMessageName(QTreeWidgetItem *item, QString name)
       Maquette::getInstance()->removeFromNetWorkNamespace(oldAddress);
       _OSCMessages.insert(item, newAddress);
       Maquette::getInstance()->appendToNetWorkNamespace(newAddress.toStdString());
+
+      /// \todo reload tree - Redemander à score le nouvel arbre (après ajout de cet item). Ainsi il ira se placer en fonction des / dans son nom comme fils ou parent des autres noeuds dans l'arbre.
     }
 }
 
@@ -2098,8 +2080,8 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
   if (box != NULL) { // Box Found
       if (box->hasCurve(address) && !_recMessages.contains(item) ) {
           if (_assignedItems.value(item).hasCurve) {
-              unsigned int sampleRate;
-              bool redundancy, interpolate;
+              unsigned int sampleRate = 0;
+              bool redundancy =  false, interpolate = false;
               vector<float> values, xPercents, yValues, coeff;
               vector<string> argTypes;
               vector<short> sectionType;
@@ -2122,8 +2104,9 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
                       Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
                   }
 
-                  updateLine(item, interpolate, sampleRate, redundancy);
+
               }
+              updateLine(item, interpolate, sampleRate, redundancy);
           }
         }
     }
@@ -2205,14 +2188,15 @@ NetworkTree::updateLine(QTreeWidgetItem *item, bool interpolationState, int samp
   setCurveActivated(item, interpolationState);
   if (interpolationState) {
       item->setCheckState(INTERPOLATION_COLUMN, Qt::Checked);
+      //SAMPLE RATE
+      setSampleRate(item, sampleRate);
+      item->setText(SR_COLUMN, QString::number(getSampleRate(item)));
     }
   else {
       item->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
+      item->setText(SR_COLUMN, "");
     }
 
-  //SAMPLE RATE
-  setSampleRate(item, sampleRate);
-  item->setText(SR_COLUMN, QString::number(getSampleRate(item)));
 
   //REDUNDANCY
   setRedundancy(item, redundancy);
