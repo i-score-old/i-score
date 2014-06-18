@@ -214,24 +214,24 @@ class AttributesEditor : public QDockWidget
     void nameChanged();
 
   private:
-    QWidget * _centralWidget;   //!< Central widget.
-    QGridLayout * _centralLayout; //!< Central layout
+    QWidget * _centralWidget;           //!< Central widget.
+    QGridLayout * _centralLayout;       //!< Central layout
 
-    QHBoxLayout *_boxSettingsLayout; //!< Layout handling box settings (name, color, assignation...).
-    NetworkTree *_networkTree; //!< NetworkTree (inspector).
+    QHBoxLayout *_boxSettingsLayout;    //!< Layout handling box settings (name, color, assignation...).
+    NetworkTree *_networkTree;          //!< NetworkTree (inspector).
 
-    /// \todo Old TODO updated (by jC)
     QDoubleSpinBox * _boxStartValue;
     QDoubleSpinBox * _boxLengthValue;    
 
     // boxEditLayout items
-    QLineEdit * _boxName; //!< Color button.
-    QPixmap *_colorButtonPixmap; //!< Color button.
-    QPushButton *_generalColorButton;  //!< Color button.
-    QPushButton *_snapshotAssignStart; //!< Start assignation button.
-    QPushButton *_snapshotAssignEnd; //!< End assignation button.
+    QLineEdit * _boxName;               //!< Color button.
+    QPixmap *_colorButtonPixmap;        //!< Color button.
+    QPushButton *_generalColorButton;   //!< Color button.
+    QPushButton *_snapshotAssignStart;  //!< Start assignation button.
+    QPushButton *_snapshotAssignEnd;    //!< End assignation button.
+    QPushButton *_OSCLearnButton;       //!< End assignation button.
 
-    unsigned int _boxEdited;    //!< ID of box being edited
-    MaquetteScene * _scene; //!< The maquetteScene related with.
+    unsigned int _boxEdited;            //!< ID of box being edited
+    MaquetteScene * _scene;             //!< The maquetteScene related with.
 };
 #endif
