@@ -1434,16 +1434,18 @@ NetworkTree::resetAssignedNodes()
 }
 
 void
-NetworkTree::refreshItemNamespace(QTreeWidgetItem *item){
+NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes){
     if(item != NULL){
         if(item->type()==DeviceNode){
+            collapseItem(item);
             string application = getAbsoluteAddress(item).toStdString();
             item->takeChildren();            
 
             /// \todo récupérer la valeur de retour. Qui peut être false en cas de OSC (traitement différent dans ce cas là).
             Maquette::getInstance()->rebuildNetworkNamespace(application);
             treeRecursiveExploration(item,true);
-            Maquette::getInstance()->updateBoxesAttributes();
+            if(updateBoxes)
+                Maquette::getInstance()->updateBoxesAttributes();
         }
     }
 }

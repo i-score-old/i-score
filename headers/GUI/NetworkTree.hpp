@@ -549,7 +549,7 @@ class NetworkTree : public QTreeWidget
       * \brief Rebuild the networkTree under the item (or currentItem by default), after asking the engine to refresh its namespace.
       * \param The application we want to refresh.
       */
-    void refreshItemNamespace(QTreeWidgetItem *item);
+    void refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes = true);
     void refreshCurrentItemNamespace();
     void deleteCurrentItemNamespace();
     void itemCollapsed();
