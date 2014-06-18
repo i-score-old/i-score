@@ -255,7 +255,6 @@ AttributesEditor::createWidgets()
               "border-color: navy; /* make the default button prominent */"
               "}"
               );
-
   //NetworkTree
   _networkTree = new NetworkTree(this);
   //_networkTree->load();

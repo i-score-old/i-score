@@ -230,6 +230,7 @@ class AttributesEditor : public QDockWidget
     // boxEditLayout items
     QLineEdit * _boxName; //!< Color button.
     QLabel * _updateLabel; //!< Color button.
+
     QPixmap *_colorButtonPixmap; //!< Color button.
     QPushButton *_generalColorButton;  //!< Color button.
     QPushButton *_snapshotAssignStart; //!< Start assignation button.
