@@ -3014,7 +3014,7 @@ Engine::setDeviceProtocol(string deviceName, string protocol)
 bool Engine::setDeviceLearn(std::string deviceName, bool newLearn)
 {
     TTSymbol applicationName(deviceName);
-    
+
     TTErr err = getApplication(applicationName)->setAttributeValue("learn", newLearn);
     
     // enable namespace observation

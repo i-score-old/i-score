@@ -244,6 +244,7 @@ NetworkTree::load()
       QString deviceName = QString::fromStdString(*nameIt);
       QTreeWidgetItem *curItem = new QTreeWidgetItem(DeviceNode);
       curItem->setText(NAME_COLUMN , deviceName);
+      curItem->setCheckState(NAME_COLUMN,Qt::Unchecked);
       treeRecursiveExploration(curItem, true);
       itemsList << curItem;
 
@@ -503,7 +504,7 @@ NetworkTree::createOCSBranch(QTreeWidgetItem *curItem)
   addANodeItem->setFlags(Qt::ItemIsEnabled);
   addANodeItem->setIcon(0, QIcon(":/resources/images/addANode.png"));
   curItem->addChild(addANodeItem);
-  curItem->setFlags(Qt::ItemIsEnabled);
+//  curItem->setFlags(Qt::ItemIsEnabled);
 }
 
 QTreeWidgetItem *
@@ -1438,6 +1439,7 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item){
         if(item->type()==DeviceNode){
             string application = getAbsoluteAddress(item).toStdString();
             item->takeChildren();
+            item->setCheckState(NAME_COLUMN,Qt::Unchecked);
 
             /// \todo récupérer la valeur de retour. Qui peut être false en cas de OSC (traitement différent dans ce cas là).
             Maquette::getInstance()->rebuildNetworkNamespace(application);
@@ -1709,7 +1711,7 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
             if(currentItem()->type() == addDeviceNode){                
                  _deviceEdit->edit();
                  setCurrentItem(NULL);                 
-            }
+            }            
             else if(event->modifiers()==Qt::AltModifier){
                 unassignItem(currentItem());
             }
@@ -1809,6 +1811,10 @@ void
 NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 {            
   if (item != NULL) {
+      if(item->type()==DeviceNode){
+          Maquette::getInstance()->setDeviceLearn(item->text(NAME_COLUMN).toStdString(),item->checkState(NAME_COLUMN));
+      }
+
       execClickAction(item, selectedItems(), column);
 
       if (item->isSelected()) {
@@ -2275,7 +2281,7 @@ NetworkTree::updateDeviceName(QString oldName, QString newName)
 void
 NetworkTree::addNewDevice(QString deviceName)
 {
-    QTreeWidgetItem *newItem = addDeviceItem(deviceName);    
+    QTreeWidgetItem *newItem = addDeviceItem(deviceName);
     refreshItemNamespace(newItem);
     string protocol;
     Maquette::getInstance()->getDeviceProtocol(deviceName.toStdString(),protocol);
