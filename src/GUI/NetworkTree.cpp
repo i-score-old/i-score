@@ -1438,8 +1438,7 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item){
     if(item != NULL){
         if(item->type()==DeviceNode){
             string application = getAbsoluteAddress(item).toStdString();
-            item->takeChildren();
-            item->setCheckState(NAME_COLUMN,Qt::Unchecked);
+            item->takeChildren();            
 
             /// \todo récupérer la valeur de retour. Qui peut être false en cas de OSC (traitement différent dans ce cas là).
             Maquette::getInstance()->rebuildNetworkNamespace(application);
@@ -2282,9 +2281,10 @@ void
 NetworkTree::addNewDevice(QString deviceName)
 {
     QTreeWidgetItem *newItem = addDeviceItem(deviceName);
+    newItem->setCheckState(NAME_COLUMN,Qt::Unchecked);
     refreshItemNamespace(newItem);
     string protocol;
-    Maquette::getInstance()->getDeviceProtocol(deviceName.toStdString(),protocol);
+    Maquette::getInstance()->getDeviceProtocol(deviceName.toStdString(),protocol);    
     if(protocol=="OSC")
         createOCSBranch(newItem);
 }
