@@ -66,9 +66,9 @@ DeviceEdit::init()
   _localHostLabel = new QLabel(tr("localHost"));
 
   _portOutputBox = new QSpinBox;
-  _portOutputBox->setRange(0, 20000);
+  _portOutputBox->setRange(0, 65535);
   _portInputBox = new QSpinBox;
-  _portInputBox->setRange(0, 20000);  
+  _portInputBox->setRange(0, 65535);  
 
   _localHostBox = new QLineEdit;
   _nameEdit = new QLineEdit;
