@@ -244,30 +244,6 @@ AttributesEditor::createWidgets()
   "}"
 );
 
-  _OSCLearnButton = new QPushButton;
-  _OSCLearnButton->setStyleSheet(
-              "QPushButton {"
-              "border: 2px solid #8f8f91;"
-              "border-radius: 6px;"
-              "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-              "stop: 0 #f6f7fa, stop: 1 #dadbde);"
-              "   min-width: 80px;"
-              "}"
-
-              "QPushButton:pressed {"
-              "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-              "                               stop: 0 #dadbde, stop: 1 #f6f7fa);"
-              "}"
-
-              "QPushButton:flat {"
-              "border: none; "
-              "}"
-
-              "QPushButton:default {"
-              "border-color: navy;"
-              "}"
-              );
-
   //NetworkTree
   _networkTree = new NetworkTree(this);
   //_networkTree->load();
@@ -294,7 +270,7 @@ AttributesEditor::addWidgetsToLayout()
   _boxSettingsLayout->addWidget(_snapshotAssignStart,Qt::AlignTop);
   _boxSettingsLayout->addWidget(_boxName,Qt::AlignBottom);
   _boxSettingsLayout->addWidget(_generalColorButton,Qt::AlignTop);
-  _boxSettingsLayout->addWidget(_snapshotAssignEnd,Qt::AlignTop);  
+  _boxSettingsLayout->addWidget(_snapshotAssignEnd,Qt::AlignTop);
   _boxSettingsLayout->setSpacing(horizontalSpacing);
 
   // Set Central Widget
