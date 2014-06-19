@@ -1011,32 +1011,25 @@ NetworkTree::updateEndMsgsDisplay()
 bool
 NetworkTree::brothersPartiallyChecked(QTreeWidgetItem *item, int column)
 {
-  QTreeWidgetItem *father, *child;
-  int countCheckedItems = 0;
-  int childrenCount = 0;
+    QTreeWidgetItem *father, *child;
+    int countCheckedItems = 0;
+    int childrenCount = 0;
 
-  if (item->parent() != NULL) {
-      father = item->parent();
-      childrenCount = father->childCount();
-      for (int i = 0; i < childrenCount; i++) {
-          child = father->child(i);
-          if (child->type() == NodeNoNamespaceType) {
-              if (child->checkState(column) == Qt::Checked || child->checkState(column) == Qt::PartiallyChecked) {
-                  countCheckedItems++;
-                }
-            }
-          else {
-              if (!child->text(column).isEmpty()) {
-                  countCheckedItems++;
-                }
+    if (item->parent() != NULL) {
+        father = item->parent();
+        childrenCount = father->childCount();
+        for (int i = 0; i < childrenCount; i++) {
+            child = father->child(i);
+            if (child->checkState(column) == Qt::Checked || child->checkState(column) == Qt::PartiallyChecked) {
+                countCheckedItems++;
             }
         }
     }
-  if (countCheckedItems > 0 && countCheckedItems < childrenCount) {
-      return true;
+    if (countCheckedItems > 0 && countCheckedItems < childrenCount) {
+        return true;
     }
-  else {
-      return false;
+    else {
+        return false;
     }
 }
 
@@ -1357,32 +1350,26 @@ NetworkTree::allBrothersAssigned(QTreeWidgetItem *item)
 bool
 NetworkTree::allBrothersChecked(QTreeWidgetItem *item, int column)
 {
-  /*
+    /*
    * Tool for columns' values
    */
-  QTreeWidgetItem *father, *child;
+    QTreeWidgetItem *father, *child;
 
-  if (item->parent() != NULL) {
-      father = item->parent();
-      int childrenCount = father->childCount();
-      for (int i = 0; i < childrenCount; i++) {
-          child = father->child(i);
+    if (item->parent() != NULL) {
+        father = item->parent();
+        int childrenCount = father->childCount();
+        for (int i = 0; i < childrenCount; i++) {
+            child = father->child(i);
 
-          if (child->type() == NodeNoNamespaceType) {
-              if (child->checkState(column) == Qt::Unchecked || child->checkState(column) == Qt::PartiallyChecked) {
-                  return false;
-                }
+            if (child->checkState(column) == Qt::Unchecked || child->checkState(column) == Qt::PartiallyChecked) {
+                return false;
             }
-          else {
-              if (child->text(column).isEmpty()) {
-                  return false;
-                }
-            }
+
         }
-      return true;
+        return true;
     }
-  else {
-      return true;
+    else {
+        return true;
     }
 }
 
