@@ -145,64 +145,63 @@ NetworkTree::~NetworkTree(){
 void
 NetworkTree::init()
 {
-   setSelectionMode(QAbstractItemView::MultiSelection);
-//    setSelectionMode(QAbstractItemView::ExtendedSelection);
+    setSelectionMode(QAbstractItemView::SingleSelection);
 
-   _treeFilterActive = true;
-  _deviceEdit = new DeviceEdit(topLevelWidget());
+    _treeFilterActive = true;
+    _deviceEdit = new DeviceEdit(topLevelWidget());
 
-  _startMessages = new NetworkMessages;
-  _endMessages = new NetworkMessages;
-  _OSCMessageCount = 0;
-  _OSCStartMessages = new NetworkMessages;
-  _OSCEndMessages = new NetworkMessages;
-  _recMessages = QList<QTreeWidgetItem*>();
-  _expandedItems = QList<QTreeWidgetItem*>();
+    _startMessages = new NetworkMessages;
+    _endMessages = new NetworkMessages;
+    _OSCMessageCount = 0;
+    _OSCStartMessages = new NetworkMessages;
+    _OSCEndMessages = new NetworkMessages;
+    _recMessages = QList<QTreeWidgetItem*>();
+    _expandedItems = QList<QTreeWidgetItem*>();
 
-  setStyleSheet(
-    "QTreeView {"
-    "show-decoration-selected: 1;"
-    "background-color: #5a5a5a;"
-    "}"
+    setStyleSheet(
+                "QTreeView {"
+                "show-decoration-selected: 1;"
+                "background-color: #5a5a5a;"
+                "}"
 
-    "QTreeView::item {"
-    "border-right: 1px solid #000000;"
-    "border-top-color: transparent;"
-    "border-bottom-color: transparent;"
-    "}"
-    
-    "QTreeView::item:disabled {"
-    "background: transparent;"
-    "}"
+                "QTreeView::item {"
+                "border-right: 1px solid #000000;"
+                "border-top-color: transparent;"
+                "border-bottom-color: transparent;"
+                "}"
+
+                "QTreeView::item:disabled {"
+                "background: transparent;"
+                "}"
                 
-    "QTreeView::item:hover {"
-    "background: qlineargradient(x1: -5, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);"
-    "border: 1px solid #bfcde4;"
-    "}"
+                "QTreeView::item:hover {"
+                "background: qlineargradient(x1: -5, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);"
+                "border: 1px solid #bfcde4;"
+                "}"
 
-    "QTreeView::item:selected {"
-    "border: 1px solid #567dbc;"
-    "}"
+                "QTreeView::item:selected {"
+                "border: 1px solid #567dbc;"
+                "}"
 
-    "QTreeView::item:selected:active{"
-    "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6ea1f1, stop: 1 #567dbc);"
-    "}"
+                "QTreeView::item:selected:active{"
+                "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6ea1f1, stop: 1 #567dbc);"
+                "}"
 
-    "QTreeView::item:selected:!active {"
-    "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6b9be8, stop: 1 #577fbf);"
-    "}"
+                "QTreeView::item:selected:!active {"
+                "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6b9be8, stop: 1 #577fbf);"
+                "}"
 
-              "  QHeaderView::section {"
-              "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-              "stop:0 #a1a1a1, stop: 0.5 #909090,"
-              "stop: 0.6 #808080, stop:1 #a3a3a3);"
-              "color: black;"
-              "padding-left: 1px;"
-              "padding-top: 2px;"
-              "padding-bottom: 1px;"
-              "border: 1px solid #606060;"
-              "}"
-    );
+                "  QHeaderView::section {"
+                "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+                "stop:0 #a1a1a1, stop: 0.5 #909090,"
+                "stop: 0.6 #808080, stop:1 #a3a3a3);"
+                "color: black;"
+                "padding-left: 1px;"
+                "padding-top: 2px;"
+                "padding-bottom: 1px;"
+                "border: 1px solid #606060;"
+                "}"
+                );
 }
 
 void
@@ -1788,8 +1787,8 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
 void
 NetworkTree::keyReleaseEvent(QKeyEvent *event)
 {  
-    if (event->key() == Qt::Key_Shift) {
-          setSelectionMode(QAbstractItemView::MultiSelection);
+    if (event->key() == Qt::Key_Shift ||event->key() == Qt::Key_Control) {
+          setSelectionMode(QAbstractItemView::SingleSelection);
         }
 }
 
@@ -1799,6 +1798,9 @@ NetworkTree::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Shift) {
         setSelectionMode(QAbstractItemView::ContiguousSelection);
     }
+    else if(event->key() == Qt::Key_Control)
+        setSelectionMode(QAbstractItemView::MultiSelection);
+
     else if (event->key() == Qt::Key_Backtab) {
         if (VALUE_MODIFIED) {
             if (currentColumn() == START_COLUMN) {
