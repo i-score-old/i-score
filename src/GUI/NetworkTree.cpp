@@ -1670,6 +1670,7 @@ NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select)
 void
 NetworkTree::mousePressEvent(QMouseEvent *event)
 {
+    _noItemClicked = true;
     QTreeWidget::mousePressEvent(event);
 
     if(currentItem()!=NULL){
@@ -1703,7 +1704,14 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
                 unassignItem(currentItem());
             }
         }
-    }   
+    }
+}
+
+void
+NetworkTree::mouseReleaseEvent(QMouseEvent *event){
+    QTreeWidget::mouseReleaseEvent(event);
+    if(_noItemClicked)
+        unselectAll();
 }
 
 void
@@ -1796,7 +1804,6 @@ NetworkTree::keyPressEvent(QKeyEvent *event)
         }
     }
     else if(event->key() == Qt::Key_Backspace){
-        std::cout<<"BackSpace"<<std::endl;
         QList<QTreeWidgetItem *> items = selectedItems();
         QList<QTreeWidgetItem *>::iterator it = items.begin();
         for(it; it!=items.end(); it++){
@@ -1808,41 +1815,42 @@ NetworkTree::keyPressEvent(QKeyEvent *event)
 
 void
 NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
-{            
-  if (item != NULL) {
-      if(item->type()==DeviceNode){
-          Maquette::getInstance()->setDeviceLearn(item->text(NAME_COLUMN).toStdString(),item->checkState(NAME_COLUMN));
-      }
-
-      execClickAction(item, selectedItems(), column);
-
-      if (item->isSelected()) {
-          recursiveChildrenSelection(item, true);
-          recursiveFatherSelection(item, true);
+{
+    _noItemClicked = false;
+    if (item != NULL) {
+        if(item->type()==DeviceNode && column == NAME_COLUMN){
+            Maquette::getInstance()->setDeviceLearn(item->text(NAME_COLUMN).toStdString(),item->checkState(NAME_COLUMN));
         }
 
-      if (!item->isSelected() && item->type() != OSCNode) {
-          unselectPartially(item);
-          recursiveChildrenSelection(item, false);
-          recursiveFatherSelection(item, false);
+        execClickAction(item, selectedItems(), column);
+
+        if (item->isSelected()) {
+            recursiveChildrenSelection(item, true);
+            recursiveFatherSelection(item, true);
         }
 
-      if (selectionMode() == QAbstractItemView::ContiguousSelection) {
-          QList<QTreeWidgetItem*> selection = selectedItems();
-          QList<QTreeWidgetItem*>::iterator it;
-          QTreeWidgetItem *curIt;
-          for (it = selection.begin(); it != selection.end(); it++) {
-              curIt = *it;
-              recursiveChildrenSelection(curIt, true);
-          }
-      }
+        if (!item->isSelected() && item->type() != OSCNode) {
+            unselectPartially(item);
+            recursiveChildrenSelection(item, false);
+            recursiveFatherSelection(item, false);
+        }
 
-      emit(selectionChanged(selectedItems()));
+        if (selectionMode() == QAbstractItemView::ContiguousSelection) {
+            QList<QTreeWidgetItem*> selection = selectedItems();
+            QList<QTreeWidgetItem*>::iterator it;
+            QTreeWidgetItem *curIt;
+            for (it = selection.begin(); it != selection.end(); it++) {
+                curIt = *it;
+                recursiveChildrenSelection(curIt, true);
+            }
+        }
 
-      if (item->type() == addOSCNode) {
-          addOSCMessage(item->parent());
-      }
-  }
+        emit(selectionChanged(selectedItems()));
+
+        if (item->type() == addOSCNode) {
+            addOSCMessage(item->parent());
+        }
+    }
 }
 
 void
@@ -2509,4 +2517,15 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
     }
 }
 
-
+void
+NetworkTree::unselectAll()
+{
+    QList<QTreeWidgetItem *> items = selectedItems();
+    QList<QTreeWidgetItem *>::iterator it = items.begin();
+    QTreeWidgetItem *curItem;
+    for(it; it!=items.end(); it++){
+        curItem=*it;
+        curItem->setSelected(false);
+    }
+    emit(selectionChanged(selectedItems()));
+}

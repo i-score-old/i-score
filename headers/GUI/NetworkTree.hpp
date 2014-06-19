@@ -388,6 +388,7 @@ class NetworkTree : public QTreeWidget
     virtual void keyReleaseEvent(QKeyEvent *event);
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mouseReleaseEvent(QMouseEvent *event);
 
     static int NAME_COLUMN;
     static int VALUE_COLUMN;
@@ -522,6 +523,7 @@ class NetworkTree : public QTreeWidget
     void updateOSCAddresses();
     void getChildren(QTreeWidgetItem *item, QList<QTreeWidgetItem *> &items);
     void execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> items, int column);
+    void unselectAll();
 
     QMap<QTreeWidgetItem *, string> _addressMap;
     QList<QTreeWidgetItem*> _nodesWithSelectedChildren;
@@ -541,6 +543,7 @@ class NetworkTree : public QTreeWidget
     int _OSCMessageCount;
     bool _treeFilterActive;
     bool _recMode;
+    bool _noItemClicked;
 
     DeviceEdit *_deviceEdit;  
 
