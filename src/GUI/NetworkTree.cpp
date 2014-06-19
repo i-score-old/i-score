@@ -1799,14 +1799,23 @@ NetworkTree::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Shift) {
         setSelectionMode(QAbstractItemView::ContiguousSelection);
     }
-    if (event->key() == Qt::Key_Backtab) {
+    else if (event->key() == Qt::Key_Backtab) {
         if (VALUE_MODIFIED) {
             if (currentColumn() == START_COLUMN) {
                 editItem(currentItem(), END_COLUMN);
             }
         }
     }
+    else if(event->key() == Qt::Key_Backspace){
+        std::cout<<"BackSpace"<<std::endl;
+        QList<QTreeWidgetItem *> items = selectedItems();
+        QList<QTreeWidgetItem *>::iterator it = items.begin();
+        for(it; it!=items.end(); it++){
+            unassignItem(*it);
+        }
+    }
 }
+
 
 void
 NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
