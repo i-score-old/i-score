@@ -1993,12 +1993,14 @@ Maquette::load(const string &fileName)
         conditionId = conditionsId.at(i);
 
         //get boxes' ids
+        boxesId.clear();
         getBoxesIdFromCondition(conditionId,boxesId);
 
         //transform in list of BasicBox
         boxes.clear();
-        for(int i=0 ; i<boxesId.size() ; i++)
+        for(int i=0 ; i<boxesId.size() ; i++){
             boxes<<getBox(boxesId.at(i));
+        }
 
         new ConditionalRelation(conditionId, boxes,_scene);
     }
