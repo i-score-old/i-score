@@ -81,7 +81,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 
   setColumnCount(10);
   QStringList list;
-  list << "Address" << "Value" << "v" <<"Start" << " ~ " << "v" <<"End" << " = " << " % "<<" type "<<"min "<<"max ";
+  list << "Address" << "Value" << "   v" <<"Start" << " ~ " << "   v" <<"End" << " = " << " % "<<" type "<<"min "<<"max ";
   // removed <<"priority " and column
   setColumnWidth(NAME_COLUMN, 115);
   setColumnWidth(VALUE_COLUMN, 63);
