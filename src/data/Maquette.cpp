@@ -1549,7 +1549,7 @@ Maquette::turnExecutionOff()
     }
 
     // Clear the trigger queue list
-    _scene->triggersQueueList()->clear();
+    _scene->triggersQueueList()->clear(); 
 }
 
 void

@@ -987,6 +987,7 @@ BasicBox::setCrossedExtremity(BoxExtremity extremity)
     _playing = false;
 
   _scene->setPlaying(_abstract->ID(), _playing);
+  update();
 }
 
 void
@@ -1995,8 +1996,9 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         _endMenuButton->setVisible(false);
         _stopButton->setVisible(_playing);
     }
-    else
+    else{
         setButtonsVisible(_hover || isSelected());
+    }
 
     //draw hover shape
     if (_hover && !isSelected() && !_playing)
