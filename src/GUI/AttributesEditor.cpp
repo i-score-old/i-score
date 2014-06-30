@@ -204,6 +204,7 @@ AttributesEditor::createWidgets()
 
   //Start&End buttons
   _snapshotAssignStart = new QPushButton;
+  _snapshotAssignStart->setToolTip("Update start queue");
   _snapshotAssignStart->setStyleSheet(
               " QPushButton {"
               "border: 2px solid #6f6f80;"
@@ -231,6 +232,7 @@ AttributesEditor::createWidgets()
               );
 
   _snapshotAssignEnd = new QPushButton;
+  _snapshotAssignEnd->setToolTip("Update end queue");
   _snapshotAssignEnd->setStyleSheet(
               " QPushButton {"
               "border: 2px solid #6f6f80;"
@@ -268,8 +270,8 @@ void
 AttributesEditor::addWidgetsToLayout()
 {
   static const unsigned int BOX_EXTREMITY_PRECISION = 3;
-  const int verticalSpacing = 6;
-  const int horizontalSpacing = 27;
+  const int verticalSpacing = 0;
+  const int horizontalSpacing = 24;
 
   _boxStartValue->setRange(0., _scene->getMaxSceneWidth() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
   _boxStartValue->setDecimals(BOX_EXTREMITY_PRECISION);
@@ -280,9 +282,9 @@ AttributesEditor::addWidgetsToLayout()
 
   _boxSettingsLayout->addWidget(_generalColorButton,0,0,2,1);
   _boxSettingsLayout->addWidget(_boxName,0,1,2,1);
-  _boxSettingsLayout->addWidget(_updateLabel,0,2,1,2,Qt::AlignCenter);
-  _boxSettingsLayout->addWidget(_snapshotAssignStart,1,2,1,1);
-  _boxSettingsLayout->addWidget(_snapshotAssignEnd,1,3,1,1);
+//  _boxSettingsLayout->addWidget(_updateLabel,0,2,1,2,Qt::AlignCenter);
+  _boxSettingsLayout->addWidget(_snapshotAssignStart,0,2,2,1);
+  _boxSettingsLayout->addWidget(_snapshotAssignEnd,0,3,2,1);
   _boxSettingsLayout->setVerticalSpacing(0);
   _boxSettingsLayout->setHorizontalSpacing(horizontalSpacing);
 
