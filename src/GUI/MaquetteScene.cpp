@@ -112,7 +112,7 @@ MaquetteScene::init()
   _progressLine->setZValue(2);
   _timeBarProxy->setZValue(3);
   _timeBarProxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
-  _timeBarProxy->setFlag(QGraphicsItem::ItemClipsToShape);
+  _timeBarProxy->setFlag(QGraphicsItem::ItemClipsToShape);    
 
   _currentInteractionMode = SELECTION_MODE;
   setCurrentMode(SELECTION_MODE);
@@ -395,6 +395,7 @@ MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
 void
 MaquetteScene::setCurrentMode(int inter, BoxCreationMode box)
 {
+    _view->resetCachedContent();
   _currentInteractionMode = inter;
   if (inter == SELECTION_MODE || inter == RELATION_MODE) {
       _view->setDragMode(QGraphicsView::RubberBandDrag);
@@ -546,6 +547,7 @@ void
 MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
 {
   if (!_maquette->isExecutionOn()) {
+
       QGraphicsScene::mouseMoveEvent(mouseEvent);
 
       switch (_currentInteractionMode) {
@@ -585,7 +587,7 @@ MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
           case SELECTION_MODE:
             break;
 
-          case CREATION_MODE:
+          case CREATION_MODE:          
             if (noBoxSelected() || subScenarioMode(mouseEvent)) {
                 if (resizeMode() == NO_RESIZE && _tempBox) {
                     int upLeftX, upLeftY, width, height;
@@ -1574,7 +1576,7 @@ MaquetteScene::setPlaying(unsigned int boxID, bool playing)
       if (playing) {
           if (box != NULL) {
               _playingBoxes[boxID] = box;
-              box->update();
+//              box->update();
               if(!_playThread->isRunning())
                   _playThread->start();
             }
@@ -1584,7 +1586,7 @@ MaquetteScene::setPlaying(unsigned int boxID, bool playing)
 
 void
 MaquetteScene::updatePlayingBoxes()
-{
+{    
   map<unsigned int, BasicBox*>::iterator it;
 
   for (it = _playingBoxes.begin(); it != _playingBoxes.end(); ++it) {
