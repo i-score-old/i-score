@@ -204,7 +204,7 @@ AttributesEditor::createWidgets()
 
   //Start&End buttons
   _snapshotAssignStart = new QPushButton;
-  _snapshotAssignStart->setToolTip("Update start queue");
+  _snapshotAssignStart->setToolTip("Update start state");
   _snapshotAssignStart->setStyleSheet(
               " QPushButton {"
               "border: 2px solid #6f6f80;"
@@ -232,7 +232,7 @@ AttributesEditor::createWidgets()
               );
 
   _snapshotAssignEnd = new QPushButton;
-  _snapshotAssignEnd->setToolTip("Update end queue");
+  _snapshotAssignEnd->setToolTip("Update end state");
   _snapshotAssignEnd->setStyleSheet(
               " QPushButton {"
               "border: 2px solid #6f6f80;"
