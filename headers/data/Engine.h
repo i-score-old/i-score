@@ -9,7 +9,7 @@
 #ifndef __SCORE_ENGINE_H__
 #define __SCORE_ENGINE_H__
 
-#include "TTScoreAPI.h"
+#include "TTScore.h"
 #include "TTModular.h"
 
 /*!
@@ -56,10 +56,10 @@ typedef unsigned int TimeConditionId;
 class EngineCacheElement {
 
 public:
-    TTObjectBasePtr object;
+    TTObject        object;
     unsigned int    index;
     TTAddress       address;
-    TTObjectBasePtr subScenario;
+    TTObject        subScenario;
     
     EngineCacheElement();
     ~EngineCacheElement();
@@ -126,7 +126,7 @@ enum BinaryRelationType { EQ_RELATION = 0, NQ_RELATION = 1, LQ_RELATION = 2, LE_
 enum RelationType {ALLEN = 0, ANTPOST = 1, INTERVAL = 2, BOUNDING = 3};
 
 /// define part dedicated for debugging
-#define iscoreEngineDebug if (getLocalApplicationDebug)
+#define iscoreEngineDebug if (accessApplicationLocalDebug)
 
 /*!
  * \class Engine
@@ -144,14 +144,14 @@ class Engine
     
 private:
     
-    TTString            iscore;                                         /// application name
+    TTSymbol            iscore;                                         /// application name
     
     TTSymbol            m_lastProjectFilePath;                          /// the last project file path
     EngineFilesMap      m_namespaceFilesPath;                           /// the last namespace file used for each device
     
-    TTTimeProcessPtr    m_mainScenario;                                 /// The top scenario
-    TTTimeEventPtr      m_mainStartEvent;                               /// The top scenario start event
-    TTTimeEventPtr      m_mainEndEvent;                                 /// The top scenario end event
+    TTObject            m_mainScenario;                                 /// The top scenario
+    TTObject            m_mainStartEvent;                               /// The top scenario start event
+    TTObject            m_mainEndEvent;                                 /// The top scenario end event
     
     unsigned int        m_nextTimeProcessId;                            /// the next Id to give to any created time process
     unsigned int        m_nextIntervalId;                               /// the next Id to give to any created interval
@@ -168,18 +168,13 @@ private:
     EngineCacheMap      m_endCallbackMap;                               /// All callback to observe when a time process ends stored using a time process id
     
     EngineCacheMap      m_statusCallbackMap;                            /// All callback to observe time event ready state stored using using a trigger id
-    EngineCacheMap      m_triggerDataMap;                               /// All TTData to expose conditioned event on the network stored using using a trigger id
 
-    TTObjectBasePtr     m_dataPlay;                                     /// A Modular TTData to expose Play transport service
-    TTObjectBasePtr     m_dataStop;                                     /// A Modular TTData to expose Stop transport service
-    TTObjectBasePtr     m_dataPause;                                    /// A Modular TTData to expose Pause transport service
-    TTObjectBasePtr     m_dataRewind;                                   /// A Modular TTData to expose Rewind transport service
-    TTObjectBasePtr     m_dataStartPoint;                               /// A Modular TTData to expose StartPoint transport service
-    TTObjectBasePtr     m_dataSpeed;                                    /// A Modular TTData to expose Speed transport service
-    
-    TTObjectBasePtr     m_sender;                                       /// A Modular TTSender to send message to any application
-    
-    TTObjectBasePtr     m_namespaceObserver;                            /// A Modular TTCallback to be notified when a node is created in learn mode
+    TTObject            m_applicationManager;                           /// #TTApplicationManager to enable communication with any distant application using any protocol
+    TTObject            m_iscore;                                       /// #TTApplication dedicated to i-score
+    TTObject            m_protocolMinuit;                               /// #Protocol for Minuit protocol
+    TTObject            m_protocolOSC;                                  /// #Protocol for OSC protocol
+    TTObject            m_sender;                                       /// #TTSender to send message to any application
+    TTObject            m_namespaceObserver;                            /// #TTCallback to be notified when a node is created in learn mode
     
 	void (*m_TimeEventStatusAttributeCallback)(ConditionedProcessId, bool);         // allow to notify the Maquette if a triggerpoint is pending
     void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);    // allow to notify the Maquette if a box is running or not
@@ -204,7 +199,7 @@ public:
            std::string pathToTheJamomaFolder);
     
     void initModular(const char* pathToTheJamomaFolder = NULL);
-    void initScore();
+    void initScore(const char* pathToTheJamomaFolder = NULL);
     
     void registerIscoreToProtocols();
     
@@ -214,28 +209,28 @@ public:
     
     // Id management //////////////////////////////////////////////////////////////////
     
-    TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess, TTAddress& anAddress, TTTimeContainerPtr subScenario = NULL);
-    TTTimeProcessPtr    getTimeProcess(TimeProcessId boxId);
+    TimeProcessId       cacheTimeProcess(TTObject& timeProcess, TTAddress& anAddress, TTObject& subScenario);
+    TTObject&           getTimeProcess(TimeProcessId boxId);
     TTAddress&          getAddress(TimeProcessId boxId);
-    TTTimeContainerPtr  getSubScenario(TimeProcessId boxId);
+    TTObject&           getSubScenario(TimeProcessId boxId);
     void                uncacheTimeProcess(TimeProcessId boxId);
     void                clearTimeProcess();
     
     TimeProcessId       getParentId(TimeProcessId boxId);
     void                getChildrenId(TimeProcessId boxId, std::vector<TimeProcessId>& childrenId);
     
-    IntervalId          cacheInterval(TTTimeProcessPtr timeProcess);
-    TTTimeProcessPtr    getInterval(IntervalId relationId);
+    IntervalId          cacheInterval(TTObject& timeProcess);
+    TTObject&           getInterval(IntervalId relationId);
     void                uncacheInterval(IntervalId relationId);
     void                clearInterval();
     
     ConditionedProcessId cacheConditionedProcess(TimeProcessId timeProcessId, TimeEventIndex controlPointId);
-    TTTimeProcessPtr    getConditionedProcess(ConditionedProcessId triggerId, TimeEventIndex& controlPointId);
+    TTObject&           getConditionedProcess(ConditionedProcessId triggerId, TimeEventIndex& controlPointId);
     void                uncacheConditionedProcess(ConditionedProcessId triggerId);
     void                clearConditionedProcess();
     
-    void                cacheTimeCondition(ConditionedProcessId triggerId, TTTimeConditionPtr timeCondition);
-    TTTimeConditionPtr  getTimeCondition(ConditionedProcessId triggerId);
+    void                cacheTimeCondition(ConditionedProcessId triggerId, TTObject& timeCondition);
+    TTObject&           getTimeCondition(ConditionedProcessId triggerId);
     void                uncacheTimeCondition(ConditionedProcessId triggerId);
     void                clearTimeCondition();
     
@@ -1283,7 +1278,7 @@ public:
 	 * \param filepath : the filepath to use.
 	 */
 	void load(std::string filepath);
-    void buildEngineCaches(TTTimeProcessPtr scenario, TTAddress& scenarioAddress);
+    void buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress);
     
 	/*!
 	 * Prints on standard output both engines. Useful only for debug purpose.
@@ -1291,11 +1286,11 @@ public:
 	void print();
     void printExecutionInLinuxConsole();
     
-    friend void TimeEventStatusAttributeCallback(TTPtr baton, const TTValue& value);
-    friend void TimeProcessStartCallback(TTPtr baton, const TTValue& value);
-    friend void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
-    friend void TriggerReceiverValueCallback(TTPtr baton, const TTValue& value);
-    friend void NamespaceCallback(TTPtr baton, const TTValue& value);
+    friend void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value);
+    friend void TimeProcessStartCallback(const TTValue& baton, const TTValue& value);
+    friend void TimeProcessEndCallback(const TTValue& baton, const TTValue& value);
+    friend void TriggerReceiverValueCallback(const TTValue& baton, const TTValue& value);
+    friend void NamespaceCallback(const TTValue& baton, const TTValue& value);
     
 private:
     
@@ -1314,58 +1309,38 @@ private:
      * \return networktreeAddress : an address managed by i-score
      */
     std::string toNetworkTreeAddress(TTAddress aTTAddress);
-    
-    /** Create a #TTData object
-     @param	service			a symbol to tell if the data have to be a "parameter", a "message" or a "return"
-     @param	TTValuePtr      a value pointer to return back
-     @param valueCallback   a pointer to a void function(TTPtr baton, TTValue& value) to return the value back
-     @param returnedData    a new data object
-     @return                an error code if the creation fails */
-    TTErr createData(TTSymbol service, TTValuePtr baton, TTFunctionWithBatonAndValue valueCallback, TTObjectBasePtr *returnedData);
-    
-    /** Register a #TTObject
-     @param	address			the absolute address where to register the object
-     @param	object          the object to register
-     @return                an error code if the registration fails */
-    TTErr registerObject(TTAddress address, TTObjectBasePtr object);
-    
-    /** Register a #TTObject
-     @param	address			the absolute address to unregister
-     @param	object          the unregistered object
-     @return                an error code if the registration fails */
-    TTErr unregisterObject(TTAddress address, TTObjectBasePtr *object = NULL);
 };
 
 typedef Engine* EnginePtr;
 
 /** time event status attribute callback
- @param	baton			a TTValuePtr containing an EnginePtr and an ConditionedProcessId
+ @param	baton			an EnginePtr and a ConditionedProcessId
  @param	value			a time event
  @return                an error code */
-void TimeEventStatusAttributeCallback(TTPtr baton, const TTValue& value);
+void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value);
 
 /** Callback used each time a process starts
- @param	baton			a TTValuePtr containing an EnginePtr and an TimeProcessId
+ @param	baton			an EnginePtr and a TimeProcessId
  @param	value			nothing
  @return                an error code */
-void TimeProcessStartCallback(TTPtr baton, const TTValue& value);
+void TimeProcessStartCallback(const TTValue& baton, const TTValue& value);
 
 /** Callback used each time a process ends
- @param	baton			a TTValuePtr containing an EnginePtr and an TimeProcessId
- @param	value			the time process running state
+ @param	baton			an EnginePtr and a TimeProcessId
+ @param	value			nothing
  @return                an error code */
-void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
+void TimeProcessEndCallback(const TTValue& baton, const TTValue& value);
 
 /** Callback used for namespace observation
- @param	baton			a TTValuePtr containing an EnginePtr and an application name
+ @param	baton			an EnginePtr and an application name
  @param	value			...
  @return                an error code */
-void NamespaceCallback(TTPtr baton, const TTValue& value);
+void NamespaceCallback(const TTValue& baton, const TTValue& value);
 
 // TODO : this should move into a TTModularAPI file
 /** compare priority attribute of object's node
- @param	v1				a pointer to a value containing a pointer to a TTNode >
- @param	v2				a pointer to a value containing a pointer to a TTNode >
+ @param	v1				a value containing a pointer to a #TTNode >
+ @param	v2				a value containing a pointer to a #TTNode >
  @return				is the priority of v1 is smaller than v2 (except if equal 0) ? */
 TTBoolean TTModularCompareNodePriorityThenNameThenInstance(TTValue& v1, TTValue& v2);
 
