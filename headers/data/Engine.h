@@ -171,8 +171,6 @@ private:
 
     TTObject            m_applicationManager;                           /// #TTApplicationManager to enable communication with any distant application using any protocol
     TTObject            m_iscore;                                       /// #TTApplication dedicated to i-score
-    TTObject            m_protocolMinuit;                               /// #Protocol for Minuit protocol
-    TTObject            m_protocolOSC;                                  /// #Protocol for OSC protocol
     TTObject            m_sender;                                       /// #TTSender to send message to any application
     TTObject            m_namespaceObserver;                            /// #TTCallback to be notified when a node is created in learn mode
     

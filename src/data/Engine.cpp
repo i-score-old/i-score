@@ -98,8 +98,10 @@ void Engine::initModular(const char* pathToTheJamomaFolder)
 
 void Engine::registerIscoreToProtocols()
 {
-    TTErr     err;
-    TTValue   out;
+    TTObject    aProtocol;
+    TTErr       err;
+    TTValue     out;
+    
     
     TTLogMessage("\n*** Enable Minuit communication ***\n");
     ////////////////////////////////////////////////////////////////////////
@@ -112,18 +114,19 @@ void Engine::registerIscoreToProtocols()
         return;
     }
     else
-        m_protocolMinuit = out[0];
+        aProtocol = out[0];
     
     // register i-score to the Minuit protocol
-    m_protocolMinuit.send("ApplicationRegister", iscore, out);
+    aProtocol.send("ApplicationRegister", iscore, out);
     
     // select i-score to set its Minuit protocol parameters
-    m_protocolMinuit.send("ApplicationSelect", iscore, out);
-    m_protocolMinuit.set("port", MINUIT_INPUT_PORT);
-    m_protocolMinuit.set("ip", "127.0.0.1");
+    aProtocol.send("ApplicationSelect", iscore, out);
+    aProtocol.set("port", MINUIT_INPUT_PORT);
+    aProtocol.set("ip", "127.0.0.1");
 
     // launch Minuit protocol communication
-    m_protocolMinuit.send("Run");
+    aProtocol.send("Run");
+    
     
     TTLogMessage("\n*** Enable OSC communication ***\n");
     ////////////////////////////////////////////////////////////////////////
@@ -136,18 +139,18 @@ void Engine::registerIscoreToProtocols()
         return;
     }
     else
-        m_protocolOSC = out[0];
+        aProtocol = out[0];
     
     // register i-score to the OSC protocol
-    m_protocolOSC.send("ApplicationRegister", iscore, out);
+    aProtocol.send("ApplicationRegister", iscore, out);
     
     // select i-score to set its OSC protocol parameters
-    m_protocolOSC.send("ApplicationSelect", iscore, out);
-    m_protocolOSC.set("port", OSC_INPUT_PORT);
-    m_protocolOSC.set("ip", "127.0.0.1");
+    aProtocol.send("ApplicationSelect", iscore, out);
+    aProtocol.set("port", OSC_INPUT_PORT);
+    aProtocol.set("ip", "127.0.0.1");
     
     // launch OSC protocol communication
-    m_protocolOSC.send("Run");
+    aProtocol.send("Run");
 }
 
 void Engine::initScore(const char* pathToTheJamomaFolder)
@@ -2024,7 +2027,7 @@ bool Engine::stop(TimeProcessId processId)
         // get all TTTimeProcesses
         getTimeProcess(processId).get("timeProcesses", objects);
         
-        // Stop all time process
+        // stop all time process
         for (TTUInt32 i = 0; i < objects.size(); i++) {
             
             TTObject timeProcess = objects[i];
@@ -2121,9 +2124,9 @@ void Engine::trigger(ConditionedProcessId triggerId)
     
     // get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        conditionedProcess.get("startEvent", out);
+        conditionnedProcess.get("startEvent", out);
     else
-        conditionedProcess.get("endEvent", out);
+        conditionnedProcess.get("endEvent", out);
     
     timeEvent = out[0];
     
@@ -2131,7 +2134,7 @@ void Engine::trigger(ConditionedProcessId triggerId)
     timeEvent.get("condition", out);
     timeCondition = out[0];
     
-    // Tell the condition to trigger this event (and dispose the others)
+    // tell the condition to trigger this event (and dispose the others)
     timeCondition.send("Trigger", timeEvent, out);
 }
 
@@ -2157,7 +2160,7 @@ void Engine::trigger(vector<ConditionedProcessId> triggerIds)
         
         timeEvent = out[0];
         
-        // Get event condition
+        // get event condition
         timeEvent.get("condition", out);
         timeCondition = out[0];
         
@@ -2181,98 +2184,67 @@ void Engine::trigger(vector<ConditionedProcessId> triggerIds)
 
 void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort)
 {
-    TTValue         v, portValue, none;
-    TTSymbol        applicationName(deviceName);
-    TTSymbol        protocolName(pluginToUse);
-    TTObjectBasePtr anApplication = NULL;
-    TTHashPtr       hashParameters;
-    TTErr           err;
+    TTValue     args, out;
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication;
+    TTObject    aProtocol;
     
     // if the application doesn't already exist
-    if (!getApplication(applicationName)) {
+    if (!accessApplication(applicationName)) {
         
         // create the application
-        v = applicationName;
-        TTObjectBaseInstantiate(kTTSym_Application, TTObjectBaseHandle(&anApplication), v);
-        
-        // set application type : here 'mirror' because it use Minuit protocol
-        // note : this should be done for all protocols which have a discovery feature
-        if (protocolName == TTSymbol("Minuit"))
-            anApplication->setAttributeValue(kTTSym_type, TTSymbol("mirror"));
-        
-        // set application type : here 'proxy' because it use OSC protocol
-        // note : this should be done for all protocols which have no discovery feature
-        if (protocolName == TTSymbol("OSC"))
-            anApplication->setAttributeValue(kTTSym_type, TTSymbol("proxy"));
+        m_applicationManager.send("ApplicationInstantiateDistant", applicationName, out);
+        anApplication = out[0];
         
         // check if the protocol has been loaded
-		if (getProtocol(protocolName)) {
+        aProtocol = accessProtocol(TTSymbol(pluginToUse));
+		if (aProtocol.valid()) {
             
             // stop the protocol
-            getProtocol(protocolName)->sendMessage(TTSymbol("Stop"));
+            aProtocol.send("Stop");
             
             // register the application to the protocol
-            v = applicationName;
-            getProtocol(protocolName)->sendMessage(TTSymbol("registerApplication"), v, none);
+            aProtocol.send("ApplicationRegister", applicationName, out);
             
-            err = getProtocol(protocolName)->getAttributeValue(TTSymbol("applicationParameters"), v);
-            
-            if (!err) {
-                
-                hashParameters = TTHashPtr((TTPtr)v[0]);
-            
-                // set plugin parameters (OSC or Minuit Plugin)
-                hashParameters->remove(TTSymbol("ip"));
-                hashParameters->append(TTSymbol("ip"), TTSymbol(DeviceIp));
-                
-                portValue = destinationPort;
-                if (receptionPort != 0)
-                    portValue.append(receptionPort);
-                
-                hashParameters->remove(TTSymbol("port"));
-                hashParameters->append(TTSymbol("port"), portValue);
-            
-                v = applicationName;
-                v.append(TTPtr(hashParameters));
-                getProtocol(protocolName)->setAttributeValue(TTSymbol("applicationParameters"), v);
-            }
+            aProtocol.send("ApplicationSelect", applicationName, out);
+            aProtocol.set("port", TTUInt16(destinationPort));
+            aProtocol.set("ip", TTSymbol(DeviceIp));
             
             // run the protocol
-            getProtocol(protocolName)->sendMessage(TTSymbol("Run"));
+            aProtocol.send("Run");
         }
         
         // set the priority, service, tag and rangeBounds attributes as a cached attributes
-        v = kTTSym_priority;
-        v.append(kTTSym_service);
-        v.append(kTTSym_tag);
-        v.append(kTTSym_rangeBounds);
-        v.append(kTTSym_rangeClipmode);
-        anApplication->setAttributeValue(TTSymbol("cachedAttributes"), v);
+        args = kTTSym_priority;
+        args.append(kTTSym_service);
+        args.append(kTTSym_tag);
+        args.append(kTTSym_rangeBounds);
+        args.append(kTTSym_rangeClipmode);
+        anApplication.set("cachedAttributes", args);
     }
 }
 
 void Engine::removeNetworkDevice(const std::string & deviceName)
 {
-    TTValue         v, none;
-    TTSymbol        applicationName(deviceName);
-    TTSymbol        protocolName;
-    TTObjectBasePtr anApplication = getApplication(applicationName);
+    TTValue     v, out;
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    TTSymbol    protocolName;
+    TTObject    aProtocol;
     
     // if the application exists
-    if (anApplication) {
+    if (anApplication.valid()) {
         
-        // get the protocols of the application
-        v = getApplicationProtocols(applicationName);
+        // get the protocol names used by the application
+        v = accessApplicationProtocolNames(applicationName);
         protocolName = v[0]; // we register application to 1 protocol only
+        aProtocol = accessProtocol(protocolName);
         
         // stop the protocol for this application
-        getProtocol(protocolName)->sendMessage(TTSymbol("Stop"));
+        aProtocol.send("Stop");
         
         // unregister the application to the protocol
-        getProtocol(protocolName)->sendMessage(TTSymbol("unregisterApplication"), applicationName, none);
-        
-        // delete the application
-        TTObjectBaseRelease(TTObjectBaseHandle(&anApplication));
+        aProtocol.send("ApplicationUnregister", applicationName, out);
     }
 }
 
@@ -2285,8 +2257,8 @@ void Engine::sendNetworkMessage(const std::string & stringToSend)
     TTAddress anAddress = toTTAddress(aSymbol.string().data());
     data.copyFrom(v, 1);
     
-    m_sender->setAttributeValue(kTTSym_address, anAddress);
-    m_sender->sendMessage(kTTSym_Send, data, out);
+    m_sender.set(kTTSym_address, anAddress);
+    m_sender.send(kTTSym_Send, data, out);
 }
 
 void Engine::getProtocolNames(std::vector<std::string>& allProtocolNames)
@@ -2295,7 +2267,7 @@ void Engine::getProtocolNames(std::vector<std::string>& allProtocolNames)
     TTSymbol    name;
     
     // get all protocol names
-    TTModularApplications->getAttributeValue(TTSymbol("protocolNames"), protocolNames);
+    m_applicationManager.get("protocolNames", protocolNames);
     
     for (TTUInt8 i = 0; i < protocolNames.size(); i++) {
         
@@ -2311,14 +2283,14 @@ void Engine::getNetworkDevicesName(std::vector<std::string>& allDeviceNames)
     TTSymbol    name;
     
     // get all application name
-    TTModularApplications->getAttributeValue(TTSymbol("applicationNames"), applicationNames);
+    m_applicationManager.get("applicationNames", applicationNames);
     
     for (TTUInt8 i = 0; i < applicationNames.size(); i++) {
         
-        // don't return the local application
         name = applicationNames[i];
         
-        if (name == getLocalApplicationName)
+        // don't return iscore application name
+        if (name == iscore)
             continue;
         
         allDeviceNames.push_back(name.c_str());
@@ -2327,19 +2299,24 @@ void Engine::getNetworkDevicesName(std::vector<std::string>& allDeviceNames)
 
 bool Engine::isNetworkDeviceRequestable(const std::string deviceName)
 {
-    
-    TTSymbol    name = TTSymbol(deviceName);
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    TTSymbol    protocolName;
+    TTObject    aProtocol;
+    TTValue     v, out;
     TTBoolean   discover = NO;
     
-    // get all protocol names used by this application
-    TTValue protocolNames = getApplicationProtocols(name);
-    
-    // if there is at least one protocol,
-    if (protocolNames.size()) {
+    // if the application exists
+    if (anApplication.valid()) {
         
-        // look if it provides namespace exploration
-        name = protocolNames[0];
-        discover = getProtocol(name)->mDiscover;
+        // get the protocol names used by the application
+        v = accessApplicationProtocolNames(applicationName);
+        protocolName = v[0]; // we register application to 1 protocol only
+        aProtocol = accessProtocol(protocolName);
+        
+        aProtocol.get("discover", out);
+   
+        discover = out[0];
     }
     
     return discover;
@@ -2351,12 +2328,12 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
     TTAddress           anAddress = toTTAddress(address);
     TTNodeDirectoryPtr  aDirectory;
     TTNodePtr           aNode;
-    TTObjectBasePtr     anObject;
+    TTObject            anObject;
     TTString            s;
     TTValue             v;
     
     // get the application directory
-    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
     
     if (aDirectory) {
     
@@ -2366,14 +2343,14 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
             // get object attributes
             anObject = aNode->getObject();
             
-            if (anObject) {
+            if (anObject.valid()) {
                 
                 // in case of proxy data or mirror object
-                if (anObject->getName() == TTSymbol("Data") ||
-                    (anObject->getName() == kTTSym_Mirror && TTMirrorPtr(anObject)->getName() == TTSymbol("Data")))
+                if (anObject.name() == TTSymbol("Data") ||
+                    (anObject.name() == kTTSym_Mirror && TTMirrorPtr(anObject.instance())->getName() == TTSymbol("Data")))
                 {
                     // get the value attribute
-                    anObject->getAttributeValue(TTSymbol("value"), v);
+                    anObject.get("value", v);
                     v.toString();
                     s = TTString(v[0]);
                     
@@ -2393,11 +2370,11 @@ Engine::requestObjectAttributeValue(const std::string & address, const std::stri
     TTAddress           anAddress = toTTAddress(address);
     TTNodeDirectoryPtr  aDirectory;
     TTNodePtr           aNode;
-    TTMirrorPtr         aMirror;
+    TTObject            anObject;
     TTString            s;
     TTValue             v;
 
-    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
     value.clear();
 
     if (!aDirectory)
@@ -2406,10 +2383,12 @@ Engine::requestObjectAttributeValue(const std::string & address, const std::stri
     if (!aDirectory->getTTNode(anAddress, &aNode)) {
 
         // get object attributes
-        aMirror = TTMirrorPtr(aNode->getObject());
+        anObject = aNode->getObject();
 
-        if (aMirror) {
-            if(!aMirror->getAttributeValue(TTSymbol(attribute), v)){               
+        if (anObject.valid()) {
+            
+            if (!anObject.get(TTSymbol(attribute), v)) {
+                
                 v.toString();
                 s = TTString(v[0]);
                 value.push_back(s.c_str());
@@ -2420,15 +2399,16 @@ Engine::requestObjectAttributeValue(const std::string & address, const std::stri
     return 0;
 }
 
-int Engine::setObjectAttributeValue(const std::string & address, const std::string & attribute, std::string & value)
+int
+Engine::setObjectAttributeValue(const std::string & address, const std::string & attribute, std::string & value)
 {
     TTAddress           anAddress = toTTAddress(address);
     TTNodeDirectoryPtr  aDirectory;
     TTNodePtr           aNode;
-    TTMirrorPtr         aMirror;
+    TTObject            anObject;
     TTValue             v;
     
-    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
     value.clear();
     
     if (!aDirectory)
@@ -2437,14 +2417,14 @@ int Engine::setObjectAttributeValue(const std::string & address, const std::stri
     if (!aDirectory->getTTNode(anAddress, &aNode)) {
         
         // set object attributes
-        aMirror = TTMirrorPtr(aNode->getObject());
+        anObject = aNode->getObject();
         
-        if (aMirror) {
+        if (anObject.valid()) {
             
             v = TTString(value);
             v.fromString();
       
-            if(!aMirror->setAttributeValue(TTSymbol(attribute), v))
+            if(!anObject.set(TTSymbol(attribute), v))
                 return 1;
         }
     }
@@ -2452,16 +2432,16 @@ int Engine::setObjectAttributeValue(const std::string & address, const std::stri
 }
 
 int
-Engine::requestObjectType(const std::string & address, std::string & nodeType){
+Engine::requestObjectType(const std::string & address, std::string & nodeType)
+{
     TTNodeDirectoryPtr  aDirectory;
     TTAddress           anAddress = toTTAddress(address);
     TTSymbol            type;
-    TTObjectBasePtr     anObject;
-    TTMirrorPtr         aMirror;
+    TTObject            anObject;
     TTNodePtr           aNode;
 
     nodeType = "none";
-    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
 
     if (!aDirectory)
         return 0;
@@ -2470,12 +2450,12 @@ Engine::requestObjectType(const std::string & address, std::string & nodeType){
 
         anObject = aNode->getObject();
         
-        if (anObject) {
+        if (anObject.valid()) {
             
-            if (anObject->getName() == kTTSym_Mirror)
-                type = TTMirrorPtr(anObject)->getName();
+            if (anObject.name() == kTTSym_Mirror)
+                type = TTMirrorPtr(anObject.instance())->getName();
             else
-                type = anObject->getName();
+                type = anObject.name();
             
             if (type != kTTSymEmpty) {
                 
@@ -2488,14 +2468,15 @@ Engine::requestObjectType(const std::string & address, std::string & nodeType){
 }
 
 int
-Engine::requestObjectPriority(const std::string &address, unsigned int &priority){
+Engine::requestObjectPriority(const std::string &address, unsigned int &priority)
+{
     TTNodeDirectoryPtr  aDirectory;
     TTAddress           anAddress = toTTAddress(address);
-    TTObjectBasePtr     anObject;
+    TTObject            anObject;
     TTNodePtr           aNode;
     TTValue             v;
 
-    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
 
     if (!aDirectory)
         return 0;
@@ -2504,9 +2485,9 @@ Engine::requestObjectPriority(const std::string &address, unsigned int &priority
 
         anObject = aNode->getObject();
 
-        if (anObject) {
+        if (anObject.valid()) {
 
-            if (!anObject->getAttributeValue(kTTSym_priority, v))
+            if (!anObject.get(kTTSym_priority, v))
                 priority = v[0];
             else
                 return 1;
@@ -2524,7 +2505,7 @@ Engine::requestObjectChildren(const std::string & address, vector<string>& child
     TTList              nodeList;
     TTString            s;
 
-    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
     children.clear();
 
     if (!aDirectory)
@@ -2551,24 +2532,26 @@ Engine::requestObjectChildren(const std::string & address, vector<string>& child
     return 0;
 }
 
-bool Engine::rebuildNetworkNamespace(const string &deviceName, const string &address)
+bool
+Engine::rebuildNetworkNamespace(const string &deviceName, const string &address)
 {
-    TTValue         v, none;
-    TTSymbol        applicationName(deviceName);
-    TTSymbol        protocolName;
-    TTObjectBasePtr anApplication = getApplication(applicationName);
+    TTValue     v, none;
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    TTSymbol    protocolName;
+    TTObject    aProtocol;
     
     // if the application exists
-    if (anApplication) {
+    if (anApplication.valid()) {
         
-        // get the protocols of the application
-        v = getApplicationProtocols(applicationName);
+        // get the protocol names used by the application
+        v = accessApplicationProtocolNames(applicationName);
         protocolName = v[0]; // we register application to 1 protocol only
         
         // Minuit case : use discovery mechanism
         if (protocolName == TTSymbol("Minuit")) {
             
-            anApplication->sendMessage("DirectoryBuild");
+            anApplication.send("DirectoryBuild");
             return 0;
         }
         // OSC case : reload the namespace from the last project file if exist
@@ -2579,12 +2562,11 @@ bool Engine::rebuildNetworkNamespace(const string &deviceName, const string &add
             
             TTSymbol namespaceFilePath = TTSymbol(m_namespaceFilesPath[deviceName]);
             
-            // Create a TTXmlHandler
+            // create a TTXmlHandler
             TTObject aXmlHandler(kTTSym_XmlHandler);
             
-            // Read the file to setup TTModularApplications
-            v = TTObjectBasePtr(anApplication);
-            aXmlHandler.set(kTTSym_object, v);
+            // read the file to setup TTModularApplications
+            aXmlHandler.set(kTTSym_object, anApplication);
             aXmlHandler.send(kTTSym_Read, namespaceFilePath, none);
             
             return 0;
@@ -2594,21 +2576,25 @@ bool Engine::rebuildNetworkNamespace(const string &deviceName, const string &add
     return 1;
 }
 
-bool Engine::loadNetworkNamespace(const string &deviceName, const string &filepath)
+bool
+Engine::loadNetworkNamespace(const string &deviceName, const string &filepath)
 {
-    // Create a TTXmlHandler
+    TTObject    anApplication = accessApplication(TTSymbol(deviceName));
+    TTValue     out;
+    TTErr       err;
+    
+    // create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
     
-    // Read the file to setup an application
-    TTValue none, v = TTObjectBasePtr(getApplication(TTSymbol(deviceName)));
-    aXmlHandler.set(kTTSym_object, v);
+    // read the file to setup an application
+    aXmlHandler.set(kTTSym_object, anApplication);
     
-    TTErr err = aXmlHandler.send(kTTSym_Read, TTSymbol(filepath), none);
+    err = aXmlHandler.send(kTTSym_Read, TTSymbol(filepath), out);
     
-    if (! err) {
+    if (!err) {
     
-        // Init the application
-        getApplication(TTSymbol(deviceName))->sendMessage(TTSymbol("Init"));
+        // init the application
+        anApplication.send("Init");
         
         // store the namespace file for this device
         m_namespaceFilesPath[deviceName] = filepath;
@@ -2617,86 +2603,95 @@ bool Engine::loadNetworkNamespace(const string &deviceName, const string &filepa
     return err != kTTErrNone;
 }
 
-bool Engine::getDeviceIntegerParameter(const string device, const string protocol, const string parameter, unsigned int &integer){
-    TTSymbol        applicationName;
-    TTErr           err;
-    TTValue         p, v;
-    TTHashPtr       hashParameters;
-
-    applicationName = TTSymbol(device);
-
-    // get parameter's table
-    v = TTSymbol(applicationName);
-    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
-
+bool
+Engine::getDeviceIntegerParameter(const string device, const string protocol, const string parameter, unsigned int &integer)
+{
+    TTSymbol    applicationName(device);
+    TTObject    aProtocol = accessProtocol(TTSymbol(protocol));
+    TTValue     out;
+    TTErr       err;
+    
+    err = aProtocol.send("ApplicationSelect", applicationName, out);
+    
     if (!err) {
-        hashParameters = TTHashPtr((TTPtr)v[0]);
-        hashParameters->lookup(TTSymbol(parameter),p);
-        integer = TTUInt32(p[0]);
-        return 0;
+        
+        err = aProtocol.get(TTSymbol(parameter), out);
+        
+        if (!err) {
+            
+            integer = TTUInt32(out[0]);
+            return 0;
+        }
     }
+    
     return 1;
 }
 
-bool Engine::getDeviceIntegerVectorParameter(const string device, const string protocol, const string parameter, vector<int>& integerVect){
-    TTSymbol        applicationName;
-    TTErr           err;
-    TTValue         p, v;
-    TTHashPtr       hashParameters;
-
-    applicationName = TTSymbol(device);
-
-    // get parameter's table
-    v = TTSymbol(applicationName);
-    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
-
+bool
+Engine::getDeviceIntegerVectorParameter(const string device, const string protocol, const string parameter, vector<int>& integerVect)
+{
+    TTSymbol    applicationName(device);
+    TTObject    aProtocol = accessProtocol(TTSymbol(protocol));
+    TTValue     out;
+    TTErr       err;
+    
+    err = aProtocol.send("ApplicationSelect", applicationName, out);
+    
     if (!err) {
-        hashParameters = TTHashPtr((TTPtr)v[0]);
-        hashParameters->lookup(TTSymbol(parameter),p);
-
-        for (TTUInt32 i = 0 ; i < p.size() ; i++)
-            integerVect.push_back(TTUInt16(p[i]));
-
-        return 0;
+        
+        err = aProtocol.get(TTSymbol(parameter), out);
+        
+        if (!err) {
+            
+            for (TTUInt32 i = 0 ; i < out.size() ; i++)
+                integerVect.push_back(TTUInt16(out[i]));
+            
+            return 0;
+        }
     }
+    
     return 1;
 }
 
-bool Engine::getDeviceStringParameter(const string device, const string protocol, const string parameter, string &string){
-
-    TTSymbol        applicationName, s;
-    TTErr           err;
-    TTValue         p, v;
-    TTHashPtr       hashParameters;
-
-    applicationName = TTSymbol(device);
-
-    // get parameter's table
-    v = TTSymbol(applicationName);
-    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
-
+bool
+Engine::getDeviceStringParameter(const string device, const string protocol, const string parameter, string &string)
+{
+    TTSymbol    applicationName(device);
+    TTObject    aProtocol = accessProtocol(TTSymbol(protocol));
+    TTValue     v, out;
+    TTErr       err;
+    
+    err = aProtocol.send("ApplicationSelect", applicationName, out);
+    
     if (!err) {
-        hashParameters = TTHashPtr((TTPtr)v[0]);
-        hashParameters->lookup(TTSymbol(parameter),p);
-        s = p[0];
-        string = s.c_str();
-        return 0;
+        
+        err = aProtocol.get(TTSymbol(parameter), out);
+        
+        if (!err) {
+            
+            TTSymbol s = out[0];
+            string = s.c_str();
+            
+            return 0;
+        }
     }
+    
     return 1;
 }
 
 bool
 Engine::getDeviceProtocol(std::string deviceName, std::string &protocol)
 {
-    TTValue         v;
-    TTSymbol        applicationName(deviceName);
-    TTSymbol        protocolName;
-    TTObjectBasePtr anApplication = getApplication(applicationName);
-
+    TTValue     v;
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    TTSymbol    protocolName;
+    
     // if the application exists
-    if (anApplication) {
-        // get the protocols of the application
-        v = getApplicationProtocols(applicationName);
+    if (anApplication.valid()) {
+        
+        // get the protocol names used by the application
+        v = accessApplicationProtocolNames(applicationName);
         protocolName = v[0]; // we register application to 1 protocol only
         protocol = protocolName.c_str();
         return 0;
@@ -2732,83 +2727,74 @@ Engine::setDeviceName(string deviceName, string newName)
 bool
 Engine::setDevicePort(string deviceName, int destinationPort, int receptionPort)
 {
-    TTValue         v, portValue;
-    TTSymbol        applicationName(deviceName);
-    TTHashPtr       hashParameters;
-    TTErr           err;
-    std::string     protocol;
-
-    v = TTSymbol(applicationName);
-
-    if (getDeviceProtocol(deviceName,protocol) != 0)
-        return 1;
-
-    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
-
-    if (!err) {
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    TTSymbol    protocolName;
+    TTObject    aProtocol;
+    TTValue     v, out;
+    TTErr       err;
+    
+    // if the application exists
+    if (anApplication.valid()) {
         
-        // stop the protocol
-        getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Stop"));
+        // get the protocol names used by the application
+        v = accessApplicationProtocolNames(applicationName);
+        protocolName = v[0]; // we register application to 1 protocol only
+        aProtocol = accessProtocol(protocolName);
         
-        hashParameters = TTHashPtr((TTPtr)v[0]);
-
-        hashParameters->remove(TTSymbol("port"));
+        err = aProtocol.send("ApplicationSelect", applicationName, out);
         
-        portValue = destinationPort;
-        if (receptionPort != 0)
-            portValue.append(receptionPort);
-        
-        hashParameters->append(TTSymbol("port"), portValue);
-
-        v = TTSymbol(applicationName);
-        v.append((TTPtr)hashParameters);
-        getProtocol(TTSymbol(protocol))->setAttributeValue(TTSymbol("applicationParameters"), v);
-        
-        // run the protocol
-        getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Run"));
-
-        return 0;
+        if (!err) {
+            
+            aProtocol.send("Stop");
+            
+            v = TTValue(destinationPort, receptionPort);
+            err = aProtocol.set("port", v);
+            
+            aProtocol.send("Run");
+            
+            if (!err)
+                return 0;
+        }
     }
-
+    
     return 1;
 }
 
 bool
 Engine::setDeviceLocalHost(string deviceName, string localHost)
 {
-    TTValue         v;
-    TTSymbol        applicationName(deviceName);
-    TTHashPtr       hashParameters;
-    TTErr           err;
-    std::string     protocol;
-
-    v = TTSymbol(applicationName);
-
-    if(getDeviceProtocol(deviceName,protocol) != 0)
-        return 1;
-
-    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
-
-    if (!err) {
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    TTSymbol    protocolName;
+    TTObject    aProtocol;
+    TTValue     v, out;
+    TTErr       err;
+    
+    // if the application exists
+    if (anApplication.valid()) {
         
-        // stop the protocol
-        getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Stop"));
+        // get the protocol names used by the application
+        v = accessApplicationProtocolNames(applicationName);
+        protocolName = v[0]; // we register application to 1 protocol only
+        aProtocol = accessProtocol(protocolName);
         
-        hashParameters = TTHashPtr((TTPtr)v[0]);
-
-        hashParameters->remove(TTSymbol("ip"));
-        hashParameters->append(TTSymbol("ip"), TTSymbol(localHost));
-
-        v = TTSymbol(applicationName);
-        v.append((TTPtr)hashParameters);
-        getProtocol(TTSymbol(protocol))->setAttributeValue(TTSymbol("applicationParameters"), v);
+        err = aProtocol.send("ApplicationSelect", applicationName, out);
         
-        // run the protocol
-        getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Run"));
-
-        return 0;
+        if (!err) {
+            
+            aProtocol.send("Stop");
+            
+            v = TTSymbol(localHost);
+            err = aProtocol.set("ip", v);
+            
+            aProtocol.send("Run");
+            
+            if (!err)
+                return 0;
+        }
     }
-
+    
     return 1;
 }
 
@@ -2839,35 +2825,30 @@ Engine::setDeviceProtocol(string deviceName, string protocol)
 
 bool Engine::setDeviceLearn(std::string deviceName, bool newLearn)
 {
-    TTSymbol applicationName(deviceName);
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
     
-    TTErr err = getApplication(applicationName)->setAttributeValue("learn", newLearn);
+    TTErr err = anApplication.set("learn", newLearn);
     
     // enable namespace observation
-    if (newLearn && !m_namespaceObserver) {
+    if (newLearn && !m_namespaceObserver.valid()) {
         
-        TTValue     none;
-        TTValuePtr  baton;
+        TTValue baton(TTPtr(this), applicationName);
         
         // create a TTCallback to observe when a node is created (using NamespaceCallback)
-        TTObjectBaseInstantiate("callback", &m_namespaceObserver, none);
+        m_namespaceObserver = TTObject("callback");
         
-        baton = new TTValue(TTPtr(this)); // baton will be deleted during the callback destruction
-        baton->append(applicationName);
+        m_namespaceObserver.set("baton", baton);
+        m_namespaceObserver.set("function", TTPtr(&NamespaceCallback));
         
-        m_namespaceObserver->setAttributeValue(kTTSym_baton, TTPtr(baton));
-        m_namespaceObserver->setAttributeValue(kTTSym_function, TTPtr(&NamespaceCallback));
-        //m_namespaceObserver->setAttributeValue(kTTSym_notification, ???);
-        
-        getApplicationDirectory(applicationName)->addObserverForNotifications(kTTAdrsRoot, TTCallbackPtr(m_namespaceObserver));
+        accessApplicationDirectory(applicationName)->addObserverForNotifications(kTTAdrsRoot, m_namespaceObserver);
     }
     // disable namespace observation
-    else if (!newLearn && m_namespaceObserver) {
+    else if (!newLearn && m_namespaceObserver.valid()) {
         
-        getApplicationDirectory(applicationName)->removeObserverForNotifications(kTTAdrsRoot, TTCallbackPtr(m_namespaceObserver));
+        accessApplicationDirectory(applicationName)->removeObserverForNotifications(kTTAdrsRoot, m_namespaceObserver);
         
-        TTObjectBaseRelease(&m_namespaceObserver);
-        m_namespaceObserver = NULL;
+        m_namespaceObserver = TTObject();
     }
     
     return err != kTTErrNone;
@@ -2876,9 +2857,10 @@ bool Engine::setDeviceLearn(std::string deviceName, bool newLearn)
 bool Engine::getDeviceLearn(std::string deviceName)
 {
     TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
     TTValue     v;
     
-    getApplication(applicationName)->getAttributeValue("learn", v);
+    anApplication.get("learn", v);
     
     return TTBoolean(v[0]);
 }
@@ -2895,7 +2877,7 @@ int Engine::requestNetworkNamespace(const std::string & address, std::string & n
     TTValue             v;
     
     // get the application directory
-    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
     
     if (!aDirectory)
         return 0;
@@ -2905,7 +2887,7 @@ int Engine::requestNetworkNamespace(const std::string & address, std::string & n
     if (!aDirectory->getTTNode(anAddress, &aNode)) {
         
         // get object attributes
-        aMirror = TTMirrorPtr(aNode->getObject());
+        aMirror = TTMirrorPtr(aNode->getObject().instance());
         if (aMirror) {
             
             type = aMirror->getName();
@@ -2992,7 +2974,7 @@ int Engine::requestNetworkNamespace(const std::string & address, std::string & n
             }
             
             // depending on the mirror object type
-            aMirror = TTMirrorPtr(childNode->getObject());
+            aMirror = TTMirrorPtr(childNode->getObject().instance());
             if (aMirror) {
                 
                 type = aMirror->getName();
@@ -3016,44 +2998,45 @@ int Engine::requestNetworkNamespace(const std::string & address, std::string & n
 int Engine::appendToNetWorkNamespace(const std::string & address, const std::string & service, const std::string & type, const std::string & priority, const std::string & description, const std::string & range, const std::string & clipmode, const std::string & tags)
 {
     TTAddress           anAddress = toTTAddress(address);
+    TTObject            anApplication = accessApplication(anAddress.getDirectory());
     TTNodeDirectoryPtr  aDirectory;
-    TTObjectBasePtr     anObject;
+    TTObject            anObject;
     TTString            s;
     TTValue             v, out;
     
     // get the application directory
-    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
     
     if (!aDirectory)
         return 0;
     
     // don't register anything into the local directory
-    if (aDirectory == getLocalDirectory)
+    if (aDirectory == accessApplicationLocalDirectory)
         return 0;
     
     // create a proxy data
-    v = TTValue(anAddress, TTSymbol(service.data()));
-    if (!getApplication(anAddress.getDirectory())->sendMessage("ProxyDataInstantiate", v, out)) {
+    v = TTValue(anAddress, TTSymbol(service));
+    if (!anApplication.send("ProxyDataInstantiate", v, out)) {
         
         anObject = out[0];
         
-        anObject->setAttributeValue("type", TTSymbol(type.data()));
+        anObject.set("type", TTSymbol(type));
         
         v = TTString(priority);
         v.fromString();
-        anObject->setAttributeValue("priority", v);
+        anObject.set("priority", v);
         
-        anObject->setAttributeValue("description", TTSymbol(description.data()));
+        anObject.set("description", TTSymbol(description));
         
         v = TTString(range);
         v.fromString();
-        anObject->setAttributeValue("rangeBounds", v);
+        anObject.set("rangeBounds", v);
         
-        anObject->setAttributeValue("rangeClipmode", TTSymbol(clipmode.data()));
+        anObject.set("rangeClipmode", TTSymbol(clipmode));
         
         v = TTString(tags);
         v.fromString();
-        anObject->setAttributeValue("tag", v);
+        anObject.set("tag", v);
         
         return 1;
     }
@@ -3066,10 +3049,10 @@ int Engine::removeFromNetWorkNamespace(const std::string & address)
     TTAddress           anAddress = toTTAddress(address);
     TTNodeDirectoryPtr  aDirectory;
     TTNodePtr           aNode;
-    TTObjectBasePtr     aMirror;
+    TTObject            anObject;
     
     // get the application directory
-    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
     
     if (!aDirectory)
         return 0;
@@ -3078,16 +3061,9 @@ int Engine::removeFromNetWorkNamespace(const std::string & address)
     // notice the tree is already built (see in initModular)
     if (!aDirectory->getTTNode(anAddress, &aNode)) {
         
-        // get object attributes
-        aMirror = TTMirrorPtr(aNode->getObject());
-        if (aMirror) {
-            
-            aDirectory->TTNodeRemove(anAddress);
-            
-            TTObjectBaseRelease(&aMirror);
-            
-            return 1;
-        }
+        aDirectory->TTNodeRemove(anAddress);
+        
+        return 1;
     }
     
     return 0;
@@ -3106,8 +3082,7 @@ void Engine::store(std::string filepath)
     TTObject aXmlHandler(kTTSym_XmlHandler);
     
     // Pass the application manager and the main scenario object
-    v = TTObjectBasePtr(TTModularApplications);
-    v.append(m_mainScenario);
+    v = TTValue(m_applicationManager, m_mainScenario);
     aXmlHandler.set(kTTSym_object, v);
     
     // Write
@@ -3116,7 +3091,7 @@ void Engine::store(std::string filepath)
 
 void Engine::load(std::string filepath)
 {
-    TTValue v, none;
+    TTValue out;
     
     // Check that all Engine caches have been properly cleared before
     if (m_timeProcessMap.size() > 1)
@@ -3136,26 +3111,25 @@ void Engine::load(std::string filepath)
     // Create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
     
-    // Read the file to setup TTModularApplications
-    v = TTObjectBasePtr(TTModularApplications);
-    aXmlHandler.set(kTTSym_object, v);
-    aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, none);
+    // Read the file to setup m_applicationManager
+    aXmlHandler.set(kTTSym_object, m_applicationManager);
+    aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, out);
     
     // Read the file to setup m_mainScenario
-    v = TTObjectBasePtr(m_mainScenario);
-    aXmlHandler.set(kTTSym_object, v);
-    aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, none);
+    aXmlHandler.set(kTTSym_object, m_mainScenario);
+    aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, out);
     
     // Rebuild all the EngineCacheMaps from the main scenario content
     buildEngineCaches(m_mainScenario, kTTAdrsRoot);
 }
 
-void Engine::buildEngineCaches(TTTimeProcessPtr scenario, TTAddress& scenarioAddress)
+void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
 {
     TTValue             v, objects, none;
-    TTTimeProcessPtr    timeProcess;
-    TTTimeEventPtr      timeEvent;
-    TTTimeConditionPtr  timeCondition;
+    TTObject            timeProcess;
+    TTObject            timeEvent;
+    TTObject            timeCondition;
+    TTObject            empty;
     TTSymbol            name;
     TimeProcessId       timeProcessId;
     IntervalId          relationId;
@@ -3163,18 +3137,18 @@ void Engine::buildEngineCaches(TTTimeProcessPtr scenario, TTAddress& scenarioAdd
     TimeConditionId     timeConditionId;
     
     // temporary map from TTTimeConditionPtr to TimeConditionId
-    std::map<TTTimeConditionPtr, TimeConditionId> TTCondToID;
+    std::map<TTObjectBasePtr, TimeConditionId> TTCondToID;
 
     // get all TTTimeConditions
-    scenario->getAttributeValue(TTSymbol("timeConditions"), objects);
+    scenario.get("timeConditions", objects);
 
     // for all time conditions
     for (TTUInt32 i = 0 ; i < objects.size() ; ++i) {
 
-        timeCondition = TTTimeConditionPtr(TTObjectBasePtr(objects[i]));
+        timeCondition = objects[i];
 
         // check if it's a condition for i-score (2-plus events)
-        timeCondition->getAttributeValue(TTSymbol("events"), v);
+        timeCondition.get("events", v);
         if (v.size() >= 2) {
 
             // get a unique ID for the condition
@@ -3184,34 +3158,33 @@ void Engine::buildEngineCaches(TTTimeProcessPtr scenario, TTAddress& scenarioAdd
             cacheTimeCondition(timeConditionId, timeCondition);
 
             // fill the temporary map
-            TTCondToID[timeCondition] = timeConditionId;
+            TTCondToID[timeCondition.instance()] = timeConditionId;
         }
     }
     
     // get all TTTimeProcesses
-    scenario->getAttributeValue(TTSymbol("timeProcesses"), objects);
+    scenario.get("timeProcesses", objects);
     
     // for all time process
     for (TTUInt32 i = 0; i < objects.size(); i++) {
         
-        timeProcess = TTTimeProcessPtr(TTObjectBasePtr(objects[i]));
+        timeProcess = objects[i];
         
         // for each Automation process
-        if (timeProcess->getName() == TTSymbol("Automation")) {
+        if (timeProcess.name() == TTSymbol("Automation")) {
             
-            timeProcess->getAttributeValue(kTTSym_name, v);
-            name = v[0];
+            timeProcess.get(kTTSym_name, name);
             
             // Cache it and get an unique id for this process
             TTAddress address = scenarioAddress.appendAddress(TTAddress(name));
-            timeProcessId = cacheTimeProcess(timeProcess, address);
+            timeProcessId = cacheTimeProcess(timeProcess, address, empty);
             
             // if the Start event of the Automation process is conditioned
-            timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
-            timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+            timeProcess.get("startEvent", v);
+            timeEvent = v[0];
             
-            timeEvent->getAttributeValue(TTSymbol("condition"), v);
-            timeCondition = TTTimeConditionPtr(TTObjectBasePtr(v[0]));
+            timeEvent.get("condition", v);
+            timeCondition = v[0];
             
             if (timeCondition != NULL) {
             
@@ -3222,7 +3195,7 @@ void Engine::buildEngineCaches(TTTimeProcessPtr scenario, TTAddress& scenarioAdd
                 cacheTimeCondition(triggerId, timeCondition);
 
                 // if it is a condition for i-score
-                std::map<TTTimeConditionPtr, TimeConditionId>::iterator it = TTCondToID.find(timeCondition);
+                std::map<TTObjectBasePtr, TimeConditionId>::iterator it = TTCondToID.find(timeCondition.instance());
                 if (it != TTCondToID.end()) {
 
                     // add it in the conditions map
@@ -3231,11 +3204,11 @@ void Engine::buildEngineCaches(TTTimeProcessPtr scenario, TTAddress& scenarioAdd
             }
             
             // if the End event of the Automation process is conditioned
-            timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-            timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+            timeProcess.get("endEvent", v);
+            timeEvent = v[0];
             
-            timeEvent->getAttributeValue(TTSymbol("condition"), v);
-            timeCondition = TTTimeConditionPtr(TTObjectBasePtr(v[0]));
+            timeEvent.get("condition", v);
+            timeCondition = v[0];
             
             if (timeCondition != NULL) {
                 
@@ -3248,23 +3221,23 @@ void Engine::buildEngineCaches(TTTimeProcessPtr scenario, TTAddress& scenarioAdd
         }
         
         // for each Interval process
-        else if (timeProcess->getName() == TTSymbol("Interval")) {
+        else if (timeProcess.name() == TTSymbol("Interval")) {
             
             // Cache it and get an unique id for this process
             relationId = cacheInterval(timeProcess);
         }
         
         // for each Scenario process
-        else if (timeProcess->getName() == TTSymbol("Scenario")) {
+        else if (timeProcess.name() == TTSymbol("Scenario")) {
             
             // get end and start events
-            TTTimeEventPtr startSubScenario, endSubScenario;
+            TTObject startSubScenario, endSubScenario;
             
-            timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
-            startSubScenario = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+            timeProcess.get("startEvent", v);
+            startSubScenario = v[0];
             
-            timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-            endSubScenario = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+            timeProcess.get("endEvent", v);
+            endSubScenario = v[0];
 
             // retreive the time process with the same end and start events
             EngineCacheMapIterator it;
@@ -3272,18 +3245,18 @@ void Engine::buildEngineCaches(TTTimeProcessPtr scenario, TTAddress& scenarioAdd
             
             for (it = m_timeProcessMap.begin(); it != m_timeProcessMap.end(); ++it) {
                 
-                TTTimeEventPtr  start, end;
+                TTObject  start, end;
                 
-                it->second->object->getAttributeValue(TTSymbol("startEvent"), v);
-                start = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+                it->second->object.get("startEvent", v);
+                start = v[0];
                 
-                it->second->object->getAttributeValue(TTSymbol("endEvent"), v);
-                end = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+                it->second->object.get("endEvent", v);
+                end = v[0];
                 
                 // set the scenario as the subScenario related to this time process
                 if (start == startSubScenario && end == endSubScenario) {
                     
-                    it->second->subScenario = TTObjectBasePtr(timeProcess);
+                    it->second->subScenario = timeProcess;
                     address = it->second->address;
                     break;
                 }
@@ -3352,23 +3325,21 @@ void Engine::printExecutionInLinuxConsole()
 
 void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value)
 {
-    TTValuePtr              b;
     EnginePtr               engine;
     ConditionedProcessId    triggerId;
-    TTObjectBasePtr         event;
+    TTObject                event;
     TTValue                 v;
     TTSymbol                status;
 	
 	// unpack baton (engine, triggerId)
-	b = (TTValuePtr)baton;
-	engine = EnginePtr((TTPtr)(*b)[0]);
-    triggerId = ConditionedProcessId((*b)[1]);
+	engine = EnginePtr((TTPtr)baton[0]);
+    triggerId = ConditionedProcessId(baton[1]);
 	
 	// Unpack data (event)
 	event = value[0];
     
     // get status
-    event->getAttributeValue(kTTSym_status, v);
+    event.get("status", v);
     status = v[0];
     
 	if (engine->m_TimeEventStatusAttributeCallback != NULL) {
@@ -3406,14 +3377,12 @@ void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value
 
 void TimeProcessStartCallback(const TTValue& baton, const TTValue& value)
 {
-    TTValuePtr      b;
     EnginePtr       engine;
     TimeProcessId   boxId;
 	
 	// unpack baton (engine, boxId)
-	b = (TTValuePtr)baton;
-	engine = EnginePtr((TTPtr)(*b)[0]);
-    boxId = TTUInt32((*b)[1]);
+	engine = EnginePtr((TTPtr)baton[0]);
+    boxId = TTUInt32(baton[1]);
     
     iscoreEngineDebug 
         TTLogMessage("TimeProcess %ld starts at %ld ms\n", boxId, engine->getCurrentExecutionDate());
@@ -3425,14 +3394,12 @@ void TimeProcessStartCallback(const TTValue& baton, const TTValue& value)
 
 void TimeProcessEndCallback(const TTValue& baton, const TTValue& value)
 {
-    TTValuePtr      b;
     EnginePtr       engine;
     TimeProcessId   boxId;
 	
 	// unpack baton (engine, boxId)
-	b = (TTValuePtr)baton;
-	engine = EnginePtr((TTPtr)(*b)[0]);
-    boxId = TTUInt32((*b)[1]);
+	engine = EnginePtr((TTPtr)baton[0]);
+    boxId = TTUInt32(baton[1]);
     
     iscoreEngineDebug
         TTLogMessage("TimeProcess %ld ends at %ld ms\n", boxId, engine->getCurrentExecutionDate());
@@ -3445,15 +3412,13 @@ void TimeProcessEndCallback(const TTValue& baton, const TTValue& value)
 
 void NamespaceCallback(const TTValue& baton, const TTValue& value)
 {
-    TTValuePtr  b;
     EnginePtr   engine;
     TTSymbol    applicationName;
 	TTUInt8     flag;
 	
 	// unpack baton (engine, applicationName)
-	b = (TTValuePtr)baton;
-	engine = EnginePtr((TTPtr)(*b)[0]);
-    applicationName = (*b)[1];
+	engine = EnginePtr((TTPtr)baton[0]);
+    applicationName = baton[1];
     
     // Unpack value (anAddress, aNode, flag, anObserver)
 	flag = value[2];
@@ -3498,12 +3463,12 @@ std::string Engine::toNetworkTreeAddress(TTAddress aTTAddress)
 TTBoolean TTModularCompareNodePriorityThenNameThenInstance(TTValue& v1, TTValue& v2)
 {
 	TTNodePtr	n1, n2;
-	TTObjectBasePtr o1, o2;
+	TTObject    o1, o2;
 	TTValue		v;
-    TTValue    name1;
-    TTValue    name2;
-    TTValue    instance1;
-    TTValue    instance2;
+    TTValue     name1;
+    TTValue     name2;
+    TTValue     instance1;
+    TTValue     instance2;
 	TTInt32		p1 = 0;
 	TTInt32		p2 = 0;
 	
@@ -3515,8 +3480,8 @@ TTBoolean TTModularCompareNodePriorityThenNameThenInstance(TTValue& v1, TTValue&
         instance1 = n1->getInstance();
 		o1 = n1->getObject();
 		
-		if (o1)
-			if (!o1->getAttributeValue(kTTSym_priority, v))
+		if (o1.valid())
+			if (!o1.get(kTTSym_priority, v))
 				p1 = v[0];
 	}
 	
@@ -3528,8 +3493,8 @@ TTBoolean TTModularCompareNodePriorityThenNameThenInstance(TTValue& v1, TTValue&
         instance2 = n2->getInstance();
 		o2 = n2->getObject();
 		
-		if (o2)
-			if (!o2->getAttributeValue(kTTSym_priority, v))
+		if (o2.valid())
+			if (!o2.get(kTTSym_priority, v))
 				p2 = v[0];
 	}
 	
