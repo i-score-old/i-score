@@ -67,8 +67,8 @@ int NetworkTree::MIN_COLUMN = 10;
 int NetworkTree::MAX_COLUMN = 11;
 unsigned int NetworkTree::PRIORITY_COLUMN = 12;
 
-const QColor NetworkTree::TEXT_COLOR = QColor(0, 0, 0);
-const QColor NetworkTree::TEXT_DISABLED_COLOR = QColor(100, 100, 100);
+const QColor NetworkTree::TEXT_COLOR = QColor(100, 100, 100);
+const QColor NetworkTree::TEXT_DISABLED_COLOR = QColor(50, 50, 50);
 
 QString NetworkTree::OSC_ADD_NODE_TEXT = QString("Add a node");
 QString NetworkTree::ADD_A_DEVICE_TEXT = QString("Add a device");
@@ -176,6 +176,7 @@ NetworkTree::init()
                 
                 "QTreeView::item:hover {"
                 "background: qlineargradient(x1: -5, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);"
+                "color: #5a5a5a;"
                 "border: 1px solid #bfcde4;"
                 "}"
 
@@ -688,6 +689,14 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
          //TOTO : check if necessary (unused for the moment) NH.
          _addressMap.insert(curItem, address);
 
+         QFont curFont = curItem->font(NAME_COLUMN);
+         curFont.setItalic(false);
+         curItem->setFont(NAME_COLUMN,curFont);
+
+         QBrush brush(Qt::lightGray);
+         curItem->setForeground(NAME_COLUMN, brush);
+         curItem->setForeground(VALUE_COLUMN, brush);
+
          //Gets object's type
          requestResult = Maquette::getInstance()->getObjectType(address,nodeType);
          requestSuccess = requestResult > 0;
@@ -719,7 +728,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                  curFont.setItalic(true);
                  curItem->setFont(NAME_COLUMN,curFont);
 
-                 QBrush brush(Qt::lightGray);
+                 QBrush brush(Qt::black);
                  curItem->setForeground(NAME_COLUMN, brush);
                  curItem->setForeground(VALUE_COLUMN, brush);
 
@@ -753,7 +762,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                      curFont.setItalic(true);
                      curItem->setFont(NAME_COLUMN,curFont);
 
-                     QBrush brush(Qt::lightGray);
+                     QBrush brush(Qt::black);
                      curItem->setForeground(NAME_COLUMN, brush);
                      curItem->setForeground(VALUE_COLUMN, brush);
 
@@ -770,7 +779,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                      curFont.setItalic(true);
                      curItem->setFont(NAME_COLUMN,curFont);
 
-                     QBrush brush(Qt::lightGray);
+                     QBrush brush(Qt::black);
                      curItem->setForeground(NAME_COLUMN, brush);
                      curItem->setForeground(VALUE_COLUMN, brush);
 
@@ -783,9 +792,11 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
 
                  //Case type parameter
                  if(attributesValues[0] == "parameter"){
+
                      curItem->setText(TYPE_COLUMN,QString("<->"));
                      curItem->setToolTip(TYPE_COLUMN, tr("Type parameter"));
                  }
+
                  curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
              }
          }
