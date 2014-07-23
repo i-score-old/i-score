@@ -62,7 +62,6 @@ void Engine::initModular(const char* pathToTheJamomaFolder)
 {
     TTErr    err;
     TTValue  args, out;
-    TTString configFile = "/usr/local/include/IScore/i-scoreConfiguration.xml";     // TODO : declare as global variable
     
     TTLogMessage("\n*** Initialisation of Modular environnement ***\n");
     ////////////////////////////////////////////////////////////////////////
