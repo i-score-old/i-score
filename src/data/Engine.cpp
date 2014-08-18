@@ -2213,10 +2213,10 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
             aProtocol.send("Run");
         }
         
-        // set the priority, service, tag and rangeBounds attributes as a cached attributes
+        // set the priority, service, tags and rangeBounds attributes as a cached attributes
         args = kTTSym_priority;
         args.append(kTTSym_service);
-        args.append(kTTSym_tag);
+        args.append(kTTSym_tags);
         args.append(kTTSym_rangeBounds);
         args.append(kTTSym_rangeClipmode);
         anApplication.set("cachedAttributes", args);
@@ -3035,7 +3035,7 @@ int Engine::appendToNetWorkNamespace(const std::string & address, const std::str
         
         v = TTString(tags);
         v.fromString();
-        anObject.set("tag", v);
+        anObject.set("tags", v);
         
         return 1;
     }

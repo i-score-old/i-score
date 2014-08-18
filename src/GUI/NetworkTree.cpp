@@ -661,7 +661,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                  delete(curItem);
                  return;
              }
-             if(Maquette::getInstance()->requestObjectAttribruteValue(address,"tag",attributesValues) > 0){
+             if(Maquette::getInstance()->requestObjectAttribruteValue(address,"tags",attributesValues) > 0){
                  if(attributesValues[0] == "setup"){
                      delete(curItem);
                      return;
