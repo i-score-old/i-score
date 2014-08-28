@@ -3071,7 +3071,7 @@ int Engine::removeFromNetWorkNamespace(const std::string & address)
 
 // LOAD AND STORE
 
-void Engine::store(std::string filepath)
+int Engine::store(std::string filepath)
 {
     TTValue v, none;
     
@@ -3085,12 +3085,15 @@ void Engine::store(std::string filepath)
     aXmlHandler.set(kTTSym_object, v);
     
     // Write
-    aXmlHandler.send(kTTSym_Write, m_lastProjectFilePath, none);
+    TTErr err = aXmlHandler.send(kTTSym_Write, m_lastProjectFilePath, none);
+    
+    return err == kTTErrNone;
 }
 
-void Engine::load(std::string filepath)
+int Engine::load(std::string filepath)
 {
     TTValue out;
+    TTErr   err;
     
     // Check that all Engine caches have been properly cleared before
     if (m_timeProcessMap.size() > 1)
@@ -3112,14 +3115,22 @@ void Engine::load(std::string filepath)
     
     // Read the file to setup m_applicationManager
     aXmlHandler.set(kTTSym_object, m_applicationManager);
-    aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, out);
+    err = aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, out);
     
-    // Read the file to setup m_mainScenario
-    aXmlHandler.set(kTTSym_object, m_mainScenario);
-    aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, out);
+    if (!err) {
+        
+        // Read the file to setup m_mainScenario
+        aXmlHandler.set(kTTSym_object, m_mainScenario);
+        err = aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, out);
+        
+        if (!err) {
+            
+            // Rebuild all the EngineCacheMaps from the main scenario content
+            buildEngineCaches(m_mainScenario, kTTAdrsRoot);
+        }
+    }
     
-    // Rebuild all the EngineCacheMaps from the main scenario content
-    buildEngineCaches(m_mainScenario, kTTAdrsRoot);
+    return err == kTTErrNone;
 }
 
 void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)

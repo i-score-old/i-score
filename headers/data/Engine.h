@@ -1267,15 +1267,17 @@ public:
 	 * Store Engine.
 	 *
 	 * \param filepath : the filepath to use.
+     * \return 1 if the storage succeed
 	 */
-	void store(std::string filepath);
+	int store(std::string filepath);
     
 	/*!
 	 * Load Engine.
 	 *
 	 * \param filepath : the filepath to use.
+     * \return 1 if the load succeed
 	 */
-	void load(std::string filepath);
+	int load(std::string filepath);
     void buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress);
     
 	/*!
