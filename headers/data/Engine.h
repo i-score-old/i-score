@@ -1166,7 +1166,7 @@ public:
      * \param clipmode : the behavior of the value at min or max bounds (none, low, high, both, wrap, fold)
      * \param tags : any words
      */
-    int appendToNetWorkNamespace(const std::string & address, const std::string & service = "parameter", const std::string & type = "decimal", const std::string & priority = "0", const std::string & description = "", const std::string & range = "0. 1.", const std::string & clipmode = "none", const std::string & tags = "");
+    int appendToNetWorkNamespace(const std::string & address, const std::string & service = "parameter", const std::string & type = "generic", const std::string & priority = "0", const std::string & description = "", const std::string & range = "0. 1.", const std::string & clipmode = "none", const std::string & tags = "");
     
     /*!
      * remove an new address from a network device
