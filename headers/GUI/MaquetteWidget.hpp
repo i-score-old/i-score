@@ -44,7 +44,8 @@ class MaquetteWidget : public QWidget
     void setName(QString name);
     static const float HEADER_HEIGHT;
     static const float NAME_POINT_SIZE;
-
+    static const QColor TITLE_BAR_COLOR;
+    
   signals:
     void beginPlaying();
     void stopSignal();

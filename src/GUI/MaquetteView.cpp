@@ -1,15 +1,16 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ *iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -57,24 +58,41 @@
 #include <QPushButton>
 
 static const int SCROLL_BAR_INCREMENT = 1000 / MaquetteScene::MS_PER_PIXEL;
+const QColor MaquetteView::BACKGROUND_COLOR = QColor(60, 60, 60);
 
 MaquetteView::MaquetteView(MainWindow *mw)
   : QGraphicsView(mw)
 {
   _mainWindow = mw;
-  setRenderHint(QPainter::Antialiasing);
 
-  setBackgroundBrush(QColor(160, 160, 160));
+  setRenderHint(QPainter::Antialiasing);
+  setBackgroundBrush(QColor(BACKGROUND_COLOR));
+  setOptimizationFlags(QGraphicsView::DontSavePainterState);
+  setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
+  setTransformationAnchor(QGraphicsView::NoAnchor);
   setCacheMode(QGraphicsView::CacheBackground);
+
+  setBackgroundBrush(QColor(90, 90, 90));
+
+  setStyleSheet(
+                "QScrollBar {"
+                "color: lightgray;"
+                            "}"
+              "QGraphicsView{"
+              "border: none;"
+              "}"
+                );
+/*              including the next line brings an ugly Windows-looking scroll bar
+                  "background-color: darkgray;"
+*/
+
 
   setWindowTitle(tr("Maquette"));
 
   setAlignment(Qt::AlignLeft | Qt::AlignTop);
   centerOn(0, 0);
-  _zoom = 1;
-  _gotoValue = 0;      
-  setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-  setCacheMode(QGraphicsView::CacheBackground);
+  _zoom = 1;    
+  _scenarioSelected = false;
 }
 
 MaquetteView::~MaquetteView()
@@ -108,9 +126,8 @@ MaquetteView::wheelEvent(QWheelEvent *event)
 }
 
 void
-MaquetteView::setGotoValue(int value)
+MaquetteView::updateTimeOffsetView()
 {
-  _gotoValue = value;
   _scene->updateProgressBar();
   updateSceneWithoutCenterOn();
 }
@@ -137,52 +154,35 @@ MaquetteView::updateScene()
 }
 
 void
-MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
+MaquetteView::drawStartIndicator(QPainter *painter)
 {
-  QGraphicsView::drawBackground(painter, rect);
-  QPen pen(QColor(160, 160, 160));
+  QPen pen(BACKGROUND_COLOR);
   //was QPen pen(QColor(145, 145, 145));
+    AbstractBox *scenarioAbstract = static_cast<AbstractBox *>(Maquette::getInstance()->getBox(ROOT_BOX_ID)->abstract());
 
-  painter->setPen(pen);
+    if(scenarioAbstract->hasFirstMsgs()){
+        painter->setPen(pen);
+        painter->save();
+        painter->setOpacity(_scenarioSelected ? 1 : 0.6);
+        QRectF gradientRect(0,0,GRADIENT_WIDTH,MaquetteScene::MAX_SCENE_HEIGHT);
+        QLinearGradient lgradient(gradientRect.topLeft(),gradientRect.topRight());
 
-  static const int S_TO_MS = 1000;
-  const int WIDTH = sceneRect().width();
-  const int HEIGHT = sceneRect().height();
-  for (int i = 0; i <= (WIDTH*MaquetteScene::MS_PER_PIXEL) / S_TO_MS; i++) {     // for each second
-      int i_PXL = i * S_TO_MS / MaquetteScene::MS_PER_PIXEL;
+        /// \todo : lgradient.setColorAt(0,scenarioAbstract->color()); (rootBox color white for the moment)
+        lgradient.setColorAt(0, Qt::black);
+        lgradient.setColorAt(1, Qt::transparent);
 
-      if (_zoom < 1 && ((i % (int)(1. / _zoom)) != 0)) {
-          continue;
-        }
-      painter->drawLine(QPointF(i_PXL, 0), QPointF(i_PXL, HEIGHT));
-
-//      if (_zoom > 1) {
-//          QPen pen = painter->pen();
-//          QPen savePen = pen;
-//          painter->setPen(pen);
-//          for (float j = i; j < i + 1; j += 1. / _zoom) {
-//              if (i != j) {
-//                  float j_PXL = 0; //=  j * S_TO_MS / (float)MaquetteScene::MS_PER_PIXEL;
-//                  if (_zoom > 4 || QString("%1").arg(j - (int)j).length() < 5) {
-//                      painter->drawText(QPointF(j_PXL - 10, 15), QString("%1").arg(round(j * 1000) / 1000.));
-//                    }
-//                  painter->drawLine(QPointF(j_PXL, 15), QPointF(j_PXL, HEIGHT));
-//                }
-//            }
-//          painter->setPen(savePen);
-//        }
+        painter->fillRect(gradientRect, lgradient);
+        painter->restore();
     }
+}
 
-  if (_scene->tracksView()) {
-      QPen pen2(Qt::darkGray);
-      pen2.setStyle(Qt::SolidLine);
-      pen2.setWidth(4);
-      painter->setPen(pen2);
+void
+MaquetteView::drawBackground(QPainter * painter, const QRectF & rect)
+{    
+  QGraphicsView::drawBackground(painter, rect);
 
-      for (int i = 0; i <= MaquetteScene::MAX_SCENE_HEIGHT; i = i + 150) {
-          painter->drawLine(QPointF(0, i), QPointF(_scene->getMaxSceneWidth(), i));
-        }
-    }
+  //Draw gradient if the root box (scenario) has start messages
+  drawStartIndicator(painter);
 }
 
 void
@@ -231,7 +231,7 @@ MaquetteView::triggerShortcut(int shorcut)
 
 void
 MaquetteView::keyPressEvent(QKeyEvent *event)
-{
+{    
   QGraphicsView::keyPressEvent(event);
 
   if (event->matches(QKeySequence::Copy)) {
@@ -255,20 +255,20 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
       _scene->displayMessage(tr("Selection removed").toStdString(), INDICATION_LEVEL);
     }
   else if ((event->key() == Qt::Key_Space || event->key() == Qt::Key_Comma || event->key() == Qt::Key_Period) && !_scene->playing()) {
-      _scene->play();
+      _scene->playOrResume();
     }
   else if ((event->key() == Qt::Key_Comma || event->key() == Qt::Key_Period) && _scene->playing()) {
-      _scene->pause();
+      _scene->stopOrPause();
     }
   else if (event->key() == Qt::Key_Space && _scene->playing()) {
-      _scene->stopWithGoto();
+      _scene->stopOrPause();
     }
   else if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
-      _scene->stopGotoStart();
+      _scene->stopAndGoToStart();
     }
   else if (event->key() == Qt::Key_0) {
       if (!_scene->playing()) {
-          _scene->play();
+          _scene->stopOrPause();
         }
       else {
           triggerShortcut(Qt::Key_0);
@@ -277,6 +277,9 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
   else if (event->key() == Qt::Key_1 || event->key() == Qt::Key_2 || event->key() == Qt::Key_3) {
       triggerShortcut(event->key());
     }
+  else if(event->key() == Qt::Key_M ){
+      _scene->muteBoxes();
+  }
 }
 
 void
@@ -289,6 +292,16 @@ void
 MaquetteView::keyReleaseEvent(QKeyEvent *event)
 {
   QGraphicsView::keyReleaseEvent(event);
+  if(event->key() == Qt::Key_Control)
+  {
+      QList<TriggerPoint *> triggerPointsSelected;
+      QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+      QList<QGraphicsItem *>::iterator it;
+      for(it = selectedItems.begin() ; it!=selectedItems.end() ; it++){
+          if((*it)->type() == TRIGGER_POINT_TYPE)
+              triggerPointsSelected<<static_cast<TriggerPoint *>(*it);
+      }
+  }
 }
 
 QList<TriggerPoint *> *
@@ -317,6 +330,7 @@ MaquetteView::zoomIn()
 
           QPointF newCenter(2 * getCenterCoordinates().x(), 2 * getCenterCoordinates().y());
           centerOn(newCenter);
+          Maquette::getInstance()->setViewPosition(newCenter);
           _scene->zoomChanged(_zoom);
           setSceneRect((QRectF(0,0,_scene->getMaxSceneWidth(),_scene->height())));
         }
@@ -361,7 +375,7 @@ MaquetteView::setZoom(float value)
   repaint();
   resetCachedContent();
 
-// TODO check if can be comment
+/// \todo Old TODO updated (by jC) : check if can be comment
   _scene->update();  
   _scene->zoomChanged(_zoom);
 
@@ -383,7 +397,15 @@ MaquetteView::zoomOut()
 
   QPointF newCenter(getCenterCoordinates().x() / 2, getCenterCoordinates().y() / 2);
   centerOn(newCenter);
+  Maquette::getInstance()->setViewPosition(newCenter);
   _scene->updateProgressBar();
   _scene->zoomChanged(_zoom);
   setSceneRect((QRectF(0,0,_scene->getMaxSceneWidth(),_scene->height())));
+}
+
+void
+MaquetteView::setScenarioSelected(bool selected){
+    _scenarioSelected = selected;
+    resetCachedContent();
+    update();
 }

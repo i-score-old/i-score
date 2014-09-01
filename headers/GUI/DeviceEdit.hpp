@@ -11,6 +11,7 @@
 #include <QSpinBox>
 #include <QPushButton>
 #include <QHostAddress>
+#include <QFileDialog>
 
 class MaquetteScene;
 
@@ -26,41 +27,64 @@ class DeviceEdit : public QDialog
 
   public:
     DeviceEdit(QWidget *parent);
+    ~DeviceEdit();
 
   public slots:
     void edit(QString name);
+    void edit();
     void setChanged();
-    void setPluginChanged();
+    void setProtocolChanged();
+    void setDeviceNameChanged();
+    void setNetworkPortChanged();
+    void setLocalHostChanged();
     void updateNetworkConfiguration();
-    void deviceNameChanged();
+    void openFileDialog();
+    void setNamespacePathChanged();
+
 
   signals:
-    void deviceNameChanged(QString, QString);
-    void devicePluginChanged(QString);
+    void deviceChanged(QString);
+    void deviceNameChanged(QString,QString);
+    void deviceProtocolChanged(QString);
+    void newDeviceAdded(QString);
+    void namespaceLoaded(QString);
 
   private:
     void init();
 
     bool _changed;
     bool _nameChanged;
-    bool _pluginChanged;
+    bool _protocolChanged;
+    bool _localHostChanged;
+    bool _networkPortChanged;
+    bool _newDevice;
+    bool _namespacePathChanged;
 
-    MyDevice _currentDevice;
+    QString defaultName = "newDevice";
+    QString defaultLocalHost = "127.0.0.1";
+    unsigned int defaultPort = 9998;
+    unsigned int defaultInputPort = 0;
+    int defaultProtocolIndex = 0;
+
+    QString _currentDevice;
 
     QGridLayout *_layout;
     QLabel *_deviceNameLabel;
     QLineEdit *_nameEdit;
 
     QLabel *_devicesLabel;       //!< QLabel for devices.
-    QLabel *_pluginsLabel;       //!< QLabel for plugins.
+    QLabel *_protocolsLabel;       //!< QLabel for protocols.
     QLabel *_portOutputLabel;          //!< QLabel for output ports.
     QLabel *_portInputLabel;          //!< QLabel for intput ports.
-    QLabel *_IPLabel;            //!< QLabel for network adress.
+    QLabel *_localHostLabel;            //!< QLabel for network adress.
 
-    QComboBox *_pluginsComboBox; //!< QComboBox handling various plug-ins available.
+    QComboBox *_protocolsComboBox; //!< QComboBox handling various plug-ins available.
     QSpinBox *_portOutputBox;          //!< QSpinBox managing output port value.
     QSpinBox *_portInputBox;          //!< QSpinBox managing input port value.
-    QLineEdit *_IPBox;           //!< QLineEdit
+    QLineEdit *_localHostBox;           //!< QLineEdit
+
+    QPushButton *_openNamespaceFileButton; //!< Button used to choose file
+    QLineEdit *_namespaceFilePath; //!< To edit/display the namespace file choosen
 
     QPushButton *_okButton;      //!< Button used to confirme.
     QPushButton *_cancelButton;  //!< Button used to cancel.

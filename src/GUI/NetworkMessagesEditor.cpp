@@ -1,15 +1,17 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
+ *
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -126,10 +128,10 @@ NetworkMessagesEditor::addLine()
   if (!_networkLines.empty()) {
       NetworkLine lastLine = _networkLines.back();
       string lastDevice = lastLine.devicesBox->itemText(lastLine.index).toStdString();
-      addMessage(lastDevice, "", "");
+      addOneMessage(lastDevice, "", "");
     }
   else {
-      addMessage("", "", "");
+      addOneMessage("", "", "");
     }
 }
 
@@ -291,7 +293,7 @@ NetworkMessagesEditor::computeMessages()
 }
 
 void
-NetworkMessagesEditor::addMessage(const string &device, const string &message, const string &value)
+NetworkMessagesEditor::addOneMessage(const string &device, const string &message, const string &value)
 {
   if (_devicesList.empty()) {
       map<string, MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
@@ -324,11 +326,11 @@ NetworkMessagesEditor::addMessage(const string &device, const string &message, c
           line.devicesBox->setCurrentIndex(deviceIndex);
         }
       else {
-          std::cerr << "NetworkMessagesEditor::addMessage : device \"" << device << "\" not found - default used " << std::endl;
+          std::cerr << "NetworkMessagesEditor::addOneMessage : device \"" << device << "\" not found - default used " << std::endl;
         }
     }
   else {
-      std::cerr << "NetworkMessagesEditor::addMessage : empty device found - default used" << std::endl;
+      std::cerr << "NetworkMessagesEditor::addOneMessage : empty device found - default used" << std::endl;
     }
   line.index = _currentLine;
 
@@ -383,7 +385,7 @@ NetworkMessagesEditor::addMessages(const vector<string> &messages)
                       if (msgWithValue.size() > valueBeginPos + 1) {
                           string msg = msgWithValue.substr(0, valueBeginPos);
                           string value = msgWithValue.substr(valueBeginPos + 1);
-                          addMessage(device, msg, value);
+                          addOneMessage(device, msg, value);
                           msgsCount++;
                         }
                       else {
@@ -432,7 +434,7 @@ NetworkMessagesEditor::importMessages()
               if (blankPos != string::npos) {
                   string msg = msgWithValue.substr(0, blankPos);
                   string value = msgWithValue.substr(blankPos + 1);
-                  addMessage(device, msg, value);
+                  addOneMessage(device, msg, value);
                 }
               else {
                   std::cerr << "NetworkMessagesEditor::importMessages : separator ' ' between message and value not found" << std::endl;

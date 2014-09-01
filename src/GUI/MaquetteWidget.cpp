@@ -1,17 +1,18 @@
 
 /*
  *
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ *iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software. You can use,
@@ -58,13 +59,14 @@ using std::string;
 
 const float MaquetteWidget::HEADER_HEIGHT = 42.;
 const float MaquetteWidget::NAME_POINT_SIZE = 20.;
+const QColor MaquetteWidget::TITLE_BAR_COLOR = QColor(90, 90, 90);
 
 MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScene *scene)
   : QWidget(parent)
 {
   _view = view;
   _scene = scene;
-  _color = QColor(Qt::white);
+  _color = QColor(TITLE_BAR_COLOR);
   _maquetteLayout = new QGridLayout();
   _nameLabel = new QLabel;
   _toolBar = new QToolBar;
@@ -238,7 +240,7 @@ MaquetteWidget::accelerationValueModified(int value)
 void
 MaquetteWidget::play()
 {
-  _scene->play();
+  _scene->playOrResume();
   updateHeader();
 }
 
@@ -246,10 +248,10 @@ void
 MaquetteWidget::stop()
 {
   if (_scene->playing()) {
-      _scene->pause();
+      _scene->stopOrPause();
     }
   else {
-      _scene->stopGotoStart();
+      _scene->stopAndGoToStart();
     }
   updateHeader();
 }
@@ -257,14 +259,14 @@ MaquetteWidget::stop()
 void
 MaquetteWidget::pause()
 {
-  _scene->pause();
+  _scene->stopOrPause();
   updateHeader();
 }
 
 void
 MaquetteWidget::rewind()
 {
-  _scene->stopGotoStart();
+  _scene->stopAndGoToStart();
   updateHeader();
 }
 

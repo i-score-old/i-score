@@ -1,15 +1,16 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -43,7 +44,7 @@
 /*!
  * \file AttributesEditor.hpp
  * \author Luc Vercellin
- * \date 30 september 2009
+ * \date March 14th 2014
  */
 
 #include <QDockWidget>
@@ -112,6 +113,8 @@ class AttributesEditor : public QDockWidget
      **/
     unsigned int currentBox();
 
+    inline void setBoxEdited(unsigned int boxId){ _boxEdited = boxId; }
+
   public slots:
     void addToExpandedItemsList(QTreeWidgetItem *item);
     void removeFromExpandedItemsList(QTreeWidgetItem *item);
@@ -135,6 +138,11 @@ class AttributesEditor : public QDockWidget
      * \brief Assigns the snapshot to the end of the box.
      */
     void snapshotEndAssignment();
+
+    void changeRangeBoundMin(QTreeWidgetItem* item, float value);
+    void changeRangeBoundMax(QTreeWidgetItem* item, float value);
+    void changeRecMode(QTreeWidgetItem* item);
+
     inline NetworkTree *
     networkTree(){ return _networkTree; }
     virtual void clear();
@@ -146,7 +154,7 @@ class AttributesEditor : public QDockWidget
      * \param language : the language to used for filling widgets' names
      **/
 
-    // TODO : use QLocale instead
+    /// \todo Old TODO updated (by jC) : use QLocale instead
     void nameWidgets();
 
     /*!
@@ -212,7 +220,7 @@ class AttributesEditor : public QDockWidget
     QHBoxLayout *_boxSettingsLayout; //!< Layout handling box settings (name, color, assignation...).
     NetworkTree *_networkTree; //!< NetworkTree (inspector).
 
-    // TODO
+    /// \todo Old TODO updated (by jC)
     QDoubleSpinBox * _boxStartValue;
     QDoubleSpinBox * _boxLengthValue;    
 

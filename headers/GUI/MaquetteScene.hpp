@@ -1,15 +1,16 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -43,7 +44,7 @@
 /*!
  * \file MaquetteScene.hpp
  *
- * \author Luc Vercellin, Bruno Valeze
+ * \author Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine 
  */
 
 #include <QGraphicsScene>
@@ -71,6 +72,7 @@ class SoundBox;
 class BoundingBox;
 class MaquetteContextMenu;
 class Relation;
+class ConditionalRelation;
 class Comment;
 class TriggerPoint;
 class PlayingThread;
@@ -302,6 +304,13 @@ class MaquetteScene : public QGraphicsScene
     void removeRelation(unsigned int relID);
 
     /*!
+     * \brief Removes a conditional relation.
+     *
+     * \param condRel : the relation to be removed
+     */
+    void removeConditionalRelation(ConditionalRelation *condRel);
+
+    /*!
      * \brief Gets a QString describing a specific relation.
      *
      * \param relID : the relation to get a string from
@@ -362,16 +371,8 @@ class MaquetteScene : public QGraphicsScene
      * \param IP : the new IP for device
      * \param port : the new port for device
      */
-    void changeNetworkDevice(string deviceName, string pluginName, string IP, string port);
-    void setNetworDeviceConfig(string deviceName, string pluginName, string IP, string port);
-
-    /*!
-     * \brief Updates messages to send for a specific box.
-     *
-     * \param boxID : the box to modify messages sent from
-     * \return true if messages could be modified
-     */
-    bool updateMessagesToSend(unsigned int boxID);
+    void changeNetworkDevice(string deviceName, string pluginName, string IP, unsigned int port);
+    void setNetworDeviceConfig(string deviceName, string pluginName, string IP, unsigned int port);
 
     /*!
      * \brief Sends a specific message with current device.
@@ -462,7 +463,14 @@ class MaquetteScene : public QGraphicsScene
      *
      * \return the box progress ratio.
      */
-    float getProgression(unsigned int boxID);
+    float getPosition(unsigned int boxID);
+    
+    /*!
+     * \brief Gets the curent time offset.
+     *
+     * \return the current time offset.
+     */
+    unsigned int getTimeOffset();
 
     /*!
      * \brief Gets a set of temporal relations involving a particular entity.
@@ -518,14 +526,15 @@ class MaquetteScene : public QGraphicsScene
      *
      * \return the playing state
      */
-    bool playing() const;
+    bool playing();
+    inline std::map<unsigned int, BasicBox*> getPlayingBoxes(){return _playingBoxes;}
 
     /*!
      * \brief Determines the paused state.
      *
      * \return the paused state
      */
-    bool paused() const;
+    bool paused();
 
     /*!
      * \brief Updates the boxes currently playing.
@@ -541,7 +550,7 @@ class MaquetteScene : public QGraphicsScene
     void setPlaying(unsigned int boxID, bool playing);
 
     //! Integer handling scene's maximal width.
-    static const int MAX_SCENE_WIDTH = 100000;
+    static const int MAX_SCENE_WIDTH = 300000;
 
     //! Integer handling scene's maximal height.
     static const int MAX_SCENE_HEIGHT = 1000;
@@ -577,20 +586,13 @@ class MaquetteScene : public QGraphicsScene
     float getMaxSceneWidth();
     void setMaxSceneWidth(float maxSceneWidth);
 
-  protected:
     /*!
-     * \brief Redifinition of QGraphicsScene::drawItems().
-     * This method is automatically called by QGraphicsScene::update().
-     *
-     * \param painter : the painter used to draw
-     * \param numItem : the number of items into the scene
-     * \param items : collection of the graphical items
-     * \param options : array of options
-     * \param widget : the widget that is being painting on
+     * \brief Attach boxes to a conditional relation.
+     * \param boxesToCondition : the boxes to attach
      */
-    virtual void drawItems(QPainter *painter, int numItems, QGraphicsItem *items[],
-                           const QStyleOptionGraphicsItem options[],
-                           QWidget *widget);
+    void conditionBoxes(QList<BasicBox *> boxesToCondition);
+
+  protected:
 
     /*!
      * \brief Redefinition of QGraphicsScene::drawForeground().
@@ -637,12 +639,13 @@ class MaquetteScene : public QGraphicsScene
   signals:
     void stopPlaying();
     void accelerationValueChanged(double value);
-    void networkConfigChanged(std::string deviceName, std::string pluginName, std::string IP, std::string port);
+    void networkConfigChanged(std::string deviceName, std::string pluginName, std::string IP, unsigned int port);
     void playModeChanged();
+    void updateRecordingBoxes();
 
   public slots:
     void verticalScroll(int value);
-    void gotoChanged(double value);
+    void changeTimeOffset(unsigned int timeOffset);
     void zoomChanged(float value);
     void speedChanged(double value);
 
@@ -654,7 +657,7 @@ class MaquetteScene : public QGraphicsScene
     /*!
      * \brief Copies selected boxes.
      */
-    void copyBoxes(bool erasing = false);
+    void copyBoxes(bool erasing = false);    
 
     /*!
      * \brief Pastes copied boxes.
@@ -662,9 +665,14 @@ class MaquetteScene : public QGraphicsScene
     void pasteBoxes();
 
     /*!
+     * \brief Mutes selected boxes.
+     */
+    void muteBoxes();
+
+    /*!
      * \brief Called when the time reaches the end.
      */
-    void timeEndReached();
+    void updatePlayModeView();
 
     /*
      * \brief Called to update the next starting time.
@@ -674,25 +682,24 @@ class MaquetteScene : public QGraphicsScene
     void updateStartingTime(int value);
 
     /*!
-     * \brief Plays the whole composition.
+     * \brief Plays the whole composition or resume it depending of the context
      */
-    void play();
+    void playOrResume();
+    void playOrResume(QList<unsigned int> boxesId);
+    void stopOrPause(QList<unsigned int> boxesId);
 
     /*!
      * \brief Stops playing the composition.
      */
-    void stop();
-    void stopGotoStart();
-    void stopWithGoto();
-
-    /*!
-     * \brief Pauses playing the composition.
-     */
-    void pause();
+    void stopOrPause();
+    void stopAndGoToStart();
+    void stopAndGoToTimeOffset(unsigned int timeOffset);
+    void stopAndGoToCurrentTime();
+    
     bool noBoxSelected();
-    inline void
-    resetSelection(){ clearSelection(); }
+    inline void resetSelection(){ clearSelection(); }
     void updateBoxesWidgets();
+    void unselectAll();
 
   private:
     /*!
@@ -770,8 +777,6 @@ class MaquetteScene : public QGraphicsScene
 
     unsigned int _resizeBox;           //!< During a resizing operation, the concerned box
     bool _clicked;                     //!< Handles if a click just occured.
-    bool _playing;                     //!< Handles playing state.
-    bool _paused;                      //!< Handles paused state.
 
     unsigned int _startingValue;       //!< Starting time in ms.
 

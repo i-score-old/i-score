@@ -1,15 +1,17 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
+ *
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -51,12 +53,13 @@
 #include <string>
 #include <map>
 #include "Abstract.hpp"
-#include "CSPTypes.hpp"
 #include <QPoint>
 #include <QColor>
 #include <math.h>
 #include <QTreeWidgetItem>
 #include "NetworkMessages.hpp"
+
+#include "Engine.h"
 
 //! Defines abstract basic box type.
 enum { ABSTRACT_BOX_TYPE = 1 };
@@ -71,8 +74,8 @@ class QColor;
 class AbstractBox : public Abstract
 {
   public:
-    friend class BasicBox;
-    friend class SoundBox;
+    friend class BasicBox; /// \todo vérifier l'implication de friend class. (par jaime Chao)
+    friend class SoundBox; /// \todo vérifier l'implication de friend class. en plus SoundBox n'existe plus. (par jaime Chao)
 
     AbstractBox(const QPointF &newTopLeft = QPointF(0., 0.), const float &newWidth = 0., const float &newHeight = 0.,
                 const std::string &newName = "", const QColor &newColor = Qt::black, unsigned int ID = NO_ID,
@@ -146,19 +149,7 @@ class AbstractBox : public Abstract
      * \return the mother of the box
      */
     inline unsigned int
-    mother() const { return _motherID; }
-
-    /*!
-     * \brief Gets the messages to send at box start.
-     * \return the messages to send at box start
-     */
-    inline std::vector<std::string> firstMsgs() const { return _firstMsgs; }
-
-    /*!
-     * \brief Gets the messages to send at box end.
-     * \return the messages to send at box end
-     */
-    inline std::vector<std::string> lastMsgs() const { return _lastMsgs; }
+    mother() const { return _motherID; } 
 
     /*!
      * \brief Gets the messages to send at box start.
@@ -241,17 +232,6 @@ class AbstractBox : public Abstract
      * \brief Sets the messages to send at box start.
      * \param firstMsgs : the new messages to send at box start
      */
-    inline void
-    setFirstMsgs(const std::vector<std::string> &firstMsgs)
-    {
-      _firstMsgs.clear();
-      _firstMsgs = firstMsgs;
-    }
-
-    /*!
-     * \brief Sets the messages to send at box start.
-     * \param firstMsgs : the new messages to send at box start
-     */
     void setStartMessages(NetworkMessages *startMsgs);
 
     /*!
@@ -307,17 +287,6 @@ class AbstractBox : public Abstract
      * \brief Sets the messages to send at box end.
      * \param lastMsgs : the new messages to send at box end
      */
-    inline void
-    setLastMsgs(const std::vector<std::string> &lastMsgs)
-    {
-      _lastMsgs.clear();
-      _lastMsgs = lastMsgs;
-    }
-
-    /*!
-     * \brief Sets the messages to send at box end.
-     * \param lastMsgs : the new messages to send at box end
-     */
     void setEndMessages(NetworkMessages *endMsgs);
     inline bool
     hasFirstMsgs(){ return !_startMessages->messages().empty(); }
@@ -325,6 +294,11 @@ class AbstractBox : public Abstract
     hasLastMsgs(){ return !_endMessages->messages().empty(); }
     void setStartMessage(QTreeWidgetItem *item, QString address);
     void setEndMessage(QTreeWidgetItem *item, QString address);
+    inline void clearMessages(){_networkTreeExpandedItems.clear();
+                                _networkTreeItems.clear();}
+    void addMessageToRecord(std::string address);
+    void removeMessageToRecord(std::string address);
+    inline QList<std::string> messagesToRecord() const {return _messagesToRecord;}
 
   protected:
     QPointF _topLeft;                    //!< The local coordinates of the upper left corner.
@@ -333,12 +307,11 @@ class AbstractBox : public Abstract
     std::string _name;                   //!< The name of the box.
     QColor _color;                       //!< The color of the box.
     unsigned int _ID;                    //!< The ID of the box.
-    unsigned int _motherID;              //!< The possible mother's ID
-    std::vector<std::string> _firstMsgs; //!< Messages linked to the start of the box
-    std::vector<std::string> _lastMsgs;  //!< Messages linked to the end of the box
+    unsigned int _motherID;              //!< The possible mother's ID    
     NetworkMessages *_startMessages;     //!< pairs QTreeWidgetItem-Message
     NetworkMessages *_endMessages;       //!< pairs QTreeWidgetItem-Message
-    QMap<QTreeWidgetItem*, Data> _networkTreeItems;
-    QList<QTreeWidgetItem*> _networkTreeExpandedItems;
+    QMap<QTreeWidgetItem *, Data> _networkTreeItems;
+    QList<QTreeWidgetItem *> _networkTreeExpandedItems;
+    QList<std::string> _messagesToRecord;
 };
 #endif

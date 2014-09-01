@@ -1,15 +1,16 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -43,7 +44,7 @@
 /*!
  * \file MainWindow.hpp
  *
- * \author Luc Vercellin, Bruno Valeze
+ * \author Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine 
  */
 
 #include <QMainWindow>
@@ -52,7 +53,7 @@
 #include <QSlider>
 
 #include "MaquetteScene.hpp"
-#include "MaquetteWidget.hpp"
+#include "HeaderPanelWidget.hpp"
 
 class MaquetteView;
 class AttributesEditor;
@@ -118,17 +119,9 @@ class MainWindow : public QMainWindow
      * \brief Called when the end of the composition is reached.
      */
     void timeEndReached();
-
-    /*!
-     * \brief Get the Command Key state.
-     *
-     * \return True if pressed, false if not.
-     */
-    bool commandKey();
-
     void setMaquetteSceneTitle(QString name);
-    inline MaquetteWidget *
-    maquetteWidget(){ return _maquetteWidget; }
+    inline HeaderPanelWidget *
+    headerPanelWidget(){ return _headerPanelWidget; }
 
   protected:
     /*!
@@ -137,9 +130,7 @@ class MainWindow : public QMainWindow
      *
      * \param event : the QT closing event
      */
-    virtual void closeEvent(QCloseEvent *event); /// \todo virtual seulement si on a besoin d'hériter de MainWindow, ce qui n'est pas le cas.
-    virtual void keyPressEvent(QKeyEvent *event);
-    virtual void keyReleaseEvent(QKeyEvent *event);
+    virtual void closeEvent(QCloseEvent *event); /// \todo virtual seulement si on a besoin d'hériter de MainWindow, ce qui n'est pas le cas. (par jaime Chao)    
 
   private slots:
     /*!
@@ -216,8 +207,13 @@ class MainWindow : public QMainWindow
      * \brief Selects the whole set of boxes.
      */
     void selectAll();
-    void changeNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, std::string port);
-    void updateCmdKeyState(bool state);
+    void changeNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, unsigned int port);
+    void updatePlayMode();
+
+    /*!
+     * \brief Updates start/end messages and messages to assign, asking to engine.
+     */
+    void updateRecordingBoxes();
 
   private:
     /*!
@@ -274,11 +270,13 @@ class MainWindow : public QMainWindow
      * \param the full name
      * \return the stripped name
      */
-    QString strippedName(const QString &fullFileName);
+    QString strippedName(const QString &fullFileName);    
 
     MaquetteView *_view;                    //!< The maquette view.
     MaquetteScene *_scene;                  //!< The maquette scene.
     AttributesEditor *_editor;              //!< The attributes editor.
+    QGridLayout *_centralLayout;
+    QWidget *_centralWidget;
 
     QString _curFile;                       //!< The current file name.
 
@@ -313,9 +311,7 @@ class MainWindow : public QMainWindow
 
     Help *_helpDialog;                      //!< Help dialog.
 
-    MaquetteWidget *_maquetteWidget;
-    NetworkConfig *_networkConfig;
-
-    bool _commandKey; //!< State of Command Key state.
+    HeaderPanelWidget *_headerPanelWidget;
+    NetworkConfig *_networkConfig; 
 };
 #endif

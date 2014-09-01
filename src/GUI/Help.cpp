@@ -1,15 +1,17 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
+ *
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -59,7 +61,7 @@ Help::Help(QWidget *parent)
   _editorTabs = new QTabWidget(this);
 
   QString fileString;
-  QFile file(":/documentation/file.htm");
+  QFile file(":/resources/documentation/file.htm");
   if (file.open(QIODevice::ReadOnly)) {
       fileString = QString(file.readAll());
     }
@@ -70,7 +72,7 @@ Help::Help(QWidget *parent)
   _fileLabel = new QLabel(fileString);
 
   QString toolbarString;
-  QFile toolbar(":/documentation/toolbar.htm");
+  QFile toolbar(":/resources/documentation/toolbar.htm");
   if (toolbar.open(QIODevice::ReadOnly)) {
       toolbarString = QString(toolbar.readAll());
     }
@@ -80,7 +82,7 @@ Help::Help(QWidget *parent)
   _toolBarLabel = new QLabel(toolbarString);
 
   QString contextString;
-  QFile context(":/documentation/contextual.htm");
+  QFile context(":/resources/documentation/contextual.htm");
   if (context.open(QIODevice::ReadOnly)) {
       contextString = QString(context.readAll());
     }
@@ -90,7 +92,7 @@ Help::Help(QWidget *parent)
   _contextLabel = new QLabel(contextString);
 
   QString interactionString;
-  QFile interaction(":/documentation/interaction.htm");
+  QFile interaction(":/resources/documentation/interaction.htm");
   if (interaction.open(QIODevice::ReadOnly)) {
       interactionString = QString(interaction.readAll());
     }
@@ -100,7 +102,7 @@ Help::Help(QWidget *parent)
   _interactionLabel = new QLabel(interactionString);
 
   QString editorGeneralString;
-  QFile editorGeneral(":/documentation/editorGeneral.htm");
+  QFile editorGeneral(":/resources/documentation/editorGeneral.htm");
   if (editorGeneral.open(QIODevice::ReadOnly)) {
       editorGeneralString = QString(editorGeneral.readAll());
     }
@@ -109,28 +111,8 @@ Help::Help(QWidget *parent)
     }
   _editorGeneralLabel = new QLabel(editorGeneralString);
 
-  QString editorProfilesString;
-  QFile editorProfiles(":/documentation/editorProfiles.htm");
-  if (editorProfiles.open(QIODevice::ReadOnly)) {
-      editorProfilesString = QString(editorProfiles.readAll());
-    }
-  else {
-      editorProfilesString = tr("No Help Found");
-    }
-  _editorProfilesLabel = new QLabel(editorProfilesString);
-
-  QString editorMessagesString;
-  QFile editorMessages(":/documentation/editorMessages.htm");
-  if (editorMessages.open(QIODevice::ReadOnly)) {
-      editorMessagesString = QString(editorMessages.readAll());
-    }
-  else {
-      editorMessagesString = tr("No Help Found");
-    }
-  _editorMessagesLabel = new QLabel(editorMessagesString);
-
   QString editorSnapshotString;
-  QFile editorSnapshot(":/documentation/editorSnapshot.htm");
+  QFile editorSnapshot(":/resources/documentation/editorSnapshot.htm");
   if (editorSnapshot.open(QIODevice::ReadOnly)) {
       editorSnapshotString = QString(editorSnapshot.readAll());
     }
@@ -138,16 +120,6 @@ Help::Help(QWidget *parent)
       editorSnapshotString = tr("No Help Found");
     }
   _editorSnapshotLabel = new QLabel(editorSnapshotString);
-
-  QString editorCurvesString;
-  QFile editorCurves(":/documentation/editorCurves.htm");
-  if (editorCurves.open(QIODevice::ReadOnly)) {
-      editorCurvesString = QString(editorCurves.readAll());
-    }
-  else {
-      editorCurvesString = tr("No Help Found");
-    }
-  _editorCurvesLabel = new QLabel(editorCurvesString);
 
   QScrollArea *fileScrollArea = new QScrollArea;
   fileScrollArea->setWidget(_fileLabel);
@@ -170,23 +142,11 @@ Help::Help(QWidget *parent)
   editorGeneralScrollArea->setWidget(_editorGeneralLabel);
   _editorTabs->addTab(editorGeneralScrollArea, tr("General"));
 
-  QScrollArea *editorProfilesScrollArea = new QScrollArea;
-  editorProfilesScrollArea->setWidget(_editorProfilesLabel);
-  _editorTabs->addTab(editorProfilesScrollArea, tr("Profiles"));
-
-  QScrollArea *editorMessagesScrollArea = new QScrollArea;
-  editorMessagesScrollArea->setWidget(_editorMessagesLabel);
-  _editorTabs->addTab(editorMessagesScrollArea, tr("Messages"));
-
   QScrollArea *editorSnapshotScrollArea = new QScrollArea;
   editorSnapshotScrollArea->setWidget(_editorSnapshotLabel);
   _editorTabs->addTab(editorSnapshotScrollArea, tr("Snapshot"));
 
-  QScrollArea *editorCurvesScrollArea = new QScrollArea;
-  editorCurvesScrollArea->setWidget(_editorCurvesLabel);
-  _editorTabs->addTab(editorCurvesScrollArea, tr("Curves"));
-
-  _tabs->addTab(_editorTabs, tr("Attributes Editor"));
+  _tabs->addTab(_editorTabs, tr("Devices Explorer"));
 
   _layout->addWidget(_tabs);
 

@@ -1,15 +1,16 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -43,7 +44,7 @@
 /*!
  * \file BoxContextMenu.hpp
  *
- * \author Luc Vercellin, Bruno Valeze
+ * \author Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine 
  */
 
 #include <QMenu>
@@ -68,6 +69,8 @@ class BoxContextMenu : public QMenu
 
     virtual
     ~BoxContextMenu();
+
+    void setDetachActionEnabled(bool enabled);
 
   private slots:
     /*!
@@ -95,6 +98,11 @@ class BoxContextMenu : public QMenu
      */
     void viewRelations();
 
+    /*!
+     * \brief Detach from condition
+     */
+    void detachFromCondition();
+
   private slots:
     /*!
      * \brief Called when the name is changed.
@@ -107,6 +115,7 @@ class BoxContextMenu : public QMenu
     QAction * _changeColorAct;   //!< Action for color changing.
     QAction * _viewRelationAct;  //!< Action for relation viewing.
     QAction * _changeNameAct;    //!< Action for name changing.
+    QAction * _detachAct;        //!< Action for conditional relation detaching
     QMenu * _commentMenu;        //!< Menu for commenting.
     QAction * _addCommentAct;    //!< Action for comment adding.
     QAction * _removeCommentAct; //!< Action for comment removing.

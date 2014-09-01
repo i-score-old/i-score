@@ -51,7 +51,7 @@
 #include "AbstractParentBox.hpp"
 #include <vector>
 
-/// \todo PARENT_BOX_TYPE need to be inserted in ParentBox. see http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var
+/// \todo PARENT_BOX_TYPE need to be inserted in ParentBox. see http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var (par jaime Chao)
 /*!
  * \brief Enum used to define Parent Box's item type.
  */
@@ -136,6 +136,8 @@ class ParentBox : public BasicBox
      * \param width : the new width
      */
     virtual void resizeWidthEdition(int width);
+    virtual void resizeHeightEdition(int height);
+    virtual void resizeAllEdition(float width, float height);
     virtual void updateDisplay(QString displayMode);
 
   protected:
@@ -151,7 +153,7 @@ class ParentBox : public BasicBox
      * \param change : containing the change's type
      * \param value : containing the change's value
      */
-    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+//    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
     /*!
      * \brief Redefinition of QGraphicsItem::mousePressEvent().
@@ -168,47 +170,6 @@ class ParentBox : public BasicBox
      * \param event : the variable containing information about the event
      */
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-
-    /*!
-     * \brief Redefinition of QGraphicsItem dragEnter method.
-     * Raised a drag&drop object enters in the bounding box.
-     *
-     * \param event : the information about the event
-     */
-    virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
-
-    /*!
-     * \brief Redefinition of QGraphicsItem dragLeave method.
-     * Raised a drag&drop object leaves in the bounding box.
-     *
-     * \param event : the information about the event
-     */
-    virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
-
-    /*!
-     * \brief Redefinition of QGraphicsItem dragMove method.
-     * Raised a drag&drop object moves in the bounding box.
-     *
-     * \param event : the information about the event
-     */
-    virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
-
-    /*!
-     * \brief Redefinition of QGraphicsItem dropEvent method.
-     * Raised when a drag&drop object is dropped on the bounding box.
-     *
-     * \param event : the information about the event
-     */
-    virtual void dropEvent(QGraphicsSceneDragDropEvent *event);
-
-    /*!
-     * \brief Redefinition of QWidget paint function.
-     *
-     * \param painter : the painter used for painting
-     * \param option : array of various options used for painting
-     * \param widget : the painter that is beeing painting on
-     */
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
   private:
     std::map<unsigned int, BasicBox*> _children;    //!< Handling box's children by ID.

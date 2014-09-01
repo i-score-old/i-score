@@ -1,15 +1,17 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
+ *
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -49,6 +51,8 @@ AbstractBox::AbstractBox(const QPointF &newTopLeft, const float &newWidth, const
   _topLeft(newTopLeft), _width(newWidth), _height(newHeight), _name(newName), _color(newColor),
   _ID(newID), _motherID(motherID), _startMessages(startMessages),_endMessages(endMessages)
 {
+    _networkTreeExpandedItems = QList<QTreeWidgetItem*>();
+    _messagesToRecord = QList<std::string>();
 }
 
 AbstractBox::AbstractBox(const AbstractBox &other) :
@@ -56,18 +60,20 @@ AbstractBox::AbstractBox(const AbstractBox &other) :
   _name(other._name), _color(other._color), _ID(other._ID), _motherID(other._motherID),
   _startMessages(other._startMessages),_endMessages(other._endMessages)
 {
+    _networkTreeExpandedItems = QList<QTreeWidgetItem*>();
+    _messagesToRecord = QList<std::string>();
 }
 
 void
 AbstractBox::setStartMessage(QTreeWidgetItem *item, QString address)
 {
-  _startMessages->addMessage(item, address);
+  _startMessages->addMessageSimple(item, address);
 }
 
 void
 AbstractBox::setEndMessage(QTreeWidgetItem *item, QString address)
 {
-  _endMessages->addMessage(item, address);
+  _endMessages->addMessageSimple(item, address);
 }
 
 int
@@ -79,7 +85,7 @@ AbstractBox::type() const
 void
 AbstractBox::setStartMessages(NetworkMessages *startMsgs)
 {
-  QMap<QTreeWidgetItem *, Message> *map = startMsgs->getMessages();
+  QMap<QTreeWidgetItem *, Message> map = startMsgs->getMessages();
   NetworkMessages *newMessages = new NetworkMessages(map);
   _startMessages = newMessages;
 }
@@ -88,4 +94,16 @@ void
 AbstractBox::setEndMessages(NetworkMessages *endMsgs)
 {
   _endMessages = new NetworkMessages(endMsgs->getMessages());
+}
+
+void
+AbstractBox::addMessageToRecord(std::string address){
+    if(!_messagesToRecord.contains(address)){
+        _messagesToRecord.push_back(address);
+    }
+}
+
+void
+AbstractBox::removeMessageToRecord(std::string address){
+    _messagesToRecord.removeAll(address);    
 }

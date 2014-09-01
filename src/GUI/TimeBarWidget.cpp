@@ -63,6 +63,18 @@ TimeBarWidget::TimeBarWidget(QWidget *parent, MaquetteScene *scene)
   setFixedHeight(height());  
   init();    
   setUpdatesEnabled(false);
+  setPalette(Qt::gray);
+  setStyleSheet(
+                "TimeBarWidget {"
+                "border: 1px solid #6f6f80;"
+                "border-radius: 6px;"
+              "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+              "stop:0 #a1a1a1, stop: 0.5 #909090,"
+              "stop: 0.6 #808080, stop:1 #a3a3a3);"
+
+                "}"
+    );
+
 }
 
 void
@@ -78,8 +90,8 @@ TimeBarWidget::~TimeBarWidget()
 void
 TimeBarWidget::mousePressEvent(QMouseEvent *event)
 {
-  int value = event->pos().x() * MaquetteScene::MS_PER_PIXEL;
-  emit gotoValueEntered(value);
+  unsigned int timeOffset = event->pos().x() * MaquetteScene::MS_PER_PIXEL;
+  emit timeOffsetEntered(timeOffset);
 }
 
 void
@@ -111,9 +123,9 @@ TimeBarWidget::drawBackground(QPainter *painter, QRect rect)
   const int HEIGHT = TIME_BAR_HEIGHT;
 
   float i_PXL;
-  QFont *font = new QFont();
-  font->setPointSize(NUMBERS_POINT_SIZE);
-  painter->setFont(*font);
+  QFont font;
+  font.setPointSize(NUMBERS_POINT_SIZE);
+  painter->setFont(font);
 
   float zoom = 16. / MaquetteScene::MS_PER_PIXEL;
   float factor = ((float)1.) / zoom;

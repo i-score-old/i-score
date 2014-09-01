@@ -1,16 +1,17 @@
 /*
  *
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ *iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software. You can use,
@@ -54,6 +55,7 @@ using std::string;
 #include <QWidget>
 #include <QGraphicsEffect>
 #include <QGraphicsOpacityEffect>
+#include <QApplication>
 
 #include "AbstractCurve.hpp"
 #include "BasicBox.hpp"
@@ -67,11 +69,11 @@ using std::string;
 #include "AttributesEditor.hpp"
 #include "MainWindow.hpp"
 
-#define COMBOBOX_WIDTH 500 /// \todo Ne pas mettre des tailles en dur
+#define COMBOBOX_WIDTH 500 /// \todo Ne pas mettre des tailles en dur et utiliser des const en C++. (par jaime Chao)
 
 BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
   : QWidget(parent)
-{
+{        
   _curveMap = new QMap<std::string, CurveWidget *>();
 
   QBrush brush;
@@ -87,18 +89,11 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
 
   _box = box;
   _comboBox = new QComboBox;
-  _curveWidget = new CurveWidget(NULL);
-  _tabWidget = new QTabWidget;
-  _tabWidget->lower();
-  _tabWidget->setAttribute(Qt::WA_TranslucentBackground, true);
+
   _stackedLayout = new QStackedLayout;
-  _stackedLayout->setStackingMode(QStackedLayout::StackAll);
+  _stackedLayout->setStackingMode(QStackedLayout::StackAll);  
 
-  _curvePageLayout = new QGridLayout;
   setLayout(_stackedLayout);
-
-  _parentWidget = parent;
-  _curveWidgetList = new QList<CurveWidget *>;
 
   _startMenu = NULL;
   _endMenu = NULL;
@@ -106,22 +101,26 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
 
 BoxWidget::~BoxWidget()
 {
+    delete _stackedLayout;
 }
 
 void
 BoxWidget::mousePressEvent(QMouseEvent *event)
-{
-  Q_UNUSED(event);
+{        
+    Q_UNUSED(event);
 
-  if (_box->maquetteScene()->paused()) {
-      _box->maquetteScene()->stopWithGoto();
-    }
 
-  if (_box->isSelected()) {
-      hide();
-      setWindowModality(Qt::WindowModal);
-      show();
-    }
+    if (_box->maquetteScene()->paused())
+        _box->maquetteScene()->stopAndGoToCurrentTime();
+    
+    
+    if (_box->isSelected()) {
+        hide();
+        setWindowModality(Qt::WindowModal);
+        show();
+    }    
+    else
+        _box->select();
 }
 
 void
@@ -171,12 +170,19 @@ BoxWidget::updateDisplay(const QString &address)
 }
 
 void
+BoxWidget::setCurveLowerStyle(std::string curveAddress, bool state){
+    CurveWidget *curCurve = getCurveWidget(curveAddress);
+    if(curCurve!=NULL){
+        curCurve->setLowerStyle(state);
+    }
+}
+
+void
 BoxWidget::displayCurve(const QString &address)
-{
+{    
   std::string add = address.toStdString();
   QMap<string, CurveWidget *>::iterator curveIt;
   CurveWidget *curveWidget;
-
 
   //Unactive curves
   QList<CurveWidget *> values = _curveMap->values();
@@ -186,19 +192,17 @@ BoxWidget::displayCurve(const QString &address)
 
   for (int i = 0; i < count; i++) {
       cur = values.at(i);
-      cur->setLowerStyle(true);
-      cur->repaint();
+      cur->setLowerStyle(true);      
     }
 
-  if (address != BasicBox::SUB_SCENARIO_MODE_TEXT) {
+  if (address != BasicBox::SCENARIO_MODE_TEXT && address != BasicBox::DEFAULT_MODE_TEXT) {
       setEnabled(true);
       curveIt = _curveMap->find(add);
       bool curveFound = (curveIt != _curveMap->end());
 
       if (curveFound) {
           curveWidget = curveIt.value();
-          curveWidget->setLowerStyle(false);
-          curveWidget->repaint();
+          curveWidget->setLowerStyle(false);          
           _stackedLayout->setCurrentWidget(curveWidget);
         }
     }
@@ -254,7 +258,6 @@ BoxWidget::clearCurves()
 
   _curveMap->clear();
   _curveIndexes.clear();
-  _curveWidgetList->clear();
 }
 
 void
@@ -289,8 +292,23 @@ void
 BoxWidget::addToComboBox(const QString address)
 {
   if (_comboBox->findText(address, Qt::MatchExactly) == -1) {
-      _comboBox->addItem(address);
+      _comboBox->addItem(address);      
+
+      //push down the "scenario" item
+      _comboBox->removeItem(_comboBox->findText(BasicBox::SCENARIO_MODE_TEXT, Qt::MatchExactly));
+      _comboBox->addItem(BasicBox::SCENARIO_MODE_TEXT);
     }
+}
+
+CurveWidget *
+BoxWidget::getCurveWidget(std::string address){
+    CurveWidget *curve = NULL;
+    QMap<string, CurveWidget *>::iterator curveIt = _curveMap->find(address);
+    bool curveFound = (curveIt != _curveMap->end());
+    if(curveFound)
+        curve = curveIt.value();
+
+    return curve;
 }
 
 bool
@@ -300,7 +318,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
   BasicBox *box = Maquette::getInstance()->getBox(_boxID);
 
   if (box != NULL) { // Box Found
-      if (box->hasCurve(address)) {
+      if (box->hasCurve(address) || box->recording()) {
           AbstractCurve *abCurve = box->getCurve(address);
           QMap<string, CurveWidget *>::iterator curveIt2 = _curveMap->find(address);
           QString curveAddressStr = QString::fromStdString(address);
@@ -315,6 +333,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
           vector<short> sectionType;
 
           bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(_boxID, address, 0, sampleRate, redundancy, interpolate, values, argTypes, xPercents, yValues, sectionType, coeff);
+          bool getCurveValuesSuccess = Maquette::getInstance()->getCurveValues(_boxID, address, 0, yValues);
 
           //--- PRINT ---
 //            std::cout<<"values : "<<std::endl;
@@ -324,7 +343,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
 //            std::cout<<std::endl;
           //-------------
 
-          if (getCurveSuccess) {
+          if (getCurveSuccess || getCurveValuesSuccess) {
               /********** Abstract Curve found ***********/
               if (abCurve != NULL) {
                   if (curveFound) {
@@ -346,7 +365,16 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
                       //Create
                       curveTab = new CurveWidget(NULL);
 
-                      curveTab->setAttributes(_boxID, address, 0, values, sampleRate, redundancy, abCurve->_show, interpolate, argTypes, xPercents, yValues, sectionType, coeff);
+                      //get range bounds
+                      vector<float> rangeBounds;
+                      float min = -100., max = 100.;
+                      if(Maquette::getInstance()->getRangeBounds(address, rangeBounds) > 0){
+                          min = rangeBounds[0];
+                          max = rangeBounds[1];
+                      }
+
+                      //Set attributes
+                      curveTab->setAttributes(_boxID, address, 0, values, sampleRate, redundancy, abCurve->_show, interpolate, argTypes, xPercents, yValues, sectionType, coeff, min, max);
                       bool muteState = Maquette::getInstance()->getCurveMuteState(_boxID, address);
                       if (!muteState) {
                           addCurve(curveAddressStr, curveTab);
@@ -365,6 +393,9 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
               else {
                   bool show = true;
 
+                  if(getCurveValuesSuccess)
+                      interpolate = true;
+
 //                    interpolate = !Maquette::getInstance()->getCurveMuteState(_boxID,address);
 //                    if (xPercents.empty() && yValues.empty() && values.size() >= 2) {
 //                        if (values.front() == values.back()) {
@@ -375,17 +406,30 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
                   //Set attributes
                   curveTab = new CurveWidget(NULL);
                   QString curveAddressStr = QString::fromStdString(address);
-                  curveTab->setAttributes(_boxID, address, 0, values, sampleRate, redundancy, show, interpolate, argTypes, xPercents, yValues, sectionType, coeff);
+
+                  //get range bounds
+                  vector<float> rangeBounds;
+                  float min = -100., max = 100.;
+                  if(Maquette::getInstance()->getRangeBounds(address, rangeBounds) > 0){
+                      min = rangeBounds[0];
+                      max = rangeBounds[1];
+                  }
+
+                  curveTab->setAttributes(_boxID, address, 0, values, sampleRate, redundancy, show, interpolate, argTypes, xPercents, yValues, sectionType, coeff, min, max);
                   if (interpolate) {
                       addCurve(curveAddressStr, curveTab);
                       box->setCurve(address, curveTab->abstractCurve());
                     }
                 }
             }
-        }
-      else {
+          else{
+              removeCurve(address);
+              return false;
+          }
+      }
+      else {          
           return false;
-        }
+      }
     }
   else {  // Box Not Found
       return false;
@@ -419,34 +463,34 @@ BoxWidget::setComboBox(QComboBox *cbox)
 
 void
 BoxWidget::execStartAction()
-{
-  MainWindow *ui = _box->maquetteScene()->view()->mainWindow();
-
-  if (ui->commandKey()) {
+{            
+  if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
       updateStartCue();
     }
   else {
       jumpToStartCue();
     }
 
+  _box->select();
+
   //set button focus off
-  _box->setFocus();
+  _box->setFocus();  
 }
 
 void
 BoxWidget::execEndAction()
-{
-  MainWindow *ui = _box->maquetteScene()->view()->mainWindow();
-
-  if (ui->commandKey()) {
+{  
+  if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
       updateEndCue();
     }
   else {
       jumpToEndCue();
     }
 
+  _box->select();
+
   //unactive button focus
-  _box->setFocus();
+  _box->setFocus();  
 }
 
 void
@@ -455,11 +499,15 @@ BoxWidget::jumpToStartCue()
   if (_startMenu != NULL) {
       _startMenu->close();
     }
-  _box->setSelected(true);
-  _box->update();
-  unsigned int gotoValue = _box->date();
-  _box->maquetteScene()->gotoChanged(gotoValue);
-  Maquette::getInstance()->initSceneState();   //reload scene (reset the remote application state)
+  _box->select();
+  unsigned int timeOffset = _box->date()+1;
+  /// \todo Enlever ce +1. Modifier score pour qu'il envoie la cue à timeOffset et non timeOffset-1. NH
+
+  _box->maquetteScene()->changeTimeOffset(timeOffset);
+  //Maquette::getInstance()->initSceneState();   //reload scene (reset the remote application state)
+
+  //unactive button focus
+  _box->setFocus();
 }
 
 void
@@ -468,11 +516,13 @@ BoxWidget::jumpToEndCue()
   if (_endMenu != NULL) {
       _endMenu->close();
     }
-  _box->setSelected(true);
-  _box->update();
-  unsigned int gotoValue = _box->date() + _box->duration();
-  _box->maquetteScene()->gotoChanged(gotoValue);
-  Maquette::getInstance()->initSceneState();   //reload scene (reset the remote application state)
+  _box->select();
+  unsigned int timeOffset = _box->date()+1 + _box->duration();
+  _box->maquetteScene()->changeTimeOffset(timeOffset);
+  //Maquette::getInstance()->initSceneState();   //reload scene (reset the remote application state)
+
+  //unactive button focus
+  _box->setFocus();
 }
 
 void
@@ -498,6 +548,35 @@ BoxWidget::updateEndCue()
 }
 
 void
+BoxWidget::play()
+{
+    QList<unsigned int> boxesId;
+
+    QList<QGraphicsItem *> selectedItems = _box->maquetteScene()->selectedItems();
+    for(QList<QGraphicsItem *>::iterator it=selectedItems.begin(); it!=selectedItems.end(); it++){
+        boxesId<<((BasicBox *)(*it))->ID();
+    }
+
+    if(!boxesId.contains(_boxID)){
+        boxesId.clear();
+        boxesId<<_boxID;
+    }
+
+    _box->maquetteScene()->playOrResume(boxesId);
+    _box->updatePlayingModeButtons();
+}
+
+void
+BoxWidget::stop()
+{
+    QList<unsigned int> boxesId;
+    boxesId << _boxID;
+
+    _box->maquetteScene()->stopOrPause(boxesId);
+    _box->updatePlayingModeButtons();
+}
+
+void
 BoxWidget::displayStartMenu(QPoint pos)
 {
   if (_startMenu != NULL) {
@@ -510,5 +589,22 @@ BoxWidget::displayEndMenu(QPoint pos)
 {
   if (_endMenu != NULL) {
       _endMenu->exec(pos);
+    }
+}
+
+void
+BoxWidget::updateCurveRangeBoundMin(string address, float value){
+    CurveWidget *curve = getCurveWidget(address);
+    if(curve != NULL){
+        curve->setMinY(value);
+    }
+}
+
+void
+BoxWidget::updateCurveRangeBoundMax(string address, float value){
+    CurveWidget *curve = getCurveWidget(address);
+    std::cout<<"BW::updateMAX"<<std::endl;
+    if(curve != NULL){
+        curve->setMaxY(value);
     }
 }

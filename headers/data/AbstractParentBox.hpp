@@ -48,7 +48,7 @@
 
 #include "AbstractBox.hpp"
 #include <string>
-#include "CSPTypes.hpp"
+#include "Engine.h"
 
 //! Defines abstract parent box type.
 enum { ABSTRACT_PARENT_BOX_TYPE = 7 };
@@ -61,7 +61,8 @@ enum { ABSTRACT_PARENT_BOX_TYPE = 7 };
 class AbstractParentBox : public AbstractBox
 {
   public:
-    friend class ParentBox;
+    friend class ParentBox; /// \todo vérifier l'implication de friend class. (par jaime Chao)
+
     AbstractParentBox(const QPointF &newTopLeft = QPointF(0., 0.), const float &newLength = 0., const float &newHeight = 0.,
                       const std::string &newName = "", const QColor &newColor = Qt::black, unsigned int ID = NO_ID, unsigned int motherID = ROOT_BOX_ID);
 

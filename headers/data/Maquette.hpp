@@ -1,15 +1,16 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -42,8 +43,8 @@
 
 /*!
  * \file Maquette.h
- * \author Luc Vercellin, Bruno Valeze
- * \date 30 september 2009
+ * \author Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine 
+ * \date March 14th 2014
  */
 
 #include <QObject>
@@ -56,8 +57,9 @@
 #include <utility>
 #include <sstream>
 #include "NetworkMessages.hpp"
-#include "CSPTypes.hpp"
 #include "BasicBox.hpp"
+
+#include "Engine.h"
 
 //! Default network host.
 
@@ -66,7 +68,6 @@
 //! Default network port.
 static const int NETWORK_PORT = 7000;
 static const int OSC_NETWORK_PORT = 9999;
-
 
 static const std::string PLAY_ENGINES_MESSAGE = "/Transport/Play";
 static const std::string STOP_ENGINES_MESSAGE = "/Transport/Stop";
@@ -100,7 +101,7 @@ typedef enum { SUCCESS = 1, NO_MODIFICATION = 0, RETURN_ERROR = -1,
 
 typedef enum { INDICATION_LEVEL, WARNING_LEVEL, ERROR_LEVEL } ErrorLevel;
 
-/// \todo les objets graphiques Qt maintiennent eux-même leurs tailles et positions
+/// \todo les objets graphiques Qt maintiennent eux-même leurs tailles et positions. (par jaime Chao)
 /*!
  * \brief Structure used to contain boxes position or size.
  * Used for interaction with MaquetteScene.
@@ -157,8 +158,9 @@ class Maquette : public QObject
   Q_OBJECT
 
   public:
-    static Maquette *
-    getInstance()
+
+    /// \todo Quel est le rôle de getInstance() avec instanciantion en static ? Faire de Maquette une classe statique ! Est-ce la bonne manière ou plutôt mettre dans un namespace. (par jaime Chao)
+    static Maquette * getInstance()
     {
       static Maquette *instance = new Maquette();
       return instance;
@@ -169,7 +171,7 @@ class Maquette : public QObject
     /*!
      * \brief Initialise the maquette elements.
      */
-    void init();
+    void init(); /// \todo Une méthode init() ne devrait pas être utilisée. surtout en public !!! Elle peut laisser l'invariant de classe instable à tout moment. (par jaime Chao)
 
     /*!
      * \brief Sets a new scene.
@@ -199,7 +201,7 @@ class Maquette : public QObject
      * \return the current network device used
      */
     std::string getNetworkDevice();
-    void addNetworkDevice(string deviceName, string plugin, string ip, string port);
+    void addNetworkDevice(string deviceName, string plugin, string ip, unsigned int destinationPort, unsigned int receptionPort = 0);
 
     /*!
      * \brief Gets a set of the available network devices.
@@ -237,16 +239,17 @@ class Maquette : public QObject
      * \param IP : the new IP to use
      * \param port : the new port to use
      */
-    void changeNetworkDevice(const std::string &deviceName, const std::string &pluginName, const std::string &IP, const std::string &port);
+    void changeNetworkDevice(const std::string &deviceName, const std::string &pluginName, const std::string &IP, const unsigned int &port);
 
     /*!
      * \brief Gets the set of devices and their respective requestability.
      *
      * \param deviceName : the devices to be filled
-     * \param pluginName : the respective requestabilities
      */
-    void getNetworkDeviceNames(std::vector<std::string>& deviceName, std::vector<bool>& namespaceRequestable);
+    void getNetworkDeviceNames(std::vector<std::string>& deviceName);
 
+    bool isNetworkDeviceRequestable(string deviceName);
+    
     /*!
      * \brief Requests a snapshot to the Engines.
      *
@@ -293,7 +296,10 @@ class Maquette : public QObject
 
     void setCurveMuteState(unsigned int boxID, const std::string &address, bool muteState);
     bool getCurveMuteState(unsigned int boxID, const std::string &address);
-
+    void setBoxMuteState(unsigned int boxID, bool muteState);
+    bool getBoxMuteState(unsigned int boxID);
+    void setStartEventMuteState(unsigned int boxID, bool muteState);
+    void setEndEventMuteState(unsigned int boxID, bool muteState);
 
     /*!
      * \brief Sets sections of a curve at a specific address in a box.
@@ -332,20 +338,12 @@ class Maquette : public QObject
                             bool &redundancy, bool &interpolate, std::vector<float>& values, std::vector<std::string> & argTypes, std::vector<float> &xPercents,
                             std::vector<float> &yValues, std::vector<short> &sectionType, std::vector<float> &coeff);
 
-
+    bool getCurveValues(unsigned int boxID, const std::string &address, unsigned int argPosition, std::vector<float> &values);
 
     /*!
      * \brief Raised when execution is finished
      */
-    void executionFinished();
-
-    /*!
-     * \brief Updates messages to send for a specific box.
-     *
-     * \param boxID : the box to modify messages sent from
-     * \return true if messages could be modified
-     */
-    bool updateMessagesToSend(unsigned int boxID);
+    void udpatePlayModeView();
 
     /*!
      * \brief Gets the set of messages to send for the beginning of a box.
@@ -366,16 +364,6 @@ class Maquette : public QObject
     std::vector<std::string> lastMessagesToSend(unsigned int boxID);
 
     /*!
-     * \brief Sets the set of messages to send for the beginning of a box.
-     *
-     * \param boxID : the box to get messages set from
-     * \param messages : the new set of the messages
-     *
-     * \return if messages could be set
-     */
-    bool setFirstMessagesToSend(unsigned int boxID, const std::vector<std::string> &messages);
-
-    /*!
      * \brief Sets the set of messages to send for the end of a box.
      *
      * \param boxID : the box to get messages set from
@@ -383,7 +371,7 @@ class Maquette : public QObject
      *
      * \return if messages could be set
      */
-    bool setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages);
+    bool setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages, bool sort = true);
     NetworkMessages *startMessages(unsigned int boxID);
 
     /*!
@@ -394,9 +382,23 @@ class Maquette : public QObject
      *
      * \return if itemsSelected could be set
      */
-
-//  bool setSelectedItemsToSend(unsigned int boxID,  QList<QTreeWidgetItem*> itemsSelected);
     bool setSelectedItemsToSend(unsigned int boxID, QMap<QTreeWidgetItem*, Data> itemsSelected);
+
+    /*!
+     * \brief Calls the NetworkTree method getAbsoluteAddress.
+     */
+    QString getAbsoluteAddress(QTreeWidgetItem *item);
+
+    /*!
+     * \brief Sorts messages by priority than alphabetical.
+     *
+     * \param messages : message to sort
+     *
+     * \return if itemsSelected could be set
+     */
+    std::vector<std::string> sortByPriority(NetworkMessages *messages);
+    static int compareByPriority(const QPair<QTreeWidgetItem *, std::string> v1, const QPair<QTreeWidgetItem *, std::string> v2);
+
 
     /*!
      * \brief Sets the set of treeItems expanded.
@@ -457,17 +459,7 @@ class Maquette : public QObject
      *
      * \return if messages could be set
      */
-    bool setLastMessagesToSend(unsigned int boxID, const std::vector<std::string> &messages);
-
-    /*!
-     * \brief Sets the set of messages to send for the end of a box.
-     *
-     * \param boxID : the box to get messages set from
-     * \param messages : the new set of the messages
-     *
-     * \return if messages could be set
-     */
-    bool setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages);
+    bool setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages, bool sort = true);
 
     /*!
      * \brief Sends a specific message with current device.
@@ -588,11 +580,11 @@ class Maquette : public QObject
     TriggerPoint* getTriggerPoint(unsigned int trgID);
 
     /*!
-     * \brief Simulates a message reception for a trigger point.
+     * \brief Trigger a trigger point.
      *
-     * \param message : the message to simulate
+     * \param triggerPoint : the trigger point to trigger
      */
-    void simulateTriggeringMessage(const std::string &message);
+    void trigger(TriggerPoint *triggerPoint);
 
     /*!
      * \brief Set trigger point 's message.
@@ -601,6 +593,44 @@ class Maquette : public QObject
      * \param message : the new message
      */
     bool setTriggerPointMessage(unsigned int trgID, const std::string &message);
+
+    /*!
+     * \brief Create a time condition between boxes.
+     *
+     * \param boxes : the boxes to condition.
+     */
+    unsigned int createCondition(QList<BasicBox *> boxes);
+
+    /*!
+     * Add a box to the condition.
+     *
+     * \param conditionId : the ID of the condition
+     * \param box : the box to add
+     */
+    void attachToCondition(unsigned int conditionId, BasicBox *box);
+
+    /*!
+     * Dettach a box from the condition.
+     *
+     * \param conditionId : the ID of the condition
+     * \param box : the box to detach
+     */
+    void detachFromCondition(unsigned int conditionId, BasicBox *box);
+
+    void setConditionMessage(unsigned int conditionId, std::string disposeMessage);
+    std::string getConditionMessage(TimeConditionId conditionId);
+
+    /*!
+     * Delete the specified TimeCondition.
+     *
+     * \param conditionId : the ID of the condition to delete
+     */
+    void deleteCondition(TimeConditionId conditionId);
+
+    void getConditionsId(std::vector<unsigned int> &conditionsId);
+
+    void getBoxesIdFromCondition(TimeConditionId conditionId, std::vector<unsigned int> &boxesId);
+
 
     /*!
      * \brief Perform moving or resizing for a set of boxes.
@@ -643,6 +673,22 @@ class Maquette : public QObject
      * \return the box specified by the ID
      */
     BasicBox* getBox(unsigned int ID);
+    
+    /*!
+     * \brief Set the color of a specific box.
+     *
+     * \param ID : the ID of the box wanted
+     * \param newColor : the box specified by the ID
+     */
+    void setBoxColor(unsigned int ID, QColor newColor);
+
+    /*!
+     * \brief Set the name of a specific box.
+     *
+     * \param ID : the ID of the box wanted
+     * \param name : the box specified by the ID
+     */
+    void setBoxName(unsigned int ID, std::string name);
 
     /*!
      * \brief Gets a specific relation.
@@ -672,7 +718,6 @@ class Maquette : public QObject
      * \param fileName : the file to load composition from
      */
     void load(const std::string &fileName);
-    void loadOLD(const std::string &fileName);
 
     /*!
      * \brief Gets the current execution time in ms.
@@ -686,19 +731,39 @@ class Maquette : public QObject
      *
      * \return the box progress ratio
      */
-    float getProgression(unsigned int boxID);
+    float getPosition(unsigned int boxID);
 
     /*!
      * \brief Requests a snapshot of the network on a namespace.
      *
      * \param address : the address to take snapshot on
+     * \param nodeType : the object type under at the address
      * \param nodes : the nodes to be filled
      * \param leaves : the leaves to be filled
      * \param attributes : the attributes to be filled
      * \param attributesValue : the respective values of the attributes to be filled
      */
-    int requestNetworkNamespace(const std::string &address, std::vector<std::string>& nodes, std::vector<std::string>& leaves,
+    int requestNetworkNamespace(const std::string &address, std::string &nodeType, std::vector<std::string>& nodes, std::vector<std::string>& leaves,
                                 std::vector<std::string>& attributes, std::vector<std::string>& attributesValue);
+    /*!
+     * \brief Refresh the network's namespace.
+     */
+    void rebuildNetworkNamespace(const std::string &application);
+
+    /*!
+     * \brief Requests a snapshot of the network on a namespace.
+     *
+     * \param address : the address to take snapshot on
+     * \param nodeType : the object type under at the address
+     * \param nodes : the nodes to be filled
+     * \param leaves : the leaves to be filled
+     * \param attributes : the attributes to be filled
+     * \param attributesValue : the respective values of the attributes to be filled
+     */
+    int requestObjectAttribruteValue(const std::string &address, const std::string &attributeName, std::vector<std::string>& value);    
+
+    void setRangeBoundMin(unsigned int boxID, const string &address, float value);
+    void setRangeBoundMax(unsigned int boxID, const string &address, float value);
 
     /*!
      * \brief Update boxes from Engines.
@@ -708,24 +773,66 @@ class Maquette : public QObject
     scene(){ return _scene; }
     static const unsigned int SIZE;
 
+    bool getDeviceLocalHost(std::string deviceName, std::string protocol, std::string &localHost);
+    bool getDeviceLocalHost(std::string deviceName, std::string &localHost);
+
+    bool getDevicePort(std::string deviceName,  std::string protocol, unsigned int &port);
+    bool getDevicePort(std::string deviceName, unsigned int &port);
+    bool getDevicePorts(std::string deviceName, std::string protocol, std::vector<int> &portVector);
+
+    int getOSCInputPort();
+    int getMinuitInputPort();
+
+    bool getDeviceProtocol(std::string deviceName, std::string &protocol);
+    std::vector<std::string> getProtocolsName();
+
+    bool setDeviceName(std::string device, std::string newName);
+    bool setDevicePort(std::string device, int destinationPort, int receptionPort = 0);
+    bool setDeviceLocalHost(std::string device, std::string localHost);
+    bool setDeviceProtocol(std::string device, std::string protocol);
+
+    bool loadNetworkNamespace(const string &application, const string &filepath);
+    int appendToNetWorkNamespace(const std::string & address, const std::string & service = "parameter", const std::string & type = "decimal", const std::string & priority = "0", const std::string & description = "", const std::string & range = "0. 1.", const std::string & clipmode = "none", const std::string & tags = "");
+    int removeFromNetWorkNamespace(const std::string & address);
+
   public slots:
+    
     /*!
-     * \brief Sets the goto value in the engines in ms.
+     * \brief Sets the time offset value in ms where the engine will start from at the nex execution. The boolean "mute" mutes or not the dump of all messages (the scene state at timeOffset).
      */
-    void setGotoValue(int gotoValue);
+    void setTimeOffset(unsigned int timeOffset, bool mute = NO);
+    
+    unsigned int getTimeOffset();
 
     /*!
-     * \brief Launches the playing process.
+     * \brief Turn engine execution on depending on the context
      */
-    void startPlaying();
+    void turnExecutionOn();
+    void turnExecutionOn(unsigned int boxId);
+    
+    /*!
+     * \brief Is the engine running ?
+     *
+     * \return true if the engine is running
+     *
+     */
+    bool isExecutionOn();
 
     /*!
-     * \brief Stops the playing process.
+     * \brief Turn engine execution off depending on the context
      */
-    void stopPlaying();
-    void stopPlayingGotoStart();
-    void stopPlayingWithGoto();
-    void pause();
+    void turnExecutionOff();
+    void turnExecutionOff(unsigned int boxId);
+
+    void stopPlayingAndGoToStart();
+    void stopPlayingAndGoToTimeOffset(unsigned int timeOffset);
+    void stopPlayingAndGoToCurrentTime();
+    
+    
+    void pauseExecution();
+    void resumeExecution();
+    
+    bool isExecutionPaused();
 
     /*!
      * \brief Sets a new acceleration factor.
@@ -734,26 +841,44 @@ class Maquette : public QObject
      */
     void setAccelerationFactor(const float &factor);
     double accelerationFactor();
-
+    
     /*!
-     * \brief Called by the callback when a transition is crossed.
+     * \brief Sets a new zoom factor into the engine
      *
-     * \param boxID : the box whose transition is crossed
-     * \param CPIndex : index of the box's control point crossed
+     * \param zoom : the new zoom factor value
      */
-    void crossedTransition(unsigned int boxID, unsigned int CPIndex);
+    void setViewZoom(const QPointF zoom);
+    
+    /*!
+     * \brief Sets a new center position into the engine
+     *
+     * \param zoom : the new zoom factor value
+     */
+    void setViewPosition(const QPointF position);
 
     /*!
-     * \brief Called by the callback when a triggerPoint is triggered.
+     * \brief Called by the callback when the running state of a box change
      *
-     * \param waiting : new waiting state of the triggerPoint
+     * \param boxID : the box whose running state have cahnged
+     * \param runnging : the new running state
+     */
+    void updateBoxRunningStatus(unsigned int boxID, bool running);
+
+    /*!
+     * \brief Called by the callback when the active state of a triggerPoint change.
+     *
+     * \param waiting : new active state of the triggerPoint
      * \param trgID : trigger point ID
      */
-    void crossedTriggerPoint(bool waiting, unsigned int trgID);
-    inline std::map<unsigned int, BasicBox*> getBoxes(){ return _boxes; }
+    void updateTriggerPointActiveStatus(unsigned int trgID, bool active);
 
+    void setTriggerPointDefault(unsigned int triggerId, bool dflt);
+    bool getTriggerPointDefault(unsigned int triggerId);
+    
+    inline std::map<unsigned int, BasicBox*> getBoxes(){ return _boxes; }
+    inline QList<BasicBox *> getRecordingBoxes(){return _recordingBoxes ;}
     /*!
-     * \brief When a goto value is entered, the scenario before this value is simulated.
+     * \brief When a time offset is entered, the scenario before this value is simulated.
      * Messages (final state of each boxes) are sended to the engine.
      */
     void initSceneState();
@@ -761,6 +886,54 @@ class Maquette : public QObject
     void setEndMessageToSend(unsigned int boxID, QTreeWidgetItem *item, QString address);
     std::vector<std::string> getPlugins();
     void removeNetworkDevice(string deviceName);
+
+    /*!
+     * \brief Requests the rangeBounds of an object to the Engines.
+     *
+     * \param address : the address to be snapped.
+     * \param rangeBounds : Result to be field.
+     */
+    int getRangeBounds(const std::string& address, std::vector<float>& rangeBounds);    
+
+    /*!
+     * Gets the type of an object.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param nodeType : will be filled with the type.
+     *
+     * \return True(1) or false(0) if the request failed or not.
+     */
+    int getObjectType(const std::string & address, std::string & nodeType);
+
+    /*!
+     * Gets the priority of an object.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param priority : will be filled with the priority.
+     *
+     * \return True(1) or false(0) if the request failed or not.
+     */
+    int getPriority(const std::string & address, unsigned int & priority);
+
+    /*!
+     * Gets the children nodes of an object.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param children : will be filled with the children' addresses.
+     *
+     * \return True(1) or false(0) if the request failed or not.
+     */
+    int getObjectChildren(const std::string & address, std::vector<std::string>& children);
+
+    /*!
+     * \brief Updates all boxes' attributes
+     */
+    void updateBoxesAttributes();
+
+    /*!
+     * \brief Sets address record mode.
+     */
+    void setCurveRecording(unsigned int boxID, std::string address, bool activated);
 
   private:
     /*!
@@ -813,8 +986,8 @@ class Maquette : public QObject
     //! The MaquetteScene managing display and interaction.
     MaquetteScene *_scene;
 
-    //! The Engines object managing temporal constraints.
-    Engines *_engines;
+    //! The Engine object managing temporal constraints.
+    Engine *_engines;
 
     //! The map of boxes (identified by IDs) managed by the maquette.
     std::map<unsigned int, BasicBox*> _boxes;
@@ -842,6 +1015,8 @@ class Maquette : public QObject
     std::vector<unsigned int> _listeningPorts;
     std::vector<std::string> _plugins;
 
+    QList<BasicBox *> _recordingBoxes;
+
     //Device _defaultDevice; //!< The default network device used.
 
     bool _recording;    //!< Handling recording state.
@@ -851,27 +1026,38 @@ class Maquette : public QObject
 };
 
 /*!
- * \brief Callback called when a transition is crossed.
+ * \brief Callback called when a Trigger Point active state change
  *
- * \param boxID : the box whose transition is crossed
- * \param CPIndex : index of the box's control point crossed
+ * \param trgID : index of the box's Trigger Point
+ * \param waiting : the active state of the Trigger Point
  */
-void crossTransitionCallback(unsigned int boxID, unsigned int CPIndex, std::vector<unsigned int> processesToStop);
-void enginesNetworkUpdateCallback(unsigned int boxID, string m1, string m2);
+void triggerPointIsActiveCallback(unsigned int trgID, bool active);
 
 /*!
- * \brief Callback called when a Trigger Point is triggered is crossed.
+ * \brief Callback called when the running state of a box change.
  *
- * \param waiting : the waiting state of the Trigger Point
- * \param trgID : index of the box's Trigger Point crossed
- * \param boxID : the box whose transition is crossed
- * \param CPIndex : index of the box's control point associated with trigger point
- * \param message : the message of the Trigger Point
+ * \param boxID : the box whose changing his running status
+ * \param running : the new running state of the box
  */
-void crossTriggerPointCallback(bool waiting, unsigned int trgID, unsigned int boxID, unsigned int CPIndex, std::string message);
+void boxIsRunningCallback(unsigned int boxID, bool running);
+
+/*!
+ * \brief Callback called when a transport feature is used
+ *
+ * \param transpport : a transport feature being used
+ * \param value : a value related to the transport
+ */
+void transportCallback(TTSymbol& transport, const TTValue& value);
 
 /*!
  * \brief Callback called when the execution is finished.
  */
 void executionFinishedCallback();
+
+/*!
+ * \brief Callback called when device namespace have to be refreshed
+ *
+ * \param deviceName : the name of the device to refresh
+ */
+void deviceCallback(TTSymbol& deviceName);
 #endif

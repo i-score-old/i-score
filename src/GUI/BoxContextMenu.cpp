@@ -1,15 +1,16 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ *iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -54,7 +55,7 @@ BoxContextMenu::BoxContextMenu(BasicBox *box)
 {
   _box = box;
 
-  setWindowModality(Qt::ApplicationModal);
+//  setWindowModality(Qt::ApplicationModal);
 
   _changeNameAct = new QAction(tr("Change name"), this);
   addAction(_changeNameAct);
@@ -82,6 +83,10 @@ BoxContextMenu::BoxContextMenu(BasicBox *box)
   addAction(_viewRelationAct);
   connect(_viewRelationAct, SIGNAL(triggered()), this, SLOT(viewRelations()));
 
+  _detachAct = new QAction(tr("Detach from condition"), this);
+  addAction(_detachAct);
+  connect(_detachAct, SIGNAL(triggered()), this, SLOT(detachFromCondition()));
+
   _nameDialog = new QDialog(this);
   _nameDialog->setWindowModality(Qt::WindowModal);
   _nameLayout = new QGridLayout(this);
@@ -97,6 +102,11 @@ BoxContextMenu::~BoxContextMenu()
   delete _changeNameAct;
   delete _changeColorAct;
   delete _viewRelationAct;
+}
+
+void
+BoxContextMenu::setDetachActionEnabled(bool enabled){
+    _detachAct->setEnabled(enabled);
 }
 
 void
@@ -142,4 +152,9 @@ BoxContextMenu::viewRelations()
 {
   ViewRelations viewRelations(_box->ID(), static_cast<MaquetteScene*>(_box->scene()), NULL);
   viewRelations.exec();
+}
+
+void
+BoxContextMenu::detachFromCondition(){
+    _box->detachFromCondition();
 }

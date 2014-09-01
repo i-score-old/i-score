@@ -1,15 +1,16 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -43,7 +44,7 @@
 /*!
  * \file BasicBox.hpp
  *
- * \author Luc Vercellin, Bruno Valeze
+ * \author Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine 
  */
 
 #include <QGraphicsItem>
@@ -54,7 +55,6 @@
 #include <string>
 #include <QInputDialog>
 #include "AbstractBox.hpp"
-#include "CSPTypes.hpp"
 #include "CurvesWidget.hpp"
 #include "BoxWidget.hpp"
 #include <QComboBox>
@@ -62,6 +62,9 @@
 #include <QObject>
 #include <QPushButton>
 #include <QMenu>
+#include <QGraphicsColorizeEffect>
+
+#include "TTScore.h"
 
 class MaquetteScene;
 class QGraphicsTextItem;
@@ -71,6 +74,7 @@ class Comment;
 class TriggerPoint;
 class TextEdit;
 class Relation;
+class ConditionalRelation;
 class AbstractCurve;
 class QObject;
 
@@ -100,6 +104,9 @@ class BasicBox : public QObject, public QGraphicsItem
      * \brief Enum used to define Basic Box's item type.
      */
     enum { BASIC_BOX_TYPE = QGraphicsItem::UserType + 1 };
+    
+    static const QColor BOX_COLOR;
+    static const QColor TEXT_COLOR;
 
     /*!
      * \brief Redefinition of QGraphicsItem::type(). Used for Item casting.
@@ -195,6 +202,14 @@ class BasicBox : public QObject, public QGraphicsItem
      * \param relation : the relation to store
      */
     void addRelation(BoxExtremity extremity, Relation *relation);
+
+    /*!
+     * \brief Adds a conditional relation to the start extremity
+     *
+     * \param condRel : the conditional relation to store
+     */
+    void addConditionalRelation(ConditionalRelation *condRel);
+
     /*!
      * \brief Removes a relation from an extremity
      *
@@ -203,6 +218,17 @@ class BasicBox : public QObject, public QGraphicsItem
      */
     void removeRelation(BoxExtremity extremity, unsigned int relID);
     void removeRelations(BoxExtremity extremity);
+
+    /*!
+     * \brief Removes a conditional relation from the start extremity
+     *
+     * \param condRelID : the conditional relation ID to remove
+     */
+    void removeConditionalRelation(ConditionalRelation *condRel);
+    void removeConditionalRelations();
+
+    void detachFromCondition();
+
     /*!
      * \brief Returns Relations associated to the start box extremity.
      */
@@ -321,6 +347,13 @@ class BasicBox : public QObject, public QGraphicsItem
      * \param extremity : the box extremity to get message from
      */
     std::string triggerPointMessage(BoxExtremity extremity);
+
+    /*!
+     * \brief Gets trigger point on the extremity.
+     *
+     * \param extremity : the box extremity to get trigger point from.
+     */
+    TriggerPoint *getTriggerPoint(BoxExtremity extremity);
 
     AbstractCurve *getCurve(const std::string &address);
     void setCurve(const std::string &address, AbstractCurve *curve);
@@ -618,9 +651,18 @@ class BasicBox : public QObject, public QGraphicsItem
      */
     void setEndMessages(NetworkMessages *messages);
 
+    /*!
+     * \brief Return, as a QString list, the start messages.
+     *
+     * \return Start cue.
+     */
+    std::vector<std::string> getStartMessages();
+
     NetworkMessages *endMessages();
     void setEndMessage(QTreeWidgetItem *item, QString address);
     void updateWidgets();
+    void updateCurveRangeBoundMin(string address, float value);
+    void updateCurveRangeBoundMax(string address, float value);
 
     //! \brief Handles line width.
     static const unsigned int LINE_WIDTH = 2;
@@ -639,7 +681,8 @@ class BasicBox : public QObject, public QGraphicsItem
     static const int COMBOBOX_HEIGHT;
     static const float MSGS_INDICATOR_WIDTH;
     static const float GRIP_CIRCLE_SIZE;
-    static const QString SUB_SCENARIO_MODE_TEXT;
+    static const QString SCENARIO_MODE_TEXT;
+    static const QString DEFAULT_MODE_TEXT;
 
     /*!
      * \brief Painting method, redefinition of QGraphicsItem::paint().
@@ -665,6 +708,7 @@ class BasicBox : public QObject, public QGraphicsItem
     void drawInteractionGrips(QPainter *painter);
     void drawTriggerGrips(QPainter *painter);
     void drawHoverShape(QPainter *painter);
+    void drawSelectShape(QPainter *painter);
 
     void updateBoxSize();
     inline QRectF
@@ -683,6 +727,8 @@ class BasicBox : public QObject, public QGraphicsItem
     setStackedLayout(QStackedLayout *slayout){ boxContentWidget()->setStackedLayout(slayout); }
     inline bool
     hasCurve(string address){ return _curvesAddresses.contains(address); }
+    void addMessageToRecord(std::string address);
+    void removeMessageToRecord(std::string address);
 
     QPointF getLeftGripPoint();
     QPointF getRightGripPoint();
@@ -701,6 +747,17 @@ class BasicBox : public QObject, public QGraphicsItem
     void changeColor(QColor color);
     inline QColor
     currentColor(){ return _color; }
+    void select();
+    void setRecMode(bool activated);
+    void setMuteState(bool activated);
+    inline bool recording(){return _recording;}
+    inline bool getMuteState(){return _mute;}
+    inline bool isConditioned(){return !_conditionalRelation.isEmpty();}
+    inline QList<ConditionalRelation *> getConditionalRelations(){return _conditionalRelation;}
+
+    void updateRecordingCurves();
+    void setButtonsVisible(bool value);
+    void updatePlayingModeButtons();
 
     /*!
      * \brief Return the messages list, like if the box just ended its execution.
@@ -799,11 +856,14 @@ class BasicBox : public QObject, public QGraphicsItem
     QMenu* _contextMenu;                                                        //!< The contextual menu, if one.
     bool _shift;                                                                //!< State of Shift Key.
     bool _playing;                                                              //!< State of playing.
+    bool _recording;                                                            //!< State of recording.
+    bool _mute;                                                                 //!< State of mute.    
     TextEdit *_trgPntMsgEdit;                                                   //!< The trigger point editing dialog.
     Comment *_comment;                                                          //!< The box comment.
     QMap<BoxExtremity, TriggerPoint*> *_triggerPoints;                          //!< The trigger points.
     std::map < BoxExtremity, std::map < unsigned int, Relation* > > _relations; //!< The relations.
-    std::map<std::string, AbstractCurve*> _abstractCurves;                      //!< The Curves
+    QList<ConditionalRelation *> _conditionalRelation;                          //!< The conditional relations attached.
+    std::map<std::string, AbstractCurve*> _abstractCurves;                      //!< The Curves.
     BoxWidget *_boxContentWidget;
 
     QRectF _boxRect;
@@ -823,6 +883,8 @@ class BasicBox : public QObject, public QGraphicsItem
     qreal _currentZvalue;
     QColor _color;
     QColor _colorUnselected;
+    QGraphicsColorizeEffect *_recEffect;
+
     bool _low;
     bool _hover;
 
@@ -836,5 +898,8 @@ class BasicBox : public QObject, public QGraphicsItem
 
     QPushButton *_startMenuButton;
     QPushButton *_endMenuButton;
+    QPushButton *_playButton;
+    QPushButton *_stopButton;
+
 };
 #endif

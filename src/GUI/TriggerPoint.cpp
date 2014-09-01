@@ -1,15 +1,17 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
+ *
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -85,6 +87,13 @@ TriggerPoint::TriggerPoint(const AbstractTriggerPoint &abstract, MaquetteScene *
 TriggerPoint::~TriggerPoint()
 {
   delete _abstract;
+    delete _edit;
+}
+
+bool
+TriggerPoint::isConditioned()
+{
+    return _scene->getBox(_abstract->boxID())->isConditioned();
 }
 
 void
@@ -95,6 +104,8 @@ TriggerPoint::init()
   setFlag(QGraphicsItem::ItemIsMovable, false);
   setVisible(true);
   setZValue(1);
+
+  _edit = new TriggerPointEdit(_abstract);
 }
 
 Abstract *
@@ -155,10 +166,7 @@ void
 TriggerPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
   QGraphicsItem::mousePressEvent(event);
-  setSelected(false);
-  if (_abstract->waiting()) {
-      _scene->trigger(this);
-    }
+
 }
 
 void
@@ -183,6 +191,16 @@ TriggerPoint::nameInputDialog()
   int MMwidth = _scene->views().first()->parentWidget()->width();
   nameDialog->move(position.x() + MMwidth / 2, position.y());
 
+  nameDialog->setStyleSheet(
+              "QInputDialog {"
+              "font-weight: bold;"
+              "border: 2px solid gray;"
+              "border-width: 2px;"
+              "border-color: #606060;"
+              "background-color: darkgray;"
+              "}"
+              );
+
   return nameDialog;
 }
 
@@ -196,7 +214,7 @@ TriggerPoint::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
        * TextEdit * trgPntMsgEdit = new TextEdit(_scene->views().first(),
        *      QObject::tr("Enter the trigger point message :").toStdString(),_abstract->message());
        */
-      QInputDialog *trgPntMsgEdit = nameInputDialog();
+//      QInputDialog *trgPntMsgEdit = nameInputDialog();
 
 /*
  *              switch (_abstract->boxExtremity()) {
@@ -214,27 +232,31 @@ TriggerPoint::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
  *                      break;
  *      }
  */
-      bool ok = trgPntMsgEdit->exec();
-      if (ok) {
-          if (_scene->setTriggerPointMessage(_abstract->ID(), trgPntMsgEdit->textValue().toStdString())) {
-              _abstract->setMessage(trgPntMsgEdit->textValue().toStdString());
-              _scene->displayMessage(QObject::tr("Trigger point's message successfully updated").toStdString(), INDICATION_LEVEL);
-            }
-          else {
-              _scene->displayMessage(QObject::tr("Trigger point's message unchanged").toStdString(), ERROR_LEVEL);
-            }
-        }
+//      trgPntMsgEdit->move(event->screenPos());
+      _edit->move(event->screenPos());
+      _edit->edit();
 
-      delete trgPntMsgEdit;
+//      bool ok = trgPntMsgEdit->exec();
+//      if (ok) {
+//          if (_scene->setTriggerPointMessage(_abstract->ID(), trgPntMsgEdit->textValue().toStdString())) {
+//              _abstract->setMessage(trgPntMsgEdit->textValue().toStdString());
+//              _scene->displayMessage(QObject::tr("Trigger point's message successfully updated").toStdString(), INDICATION_LEVEL);
+//            }
+//          else {
+//              _scene->displayMessage(QObject::tr("Trigger point's message unchanged").toStdString(), ERROR_LEVEL);
+//            }
+//        }
+
+//      delete trgPntMsgEdit;
     }
 }
 
 void
 TriggerPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-  QGraphicsItem::mouseReleaseEvent(event);
-  if (_abstract->waiting()) {
-      setSelected(false);
+{    
+    QGraphicsItem::mouseReleaseEvent(event);
+    if (_abstract->waiting() && event->modifiers()!=Qt::ControlModifier) {
+        _scene->trigger(this);
     }
 }
 
@@ -335,6 +357,7 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 
               else {
                   if(!_scene->triggersQueueList()->isEmpty())
+				  {
                       if (_scene->triggersQueueList()->first() == this) {
                           drawFlag(painter, QColor("green"));
                           this->setFocus();
@@ -344,6 +367,7 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 //                      painter->setBrush(brush);
                       drawFlag(painter, QColor("orange"));
                     }
+				  }
                 }
 
               if (_abstract->waiting()) {

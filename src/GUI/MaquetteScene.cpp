@@ -1,15 +1,16 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ *iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -53,6 +54,7 @@
 #include "MaquetteView.hpp"
 #include "MainWindow.hpp"
 #include "Relation.hpp"
+#include "ConditionalRelation.hpp"
 #include "Comment.hpp"
 #include "TriggerPoint.hpp"
 #include "ViewRelations.hpp"
@@ -84,15 +86,13 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 {
   _editor = editor;
   _clicked = false;
-  _playing = false;
-  _paused = false;
   _modified = false;
-  _maxSceneWidth = 100000;
+  _maxSceneWidth = 360000;
 
-  _relation = new AbstractRelation; /// \todo pourquoi instancier une AbstractRelation ici ?
+  _relation = new AbstractRelation; /// \todo pourquoi instancier une AbstractRelation ici ? (par jaime Chao)
   _playThread = new PlayingThread(this);
   _timeBar = new TimeBarWidget(0, this);  
-  _timeBarProxy = addWidget(_timeBar);/// \todo Vérifier ajout si classe TimeBarWidget hérite de GraphicsProxyWidget ou GraphicsObject. Notamment pour lier avec background.
+  _timeBarProxy = addWidget(_timeBar);/// \todo Vérifier ajout si classe TimeBarWidget hérite de GraphicsProxyWidget ou GraphicsObject. Notamment pour lier avec background. (par jaime Chao)
 
   _progressLine = new QGraphicsLineItem(QLineF(sceneRect().topLeft().x(), sceneRect().topLeft().y(), sceneRect().bottomLeft().x(), MAX_SCENE_HEIGHT));
 
@@ -112,6 +112,7 @@ MaquetteScene::init()
   _progressLine->setZValue(2);
   _timeBarProxy->setZValue(3);
   _timeBarProxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+  _timeBarProxy->setFlag(QGraphicsItem::ItemClipsToShape);    
 
   _currentInteractionMode = SELECTION_MODE;
   setCurrentMode(SELECTION_MODE);
@@ -123,10 +124,10 @@ MaquetteScene::init()
   _accelerationFactorSave = 1.;
   _accelerationFactor = 1.;
 
-  /// \todo MainWindow appelle init() de MaquetteScene, qui instancie lui même Maquette puis l'init.
+  /// \todo MainWindow appelle init() de MaquetteScene, qui instancie lui même Maquette puis l'init. (par jaime Chao)
   _maquette = Maquette::getInstance();
   _maquette->setScene(this);
-  _maquette->init();
+  _maquette->init();      
 
   _tempBox = NULL;
   _resizeBox = NO_ID;
@@ -137,19 +138,19 @@ MaquetteScene::init()
 
   _mousePos = QPointF(0., 0.);
 
-  connect(_timeBar, SIGNAL(gotoValueEntered(double)), this, SLOT(gotoChanged(double)));
-  connect(this, SIGNAL(stopPlaying()), this, SLOT(stop()));
+  connect(_timeBar, SIGNAL(timeOffsetEntered(unsigned int)), this, SLOT(changeTimeOffset(unsigned int)));
+  connect(this, SIGNAL(stopPlaying()), this, SLOT(stopOrPause()));
 }
 
 void
 MaquetteScene::updateProgressBar()
 {
-  if (_playing) {      
+  if (_maquette->isExecutionOn()) {      
       _progressLine->setPos(_maquette->getCurrentTime() / MS_PER_PIXEL, sceneRect().topLeft().y());
       invalidate();
     }
   else {      
-      _progressLine->setPos(_view->gotoValue() / MS_PER_PIXEL, sceneRect().topLeft().y());
+      _progressLine->setPos(_maquette->getTimeOffset() / MS_PER_PIXEL, sceneRect().topLeft().y());
       invalidate();
     }
 }
@@ -158,19 +159,18 @@ void
 MaquetteScene::zoomChanged(float value)
 {
   setMaxSceneWidth(MaquetteScene::MAX_SCENE_WIDTH*value);
-
   updateProgressBar();
   _timeBar->updateZoom(value);
+    
+  Maquette::getInstance()->setViewZoom(QPointF(value, 1.));
 }
 
 void
-MaquetteScene::gotoChanged(double value)
+MaquetteScene::changeTimeOffset(unsigned int timeOffset)
 {
-  if (_paused) {
-      stop();
-    }
-  Maquette::getInstance()->setGotoValue(value);
-  _view->repaint();
+    stopAndGoToTimeOffset(timeOffset);
+    
+//    _view->repaint();
 }
 
 void
@@ -179,11 +179,11 @@ MaquetteScene::updateView()
   _view = static_cast<MaquetteView*>(views().front());
 }
 
-/// \todo Vérifier l'utilité de faire une surcouche d'appels de méthodes de AttributesEditor (_editor)
+/// \todo Vérifier l'utilité de faire une surcouche d'appels de méthodes de AttributesEditor (_editor). (par jaime Chao)
 void
 MaquetteScene::updateWidgets()
 {
-  _editor->updateWidgets(true);
+  _editor->updateWidgets(true); /// \todo updateWidgets() est un public slot. mieux vaux faire appel au mécanisme d'auto-connexion des signaux dans Qt (QMetaObject) que de le garder en attribut de classe pour éviter le couplage. (par jaime Chao)
 }
 
 void
@@ -199,23 +199,16 @@ MaquetteScene::getNetworkDevices()
 }
 
 void
-MaquetteScene::changeNetworkDevice(std::string deviceName, std::string pluginName, std::string IP, std::string port)
+MaquetteScene::changeNetworkDevice(std::string deviceName, std::string pluginName, std::string IP, unsigned int port)
 {
   _maquette->changeNetworkDevice(deviceName, pluginName, IP, port);
   setModified(true);
 }
 
 void
-MaquetteScene::setNetworDeviceConfig(string deviceName, string pluginName, string IP, string port)
+MaquetteScene::setNetworDeviceConfig(string deviceName, string pluginName, string IP, unsigned int port)
 {
   emit(networkConfigChanged(deviceName, pluginName, IP, port));
-}
-
-bool
-MaquetteScene::updateMessagesToSend(unsigned int boxID)
-{
-  setModified(true);
-  return _maquette->updateMessagesToSend(boxID);
 }
 
 bool
@@ -261,34 +254,22 @@ MaquetteScene::getCurrentTime()
 }
 
 float
-MaquetteScene::getProgression(unsigned int boxID)
+MaquetteScene::getPosition(unsigned int boxID)
 {
-  return _maquette->getProgression(boxID);
+  return _maquette->getPosition(boxID);
 }
 
-void
-MaquetteScene::drawItems(QPainter *painter, int numItems, QGraphicsItem *items[], const QStyleOptionGraphicsItem options[], QWidget *widget)
+unsigned int
+MaquetteScene::getTimeOffset()
 {
-  QGraphicsScene::drawItems(painter, numItems, items, options, widget);
-  qreal xmax = width(), ymax = height();
-
-  for (int i = 0; i < numItems; i++) {
-
-      // Look if the scene rectangle has to be updated
-      if (xmax < items[i]->mapToScene(items[i]->boundingRect().bottomRight()).x()) {
-          xmax = items[i]->mapToScene(items[i]->boundingRect().bottomRight()).x();
-        }
-      if (ymax < items[i]->mapToScene(items[i]->boundingRect().bottomRight()).y()) {
-          ymax = items[i]->mapToScene(items[i]->boundingRect().bottomRight()).y();
-        }
-    }
+    return _maquette->getTimeOffset();
 }
 
 void
 MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
 {
   Q_UNUSED(rect);
-  if (!_playing) {
+  if (!_maquette->isExecutionOn()) {
 
       if (_currentInteractionMode == RELATION_MODE) {
           if (_clicked) {
@@ -414,6 +395,7 @@ MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
 void
 MaquetteScene::setCurrentMode(int inter, BoxCreationMode box)
 {
+    _view->resetCachedContent();
   _currentInteractionMode = inter;
   if (inter == SELECTION_MODE || inter == RELATION_MODE) {
       _view->setDragMode(QGraphicsView::RubberBandDrag);
@@ -473,7 +455,7 @@ bool
 MaquetteScene::subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent)
 {
   if (getSelectedItem() != NULL && itemAt(mouseEvent->scenePos()) != 0) {
-      return(getSelectedItem()->type() == PARENT_BOX_TYPE && static_cast<BasicBox*>(getSelectedItem())->currentText() == BasicBox::SUB_SCENARIO_MODE_TEXT && static_cast<BasicBox*>(getSelectedItem())->boxBody().contains(mouseEvent->pos()) && itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::ArrowCursor);
+      return(getSelectedItem()->type() == PARENT_BOX_TYPE && static_cast<BasicBox*>(getSelectedItem())->currentText() == BasicBox::SCENARIO_MODE_TEXT && static_cast<BasicBox*>(getSelectedItem())->boxBody().contains(mouseEvent->pos()) && itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::ArrowCursor);
     }
   else {
       return false;
@@ -485,6 +467,9 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
   QGraphicsScene::mousePressEvent(mouseEvent);
   _clicked = true;
+ 
+  if (paused())
+      stopAndGoToCurrentTime();
 
   if (_tempBox) {
       removeItem(_tempBox);
@@ -496,9 +481,9 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
   if (mouseEvent->modifiers() == Qt::ShiftModifier) {
       setCurrentMode(SELECTION_MODE);
     }
-  else if (noBoxSelected() || subScenarioMode(mouseEvent)) {
+  else if ((noBoxSelected() || subScenarioMode(mouseEvent)) && mouseEvent->modifiers()==Qt::ControlModifier) {
       setCurrentMode(CREATION_MODE);
-    }
+    }  
   else {
       setCurrentMode(SELECTION_MODE);
     }
@@ -540,7 +525,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
           }
 
         else if (getSelectedItem() != NULL ? getSelectedItem()->type() == PARENT_BOX_TYPE : false && subScenarioMode(mouseEvent)) {
-            // TODO : see why creation is possible in a parent box during resize mode
+            /// \todo Old TODO updated (by jC) : see why creation is possible in a parent box during resize mode
             if (resizeMode() == NO_RESIZE) {
                 // Store the first pressed point
                 _pressPoint = mouseEvent->scenePos();
@@ -555,13 +540,14 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
       case BOX_EDIT_MODE:
         break;
-    }
+    } 
 }
 
 void
 MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
 {
-  if (!_playing) {
+  if (!_maquette->isExecutionOn()) {
+
       QGraphicsScene::mouseMoveEvent(mouseEvent);
 
       switch (_currentInteractionMode) {
@@ -601,7 +587,7 @@ MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
           case SELECTION_MODE:
             break;
 
-          case CREATION_MODE:
+          case CREATION_MODE:          
             if (noBoxSelected() || subScenarioMode(mouseEvent)) {
                 if (resizeMode() == NO_RESIZE && _tempBox) {
                     int upLeftX, upLeftY, width, height;
@@ -647,27 +633,37 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
         if (itemAt(mouseEvent->scenePos()) != 0) {
             int type = itemAt(mouseEvent->scenePos())->type();
             if (type == PARENT_BOX_TYPE) {
-                BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
 
+                BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
                 BasicBox *firstBox = getBox(_relation->firstBox());
-                if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE)) {
-                    setRelationSecondBox(secondBox->ID(), BOX_START);
-                    addPendingRelation();
-                    firstBox->setSelected(true);
-                  }
-                else if (mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
-                    setRelationSecondBox(secondBox->ID(), BOX_END);
-                    addPendingRelation();
-                    firstBox->setSelected(true);
-                  }
-                else {
-                    if (selectedItems().empty()) {
-                      }
+
+                if(mouseEvent->modifiers() == Qt::AltModifier){ //case conditional relation
+                    QList<BasicBox *> boxesToCondition;
+                    boxesToCondition<<firstBox;
+                    boxesToCondition<<secondBox;
+                    conditionBoxes(boxesToCondition);
+                }
+                else{
+
+                    if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE)) {
+                        setRelationSecondBox(secondBox->ID(), BOX_START);
+                        addPendingRelation();
+                        firstBox->setSelected(true);
+                    }
+                    else if (mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
+                        setRelationSecondBox(secondBox->ID(), BOX_END);
+                        addPendingRelation();
+                        firstBox->setSelected(true);
+                    }
                     else {
-                        selectionMoved();
-                      }
-                  }
-              }
+                        if (selectedItems().empty()) {
+                        }
+                        else {
+                            selectionMoved();
+                        }
+                    }
+                }
+            }
             else {
                 _relationBoxFound = false;
                 delete _relation;
@@ -683,7 +679,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
 
       case SELECTION_MODE:
         if (selectedItems().isEmpty()) {
-            _editor->noBoxEdited();
+            _editor->noBoxEdited(); /// \todo noBoxEdited() est un public slot. mieux vaux faire appel au mécanisme d'auto-connexion des signaux dans Qt (QMetaObject) que de le garder en attribut de classe pour éviter le couplage. (par jaime Chao)
           }
 
         break;
@@ -708,7 +704,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
 
             else {
                 if (selectedItems().empty()) {
-                    _editor->noBoxEdited();
+                    _editor->noBoxEdited(); /// \todo noBoxEdited() est un public slot. mieux vaux faire appel au mécanisme d'auto-connexion des signaux dans Qt (QMetaObject) que de le garder en attribut de classe (couplage). (par jaime Chao)
                   }
               }
           }
@@ -721,7 +717,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
 
   setCurrentMode(_savedInteractionMode, BoxCreationMode(_savedBoxMode));
 
-  update();
+//  update();
 }
 
 void
@@ -912,8 +908,6 @@ MaquetteScene::pasteBoxes()
 
           newBox->setStartMessages(absCopyBox->startMessages());
           newBox->setEndMessages(absCopyBox->endMessages());
-          newBox->setFirstMessagesToSend(absCopyBox->startMessages()->computeMessages());
-          newBox->setLastMessagesToSend(absCopyBox->endMessages()->computeMessages());
 
           newBox->setSelected(true);
           newBox->centerWidget();
@@ -980,11 +974,27 @@ MaquetteScene::pasteBoxes()
 }
 
 void
+MaquetteScene::muteBoxes()
+{
+    for (int i = 0; i < selectedItems().size(); i++)
+    {
+        QGraphicsItem *curItem = selectedItems().at(i);
+        int type = curItem->type();
+        BasicBox *curBox = static_cast<BasicBox*>(curItem);
+        if (type == PARENT_BOX_TYPE) {
+            curBox = static_cast<BasicBox*>(curItem);
+            curBox->setMuteState(!curBox->getMuteState());
+        }
+    }
+    update();
+}
+
+void
 MaquetteScene::clear()
 {
   selectAll();
   removeSelectedItems();
-  gotoChanged(0);
+  changeTimeOffset(0);
   setModified(true);
 }
 
@@ -1090,7 +1100,7 @@ MaquetteScene::removeTriggerPoint(unsigned int trgID)
 void
 MaquetteScene::trigger(TriggerPoint *triggerPoint)
 {
-  _maquette->simulateTriggeringMessage(static_cast<AbstractTriggerPoint *>(triggerPoint->abstract())->message());
+  _maquette->trigger(triggerPoint);
   removeFromTriggerQueue(triggerPoint);
   triggerPoint->setSelected(false);
 }
@@ -1099,7 +1109,7 @@ void
 MaquetteScene::triggerNext()
 {
    TriggerPoint *triggerPoint = triggersQueueList()->first();
-  _maquette->simulateTriggeringMessage(static_cast<AbstractTriggerPoint *>(triggerPoint->abstract())->message());
+  _maquette->trigger(triggerPoint);
   removeFromTriggerQueue(triggerPoint);
   triggerPoint->setSelected(false);
 }
@@ -1117,14 +1127,14 @@ MaquetteScene::findMother(const QPointF &topLeft, const QPointF &size)
   std::cerr << "MaquetteScene::findMother : child coords : [" << topLeft.x() << ";" << topLeft.y()
             << "] / [" << size.x() << ";" << size.y() << "]" << std::endl;
 #endif
-  map<unsigned int, ParentBox*> parentBoxes = _maquette->parentBoxes(); /// \todo Mieux vaut parcourir les ParentBoxes contenus dans la scene, pas aller les chercher dans Maquette car on perd l'intérêt d'utiliser le Graphics View Framework
+  map<unsigned int, ParentBox*> parentBoxes = _maquette->parentBoxes(); /// \todo Mieux vaut parcourir les ParentBoxes contenus dans la scene, pas aller les chercher dans Maquette car on perd l'intérêt d'utiliser le Graphics View Framework. (par jaime Chao)
 #ifdef DEBUG
   std::cerr << "MaquetteScene::findMother : parentBoxes size : " << parentBoxes.size() << std::endl;
 #endif
   map<unsigned int, ParentBox*>::iterator it;
   unsigned int motherID = ROOT_BOX_ID;
   float motherZValue = std::numeric_limits<float>::min();
-  QRectF childRect = QRectF(topLeft, QSize(size.x(), size.y())); /// \todo
+  QRectF childRect = QRectF(topLeft, QSize(size.x(), size.y())); /// \todo old TODO updated (by jC)
   for (it = parentBoxes.begin(); it != parentBoxes.end(); ++it) {
       QRectF mRect = QRectF(it->second->getTopLeft(), QSize(it->second->getSize().x(), it->second->getSize().y()));
 #ifdef DEBUG
@@ -1156,14 +1166,14 @@ MaquetteScene::addBox(BoxCreationMode mode)
           default:
             std::cerr << "MaquetteScene :: Unknown Box Creation Mode" << std::endl;
 
-            //TODO check this :
+            /// \todo Old TODO updated (by jC) : check this
             boxID = addParentBox();
             update();
             break;
         }
     }
   if (boxID != NO_ID) {
-      setAttributes(static_cast<AbstractBox*>(getBox(boxID)->abstract()));
+      getBox(boxID)->select();
     }
 }
 
@@ -1171,7 +1181,7 @@ unsigned int
 MaquetteScene::addParentBox(unsigned int ID)
 {
   if (ID != NO_ID) {
-      if (_maquette->getBox(ID)->type() == PARENT_BOX_TYPE) { /// \todo Le type des GraphicsItem est mal utilisé !! Voir http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var
+      if (_maquette->getBox(ID)->type() == PARENT_BOX_TYPE) { /// \todo Le type des GraphicsItem est mal utilisé !! Voir http://qt-project.org/doc/qt-4.8/qgraphicsitem.html#UserType-var (par jaime Chao)
           ParentBox *parentBox = static_cast<ParentBox*>(_maquette->getBox(ID));
           parentBox->setPos(parentBox->getCenter());
           parentBox->update();
@@ -1190,7 +1200,7 @@ MaquetteScene::addParentBox(unsigned int ID)
 unsigned int
 MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name)
 {
- /// \todo verify if GraphicsScene provide this method
+ /// \todo verify if GraphicsScene provide this method. (par jaime Chao)
   unsigned int motherID = findMother(topLeft, QPointF(std::fabs(bottomRight.x() - topLeft.x()),
                                                       std::fabs(bottomRight.y() - topLeft.y())));
 
@@ -1322,14 +1332,14 @@ void
 MaquetteScene::changeRelationBounds(unsigned int relID, const float &length, const float &minBound, const float &maxBound)
 {
   Relation *rel = getRelation(relID);
-  if (rel != NULL) {
+  if (rel != NULL) {      
       _maquette->changeRelationBounds(relID, minBound, maxBound);
       rel->changeBounds(minBound, maxBound);
       if (length != NO_LENGTH) {
           AbstractRelation *abRel = static_cast<AbstractRelation*>(rel->abstract());
           float oldLength = abRel->length();
           BasicBox *secondBox = getBox(abRel->secondBox());
-          if (secondBox != NULL) {
+          if (secondBox != NULL) {              
               secondBox->moveBy(length - oldLength, 0.);
               vector<unsigned int> boxMoved;
               boxMoved.push_back(secondBox->ID());
@@ -1369,6 +1379,28 @@ MaquetteScene::removeRelation(unsigned int relID)
       setModified(true);
     }
 }
+
+void
+MaquetteScene::removeConditionalRelation(ConditionalRelation *condRel)
+{
+    if(condRel != NULL)
+    {
+        QList<BasicBox *>::iterator     it;
+        QList<BasicBox *>               boxes = condRel->getBoxes();
+        BasicBox                        *curBox;
+
+        for(it = boxes.begin() ; it!=boxes.end() ; it++)
+        {
+            curBox = *it;
+            curBox->removeConditionalRelation(condRel);
+        }
+
+        removeItem(condRel);
+        Maquette::getInstance()->deleteCondition(condRel->ID());
+        setModified(true);
+    }
+}
+
 
 void
 MaquetteScene::setRelationFirstBox(unsigned int ID, BoxExtremity extremumType)
@@ -1417,6 +1449,8 @@ MaquetteScene::selectionMoved()
           BasicBox *curBox = static_cast<BasicBox*>(curItem);
           boxMoved(curBox->ID());
         }
+      else if (type == CONDITIONAL_RELATION_TYPE){
+      }
     }
 }
 
@@ -1427,9 +1461,9 @@ MaquetteScene::boxMoved(unsigned int boxID)
   Coords coord;
   BasicBox * box = _maquette->getBox(boxID);
   if (box != NULL) {
+
       if (!box->hasMother()) {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x();
-//          std::cout<<"X = "<<coord.topLeftX* MaquetteScene::MS_PER_PIXEL<<std::endl;
         }
       else {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x()
@@ -1440,18 +1474,12 @@ MaquetteScene::boxMoved(unsigned int boxID)
 //      std::cout<<"Y = "<<coord.sizeX* MaquetteScene::MS_PER_PIXEL<<std::endl;
       coord.sizeY = box->boxRect().size().height();
     }
+
   bool ret = _maquette->updateBox(boxID, coord);
 
   if (ret) {
       update();
       setModified(true);
-
-/*		std::cerr << "Box top left coordinates : " << box->mapToScene(box->boundingRect().topLeft()).x() + box->boundingRect().size().width() << std::endl;
- *              std::cerr << "View right max coordinates :" << _view->sceneRect().topLeft().x() + _view->sceneRect().width() << std::endl;*/
-
-      //if (box->mapToScene(box->boundingRect().topLeft()).x() + box->boundingRect().size().width() >= (_view->sceneRect().topLeft().x() + _view->sceneRect().width() - 100)) {
-      //_view->fitInView(box,Qt::KeepAspectRatio);
-      //}
     }
 
   return ret;
@@ -1470,8 +1498,8 @@ MaquetteScene::removeBox(unsigned int boxID)
 {
   BasicBox *box = getBox(boxID);
   if (box != NULL) {
-      if (boxID == _editor->currentBox()) {
-          _editor->noBoxEdited();
+      if (boxID == _editor->currentBox()) { /// \todo Uniquement changer cette méthode publique en slot pour pouvoir découpler MaquetteScene et AttributesEditor. (c'est l'unique appel utile de _editor dans MaquetteScene). (par jaime Chao)
+          _editor->noBoxEdited(); /// \todo noBoxEdited() est un public slot. mieux vaux faire appel au mécanisme d'auto-connexion des signaux dans Qt (QMetaObject) que de le garder en attribut de classe (couplage). (par jaime Chao)
         }
       removeItem(box);
 
@@ -1495,15 +1523,15 @@ MaquetteScene::removeBox(unsigned int boxID)
             }
         }
 
+      box->removeComment();
+      box->removeTriggerPoint(BOX_START);
+      box->removeTriggerPoint(BOX_END);
+      
       vector<unsigned int> removedRelations = _maquette->removeBox(boxID);
       for (vector<unsigned int>::iterator it = removedRelations.begin(); it != removedRelations.end(); it++) {
           removeRelation(*it);
         }
-
-      box->removeComment();
-      box->removeTriggerPoint(BOX_START);
-      box->removeTriggerPoint(BOX_END);
-
+      
       delete box;
       setModified(true);
     }
@@ -1512,15 +1540,15 @@ MaquetteScene::removeBox(unsigned int boxID)
 }
 
 bool
-MaquetteScene::playing() const
-{
-  return _playing;
+MaquetteScene::playing()
+{    
+  return _maquette->isExecutionOn() && !_maquette->isExecutionPaused();
 }
 
 bool
-MaquetteScene::paused() const
+MaquetteScene::paused()
 {
-  return _paused;
+  return _maquette->isExecutionPaused();
 }
 
 void
@@ -1531,8 +1559,8 @@ MaquetteScene::updateStartingTime(int value)
 
 void
 MaquetteScene::setPlaying(unsigned int boxID, bool playing)
-{
-  BasicBox *box = getBox(boxID); /// \todo Besoin d'un cast qt explicite !
+{    
+  BasicBox *box = getBox(boxID); /// \todo Besoin d'un cast qt explicite ! (par jaime Chao)
   map<unsigned int, BasicBox*>::iterator it;
   if ((it = _playingBoxes.find(boxID)) != _playingBoxes.end()) {
       it->second = box;
@@ -1541,14 +1569,16 @@ MaquetteScene::setPlaying(unsigned int boxID, bool playing)
           _playingBoxes.erase(it);
         }
       else {
-          std::cerr << "MaquetteScene::setPlaying : trying to start playing an playing box" << std::endl;
+          std::cerr << "MaquetteScene::setPlaying : trying to start playing on playing box" << std::endl;
         }
     }
   else {
       if (playing) {
           if (box != NULL) {
               _playingBoxes[boxID] = box;
-              box->update();
+//              box->update();
+              if(!_playThread->isRunning())
+                  _playThread->start();
             }
         }
     }
@@ -1556,70 +1586,94 @@ MaquetteScene::setPlaying(unsigned int boxID, bool playing)
 
 void
 MaquetteScene::updatePlayingBoxes()
-{
+{    
   map<unsigned int, BasicBox*>::iterator it;
 
   for (it = _playingBoxes.begin(); it != _playingBoxes.end(); ++it) {
       it->second->update();
+
+      //Recording curves
+//      if(it->second->recording()){
+//          QList<std::string> recMsgs = static_cast<AbstractBox *>(it->second->abstract())->messagesToRecord();
+//          for(int i=0 ; i<recMsgs.size() ; i++)
+//              it->second->updateCurve(recMsgs.at(i),true);
+//      }
     }
 }
 
 void
-MaquetteScene::play()
+MaquetteScene::playOrResume()
 {
-  displayMessage(tr("Playing ...").toStdString(), INDICATION_LEVEL);
-  if (_paused) {
-      _playing = true;
-      _maquette->setAccelerationFactor(_accelerationFactor);
-      _maquette->startPlaying();
-      _playThread->start();
-      _paused = false;
+    displayMessage(tr("Playing ...").toStdString(), INDICATION_LEVEL);
+    
+    _maquette->setAccelerationFactor(_accelerationFactor);
+
+    if (_maquette->isExecutionPaused())        
+        _maquette->resumeExecution();    
+    else
+        _maquette->turnExecutionOn();
+
+    _playThread->start();
+    _startingValue = _maquette->getTimeOffset();
+    
+    emit(playModeChanged());
+}
+
+void
+MaquetteScene::playOrResume(QList<unsigned int> boxesId)
+{
+    for(QList<unsigned int>::iterator it=boxesId.begin(); it!=boxesId.end(); it++){        
+        _maquette->turnExecutionOn(*it);//TODO
     }
-  else {
-      _playing = true;
-      _maquette->startPlaying();
-      _playThread->start();
-      _startingValue = _view->gotoValue();
-    }  
-  emit(playModeChanged());
+    _playThread->start();
 }
 
 void
-MaquetteScene::pause()
+MaquetteScene::stopOrPause()
 {
-  displayMessage(tr("Paused").toStdString(), INDICATION_LEVEL);
-  _playing = false;
-  _paused = true;
-  _maquette->pause();
-  _playThread->quit();
-  _accelerationFactorSave = _maquette->accelerationFactor();
-  _maquette->setAccelerationFactor(0.);
-  update();
-  emit(playModeChanged());
-}
-
-
-void
-MaquetteScene::stop()
-{
-  _playing = false;
-  _maquette->stopPlaying();
-  _playThread->quit();
-  _playingBoxes.clear();
-  update();
-  emit(playModeChanged());
+    if (!_maquette->isExecutionPaused()){
+        _maquette->pauseExecution();
+        emit(playModeChanged());
+    }
+    else {
+        _playThread->quit();
+        _maquette->turnExecutionOff();
+        emit(playModeChanged());
+        emit(updateRecordingBoxes());
+        _playingBoxes.clear();        
+    }        
 }
 
 void
-MaquetteScene::stopWithGoto()
+MaquetteScene::stopOrPause(QList<unsigned int> boxesId)
 {
-  displayMessage(tr("Stopped").toStdString(), INDICATION_LEVEL);
-  _playing = false;
-  _maquette->stopPlayingWithGoto();
-  _playThread->quit();
-  _playingBoxes.clear();
-  update();
-  emit(playModeChanged());
+    _playThread->quit();
+    for(QList<unsigned int>::iterator it=boxesId.begin(); it!=boxesId.end(); it++){
+        _maquette->turnExecutionOff(*it);
+    }
+}
+
+void
+MaquetteScene::stopAndGoToTimeOffset(unsigned int timeOffset)
+{
+    displayMessage(tr("Stopped").toStdString(), INDICATION_LEVEL);
+
+    _playThread->quit();
+    _maquette->stopPlayingAndGoToTimeOffset(timeOffset);    
+    emit(playModeChanged());
+    _playingBoxes.clear();            
+}
+
+void
+MaquetteScene::stopAndGoToCurrentTime()
+{
+    displayMessage(tr("Stopped").toStdString(), INDICATION_LEVEL);
+    
+    _maquette->stopPlayingAndGoToCurrentTime();
+    _playThread->quit();
+    emit(playModeChanged());
+    emit(updateRecordingBoxes());
+    _playingBoxes.clear();           
 }
 
 void
@@ -1637,18 +1691,31 @@ MaquetteScene::speedChanged(double value)
 }
 
 void
-MaquetteScene::stopGotoStart()
+MaquetteScene::stopAndGoToStart()
 {
-  displayMessage(tr("Stopped and go to start").toStdString(), INDICATION_LEVEL);
-  _playing = false;
-  _paused = false;
-  _maquette->setAccelerationFactor(1.);
-  emit(accelerationValueChanged(1.));
-  _maquette->stopPlayingGotoStart();
-  _playThread->quit();
-  _playingBoxes.clear();
-  update();
-  emit(playModeChanged());
+    bool updateRecBoxes = false;
+    if(_maquette->isExecutionOn())
+        updateRecBoxes = true;
+
+    displayMessage(tr("Stopped and go to start").toStdString(), INDICATION_LEVEL);
+    
+    _maquette->setAccelerationFactor(1.);
+    emit(accelerationValueChanged(1.));
+    _playThread->quit();
+    _playingBoxes.clear();
+    _maquette->stopPlayingAndGoToStart();
+
+    //send root box start messages
+    std::vector<std::string> startCue = _maquette->getBox(ROOT_BOX_ID)->getStartMessages();
+    for(int i=0; i<startCue.size(); i++)
+        sendMessage(startCue.at(i));
+
+    update();
+    
+    emit(playModeChanged());
+
+    if(updateRecBoxes)
+        emit(updateRecordingBoxes());
 }
 
 void
@@ -1676,6 +1743,9 @@ MaquetteScene::removeSelectedItems()
       else if ((*it)->type() == TRIGGER_POINT_TYPE) {
           removeTriggerPoint(static_cast<TriggerPoint*>(*it)->ID());
         }
+      else if ((*it)->type() == CONDITIONAL_RELATION_TYPE) {
+          removeConditionalRelation(static_cast<ConditionalRelation*>(*it));
+        }
     }
   map<unsigned int, BasicBox*>::iterator boxIt;
   for (boxIt = boxesToRemove.begin(); boxIt != boxesToRemove.end(); ++boxIt) {
@@ -1685,11 +1755,14 @@ MaquetteScene::removeSelectedItems()
 }
 
 void
-MaquetteScene::timeEndReached()
+MaquetteScene::updatePlayModeView()
 {
-  _playing = false;
-  emit(playModeChanged());
-  update();
+    view()->updateTimeOffsetView();
+    
+    update();
+    
+    emit(playModeChanged());
+    emit(updateRecordingBoxes());
 }
 
 bool
@@ -1716,7 +1789,7 @@ MaquetteScene::load(const string &fileName)
 {
   _maquette->load(fileName);
   setModified(false);
-  updateBoxesWidgets();
+  updateBoxesWidgets();  
 }
 
 void
@@ -1724,12 +1797,16 @@ MaquetteScene::updateBoxesWidgets()
 {
   std::map<unsigned int, BasicBox*>::iterator it;
   std::map<unsigned int, BasicBox*> boxes = _maquette->getBoxes();
+  unsigned int currentBoxSave = _editor->currentBox();
+
   for (it = boxes.begin(); it != boxes.end(); it++) {
       unsigned int boxID = it->first;
+      static_cast<AbstractBox*>(getBox(boxID)->abstract())->clearMessages();      
       if (boxID != NO_ID) {
           setAttributes(static_cast<AbstractBox*>(getBox(boxID)->abstract()));
         }
     }
+    _editor->setBoxEdited(currentBoxSave); //Because setAttributes changes currentBoxEdited value. And the edited box became an unselected one.
 }
 
 void
@@ -1764,4 +1841,64 @@ MaquetteScene::setMaxSceneWidth(float maxSceneWidth){
 float
 MaquetteScene::getMaxSceneWidth(){
   return _maxSceneWidth;
+}
+
+void
+MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
+{
+    QList<BasicBox *>::iterator     it = boxesToCondition.begin();
+    BasicBox                        *box,
+                                    *earliestBox = *it;
+    unsigned int                    earliestDate = earliestBox->date();
+    bool                            conditionalRelationFound = false;
+    ConditionalRelation             *condRel;
+
+
+    //Check if all boxes have a trigger point on start and force to move to the same date.
+    //Check if boxes have to be simply attached to an existing conditional relation, else create a new one.
+    for(it ; it!=boxesToCondition.end() ; it++)
+    {
+        box = *it;
+
+        if(!box->hasTriggerPoint(BOX_START)) //Force trigger point creation
+            box->addTriggerPoint(BOX_START);
+
+        if(box->isConditioned()) // Check if a conditional relation is already attached to a box, to create or not a new one.
+        {
+            conditionalRelationFound = true;
+            condRel = box->getConditionalRelations().first();
+        }
+
+        //Find the earliest box
+        if(box->date()<earliestDate){
+            earliestBox = box;
+            earliestDate = box->date();
+        }
+    }
+
+    //Force boxes to move to the earliest box date.
+    /// \todo This is provisional, has to be done automatically by Score. NH
+    for(it=boxesToCondition.begin() ; it!=boxesToCondition.end() ; it++)
+    {
+        box = *it;
+        box->moveBy((qreal)(earliestDate/MS_PER_PIXEL) -(qreal)(box->date() / MS_PER_PIXEL), 0.);
+        boxMoved(box->ID());
+    }
+
+    if(conditionalRelationFound) //just attach boxes to existing relation
+    {
+        condRel->attachBoxes(boxesToCondition);
+    }
+    else //create a new one
+    {
+        condRel = new ConditionalRelation(boxesToCondition, this);
+    }    
+}
+
+void
+MaquetteScene::unselectAll(){
+    QList<QGraphicsItem *> items = selectedItems();
+    QList<QGraphicsItem *>::iterator it;
+    for(it = items.begin(); it != items.end() ; it++)
+        (*it)->setSelected(false);
 }

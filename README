@@ -1,7 +1,8 @@
-i-score is an interactive intermedia sequencer - read more at https://github.com/nicolashincker/i-score/wiki/What-is-i_score        
+i-score is an interactive intermedia sequencer - read more on http://i-score.org/
 
-i-score currently builds only on MacOS - Linux builds have been achieved in a former version, but they have not been tested lately, so we don't guarantee that it will work 
+In order to build i-score, follow the instructions in INSTALL.txt.
+Current builds tested on Mac OS X 10.9 and Debian GNU/Linux.
 
-in order to build i-score, follow the instructions in INSTALL.txt
+An installer is available on http://i-score.org/
 
-no installer is available yet (planned for late december 2012)
+A set of interfaces with the Minuit protocol are available for various multimedia environments at https://github.com/Minuit/minuit

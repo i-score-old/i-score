@@ -1,15 +1,17 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
+ *
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -181,7 +183,7 @@ Relation::updateCoordinates()
   if (box != NULL) {
       switch (_abstract->firstExtremity()) {
           case BOX_START:
-            _start = box->getLeftGripPoint();
+            _start = box->getLeftGripPoint();            
             break;
 
           case BOX_END:
@@ -258,7 +260,7 @@ Relation::setID(unsigned int ID)
 
 void
 Relation::changeBounds(const float &minBound, const float &maxBound)
-{
+{    
   _abstract->setMinBound(minBound);
   _abstract->setMaxBound(maxBound);
 }
@@ -394,7 +396,7 @@ Relation::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
           changeBounds(_abstract->minBound(), NO_BOUND);
           _scene->changeRelationBounds(_abstract->ID(), NO_LENGTH, _abstract->minBound(), NO_BOUND);
         }
-
+      update();
 //        else{
 //          RelationEdit * relEdit = new RelationEdit(_scene,_abstract->ID(),_scene->views().first());
 //          relEdit->move(mapToScene(boundingRect().topLeft()).x(),mapToScene(boundingRect().topLeft()).y());
@@ -412,10 +414,10 @@ Relation::mousePressEvent(QGraphicsSceneMouseEvent * event)
   if (!_scene->playing()) {
       if (cursor().shape() == Qt::SplitHCursor) {
           double startX = mapFromScene(_start).x();
-          double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
+          double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();          
 
           double startBound = startX;
-          if (_abstract->minBound() != NO_BOUND) {
+          if (_abstract->minBound() != NO_BOUND) {              
               startBound = startX + _abstract->minBound() * _scene->zoom();
             }
 
@@ -424,7 +426,8 @@ Relation::mousePressEvent(QGraphicsSceneMouseEvent * event)
               endBound = startX + _abstract->maxBound() * _scene->zoom();
             }
 
-          if (QRectF(startX + (endX - startX) / 2 - HANDLE_WIDTH / 2, endY - HANDLE_HEIGHT / 2, HANDLE_WIDTH, HANDLE_HEIGHT).contains(event->pos())) {
+          /// \todo : Le QRectF middleHandle devrait être en attribut. NH
+          if (!_flexibleRelation && QRectF(startX + (endX - startX) / 2 - HANDLE_WIDTH / 2, endY - HANDLE_HEIGHT / 2, HANDLE_WIDTH, HANDLE_HEIGHT).contains(event->pos())) {
               _middleHandleSelected = true;
               _mouseClickPosSave = event->pos();
             }
@@ -446,12 +449,13 @@ Relation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
   double startX = mapFromScene(_start).x();
 
   if (_leftHandleSelected) {
-      changeBounds(_abstract->maxBound() == NO_BOUND ? std::max(eventPosX - startX, 0.) : std::min((float)std::max(eventPosX - startX, 0.), _abstract->maxBound()), _abstract->maxBound());
+      changeBounds(_abstract->maxBound() == NO_BOUND ? std::max(eventPosX - startX, 0.) : std::min((float)std::max((eventPosX - startX)/_scene->zoom(), 0.), _abstract->maxBound()),
+                   _abstract->maxBound());
       _scene->changeRelationBounds(_abstract->ID(), NO_LENGTH, _abstract->minBound(), _abstract->maxBound());
       update();
     }
   else if (_rightHandleSelected) {
-      _scene->changeRelationBounds(_abstract->ID(), NO_LENGTH, _abstract->minBound(), std::max((float)std::max(eventPosX - startX, 0.), _abstract->minBound()));
+      _scene->changeRelationBounds(_abstract->ID(), NO_LENGTH, _abstract->minBound(), std::max((float)std::max((eventPosX - startX)/_scene->zoom(), 0.), _abstract->minBound()));
       update();
     }
   else if (_middleHandleSelected) {
@@ -526,8 +530,6 @@ Relation::shape() const
       path.lineTo(endBound - HANDLE_WIDTH / 2, endY - HANDLE_HEIGHT / 2);
     }
 
-
-
   return path;
 }
 
@@ -549,7 +551,6 @@ Relation::updateFlexibility()
   else {
       _flexibleRelation = false;
     }
-
 
   double startX = mapFromScene(_start).x();
   double endX = mapFromScene(_end).x();
@@ -624,8 +625,8 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
   //----------------------- Flexible relation --------------------------//
   if (_flexibleRelation) {
-      /************ Draw relation ************/
 
+      /************ Draw relation ************/
       painter->setPen(solidLine);
 
       //Horizontal : Point to box
@@ -677,11 +678,6 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
       if (_abstract->maxBound() != NO_BOUND) {
           drawRail(painter, startBound, endBound);
         }
-
-//        painter->drawLine(startBound,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX - GRIP_CIRCLE_SIZE, endY);
-
-//        painter->setPen(solidLine);
-//        painter->drawLine(endBound,endY,_abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE/2 : endX - GRIP_CIRCLE_SIZE, endY);
     }
 
 
@@ -715,9 +711,7 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
           handlePen.setColor(isSelected() ? _color : Qt::black);
           painter->setPen(handlePen);
           painter->drawLine(startX + (endX - startX) / 2, endY - HANDLE_HEIGHT / 2, startX + (endX - startX) / 2, endY + HANDLE_HEIGHT / 2);
-
-//            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,(endX-startX)/_scene->zoom(),(endX-startX)/_scene->zoom()+RIGID_TOLERANCE);
-        }
+      }
       else {
           double handleZone = 10;
           painter->drawLine(startX, endY, startX + (endX - startX) / 2 - handleZone, endY);
@@ -725,8 +719,6 @@ Relation::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
           painter->drawLine(startX + (endX - startX) / 2 - handleZone, endY, startX + (endX - startX) / 2 + handleZone, endY);
           painter->setPen(solidLine);
           painter->drawLine(startX + (endX - startX) / 2 + handleZone, endY, _abstract->secondExtremity() == BOX_END ? endX + GRIP_CIRCLE_SIZE / 2 : endX - GRIP_CIRCLE_SIZE, endY);
-
-//            _scene->changeRelationBounds(_abstract->ID(),NO_LENGTH,NO_BOUND,NO_BOUND);
         }
     }
 }

@@ -38,7 +38,7 @@
  */
 #include "NetworkMessages.hpp"
 #include "Maquette.hpp"
-#include <Qmap>
+#include <QMap>
 #include <set>
 #include <sstream>
 #include <limits>
@@ -57,48 +57,63 @@ NetworkMessages::NetworkMessages()
   init();
 }
 
-NetworkMessages::NetworkMessages(QMap<QTreeWidgetItem *, Message> *msgs)
+NetworkMessages::NetworkMessages(QMap<QTreeWidgetItem *, Message> msgs)
 {
-  _messages = new QMap<QTreeWidgetItem *, Message>(*msgs);
+  _messages = QMap<QTreeWidgetItem *, Message>(msgs);
 }
 
 void
 NetworkMessages::init()
 {
-  _messages = new QMap<QTreeWidgetItem *, Message>();
+  _messages = QMap<QTreeWidgetItem *, Message>();
 }
 
 NetworkMessages::~NetworkMessages()
-{
-  _messages->clear();
+{  
 }
 
 
 void
 NetworkMessages::clear()
 {
-  _messages->clear();
+  _messages.clear();
   emit(messagesChanged());
 }
 
 void
 NetworkMessages::clearDevicesMsgs(QList<QString> devices)
 {
-  QList<QTreeWidgetItem *> messagesList = _messages->keys();
+  QList<QTreeWidgetItem *> messagesList = _messages.keys();
   QList<QTreeWidgetItem *>::iterator it;
   QTreeWidgetItem *curItem;
   Message curMsg;
+  vector<string> attributesValues;
+  string nodeType;
+  string address;
 
   for (it = messagesList.begin(); it != messagesList.end(); it++) {
       curItem = *it;
-      curMsg = _messages->value(curItem);
+      curMsg = _messages.value(curItem);
+      address = computeMessageWithoutValue(curMsg);
+
       if (devices.contains(curMsg.device)) {
-          _messages->remove(curItem);
+
+          //we don't remove messages and preset manager
+          if(Maquette::getInstance()->requestObjectAttribruteValue(address,"service",attributesValues) > 0){
+              if(attributesValues[0]=="message")
+                  ;
+          }
+          else if(Maquette::getInstance()->getObjectType(address,nodeType)>0){
+              if(nodeType=="PresetManager")
+                  ;
+          }
+          else
+              _messages.remove(curItem);
         }
     }
 }
 
-QMap<QTreeWidgetItem *, Message> *
+QMap<QTreeWidgetItem *, Message>
 NetworkMessages::getMessages()
 {
   return _messages;
@@ -168,7 +183,7 @@ NetworkMessages::toMapAddressValue()
   QMap<QString, QString> messages;
   QMap<QTreeWidgetItem *, Message>::iterator it;
 
-  for (it = _messages->begin(); it != _messages->end(); it++) {
+  for (it = _messages.begin(); it != _messages.end(); it++) {
       address = QString::fromStdString(computeMessageWithoutValue(*it));
       messages.insert(address, (*it).value);
     }
@@ -203,10 +218,10 @@ NetworkMessages::computeMessages()
 {
   vector<string> msgs;
   QMap<QTreeWidgetItem *, Message>::iterator it;
-  for (it = _messages->begin(); it != _messages->end(); it++) {
-      string lineMsg = computeMessage(*it);
+  for (it = _messages.begin(); it != _messages.end(); it++) {      
+      string lineMsg = computeMessage(*it);            
       if (lineMsg != "") {
-          msgs.push_back(lineMsg);
+          msgs.push_back(lineMsg);          
         }
       else {
           std::cerr << "NetworkMessages::computeMessages : bad message ignored" << std::endl;
@@ -218,15 +233,15 @@ NetworkMessages::computeMessages()
 void
 NetworkMessages::changeMessage(QTreeWidgetItem *item, QString newName)
 {
-  QMap<QTreeWidgetItem *, Message>::iterator it = _messages->find(item);
+  QMap<QTreeWidgetItem *, Message>::iterator it = _messages.find(item);
   Message msg;
 
-  if (it != _messages->end()) {
+  if (it != _messages.end()) {
       msg = it.value();
       newName.push_front("/");
       msg.message = newName;
-      _messages->remove(item);
-      _messages->insert(item, msg);
+      _messages.remove(item);
+      _messages.insert(item, msg);
 
       //print
 //        std::vector<std::string> list = computeMessages();
@@ -247,28 +262,28 @@ NetworkMessages::changeDevice(QString oldName, QString newName)
   QTreeWidgetItem *curItem;
   Message msg;
 
-  for (it = _messages->begin(); it != _messages->end(); it++) {
+  for (it = _messages.begin(); it != _messages.end(); it++) {
       curItem = it.key();
       msg = it.value();
       if (msg.device == oldName) {
           msg.device = newName;
-          _messages->remove(curItem);
-          _messages->insert(curItem, msg);
+          _messages.remove(curItem);
+          _messages.insert(curItem, msg);
         }
     }
 }
 
 void
-NetworkMessages::addMessage(QTreeWidgetItem *treeItem, const QString &device, const QString &message, const QString &value)
+NetworkMessages::addMessageLong(QTreeWidgetItem *treeItem, const QString &device, const QString &message, const QString &value)
 {
-  Message msg = { device, message, value };
-  _messages->insert(treeItem, msg);
+    Message msg = { device, message, value };
+    _messages.insert(treeItem, msg);
 }
 
 void
 NetworkMessages::removeMessage(QTreeWidgetItem *item)
 {
-  _messages->remove(item);
+  _messages.remove(item);
 }
 
 void
@@ -278,7 +293,7 @@ NetworkMessages::setMessages(const QList < QPair<QTreeWidgetItem *, Message> > m
   QPair<QTreeWidgetItem *, Message> curPair;
   for (it = messagesList.begin(); it != messagesList.end(); it++) {
       curPair = *it;
-      addMessage(curPair.first, curPair.second.device, curPair.second.message, curPair.second.value);
+      addMessageLong(curPair.first, curPair.second.device, curPair.second.message, curPair.second.value);
     }
 }
 
@@ -288,7 +303,6 @@ NetworkMessages::setMessages(const QMap<QTreeWidgetItem *, Data> messagesList)
   QList<QTreeWidgetItem *> itemsList = messagesList.keys();
   QList<QTreeWidgetItem *>::iterator it;
   QTreeWidgetItem *item;
-
   unsigned int msgsCount = 0;
 
   for (it = itemsList.begin(); it != itemsList.end(); it++) {
@@ -309,7 +323,7 @@ NetworkMessages::setMessages(const QMap<QTreeWidgetItem *, Data> messagesList)
                           QString Qmsg = QString::fromStdString(msg);
                           QString Qdevice = QString::fromStdString(device);
                           QString Qvalue = QString::fromStdString(value);
-                          addMessage(item, Qdevice, Qmsg, Qvalue);
+                          addMessageLong(item, Qdevice, Qmsg, Qvalue);
                           msgsCount++;
                         }
                       else {
@@ -361,7 +375,7 @@ NetworkMessages::setMessages(const QList < QPair<QTreeWidgetItem *, QString> > m
                           QString Qmsg = QString::fromStdString(msg);
                           QString Qdevice = QString::fromStdString(device);
                           QString Qvalue = QString::fromStdString(value);
-                          addMessage(item, Qdevice, Qmsg, Qvalue);
+                          addMessageLong(item, Qdevice, Qmsg, Qvalue);
                           msgsCount++;
                         }
                       else {
@@ -386,7 +400,7 @@ NetworkMessages::setMessages(const QList < QPair<QTreeWidgetItem *, QString> > m
 }
 
 void
-NetworkMessages::addMessage(QTreeWidgetItem *item, QString address)
+NetworkMessages::addMessageSimple(QTreeWidgetItem *item, QString address)
 {
   unsigned int msgsCount = 0;
   string msg = address.toStdString();
@@ -405,7 +419,7 @@ NetworkMessages::addMessage(QTreeWidgetItem *item, QString address)
                       QString Qmsg = QString::fromStdString(msg);
                       QString Qdevice = QString::fromStdString(device);
                       QString Qvalue = QString::fromStdString(value);
-                      addMessage(item, Qdevice, Qmsg, Qvalue);
+                      addMessageLong(item, Qdevice, Qmsg, Qvalue);
                       msgsCount++;
                     }
                   else {
@@ -457,7 +471,7 @@ NetworkMessages::addMessages(const QList < QPair<QTreeWidgetItem *, QString> > m
                           QString Qmsg = QString::fromStdString(msg);
                           QString Qdevice = QString::fromStdString(device);
                           QString Qvalue = QString::fromStdString(value);
-                          addMessage(item, Qdevice, Qmsg, Qvalue);
+                          addMessageLong(item, Qdevice, Qmsg, Qvalue);
                           msgsCount++;
                         }
                       else {
@@ -484,10 +498,10 @@ NetworkMessages::addMessages(const QList < QPair<QTreeWidgetItem *, QString> > m
 bool
 NetworkMessages::setValue(QTreeWidgetItem *item, QString newValue)
 {
-  if (_messages->contains(item)) {
-      Message newMsg = _messages->value(item);
+  if (_messages.contains(item)) {
+      Message newMsg = _messages.value(item);
       newMsg.value = newValue;
-      _messages->insert(item, newMsg);
+      _messages.insert(item, newMsg);
       return true;
     }
   else {
@@ -505,10 +519,10 @@ NetworkMessages::setDeviceMessages(QString deviceName, QMap<QTreeWidgetItem *, M
   QMap<QTreeWidgetItem *, Message>::iterator it;
   Message curMsg;
 
-  for (it = _messages->begin(); it != _messages->end(); it++) {
+  for (it = _messages.begin(); it != _messages.end(); it++) {
       curMsg = *it;
       if (curMsg.device == deviceName) {
-          _messages->erase(it);
+          _messages.erase(it);
         }
     }
 }

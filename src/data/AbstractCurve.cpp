@@ -1,15 +1,17 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
+ *
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -51,13 +53,12 @@ AbstractCurve::AbstractCurve(unsigned int boxID, const std::string &address, uns
                              unsigned int sampleRate, bool redundancy, bool show, bool interpolate, float lastPointCoeff, const vector<float> &curve,
                              const map<float, pair<float, float> > &breakpoints) :
   _boxID(boxID), _address(address), _argPosition(argPosition), _sampleRate(sampleRate), _redundancy(redundancy), _show(show),
-  _interpolate(interpolate), _lastPointCoeff(lastPointCoeff), _curve(curve), _breakpoints(breakpoints)
+  _interpolate(interpolate), _curve(curve), _breakpoints(breakpoints)
 {}
 
 AbstractCurve::AbstractCurve(const AbstractCurve &other) :
   Abstract(), _boxID(other._boxID), _address(other._address), _argPosition(other._argPosition),
-  _sampleRate(other._sampleRate), _redundancy(other._redundancy), _show(other._show), _interpolate(other._interpolate),
-  _lastPointCoeff(other._lastPointCoeff), _curve(other._curve), _breakpoints(other._breakpoints)
+  _sampleRate(other._sampleRate), _redundancy(other._redundancy), _show(other._show), _interpolate(other._interpolate), _curve(other._curve), _breakpoints(other._breakpoints)
 {}
 
 int

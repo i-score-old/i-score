@@ -1,15 +1,16 @@
 /*
- * Copyright: LaBRI / SCRIME
+ * Copyright: LaBRI / SCRIME / L'Arboretum
  *
- * Authors: Luc Vercellin and Bruno Valeze (08/03/2010)
+ * Authors: Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine (as of 16/03/2014)
  *
- * luc.vercellin@labri.fr
+ * iscore.contact@gmail.com
  *
- * This software is a computer program whose purpose is to provide
- * notation/composition combining synthesized as well as recorded
- * sounds, providing answers to the problem of notation and, drawing,
- * from its very design, on benefits from state of the art research
- * in musicology and sound/music computing.
+ * This software is an interactive intermedia sequencer.
+ * It allows the precise and flexible scripting of interactive scenarios.
+ * In contrast to most sequencers, i-score doesn’t produce any media, 
+ * but controls other environments’ parameters, by creating snapshots 
+ * and automations, and organizing them in time in a multi-linear way.
+ * More about i-score on http://www.i-score.org
  *
  * This software is governed by the CeCILL license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -58,8 +59,10 @@ using std::string;
 using std::map;
 
 
-enum { NodeNamespaceType = QTreeWidgetItem::UserType + 1, NodeNoNamespaceType = QTreeWidgetItem::UserType + 2,
-       LeaveType = QTreeWidgetItem::UserType + 3, AttributeType = QTreeWidgetItem::UserType + 4, OSCNamespace = QTreeWidgetItem::UserType + 5, OSCNode = QTreeWidgetItem::UserType + 6, addOSCNode = QTreeWidgetItem::UserType + 7 };
+enum { DeviceNode = QTreeWidgetItem::UserType + 1, NodeNoNamespaceType = QTreeWidgetItem::UserType + 2,
+       LeaveType = QTreeWidgetItem::UserType + 3, AttributeType = QTreeWidgetItem::UserType + 4,
+       OSCNamespace = QTreeWidgetItem::UserType + 5, OSCNode = QTreeWidgetItem::UserType + 6, addOSCNode = QTreeWidgetItem::UserType + 7,
+       MessageType = QTreeWidgetItem::UserType + 8, addDeviceNode = QTreeWidgetItem::UserType + 9};
 
 
 
@@ -69,7 +72,7 @@ class NetworkTree : public QTreeWidget
 
   public:
     NetworkTree(QWidget * parent = 0);
-
+    ~NetworkTree();
     void load();
 
     void init();
@@ -175,12 +178,15 @@ class NetworkTree : public QTreeWidget
     void clearDevicesEndMsgs(QList<QString> devices);
 
     /*!
-     * \brief Checks item's messages, to knows if start and end messages are set.
+     * \brief Checks item's messages, to knows if start or end messages are set.
      * \param The item we want to check.
      * \return True if start and end messages are set.
      */
     bool hasStartEndMsg(QTreeWidgetItem *item);
+    bool hasStartMsg(QTreeWidgetItem *item);
+    bool hasEndMsg(QTreeWidgetItem *item);
 
+    
     /***********************************************************************
     *                       General display tools
     ***********************************************************************/
@@ -208,7 +214,7 @@ class NetworkTree : public QTreeWidget
      * \brief Clears a columns.
      * \param column : the column numero.
      */
-    void clearColumn(unsigned int column);
+    void clearColumn(unsigned int column, bool fullCleaning = true);
 
     /*!
      * \brief Expands items.
@@ -249,7 +255,7 @@ class NetworkTree : public QTreeWidget
     void expandItems(QList<QTreeWidgetItem*> expandedItems);
 
     /*!
-     * \brief Loads assigned items and messages' value, from the _firstMsgs and _lastMsgs of the abstract box.
+     * \brief Loads assigned items and messages' value requesting engine.
      * \param abBox : The abstractBox.
      */
     void loadNetworkTree(AbstractBox *abBox);
@@ -339,6 +345,8 @@ class NetworkTree : public QTreeWidget
     inline void
     removeAssignItem(QTreeWidgetItem* item){ _assignedItems.remove(item); }
 
+    inline bool
+    treeFilterActive(){return _treeFilterActive;}
     /*!
      * \brief Reset the display of assigned items (leaves) and clear the assigned items list.
      */
@@ -375,20 +383,30 @@ class NetworkTree : public QTreeWidget
     virtual void keyPressEvent(QKeyEvent *event);
     virtual void keyReleaseEvent(QKeyEvent *event);
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
 
     static int NAME_COLUMN;
     static int VALUE_COLUMN;
-    static int START_COLUMN;
+    static int START_COLUMN;	
     static int END_COLUMN;
     static int INTERPOLATION_COLUMN;
     static int REDUNDANCY_COLUMN;
     static int SR_COLUMN;
+    static int TYPE_COLUMN;
+    static int MIN_COLUMN;
+    static int MAX_COLUMN;
+    static unsigned int PRIORITY_COLUMN;
     static QString OSC_ADD_NODE_TEXT;
+    static QString ADD_A_DEVICE_TEXT;
     static unsigned int TEXT_POINT_SIZE;
+    static const QColor TEXT_COLOR;
+    static const QColor TEXT_DISABLED_COLOR;
 
     bool VALUE_MODIFIED;
     bool SR_MODIFIED;
     bool NAME_MODIFIED;
+    bool MIN_MODIFIED;
+    bool MAX_MODIFIED;
 
   signals:
     void startValueChanged(QTreeWidgetItem *, QString newValue);
@@ -407,11 +425,20 @@ class NetworkTree : public QTreeWidget
     void messageChanged(QTreeWidgetItem *item, QString address);
     void deviceChanged(QString oldName, QString newName);
     void pluginChanged(QString deviceName);
-    void cmdKeyStateChanged(bool);
+    void rangeBoundMinChanged(QTreeWidgetItem *item, float newValue);
+    void rangeBoundMaxChanged(QTreeWidgetItem *item, float newValue);
+    void recModeChanged(QTreeWidgetItem *item);
 
   private:
-    void treeRecursiveExploration(QTreeWidgetItem *curItem, bool onflict);
+    void treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict);
     void createOCSBranch(QTreeWidgetItem *curItem);
+    QTreeWidgetItem *addADeviceNode();
+
+    /*!
+      * \brief Adds a top level item, with a deviceNode type.
+      * \param name : the new device's name.
+      */
+    QTreeWidgetItem *addDeviceItem(QString name);
 
 
     /***********************************************************************
@@ -462,7 +489,9 @@ class NetworkTree : public QTreeWidget
     }
     void assignPartially(QTreeWidgetItem *item);
     void unassignPartially(QTreeWidgetItem *item);
-    void unassignItem(QTreeWidgetItem *item);
+    void unassignItem(QTreeWidgetItem *item, bool recursive=true);
+    void setUnassignedStyle(QTreeWidgetItem *item);
+
     inline void
     addNodeTotallyAssigned(QTreeWidgetItem *item)
     {
@@ -492,21 +521,36 @@ class NetworkTree : public QTreeWidget
     NetworkMessages *_endMessages;
     NetworkMessages *_OSCStartMessages;
     NetworkMessages *_OSCEndMessages;
+    QList<QTreeWidgetItem *> _recMessages;
     QMap<QTreeWidgetItem *, QString> _OSCMessages;
+    QTreeWidgetItem *_addADeviceItem;
 
     int _OSCMessageCount;
+    bool _treeFilterActive;
+    bool _recMode;
 
-    DeviceEdit *_deviceEdit;
+    DeviceEdit *_deviceEdit;  
 
   public slots:
+    /*!
+      * \brief Rebuild the networkTree under the item (or currentItem by default), after asking the engine to refresh its namespace.
+      * \param The application we want to refresh.
+      */
+    void refreshItemNamespace(QTreeWidgetItem *item);
+    void refreshCurrentItemNamespace();
+    void deleteCurrentItemNamespace();
     void itemCollapsed();
     void clickInNetworkTree(QTreeWidgetItem *item, int column);
     void valueChanged(QTreeWidgetItem* item, int column);
     void changeStartValue(QTreeWidgetItem* item, QString newValue);
     void changeEndValue(QTreeWidgetItem* item, QString newValue);
     void changeNameValue(QTreeWidgetItem* item, QString newValue);
-    void updateDeviceName(QString newName, QString plugin);
-    void updateDevicePlugin(QString newName);
+    void updateDeviceName(QString oldName, QString newName);
+    void addNewDevice(QString deviceName);
+    void updateDeviceProtocol(QString newName);
+    void updateDeviceNamespace(QString deviceName);
+    void setRecMode(std::string address);
+    void setRecMode(QList<std::string> items);
 
     virtual void clear();
 };
