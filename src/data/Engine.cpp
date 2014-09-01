@@ -219,7 +219,7 @@ TimeProcessId Engine::cacheTimeProcess(TTObject& timeProcess, TTAddress& anAddre
     e->subScenario = subScenario;
     
     TTValue out, args = TTValue(e->address, e->object);
-    m_iscore.send("RegisterObject", args, out);
+    m_iscore.send("ObjectRegister", args, out);
     
     id = m_nextTimeProcessId;
     m_timeProcessMap[id] = e;
@@ -298,7 +298,7 @@ void Engine::uncacheTimeProcess(TimeProcessId boxId)
     uncacheEndCallback(boxId);
     
     TTValue out;
-    m_iscore.send("UnregisterObject", e->address, out);
+    m_iscore.send("ObjectUnregister", e->address, out);
     
     delete e;
     m_timeProcessMap.erase(boxId);
@@ -1082,7 +1082,7 @@ bool Engine::getBoxMuteState(TimeProcessId boxId)
 
 void Engine::setBoxName(TimeProcessId boxId, string name)
 {
-    TTSymbol    oldName, newName;
+    TTSymbol oldName, newName;
     
     getTimeProcess(boxId).get("name", oldName);
     
@@ -1091,10 +1091,12 @@ void Engine::setBoxName(TimeProcessId boxId, string name)
     // filter repetitions
     if (newName != oldName) {
         
-        getTimeProcess(boxId).set("name", newName);
+        // rename the time process into the i-score application
+        TTValue effectiveName, args(getTimeProcess(boxId), newName);
+        m_iscore.send("ObjectRename", args, effectiveName);
         
-        // register the time process with the new name
-        //unregisterObject(getAddress(boxId));
+        // rename the time process object with the effective registration name
+        getTimeProcess(boxId).set("name", effectiveName);
     }
 }
 
