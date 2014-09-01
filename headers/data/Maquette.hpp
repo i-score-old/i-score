@@ -793,7 +793,7 @@ class Maquette : public QObject
     bool setDeviceLearn(std::string deviceName, bool newLearn);
 
     bool loadNetworkNamespace(const string &application, const string &filepath);
-    int appendToNetWorkNamespace(const std::string & address, const std::string & service = "parameter", const std::string & type = "decimal", const std::string & priority = "0", const std::string & description = "", const std::string & range = "0. 1.", const std::string & clipmode = "none", const std::string & tags = "");
+    int appendToNetWorkNamespace(const std::string & address, const std::string & service = "parameter", const std::string & type = "generic", const std::string & priority = "0", const std::string & description = "", const std::string & range = "0. 1.", const std::string & clipmode = "none", const std::string & tags = "");
     int removeFromNetWorkNamespace(const std::string & address);
 
   public slots:
