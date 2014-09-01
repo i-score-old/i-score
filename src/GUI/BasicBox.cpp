@@ -1161,6 +1161,13 @@ BasicBox::addToExpandedItemsList(QTreeWidgetItem *item)
 }
 
 void
+BasicBox::
+setSelectedTreeItems(QList<QTreeWidgetItem *> selectedItems)
+{
+    _abstract->setNetworkTreeSelectedItems(selectedItems);
+}
+
+void
 BasicBox::removeFromExpandedItemsList(QTreeWidgetItem *item)
 {
   _abstract->removeFromNetworkTreeExpandedItems(item);
@@ -1871,6 +1878,7 @@ BasicBox::drawTriggerGrips(QPainter *painter)
 void
 BasicBox::drawInteractionGrips(QPainter *painter)
 {
+    painter->save();
   float earWidth = EAR_WIDTH * 2;
   float earHeight = EAR_HEIGHT;
 
@@ -1886,20 +1894,25 @@ BasicBox::drawInteractionGrips(QPainter *painter)
 
   int startAngle = 30 * 16;
   int spanAngle = 120 * 16;
-  painter->rotate(90);
-  rect.moveTo(QPointF(-(earWidth / 2), -(earHeight / 4 + width() / 2)));
-
   int newX = -(earHeight / 4 + width() / 2);
   int newY = -(earWidth / 2);
-  _leftEar = QRectF(QPointF(newX, newY), QSize(earHeight / 4, earWidth));
+  QSize size(earHeight / 4, earWidth);
+
+  painter->rotate(90);
+  rect.moveTo(QPointF(newY, newX));
+
+  _leftEar = QRectF(QPointF(newX, newY), size);
 
   newX = width() / 2;
-  _rightEar = QRectF(QPointF(newX, newY), QSize(earHeight / 4, earWidth));
+  _rightEar = QRectF(QPointF(newX, newY), size);
 
   painter->drawChord(rect, startAngle, spanAngle);
   painter->rotate(-180);
+
   painter->drawChord(rect, startAngle, spanAngle);
   painter->rotate(90);
+
+  painter->restore();
 }
 
 void

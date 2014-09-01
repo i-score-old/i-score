@@ -82,7 +82,11 @@ class NetworkTree : public QTreeWidget
     *                          General tools
     ***********************************************************************/
 
+    /*!
+     * \brief Gets all assigned items.
+     */
     QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot(unsigned int boxID);
+    QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot(unsigned int boxID, QList<QTreeWidgetItem *> itemsList);
 
     /*!
      * \brief Gets the absolute address of an item in the snapshot tree.
@@ -384,10 +388,13 @@ class NetworkTree : public QTreeWidget
     virtual void keyReleaseEvent(QKeyEvent *event);
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mouseReleaseEvent(QMouseEvent *event);
 
     static int NAME_COLUMN;
     static int VALUE_COLUMN;
+    static int START_ASSIGNATION_COLUMN;
     static int START_COLUMN;	
+    static int END_ASSIGNATION_COLUMN;
     static int END_COLUMN;
     static int INTERPOLATION_COLUMN;
     static int REDUNDANCY_COLUMN;
@@ -428,6 +435,9 @@ class NetworkTree : public QTreeWidget
     void rangeBoundMinChanged(QTreeWidgetItem *item, float newValue);
     void rangeBoundMaxChanged(QTreeWidgetItem *item, float newValue);
     void recModeChanged(QTreeWidgetItem *item);
+    void requestSnapshotStart(QList<QTreeWidgetItem *> itemsList);
+    void requestSnapshotEnd(QList<QTreeWidgetItem *> itemsLists);
+    void selectionChanged(QList<QTreeWidgetItem *> selectedItems);
 
   private:
     void treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict);
@@ -487,7 +497,7 @@ class NetworkTree : public QTreeWidget
           _nodesWithSomeChildrenAssigned.removeAll(item);
         }
     }
-    void assignPartially(QTreeWidgetItem *item);
+    void setPartiallyAssign(QTreeWidgetItem *item);
     void unassignPartially(QTreeWidgetItem *item);
     void unassignItem(QTreeWidgetItem *item, bool recursive=true);
     void setUnassignedStyle(QTreeWidgetItem *item);
@@ -506,14 +516,18 @@ class NetworkTree : public QTreeWidget
           _nodesWithAllChildrenAssigned.removeAll(item);
         }
     }
-    void assignTotally(QTreeWidgetItem *item);
+
+    void setTotallyAssignedStyle(QTreeWidgetItem *item);
     void unassignTotally(QTreeWidgetItem *item);
     void assignItem(QTreeWidgetItem *item, Data data);
     void updateOSCAddresses();
+    void getChildren(QTreeWidgetItem *item, QList<QTreeWidgetItem *> &items);
+    void execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> items, int column);
+    void unselectAll();
 
     QMap<QTreeWidgetItem *, string> _addressMap;
     QList<QTreeWidgetItem*> _nodesWithSelectedChildren;
-    QMap<QTreeWidgetItem *, Data> _assignedItems;
+    QMap<QTreeWidgetItem *, Data> _assignedItems;    
     QList<QTreeWidgetItem*> _nodesWithSomeChildrenAssigned;
     QList<QTreeWidgetItem*> _nodesWithAllChildrenAssigned;
 
@@ -524,10 +538,12 @@ class NetworkTree : public QTreeWidget
     QList<QTreeWidgetItem *> _recMessages;
     QMap<QTreeWidgetItem *, QString> _OSCMessages;
     QTreeWidgetItem *_addADeviceItem;
+    QList<QTreeWidgetItem*> _expandedItems;
 
     int _OSCMessageCount;
     bool _treeFilterActive;
     bool _recMode;
+    bool _noItemClicked;
 
     DeviceEdit *_deviceEdit;  
 
@@ -536,13 +552,13 @@ class NetworkTree : public QTreeWidget
       * \brief Rebuild the networkTree under the item (or currentItem by default), after asking the engine to refresh its namespace.
       * \param The application we want to refresh.
       */
-    void refreshItemNamespace(QTreeWidgetItem *item);
+    void refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes = true);
     void refreshCurrentItemNamespace();
     void deleteCurrentItemNamespace();
     void itemCollapsed();
     void clickInNetworkTree(QTreeWidgetItem *item, int column);
     void valueChanged(QTreeWidgetItem* item, int column);
-    void changeStartValue(QTreeWidgetItem* item, QString newValue);
+    void changeStartValue(QTreeWidgetItem* item, QString newValue);    
     void changeEndValue(QTreeWidgetItem* item, QString newValue);
     void changeNameValue(QTreeWidgetItem* item, QString newValue);
     void updateDeviceName(QString oldName, QString newName);
@@ -551,6 +567,8 @@ class NetworkTree : public QTreeWidget
     void updateDeviceNamespace(QString deviceName);
     void setRecMode(std::string address);
     void setRecMode(QList<std::string> items);
+    void addToExpandedItems(QTreeWidgetItem *item);
+    void removeFromExpandedItems(QTreeWidgetItem *item);
 
     virtual void clear();
 };

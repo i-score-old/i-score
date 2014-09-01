@@ -790,6 +790,7 @@ class Maquette : public QObject
     bool setDevicePort(std::string device, int destinationPort, int receptionPort = 0);
     bool setDeviceLocalHost(std::string device, std::string localHost);
     bool setDeviceProtocol(std::string device, std::string protocol);
+    bool setDeviceLearn(std::string deviceName, bool newLearn);
 
     bool loadNetworkNamespace(const string &application, const string &filepath);
     int appendToNetWorkNamespace(const std::string & address, const std::string & service = "parameter", const std::string & type = "generic", const std::string & priority = "0", const std::string & description = "", const std::string & range = "0. 1.", const std::string & clipmode = "none", const std::string & tags = "");
