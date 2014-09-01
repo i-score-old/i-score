@@ -2701,26 +2701,14 @@ Engine::getDeviceProtocol(std::string deviceName, std::string &protocol)
 bool
 Engine::setDeviceName(string deviceName, string newName)
 {
-    string          protocol,
-                    localHost;
-    unsigned int    port;
-
-    //get protocol name
-    if(getDeviceProtocol(deviceName,protocol) != 0)
-        return 1;
-
-    //get port
-    if(getDeviceIntegerParameter(deviceName,protocol,"port",port) != 0)
-        return 1;
-
-    //get ip
-    if(getDeviceStringParameter(deviceName,protocol,"ip",localHost) != 0)
-        return 1;
-
-    addNetworkDevice(newName,protocol,localHost,port);
-    removeNetworkDevice(deviceName);
-
-    return 0;
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    TTSymbol    newApplicationName(newName);
+    TTErr       err;
+    
+    err = anApplication.set("name", newApplicationName);
+    
+    return err != kTTErrNone;
 }
 
 bool
