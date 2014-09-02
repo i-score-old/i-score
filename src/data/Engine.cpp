@@ -219,7 +219,7 @@ TimeProcessId Engine::cacheTimeProcess(TTObject& timeProcess, TTAddress& anAddre
     e->subScenario = subScenario;
     
     TTValue out, args = TTValue(e->address, e->object);
-    m_iscore.send("RegisterObject", args, out);
+    m_iscore.send("ObjectRegister", args, out);
     
     id = m_nextTimeProcessId;
     m_timeProcessMap[id] = e;
@@ -298,7 +298,7 @@ void Engine::uncacheTimeProcess(TimeProcessId boxId)
     uncacheEndCallback(boxId);
     
     TTValue out;
-    m_iscore.send("UnregisterObject", e->address, out);
+    m_iscore.send("ObjectUnregister", e->address, out);
     
     delete e;
     m_timeProcessMap.erase(boxId);
@@ -1082,7 +1082,7 @@ bool Engine::getBoxMuteState(TimeProcessId boxId)
 
 void Engine::setBoxName(TimeProcessId boxId, string name)
 {
-    TTSymbol    oldName, newName;
+    TTSymbol oldName, newName;
     
     getTimeProcess(boxId).get("name", oldName);
     
@@ -1091,10 +1091,12 @@ void Engine::setBoxName(TimeProcessId boxId, string name)
     // filter repetitions
     if (newName != oldName) {
         
-        getTimeProcess(boxId).set("name", newName);
+        // rename the time process into the i-score application
+        TTValue effectiveName, args(getTimeProcess(boxId), newName);
+        m_iscore.send("ObjectRename", args, effectiveName);
         
-        // register the time process with the new name
-        //unregisterObject(getAddress(boxId));
+        // rename the time process object with the effective registration name
+        getTimeProcess(boxId).set("name", effectiveName);
     }
 }
 
@@ -2701,26 +2703,14 @@ Engine::getDeviceProtocol(std::string deviceName, std::string &protocol)
 bool
 Engine::setDeviceName(string deviceName, string newName)
 {
-    string          protocol,
-                    localHost;
-    unsigned int    port;
-
-    //get protocol name
-    if(getDeviceProtocol(deviceName,protocol) != 0)
-        return 1;
-
-    //get port
-    if(getDeviceIntegerParameter(deviceName,protocol,"port",port) != 0)
-        return 1;
-
-    //get ip
-    if(getDeviceStringParameter(deviceName,protocol,"ip",localHost) != 0)
-        return 1;
-
-    addNetworkDevice(newName,protocol,localHost,port);
-    removeNetworkDevice(deviceName);
-
-    return 0;
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    TTSymbol    newApplicationName(newName);
+    TTErr       err;
+    
+    err = anApplication.set("name", newApplicationName);
+    
+    return err != kTTErrNone;
 }
 
 bool
@@ -3071,7 +3061,7 @@ int Engine::removeFromNetWorkNamespace(const std::string & address)
 
 // LOAD AND STORE
 
-void Engine::store(std::string filepath)
+int Engine::store(std::string filepath)
 {
     TTValue v, none;
     
@@ -3085,12 +3075,15 @@ void Engine::store(std::string filepath)
     aXmlHandler.set(kTTSym_object, v);
     
     // Write
-    aXmlHandler.send(kTTSym_Write, m_lastProjectFilePath, none);
+    TTErr err = aXmlHandler.send(kTTSym_Write, m_lastProjectFilePath, none);
+    
+    return err == kTTErrNone;
 }
 
-void Engine::load(std::string filepath)
+int Engine::load(std::string filepath)
 {
     TTValue out;
+    TTErr   err;
     
     // Check that all Engine caches have been properly cleared before
     if (m_timeProcessMap.size() > 1)
@@ -3112,14 +3105,22 @@ void Engine::load(std::string filepath)
     
     // Read the file to setup m_applicationManager
     aXmlHandler.set(kTTSym_object, m_applicationManager);
-    aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, out);
+    err = aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, out);
     
-    // Read the file to setup m_mainScenario
-    aXmlHandler.set(kTTSym_object, m_mainScenario);
-    aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, out);
+    if (!err) {
+        
+        // Read the file to setup m_mainScenario
+        aXmlHandler.set(kTTSym_object, m_mainScenario);
+        err = aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, out);
+        
+        if (!err) {
+            
+            // Rebuild all the EngineCacheMaps from the main scenario content
+            buildEngineCaches(m_mainScenario, kTTAdrsRoot);
+        }
+    }
     
-    // Rebuild all the EngineCacheMaps from the main scenario content
-    buildEngineCaches(m_mainScenario, kTTAdrsRoot);
+    return err == kTTErrNone;
 }
 
 void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)

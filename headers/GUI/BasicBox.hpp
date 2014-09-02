@@ -625,6 +625,8 @@ class BasicBox : public QObject, public QGraphicsItem
      */
     void addToExpandedItemsList(QTreeWidgetItem* item);
 
+    void setSelectedTreeItems(QList<QTreeWidgetItem *> selectedItems);
+
     /*!
      * \brief Send the items to be removed from the networkTreeExpandedItems.
      *

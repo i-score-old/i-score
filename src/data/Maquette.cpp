@@ -2155,8 +2155,10 @@ transportCallback(TTSymbol& transport, const TTValue& value)
 #endif
 }
 
-void deviceCallback(TTSymbol& deviceName)
+void
+deviceCallback(TTSymbol& deviceName)
 {
+    Maquette::getInstance()->scene()->editor()->networkTree()->refreshItemNamespace(Maquette::getInstance()->scene()->editor()->networkTree()->getItemFromAddress(deviceName.c_str()), false);
     std::cerr << "Maquette::deviceCallback : " << deviceName.c_str() << std::endl;
 }
 
@@ -2338,6 +2340,11 @@ Maquette::setDeviceLocalHost(std::string device, std::string localHost){
 bool
 Maquette::setDeviceProtocol(std::string device, std::string protocol){
     return _engines->setDeviceProtocol(device, protocol);
+}
+
+bool
+Maquette::setDeviceLearn(std::string deviceName, bool newLearn){
+    return _engines->setDeviceLearn(deviceName, newLearn);
 }
 
 bool

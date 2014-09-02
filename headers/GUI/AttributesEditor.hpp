@@ -117,6 +117,7 @@ class AttributesEditor : public QDockWidget
 
   public slots:
     void addToExpandedItemsList(QTreeWidgetItem *item);
+    void addToSelectedItemsList(QList<QTreeWidgetItem *> selectedItems);
     void removeFromExpandedItemsList(QTreeWidgetItem *item);
 
     /*!
@@ -133,11 +134,13 @@ class AttributesEditor : public QDockWidget
      * \brief Assigns the snapshot to the start of the box.
      */
     void snapshotStartAssignment();
+    void snapshotStartAssignment(QList<QTreeWidgetItem *> itemsList);
 
     /*!
      * \brief Assigns the snapshot to the end of the box.
      */
     void snapshotEndAssignment();
+    void snapshotEndAssignment(QList<QTreeWidgetItem *> itemsList);
 
     void changeRangeBoundMin(QTreeWidgetItem* item, float value);
     void changeRangeBoundMax(QTreeWidgetItem* item, float value);
@@ -217,7 +220,7 @@ class AttributesEditor : public QDockWidget
     QWidget * _centralWidget;   //!< Central widget.
     QGridLayout * _centralLayout; //!< Central layout
 
-    QHBoxLayout *_boxSettingsLayout; //!< Layout handling box settings (name, color, assignation...).
+    QGridLayout *_boxSettingsLayout; //!< Layout handling box settings (name, color, assignation...).
     NetworkTree *_networkTree; //!< NetworkTree (inspector).
 
     /// \todo Old TODO updated (by jC)
@@ -226,6 +229,8 @@ class AttributesEditor : public QDockWidget
 
     // boxEditLayout items
     QLineEdit * _boxName; //!< Color button.
+    QLabel * _updateLabel; //!< Color button.
+
     QPixmap *_colorButtonPixmap; //!< Color button.
     QPushButton *_generalColorButton;  //!< Color button.
     QPushButton *_snapshotAssignStart; //!< Start assignation button.
