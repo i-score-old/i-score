@@ -48,19 +48,41 @@
 #include "MaquetteScene.hpp"
 
 PlayingThread::PlayingThread(MaquetteScene *scene)
-  : QThread()
 {
   _scene = scene;
+
+  _thread.start();
+  connect(&_timer, SIGNAL(timeout()),
+          this, SLOT(update()));
+
+  this->moveToThread(&_thread);
 }
 
-void
-PlayingThread::run()
+bool PlayingThread::isRunning() const
 {
-  while (!_scene->getPlayingBoxes().empty() || _scene->playing()) {
-      _scene->updatePlayingBoxes();
-      _scene->updateProgressBar();
-
-      msleep(30);
-    }
-  quit();
+  return _timer.isActive();
 }
+
+void PlayingThread::start()
+{
+  _timer.start(_frameDuration);
+}
+
+void PlayingThread::quit()
+{
+  _timer.stop();
+}
+
+void PlayingThread::update()
+{
+  if(!_scene->getPlayingBoxes().empty() || _scene->playing())
+  {
+    _scene->updatePlayingBoxes();
+    _scene->updateProgressBar();
+  }
+  else
+  {
+    _timer.stop();
+  }
+}
+
