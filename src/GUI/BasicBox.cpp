@@ -312,7 +312,7 @@ BasicBox::createWidget()
 
   _curveProxy = new QGraphicsProxyWidget(this);
 
-  _curveProxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+  _curveProxy->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
   _curveProxy->setAcceptedMouseButtons(Qt::LeftButton);
   _curveProxy->setFlag(QGraphicsItem::ItemIsMovable, false);
   _curveProxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
@@ -434,11 +434,8 @@ BasicBox::init()
 
   updateBoxSize();
 
-  setCacheMode(QGraphicsItem::ItemCoordinateCache);
+  setCacheMode(QGraphicsItem::DeviceCoordinateCache);
   setFlag(QGraphicsItem::ItemIsMovable, true);
-
-  /// \todo Affiner la limite du cache. Cette ligne permet de résoudre le bug de latence (toutes les boîtes automatiquement repeintes au scroll/move/resize).
-  QPixmapCache::setCacheLimit(220000);
 
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setFlag(QGraphicsItem::ItemIsFocusable, true);

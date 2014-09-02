@@ -56,7 +56,7 @@
 #include <QKeyEvent>
 #include <QScrollBar>
 #include <QPushButton>
-
+#include <QPixmapCache>
 static const int SCROLL_BAR_INCREMENT = 1000 / MaquetteScene::MS_PER_PIXEL;
 const QColor MaquetteView::BACKGROUND_COLOR = QColor(60, 60, 60);
 
@@ -64,6 +64,9 @@ MaquetteView::MaquetteView(MainWindow *mw)
   : QGraphicsView(mw)
 {
   _mainWindow = mw;
+
+  /// \todo Affiner la limite du cache. Cette ligne permet de résoudre le bug de latence (toutes les boîtes automatiquement repeintes au scroll/move/resize).
+  QPixmapCache::setCacheLimit(800000);
 
   setRenderHint(QPainter::Antialiasing);
   setBackgroundBrush(QColor(BACKGROUND_COLOR));
