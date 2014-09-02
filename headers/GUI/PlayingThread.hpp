@@ -48,6 +48,7 @@
  */
 
 #include <QThread>
+#include <QTimer>
 
 class MaquetteScene;
 
@@ -59,17 +60,26 @@ class MaquetteScene;
  *
  * \brief Thread handling playing.
  */
-class PlayingThread : public QThread
+class PlayingThread : public QObject
 {
-
-  MaquetteScene *_scene;
+  Q_OBJECT
 
   public:
     PlayingThread(MaquetteScene *scene);
 
-  protected:
-    void run();
+    bool isRunning() const;
+    void start();
+    void quit();
 
+  private slots:
+    void update();
+
+  private:
+    QThread _thread;
+    QTimer _timer;
+    MaquetteScene *_scene;
+
+    const unsigned int _frameDuration{17}; // In milliseconds. 16.6 for 60hz, 33.3 for 30hz.
 };
 
 #endif
