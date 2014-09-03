@@ -39,10 +39,6 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-#include <iostream>
-#include <map>
-#include <vector>
-#include <QPainter>
 
 #include "TimeBarWidget.hpp"
 #include "MaquetteView.hpp"
@@ -61,9 +57,6 @@ TimeBarWidget::TimeBarWidget(QWidget *parent, MaquetteScene *scene)
 {
   _scene = scene;
 
-
-  init();
-  setUpdatesEnabled(false);
   setPalette(Qt::gray);
   setStyleSheet(
         "TimeBarWidget {"
@@ -78,16 +71,6 @@ TimeBarWidget::TimeBarWidget(QWidget *parent, MaquetteScene *scene)
 }
 
 void
-TimeBarWidget::init()
-{   
-  _zoom = 1.;
-}
-
-TimeBarWidget::~TimeBarWidget()
-{
-}
-
-void
 TimeBarWidget::mousePressEvent(QMouseEvent *event)
 {
   unsigned int timeOffset = (event->pos().x() + x())* MaquetteScene::MS_PER_PIXEL;
@@ -97,90 +80,71 @@ TimeBarWidget::mousePressEvent(QMouseEvent *event)
 void TimeBarWidget::moveEvent(QMoveEvent *)
 {
   redrawPixmap();
-  update();
 }
 
 void
-TimeBarWidget::setZoomValue(float value)
+TimeBarWidget::updateZoom(float /*value*/)
 {
-  _zoom = value;
   redrawPixmap();
-  update();
-}
-
-void
-TimeBarWidget::updateZoom(float newValue)
-{
-  std::cout<<"UDPATE ZOOM"<<std::endl;
-  _zoom = newValue;
-  setUpdatesEnabled(true);
-  redrawPixmap();
-  update();
-  setUpdatesEnabled(false);
 }
 
 void TimeBarWidget::updateSize()
 {
-  auto rect = _scene->view()->mapToScene(_scene->view()->rect()).boundingRect();
-  if(_scene->view()->size().width() > 20)
-  {
-    _rect = QRect(rect.x(), 0, _scene->view()->size().width(), TIME_BAR_HEIGHT);
-    setGeometry(_rect);
-    _pixmap = QPixmap(_rect.width(), _rect.height());
+  auto viewport = _scene->view()->mapToScene(_scene->view()->rect()).boundingRect();
 
-    setFixedHeight(height());
+  _rect = QRect(viewport.x(), viewport.y(),
+                _scene->view()->size().width(), TIME_BAR_HEIGHT);
 
-    redrawPixmap();
-    update();
-  }
+  setGeometry(_rect);
+  _pixmap = QPixmap(_rect.width(), _rect.height());
+
+  setFixedHeight(height());
+
+  redrawPixmap();
 }
 
 void TimeBarWidget::redrawPixmap()
 {
   _pixmap.fill(QColor(Qt::transparent));
-  QPainter painter(&_pixmap);
+  if(_pixmap.isNull()) return;
+  _painter.begin(&_pixmap);
 
-  painter.setRenderHint(QPainter::Antialiasing, true);
+  _painter.setFont(_font);
+  _painter.setRenderHint(QPainter::Antialiasing, true);
 
-  const int HEIGHT = TIME_BAR_HEIGHT;
+  const float factor{MaquetteScene::MS_PER_PIXEL / 16};
+  const int grad_width_in_px{S_TO_MS / 16};
+  const int h_origin{x()};
 
-  float i_PXL;
-  QFont font;
-  font.setPointSize(NUMBERS_POINT_SIZE);
-  painter.setFont(font);
+  int pos{((h_origin / grad_width_in_px) + 1 ) * grad_width_in_px - h_origin};
 
-  float zoom = 16. / MaquetteScene::MS_PER_PIXEL;
-  float factor = ((float)1.) / zoom;
-
-  int grad_width_in_px = S_TO_MS / 16;
-  int count =  width() / grad_width_in_px;
-
-  int pos = ((x() / grad_width_in_px) + 1 ) * grad_width_in_px - x();
-
-  for(int i = 0; i < count; i++)
+  for(int i = 0;
+      i < width() / grad_width_in_px + 1;
+      ++i)
   {
-    painter.drawLine(QPointF(pos, 3 * HEIGHT / 4), QPointF(pos, HEIGHT));
-    float secondDrawn = ((x() + pos) / grad_width_in_px) * factor;
+    _painter.drawLine(QPointF(pos, 3 * TIME_BAR_HEIGHT / 4), QPointF(pos, TIME_BAR_HEIGHT));
+    float secondDrawn = ((h_origin + pos) / grad_width_in_px) * factor;
 
     if(factor >= 1)
     {
-      int m = secondDrawn / 60;
-      int s = (int)secondDrawn % 60;
-      painter.drawText(QPointF(pos, 2 * HEIGHT / 3), QString("%1'%2").arg(m).arg(s));
+      _painter.drawText(QPointF(pos, 2 * TIME_BAR_HEIGHT / 3), QString("%1'%2").arg(int(secondDrawn) / 60).arg(int(secondDrawn) % 60));
     }
     else
     {
-      painter.drawText(QPointF(pos, 2 * HEIGHT / 3), QString("%1").arg(secondDrawn));
+      _painter.drawText(QPointF(pos, 2 * TIME_BAR_HEIGHT / 3), QString("%1").arg(secondDrawn));
     }
     pos += grad_width_in_px;
   }
+  _painter.end();
 }
 
 void
 TimeBarWidget::paintEvent(QPaintEvent *event)
 {
   Q_UNUSED(event);
-  QPainter painter(this);
-  painter.drawRect(_rect);
-  painter.drawPixmap(_rect, _pixmap);
+
+  _painter.begin(this);
+  _painter.drawRect(_rect);
+  _painter.drawPixmap(0, 0, _rect.width(), _rect.height(), _pixmap);
+  _painter.end();
 }
