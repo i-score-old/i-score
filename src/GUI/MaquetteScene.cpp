@@ -1708,8 +1708,8 @@ MaquetteScene::stopAndGoToStart()
 
     //send root box start messages
     std::vector<std::string> startCue = _maquette->getBox(ROOT_BOX_ID)->getStartMessages();
-    for(int i=0; i<startCue.size(); i++)
-        sendMessage(startCue.at(i));
+    for(auto& cue : startCue)
+        sendMessage(cue);
 
     update();
     
@@ -1854,20 +1854,21 @@ MaquetteScene::getMaxSceneWidth(){
 void
 MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
 {
-    QList<BasicBox *>::iterator     it = boxesToCondition.begin();
-    BasicBox                        *box,
-                                    *earliestBox = *it;
-    unsigned int                    earliestDate = earliestBox->date();
+    if(boxesToCondition.isEmpty())
+    {
+        qWarning() << "MaquetteScene::conditionBoxes : boxesToCondition is empty";
+        return;
+    }
+
+    unsigned int                    earliestDate = boxesToCondition.first()->date();
     bool                            conditionalRelationFound = false;
     ConditionalRelation             *condRel;
 
 
     //Check if all boxes have a trigger point on start and force to move to the same date.
     //Check if boxes have to be simply attached to an existing conditional relation, else create a new one.
-    for(it ; it!=boxesToCondition.end() ; it++)
+    for(auto& box : boxesToCondition)
     {
-        box = *it;
-
         if(!box->hasTriggerPoint(BOX_START)) //Force trigger point creation
             box->addTriggerPoint(BOX_START);
 
@@ -1879,16 +1880,14 @@ MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
 
         //Find the earliest box
         if(box->date()<earliestDate){
-            earliestBox = box;
             earliestDate = box->date();
         }
     }
 
     //Force boxes to move to the earliest box date.
     /// \todo This is provisional, has to be done automatically by Score. NH
-    for(it=boxesToCondition.begin() ; it!=boxesToCondition.end() ; it++)
+    for(auto& box : boxesToCondition)
     {
-        box = *it;
         box->moveBy((qreal)(earliestDate/MS_PER_PIXEL) -(qreal)(box->date() / MS_PER_PIXEL), 0.);
         boxMoved(box->ID());
     }

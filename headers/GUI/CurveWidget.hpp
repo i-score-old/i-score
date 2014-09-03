@@ -130,7 +130,6 @@ class CurveWidget : public QWidget
      * \param event : the information about the event
      */
     virtual void paintEvent(QPaintEvent *event);
-    virtual void paintEngine();
 
     /*!
      * \brief Redefinition of QWidget::moussPressEvent(QPaintEvent *event).

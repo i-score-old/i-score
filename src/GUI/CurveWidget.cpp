@@ -553,11 +553,6 @@ CurveWidget::resizeEvent(QResizeEvent * event)
 }
 
 void
-CurveWidget::paintEngine()
-{
-}
-
-void
 CurveWidget::paintEvent(QPaintEvent * /* event */)
 {        
   QPainter *painter = new QPainter(this);
