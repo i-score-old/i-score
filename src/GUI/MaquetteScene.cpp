@@ -111,7 +111,6 @@ MaquetteScene::init()
   _triggersQueueList = new QList<TriggerPoint *>();
   _progressLine->setZValue(2);
   _timeBarProxy->setZValue(3);
-  //_timeBarProxy->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
   _timeBarProxy->setFlag(QGraphicsItem::ItemClipsToShape);    
 
   _currentInteractionMode = SELECTION_MODE;
