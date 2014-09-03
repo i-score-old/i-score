@@ -412,3 +412,9 @@ MaquetteView::setScenarioSelected(bool selected){
     resetCachedContent();
     update();
 }
+
+void MaquetteView::resizeEvent(QResizeEvent * evt)
+{
+  emit sizeChanged();
+  QGraphicsView::resizeEvent(evt);
+}

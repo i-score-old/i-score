@@ -91,7 +91,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 
   _relation = new AbstractRelation; /// \todo pourquoi instancier une AbstractRelation ici ? (par jaime Chao)
   _playThread = new PlayingThread(this);
-  _timeBar = new TimeBarWidget(0, this);  
+  _timeBar = new TimeBarWidget(0, this);
   _timeBarProxy = addWidget(_timeBar);/// \todo Vérifier ajout si classe TimeBarWidget hérite de GraphicsProxyWidget ou GraphicsObject. Notamment pour lier avec background. (par jaime Chao)
 
   _progressLine = new QGraphicsLineItem(QLineF(sceneRect().topLeft().x(), sceneRect().topLeft().y(), sceneRect().bottomLeft().x(), MAX_SCENE_HEIGHT));
@@ -111,7 +111,7 @@ MaquetteScene::init()
   _triggersQueueList = new QList<TriggerPoint *>();
   _progressLine->setZValue(2);
   _timeBarProxy->setZValue(3);
-  _timeBarProxy->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+  //_timeBarProxy->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
   _timeBarProxy->setFlag(QGraphicsItem::ItemClipsToShape);    
 
   _currentInteractionMode = SELECTION_MODE;
@@ -174,9 +174,11 @@ MaquetteScene::changeTimeOffset(unsigned int timeOffset)
 }
 
 void
-MaquetteScene::updateView()
+MaquetteScene::initView()
 {
   _view = static_cast<MaquetteView*>(views().front());
+  connect(_view, SIGNAL(sizeChanged()),
+          _timeBar, SLOT(updateSize()));
 }
 
 /// \todo Vérifier l'utilité de faire une surcouche d'appels de méthodes de AttributesEditor (_editor). (par jaime Chao)
@@ -1829,8 +1831,15 @@ MaquetteScene::addToTriggerQueue(TriggerPoint *trigger)
 void
 MaquetteScene::verticalScroll(int value)
 {
-  _timeBar->move(0, value);
-  _view->repaint();
+  _timeBar->move(_timeBar->pos().x(), value);
+  _view->update();
+}
+
+void
+MaquetteScene::horizontalScroll(int value)
+{
+  _timeBar->move(value, _timeBar->pos().y());
+  _view->update();
 }
 
 void

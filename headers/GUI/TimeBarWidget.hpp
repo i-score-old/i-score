@@ -23,17 +23,19 @@ class TimeBarWidget : public QWidget {
 
   public slots:
     void updateZoom(float newValue);
+    void updateSize();
 
   protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
-    virtual void drawBackground(QPainter *painter, QRect rect);
+    virtual void moveEvent(QMoveEvent*);
     float _zoom;
 
   private:    
-
+    void redrawPixmap();
     MaquetteScene *_scene;
     float _sceneHeight;
     QRect _rect;
+    QPixmap _pixmap;
 };
 #endif // TIMEBARWIDGET_HPP
