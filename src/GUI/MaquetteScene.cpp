@@ -55,6 +55,7 @@
 #include "MaquetteView.hpp"
 #include "MainWindow.hpp"
 #include "Relation.hpp"
+#include "ConditionalRelation.hpp"
 #include "Comment.hpp"
 #include "TriggerPoint.hpp"
 #include "ViewRelations.hpp"
@@ -91,7 +92,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 
   _relation = new AbstractRelation; /// \todo pourquoi instancier une AbstractRelation ici ? (par jaime Chao)
   _playThread = new PlayingThread(this);
-  _timeBar = new TimeBarWidget(0, this);  
+  _timeBar = new TimeBarWidget(0, this);
   _timeBarProxy = addWidget(_timeBar);/// \todo Vérifier ajout si classe TimeBarWidget hérite de GraphicsProxyWidget ou GraphicsObject. Notamment pour lier avec background. (par jaime Chao)
 
   _progressLine = new QGraphicsLineItem(QLineF(sceneRect().topLeft().x(), sceneRect().topLeft().y(), sceneRect().bottomLeft().x(), MAX_SCENE_HEIGHT));
@@ -111,8 +112,7 @@ MaquetteScene::init()
   _triggersQueueList = new QList<TriggerPoint *>();
   _progressLine->setZValue(2);
   _timeBarProxy->setZValue(3);
-  _timeBarProxy->setCacheMode(QGraphicsItem::ItemCoordinateCache);
-  _timeBarProxy->setFlag(QGraphicsItem::ItemClipsToShape);
+  _timeBarProxy->setFlag(QGraphicsItem::ItemClipsToShape);    
 
   _currentInteractionMode = SELECTION_MODE;
   setCurrentMode(SELECTION_MODE);
@@ -158,9 +158,7 @@ MaquetteScene::updateProgressBar()
 void
 MaquetteScene::zoomChanged(float value)
 {
-    std::cout<<value<<std::endl;
   setMaxSceneWidth(MaquetteScene::MAX_SCENE_WIDTH*value);
-  std::cout<<" > "<<MaquetteScene::MAX_SCENE_WIDTH*value<<std::endl;
   updateProgressBar();
   _timeBar->updateZoom(value);
     
@@ -176,9 +174,11 @@ MaquetteScene::changeTimeOffset(unsigned int timeOffset)
 }
 
 void
-MaquetteScene::updateView()
+MaquetteScene::initView()
 {
   _view = static_cast<MaquetteView*>(views().front());
+  connect(_view, SIGNAL(sizeChanged()),
+          _timeBar, SLOT(updateSize()));
 }
 
 /// \todo Vérifier l'utilité de faire une surcouche d'appels de méthodes de AttributesEditor (_editor). (par jaime Chao)
@@ -256,9 +256,9 @@ MaquetteScene::getCurrentTime()
 }
 
 float
-MaquetteScene::getProgression(unsigned int boxID)
+MaquetteScene::getPosition(unsigned int boxID)
 {
-  return _maquette->getProgression(boxID);
+  return _maquette->getPosition(boxID);
 }
 
 unsigned int
@@ -299,10 +299,10 @@ MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
                       double endX = 0., endY = 0.;
                       static const double arrowSize = 12.;
                       BasicBox *box = NULL;
-                      if (itemAt(_mousePos) != 0) {
-                          int type = itemAt(_mousePos)->type();
+                      if (itemAt(_mousePos, QTransform()) != 0) {
+                          int type = itemAt(_mousePos, QTransform())->type();
                           if (type == PARENT_BOX_TYPE) {
-                              box = static_cast<BasicBox*>(itemAt(_mousePos));
+                              box = static_cast<BasicBox*>(itemAt(_mousePos, QTransform()));
                               if (_mousePos.x() < (box->mapToScene(box->boundingRect().topLeft()).x()
                                                    + BasicBox::RESIZE_TOLERANCE)) {
                                   endX = box->getLeftGripPoint().x();
@@ -397,6 +397,7 @@ MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
 void
 MaquetteScene::setCurrentMode(int inter, BoxCreationMode box)
 {
+    _view->resetCachedContent();
   _currentInteractionMode = inter;
   if (inter == SELECTION_MODE || inter == RELATION_MODE) {
       _view->setDragMode(QGraphicsView::RubberBandDrag);
@@ -455,8 +456,8 @@ MaquetteScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 bool
 MaquetteScene::subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent)
 {
-  if (getSelectedItem() != NULL && itemAt(mouseEvent->scenePos()) != 0) {
-      return(getSelectedItem()->type() == PARENT_BOX_TYPE && static_cast<BasicBox*>(getSelectedItem())->currentText() == BasicBox::SUB_SCENARIO_MODE_TEXT && static_cast<BasicBox*>(getSelectedItem())->boxBody().contains(mouseEvent->pos()) && itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::ArrowCursor);
+  if (getSelectedItem() != NULL && itemAt(mouseEvent->scenePos(), QTransform()) != 0) {
+      return(getSelectedItem()->type() == PARENT_BOX_TYPE && static_cast<BasicBox*>(getSelectedItem())->currentText() == BasicBox::SCENARIO_MODE_TEXT && static_cast<BasicBox*>(getSelectedItem())->boxBody().contains(mouseEvent->pos()) && itemAt(mouseEvent->scenePos(), QTransform())->cursor().shape() == Qt::ArrowCursor);
     }
   else {
       return false;
@@ -482,18 +483,18 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
   if (mouseEvent->modifiers() == Qt::ShiftModifier) {
       setCurrentMode(SELECTION_MODE);
     }
-  else if (noBoxSelected() || subScenarioMode(mouseEvent)) {
+  else if ((noBoxSelected() || subScenarioMode(mouseEvent)) && mouseEvent->modifiers()==Qt::ControlModifier) {
       setCurrentMode(CREATION_MODE);
-    }
+    }  
   else {
       setCurrentMode(SELECTION_MODE);
     }
 
-  if (itemAt(mouseEvent->scenePos()) != 0) {
-      if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::PointingHandCursor && _currentInteractionMode != TRIGGER_MODE) {
+  if (itemAt(mouseEvent->scenePos(), QTransform()) != 0) {
+      if (itemAt(mouseEvent->scenePos(), QTransform())->cursor().shape() == Qt::PointingHandCursor && _currentInteractionMode != TRIGGER_MODE) {
           setCurrentMode(TRIGGER_MODE);
         }
-      if (itemAt(mouseEvent->scenePos())->cursor().shape() == Qt::CrossCursor && _currentInteractionMode != RELATION_MODE) {
+      if (itemAt(mouseEvent->scenePos(), QTransform())->cursor().shape() == Qt::CrossCursor && _currentInteractionMode != RELATION_MODE) {
           setCurrentMode(RELATION_MODE);
         }
     }
@@ -513,7 +514,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
         break;
 
       case CREATION_MODE:
-        if (itemAt(mouseEvent->scenePos()) == 0) {
+        if (itemAt(mouseEvent->scenePos(), QTransform()) == 0) {
             if (resizeMode() == NO_RESIZE) {
                 // Store the first pressed point
                 _pressPoint = mouseEvent->scenePos();
@@ -548,6 +549,7 @@ void
 MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
 {
   if (!_maquette->isExecutionOn()) {
+
       QGraphicsScene::mouseMoveEvent(mouseEvent);
 
       switch (_currentInteractionMode) {
@@ -558,10 +560,10 @@ MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
                 if (_relation->firstBox() != NO_ID) {
                     update();
                   }
-                if (itemAt(mouseEvent->scenePos()) != 0) {
-                    int type = itemAt(mouseEvent->scenePos())->type();
+                if (itemAt(mouseEvent->scenePos(), QTransform()) != 0) {
+                    int type = itemAt(mouseEvent->scenePos(), QTransform())->type();
                     if (type == PARENT_BOX_TYPE) {
-                        BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
+                        BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos(), QTransform()));
                         if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE) ||
                             mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
                             _relationBoxFound = true;
@@ -587,7 +589,7 @@ MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
           case SELECTION_MODE:
             break;
 
-          case CREATION_MODE:
+          case CREATION_MODE:          
             if (noBoxSelected() || subScenarioMode(mouseEvent)) {
                 if (resizeMode() == NO_RESIZE && _tempBox) {
                     int upLeftX, upLeftY, width, height;
@@ -630,30 +632,40 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
   switch (_currentInteractionMode) {
       case RELATION_MODE:
 
-        if (itemAt(mouseEvent->scenePos()) != 0) {
-            int type = itemAt(mouseEvent->scenePos())->type();
+        if (itemAt(mouseEvent->scenePos(), QTransform()) != 0) {
+            int type = itemAt(mouseEvent->scenePos(), QTransform())->type();
             if (type == PARENT_BOX_TYPE) {
-                BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos()));
 
+                BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos(), QTransform()));
                 BasicBox *firstBox = getBox(_relation->firstBox());
-                if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE)) {
-                    setRelationSecondBox(secondBox->ID(), BOX_START);
-                    addPendingRelation();
-                    firstBox->setSelected(true);
-                  }
-                else if (mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
-                    setRelationSecondBox(secondBox->ID(), BOX_END);
-                    addPendingRelation();
-                    firstBox->setSelected(true);
-                  }
-                else {
-                    if (selectedItems().empty()) {
-                      }
+
+                if(mouseEvent->modifiers() == Qt::AltModifier){ //case conditional relation
+                    QList<BasicBox *> boxesToCondition;
+                    boxesToCondition<<firstBox;
+                    boxesToCondition<<secondBox;
+                    conditionBoxes(boxesToCondition);
+                }
+                else{
+
+                    if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE)) {
+                        setRelationSecondBox(secondBox->ID(), BOX_START);
+                        addPendingRelation();
+                        firstBox->setSelected(true);
+                    }
+                    else if (mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
+                        setRelationSecondBox(secondBox->ID(), BOX_END);
+                        addPendingRelation();
+                        firstBox->setSelected(true);
+                    }
                     else {
-                        selectionMoved();
-                      }
-                  }
-              }
+                        if (selectedItems().empty()) {
+                        }
+                        else {
+                            selectionMoved();
+                        }
+                    }
+                }
+            }
             else {
                 _relationBoxFound = false;
                 delete _relation;
@@ -678,7 +690,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
         break;
 
       case TEXT_MODE:
-        if (itemAt(mouseEvent->scenePos()) == 0) {
+        if (itemAt(mouseEvent->scenePos(), QTransform()) == 0) {
             addComment(tr("Comment").toStdString(), mouseEvent->scenePos(), NO_ID);
           }
         break;
@@ -961,6 +973,22 @@ MaquetteScene::pasteBoxes()
   _toCopy.clear();
   _copySize = QPointF(0, 0);
   setModified(true);
+}
+
+void
+MaquetteScene::muteBoxes()
+{
+    for (int i = 0; i < selectedItems().size(); i++)
+    {
+        QGraphicsItem *curItem = selectedItems().at(i);
+        int type = curItem->type();
+        BasicBox *curBox = static_cast<BasicBox*>(curItem);
+        if (type == PARENT_BOX_TYPE) {
+            curBox = static_cast<BasicBox*>(curItem);
+            curBox->setMuteState(!curBox->getMuteState());
+        }
+    }
+    update();
 }
 
 void
@@ -1313,7 +1341,7 @@ MaquetteScene::changeRelationBounds(unsigned int relID, const float &length, con
           AbstractRelation *abRel = static_cast<AbstractRelation*>(rel->abstract());
           float oldLength = abRel->length();
           BasicBox *secondBox = getBox(abRel->secondBox());
-          if (secondBox != NULL) {
+          if (secondBox != NULL) {              
               secondBox->moveBy(length - oldLength, 0.);
               vector<unsigned int> boxMoved;
               boxMoved.push_back(secondBox->ID());
@@ -1353,6 +1381,28 @@ MaquetteScene::removeRelation(unsigned int relID)
       setModified(true);
     }
 }
+
+void
+MaquetteScene::removeConditionalRelation(ConditionalRelation *condRel)
+{
+    if(condRel != NULL)
+    {
+        QList<BasicBox *>::iterator     it;
+        QList<BasicBox *>               boxes = condRel->getBoxes();
+        BasicBox                        *curBox;
+
+        for(it = boxes.begin() ; it!=boxes.end() ; it++)
+        {
+            curBox = *it;
+            curBox->removeConditionalRelation(condRel);
+        }
+
+        removeItem(condRel);
+        Maquette::getInstance()->deleteCondition(condRel->ID());
+        setModified(true);
+    }
+}
+
 
 void
 MaquetteScene::setRelationFirstBox(unsigned int ID, BoxExtremity extremumType)
@@ -1401,6 +1451,8 @@ MaquetteScene::selectionMoved()
           BasicBox *curBox = static_cast<BasicBox*>(curItem);
           boxMoved(curBox->ID());
         }
+      else if (type == CONDITIONAL_RELATION_TYPE){
+      }
     }
 }
 
@@ -1411,9 +1463,9 @@ MaquetteScene::boxMoved(unsigned int boxID)
   Coords coord;
   BasicBox * box = _maquette->getBox(boxID);
   if (box != NULL) {
+
       if (!box->hasMother()) {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x();
-//          std::cout<<"X = "<<coord.topLeftX* MaquetteScene::MS_PER_PIXEL<<std::endl;
         }
       else {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x()
@@ -1424,18 +1476,12 @@ MaquetteScene::boxMoved(unsigned int boxID)
 //      std::cout<<"Y = "<<coord.sizeX* MaquetteScene::MS_PER_PIXEL<<std::endl;
       coord.sizeY = box->boxRect().size().height();
     }
+
   bool ret = _maquette->updateBox(boxID, coord);
 
   if (ret) {
       update();
       setModified(true);
-
-/*		std::cerr << "Box top left coordinates : " << box->mapToScene(box->boundingRect().topLeft()).x() + box->boundingRect().size().width() << std::endl;
- *              std::cerr << "View right max coordinates :" << _view->sceneRect().topLeft().x() + _view->sceneRect().width() << std::endl;*/
-
-      //if (box->mapToScene(box->boundingRect().topLeft()).x() + box->boundingRect().size().width() >= (_view->sceneRect().topLeft().x() + _view->sceneRect().width() - 100)) {
-      //_view->fitInView(box,Qt::KeepAspectRatio);
-      //}
     }
 
   return ret;
@@ -1515,7 +1561,7 @@ MaquetteScene::updateStartingTime(int value)
 
 void
 MaquetteScene::setPlaying(unsigned int boxID, bool playing)
-{
+{    
   BasicBox *box = getBox(boxID); /// \todo Besoin d'un cast qt explicite ! (par jaime Chao)
   map<unsigned int, BasicBox*>::iterator it;
   if ((it = _playingBoxes.find(boxID)) != _playingBoxes.end()) {
@@ -1532,7 +1578,9 @@ MaquetteScene::setPlaying(unsigned int boxID, bool playing)
       if (playing) {
           if (box != NULL) {
               _playingBoxes[boxID] = box;
-              box->update();
+//              box->update();
+              if(!_playThread->isRunning())
+                  _playThread->start();
             }
         }
     }
@@ -1540,7 +1588,7 @@ MaquetteScene::setPlaying(unsigned int boxID, bool playing)
 
 void
 MaquetteScene::updatePlayingBoxes()
-{
+{    
   map<unsigned int, BasicBox*>::iterator it;
 
   for (it = _playingBoxes.begin(); it != _playingBoxes.end(); ++it) {
@@ -1574,6 +1622,15 @@ MaquetteScene::playOrResume()
 }
 
 void
+MaquetteScene::playOrResume(QList<unsigned int> boxesId)
+{
+    for(QList<unsigned int>::iterator it=boxesId.begin(); it!=boxesId.end(); it++){        
+        _maquette->turnExecutionOn(*it);//TODO
+    }
+    _playThread->start();
+}
+
+void
 MaquetteScene::stopOrPause()
 {
     if (!_maquette->isExecutionPaused()){
@@ -1587,6 +1644,15 @@ MaquetteScene::stopOrPause()
         emit(updateRecordingBoxes());
         _playingBoxes.clear();        
     }        
+}
+
+void
+MaquetteScene::stopOrPause(QList<unsigned int> boxesId)
+{
+    _playThread->quit();
+    for(QList<unsigned int>::iterator it=boxesId.begin(); it!=boxesId.end(); it++){
+        _maquette->turnExecutionOff(*it);
+    }
 }
 
 void
@@ -1643,8 +1709,8 @@ MaquetteScene::stopAndGoToStart()
 
     //send root box start messages
     std::vector<std::string> startCue = _maquette->getBox(ROOT_BOX_ID)->getStartMessages();
-    for(int i=0; i<startCue.size(); i++)
-        sendMessage(startCue.at(i));
+    for(auto& cue : startCue)
+        sendMessage(cue);
 
     update();
     
@@ -1679,6 +1745,9 @@ MaquetteScene::removeSelectedItems()
       else if ((*it)->type() == TRIGGER_POINT_TYPE) {
           removeTriggerPoint(static_cast<TriggerPoint*>(*it)->ID());
         }
+      else if ((*it)->type() == CONDITIONAL_RELATION_TYPE) {
+          removeConditionalRelation(static_cast<ConditionalRelation*>(*it));
+        }
     }
   map<unsigned int, BasicBox*>::iterator boxIt;
   for (boxIt = boxesToRemove.begin(); boxIt != boxesToRemove.end(); ++boxIt) {
@@ -1688,7 +1757,7 @@ MaquetteScene::removeSelectedItems()
 }
 
 void
-MaquetteScene::timeEndReached()
+MaquetteScene::updatePlayModeView()
 {
     view()->updateTimeOffsetView();
     
@@ -1730,13 +1799,16 @@ MaquetteScene::updateBoxesWidgets()
 {
   std::map<unsigned int, BasicBox*>::iterator it;
   std::map<unsigned int, BasicBox*> boxes = _maquette->getBoxes();
+  unsigned int currentBoxSave = _editor->currentBox();
+
   for (it = boxes.begin(); it != boxes.end(); it++) {
       unsigned int boxID = it->first;
-      static_cast<AbstractBox*>(getBox(boxID)->abstract())->clearMessages();
+      static_cast<AbstractBox*>(getBox(boxID)->abstract())->clearMessages();      
       if (boxID != NO_ID) {
           setAttributes(static_cast<AbstractBox*>(getBox(boxID)->abstract()));
         }
     }
+    _editor->setBoxEdited(currentBoxSave); //Because setAttributes changes currentBoxEdited value. And the edited box became an unselected one.
 }
 
 void
@@ -1759,8 +1831,15 @@ MaquetteScene::addToTriggerQueue(TriggerPoint *trigger)
 void
 MaquetteScene::verticalScroll(int value)
 {
-  _timeBar->move(0, value);
-  _view->repaint();
+  _timeBar->move(_timeBar->pos().x(), value);
+  _view->update();
+}
+
+void
+MaquetteScene::horizontalScroll(int value)
+{
+  _timeBar->move(value, _timeBar->pos().y());
+  _view->update();
 }
 
 void
@@ -1771,6 +1850,57 @@ MaquetteScene::setMaxSceneWidth(float maxSceneWidth){
 float
 MaquetteScene::getMaxSceneWidth(){
   return _maxSceneWidth;
+}
+
+void
+MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
+{
+    if(boxesToCondition.isEmpty())
+    {
+        qWarning() << "MaquetteScene::conditionBoxes : boxesToCondition is empty";
+        return;
+    }
+
+    unsigned int                    earliestDate = boxesToCondition.first()->date();
+    bool                            conditionalRelationFound = false;
+    ConditionalRelation             *condRel;
+
+
+    //Check if all boxes have a trigger point on start and force to move to the same date.
+    //Check if boxes have to be simply attached to an existing conditional relation, else create a new one.
+    for(auto& box : boxesToCondition)
+    {
+        if(!box->hasTriggerPoint(BOX_START)) //Force trigger point creation
+            box->addTriggerPoint(BOX_START);
+
+        if(box->isConditioned()) // Check if a conditional relation is already attached to a box, to create or not a new one.
+        {
+            conditionalRelationFound = true;
+            condRel = box->getConditionalRelations().first();
+        }
+
+        //Find the earliest box
+        if(box->date()<earliestDate){
+            earliestDate = box->date();
+        }
+    }
+
+    //Force boxes to move to the earliest box date.
+    /// \todo This is provisional, has to be done automatically by Score. NH
+    for(auto& box : boxesToCondition)
+    {
+        box->moveBy((qreal)(earliestDate/MS_PER_PIXEL) -(qreal)(box->date() / MS_PER_PIXEL), 0.);
+        boxMoved(box->ID());
+    }
+
+    if(conditionalRelationFound) //just attach boxes to existing relation
+    {
+        condRel->attachBoxes(boxesToCondition);
+    }
+    else //create a new one
+    {
+        condRel = new ConditionalRelation(boxesToCondition, this);
+    }    
 }
 
 void

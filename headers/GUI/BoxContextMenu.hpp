@@ -70,6 +70,8 @@ class BoxContextMenu : public QMenu
     virtual
     ~BoxContextMenu();
 
+    void setDetachActionEnabled(bool enabled);
+
   private slots:
     /*!
      * \brief Edits name of the box.
@@ -96,6 +98,11 @@ class BoxContextMenu : public QMenu
      */
     void viewRelations();
 
+    /*!
+     * \brief Detach from condition
+     */
+    void detachFromCondition();
+
   private slots:
     /*!
      * \brief Called when the name is changed.
@@ -108,6 +115,7 @@ class BoxContextMenu : public QMenu
     QAction * _changeColorAct;   //!< Action for color changing.
     QAction * _viewRelationAct;  //!< Action for relation viewing.
     QAction * _changeNameAct;    //!< Action for name changing.
+    QAction * _detachAct;        //!< Action for conditional relation detaching
     QMenu * _commentMenu;        //!< Menu for commenting.
     QAction * _addCommentAct;    //!< Action for comment adding.
     QAction * _removeCommentAct; //!< Action for comment removing.

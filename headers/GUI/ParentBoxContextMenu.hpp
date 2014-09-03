@@ -63,6 +63,7 @@ class ParentBoxContextMenu : public BoxContextMenu
 
   public:
     ParentBoxContextMenu(ParentBox *box);
+
     virtual
     ~ParentBoxContextMenu();
 

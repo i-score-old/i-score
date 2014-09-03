@@ -92,7 +92,9 @@ ParentBox::init()
   BasicBox::init();
   _contextMenu = new ParentBoxContextMenu(this);
 
-  addToComboBox(BasicBox::SUB_SCENARIO_MODE_TEXT);
+  addToComboBox(BasicBox::DEFAULT_MODE_TEXT);
+  addToComboBox(BasicBox::SCENARIO_MODE_TEXT);
+
   _hasContextMenu = true;
 }
 
@@ -113,7 +115,7 @@ ParentBox::updateDisplay(QString displayMode)
 {    
   BasicBox *curBox;
   std::map<unsigned int, BasicBox*>::iterator it;
-  if (displayMode == SUB_SCENARIO_MODE_TEXT) {
+  if (displayMode == SCENARIO_MODE_TEXT) {
       for (it = _children.begin(); it != _children.end(); ++it) {
           curBox = it->second;
           curBox->lower(false);
@@ -218,11 +220,11 @@ ParentBox::empty() const
 //}
 
 void
-ParentBox::resizeWidthEdition(int width)
+ParentBox::resizeWidthEdition(float width)
 {    
   BasicBox::resizeWidthEdition(width);
   float newWidth = _abstract->width();
-  std::map<unsigned int, BasicBox*>::iterator it;
+  std::map<unsigned int, BasicBox *>::iterator it;
   for (it = _children.begin(); it != _children.end(); ++it) {
       if (it->second->getBottomRight().x() >= (_abstract->topLeft().x() + width)) {
           newWidth = it->second->getBottomRight().x() - _abstract->topLeft().x();
@@ -231,6 +233,29 @@ ParentBox::resizeWidthEdition(int width)
   _abstract->setWidth(newWidth);
 }
 
+void
+ParentBox::resizeHeightEdition(float height)
+{
+
+    std::map<unsigned int, BasicBox *>::iterator it;
+    float newHeight = 0.;
+
+    for (it = _children.begin(); it != _children.end(); ++it) {
+        if (it->second->getBottomRight().y() >= (_abstract->topLeft().y() + height)) {
+            newHeight = it->second->getBottomRight().y() - _abstract->topLeft().y();
+          }
+      }
+
+    BasicBox::resizeHeightEdition(std::max((double)newHeight,(double)height));
+    _abstract->setHeight(std::max((double)newHeight,(double)height));
+}
+
+void
+ParentBox::resizeAllEdition(float width, float height)
+{
+    resizeWidthEdition(width);
+    resizeHeightEdition(height);
+}
 void
 ParentBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
@@ -302,12 +327,12 @@ ParentBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             break;
 
           case VERTICAL_RESIZE:
-            resizeHeightEdition(std::max(double(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y()), (double)BOX_MARGIN));
-            break;
+          resizeHeightEdition(std::max(double(_abstract->height() + event->pos().y() - _boxRect.bottomRight().y()), (double)BOX_MARGIN));
+          break;
 
-          case DIAGONAL_RESIZE:
-            resizeAllEdition(std::max(double(_abstract->width() + event->pos().x() - boxRect().topRight().x()), (double)BOX_MARGIN),
-                             std::max(double(_abstract->height() + event->pos().y() - boxRect().bottomRight().y()), (double)BOX_MARGIN));
+          case DIAGONAL_RESIZE:          
+          resizeAllEdition(std::max(double(_abstract->width() + event->pos().x() - boxRect().topRight().x()), (double)BOX_MARGIN),
+                           std::max(double(_abstract->height() + event->pos().y() - boxRect().bottomRight().y()), (double)BOX_MARGIN));
         }
       QPainterPath nullPath;
       nullPath.addRect(QRectF(QPointF(0., 0.), QSizeF(0., 0.)));

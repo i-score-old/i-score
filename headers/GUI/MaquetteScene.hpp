@@ -72,6 +72,7 @@ class SoundBox;
 class BoundingBox;
 class MaquetteContextMenu;
 class Relation;
+class ConditionalRelation;
 class Comment;
 class TriggerPoint;
 class PlayingThread;
@@ -121,7 +122,7 @@ class MaquetteScene : public QGraphicsScene
     /*!
      * \brief Updates current view.
      */
-    void updateView();
+    void initView();
 
     /*!
      * \brief Returns the current interaction mode.
@@ -303,6 +304,13 @@ class MaquetteScene : public QGraphicsScene
     void removeRelation(unsigned int relID);
 
     /*!
+     * \brief Removes a conditional relation.
+     *
+     * \param condRel : the relation to be removed
+     */
+    void removeConditionalRelation(ConditionalRelation *condRel);
+
+    /*!
      * \brief Gets a QString describing a specific relation.
      *
      * \param relID : the relation to get a string from
@@ -455,7 +463,7 @@ class MaquetteScene : public QGraphicsScene
      *
      * \return the box progress ratio.
      */
-    float getProgression(unsigned int boxID);
+    float getPosition(unsigned int boxID);
     
     /*!
      * \brief Gets the curent time offset.
@@ -519,6 +527,7 @@ class MaquetteScene : public QGraphicsScene
      * \return the playing state
      */
     bool playing();
+    inline std::map<unsigned int, BasicBox*> getPlayingBoxes(){return _playingBoxes;}
 
     /*!
      * \brief Determines the paused state.
@@ -577,6 +586,12 @@ class MaquetteScene : public QGraphicsScene
     float getMaxSceneWidth();
     void setMaxSceneWidth(float maxSceneWidth);
 
+    /*!
+     * \brief Attach boxes to a conditional relation.
+     * \param boxesToCondition : the boxes to attach
+     */
+    void conditionBoxes(QList<BasicBox *> boxesToCondition);
+
   protected:
 
     /*!
@@ -630,6 +645,7 @@ class MaquetteScene : public QGraphicsScene
 
   public slots:
     void verticalScroll(int value);
+    void horizontalScroll(int value);
     void changeTimeOffset(unsigned int timeOffset);
     void zoomChanged(float value);
     void speedChanged(double value);
@@ -642,7 +658,7 @@ class MaquetteScene : public QGraphicsScene
     /*!
      * \brief Copies selected boxes.
      */
-    void copyBoxes(bool erasing = false);
+    void copyBoxes(bool erasing = false);    
 
     /*!
      * \brief Pastes copied boxes.
@@ -650,9 +666,14 @@ class MaquetteScene : public QGraphicsScene
     void pasteBoxes();
 
     /*!
+     * \brief Mutes selected boxes.
+     */
+    void muteBoxes();
+
+    /*!
      * \brief Called when the time reaches the end.
      */
-    void timeEndReached();
+    void updatePlayModeView();
 
     /*
      * \brief Called to update the next starting time.
@@ -665,6 +686,8 @@ class MaquetteScene : public QGraphicsScene
      * \brief Plays the whole composition or resume it depending of the context
      */
     void playOrResume();
+    void playOrResume(QList<unsigned int> boxesId);
+    void stopOrPause(QList<unsigned int> boxesId);
 
     /*!
      * \brief Stops playing the composition.

@@ -24,4 +24,3 @@ load ./doxygen/Doxyfile with Doxygen and run it.
 - cd into i-score folder with your terminal.
 
 - Compile by running the script : ./build.sh
-

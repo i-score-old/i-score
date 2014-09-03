@@ -32,210 +32,147 @@ EngineCacheElement::~EngineCacheElement()
 Engine::Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
                void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
                void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
+               void (*networkDeviceNamespaceCallback)(TTSymbol&),
                std::string pathToTheJamomaFolder)
 {
     m_TimeEventStatusAttributeCallback = timeEventStatusAttributeCallback;
     m_TimeProcessSchedulerRunningAttributeCallback = timeProcessSchedulerRunningAttributeCallback;
     m_TransportDataValueCallback = transportDataValueCallback;
+    m_NetworkDeviceNamespaceCallback = networkDeviceNamespaceCallback;
     
     m_nextTimeProcessId = 1;
     m_nextIntervalId = 1;
     m_nextConditionedProcessId = 1;
     
-    m_mainScenario = NULL;
+    iscore = TTSymbol("i-score");
     
-    iscore = "i-score";
-    
-    if (!pathToTheJamomaFolder.empty())
+    if (!pathToTheJamomaFolder.empty()){
+        
         initModular(pathToTheJamomaFolder.c_str());
-    else
+        initScore(pathToTheJamomaFolder.c_str());
+    }
+    else {
+        
         initModular();
-    
-    initScore();
+        initScore();
+    }
 }
 
 void Engine::initModular(const char* pathToTheJamomaFolder)
 {
     TTErr    err;
-    TTValue  args;
-                      // TODO : declare as global variable
-    TTString configFile = "/usr/local/include/IScore/i-scoreConfiguration.xml";
+    TTValue  args, out;
+    
+    TTLogMessage("\n*** Initialisation of Modular environnement ***\n");
+    ////////////////////////////////////////////////////////////////////////
 
     // this initializes the Modular framework and loads protocol plugins
     TTModularInit(pathToTheJamomaFolder);
     
-    // create a local application named i-score
-    TTModularCreateLocalApplication(iscore, configFile);
+    // create application manager
+    m_applicationManager = TTObject("ApplicationManager");
+    
+    
+    TTLogMessage("\n*** Creation of i-score application ***\n");
+    ////////////////////////////////////////////////////////////////////////////////
+    
+    // create a local application called "i-score" and get it back
+    err = m_applicationManager.send("ApplicationInstantiateLocal", iscore, out);
+    
+    if (err) {
+        TTLogError("Error : can't create i-score application \n");
+        return;
+    }
+    else
+        m_iscore = out[0];
     
     // set the application in debug mode
-    getLocalApplication->setAttributeValue(TTSymbol("debug"), YES);
+    m_iscore.set("debug", YES);
     
-    // Create a sender to send message to any application
-    m_sender = NULL;
-    args.clear();
-    TTObjectBaseInstantiate(kTTSym_Sender, &m_sender, args);
+    // create a sender to send message to any application
+    m_sender = TTObject("Sender");
     
-    registerIscoreTransportData();
     registerIscoreToProtocols();
-}
-
-void Engine::registerIscoreTransportData()
-{
-    TTValue args, v, none;
-    
-    // create TTData for transport service and expose them
-    
-    // Play
-    TTValuePtr batonPlay = new TTValue(TTPtr(this));
-    batonPlay->append(TTSymbol("Play"));
-    TTModularCreateData(kTTSym_message, batonPlay, &TransportDataValueCallback, &m_dataPlay);
-    
-    m_dataPlay->setAttributeValue(kTTSym_type, kTTSym_none);
-    m_dataPlay->setAttributeValue(kTTSym_description, TTSymbol("start i-score execution"));
-    
-    TTModularRegisterObject(TTAddress("/Transport/Play"), m_dataPlay);
-    
-    // Stop
-    TTValuePtr batonStop = new TTValue(TTPtr(this));
-    batonStop->append(TTSymbol("Stop"));
-    TTModularCreateData(kTTSym_message, batonStop, &TransportDataValueCallback, &m_dataStop);
-    
-    m_dataStop->setAttributeValue(kTTSym_type, kTTSym_none);
-    m_dataStop->setAttributeValue(kTTSym_description, TTSymbol("stop i-score execution"));
-    
-    TTModularRegisterObject(TTAddress("/Transport/Stop"), m_dataStop);
-    
-    // Pause
-    TTValuePtr batonPause = new TTValue(TTPtr(this));
-    batonPause->append(TTSymbol("Pause"));
-    TTModularCreateData(kTTSym_message, batonPause, &TransportDataValueCallback, &m_dataPause);
-    
-    m_dataPause->setAttributeValue(kTTSym_type, kTTSym_none);
-    m_dataPause->setAttributeValue(kTTSym_description, TTSymbol("pause i-score execution"));
-    
-    TTModularRegisterObject(TTAddress("/Transport/Pause"), m_dataPause);
-    
-    // Rewind
-    TTValuePtr batonRewind = new TTValue(TTPtr(this));
-    batonRewind->append(TTSymbol("Rewind"));
-    TTModularCreateData(kTTSym_message, batonRewind, &TransportDataValueCallback, &m_dataRewind);
-    
-    m_dataRewind->setAttributeValue(kTTSym_type, kTTSym_none);
-    m_dataRewind->setAttributeValue(kTTSym_description, TTSymbol("return to the beginning of the scenario"));
-    
-    TTModularRegisterObject(TTAddress("/Transport/Rewind"), m_dataRewind);
-    
-    // StartPoint
-    TTValuePtr batonStartPoint = new TTValue(TTPtr(this));
-    batonStartPoint->append(TTSymbol("StartPoint"));
-    TTModularCreateData(kTTSym_message, batonStartPoint, &TransportDataValueCallback, &m_dataStartPoint);
-    
-    m_dataStartPoint->setAttributeValue(kTTSym_type, kTTSym_integer);
-    m_dataStartPoint->setAttributeValue(kTTSym_description, TTSymbol("set the time where to start i-score execution (in ms)"));
-    
-    TTModularRegisterObject(TTAddress("/Transport/StartPoint"), m_dataStartPoint);
-    
-    // Speed
-    TTValuePtr batonSpeed = new TTValue(TTPtr(this));
-    batonSpeed->append(TTSymbol("Speed"));
-    TTModularCreateData(kTTSym_message, batonSpeed, &TransportDataValueCallback, &m_dataSpeed);
-    
-    m_dataSpeed->setAttributeValue(kTTSym_type, kTTSym_decimal);
-    v = TTValue(0., 10.);
-    m_dataSpeed->setAttributeValue(kTTSym_rangeBounds, v);
-    m_dataSpeed->setAttributeValue(kTTSym_description, TTSymbol("change i-score speed rate execution"));
-    
-    TTModularRegisterObject(TTAddress("/Transport/Speed"), m_dataSpeed);
 }
 
 void Engine::registerIscoreToProtocols()
 {
-    TTErr     err;
-    TTValue   args, v, none;
-    TTHashPtr hashParameters;
+    TTObject    aProtocol;
+    TTErr       err;
+    TTValue     out;
     
-    // Register i-score to the Minuit and OSC protocol
     
-    // check if the Minuit protocol has been loaded
-    if (getProtocol(TTSymbol("Minuit"))) {
-        
-        // register the local application to the Minuit protocol
-        getProtocol(TTSymbol("Minuit"))->sendMessage(TTSymbol("registerApplication"), TTSymbol(iscore), none);
-        
-        // get parameter's table
-        v = TTSymbol(iscore);
-        err = getProtocol(TTSymbol("Minuit"))->getAttributeValue(TTSymbol("applicationParameters"), v);
-        
-        if (!err) {
-            
-            hashParameters = TTHashPtr((TTPtr)v[0]);
-        
-            // replace the Minuit parameters for the local application
-            hashParameters->remove(TTSymbol("port"));
-            hashParameters->append(TTSymbol("port"), MINUIT_INPUT_PORT);
-            
-            hashParameters->remove(TTSymbol("ip"));
-            hashParameters->append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
-        
-            v = TTSymbol(iscore);
-            v.append((TTPtr)hashParameters);
-            getProtocol(TTSymbol("Minuit"))->setAttributeValue(TTSymbol("applicationParameters"), v);
-        }
+    TTLogMessage("\n*** Enable Minuit communication ***\n");
+    ////////////////////////////////////////////////////////////////////////
+    
+    // create a Minuit protocol unit
+    err = m_applicationManager.send("ProtocolInstantiate", "Minuit", out);
+    
+    if (err) {
+        TTLogError("Error : can't create Minuit protocol unit \n");
+        return;
     }
+    else
+        aProtocol = out[0];
     
-    // check if the OSC protocol has been loaded
-    if (getProtocol(TTSymbol("OSC"))) {
-        
-        // register the local application to the Minuit protocol
-        getProtocol(TTSymbol("OSC"))->sendMessage(TTSymbol("registerApplication"), TTSymbol(iscore), none);
-        
-        // get parameter's table
-        v = TTSymbol(iscore);
-        err = getProtocol(TTSymbol("OSC"))->getAttributeValue(TTSymbol("applicationParameters"), v);
-        
-        if (!err) {
-            
-            hashParameters = TTHashPtr((TTPtr)v[0]);
-            
-            // replace the Minuit parameters for the local application
-            hashParameters->remove(TTSymbol("port"));
-            
-            v = TTValue(OSC_INPUT_PORT, OSC_OUTPUT_PORT);
-            hashParameters->append(TTSymbol("port"), OSC_INPUT_PORT);
-            
-            hashParameters->remove(TTSymbol("ip"));
-            hashParameters->append(TTSymbol("ip"), TTSymbol("127.0.0.1"));
-            
-            v = TTSymbol(iscore);
-            v.append((TTPtr)hashParameters);
-            getProtocol(TTSymbol("OSC"))->setAttributeValue(TTSymbol("applicationParameters"), v);
-        }
+    // register i-score to the Minuit protocol
+    aProtocol.send("ApplicationRegister", iscore, out);
+    
+    // select i-score to set its Minuit protocol parameters
+    aProtocol.send("ApplicationSelect", iscore, out);
+    aProtocol.set("port", MINUIT_INPUT_PORT);
+    aProtocol.set("ip", "127.0.0.1");
+
+    // launch Minuit protocol communication
+    aProtocol.send("Run");
+    
+    
+    TTLogMessage("\n*** Enable OSC communication ***\n");
+    ////////////////////////////////////////////////////////////////////////
+    
+    // create a OSC protocol unit
+    err = m_applicationManager.send("ProtocolInstantiate", "OSC", out);
+    
+    if (err) {
+        TTLogError("Error : can't create OSC protocol unit \n");
+        return;
     }
+    else
+        aProtocol = out[0];
+    
+    // register i-score to the OSC protocol
+    aProtocol.send("ApplicationRegister", iscore, out);
+    
+    // select i-score to set its OSC protocol parameters
+    aProtocol.send("ApplicationSelect", iscore, out);
+    aProtocol.set("port", OSC_INPUT_PORT);
+    aProtocol.set("ip", "127.0.0.1");
+    
+    // launch OSC protocol communication
+    aProtocol.send("Run");
 }
 
-void Engine::initScore()
+void Engine::initScore(const char* pathToTheJamomaFolder)
 {   
-    // this initializes the Score framework
-    TTScoreInitialize();
+    TTValue     args, out;
     
-    // Create a time event for the start
-    TTScoreTimeEventCreate(&m_mainStartEvent, 0);
+    TTLogMessage("\n*** Initialisation of Score environnement ***\n");
+    /////////////////////////////////////////////////////////////////////
     
-    // Create a time event for the end at 1 hour (in millisecond)
-    TTScoreTimeEventCreate(&m_mainEndEvent, 36000000);
-
-    // Create the main scenario
-    TTScoreTimeProcessCreate(&m_mainScenario, "Scenario", m_mainStartEvent, m_mainEndEvent);
-    TTScoreTimeProcessSetName(m_mainScenario, "root");
-
-    // TODO : use TTScoreAPI to be notified when a time process starts via startCallbackFunction(TTTimeProcessPtr)
-    //TTScoreTimeProcessStartCallbackCreate(m_mainScenario, &m_mainStartCallback, startCallbackFunction);
-
-    // TODO : use TTScoreAPI to be notified when a time process ends via endCallbackFunction(TTTimeProcessPtr)
-    //TTScoreTimeProcessEndCallbackCreate(m_mainScenario, &m_mainEndCallback, endCallbackFunction);
+    // Init the Score library (passing the folder path where all the dylibs are)
+    TTScoreInit(pathToTheJamomaFolder);
+    
+    
+    TTLogMessage("\n*** Creating an empty Scenario ***\n");
+    /////////////////////////////////////////////////////////////////////
+    
+    // Create an empty Scenario
+    m_mainScenario = TTObject("Scenario");
+    m_mainScenario.set("name", TTSymbol("Main"));
 
     // Store the main scenario (so ROOT_BOX_ID is 1)
-    cacheTimeProcess(m_mainScenario, "root");
+    TTAddress address("/Main");
+    cacheTimeProcess(m_mainScenario, address, m_mainScenario);
 }
 
 void Engine::dumpAddressBelow(TTNodePtr aNode)
@@ -269,28 +206,20 @@ Engine::~Engine()
     clearInterval();
     clearConditionedProcess();
     clearTimeCondition();
-    
-    // Delete the main scenario
-    TTScoreTimeProcessRelease(&m_mainScenario);
-    
-    // Delete the main scenario start event
-    TTScoreTimeEventRelease(&m_mainStartEvent);
-    
-    // Delete the main scenario end event
-    TTScoreTimeEventRelease(&m_mainEndEvent);
-    
-    // delete the sender
-    TTObjectBaseRelease(&m_sender);
 }
 
-TimeProcessId Engine::cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::string & name)
+TimeProcessId Engine::cacheTimeProcess(TTObject& timeProcess, TTAddress& anAddress, TTObject& subScenario)
 {
     TimeProcessId id;
     EngineCacheElementPtr e;
     
     e = new EngineCacheElement();
-    e->object = TTObjectBasePtr(timeProcess);
-    e->name = name;
+    e->object = timeProcess;
+    e->address = anAddress;
+    e->subScenario = subScenario;
+    
+    TTValue out, args = TTValue(e->address, e->object);
+    m_iscore.send("ObjectRegister", args, out);
     
     id = m_nextTimeProcessId;
     m_timeProcessMap[id] = e;
@@ -302,9 +231,63 @@ TimeProcessId Engine::cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::
     return id;
 }
 
-TTTimeProcessPtr Engine::getTimeProcess(TimeProcessId boxId)
+TTObject& Engine::getTimeProcess(TimeProcessId boxId)
 {
-    return TTTimeProcessPtr(TTObjectBasePtr(m_timeProcessMap[boxId]->object));
+    return m_timeProcessMap[boxId]->object;
+}
+
+TTAddress& Engine::getAddress(TimeProcessId boxId)
+{
+    return m_timeProcessMap[boxId]->address;
+}
+
+TTObject& Engine::getSubScenario(TimeProcessId boxId)
+{
+    return m_timeProcessMap[boxId]->subScenario;
+}
+
+TimeProcessId Engine::getParentId(TimeProcessId boxId)
+{
+    EngineCacheMapIterator it;
+    TimeProcessId   parentId = NO_ID;
+    TTObject        parentScenario;
+    TTValue         v;
+    
+    m_timeProcessMap[boxId]->object.get("container", v);
+    parentScenario = v[0];
+    
+    // retreive the id of the scenario
+    for (it = m_timeProcessMap.begin(); it != m_timeProcessMap.end(); ++it) {
+        
+        if (it->second->subScenario == parentScenario) {
+
+            parentId = it->first;
+            break;
+        }
+    }
+    
+    return parentId;
+}
+
+void Engine::getChildrenId(TimeProcessId boxId, vector<TimeProcessId>& childrenId)
+{
+    EngineCacheMapIterator it;
+    TTObject    subScenario = getSubScenario(boxId);
+    TTObject    parentScenario;
+    TTValue     v;
+    
+    // Get all boxes id that have the subScenario as parent
+    for (it = m_timeProcessMap.begin(); it != m_timeProcessMap.end(); ++it) {
+        
+        if (it->first == boxId)
+            continue;
+        
+        it->second->object.get("container", v);
+        parentScenario = v[0];
+        
+        if (parentScenario != NULL && parentScenario == subScenario)
+            childrenId.push_back(it->first);
+    }
 }
 
 void Engine::uncacheTimeProcess(TimeProcessId boxId)
@@ -313,6 +296,9 @@ void Engine::uncacheTimeProcess(TimeProcessId boxId)
     
     uncacheStartCallback(boxId);
     uncacheEndCallback(boxId);
+    
+    TTValue out;
+    m_iscore.send("ObjectUnregister", e->address, out);
     
     delete e;
     m_timeProcessMap.erase(boxId);
@@ -341,13 +327,13 @@ void Engine::clearTimeProcess()
     m_nextTimeProcessId = 2;
 }
 
-IntervalId Engine::cacheInterval(TTTimeProcessPtr timeProcess)
+IntervalId Engine::cacheInterval(TTObject& timeProcess)
 {
     TimeProcessId id;
     EngineCacheElementPtr e;
     
     e = new EngineCacheElement();
-    e->object = TTObjectBasePtr(timeProcess);
+    e->object = timeProcess;
     
     id = m_nextIntervalId;
     m_intervalMap[id] = e;
@@ -356,9 +342,9 @@ IntervalId Engine::cacheInterval(TTTimeProcessPtr timeProcess)
     return id;
 }
 
-TTTimeProcessPtr Engine::getInterval(IntervalId relationId)
+TTObject& Engine::getInterval(IntervalId relationId)
 {
-    return TTTimeProcessPtr(TTObjectBasePtr(m_intervalMap[relationId]->object));
+    return m_intervalMap[relationId]->object;
 }
 
 void Engine::uncacheInterval(IntervalId relationId)
@@ -383,19 +369,19 @@ void Engine::clearInterval()
 
 ConditionedProcessId Engine::cacheConditionedProcess(TimeProcessId timeProcessId, TimeEventIndex controlPointId)
 {
-    TTTimeProcessPtr        timeProcess = getTimeProcess(timeProcessId);
-    TTTimeEventPtr          timeEvent;
+    TTObject                timeProcess = getTimeProcess(timeProcessId);
+    TTObject                timeEvent;
     ConditionedProcessId    id;
     EngineCacheElementPtr   e;
     TTValue                 v;
     
     // Get start or end time event
     if (controlPointId == BEGIN_CONTROL_POINT_INDEX)
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+        timeProcess.get("startEvent", v);
     else
-        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
+        timeProcess.get("endEvent", v);
     
-    timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+    timeEvent = v[0];
     
     // Create a new engine cache element
     e = new EngineCacheElement();
@@ -409,19 +395,14 @@ ConditionedProcessId Engine::cacheConditionedProcess(TimeProcessId timeProcessId
     // We cache an observer on time event status attribute
     cacheStatusCallback(id, controlPointId);
     
-    // We cache a TTData to allow remote triggering
-    // théo : we don't create the /Box.n/start or /Box.n/end message for the moment
-    // because it makes strange trouble if it is written into the i-score namespace
-    //cacheTriggerDataCallback(id, timeProcessId);
-    
     return id;
 }
 
-TTTimeProcessPtr Engine::getConditionedProcess(ConditionedProcessId triggerId, TimeEventIndex& controlPointId)
+TTObject& Engine::getConditionedProcess(ConditionedProcessId triggerId, TimeEventIndex& controlPointId)
 {
     controlPointId = m_conditionedProcessMap[triggerId]->index;
     
-    return TTTimeProcessPtr(TTObjectBasePtr(m_conditionedProcessMap[triggerId]->object));
+    return m_conditionedProcessMap[triggerId]->object;
 }
 
 void Engine::uncacheConditionedProcess(ConditionedProcessId triggerId)
@@ -431,9 +412,6 @@ void Engine::uncacheConditionedProcess(ConditionedProcessId triggerId)
     
     // Uncache observer on time event status attribute
     uncacheStatusCallback(triggerId, e->index);
-    
-    // Uncache TTData used for remote triggering
-    uncacheTriggerDataCallback(triggerId);
     
     // Delete the engine cache element
     delete e;
@@ -447,19 +425,17 @@ void Engine::clearConditionedProcess()
     for (it = m_conditionedProcessMap.begin(); it != m_conditionedProcessMap.end(); ++it) {
         
         uncacheStatusCallback(it->first, it->second->index);
-        uncacheTriggerDataCallback(it->first);
         
         delete it->second;
     }
     
     m_conditionedProcessMap.clear();
     m_statusCallbackMap.clear();
-    m_triggerDataMap.clear();
     
     m_nextConditionedProcessId = 1;
 }
 
-void Engine::cacheTimeCondition(ConditionedProcessId triggerId, TTTimeConditionPtr timeCondition)
+void Engine::cacheTimeCondition(ConditionedProcessId triggerId, TTObject& timeCondition)
 {
     EngineCacheElementPtr   e;
     TTValue                 args, v;
@@ -471,9 +447,9 @@ void Engine::cacheTimeCondition(ConditionedProcessId triggerId, TTTimeConditionP
     m_timeConditionMap[triggerId] = e;
 }
 
-TTTimeConditionPtr Engine::getTimeCondition(ConditionedProcessId triggerId)
+TTObject& Engine::getTimeCondition(ConditionedProcessId triggerId)
 {
-    return TTTimeConditionPtr(TTObjectBasePtr(m_timeConditionMap[triggerId]->object));
+    return m_timeConditionMap[triggerId]->object;
 }
 
 void Engine::uncacheTimeCondition(ConditionedProcessId triggerId)
@@ -497,24 +473,21 @@ void Engine::clearTimeCondition()
 void Engine::cacheStartCallback(TimeProcessId boxId)
 {
     EngineCacheElementPtr   e;
-    TTValuePtr              processStartedBaton;
+    TTValue                 baton;
     
     e = new EngineCacheElement();
-    e->object = NULL;
     e->index = boxId;
     
     // create a TTCallback to observe when time process starts (using TimeProcessStartCallback)
-    TTObjectBaseInstantiate(TTSymbol("callback"), &e->object, kTTValNONE);
+    e->object = TTObject("callback");
     
-    processStartedBaton = new TTValue(TTPtr(this)); // processStartedBaton will be deleted during the callback destruction
-    processStartedBaton->append(TTUInt32(boxId));
-    
-    e->object->setAttributeValue(kTTSym_baton, TTPtr(processStartedBaton));
-    e->object->setAttributeValue(kTTSym_function, TTPtr(&TimeProcessStartCallback));
-    e->object->setAttributeValue(kTTSym_notification, kTTSym_ProcessStarted);
+    baton = TTValue(TTPtr(this), TTUInt32(boxId));
+    e->object.set("baton", baton);
+    e->object.set("function", TTPtr(&TimeProcessStartCallback));
+    e->object.set("notification", TTSymbol("ProcessStarted"));
     
     // observe the "ProcessStarted" notification
-    getTimeProcess(boxId)->registerObserverForNotifications(*e->object);
+    getTimeProcess(boxId).registerObserverForNotifications(e->object);
 
     m_startCallbackMap[boxId] = e;
 }
@@ -523,15 +496,9 @@ void Engine::uncacheStartCallback(TimeProcessId boxId)
 {
     EngineCacheElementPtr   e = m_startCallbackMap[boxId];
     TTValue                 v;
-    TTErr                   err;
     
     // don't observe the "ProcessStarted" notification anymore
-    err = getTimeProcess(boxId)->unregisterObserverForNotifications(*e->object);
-    
-    if (!err) {
-        delete (TTValuePtr)TTCallbackPtr(e->object)->getBaton();
-        TTObjectBaseRelease(&e->object);
-    }
+    getTimeProcess(boxId).unregisterObserverForNotifications(e->object);
     
     delete e;
     m_startCallbackMap.erase(boxId);
@@ -540,24 +507,21 @@ void Engine::uncacheStartCallback(TimeProcessId boxId)
 void Engine::cacheEndCallback(TimeProcessId boxId)
 {
     EngineCacheElementPtr   e;
-    TTValuePtr              processEndedBaton;
+    TTValue                 baton;
     
     e = new EngineCacheElement();
-    e->object = NULL;
     e->index = boxId;
     
-    // create a TTCallback to observe when time process ends (using TimeProcessEndCallback)
-    TTObjectBaseInstantiate(TTSymbol("callback"), &e->object, kTTValNONE);
+    // create a TTCallback to observe when time process starts (using TimeProcessEndCallback)
+    e->object = TTObject("callback");
     
-    processEndedBaton = new TTValue(TTPtr(this)); // processEndedBaton will be deleted during the callback destruction
-    processEndedBaton->append(TTUInt32(boxId));
+    baton = TTValue(TTPtr(this), TTUInt32(boxId));
+    e->object.set("baton", baton);
+    e->object.set("function", TTPtr(&TimeProcessEndCallback));
+    e->object.set("notification", TTSymbol("ProcessEnded"));
     
-    e->object->setAttributeValue(kTTSym_baton, TTPtr(processEndedBaton));
-    e->object->setAttributeValue(kTTSym_function, TTPtr(&TimeProcessEndCallback));
-    e->object->setAttributeValue(kTTSym_notification, kTTSym_ProcessEnded);
-    
-    // observe the "ProcessEnded" notification
-    getTimeProcess(boxId)->registerObserverForNotifications(*e->object);
+    // observe the "ProcessStarted" notification
+    getTimeProcess(boxId).registerObserverForNotifications(e->object);
     
     m_endCallbackMap[boxId] = e;
 }
@@ -566,15 +530,9 @@ void Engine::uncacheEndCallback(TimeProcessId boxId)
 {
     EngineCacheElementPtr   e = m_endCallbackMap[boxId];
     TTValue                 v;
-    TTErr                   err;
     
     // don't observe the "ProcessEnded" notification anymore
-    err = getTimeProcess(boxId)->registerObserverForNotifications(*e->object);
-    
-    if (!err) {
-        delete (TTValuePtr)TTCallbackPtr(e->object)->getBaton();
-        TTObjectBaseRelease(&e->object);
-    }
+    getTimeProcess(boxId).registerObserverForNotifications(e->object);
     
     delete e;
     m_endCallbackMap.erase(boxId);
@@ -583,37 +541,32 @@ void Engine::uncacheEndCallback(TimeProcessId boxId)
 void Engine::cacheStatusCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId)
 {
     EngineCacheElementPtr   e;
-    TTTimeProcessPtr        timeProcess = getConditionedProcess(triggerId, controlPointId);
-    TTTimeEventPtr          timeEvent;
-    TTValue                 v, out;
-    TTValuePtr              statusChangedBaton;
-    TTErr                   err;
+    TTObject    timeProcess = getConditionedProcess(triggerId, controlPointId);
+    TTObject    timeEvent;
+    TTValue     v, baton;
     
     // Create a new engine cache element
     e = new EngineCacheElement();
-    e->object = NULL;
     e->index = triggerId;
     
-    // Get start or end time event
+    // get start or end time event
     if (controlPointId == BEGIN_CONTROL_POINT_INDEX)
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+        timeProcess.get("startEvent", v);
     else
-        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
+        timeProcess.get("endEvent", v);
     
-    timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+    timeEvent = v[0];
     
-    // Create a TTCallback to observe time event status attribute (using TimeEventStatusAttributeCallback)
-    TTObjectBaseInstantiate(TTSymbol("callback"), &e->object, kTTValNONE);
+    // create a TTCallback to observe time event status attribute (using TimeEventStatusAttributeCallback)
+    e->object = TTObject("callback");
     
-    statusChangedBaton = new TTValue(TTPtr(this)); // statusChangedBaton will be deleted during the callback destruction
-    statusChangedBaton->append(TTUInt32(triggerId));
-    
-    e->object->setAttributeValue(kTTSym_baton, TTPtr(statusChangedBaton));
-    e->object->setAttributeValue(kTTSym_function, TTPtr(&TimeEventStatusAttributeCallback));
-    e->object->setAttributeValue(kTTSym_notification, kTTSym_EventStatusChanged);
+    baton = TTValue(TTPtr(this), TTUInt32(triggerId));
+    e->object.set("baton", baton);
+    e->object.set("function", TTPtr(&TimeEventStatusAttributeCallback));
+    e->object.set("notification", TTSymbol("EventStatusChanged"));
     
     // observe the "EventReadyChanged" notification
-    timeEvent->registerObserverForNotifications(*e->object);
+    timeEvent.registerObserverForNotifications(e->object);
 
     m_statusCallbackMap[triggerId] = e;
 }
@@ -621,87 +574,61 @@ void Engine::cacheStatusCallback(ConditionedProcessId triggerId, TimeEventIndex 
 void Engine::uncacheStatusCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId)
 {
     EngineCacheElementPtr   e = m_statusCallbackMap[triggerId];
-    TTTimeProcessPtr        timeProcess = getConditionedProcess(triggerId, controlPointId);
-    TTTimeEventPtr          timeEvent;
-    TTValue                 v;
-    TTErr                   err;
+    TTObject    timeProcess = getConditionedProcess(triggerId, controlPointId);
+    TTObject    timeEvent;
+    TTValue     v;
     
-    // Get start or end time event
+    // get start or end time event
     if (controlPointId == BEGIN_CONTROL_POINT_INDEX)
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+        timeProcess.get("startEvent", v);
     else
-        timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
+        timeProcess.get("endEvent", v);
     
-    timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+    timeEvent = v[0];
     
     // don't observe the "EventStatusChanged" notification anymore
-    err = timeEvent->unregisterObserverForNotifications(*e->object);
-    
-    if (!err) {
-        delete (TTValuePtr)TTCallbackPtr(e->object)->getBaton();
-        TTObjectBaseRelease(&e->object);
-    }
+    timeEvent.unregisterObserverForNotifications(e->object);
     
     delete e;
     m_statusCallbackMap.erase(triggerId);
-}
-
-void Engine::cacheTriggerDataCallback(ConditionedProcessId triggerId, TimeProcessId boxId)
-{
-    EngineCacheElementPtr   e;
-    TTValue                 v;
-    TTString                address;
-    TTSymbol                boxName = TTSymbol();
-    
-    e = new EngineCacheElement();
-    e->object = NULL;
-    e->index = boxId;
-    
-    // Create a TTData
-    TTModularCreateData(kTTSym_message, NULL, NULL, &e->object);
-    
-    e->object->setAttributeValue(kTTSym_type, kTTSym_none);
-    e->object->setAttributeValue(kTTSym_description, TTSymbol("trigger an event"));
-    
-    // register the TTData under /Box.n/start or /Box.n/end address
-    address = "/";
-    address += m_timeProcessMap[boxId]->name.c_str();
-
-    if (m_conditionedProcessMap[triggerId]->index == BEGIN_CONTROL_POINT_INDEX)
-        address += "/start";
-    else
-        address += "/end";
-    
-    TTModularRegisterObject(TTAddress(address), e->object);
-    
-    m_triggerDataMap[triggerId] = e;
-}
-
-void Engine::uncacheTriggerDataCallback(ConditionedProcessId triggerId)
-{
-    ; // TODO
 }
 
 // Edition ////////////////////////////////////////////////////////////////////////
 
 TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const std::string & name, TimeProcessId motherId)
 {
-    TTTimeEventPtr      startEvent, endEvent;
-    TTTimeProcessPtr    timeProcess;
-    TimeProcessId       boxId;
+    TTObject        startEvent, endEvent;
+    TTObject        timeProcess, subScenario;
+    TimeProcessId   boxId;
+    TTAddress       address;
+    TTValue         args, out;
     
-    // Create a time event for the start into the main scenario
-    TTScoreTimeEventCreate(&startEvent, boxBeginPos, TTTimeContainerPtr(m_mainScenario));
+    // create a time event for the start into the mother scenario
+    getSubScenario(motherId).send("TimeEventCreate", boxBeginPos, out);
+    startEvent = out[0];
 
-    // Create a time event for the end into the main scenario
-    TTScoreTimeEventCreate(&endEvent, boxBeginPos+boxLength, TTTimeContainerPtr(m_mainScenario));
+    // create a time event for the end into the mother scenario
+    getSubScenario(motherId).send("TimeEventCreate", boxBeginPos+boxLength, out);
+    endEvent = out[0];
     
-    // Create a new automation time process into the main scenario
-    TTScoreTimeProcessCreate(&timeProcess, "Automation", startEvent, endEvent, TTTimeContainerPtr(m_mainScenario));
-    TTScoreTimeProcessSetName(timeProcess, name);
+    // create a new automation time process into the mother scenario
+    args = TTValue(TTSymbol("Automation"), startEvent, endEvent);
+    getSubScenario(motherId).send("TimeProcessCreate", args, out);
+    timeProcess = out[0];
+    timeProcess.set("name", TTSymbol(name));
     
-    // Cache it and get an unique id for this process
-    boxId = cacheTimeProcess(timeProcess, name);
+    // create a new sub scenario time process into the mother scenario
+    args = TTValue(TTSymbol("Scenario"), startEvent, endEvent);
+    getSubScenario(motherId).send("TimeProcessCreate", args, out);
+    subScenario = out[0];
+    
+    // cache it and get an unique id for this process
+    if (motherId == ROOT_BOX_ID)
+        address = kTTAdrsRoot.appendAddress(TTAddress(name.data()));
+    else
+        address = getAddress(motherId).appendAddress(TTAddress(name.data()));
+    
+    boxId = cacheTimeProcess(timeProcess, address, subScenario);
     
     iscoreEngineDebug TTLogMessage("TimeProcess %ld created at %ld ms for a duration of %ld ms\n", boxId, boxBeginPos, boxLength);
     
@@ -710,26 +637,38 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const s
 
 void Engine::removeBox(TimeProcessId boxId)
 {
-    TTTimeProcessPtr    timeProcess;
-    TTTimeEventPtr      startEvent, endEvent;
-    TTErr               err;
+    TTObject    timeProcess, subScenario;
+    TTObject    parentScenario;
+    TTObject    startEvent, endEvent;
+    TTValue     out;
+    TTErr       err;
     
-    // Retreive the time process using the boxId
+    // retreive the time process using the boxId
     timeProcess = getTimeProcess(boxId);
+    subScenario = getSubScenario(boxId);
     
-    // Remove the time process from the cache
+    // get the parent scenario
+    timeProcess.get("container", out);
+    parentScenario = out[0];
+    
+    // remove the time process from the cache
     uncacheTimeProcess(boxId);
     
-    // Release the time process from the main scenario
-    TTScoreTimeProcessRelease(&timeProcess, TTTimeContainerPtr(m_mainScenario), &startEvent, &endEvent);
+    // release the time process from the mother scenario
+    parentScenario.send("TimeProcessRelease", timeProcess, out);
+    startEvent = out[0];
+    endEvent = out[1];
+
+    // release the sub scenario from the mother scenario
+    parentScenario.send("TimeProcessRelease", subScenario, out);
     
-    // Release start event from the main scenario
-    err = TTScoreTimeEventRelease(&startEvent, TTTimeContainerPtr(m_mainScenario));
+    // release start event from the mother scenario
+    err = parentScenario.send("TimeEventRelease", startEvent, out);
     if (err)
         iscoreEngineDebug TTLogMessage("Box %ld cannot release his start event\n", boxId);
     
-    // Release end event from the main scenario
-    err = TTScoreTimeEventRelease(&endEvent, TTTimeContainerPtr(m_mainScenario));
+    // release end event from the mother scenario
+    err = parentScenario.send("TimeEventRelease", endEvent, out);
     if (err)
         iscoreEngineDebug TTLogMessage("Box %ld cannot release his end event\n", boxId);
 }
@@ -741,37 +680,57 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
                                        TemporalRelationType type,
                                        vector<TimeProcessId>& movedBoxes)
 {
-    TTTimeProcessPtr        timeProcess = NULL;
-    TTTimeProcessPtr        tp1, tp2;
-    TTTimeEventPtr          startEvent, endEvent;
-    IntervalId              relationId;
+    TTObject    timeProcess;
+    TTObject    tp1, tp2;
+    TTObject    startEvent, endEvent;
+    TTObject    startScenario, endScenario;
+    IntervalId  relationId;
+    TTValue     args, out;
+    TTErr       err;
     EngineCacheMapIterator  it;
-    TTErr                   err;
     
-    // Get the events from the given box ids and pass them to the time process
+    // get the events from the given box ids and pass them to the time process
     tp1 = getTimeProcess(boxId1);
     tp2 = getTimeProcess(boxId2);
     
     if (controlPoint1 == BEGIN_CONTROL_POINT_INDEX)
-        TTScoreTimeProcessGetStartEvent(tp1, &startEvent);
+        tp1.get("startEvent", out);
     else
-        TTScoreTimeProcessGetEndEvent(tp1, &startEvent);
+        tp1.get("endEvent", out);
+    
+    startEvent = out[0];
     
     if (controlPoint2 == BEGIN_CONTROL_POINT_INDEX)
-        TTScoreTimeProcessGetStartEvent(tp2, &endEvent);
+        tp2.get("startEvent", out);
     else
-        TTScoreTimeProcessGetEndEvent(tp2, &endEvent);
+        tp2.get("endEvent", out);
+    
+    endEvent = out[0];
+    
+    // get start and end events container
+    startEvent.get("container", out);
+    startScenario = out[0];
+    
+    endEvent.get("container", out);
+    endScenario = out[0];
+    
+    // can't create a relation between to events of 2 differents scenarios
+    if (startScenario != endScenario)
+        return NO_ID;
 
-    // Create a new interval time process into the main scenario
-    err = TTScoreTimeProcessCreate(&timeProcess, "Interval", startEvent, endEvent, TTTimeContainerPtr(m_mainScenario));
-
+    // create a new interval time process into the main scenario
+    args = TTValue(TTSymbol("Interval"), startEvent, endEvent);
+    err = startScenario.send("TimeProcessCreate", args, out);
+    
     // an error can append if the start is after the end
     if (!err) {
         
-        // Set the time process rigid
-        TTScoreTimeProcessSetRigid(timeProcess, true);
+        timeProcess = out[0];
         
-        // Cache it and get an unique id for this process
+        // set the time process rigid
+        timeProcess.set("rigid", true);
+
+        // cache it and get an unique id for this process
         relationId = cacheInterval(timeProcess);
     
         // return the entire timeProcessMap except the first process !!! (this is bad but it is like former engine)
@@ -788,36 +747,45 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
 
 void Engine::removeTemporalRelation(IntervalId relationId)
 {
-    TTTimeProcessPtr    timeProcess;
-    TTTimeEventPtr      startEvent, endEvent;
-    TTErr               err;
+    TTObject    timeProcess;
+    TTObject    startEvent, endEvent;
+    TTObject    parentScenario;
+    TTValue     out;
+    TTErr       err;
     
-    // Retreive the interval using the relationId
+    // retreive the interval using the relationId
     timeProcess = getInterval(relationId);
     
-    // Release the time process from the main scenario
-    TTScoreTimeProcessRelease(&timeProcess, TTTimeContainerPtr(m_mainScenario), &startEvent, &endEvent);
-
-    // Release start event from the main scenario
-    err = TTScoreTimeEventRelease(&startEvent, TTTimeContainerPtr(m_mainScenario));
+    // get the parent scenario
+    timeProcess.get("container", out);
+    parentScenario = out[0];
+    
+    // release the time process from the mother scenario
+    parentScenario.send("TimeProcessRelease", timeProcess, out);
+    startEvent = out[0];
+    endEvent = out[1];
+    
+    // release start event from the mother scenario
+    err = parentScenario.send("TimeEventRelease", startEvent, out);
     if (err)
         iscoreEngineDebug TTLogMessage("Relation %ld cannot release his start event\n", relationId);
 
-    // Release end event from the main scenario
-    err = TTScoreTimeEventRelease(&endEvent, TTTimeContainerPtr(m_mainScenario));
+    // release end event from the mother scenario
+   err = parentScenario.send("TimeEventRelease", endEvent, out);
     if (err)
         iscoreEngineDebug TTLogMessage("Relation %ld cannot release his end event\n", relationId);
 
-    // Remove the interval from the cache
+    // remove the interval from the cache
     uncacheInterval(relationId);
 }
 
 void Engine::changeTemporalRelationBounds(IntervalId relationId, BoundValue minBound, BoundValue maxBound, vector<TimeProcessId>& movedBoxes)
 {
-    TTTimeProcessPtr        timeProcess = getInterval(relationId);
+    TTObject    timeProcess = getInterval(relationId);
+    TTUInt32    durationMin;
+    TTUInt32    durationMax;
+    TTValue     args, out;
     EngineCacheMapIterator  it;
-    TTUInt32                durationMin;
-    TTUInt32                durationMax;
 
     // filtering NO_BOUND (-1) and negative value because we use unsigned int
     if (minBound == NO_BOUND)
@@ -836,7 +804,8 @@ void Engine::changeTemporalRelationBounds(IntervalId relationId, BoundValue minB
     
     // NOTE : sending 0 0 means the relation is not rigid
     // NOTE : it is also possible to use the "rigid" attribute to swicth between those two states
-    TTScoreTimeProcessLimit(timeProcess, durationMin, durationMax);
+    args = TTValue(durationMin, durationMax);
+    timeProcess.send("Limit", args, out);
     
     // return the entire timeProcessMap except the first process !!! (this is bad but it is like former engine)
     it = m_timeProcessMap.begin();
@@ -847,35 +816,29 @@ void Engine::changeTemporalRelationBounds(IntervalId relationId, BoundValue minB
 
 bool Engine::isTemporalRelationExisting(TimeProcessId boxId1, TimeEventIndex controlPoint1, TimeProcessId boxId2, TimeEventIndex controlPoint2)
 {
-    TTValue                 v1, v2, v;
-    TTTimeProcessPtr        timeProcess, tp1, tp2;
-    IntervalId              found = NO_ID;
+    TTValue     v1, v2, v;
+    IntervalId  found = NO_ID;
     EngineCacheMapIterator  it;
     
     // Get the events from the given box ids and pass them to the time process
-    tp1 = getTimeProcess(boxId1);
-    tp2 = getTimeProcess(boxId2);
-    
     if (controlPoint1 == BEGIN_CONTROL_POINT_INDEX)
-        tp1->getAttributeValue(TTSymbol("startEvent"), v1);
+        getTimeProcess(boxId1).get("startEvent", v1);
     else
-        tp1->getAttributeValue(TTSymbol("endEvent"), v1);
+        getTimeProcess(boxId1).get("endEvent", v1);
     
     if (controlPoint2 == BEGIN_CONTROL_POINT_INDEX)
-        tp2->getAttributeValue(TTSymbol("startEvent"), v2);
+        getTimeProcess(boxId2).get("startEvent", v2);
     else
-        tp2->getAttributeValue(TTSymbol("endEvent"), v2);
+        getTimeProcess(boxId2).get("endEvent", v2);
     
     // Look into the interval map to retreive an interval with the same events
     for (it = m_intervalMap.begin(); it != m_intervalMap.end(); ++it) {
         
-        timeProcess = TTTimeProcessPtr(TTObjectBasePtr(it->second->object));
-        
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
+        it->second->object.get("startEvent", v);
         
         if (v == v1) {
             
-            timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
+            it->second->object.get("endEvent", v);
             
             if (v == v2) {
                 found = it->first;
@@ -889,31 +852,26 @@ bool Engine::isTemporalRelationExisting(TimeProcessId boxId1, TimeEventIndex con
 
 TimeProcessId Engine::getRelationFirstBoxId(IntervalId relationId)
 {
-    TTValue                 v, vt;
-    TTTimeProcessPtr        timeProcess = getInterval(relationId);
-    TTTimeEventPtr          event;
-    TimeProcessId           found = NO_ID;
+    TTValue         out, v;
+    TimeProcessId   found = NO_ID;
     EngineCacheMapIterator  it;
     
     // get the start event of the interval
-	timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
-    event = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+	getInterval(relationId).get("startEvent", out);
     
     // Look into the automation map to retreive an automation with the same event
     for (it = m_timeProcessMap.begin(); it != m_timeProcessMap.end(); ++it) {
         
-        timeProcess = TTTimeProcessPtr(TTObjectBasePtr(it->second->object));
+        it->second->object.get("startEvent", v);
         
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), vt);
-        
-        if (v == vt) {
+        if (out == v) {
             found = it->first;
             break;
         }
         
-        timeProcess->getAttributeValue(TTSymbol("endEvent"), vt);
+        it->second->object.get("endEvent", v);
         
-        if (v == vt) {
+        if (out == v) {
             found = it->first;
             break;
         }
@@ -924,31 +882,26 @@ TimeProcessId Engine::getRelationFirstBoxId(IntervalId relationId)
 
 TimeEventIndex Engine::getRelationFirstCtrlPointIndex(IntervalId relationId)
 {
-    TTValue                 v, vt;
-    TTTimeProcessPtr        timeProcess = getInterval(relationId);
-    TTTimeEventPtr          event;
-    TimeEventIndex          ctrlPointId = NO_ID;
+    TTValue         out, v;
+    TimeEventIndex  ctrlPointId = NO_ID;
     EngineCacheMapIterator  it;
     
     // get the start event of the interval
-	timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
-    event = TTTimeEventPtr(TTObjectBasePtr(v[0]));
-    
+	getInterval(relationId).get("startEvent", out);
+
     // Look into the automation map to retreive an automation with the same event
     for (it = m_timeProcessMap.begin(); it != m_timeProcessMap.end(); ++it) {
         
-        timeProcess = TTTimeProcessPtr(TTObjectBasePtr(it->second->object));
+        it->second->object.get("startEvent", v);
         
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), vt);
-        
-        if (v == vt) {
+        if (out == v) {
             ctrlPointId = BEGIN_CONTROL_POINT_INDEX;
             break;
         }
         
-        timeProcess->getAttributeValue(TTSymbol("endEvent"), vt);
+        it->second->object.get("endEvent", v);
         
-        if (v == vt) {
+        if (out == v) {
             ctrlPointId = END_CONTROL_POINT_INDEX;
             break;
         }
@@ -959,31 +912,26 @@ TimeEventIndex Engine::getRelationFirstCtrlPointIndex(IntervalId relationId)
 
 TimeProcessId Engine::getRelationSecondBoxId(IntervalId relationId)
 {
-    TTValue                 v, vt;
-    TTTimeProcessPtr        timeProcess = getInterval(relationId);
-    TTTimeEventPtr          event;
-    TimeProcessId           found = NO_ID;
+    TTValue         out, v;
+    TimeProcessId   found = NO_ID;
     EngineCacheMapIterator  it;
     
     // Get the end event of the interval
-	timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-    event = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+	getInterval(relationId).get("endEvent", out);
     
     // Look into the automation map to retreive an automation with the same event
     for (it = m_timeProcessMap.begin(); it != m_timeProcessMap.end(); ++it) {
         
-        timeProcess = TTTimeProcessPtr(TTObjectBasePtr(it->second->object));
+        it->second->object.get("startEvent", v);
         
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), vt);
-        
-        if (v == vt) {
+        if (out == v) {
             found = it->first;
             break;
         }
         
-        timeProcess->getAttributeValue(TTSymbol("endEvent"), vt);
+        it->second->object.get("endEvent", v);
         
-        if (v == vt) {
+        if (out == v) {
             found = it->first;
             break;
         }
@@ -994,31 +942,26 @@ TimeProcessId Engine::getRelationSecondBoxId(IntervalId relationId)
 
 TimeEventIndex Engine::getRelationSecondCtrlPointIndex(IntervalId relationId)
 {
-    TTValue                 v, vt;
-    TTTimeProcessPtr        timeProcess = getInterval(relationId);
-    TTTimeEventPtr          event;
-    TimeEventIndex          ctrlPointId = NO_ID;
+    TTValue         out, v;
+    TimeEventIndex  ctrlPointId = NO_ID;
     EngineCacheMapIterator  it;
     
     // get the start event of the interval
-	timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-    event = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+	getInterval(relationId).get("endEvent", out);
     
     // Look into the automation map to retreive an automation with the same event
     for (it = m_timeProcessMap.begin(); it != m_timeProcessMap.end(); ++it) {
         
-        timeProcess = TTTimeProcessPtr(TTObjectBasePtr(it->second->object));
+        it->second->object.get("startEvent", v);
         
-        timeProcess->getAttributeValue(TTSymbol("startEvent"), vt);
-        
-        if (v == vt) {
+        if (out == v) {
             ctrlPointId = BEGIN_CONTROL_POINT_INDEX;
             break;
         }
         
-        timeProcess->getAttributeValue(TTSymbol("endEvent"), vt);
+        it->second->object.get("endEvent", v);
         
-        if (v == vt) {
+        if (out == v) {
             ctrlPointId = END_CONTROL_POINT_INDEX;
             break;
         }
@@ -1029,31 +972,30 @@ TimeEventIndex Engine::getRelationSecondCtrlPointIndex(IntervalId relationId)
 
 BoundValue Engine::getRelationMinBound(IntervalId relationId)
 {
-    TTTimeProcessPtr    timeProcess = getInterval(relationId);
-    TTValue             v;
+    TTValue v;
     
-    timeProcess->getAttributeValue(TTSymbol("durationMin"), v);
+    getInterval(relationId).get("durationMin", v);
     
     return v[0];
 }
 
 BoundValue Engine::getRelationMaxBound(IntervalId relationId)
 {
-    TTTimeProcessPtr  timeProcess = getInterval(relationId);
-    TTValue         v;
-
-    timeProcess->getAttributeValue(TTSymbol("durationMax"), v);
+    TTValue v;
+    
+    getInterval(relationId).get("durationMax", v);
     
     return v[0];
 }
 
 bool Engine::performBoxEditing(TimeProcessId boxId, TimeValue start, TimeValue end, vector<TimeProcessId>& movedBoxes)
 {
-    TTTimeProcessPtr        timeProcess = getTimeProcess(boxId);
+    TTValue args, out;
+    TTErr   err;
     EngineCacheMapIterator  it;
-    TTErr                   err;
-
-    err = TTScoreTimeProcessMove(timeProcess, start, end);
+    
+    args = TTValue(start, end);
+    err = getTimeProcess(boxId).send("Move", args, out);
 
     // return the entire timeProcessMap except the first process !!! (this is bad but it is like former engine)
     it = m_timeProcessMap.begin();
@@ -1066,60 +1008,47 @@ bool Engine::performBoxEditing(TimeProcessId boxId, TimeValue start, TimeValue e
 
 std::string Engine::getBoxName(TimeProcessId boxId)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTValue             v;
-    TTSymbol            name;
+    TTSymbol    name;
     
-	timeProcess->getAttributeValue(TTSymbol("name"), v);
-    
-    name = v[0];
+	getTimeProcess(boxId).get("name", name);
     
     return name.c_str();
 }
 
 unsigned int Engine::getBoxVerticalPosition(TimeProcessId boxId)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTValue             v;
+    TTValue v;
     
-	timeProcess->getAttributeValue(TTSymbol("verticalPosition"), v);
+	getTimeProcess(boxId).get("verticalPosition", v);
     
     return v[0];
 }
 
 void Engine::setBoxVerticalPosition(TimeProcessId boxId, unsigned int newPosition)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTValue             v = TTUInt32(newPosition);
-    
-	timeProcess->setAttributeValue(TTSymbol("verticalPosition"), v);
+	getTimeProcess(boxId).set("verticalPosition", TTUInt32(newPosition));
 }
 
 unsigned int Engine::getBoxVerticalSize(TimeProcessId boxId)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTValue             v;
+    TTValue v;
     
-	timeProcess->getAttributeValue(TTSymbol("verticalSize"), v);
+	getTimeProcess(boxId).get("verticalSize", v);
     
     return v[0];
 }
 
 void Engine::setBoxVerticalSize(TimeProcessId boxId, unsigned int newSize)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTValue             v = TTUInt32(newSize);
-    
-	timeProcess->setAttributeValue(TTSymbol("verticalSize"), v);
+    getTimeProcess(boxId).set("verticalSize", TTUInt32(newSize));
 }
 
 QColor Engine::getBoxColor(TimeProcessId boxId)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTValue             v;
-    QColor              color;
+    TTValue v;
+    QColor  color;
     
-	timeProcess->getAttributeValue(TTSymbol("color"), v);
+	getTimeProcess(boxId).get("color", v);
     
     color = QColor(v[0], v[1], v[2]);
     
@@ -1128,105 +1057,120 @@ QColor Engine::getBoxColor(TimeProcessId boxId)
 
 void Engine::setBoxColor(TimeProcessId boxId, QColor newColor)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTValue             v;
+    TTValue v;
     
     v = newColor.red();
     v.append(newColor.green());
     v.append(newColor.blue());
     
-	timeProcess->setAttributeValue(TTSymbol("color"), v);
+	getTimeProcess(boxId).set("color", v);
 }
 
 void Engine::setBoxMuteState(TimeProcessId boxId, bool muteState)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTValue             v;
+    getTimeProcess(boxId).set("mute", muteState);
+}
 
-    v = (TTBoolean)muteState;
-
-    timeProcess->setAttributeValue(TTSymbol("mute"), v);
+bool Engine::getBoxMuteState(TimeProcessId boxId)
+{
+    TTValue v;
+    
+    getTimeProcess(boxId).get("mute", v);
+    
+    return TTBoolean(v[0]);
 }
 
 void Engine::setBoxName(TimeProcessId boxId, string name)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTSymbol            boxName;
-
-    boxName = TTSymbol(name);
-    timeProcess->setAttributeValue(kTTSym_name, boxName);
+    TTSymbol oldName, newName;
+    
+    getTimeProcess(boxId).get("name", oldName);
+    
+    newName = TTSymbol(name);
+    
+    // filter repetitions
+    if (newName != oldName) {
+        
+        // rename the time process into the i-score application
+        TTValue effectiveName, args(getTimeProcess(boxId), newName);
+        m_iscore.send("ObjectRename", args, effectiveName);
+        
+        // rename the time process object with the effective registration name
+        getTimeProcess(boxId).set("name", effectiveName);
+    }
 }
 
 TimeValue Engine::getBoxBeginTime(TimeProcessId boxId)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTValue             v;
+    TTValue     v;
+    TimeValue   startDate;
+
+	getTimeProcess(boxId).get("startDate", v);
+    startDate = v[0];
     
-	timeProcess->getAttributeValue(TTSymbol("startDate"), v);
-    
-    return v[0];
+    return startDate;
 }
 
 TimeValue Engine::getBoxEndTime(TimeProcessId boxId)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTValue             v;
+    TTValue     v;
+    TimeValue   endDate;
+
+	getTimeProcess(boxId).get("endDate", v);
+    endDate = v[0];
     
-	timeProcess->getAttributeValue(TTSymbol("endDate"), v);
-    
-    return v[0];
+    return endDate;
 }
 
 TimeValue Engine::getBoxDuration(TimeProcessId boxId)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTValue             v;
+    TTValue v;
     
-	timeProcess->getAttributeValue(TTSymbol("duration"), v);
+	getTimeProcess(boxId).get("duration", v);
     
     return v[0];
 }
 
 int Engine::getBoxNbCtrlPoints(TimeProcessId boxId)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTValue             v;
+    TTValue v;
     
-	timeProcess->getAttributeValue(TTSymbol("intermediateEvents"), v);
+	getTimeProcess(boxId).get("intermediateEvents", v);
     
     return v.size() + 2; // because there is always a start and an end event too
 }
 
-TimeEventIndex Engine::getBoxFirstCtrlPointIndex(TimeProcessId boxId)
+TimeEventIndex Engine::getBoxFirstCtrlPointIndex(TimeProcessId /*boxId*/)
 {
 	return BEGIN_CONTROL_POINT_INDEX;
 }
 
-TimeEventIndex Engine::getBoxLastCtrlPointIndex(TimeProcessId boxId)
+TimeEventIndex Engine::getBoxLastCtrlPointIndex(TimeProcessId /*boxId*/)
 {
 	return END_CONTROL_POINT_INDEX;
 }
 
-void Engine::setCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex controlPointIndex, std::vector<std::string> messageToSend, bool muteState)
+void Engine::setCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex controlPointIndex, std::vector<std::string> messageToSend, bool /*muteState*/)
 {
-    TTValue             v;
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTTimeEventPtr      event;
-    TTObjectBasePtr     state;
-    TTUInt32            i;
+    TTValue     out;
+    TTObject    event;
+    TTObject    state;
+    TTUInt32    i;
 
-    // Get the start or end event
+    // get the start or end event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        TTScoreTimeProcessGetStartEvent(timeProcess, &event);
+        getTimeProcess(boxId).get("startEvent", out);
     else
-        TTScoreTimeProcessGetEndEvent(timeProcess, &event);
+        getTimeProcess(boxId).get("endEvent", out);
+    
+    event = out[0];
     
     // get the state of the event
-    event->getAttributeValue(TTSymbol("state"), v);
-    state = v[0];
+    event.get("state", out);
+    state = out[0];
     
     // clear the state
-    state->sendMessage(TTSymbol("Clear"));
+    state.send("Clear");
     
     // parse each incoming string into < directory:/address, value >
     for (i = 0; i < messageToSend.size(); i++) {
@@ -1239,53 +1183,53 @@ void Engine::setCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex cont
         v[0] = anAddress;
         
         // append a line to the state
-        state->sendMessage(TTSymbol("Append"), v, kTTValNONE);
+        state.send("Append", v, out);
     }
     
-    // Flatten the state to increase the speed of the recall
-    state->sendMessage(TTSymbol("Flatten"));
+    // flatten the state to increase the speed of the recall
+    state.send("Flatten");
     
-    // Don't update curve for the root box because it is a Scenario and not an Automation
+    // don't update curve for the root box because it is a Scenario and not an Automation
     if (boxId != ROOT_BOX_ID) {
     
-        // Update all curves (for automation process only)
-        TTValue empty; // théo : this is to pass thru a Foundation bug which will disapear in a next version
-        timeProcess->sendMessage(TTSymbol("CurveUpdate"), empty, empty);
+        // update all curves (for automation process only)
+        getTimeProcess(boxId).send("CurveUpdate");
     }
 }
 
 void Engine::getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex controlPointIndex, std::vector<std::string>& messages)
 {
-    TTValue             v;
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTTimeEventPtr      event;
-    TTBoolean           flattened;
-    TTObjectBasePtr     state;
-    TTListPtr           lines = NULL;
+    TTValue     out;
+    TTObject    event;
+    TTObject    state;
+    TTBoolean   flattened;
+    TTListPtr   lines = NULL;
     TTDictionaryBasePtr aLine;
-    TTAddress           address;
-    std::string         s;
+    TTAddress   address;
+    std::string s;
     
-    // Get the start or end event
+    // get the start or end event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        TTScoreTimeProcessGetStartEvent(timeProcess, &event);
+        getTimeProcess(boxId).get("startEvent", out);
     else
-        TTScoreTimeProcessGetEndEvent(timeProcess, &event);
+        getTimeProcess(boxId).get("endEvent", out);
+    
+    event = out[0];
     
     // get the state of the event
-    event->getAttributeValue(TTSymbol("state"), v);
-    state = v[0];
+    event.get("state", out);
+    state = out[0];
     
     // check if the state is flattened
-    state->getAttributeValue(TTSymbol("flattened"), v);
-    flattened = v[0];
+    state.get("flattened", out);
+    flattened = out[0];
     
     if (!flattened)
-        state->sendMessage(TTSymbol("Flatten"));
+        state.send("Flatten");
     
     // get the state lines
-    state->getAttributeValue(TTSymbol("flattenedLines"), v);
-    lines = TTListPtr((TTPtr)v[0]);
+    state.get("flattenedLines", out);
+    lines = TTListPtr((TTPtr)out[0]);
     
     if (lines) {
         // edit each line address into a "directory/address value" string
@@ -1294,17 +1238,17 @@ void Engine::getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex cont
             aLine = TTDictionaryBasePtr((TTPtr)lines->current()[0]);
             
             // get the target address
-            aLine->lookup(kTTSym_target, v);
-            address = v[0];
+            aLine->lookup(kTTSym_target, out);
+            address = out[0];
             
             // get value
-            aLine->getValue(v);
-            v.toString();
+            aLine->getValue(out);
+            out.toString();
             
             // edit string
             s = toNetworkTreeAddress(address);
             s += " ";
-            s += TTString(v[0]).c_str();
+            s += TTString(out[0]).c_str();
             
             messages.push_back(s);
         }
@@ -1313,72 +1257,86 @@ void Engine::getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex cont
 
 void Engine::setCtrlPointMutingState(TimeProcessId boxId, TimeEventIndex controlPointIndex, bool mute)
 {
-    TTValue             v;
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTTimeEventPtr      event;
+    TTValue     out;
+    TTObject    event;
     
-    // Get the start or end event
+    // get the start or end event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        TTScoreTimeProcessGetStartEvent(timeProcess, &event);
+        getTimeProcess(boxId).get("startEvent", out);
     else
-        TTScoreTimeProcessGetEndEvent(timeProcess, &event);
+        getTimeProcess(boxId).get("endEvent", out);
     
-    event->setAttributeValue(kTTSym_mute, TTBoolean(mute));
+    event = out[0];
+    
+    event.set("mute", mute);
+}
+
+bool Engine::getCtrlPointMutingState(TimeProcessId boxId, TimeEventIndex controlPointIndex)
+{
+    TTValue     out;
+    TTObject    event;
+    
+    // get the start or end event
+    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+        getTimeProcess(boxId).get("startEvent", out);
+    else
+        getTimeProcess(boxId).get("endEvent", out);
+    
+    event = out[0];
+    
+    event.get("mute", out);
+    
+    return TTBoolean(out[0]);
 }
 
 //CURVES ////////////////////////////////////////////////////////////////////////////////////
 
 void Engine::addCurve(TimeProcessId boxId, const std::string & address)
 {
-    TTTimeProcessPtr  timeProcess = getTimeProcess(boxId);
+    TTValue out;
     
     // add the curve addresses into the automation time process
-    timeProcess->sendMessage(TTSymbol("CurveAdd"), toTTAddress(address), kTTValNONE);
+    getTimeProcess(boxId).send("CurveAdd", toTTAddress(address), out);
 }
 
 void Engine::removeCurve(TimeProcessId boxId, const std::string & address)
 {
-    TTTimeProcessPtr  timeProcess = getTimeProcess(boxId);
+    TTValue out;
     
     // remove the curve addresses of the automation time process
-    timeProcess->sendMessage(TTSymbol("CurveRemove"), toTTAddress(address), kTTValNONE);
+    getTimeProcess(boxId).send("CurveRemove", toTTAddress(address), out);
 }
 
 void Engine::clearCurves(TimeProcessId boxId)
 {
-    TTTimeProcessPtr  timeProcess = getTimeProcess(boxId);
-    
     // clear all the curves of the automation time process
-    timeProcess->sendMessage(TTSymbol("Clear"));
+    getTimeProcess(boxId).send("Clear");
 }
 
 std::vector<std::string> Engine::getCurvesAddress(TimeProcessId boxId)
 {
     std::vector<std::string> curveAddresses;
-    
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTValue             v;
+    TTValue out;
     
     // get the curve addresses of the automation time process
-    timeProcess->getAttributeValue(TTSymbol("curveAddresses"), v);
+    getTimeProcess(boxId).get("curveAddresses", out);
     
     // copy the addresses into the vector
-    for (TTUInt32 i = 0; i < v.size(); i++)
-        curveAddresses.push_back(toNetworkTreeAddress(v[i]));
+    for (TTUInt32 i = 0; i < out.size(); i++)
+        curveAddresses.push_back(toNetworkTreeAddress(out[i]));
     
 	return curveAddresses;
 }
 
 void Engine::setCurveSampleRate(TimeProcessId boxId, const std::string & address, unsigned int nbSamplesBySec)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTObjectBasePtr     curve;
-    TTValue             objects;
-    TTUInt32            i;
-    TTErr               err;
+    TTObject    curve;
+    TTValue     objects;
+    TTUInt32    i;
+    TTErr       err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), objects);
+    err = getTimeProcess(boxId).send("CurveGet", toTTAddress(address), objects);
     
     if (!err) {
         
@@ -1387,28 +1345,27 @@ void Engine::setCurveSampleRate(TimeProcessId boxId, const std::string & address
             
             curve = objects[i];
             
-            curve->setAttributeValue(TTSymbol("sampleRate"), nbSamplesBySec);
+            curve.set("sampleRate", nbSamplesBySec);
         }
     }
 }
 
 unsigned int Engine::getCurveSampleRate(TimeProcessId boxId, const std::string & address)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTObjectBasePtr     curve;
-    TTValue             v, objects;
-    TTErr               err;
+    TTObject    curve;
+    TTValue     out, objects;
+    TTErr       err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), objects);
+    err = getTimeProcess(boxId).send("CurveGet", toTTAddress(address), objects);
     
     if (!err) {
         
         curve = objects[0];
         
-        curve->getAttributeValue(TTSymbol("sampleRate"), v);
+        curve.get("sampleRate", out);
         
-        return TTUInt32(v[0]);
+        return TTUInt32(out[0]);
     }
     
 	return 0;
@@ -1416,14 +1373,13 @@ unsigned int Engine::getCurveSampleRate(TimeProcessId boxId, const std::string &
 
 void Engine::setCurveRedundancy(TimeProcessId boxId, const std::string & address, bool redundancy)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTObjectBasePtr     curve;
-    TTValue             objects;
-    TTUInt32            i;
-    TTErr               err;
+    TTObject    curve;
+    TTValue     objects;
+    TTUInt32    i;
+    TTErr       err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), objects);
+    err = getTimeProcess(boxId).send("CurveGet", toTTAddress(address), objects);
     
     if (!err) {
         
@@ -1432,29 +1388,28 @@ void Engine::setCurveRedundancy(TimeProcessId boxId, const std::string & address
             
             curve = objects[i];
             
-            curve->setAttributeValue(TTSymbol("redundancy"), redundancy);
+            curve.set("redundancy", redundancy);
         }
     }
 }
 
 bool Engine::getCurveRedundancy(TimeProcessId boxId, const std::string & address)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTObjectBasePtr     curve;
-    TTValue             v, objects;
-    TTErr               err;
+    TTObject    curve;
+    TTValue     out, objects;
+    TTErr       err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), objects);
+    err = getTimeProcess(boxId).send("CurveGet", toTTAddress(address), objects);
     
     if (!err) {
         
         // get first indexed curve only
         curve = objects[0];
         
-        curve->getAttributeValue(TTSymbol("redundancy"), v);
+        curve.get("redundancy", out);
         
-        return TTBoolean(v[0]);
+        return TTBoolean(out[0]);
     }
     
 	return false;
@@ -1462,14 +1417,13 @@ bool Engine::getCurveRedundancy(TimeProcessId boxId, const std::string & address
 
 void Engine::setCurveMuteState(TimeProcessId boxId, const std::string & address, bool muteState)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTObjectBasePtr     curve;
-    TTValue             objects;
-    TTUInt32            i;
-    TTErr               err;
+    TTObject    curve;
+    TTValue     objects;
+    TTUInt32    i;
+    TTErr       err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), objects);
+    err = getTimeProcess(boxId).send("CurveGet", toTTAddress(address), objects);
     
     if (!err) {
         
@@ -1478,29 +1432,28 @@ void Engine::setCurveMuteState(TimeProcessId boxId, const std::string & address,
         
             curve = objects[i];
         
-            curve->setAttributeValue(TTSymbol("active"), !muteState);
+            curve.set("active", !muteState);
         }
     }
 }
 
 bool Engine::getCurveMuteState(TimeProcessId boxId, const std::string & address)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTObjectBasePtr     curve;
-    TTValue             v, objects;
-    TTErr               err;
+    TTObject    curve;
+    TTValue     out, objects;
+    TTErr       err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), objects);
+    err = getTimeProcess(boxId).send("CurveGet", toTTAddress(address), objects);
     
     if (!err) {
         
         // get first indexed curve only
         curve = objects[0];
         
-        curve->getAttributeValue(TTSymbol("active"), v);
+        curve.get("active", out);
         
-        return !TTBoolean(v[0]);
+        return !TTBoolean(out[0]);
     }
     
 	return false;
@@ -1508,37 +1461,34 @@ bool Engine::getCurveMuteState(TimeProcessId boxId, const std::string & address)
 
 void Engine::setCurveRecording(TimeProcessId boxId, const std::string & address, bool record)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTValue             v, out;
+    TTValue args, out;
     
     // enable/disable recording
-    v = toTTAddress(address);
-    v.append(record);
+    args = TTValue(toTTAddress(address), record);
     
-    timeProcess->sendMessage(TTSymbol("CurveRecord"), v, out);
+    getTimeProcess(boxId).send("CurveRecord", args, out);
 }
 
-bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned int argNb, const std::vector<float> & percent, const std::vector<float> & y, const std::vector<short> & sectionType, const std::vector<float> & coeff)
+bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned int /*argNb*/, const std::vector<float> & percent, const std::vector<float> & y, const std::vector<short> & sectionType, const std::vector<float> & coeff)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTObjectBasePtr     curve;
-    TTValue             v, objects;
-    TTUInt32            i, nbPoints = coeff.size();
-    TTErr               err;
+    TTObject    curve;
+    TTValue     parameters, objects;
+    TTUInt32    i, nbPoints = coeff.size();
+    TTErr       err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), objects);
+    err = getTimeProcess(boxId).send("CurveGet", toTTAddress(address), objects);
     
     if (!err) {
         
-        // edit value as : x1 y1 b1 x2 y2 b2
-        v.resize(nbPoints * 3);
+        // edit parameters as : x1 y1 b1 x2 y2 b2
+        parameters.resize(nbPoints * 3);
         
-        for (i = 0; i < v.size(); i = i+3) {
+        for (i = 0; i < parameters.size(); i = i+3) {
             
-            v[i] = TTFloat64(percent[i/3] / 100.);
-            v[i+1] = TTFloat64(y[i/3]);
-            v[i+2] = TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]);
+            parameters[i] = TTFloat64(percent[i/3] / 100.);
+            parameters[i+1] = TTFloat64(y[i/3]);
+            parameters[i+2] = TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]);
             
         }
         
@@ -1546,7 +1496,7 @@ bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned
         curve = objects[0];
         
         // set a curve parameters
-        err = curve->setAttributeValue(TTSymbol("functionParameters"), v);
+        err = curve.set("functionParameters", parameters);
     }
     
     return err == kTTErrNone;
@@ -1555,14 +1505,13 @@ bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned
 bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned int argNb,
                               std::vector<float> & percent,  std::vector<float> & y,  std::vector<short> & sectionType,  std::vector<float> & coeff)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTObjectBasePtr     curve;
-    TTValue             v, objects;
-    TTUInt32            i;
-    TTErr               err;
+    TTObject    curve;
+    TTValue     parameters, objects;
+    TTUInt32    i;
+    TTErr       err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), objects);
+    err = getTimeProcess(boxId).send("CurveGet", toTTAddress(address), objects);
     
     if (!err) {
         
@@ -1570,17 +1519,17 @@ bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned
         curve = objects[0];
 
         // get a curve parameters
-        err = curve->getAttributeValue(TTSymbol("functionParameters"), v);
+        err = curve.get("functionParameters", parameters);
         
         if (!err) {
 
             // edit percent, y, sectionType and coeff from v : x1 y1 b1 x2 y2 b2 . . .
-            for (i = 0; i < v.size(); i = i+3) {
+            for (i = 0; i < parameters.size(); i = i+3) {
                 
-                percent.push_back(TTFloat64(v[i]) * 100.);
-                y.push_back(TTFloat64(v[i+1]));
+                percent.push_back(TTFloat64(parameters[i]) * 100.);
+                y.push_back(TTFloat64(parameters[i+1]));
                 sectionType.push_back(1);
-                coeff.push_back(sqrt(sqrt(TTFloat64(v[i+2]))));
+                coeff.push_back(sqrt(sqrt(TTFloat64(parameters[i+2]))));
             }
         }
     }
@@ -1590,24 +1539,23 @@ bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned
 
 bool Engine::getCurveValues(TimeProcessId boxId, const std::string & address, unsigned int argNb, std::vector<float>& result)
 {
-    TTTimeProcessPtr    timeProcess = getTimeProcess(boxId);
-    TTObjectBasePtr     curve;
-    TTValue             v, curveValues;
-    TTErr               err;
+    TTObject    curve;
+    TTValue     out, duration, curveValues;
+    TTErr       err;
     
     // get curve object at address
-    err = timeProcess->sendMessage(TTSymbol("CurveGet"), toTTAddress(address), v);
+    err = getTimeProcess(boxId).send("CurveGet", toTTAddress(address), out);
 
     if (!err) {
         
         // get first indexed curve only
-        curve = v[0];
+        curve = out[0];
         
         // get time process duration
-        timeProcess->getAttributeValue(TTSymbol("duration"), v);
+        getTimeProcess(boxId).get("duration", duration);
     
         // sample the curve
-        err = curve->sendMessage(TTSymbol("Sample"), v, curveValues);
+        err = curve.send("Sample", duration, curveValues);
     
         // copy the curveValues into the result vector
         for (TTUInt32 i = 0; i < curveValues.size(); i++)
@@ -1619,32 +1567,38 @@ bool Engine::getCurveValues(TimeProcessId boxId, const std::string & address, un
 
 ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, TimeEventIndex controlPointIndex)
 {
-    TTTimeProcessPtr        timeProcess = getTimeProcess(containingBoxId);
-    TTTimeEventPtr          timeEvent;
-    TTTimeConditionPtr      timeCondition;
-    ConditionedProcessId    triggerId;
-    TTValue                 v, args, out;
+    TTObject    timeEvent;
+    TTObject    timeCondition;
+    TTObject    parentScenario;
+    ConditionedProcessId triggerId;
+    TTValue     args, out;
+    TTString    instance;
     
-    // Get start or end time event
+    // get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        TTScoreTimeProcessGetStartEvent(timeProcess, &timeEvent);
+        getTimeProcess(containingBoxId).get("startEvent", out);
     else
-        TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
+        getTimeProcess(containingBoxId).get("endEvent", out);
     
-    // Create a TTTimeCondition
-    m_mainScenario->sendMessage(TTSymbol("TimeConditionCreate"), args, v);
-    timeCondition = TTTimeConditionPtr(TTObjectBasePtr(v[0]));
+    timeEvent = out[0];
     
-    // Add the event to the condition with no associated expression
-    args = TTObjectBasePtr(timeEvent);
-    timeCondition->sendMessage(TTSymbol("EventAdd"), args, v);
+    // get the parent scenario
+    getTimeProcess(containingBoxId).get("container", out);
+    parentScenario = out[0];
     
-    // We cache the time process and the event index instead of the event itself
+    // create a TTTimeCondition
+    parentScenario.send("TimeConditionCreate", args, out);
+    timeCondition = out[0];
+    
+    // add the event to the condition with no associated expression
+    timeCondition.send("EventAdd", timeEvent, out);
+    
+    // we cache the time process and the event index instead of the event itself
     triggerId = cacheConditionedProcess(containingBoxId, controlPointIndex);
     
-    // We cache the TTTimeCondition
+    // we cache the TTTimeCondition
     cacheTimeCondition(triggerId, timeCondition);
-    
+
     // note : see in setTriggerPointMessage to see how the expression associated to an event is edited
     
 	return triggerId;
@@ -1652,54 +1606,195 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
 
 void Engine::removeTriggerPoint(ConditionedProcessId triggerId)
 {
-    TTValue             v, out;
+    // check existence before because they could have been destroyed in deleteCondition
+    if (m_conditionedProcessMap.find(triggerId) == m_conditionedProcessMap.end())
+        return;
     
-    // Release the time condition
-    v = TTObjectBasePtr(getTimeCondition(triggerId));
-    m_mainScenario->sendMessage(TTSymbol("TimeConditionRelease"), v, out);
+    TTValue     out;
+    TTObject    parentScenario;
     
-    // Uncache
+    // get the parent scenario
+    getTimeCondition(triggerId).get("container", out);
+    parentScenario = out[0];
+    
+    // release the time condition
+    parentScenario.send("TimeConditionRelease", getTimeCondition(triggerId), out);
+    
+    // uncache
     uncacheConditionedProcess(triggerId);
     
     uncacheTimeCondition(triggerId);
 }
 
+TimeConditionId Engine::createCondition(std::vector<ConditionedProcessId> triggerIds)
+{
+    // create an id for the condition and cache it (from ConditionedProcessId because it is mixed with timeConditionMap)
+    std::vector<ConditionedProcessId>::iterator it = triggerIds.begin();
+    TimeConditionId conditionId = m_nextConditionedProcessId++;
+    cacheTimeCondition(conditionId, getTimeCondition(*it));
+
+    for(++it ; it != triggerIds.end() ; ++it)
+        attachToCondition(conditionId, *it);
+
+    return conditionId;
+}
+
+void Engine::attachToCondition(TimeConditionId conditionId, ConditionedProcessId triggerId)
+{
+    TimeEventIndex  idx = BEGIN_CONTROL_POINT_INDEX;                // Because a condition is always at the start of a box
+    TTObject        timeEvent;
+    TTObject        parentScenario;
+    TTValue         out;
+    
+    getConditionedProcess(triggerId, idx).get("startEvent", out);
+    timeEvent = out[0];
+
+    // should be different conditions before the merge
+    if (getTimeCondition(triggerId) != getTimeCondition(conditionId)) {
+
+        // save the expression
+        std::string expr = getTriggerPointMessage(triggerId);
+        
+        // get parent scenario
+        timeEvent.get("container", out);
+        parentScenario = out[0];
+
+        // release the other time condition
+        parentScenario.send("TimeConditionRelease", getTimeCondition(triggerId), out);
+
+        // add the event to the chosen time condition with the saved expression
+        getTimeCondition(conditionId).send("EventAdd", timeEvent, out);
+//        setTriggerPointMessage(triggerId, expr);
+
+        // modify the cache
+        m_timeConditionMap[triggerId]->object = getTimeCondition(conditionId);
+        m_conditionsMap[conditionId].push_back(triggerId);
+    }
+}
+
+void Engine::detachFromCondition(TimeConditionId conditionId, ConditionedProcessId triggerId)
+{
+    // check existence before because they could have been destroyed in removeTriggerPoint
+    if (m_conditionsMap.find(conditionId) == m_conditionsMap.end())
+        return;
+    
+    if (m_conditionedProcessMap.find(triggerId) == m_conditionedProcessMap.end())
+        return;
+    
+    TimeEventIndex  idx = BEGIN_CONTROL_POINT_INDEX;                 // Because a condition is always at the start of a box
+    TTObject        timeEvent;
+    TTObject        parentScenario;
+    TTValue         args, out;
+    
+    getConditionedProcess(triggerId, idx).get("startEvent", out);
+    timeEvent = out[0];
+
+    // should be the same condition before the separation
+    if (getTimeCondition(triggerId) == getTimeCondition(conditionId)) {
+
+        // save the expression
+        std::string expr = getTriggerPointMessage(triggerId);
+        
+        // get parent scenario
+        timeEvent.get("container", out);
+        parentScenario = out[0];
+
+        // remove the event from the chosen time condition
+        getTimeCondition(conditionId).send("EventRemove", timeEvent, out);
+
+        // create a new TTTimeCondition
+        parentScenario.send("TimeConditionCreate", timeEvent, out);
+        getTimeCondition(triggerId) = out[0];
+
+        // add the event to the new condition with the saved expression
+        getTimeCondition(conditionId).send("EventAdd", timeEvent, out);
+        setTriggerPointMessage(triggerId, expr);
+
+        // modify cache
+        m_timeConditionMap[triggerId]->object = getTimeCondition(triggerId);
+        m_conditionsMap[conditionId].remove(triggerId);
+    }
+}
+
+void Engine::deleteCondition(TimeConditionId conditionId)
+{
+    std::list<ConditionedProcessId> & triggerIds = m_conditionsMap[conditionId];
+    std::list<ConditionedProcessId>::iterator it;
+    TTObject    parentScenario;
+    TTValue     out;
+
+    for(it = triggerIds.begin() ; it != triggerIds.end() ; ++it)
+        detachFromCondition(conditionId, *it);
+    
+    // get parent scenario
+    getTimeCondition(conditionId).get("container", out);
+    parentScenario = out[0];
+
+    // release the condition
+    parentScenario.send("TimeConditionRelease", getTimeCondition(conditionId), out);
+
+    // uncache the condition
+    uncacheTimeCondition(conditionId);
+    m_conditionsMap.erase(conditionId);
+}
+
+void Engine::getConditionTriggerIds(TimeConditionId conditionId, std::vector<TimeProcessId>& triggerIds)
+{
+    triggerIds.assign(m_conditionsMap[conditionId].begin(), m_conditionsMap[conditionId].end());
+}
+
+void Engine::setConditionMessage(TimeConditionId conditionId, std::string disposeMessage)
+{
+    getTimeCondition(conditionId).set("disposeMessage", TTSymbol(disposeMessage));
+}
+
+std::string Engine::getConditionMessage(TimeConditionId conditionId)
+{
+    TTSymbol expr;
+    
+    getTimeCondition(conditionId).get("disposeMessage", expr);
+
+    return expr.c_str();
+}
+
 void Engine::setTriggerPointMessage(ConditionedProcessId triggerId, std::string triggerMessage)
 {
-    TimeEventIndex      controlPointIndex;
-    TTTimeProcessPtr    timeProcess = getConditionedProcess(triggerId, controlPointIndex);
-    TTTimeEventPtr      timeEvent;
-    TTValue             v, out;
+    TimeEventIndex  controlPointIndex;
+    TTObject        conditionedProcess = getConditionedProcess(triggerId, controlPointIndex);
+    TTObject        timeEvent;
+    TTValue         args, out;
     
-    // Get start or end time event
+    // get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        TTScoreTimeProcessGetStartEvent(timeProcess, &timeEvent);
+        conditionedProcess.get("startEvent", out);
     else
-        TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
+        conditionedProcess.get("endEvent", out);
+    
+    timeEvent = out[0];
     
     // edit the expression associated to this event
-    v = TTObjectBasePtr(timeEvent);
-    v.append(TTSymbol(triggerMessage));
-    getTimeCondition(triggerId)->sendMessage(TTSymbol("EventExpression"), v, out);
+    args = TTValue(timeEvent, TTSymbol(triggerMessage));
+    getTimeCondition(triggerId).send("EventExpression", args, out);
 }
 
 std::string Engine::getTriggerPointMessage(ConditionedProcessId triggerId)
 {
-    TimeEventIndex          controlPointIndex;
-    TTTimeProcessPtr        timeProcess = getConditionedProcess(triggerId, controlPointIndex);
-    TTTimeEventPtr          timeEvent;
-    TTSymbol                expression;
-    TTValue                 v, out;
+    TimeEventIndex  controlPointIndex;
+    TTObject        conditionedProcess = getConditionedProcess(triggerId, controlPointIndex);
+    TTObject        timeEvent;
+    TTSymbol        expression;
+    TTValue         out;
     
-    // Get start or end time event
+    // get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        TTScoreTimeProcessGetStartEvent(timeProcess, &timeEvent);
+        conditionedProcess.get("startEvent", out);
     else
-        TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
+        conditionedProcess.get("endEvent", out);
+    
+    timeEvent = out[0];
     
     // Get the expression associated to this event
-    v = TTObjectBasePtr(timeEvent);
-    if (!getTimeCondition(triggerId)->sendMessage(TTSymbol("ExpressionFind"), v, out)) {
+    if (!getTimeCondition(triggerId).send("ExpressionFind", timeEvent, out)) {
         
         expression = out[0];
         return expression.c_str();
@@ -1711,17 +1806,62 @@ std::string Engine::getTriggerPointMessage(ConditionedProcessId triggerId)
     }
 }
 
+//!\ Crappy copy
+void Engine::setTriggerPointDefault(ConditionedProcessId triggerId, bool dflt)
+{
+    TimeEventIndex  controlPointIndex;
+    TTObject        conditionedProcess = getConditionedProcess(triggerId, controlPointIndex);
+    TTObject        timeEvent;
+    TTValue         args, out;
+
+    // get start or end time event
+    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+        conditionedProcess.get("startEvent", out);
+    else
+        conditionedProcess.get("endEvent", out);
+    
+    timeEvent = out[0];
+
+    // edit the default comportment associated to this event
+    args = TTValue(timeEvent, dflt);
+    getTimeCondition(triggerId).send("EventDefault", args, out);
+}
+
+//!\ Crappy copy
+bool Engine::getTriggerPointDefault(ConditionedProcessId triggerId)
+{
+    TimeEventIndex  controlPointIndex;
+    TTObject        conditionedProcess = getConditionedProcess(triggerId, controlPointIndex);
+    TTObject        timeEvent;
+    TTValue         args, out;
+    TTBoolean       dflt = NO;
+    
+    // get start or end time event
+    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+        conditionedProcess.get("startEvent", out);
+    else
+        conditionedProcess.get("endEvent", out);
+    
+    timeEvent = out[0];
+
+    // get the default comportment associated to this event
+    if (!getTimeCondition(triggerId).send("DefaultFind", timeEvent, out))
+        dflt = out[0];
+        
+    return dflt;
+}
+
 TimeProcessId Engine::getTriggerPointRelatedBoxId(ConditionedProcessId triggerId)
 {
-    TimeEventIndex          controlPointIndex;
-    TTTimeProcessPtr        timeProcess = getConditionedProcess(triggerId, controlPointIndex);
+    TimeEventIndex  controlPointIndex;
+    TTObject        conditionedProcess = getConditionedProcess(triggerId, controlPointIndex);
     EngineCacheMapIterator  it;
-    TimeProcessId           id = NO_ID;
+    TimeProcessId   id = NO_ID;
     
     // look for the time process id into the time process map
     for (it = m_timeProcessMap.begin(); it != m_timeProcessMap.end(); ++it) {
         
-        if (it->second->object == timeProcess) {
+        if (it->second->object == conditionedProcess) {
             
             id = it->first;
             break;
@@ -1766,46 +1906,51 @@ void Engine::getTriggersPointId(vector<ConditionedProcessId>& triggersID)
         triggersID.push_back(it->first);
 }
 
+void Engine::getConditionsId(vector<TimeConditionId>& conditionsID)
+{
+    std::map<TimeConditionId, std::list<ConditionedProcessId>>::iterator it;
+
+    conditionsID.clear();
+
+    for(it = m_conditionsMap.begin() ; it != m_conditionsMap.end() ; ++it) {
+        conditionsID.push_back(it->first);
+    }
+}
+
 void Engine::setViewZoom(QPointF zoom)
 {
-    TTValue v;
+    TTValue v(zoom.x(), zoom.y());
     
-    v.append(zoom.x());
-    v.append(zoom.y());
-    
-    m_mainScenario->setAttributeValue(TTSymbol("viewZoom"), v);
+    m_mainScenario.set("viewZoom", v);
 }
 
 QPointF Engine::getViewZoom()
 {
     QPointF zoom;
-    TTValue v;
+    TTValue out;
     
-    m_mainScenario->getAttributeValue(TTSymbol("viewZoom"), v);
+    m_mainScenario.get("viewZoom", out);
     
-    zoom = QPointF(v[0], v[1]);
+    zoom = QPointF(out[0], out[1]);
     
     return zoom;
 }
 
 void Engine::setViewPosition(QPointF position)
 {
-    TTValue v;
-    
-    v.append(position.x());
-    v.append(position.y());
-    
-    m_mainScenario->setAttributeValue(TTSymbol("viewPosition"), v);
+    TTValue v(position.x(), position.y());
+
+    m_mainScenario.set("viewPosition", v);
 }
 
 QPointF Engine::getViewPosition()
 {
     QPointF position;
-    TTValue v;
+    TTValue out;
     
-    m_mainScenario->getAttributeValue(TTSymbol("viewPosition"), v);
+    m_mainScenario.get("viewPosition", out);
     
-    position = QPointF(v[0], v[1]);
+    position = QPointF(out[0], out[1]);
     
     return position;
 }
@@ -1813,109 +1958,83 @@ QPointF Engine::getViewPosition()
 //Execution ///////////////////////////////////////////////////////////
 void Engine::setTimeOffset(TimeValue timeOffset, bool mute)
 {
-    TTValue v, none;
-    
-    v = timeOffset;
-    v.append(mute);
-    
+    TTValue out, args(timeOffset, mute);
+
     // set the time process at time offset (an optionaly mute the output)
-    m_mainScenario->sendMessage(kTTSym_Goto, v, none);
+    m_mainScenario.send("Goto", args, out);
     
     TTLogMessage("Engine::setTimeOffset = %ld\n", timeOffset);       
 }
 
 TimeValue Engine::getTimeOffset()
 {
-    TTValue         v;
-    TTObjectBasePtr scheduler;
+    TTValue     out;
+    TTObject    scheduler;
     
     // TODO : TTTimeProcess should extend Scheduler class
-    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
+    m_mainScenario.get("scheduler", out);
     
-    scheduler = v[0];
+    scheduler = out[0];
     
-    scheduler->getAttributeValue(kTTSym_offset, v);
+    scheduler.get("offset", out);
     
-    TTLogMessage("Engine::getTimeOffset = %ld\n", TimeValue(TTFloat64(v[0])));
+    TTLogMessage("Engine::getTimeOffset = %ld\n", TimeValue(TTFloat64(out[0])));
     
-    return TimeValue(TTFloat64(v[0]));
+    return TimeValue(TTFloat64(out[0]));
 }
 
-bool Engine::play()
+bool Engine::play(TimeProcessId processId)
 {
     TTLogMessage("***************************************\n");
     TTLogMessage("Engine::play\n");
     
-    // compile the main scenario
-    m_mainScenario->sendMessage(TTSymbol("Compile"));
-    
     // make the start event to happen
-    return !m_mainScenario->sendMessage(TTSymbol("Start"));
+    TTErr err = getTimeProcess(processId).send("Start");
+    if (processId != ROOT_BOX_ID)
+        getSubScenario(processId).send("Start");
+    
+    return err == kTTErrNone;
 }
 
-
-bool Engine::isPlaying()
+bool Engine::isPlaying(TimeProcessId processId)
 {
-    TTValue         v;
-    TTObjectBasePtr aScheduler;
+    TTValue     out;
+    TTObject    scheduler;
     
     // TODO : TTTimeProcess should extend Scheduler class
-    // get the scheduler object of the main scenario
-    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
-    aScheduler = TTObjectBasePtr(v[0]);
+    // get the scheduler object
+    getTimeProcess(processId).get("scheduler", out);
+    scheduler = out[0];
     
-    aScheduler->getAttributeValue(TTSymbol("running"), v);
+    scheduler.get("running", out);
     
-    return TTBoolean(v[0]);
+    return TTBoolean(out[0]);
 }
 
-void Engine::pause(bool pauseValue)
+bool Engine::stop(TimeProcessId processId)
 {
-    if (pauseValue) {
-        TTLogMessage("---------------------------------------\n");
-        m_mainScenario->sendMessage(kTTSym_Pause);
-    }
-    else {
-        TTLogMessage("+++++++++++++++++++++++++++++++++++++++\n");
-        m_mainScenario->sendMessage(kTTSym_Resume);
-    }
-}
-
-bool Engine::isPaused()
-{
-    TTValue         v;
-    TTObjectBasePtr aScheduler;
-    
-    // TODO : TTTimeProcess should extend Scheduler class
-    // get the scheduler object of the main scenario
-    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
-    aScheduler = TTObjectBasePtr(v[0]);
-    
-    aScheduler->getAttributeValue(TTSymbol("paused"), v);
-    
-    return TTBoolean(v[0]);
-}
-
-bool Engine::stop()
-{    
-    TTValue         objects;
-    TTObjectBasePtr timeProcess;
+    TTValue objects;
     
     TTLogMessage("Engine::stop\n");
     
     // stop the main scenario execution
     // but the end event don't happen
-    TTBoolean success = !m_mainScenario->sendMessage(kTTSym_Stop);
+    TTBoolean success = !getTimeProcess(processId).send("Stop");
+    if (processId != ROOT_BOX_ID)
+        getSubScenario(processId).send("Stop");
     
-    // get all TTTimeProcesses
-    m_mainScenario->getAttributeValue(TTSymbol("timeProcesses"), objects);
-    
-    // Stop all time process
-    for (TTUInt32 i = 0; i < objects.size(); i++) {
+    if (processId == ROOT_BOX_ID) {
         
-        timeProcess = objects[i];
+        // get all TTTimeProcesses
+        getTimeProcess(processId).get("timeProcesses", objects);
         
-        timeProcess->sendMessage(kTTSym_Stop);
+        // stop all time process
+        for (TTUInt32 i = 0; i < objects.size(); i++) {
+            
+            TTObject timeProcess = objects[i];
+            
+            timeProcess.send("Stop");
+        }
     }
     
     TTLogMessage("***************************************\n");
@@ -1923,174 +2042,210 @@ bool Engine::stop()
     return success;
 }
 
-TimeValue Engine::getCurrentExecutionTime()
+void Engine::pause(bool pauseValue, TimeProcessId processId)
 {
-    TTValue         v;
-    TTUInt32        time;
-    TTObjectBasePtr aScheduler;
+    if (pauseValue) {
+        TTLogMessage("---------------------------------------\n");
+        getTimeProcess(processId).send("Pause");
+        if (processId != ROOT_BOX_ID)
+            getSubScenario(processId).send("Pause");
+    }
+    else {
+        TTLogMessage("+++++++++++++++++++++++++++++++++++++++\n");
+        getTimeProcess(processId).send("Resume");
+        if (processId != ROOT_BOX_ID)
+            getSubScenario(processId).send("Resume");
+    }
+}
+
+bool Engine::isPaused(TimeProcessId processId)
+{
+    TTValue     out;
+    TTObject    scheduler;
     
     // TODO : TTTimeProcess should extend Scheduler class
-    // get the scheduler object of the main scenario
-    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
-    aScheduler = TTObjectBasePtr(v[0]);
+    // get the scheduler object
+    getTimeProcess(processId).get("scheduler", out);
+    scheduler = out[0];
     
-    aScheduler->getAttributeValue(TTSymbol("realTime"), v);
-    time = TTFloat64(v[0]);
-        
+    scheduler.get("paused", out);
+    
+    return TTBoolean(out[0]);
+}
+
+TimeValue Engine::getCurrentExecutionDate(TimeProcessId processId)
+{
+    TTValue     out;
+    TTUInt32    time;
+    
+    // TODO : TTTimeProcess should extend Scheduler class
+    getTimeProcess(processId).get("date", out);
+    time = TTFloat64(out[0]);
+    
     return time;
 }
 
-void Engine::setExecutionSpeedFactor(float factor)
+float Engine::getCurrentExecutionPosition(TimeProcessId processId)
 {
-    TTValue         v;
-    TTObjectBasePtr aScheduler;
-
-    // TODO : TTTimeProcess should extend Scheduler class
-    // get the scheduler object of the main scenario
-    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
-    aScheduler = TTObjectBasePtr(v[0]);
+    TTValue     out;
+    TTFloat64   position;
     
-    aScheduler->setAttributeValue(kTTSym_speed, TTFloat64(factor));
+    // TODO : TTTimeProcess should extend Scheduler class
+    getTimeProcess(processId).get("position", out);
+    position = TTFloat64(out[0]);
+    
+    return position;
 }
 
-float Engine::getExecutionSpeedFactor()
+void Engine::setExecutionSpeedFactor(float factor, TimeProcessId processId)
 {
-    TTValue         v;
-    TTObjectBasePtr aScheduler;
-    
     // TODO : TTTimeProcess should extend Scheduler class
-    // get the scheduler object of the main scenario
-    m_mainScenario->getAttributeValue(TTSymbol("scheduler"), v);
-    aScheduler = TTObjectBasePtr(v[0]);
-    
-    aScheduler->getAttributeValue(kTTSym_speed, v);
-    
-    return TTFloat64(v[0]);
+    getTimeProcess(processId).set("speed", TTFloat64(factor));
+    if (processId != ROOT_BOX_ID)
+        getSubScenario(processId).set("speed", TTFloat64(factor));
 }
 
-float Engine::getProcessProgression(TimeProcessId processId)
+float Engine::getExecutionSpeedFactor(TimeProcessId processId)
 {
-    TTValue         v;
-    TTFloat64       time;
-    TTTimeProcessPtr  timeProcess = getTimeProcess(processId);
-    TTObjectBasePtr aScheduler;
+    TTValue out;
     
     // TODO : TTTimeProcess should extend Scheduler class
-    // get the scheduler object of the time process
-    timeProcess->getAttributeValue(TTSymbol("scheduler"), v);
-    aScheduler = TTObjectBasePtr(v[0]);
+    getTimeProcess(processId).get("speed", out);
     
-    aScheduler->getAttributeValue(TTSymbol("progression"), v);
-    time = TTFloat64(v[0]);
-    
-    return time;
+    return TTFloat64(out[0]);
 }
 
 void Engine::trigger(ConditionedProcessId triggerId)
 {
-    TimeEventIndex      controlPointIndex;
-    TTTimeProcessPtr    timeProcess = getConditionedProcess(triggerId, controlPointIndex);
-    TTTimeEventPtr      timeEvent;
-    TTValue             v, out;
+    TimeEventIndex  controlPointIndex;
+    TTObject        conditionnedProcess = getConditionedProcess(triggerId, controlPointIndex);
+    TTObject        timeCondition;
+    TTObject        timeEvent;
+    TTValue         out;
     
-    // Get start or end time event
+    // get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        TTScoreTimeProcessGetStartEvent(timeProcess, &timeEvent);
+        conditionnedProcess.get("startEvent", out);
     else
-        TTScoreTimeProcessGetEndEvent(timeProcess, &timeEvent);
+        conditionnedProcess.get("endEvent", out);
+    
+    timeEvent = out[0];
+    
+    // get event condition
+    timeEvent.get("condition", out);
+    timeCondition = out[0];
+    
+    // tell the condition to trigger this event (and dispose the others)
+    timeCondition.send("Trigger", timeEvent, out);
+}
+
+void Engine::trigger(vector<ConditionedProcessId> triggerIds)
+{
+    vector<ConditionedProcessId>::iterator it;
+    TTObject    lastTimeCondition;
+    TTValue     events, out;
+    
+    // get all time events
+    for (it = triggerIds.begin(); it != triggerIds.end(); ++it) {
+        
+        TimeEventIndex  controlPointIndex;
+        TTObject        conditionedProcess = getConditionedProcess(*it, controlPointIndex);
+        TTObject        timeEvent;
+        TTObject        timeCondition;
+        
+        // get start or end time event
+        if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+            conditionedProcess.get("startEvent", out);
+        else
+            conditionedProcess.get("endEvent", out);
+        
+        timeEvent = out[0];
+        
+        // get event condition
+        timeEvent.get("condition", out);
+        timeCondition = out[0];
+        
+        // check that all events are part of the same condition
+        if (!lastTimeCondition.valid())
+            lastTimeCondition = timeCondition;
+        
+        if (lastTimeCondition != timeCondition) {
             
-    timeEvent->sendMessage(kTTSym_Trigger);
+            lastTimeCondition = TTObject();
+            break;
+        }
+        
+        events.append(timeEvent);
+    }
+    
+    // if all events are part of the same time condition
+    if (lastTimeCondition.valid())
+        lastTimeCondition.send("Trigger", events, out);
 }
 
 void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort)
 {
-    TTValue         v, portValue, none;
-    TTSymbol        applicationName(deviceName);
-    TTSymbol        protocolName(pluginToUse);
-    TTObjectBasePtr anApplication = NULL;
-    TTHashPtr       hashParameters;
-    TTErr           err;
+    TTValue     args, out;
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication;
+    TTObject    aProtocol;
     
     // if the application doesn't already exist
-    if (!getApplication(applicationName)) {
+    if (!accessApplication(applicationName)) {
         
         // create the application
-        v = applicationName;
-        TTObjectBaseInstantiate(kTTSym_Application, TTObjectBaseHandle(&anApplication), v);
-        
-        // set application type : here 'mirror' because it use Minuit protocol
-        // note : this should be done for all protocols which have a discovery feature
-        if (protocolName == TTSymbol("Minuit"))
-            anApplication->setAttributeValue(kTTSym_type, TTSymbol("mirror"));
+        m_applicationManager.send("ApplicationInstantiateDistant", applicationName, out);
+        anApplication = out[0];
         
         // check if the protocol has been loaded
-		if (getProtocol(protocolName)) {
+        aProtocol = accessProtocol(TTSymbol(pluginToUse));
+		if (aProtocol.valid()) {
             
             // stop the protocol
-            getProtocol(protocolName)->sendMessage(TTSymbol("Stop"));
+            aProtocol.send("Stop");
             
             // register the application to the protocol
-            v = applicationName;
-            getProtocol(protocolName)->sendMessage(TTSymbol("registerApplication"), v, none);
+            aProtocol.send("ApplicationRegister", applicationName, out);
             
-            err = getProtocol(protocolName)->getAttributeValue(TTSymbol("applicationParameters"), v);
-            
-            if (!err) {
-                
-                hashParameters = TTHashPtr((TTPtr)v[0]);
-            
-                // set plugin parameters (OSC or Minuit Plugin)
-                hashParameters->remove(TTSymbol("ip"));
-                hashParameters->append(TTSymbol("ip"), TTSymbol(DeviceIp));
-                
-                portValue = destinationPort;
-                if (receptionPort != 0)
-                    portValue.append(receptionPort);
-                
-                hashParameters->remove(TTSymbol("port"));
-                hashParameters->append(TTSymbol("port"), portValue);
-            
-                v = applicationName;
-                v.append(TTPtr(hashParameters));
-                getProtocol(protocolName)->setAttributeValue(TTSymbol("applicationParameters"), v);
-            }
+            aProtocol.send("ApplicationSelect", applicationName, out);
+            aProtocol.set("port", TTUInt16(destinationPort));
+            aProtocol.set("ip", TTSymbol(DeviceIp));
             
             // run the protocol
-            getProtocol(protocolName)->sendMessage(TTSymbol("Run"));
+            aProtocol.send("Run");
         }
         
-        // set the priority, service, tag and rangeBounds attributes as a cached attributes
-        v = kTTSym_priority;
-        v.append(kTTSym_service);
-        v.append(kTTSym_tag);
-        v.append(kTTSym_rangeBounds);
-        v.append(kTTSym_rangeClipmode);
-        anApplication->setAttributeValue(TTSymbol("cachedAttributes"), v);
+        // set the priority, service, tags and rangeBounds attributes as a cached attributes
+        args = kTTSym_priority;
+        args.append(kTTSym_service);
+        args.append(kTTSym_tags);
+        args.append(kTTSym_rangeBounds);
+        args.append(kTTSym_rangeClipmode);
+        anApplication.set("cachedAttributes", args);
     }
 }
 
 void Engine::removeNetworkDevice(const std::string & deviceName)
 {
-    TTValue         v, none;
-    TTSymbol        applicationName(deviceName);
-    TTSymbol        protocolName;
-    TTObjectBasePtr anApplication = getApplication(applicationName);
+    TTValue     v, out;
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    TTSymbol    protocolName;
+    TTObject    aProtocol;
     
     // if the application exists
-    if (anApplication) {
+    if (anApplication.valid()) {
         
-        // get the protocols of the application
-        v = getApplicationProtocols(applicationName);
+        // get the protocol names used by the application
+        v = accessApplicationProtocolNames(applicationName);
         protocolName = v[0]; // we register application to 1 protocol only
+        aProtocol = accessProtocol(protocolName);
         
         // stop the protocol for this application
-        getProtocol(protocolName)->sendMessage(TTSymbol("Stop"));
+        aProtocol.send("Stop");
         
         // unregister the application to the protocol
-        getProtocol(protocolName)->sendMessage(TTSymbol("unregisterApplication"), applicationName, none);
-        
-        // delete the application
-        TTObjectBaseRelease(TTObjectBaseHandle(&anApplication));
+        aProtocol.send("ApplicationUnregister", applicationName, out);
     }
 }
 
@@ -2103,8 +2258,8 @@ void Engine::sendNetworkMessage(const std::string & stringToSend)
     TTAddress anAddress = toTTAddress(aSymbol.string().data());
     data.copyFrom(v, 1);
     
-    m_sender->setAttributeValue(kTTSym_address, anAddress);
-    m_sender->sendMessage(kTTSym_Send, data, out);
+    m_sender.set(kTTSym_address, anAddress);
+    m_sender.send(kTTSym_Send, data, out);
 }
 
 void Engine::getProtocolNames(std::vector<std::string>& allProtocolNames)
@@ -2113,7 +2268,7 @@ void Engine::getProtocolNames(std::vector<std::string>& allProtocolNames)
     TTSymbol    name;
     
     // get all protocol names
-    TTModularApplications->getAttributeValue(TTSymbol("protocolNames"), protocolNames);
+    m_applicationManager.get("protocolNames", protocolNames);
     
     for (TTUInt8 i = 0; i < protocolNames.size(); i++) {
         
@@ -2129,14 +2284,14 @@ void Engine::getNetworkDevicesName(std::vector<std::string>& allDeviceNames)
     TTSymbol    name;
     
     // get all application name
-    TTModularApplications->getAttributeValue(TTSymbol("applicationNames"), applicationNames);
+    m_applicationManager.get("applicationNames", applicationNames);
     
     for (TTUInt8 i = 0; i < applicationNames.size(); i++) {
         
-        // don't return the local application
         name = applicationNames[i];
         
-        if (name == getLocalApplicationName)
+        // don't return iscore application name
+        if (name == iscore)
             continue;
         
         allDeviceNames.push_back(name.c_str());
@@ -2145,19 +2300,24 @@ void Engine::getNetworkDevicesName(std::vector<std::string>& allDeviceNames)
 
 bool Engine::isNetworkDeviceRequestable(const std::string deviceName)
 {
-    
-    TTSymbol    name = TTSymbol(deviceName);
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    TTSymbol    protocolName;
+    TTObject    aProtocol;
+    TTValue     v, out;
     TTBoolean   discover = NO;
     
-    // get all protocol names used by this application
-    TTValue protocolNames = getApplicationProtocols(name);
-    
-    // if there is at least one protocol,
-    if (protocolNames.size()) {
+    // if the application exists
+    if (anApplication.valid()) {
         
-        // look if it provides namespace exploration
-        name = protocolNames[0];
-        discover = getProtocol(name)->mDiscover;
+        // get the protocol names used by the application
+        v = accessApplicationProtocolNames(applicationName);
+        protocolName = v[0]; // we register application to 1 protocol only
+        aProtocol = accessProtocol(protocolName);
+        
+        aProtocol.get("discover", out);
+   
+        discover = out[0];
     }
     
     return discover;
@@ -2169,12 +2329,12 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
     TTAddress           anAddress = toTTAddress(address);
     TTNodeDirectoryPtr  aDirectory;
     TTNodePtr           aNode;
-    TTObjectBasePtr     anObject;
+    TTObject            anObject;
     TTString            s;
     TTValue             v;
     
     // get the application directory
-    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
     
     if (aDirectory) {
     
@@ -2184,14 +2344,14 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
             // get object attributes
             anObject = aNode->getObject();
             
-            if (anObject) {
+            if (anObject.valid()) {
                 
                 // in case of proxy data or mirror object
-                if (anObject->getName() == TTSymbol("Data") ||
-                    (anObject->getName() == kTTSym_Mirror && TTMirrorPtr(anObject)->getName() == TTSymbol("Data")))
+                if (anObject.name() == TTSymbol("Data") ||
+                    (anObject.name() == kTTSym_Mirror && TTMirrorPtr(anObject.instance())->getName() == TTSymbol("Data")))
                 {
                     // get the value attribute
-                    anObject->getAttributeValue(TTSymbol("value"), v);
+                    anObject.get("value", v);
                     v.toString();
                     s = TTString(v[0]);
                     
@@ -2206,16 +2366,16 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
 }
 
 int
-Engine::requestObjectAttributeValue(const std::string & address, const std::string & attribute, vector<string>& value){
-
+Engine::requestObjectAttributeValue(const std::string & address, const std::string & attribute, vector<string>& value)
+{
     TTAddress           anAddress = toTTAddress(address);
     TTNodeDirectoryPtr  aDirectory;
     TTNodePtr           aNode;
-    TTMirrorPtr         aMirror;
+    TTObject            anObject;
     TTString            s;
     TTValue             v;
 
-    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
     value.clear();
 
     if (!aDirectory)
@@ -2224,10 +2384,12 @@ Engine::requestObjectAttributeValue(const std::string & address, const std::stri
     if (!aDirectory->getTTNode(anAddress, &aNode)) {
 
         // get object attributes
-        aMirror = TTMirrorPtr(aNode->getObject());
+        anObject = aNode->getObject();
 
-        if (aMirror) {
-            if(!aMirror->getAttributeValue(TTSymbol(attribute), v)){               
+        if (anObject.valid()) {
+            
+            if (!anObject.get(TTSymbol(attribute), v)) {
+                
                 v.toString();
                 s = TTString(v[0]);
                 value.push_back(s.c_str());
@@ -2239,16 +2401,48 @@ Engine::requestObjectAttributeValue(const std::string & address, const std::stri
 }
 
 int
-Engine::requestObjectType(const std::string & address, std::string & nodeType){
+Engine::setObjectAttributeValue(const std::string & address, const std::string & attribute, std::string & value)
+{
+    TTAddress           anAddress = toTTAddress(address);
+    TTNodeDirectoryPtr  aDirectory;
+    TTNodePtr           aNode;
+    TTObject            anObject;
+    TTValue             v;
+    
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
+    value.clear();
+    
+    if (!aDirectory)
+        return 1;
+    
+    if (!aDirectory->getTTNode(anAddress, &aNode)) {
+        
+        // set object attributes
+        anObject = aNode->getObject();
+        
+        if (anObject.valid()) {
+            
+            v = TTString(value);
+            v.fromString();
+      
+            if(!anObject.set(TTSymbol(attribute), v))
+                return 1;
+        }
+    }
+    return 0;
+}
+
+int
+Engine::requestObjectType(const std::string & address, std::string & nodeType)
+{
     TTNodeDirectoryPtr  aDirectory;
     TTAddress           anAddress = toTTAddress(address);
     TTSymbol            type;
-    TTObjectBasePtr     anObject;
-    TTMirrorPtr         aMirror;
+    TTObject            anObject;
     TTNodePtr           aNode;
 
     nodeType = "none";
-    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
 
     if (!aDirectory)
         return 0;
@@ -2257,12 +2451,12 @@ Engine::requestObjectType(const std::string & address, std::string & nodeType){
 
         anObject = aNode->getObject();
         
-        if (anObject) {
+        if (anObject.valid()) {
             
-            if (anObject->getName() == kTTSym_Mirror)
-                type = TTMirrorPtr(anObject)->getName();
+            if (anObject.name() == kTTSym_Mirror)
+                type = TTMirrorPtr(anObject.instance())->getName();
             else
-                type = anObject->getName();
+                type = anObject.name();
             
             if (type != kTTSymEmpty) {
                 
@@ -2275,14 +2469,15 @@ Engine::requestObjectType(const std::string & address, std::string & nodeType){
 }
 
 int
-Engine::requestObjectPriority(const std::string &address, unsigned int &priority){
+Engine::requestObjectPriority(const std::string &address, unsigned int &priority)
+{
     TTNodeDirectoryPtr  aDirectory;
     TTAddress           anAddress = toTTAddress(address);
-    TTObjectBasePtr     anObject;
+    TTObject            anObject;
     TTNodePtr           aNode;
     TTValue             v;
 
-    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
 
     if (!aDirectory)
         return 0;
@@ -2291,9 +2486,9 @@ Engine::requestObjectPriority(const std::string &address, unsigned int &priority
 
         anObject = aNode->getObject();
 
-        if (anObject) {
+        if (anObject.valid()) {
 
-            if (!anObject->getAttributeValue(kTTSym_priority, v))
+            if (!anObject.get(kTTSym_priority, v))
                 priority = v[0];
             else
                 return 1;
@@ -2311,7 +2506,7 @@ Engine::requestObjectChildren(const std::string & address, vector<string>& child
     TTList              nodeList;
     TTString            s;
 
-    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
     children.clear();
 
     if (!aDirectory)
@@ -2338,111 +2533,166 @@ Engine::requestObjectChildren(const std::string & address, vector<string>& child
     return 0;
 }
 
-void Engine::refreshNetworkNamespace(const string &application, const string &address)
+bool
+Engine::rebuildNetworkNamespace(const string &deviceName, const string &address)
 {
-    TTValue none;
+    TTValue     v, none;
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    TTSymbol    protocolName;
+    TTObject    aProtocol;
     
-    getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryClear"));
-    getApplication(TTSymbol(application))->sendMessage(TTSymbol("DirectoryBuild"));
+    // if the application exists
+    if (anApplication.valid()) {
+        
+        // get the protocol names used by the application
+        v = accessApplicationProtocolNames(applicationName);
+        protocolName = v[0]; // we register application to 1 protocol only
+        
+        // Minuit case : use discovery mechanism
+        if (protocolName == TTSymbol("Minuit")) {
+            
+            anApplication.send("DirectoryBuild");
+            return 0;
+        }
+        // OSC case : reload the namespace from the last project file if exist
+        else if (protocolName == TTSymbol("OSC")) {
+            
+            if (m_namespaceFilesPath.find(deviceName) == m_namespaceFilesPath.end())
+                return 1;
+            
+            TTSymbol namespaceFilePath = TTSymbol(m_namespaceFilesPath[deviceName]);
+            
+            // create a TTXmlHandler
+            TTObject aXmlHandler(kTTSym_XmlHandler);
+            
+            // read the file to setup TTModularApplications
+            aXmlHandler.set(kTTSym_object, anApplication);
+            aXmlHandler.send(kTTSym_Read, namespaceFilePath, none);
+            
+            return 0;
+        }
+    }
+    
+    return 1;
 }
 
-bool Engine::loadNetworkNamespace(const string &application, const string &filepath)
+bool
+Engine::loadNetworkNamespace(const string &deviceName, const string &filepath)
 {
-    // Create a TTXmlHandler
+    TTObject    anApplication = accessApplication(TTSymbol(deviceName));
+    TTValue     out;
+    TTErr       err;
+    
+    // create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
     
-    // Read the file to setup an application
-    TTValue none, v = TTObjectBasePtr(getApplication(TTSymbol(application)));
-    aXmlHandler.set(kTTSym_object, v);
+    // read the file to setup an application
+    aXmlHandler.set(kTTSym_object, anApplication);
     
-    TTErr err = aXmlHandler.send(kTTSym_Read, TTSymbol(filepath), none);
+    err = aXmlHandler.send(kTTSym_Read, TTSymbol(filepath), out);
     
-    // Init the application
-    getApplication(TTSymbol(application))->sendMessage(TTSymbol("Init"));
+    if (!err) {
+    
+        // init the application
+        anApplication.send("Init");
+        
+        // store the namespace file for this device
+        m_namespaceFilesPath[deviceName] = filepath;
+    }
 
     return err != kTTErrNone;
 }
 
-bool Engine::getDeviceIntegerParameter(const string device, const string protocol, const string parameter, unsigned int &integer){
-    TTSymbol        applicationName;
-    TTErr           err;
-    TTValue         p, v;
-    TTHashPtr       hashParameters;
-
-    applicationName = TTSymbol(device);
-
-    // get parameter's table
-    v = TTSymbol(applicationName);
-    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
-
+bool
+Engine::getDeviceIntegerParameter(const string device, const string protocol, const string parameter, unsigned int &integer)
+{
+    TTSymbol    applicationName(device);
+    TTObject    aProtocol = accessProtocol(TTSymbol(protocol));
+    TTValue     out;
+    TTErr       err;
+    
+    err = aProtocol.send("ApplicationSelect", applicationName, out);
+    
     if (!err) {
-        hashParameters = TTHashPtr((TTPtr)v[0]);
-        hashParameters->lookup(TTSymbol(parameter),p);
-        integer = TTUInt32(p[0]);
-        return 0;
+        
+        err = aProtocol.get(TTSymbol(parameter), out);
+        
+        if (!err) {
+            
+            integer = TTUInt32(out[0]);
+            return 0;
+        }
     }
+    
     return 1;
 }
 
-bool Engine::getDeviceIntegerVectorParameter(const string device, const string protocol, const string parameter, vector<int>& integerVect){
-    TTSymbol        applicationName;
-    TTErr           err;
-    TTValue         p, v;
-    TTHashPtr       hashParameters;
-
-    applicationName = TTSymbol(device);
-
-    // get parameter's table
-    v = TTSymbol(applicationName);
-    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
-
+bool
+Engine::getDeviceIntegerVectorParameter(const string device, const string protocol, const string parameter, vector<int>& integerVect)
+{
+    TTSymbol    applicationName(device);
+    TTObject    aProtocol = accessProtocol(TTSymbol(protocol));
+    TTValue     out;
+    TTErr       err;
+    
+    err = aProtocol.send("ApplicationSelect", applicationName, out);
+    
     if (!err) {
-        hashParameters = TTHashPtr((TTPtr)v[0]);
-        hashParameters->lookup(TTSymbol(parameter),p);
-
-        for (TTUInt32 i = 0 ; i < p.size() ; i++)
-            integerVect.push_back(TTUInt16(p[i]));
-
-        return 0;
+        
+        err = aProtocol.get(TTSymbol(parameter), out);
+        
+        if (!err) {
+            
+            for (TTUInt32 i = 0 ; i < out.size() ; i++)
+                integerVect.push_back(TTUInt16(out[i]));
+            
+            return 0;
+        }
     }
+    
     return 1;
 }
 
-bool Engine::getDeviceStringParameter(const string device, const string protocol, const string parameter, string &string){
-
-    TTSymbol        applicationName, s;
-    TTErr           err;
-    TTValue         p, v;
-    TTHashPtr       hashParameters;
-
-    applicationName = TTSymbol(device);
-
-    // get parameter's table
-    v = TTSymbol(applicationName);
-    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
-
+bool
+Engine::getDeviceStringParameter(const string device, const string protocol, const string parameter, string &string)
+{
+    TTSymbol    applicationName(device);
+    TTObject    aProtocol = accessProtocol(TTSymbol(protocol));
+    TTValue     v, out;
+    TTErr       err;
+    
+    err = aProtocol.send("ApplicationSelect", applicationName, out);
+    
     if (!err) {
-        hashParameters = TTHashPtr((TTPtr)v[0]);
-        hashParameters->lookup(TTSymbol(parameter),p);
-        s = p[0];
-        string = s.c_str();
-        return 0;
+        
+        err = aProtocol.get(TTSymbol(parameter), out);
+        
+        if (!err) {
+            
+            TTSymbol s = out[0];
+            string = s.c_str();
+            
+            return 0;
+        }
     }
+    
     return 1;
 }
 
 bool
 Engine::getDeviceProtocol(std::string deviceName, std::string &protocol)
 {
-    TTValue         v;
-    TTSymbol        applicationName(deviceName);
-    TTSymbol        protocolName;
-    TTObjectBasePtr anApplication = getApplication(applicationName);
-
+    TTValue     v;
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    TTSymbol    protocolName;
+    
     // if the application exists
-    if (anApplication) {
-        // get the protocols of the application
-        v = getApplicationProtocols(applicationName);
+    if (anApplication.valid()) {
+        
+        // get the protocol names used by the application
+        v = accessApplicationProtocolNames(applicationName);
         protocolName = v[0]; // we register application to 1 protocol only
         protocol = protocolName.c_str();
         return 0;
@@ -2453,108 +2703,87 @@ Engine::getDeviceProtocol(std::string deviceName, std::string &protocol)
 bool
 Engine::setDeviceName(string deviceName, string newName)
 {
-    string          protocol,
-                    localHost;
-    unsigned int    port;
-
-    //get protocol name
-    if(getDeviceProtocol(deviceName,protocol) != 0)
-        return 1;
-
-    //get port
-    if(getDeviceIntegerParameter(deviceName,protocol,"port",port) != 0)
-        return 1;
-
-    //get ip
-    if(getDeviceStringParameter(deviceName,protocol,"ip",localHost) != 0)
-        return 1;
-
-    addNetworkDevice(newName,protocol,localHost,port);
-    removeNetworkDevice(deviceName);
-
-    return 0;
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    TTSymbol    newApplicationName(newName);
+    TTErr       err;
+    
+    err = anApplication.set("name", newApplicationName);
+    
+    return err != kTTErrNone;
 }
 
 bool
 Engine::setDevicePort(string deviceName, int destinationPort, int receptionPort)
 {
-    TTValue         v, portValue;
-    TTSymbol        applicationName(deviceName);
-    TTHashPtr       hashParameters;
-    TTErr           err;
-    std::string     protocol;
-
-    v = TTSymbol(applicationName);
-
-    if (getDeviceProtocol(deviceName,protocol) != 0)
-        return 1;
-
-    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
-
-    if (!err) {
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    TTSymbol    protocolName;
+    TTObject    aProtocol;
+    TTValue     v, out;
+    TTErr       err;
+    
+    // if the application exists
+    if (anApplication.valid()) {
         
-        // stop the protocol
-        getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Stop"));
+        // get the protocol names used by the application
+        v = accessApplicationProtocolNames(applicationName);
+        protocolName = v[0]; // we register application to 1 protocol only
+        aProtocol = accessProtocol(protocolName);
         
-        hashParameters = TTHashPtr((TTPtr)v[0]);
-
-        hashParameters->remove(TTSymbol("port"));
+        err = aProtocol.send("ApplicationSelect", applicationName, out);
         
-        portValue = destinationPort;
-        if (receptionPort != 0)
-            portValue.append(receptionPort);
-        
-        hashParameters->append(TTSymbol("port"), portValue);
-
-        v = TTSymbol(applicationName);
-        v.append((TTPtr)hashParameters);
-        getProtocol(TTSymbol(protocol))->setAttributeValue(TTSymbol("applicationParameters"), v);
-        
-        // run the protocol
-        getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Run"));
-
-        return 0;
+        if (!err) {
+            
+            aProtocol.send("Stop");
+            
+            v = TTValue(destinationPort, receptionPort);
+            err = aProtocol.set("port", v);
+            
+            aProtocol.send("Run");
+            
+            if (!err)
+                return 0;
+        }
     }
-
+    
     return 1;
 }
 
 bool
 Engine::setDeviceLocalHost(string deviceName, string localHost)
 {
-    TTValue         v;
-    TTSymbol        applicationName(deviceName);
-    TTHashPtr       hashParameters;
-    TTErr           err;
-    std::string     protocol;
-
-    v = TTSymbol(applicationName);
-
-    if(getDeviceProtocol(deviceName,protocol) != 0)
-        return 1;
-
-    err = getProtocol(TTSymbol(protocol))->getAttributeValue(TTSymbol("applicationParameters"), v);
-
-    if (!err) {
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    TTSymbol    protocolName;
+    TTObject    aProtocol;
+    TTValue     v, out;
+    TTErr       err;
+    
+    // if the application exists
+    if (anApplication.valid()) {
         
-        // stop the protocol
-        getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Stop"));
+        // get the protocol names used by the application
+        v = accessApplicationProtocolNames(applicationName);
+        protocolName = v[0]; // we register application to 1 protocol only
+        aProtocol = accessProtocol(protocolName);
         
-        hashParameters = TTHashPtr((TTPtr)v[0]);
-
-        hashParameters->remove(TTSymbol("ip"));
-        hashParameters->append(TTSymbol("ip"), TTSymbol(localHost));
-
-        v = TTSymbol(applicationName);
-        v.append((TTPtr)hashParameters);
-        getProtocol(TTSymbol(protocol))->setAttributeValue(TTSymbol("applicationParameters"), v);
+        err = aProtocol.send("ApplicationSelect", applicationName, out);
         
-        // run the protocol
-        getProtocol(TTSymbol(protocol))->sendMessage(TTSymbol("Run"));
-
-        return 0;
+        if (!err) {
+            
+            aProtocol.send("Stop");
+            
+            v = TTSymbol(localHost);
+            err = aProtocol.set("ip", v);
+            
+            aProtocol.send("Run");
+            
+            if (!err)
+                return 0;
+        }
     }
-
+    
     return 1;
 }
 
@@ -2583,6 +2812,48 @@ Engine::setDeviceProtocol(string deviceName, string protocol)
     return 0;
 }
 
+bool Engine::setDeviceLearn(std::string deviceName, bool newLearn)
+{
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    
+    TTErr err = anApplication.set("learn", newLearn);
+    
+    // enable namespace observation
+    if (newLearn && !m_namespaceObserver.valid()) {
+        
+        TTValue baton(TTPtr(this), applicationName);
+        
+        // create a TTCallback to observe when a node is created (using NamespaceCallback)
+        m_namespaceObserver = TTObject("callback");
+        
+        m_namespaceObserver.set("baton", baton);
+        m_namespaceObserver.set("function", TTPtr(&NamespaceCallback));
+        
+        accessApplicationDirectory(applicationName)->addObserverForNotifications(kTTAdrsRoot, m_namespaceObserver);
+    }
+    // disable namespace observation
+    else if (!newLearn && m_namespaceObserver.valid()) {
+        
+        accessApplicationDirectory(applicationName)->removeObserverForNotifications(kTTAdrsRoot, m_namespaceObserver);
+        
+        m_namespaceObserver = TTObject();
+    }
+    
+    return err != kTTErrNone;
+}
+
+bool Engine::getDeviceLearn(std::string deviceName)
+{
+    TTSymbol    applicationName(deviceName);
+    TTObject    anApplication = accessApplication(applicationName);
+    TTValue     v;
+    
+    anApplication.get("learn", v);
+    
+    return TTBoolean(v[0]);
+}
+
 int Engine::requestNetworkNamespace(const std::string & address, std::string & nodeType, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)
 {
     TTAddress           anAddress = toTTAddress(address);
@@ -2595,7 +2866,7 @@ int Engine::requestNetworkNamespace(const std::string & address, std::string & n
     TTValue             v;
     
     // get the application directory
-    aDirectory = getApplicationDirectory(anAddress.getDirectory());
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
     
     if (!aDirectory)
         return 0;
@@ -2605,7 +2876,7 @@ int Engine::requestNetworkNamespace(const std::string & address, std::string & n
     if (!aDirectory->getTTNode(anAddress, &aNode)) {
         
         // get object attributes
-        aMirror = TTMirrorPtr(aNode->getObject());
+        aMirror = TTMirrorPtr(aNode->getObject().instance());
         if (aMirror) {
             
             type = aMirror->getName();
@@ -2692,7 +2963,7 @@ int Engine::requestNetworkNamespace(const std::string & address, std::string & n
             }
             
             // depending on the mirror object type
-            aMirror = TTMirrorPtr(childNode->getObject());
+            aMirror = TTMirrorPtr(childNode->getObject().instance());
             if (aMirror) {
                 
                 type = aMirror->getName();
@@ -2713,59 +2984,186 @@ int Engine::requestNetworkNamespace(const std::string & address, std::string & n
     return 0;
 }
 
+int Engine::appendToNetWorkNamespace(const std::string & address, const std::string & service, const std::string & type, const std::string & priority, const std::string & description, const std::string & range, const std::string & clipmode, const std::string & tags)
+{
+    TTAddress           anAddress = toTTAddress(address);
+    TTObject            anApplication = accessApplication(anAddress.getDirectory());
+    TTNodeDirectoryPtr  aDirectory;
+    TTObject            anObject;
+    TTString            s;
+    TTValue             v, out;
+    
+    // get the application directory
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
+    
+    if (!aDirectory)
+        return 0;
+    
+    // don't register anything into the local directory
+    if (aDirectory == accessApplicationLocalDirectory)
+        return 0;
+    
+    // create a proxy data
+    v = TTValue(anAddress, TTSymbol(service));
+    if (!anApplication.send("ProxyDataInstantiate", v, out)) {
+        
+        anObject = out[0];
+        
+        anObject.set("type", TTSymbol(type));
+        
+        v = TTString(priority);
+        v.fromString();
+        anObject.set("priority", v);
+        
+        anObject.set("description", TTSymbol(description));
+        
+        v = TTString(range);
+        v.fromString();
+        anObject.set("rangeBounds", v);
+        
+        anObject.set("rangeClipmode", TTSymbol(clipmode));
+        
+        v = TTString(tags);
+        v.fromString();
+        anObject.set("tags", v);
+        
+        return 1;
+    }
+    
+    return 0;
+}
+
+int Engine::removeFromNetWorkNamespace(const std::string & address)
+{
+    TTAddress           anAddress = toTTAddress(address);
+    TTNodeDirectoryPtr  aDirectory;
+    TTNodePtr           aNode;
+    TTObject            anObject;
+    
+    // get the application directory
+    aDirectory = accessApplicationDirectoryFrom(anAddress);
+    
+    if (!aDirectory)
+        return 0;
+    
+    // explore the directory at this address
+    // notice the tree is already built (see in initModular)
+    if (!aDirectory->getTTNode(anAddress, &aNode)) {
+        
+        aDirectory->TTNodeRemove(anAddress);
+        
+        return 1;
+    }
+    
+    return 0;
+}
 
 
 // LOAD AND STORE
 
-void Engine::store(std::string fileName)
+int Engine::store(std::string filepath)
 {
     TTValue v, none;
+    
+    m_lastProjectFilePath = TTSymbol(filepath);
     
     // Create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
     
     // Pass the application manager and the main scenario object
-    v = TTObjectBasePtr(TTModularApplications);
-    v.append(m_mainScenario);
+    v = TTValue(m_applicationManager, m_mainScenario);
     aXmlHandler.set(kTTSym_object, v);
     
     // Write
-    aXmlHandler.send(kTTSym_Write, TTSymbol(fileName), none);
+    TTErr err = aXmlHandler.send(kTTSym_Write, m_lastProjectFilePath, none);
+    
+    return err == kTTErrNone;
 }
 
-void Engine::load(std::string fileName)
+int Engine::load(std::string filepath)
 {
-    TTValue             v, objects, none;
-    TTObjectBasePtr     timeProcess, timeEvent, timeCondition;
-    TTSymbol            name;
-    TimeProcessId       timeProcessId;
-    IntervalId          relationId;
-    ConditionedProcessId triggerId;
+    TTValue out;
+    TTErr   err;
     
-    // Clear all the EngineCacheMaps
-    // note : this should be useless because all elements are removed by the maquette
-    clearTimeProcess();
-    clearInterval();
-    clearConditionedProcess();
-    clearTimeCondition();
+    // Check that all Engine caches have been properly cleared before
+    if (m_timeProcessMap.size() > 1)
+        TTLogMessage("Engine::load : m_timeProcessMap not empty before the loading\n");
+    
+    if (!m_intervalMap.empty())
+        TTLogMessage("Engine::load : m_intervalMap not empty before the loading\n");
+    
+    if (!m_conditionedProcessMap.empty())
+        TTLogMessage("Engine::load : m_conditionedProcessMap not empty before the loading\n");
+    
+    if (!m_timeConditionMap.empty())
+        TTLogMessage("Engine::load : m_timeConditionMap not empty before the loading\n");
+    
+    m_lastProjectFilePath = TTSymbol(filepath);
     
     // Create a TTXmlHandler
     TTObject aXmlHandler(kTTSym_XmlHandler);
     
-    // Read the file to setup TTModularApplications
-    v = TTObjectBasePtr(TTModularApplications);
-    aXmlHandler.set(kTTSym_object, v);
-    aXmlHandler.send(kTTSym_Read, TTSymbol(fileName), none);
+    // Read the file to setup m_applicationManager
+    aXmlHandler.set(kTTSym_object, m_applicationManager);
+    err = aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, out);
     
-    // Read the file to setup m_mainScenario
-    v = TTObjectBasePtr(m_mainScenario);
-    aXmlHandler.set(kTTSym_object, v);
-    aXmlHandler.send(kTTSym_Read, TTSymbol(fileName), none);
+    if (!err) {
+        
+        // Read the file to setup m_mainScenario
+        aXmlHandler.set(kTTSym_object, m_mainScenario);
+        err = aXmlHandler.send(kTTSym_Read, m_lastProjectFilePath, out);
+        
+        if (!err) {
+            
+            // Rebuild all the EngineCacheMaps from the main scenario content
+            buildEngineCaches(m_mainScenario, kTTAdrsRoot);
+        }
+    }
     
-    // Rebuild all the EngineCacheMaps from the main scenario content
+    return err == kTTErrNone;
+}
+
+void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
+{
+    TTValue             v, objects, none;
+    TTObject            timeProcess;
+    TTObject            timeEvent;
+    TTObject            timeCondition;
+    TTObject            empty;
+    TTSymbol            name;
+    TimeProcessId       timeProcessId;
+    IntervalId          relationId;
+    ConditionedProcessId triggerId;
+    TimeConditionId     timeConditionId;
+    
+    // temporary map from TTTimeConditionPtr to TimeConditionId
+    std::map<TTObjectBasePtr, TimeConditionId> TTCondToID;
+
+    // get all TTTimeConditions
+    scenario.get("timeConditions", objects);
+
+    // for all time conditions
+    for (TTUInt32 i = 0 ; i < objects.size() ; ++i) {
+
+        timeCondition = objects[i];
+
+        // check if it's a condition for i-score (2-plus events)
+        timeCondition.get("events", v);
+        if (v.size() >= 2) {
+
+            // get a unique ID for the condition
+            timeConditionId = m_nextConditionedProcessId++;
+
+            // cache it
+            cacheTimeCondition(timeConditionId, timeCondition);
+
+            // fill the temporary map
+            TTCondToID[timeCondition.instance()] = timeConditionId;
+        }
+    }
     
     // get all TTTimeProcesses
-    m_mainScenario->getAttributeValue(TTSymbol("timeProcesses"), objects);
+    scenario.get("timeProcesses", objects);
     
     // for all time process
     for (TTUInt32 i = 0; i < objects.size(); i++) {
@@ -2773,20 +3171,20 @@ void Engine::load(std::string fileName)
         timeProcess = objects[i];
         
         // for each Automation process
-        if (timeProcess->getName() == TTSymbol("Automation")) {
+        if (timeProcess.name() == TTSymbol("Automation")) {
             
-            timeProcess->getAttributeValue(kTTSym_name, v);
-            name = v[0];
+            timeProcess.get(kTTSym_name, name);
             
             // Cache it and get an unique id for this process
-            timeProcessId = cacheTimeProcess((TTTimeProcessPtr)timeProcess, name.c_str());
+            TTAddress address = scenarioAddress.appendAddress(TTAddress(name));
+            timeProcessId = cacheTimeProcess(timeProcess, address, empty);
             
             // if the Start event of the Automation process is conditioned
-            timeProcess->getAttributeValue(TTSymbol("startEvent"), v);
-            timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+            timeProcess.get("startEvent", v);
+            timeEvent = v[0];
             
-            timeEvent->getAttributeValue(TTSymbol("condition"), v);
-            timeCondition = TTTimeConditionPtr(TTObjectBasePtr(v[0]));
+            timeEvent.get("condition", v);
+            timeCondition = v[0];
             
             if (timeCondition != NULL) {
             
@@ -2794,15 +3192,23 @@ void Engine::load(std::string fileName)
                 triggerId = cacheConditionedProcess(timeProcessId, BEGIN_CONTROL_POINT_INDEX);
             
                 // We cache the TTTimeCondition
-                cacheTimeCondition(triggerId, (TTTimeConditionPtr)timeCondition);
+                cacheTimeCondition(triggerId, timeCondition);
+
+                // if it is a condition for i-score
+                std::map<TTObjectBasePtr, TimeConditionId>::iterator it = TTCondToID.find(timeCondition.instance());
+                if (it != TTCondToID.end()) {
+
+                    // add it in the conditions map
+                    m_conditionsMap[it->second].push_back(triggerId);
+                }
             }
             
             // if the End event of the Automation process is conditioned
-            timeProcess->getAttributeValue(TTSymbol("endEvent"), v);
-            timeEvent = TTTimeEventPtr(TTObjectBasePtr(v[0]));
+            timeProcess.get("endEvent", v);
+            timeEvent = v[0];
             
-            timeEvent->getAttributeValue(TTSymbol("condition"), v);
-            timeCondition = TTTimeConditionPtr(TTObjectBasePtr(v[0]));
+            timeEvent.get("condition", v);
+            timeCondition = v[0];
             
             if (timeCondition != NULL) {
                 
@@ -2810,22 +3216,61 @@ void Engine::load(std::string fileName)
                 triggerId = cacheConditionedProcess(timeProcessId, END_CONTROL_POINT_INDEX);
             
                 // We cache the TTTimeCondition
-                cacheTimeCondition(triggerId, (TTTimeConditionPtr)timeCondition);
+                cacheTimeCondition(triggerId, timeCondition);
             }
         }
         
         // for each Interval process
-        else if (timeProcess->getName() == TTSymbol("Interval")) {
+        else if (timeProcess.name() == TTSymbol("Interval")) {
             
             // Cache it and get an unique id for this process
-            relationId = cacheInterval((TTTimeProcessPtr)timeProcess);
+            relationId = cacheInterval(timeProcess);
+        }
+        
+        // for each Scenario process
+        else if (timeProcess.name() == TTSymbol("Scenario")) {
+            
+            // get end and start events
+            TTObject startSubScenario, endSubScenario;
+            
+            timeProcess.get("startEvent", v);
+            startSubScenario = v[0];
+            
+            timeProcess.get("endEvent", v);
+            endSubScenario = v[0];
+
+            // retreive the time process with the same end and start events
+            EngineCacheMapIterator it;
+            TTAddress address;
+            
+            for (it = m_timeProcessMap.begin(); it != m_timeProcessMap.end(); ++it) {
+                
+                TTObject  start, end;
+                
+                it->second->object.get("startEvent", v);
+                start = v[0];
+                
+                it->second->object.get("endEvent", v);
+                end = v[0];
+                
+                // set the scenario as the subScenario related to this time process
+                if (start == startSubScenario && end == endSubScenario) {
+                    
+                    it->second->subScenario = timeProcess;
+                    address = it->second->address;
+                    break;
+                }
+            }
+            
+            // Rebuild all the EngineCacheMaps from the sub scenario content
+            buildEngineCaches(timeProcess, address);
         }
     }
 }
 
 // NETWORK
 void Engine::print() {
-#ifdef TODO_ENGINE    
+#ifdef TODO_ENGINE
 	m_executionMachine->getPetriNet()->print();
 #endif
 }
@@ -2847,7 +3292,7 @@ void Engine::printExecutionInLinuxConsole()
 				for (unsigned int i = 0; i < boxesId.size(); ++i) {
 					unsigned int processPercent;
                     
-					processPercent = getProcessProgression(boxesId[i]);
+					processPercent = getProcessPosition(boxesId[i]);
                     
 					if ((processPercent > 0) && (processPercent < 99)) {
 						std::cout << "[*";
@@ -2878,25 +3323,23 @@ void Engine::printExecutionInLinuxConsole()
 #pragma mark Callback Methods
 #endif
 
-void TimeEventStatusAttributeCallback(TTPtr baton, const TTValue& value)
+void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value)
 {
-    TTValuePtr              b;
     EnginePtr               engine;
     ConditionedProcessId    triggerId;
-    TTObjectBasePtr         event;
+    TTObject                event;
     TTValue                 v;
     TTSymbol                status;
 	
 	// unpack baton (engine, triggerId)
-	b = (TTValuePtr)baton;
-	engine = EnginePtr((TTPtr)(*b)[0]);
-    triggerId = ConditionedProcessId((*b)[1]);
+	engine = EnginePtr((TTPtr)baton[0]);
+    triggerId = ConditionedProcessId(baton[1]);
 	
 	// Unpack data (event)
 	event = value[0];
     
     // get status
-    event->getAttributeValue(kTTSym_status, v);
+    event.get("status", v);
     status = v[0];
     
 	if (engine->m_TimeEventStatusAttributeCallback != NULL) {
@@ -2932,39 +3375,34 @@ void TimeEventStatusAttributeCallback(TTPtr baton, const TTValue& value)
     }
 }
 
-void TimeProcessStartCallback(TTPtr baton, const TTValue& value)
+void TimeProcessStartCallback(const TTValue& baton, const TTValue& value)
 {
-    TTValuePtr      b;
     EnginePtr       engine;
     TimeProcessId   boxId;
 	
 	// unpack baton (engine, boxId)
-	b = (TTValuePtr)baton;
-	engine = EnginePtr((TTPtr)(*b)[0]);
-    boxId = TTUInt32((*b)[1]);
+	engine = EnginePtr((TTPtr)baton[0]);
+    boxId = TTUInt32(baton[1]);
     
     iscoreEngineDebug 
-        TTLogMessage("TimeProcess %ld starts at %ld ms\n", boxId, engine->getCurrentExecutionTime());
-    
-    // don't update main scenario running state
-    if (boxId > ROOT_BOX_ID && engine->m_TimeProcessSchedulerRunningAttributeCallback != NULL)
+        TTLogMessage("TimeProcess %ld starts at %ld ms\n", boxId, engine->getCurrentExecutionDate());
+        
+    if (engine->m_TimeProcessSchedulerRunningAttributeCallback != NULL)
         engine->m_TimeProcessSchedulerRunningAttributeCallback(boxId, YES);
 
 }
 
-void TimeProcessEndCallback(TTPtr baton, const TTValue& value)
+void TimeProcessEndCallback(const TTValue& baton, const TTValue& value)
 {
-    TTValuePtr      b;
     EnginePtr       engine;
     TimeProcessId   boxId;
 	
 	// unpack baton (engine, boxId)
-	b = (TTValuePtr)baton;
-	engine = EnginePtr((TTPtr)(*b)[0]);
-    boxId = TTUInt32((*b)[1]);
+	engine = EnginePtr((TTPtr)baton[0]);
+    boxId = TTUInt32(baton[1]);
     
     iscoreEngineDebug
-        TTLogMessage("TimeProcess %ld ends at %ld ms\n", boxId, engine->getCurrentExecutionTime());
+        TTLogMessage("TimeProcess %ld ends at %ld ms\n", boxId, engine->getCurrentExecutionDate());
     
     // update all process running state too
     if (engine->m_TimeProcessSchedulerRunningAttributeCallback != NULL)
@@ -2972,45 +3410,21 @@ void TimeProcessEndCallback(TTPtr baton, const TTValue& value)
     
 }
 
-void TransportDataValueCallback(TTPtr baton, const TTValue& value)
+void NamespaceCallback(const TTValue& baton, const TTValue& value)
 {
-    TTValuePtr          b;
-    EnginePtr           engine;
-    TTSymbol            transport;
+    EnginePtr   engine;
+    TTSymbol    applicationName;
+	TTUInt8     flag;
 	
-	// unpack baton (engine, transport)
-	b = (TTValuePtr)baton;
-	engine = EnginePtr((TTPtr)(*b)[0]);
-    transport = (*b)[0];
-	
-    if (transport == TTSymbol("Play"))
-        engine->play();
+	// unpack baton (engine, applicationName)
+	engine = EnginePtr((TTPtr)baton[0]);
+    applicationName = baton[1];
     
-    else if (transport == TTSymbol("Stop"))
-        engine->stop();
+    // Unpack value (anAddress, aNode, flag, anObserver)
+	flag = value[2];
     
-    else if (transport == TTSymbol("Pause"))
-        engine->pause(!engine->isPaused());
-    
-    else if (transport == TTSymbol("Rewind")) {
-        engine->stop();
-        engine->setTimeOffset(0);
-    }
-    else if (transport == TTSymbol("StartPoint")) {
-        
-        if (value.size() == 1)
-            if (value[0].type() == kTypeUInt32)
-                engine->setTimeOffset(value[0]);
-        
-    }
-    else if (transport == TTSymbol("Speed")) {
-        
-        if (value.size() == 1)
-            if (value[0].type() == kTypeFloat32)
-                engine->setExecutionSpeedFactor(value[0]);
-    }
-    
-    engine->m_TransportDataValueCallback(transport, value);
+    if (flag == kAddressCreated)
+        engine->m_NetworkDeviceNamespaceCallback(applicationName);
 }
 
 TTAddress Engine::toTTAddress(string networktreeAddress)
@@ -3046,48 +3460,15 @@ std::string Engine::toNetworkTreeAddress(TTAddress aTTAddress)
 #pragma mark Miscellaneous Methods
 #endif
 
-// TODO : this should move into a TTModularAPI file
-TTErr TTModularCreateData(TTSymbol service, TTValuePtr baton, TTFunctionWithBatonAndValue valueCallback, TTObjectBasePtr *returnedData)
-{
-    TTValue			args;
-	TTObjectBasePtr	returnValueCallback;
-	
-	// prepare arguments
-	returnValueCallback = NULL;
-	TTObjectBaseInstantiate(TTSymbol("callback"), TTObjectBaseHandle(&returnValueCallback), kTTValNONE);
-    
-	returnValueCallback->setAttributeValue(kTTSym_baton, TTPtr(baton));
-	returnValueCallback->setAttributeValue(kTTSym_function, TTPtr(valueCallback));
-    
-	args.append(returnValueCallback);
-	
-	args.append(service);
-	
-    // create data
-	*returnedData = NULL;
-	TTObjectBaseInstantiate(kTTSym_Data, TTObjectBaseHandle(returnedData), args);
-	
-	return kTTErrNone;
-}
-
-// TODO : this should move into a TTModularAPI file
-TTErr TTModularRegisterObject(TTAddress address, TTObjectBasePtr object)
-{
-    TTNodePtr returnedTTNode;
-    TTBoolean nodeCreated;
-    
-    return getLocalDirectory->TTNodeCreate(address, object, NULL, &returnedTTNode, &nodeCreated);
-}
-
 TTBoolean TTModularCompareNodePriorityThenNameThenInstance(TTValue& v1, TTValue& v2)
 {
 	TTNodePtr	n1, n2;
-	TTObjectBasePtr o1, o2;
+	TTObject    o1, o2;
 	TTValue		v;
-    TTValue    name1;
-    TTValue    name2;
-    TTValue    instance1;
-    TTValue    instance2;
+    TTValue     name1;
+    TTValue     name2;
+    TTValue     instance1;
+    TTValue     instance2;
 	TTInt32		p1 = 0;
 	TTInt32		p2 = 0;
 	
@@ -3099,8 +3480,8 @@ TTBoolean TTModularCompareNodePriorityThenNameThenInstance(TTValue& v1, TTValue&
         instance1 = n1->getInstance();
 		o1 = n1->getObject();
 		
-		if (o1)
-			if (!o1->getAttributeValue(kTTSym_priority, v))
+		if (o1.valid())
+			if (!o1.get(kTTSym_priority, v))
 				p1 = v[0];
 	}
 	
@@ -3112,8 +3493,8 @@ TTBoolean TTModularCompareNodePriorityThenNameThenInstance(TTValue& v1, TTValue&
         instance2 = n2->getInstance();
 		o2 = n2->getObject();
 		
-		if (o2)
-			if (!o2->getAttributeValue(kTTSym_priority, v))
+		if (o2.valid())
+			if (!o2.get(kTTSym_priority, v))
 				p2 = v[0];
 	}
 	

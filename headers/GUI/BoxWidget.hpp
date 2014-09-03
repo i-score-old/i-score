@@ -67,6 +67,7 @@ class BoxWidget : public QWidget
     inline void
     setStackedLayout(QStackedLayout *slayout){ _stackedLayout = slayout; setLayout(_stackedLayout); }
     void addToComboBox(const QString address);
+    void setCurveLowerStyle(std::string curveAddress, bool state);
     void displayCurve(const QString &address);
     inline void
     setStartMenu(QMenu *menu){ _startMenu = menu; }
@@ -82,6 +83,8 @@ class BoxWidget : public QWidget
     void jumpToEndCue();
     void updateStartCue();
     void updateEndCue();
+    void play();
+    void stop();
     void execStartAction();
     void execEndAction();
     void displayStartMenu(QPoint pos);

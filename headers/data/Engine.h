@@ -9,7 +9,7 @@
 #ifndef __SCORE_ENGINE_H__
 #define __SCORE_ENGINE_H__
 
-#include "TTScoreAPI.h"
+#include "TTScore.h"
 #include "TTModular.h"
 
 /*!
@@ -49,13 +49,17 @@ typedef unsigned int IntervalId;
 /** a temporary type dedicated to retreive a process with an Conditioned TimeEvent inside (this is related to TriggerPoint notion) */
 typedef unsigned int ConditionedProcessId;
 
+/** a temporary type dedicated to retreive a Condition */
+typedef unsigned int TimeConditionId;
+
 /** a class used to cache TTObject and some observers */
 class EngineCacheElement {
 
 public:
-    TTObjectBasePtr object;
+    TTObject        object;
     unsigned int    index;
-    std::string     name;
+    TTAddress       address;
+    TTObject        subScenario;
     
     EngineCacheElement();
     ~EngineCacheElement();
@@ -72,6 +76,12 @@ typedef std::map<unsigned int, EngineCacheElementPtr> EngineCacheMap;
 typedef	EngineCacheMap*	EngineCacheMapPtr;
 
 typedef std::map<unsigned int, EngineCacheElementPtr>::iterator EngineCacheMapIterator;
+
+/** a temporary type to define a map to store and retreive the triggerIds associated with a conditionId */
+typedef std::map<unsigned int, std::list<unsigned int>> EngineConditionsMap;
+
+/** a map used to remember the namespace file path for each device */
+typedef std::map<std::string, std::string> EngineFilesMap;
 
 #define NO_BOUND -1
 
@@ -116,7 +126,7 @@ enum BinaryRelationType { EQ_RELATION = 0, NQ_RELATION = 1, LQ_RELATION = 2, LE_
 enum RelationType {ALLEN = 0, ANTPOST = 1, INTERVAL = 2, BOUNDING = 3};
 
 /// define part dedicated for debugging
-#define iscoreEngineDebug if (getLocalApplicationDebug)
+#define iscoreEngineDebug if (accessApplicationLocalDebug)
 
 /*!
  * \class Engine
@@ -134,11 +144,14 @@ class Engine
     
 private:
     
-    TTString            iscore;                                         /// application name
+    TTSymbol            iscore;                                         /// application name
     
-    TTTimeProcessPtr    m_mainScenario;                                 /// The top scenario
-    TTTimeEventPtr      m_mainStartEvent;                               /// The top scenario start event
-    TTTimeEventPtr      m_mainEndEvent;                                 /// The top scenario end event
+    TTSymbol            m_lastProjectFilePath;                          /// the last project file path
+    EngineFilesMap      m_namespaceFilesPath;                           /// the last namespace file used for each device
+    
+    TTObject            m_mainScenario;                                 /// The top scenario
+    TTObject            m_mainStartEvent;                               /// The top scenario start event
+    TTObject            m_mainEndEvent;                                 /// The top scenario end event
     
     unsigned int        m_nextTimeProcessId;                            /// the next Id to give to any created time process
     unsigned int        m_nextIntervalId;                               /// the next Id to give to any created interval
@@ -149,24 +162,22 @@ private:
     EngineCacheMap      m_timeConditionMap;                             /// All condition stored using an unique id
     EngineCacheMap      m_conditionedProcessMap;                        /// All conditioned time process with an conditioned event stored using an unique id
     
+    EngineConditionsMap m_conditionsMap;                                /// All conditions Ids (in i-score point of view) mapped to corresponding triggers id
+
     EngineCacheMap      m_startCallbackMap;                             /// All callback to observe when a time process starts stored using a time process id
     EngineCacheMap      m_endCallbackMap;                               /// All callback to observe when a time process ends stored using a time process id
     
-    EngineCacheMap      m_statusCallbackMap;                             /// All callback to observe time event ready state stored using using a trigger id
-    EngineCacheMap      m_triggerDataMap;                               /// All TTData to expose conditioned event on the network stored using using a trigger id
+    EngineCacheMap      m_statusCallbackMap;                            /// All callback to observe time event ready state stored using using a trigger id
 
-    TTObjectBasePtr     m_dataPlay;                                     /// A Modular TTData to expose Play transport service
-    TTObjectBasePtr     m_dataStop;                                     /// A Modular TTData to expose Stop transport service
-    TTObjectBasePtr     m_dataPause;                                    /// A Modular TTData to expose Pause transport service
-    TTObjectBasePtr     m_dataRewind;                                   /// A Modular TTData to expose Rewind transport service
-    TTObjectBasePtr     m_dataStartPoint;                               /// A Modular TTData to expose StartPoint transport service
-    TTObjectBasePtr     m_dataSpeed;                                    /// A Modular TTData to expose Speed transport service
+    TTObject            m_applicationManager;                           /// #TTApplicationManager to enable communication with any distant application using any protocol
+    TTObject            m_iscore;                                       /// #TTApplication dedicated to i-score
+    TTObject            m_sender;                                       /// #TTSender to send message to any application
+    TTObject            m_namespaceObserver;                            /// #TTCallback to be notified when a node is created in learn mode
     
-    TTObjectBasePtr     m_sender;                                       /// A Modular TTSender to send message to any application
-    
-	void (*m_TimeEventStatusAttributeCallback)(ConditionedProcessId, bool);
-    void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);
-    void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);
+	void (*m_TimeEventStatusAttributeCallback)(ConditionedProcessId, bool);         // allow to notify the Maquette if a triggerpoint is pending
+    void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);    // allow to notify the Maquette if a box is running or not
+    void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);                // allow to notify the Maquette if the transport features have been used remotly (via OSC messages for example)
+    void (*m_NetworkDeviceNamespaceCallback)(TTSymbol&);                            // allow to notify the Maquette if a device's namespace have changed (see in setDeviceLearn)
 
 public:
 
@@ -182,12 +193,12 @@ public:
     Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
            void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
            void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
+           void (*networkDeviceNamespaceCallback)(TTSymbol&),
            std::string pathToTheJamomaFolder);
     
     void initModular(const char* pathToTheJamomaFolder = NULL);
-    void initScore();
+    void initScore(const char* pathToTheJamomaFolder = NULL);
     
-    void registerIscoreTransportData();
     void registerIscoreToProtocols();
     
     void dumpAddressBelow(TTNodePtr aNode);
@@ -196,23 +207,28 @@ public:
     
     // Id management //////////////////////////////////////////////////////////////////
     
-    TimeProcessId       cacheTimeProcess(TTTimeProcessPtr timeProcess, const std::string & name);
-    TTTimeProcessPtr    getTimeProcess(TimeProcessId boxId);
+    TimeProcessId       cacheTimeProcess(TTObject& timeProcess, TTAddress& anAddress, TTObject& subScenario);
+    TTObject&           getTimeProcess(TimeProcessId boxId);
+    TTAddress&          getAddress(TimeProcessId boxId);
+    TTObject&           getSubScenario(TimeProcessId boxId);
     void                uncacheTimeProcess(TimeProcessId boxId);
     void                clearTimeProcess();
     
-    IntervalId          cacheInterval(TTTimeProcessPtr timeProcess);
-    TTTimeProcessPtr    getInterval(IntervalId relationId);
+    TimeProcessId       getParentId(TimeProcessId boxId);
+    void                getChildrenId(TimeProcessId boxId, std::vector<TimeProcessId>& childrenId);
+    
+    IntervalId          cacheInterval(TTObject& timeProcess);
+    TTObject&           getInterval(IntervalId relationId);
     void                uncacheInterval(IntervalId relationId);
     void                clearInterval();
     
     ConditionedProcessId cacheConditionedProcess(TimeProcessId timeProcessId, TimeEventIndex controlPointId);
-    TTTimeProcessPtr    getConditionedProcess(ConditionedProcessId triggerId, TimeEventIndex& controlPointId);
+    TTObject&           getConditionedProcess(ConditionedProcessId triggerId, TimeEventIndex& controlPointId);
     void                uncacheConditionedProcess(ConditionedProcessId triggerId);
     void                clearConditionedProcess();
     
-    void                cacheTimeCondition(ConditionedProcessId triggerId, TTTimeConditionPtr timeCondition);
-    TTTimeConditionPtr  getTimeCondition(ConditionedProcessId triggerId);
+    void                cacheTimeCondition(ConditionedProcessId triggerId, TTObject& timeCondition);
+    TTObject&           getTimeCondition(ConditionedProcessId triggerId);
     void                uncacheTimeCondition(ConditionedProcessId triggerId);
     void                clearTimeCondition();
     
@@ -236,11 +252,11 @@ public:
 	 * \param boxBeginPos : the begin value in ms.
 	 * \param boxLength : the length value in ms.
      * \param name : the name of the box
-	 * \param motherId : mother box ID if any, NO_ID if the box to create has no mother.
+	 * \param motherId : mother box ID (default : root scenario)
 	 *
 	 * \return the newly created box ID.
 	 */
-	TimeProcessId addBox(TimeValue boxBeginPos, TimeValue boxLength, const std::string & name, TimeProcessId motherId);
+	TimeProcessId addBox(TimeValue boxBeginPos, TimeValue boxLength, const std::string & name, TimeProcessId motherId = ROOT_BOX_ID);
     
 	/*!
 	 * Removes a box from the CSP : removes the relation implicating it and the
@@ -269,7 +285,7 @@ public:
     /*!
 	 * Removes the temporal relation using given id.
 	 *
-	 * \param relationId : the ID of the relation to remove.
+	 * \param relationId : the ID of the relation to remove
 	 */
 	void removeTemporalRelation(IntervalId relationId);
     
@@ -428,6 +444,16 @@ public:
      * \param muteState : the muteState of the box matching the given ID
      */
     void setBoxMuteState(TimeProcessId boxId, bool muteState);
+    
+    /*!
+     * Get the mute state of the box (process) matching the given ID
+     *
+     *
+     * \param boxId : the ID of the box
+     *
+     * \return the muteState of the box matching the given ID
+     */
+    bool getBoxMuteState(TimeProcessId boxId);
 
     /*!
      * Sets the name of the box matching the given ID
@@ -536,6 +562,15 @@ public:
 	 * \param mute : the mute state to set (true or false).
 	 */
 	void setCtrlPointMutingState(TimeProcessId boxId, TimeEventIndex controlPointIndex, bool mute);
+    
+    /*!
+	 * Gets the control point mute state.
+	 *
+	 * \param boxId : the ID of the box.
+	 * \param controlPointIndex : the index of the control point.
+	 * \return the mute state (true or false).
+	 */
+	bool getCtrlPointMutingState(TimeProcessId boxId, TimeEventIndex controlPointIndex);
     
 	//CURVES ////////////////////////////////////////////////////////////////////////////////////
     
@@ -695,6 +730,8 @@ public:
     
 	/*!
 	 * Adds a new triggerPoint in CSP.
+     *
+     * \param containingBoxId :
 	 *
 	 * \return the created trigger ID
 	 */
@@ -708,7 +745,45 @@ public:
 	 * \param triggerId : the ID of the trigger to be removed.
 	 */
 	void removeTriggerPoint(ConditionedProcessId triggerId);
+
+    /*!
+     * Mix multiple triggerPoints into one TimeCondition.
+     *
+     * \return the created condition ID
+     */
+    TimeConditionId createCondition(std::vector<ConditionedProcessId> triggerIds);
+
+    /*!
+     * Add a trigger point to the condition.
+     *
+     * \param conditionId : the ID of the condition
+     * \param triggerId : the ID of the trigger to add
+     */
+    void attachToCondition(TimeConditionId conditionId, ConditionedProcessId triggerId);
+
+    /*!
+     * Remove a trigger point from the condition.
+     *
+     * \param conditionId : the ID of the condition
+     * \param triggerId : the ID of the trigger to remove
+     */
+    void detachFromCondition(TimeConditionId conditionId, ConditionedProcessId triggerId);
+
+    /*!
+     * Delete the specified TimeCondition.
+     *
+     * \param conditionId : the ID of the condition to delete
+     */
+    void deleteCondition(TimeConditionId conditionId);
+
+    void getConditionTriggerIds(TimeConditionId conditionId, std::vector<TimeProcessId>& triggerIds);
     
+    // Sick of useless doc
+    void setConditionMessage(TimeConditionId conditionId, std::string disposeMessage);
+
+    // Sick of useless doc
+    std::string getConditionMessage(TimeConditionId conditionId);
+
 	/*!
 	 * Sets the triggerPoint (given by ID) message.
 	 *
@@ -729,6 +804,12 @@ public:
 	 * \return the trigger message
 	 */
 	std::string getTriggerPointMessage(ConditionedProcessId triggerId);
+
+    // Sick of useless doc
+    void setTriggerPointDefault(ConditionedProcessId triggerId, bool dflt);
+
+    // Sick of useless doc
+    bool getTriggerPointDefault(ConditionedProcessId triggerId);
     
 	/*!
 	 * Gets the id of the box linked to the given trigger point.
@@ -773,6 +854,14 @@ public:
 	 * \param triggersID : the vector to fill with all triggers ID used.
 	 */
 	void getTriggersPointId(std::vector<ConditionedProcessId>& triggersID);
+
+    /*!
+     * Fills the given vector with all the conditions ID used in the editor.
+     * Useful after a load.
+     *
+     * \param conditionsID : the vector to fill with all conditions ID used.
+     */
+    void getConditionsId(std::vector<TimeConditionId>& conditionsID);
     
     /*!
 	 * Set the zoom factor of the view of the main scenario
@@ -822,69 +911,77 @@ public:
 	TimeValue getTimeOffset();
     
 	/*!
-	 * Plays the main scenario (compiles and runs it).
+	 * Plays a box.
 	 *
-	 * \return true if the scenario execution starts fine.
+     * \param processId: the id of the process (default : the main scenario).
+	 * \return true if the box starts fine.
 	 */
-	bool play();
+	bool play(TimeProcessId processId = ROOT_BOX_ID);
     
     /*!
 	 * Tests if the main scenario is actually running.
 	 *
+     * \param processId: the id of the process (default : the main scenario).
 	 * \return true if the main scnerio is running. False if not.
 	 */
-	bool isPlaying();
+	bool isPlaying(TimeProcessId processId = ROOT_BOX_ID);
 
 	/*!
-	 * Stops the main scenario.
+	 * Stops a box.
 	 *
-	 * \return true if the main scenario will actually stop.
+     * \param processId: the id of the process (default : the main scenario).
+	 * \return true if the box will actually stop.
 	 */
-	bool stop();
+	bool stop(TimeProcessId processId = ROOT_BOX_ID);
     
     /*!
-	 * Pause the main scenrio execution
+	 * Pause a box.
      *
      * \param pause: new pause value
+     * \param processId: the id of the process (default : the main scenario).
 	 *
 	 */
-	void pause(bool pauseValue);
+	void pause(bool pauseValue, TimeProcessId processId = ROOT_BOX_ID);
  
     /*!
-	 * Tests if the main scenario is actually paused.
+	 * Tests if a box is actually paused.
 	 *
+     * \param processId: the id of the process (default : the main scenario).
 	 * \return true if the main scnerio is paused. False if not.
 	 */
-	bool isPaused();
+	bool isPaused(TimeProcessId processId = ROOT_BOX_ID);
     
 	/*!
-	 * Gets the main scenario current execution time in milliseconds.
+	 * Gets box current execution time (default : the main scenario).
 	 *
+     * \param processId: the id of the process.
 	 * \return the execution time in milliseconds.
 	 */
-	TimeValue getCurrentExecutionTime();
-    
-	/*!
-	 * Changes the execution speed.
-	 *
-	 * \param factor: the new speed factor.
-	 */
-	void setExecutionSpeedFactor(float factor);
+	TimeValue getCurrentExecutionDate(TimeProcessId processId = ROOT_BOX_ID);
     
     /*!
-	 * Gets the execution speed.
+	 * Gets box current execution position (default : the main scenario).
 	 *
-	 * \return the speed factor.
+     * \param processId: the id of the process.
+	 * \return the execution position (normalized [0::1]).
 	 */
-	float getExecutionSpeedFactor();
+	float getCurrentExecutionPosition(TimeProcessId processId = ROOT_BOX_ID);
     
 	/*!
-	 * Gets the progression of a process (in percent).
+	 * Changes the execution speed of a box (default : the main scenario).
 	 *
-	 * \param processId: the id of the process.
-	 * \return the progression inpercent.
+	 * \param factor: the new speed factor.
+     * \param processId: the id of the process.
 	 */
-	float getProcessProgression(TimeProcessId boxId);
+	void setExecutionSpeedFactor(float factor, TimeProcessId processId = ROOT_BOX_ID);
+    
+    /*!
+	 * Gets the execution speed of a box (default : the main scenario).
+	 *
+     * \param processId: the id of the process.
+	 * \return the speed factor.
+	 */
+	float getExecutionSpeedFactor(TimeProcessId processId = ROOT_BOX_ID);
     
     
 	//Network //////////////////////////////////////////////////////////////////////////////////////////////
@@ -897,6 +994,15 @@ public:
 	 * \param triggerId : the id of the trigger point to trigger.
 	 */
 	void trigger(ConditionedProcessId triggerId);
+    
+    /*!
+	 * Trigger several trigger point manually.
+	 *
+	 * Tells the ECOMachine that a trigger point is trggered.
+	 *
+	 * \param triggerIds : a vector of trigger point id to trigger.
+	 */
+	void trigger(std::vector<ConditionedProcessId> triggerIds);
     
 	/*!
 	 * Adds a network device.
@@ -989,6 +1095,17 @@ public:
      * \return True(1) or false(0) if the request failed or not.
      */
     int requestObjectAttributeValue(const std::string & address, const std::string & attribute, std::vector<std::string>& value);
+    
+    /*!
+     * Set an attribute value.
+     *
+     * \param address : the object's address. ex : /deviceName/address1/address2/
+     * \param attribute : the attribute's name we request. ex : "service", "rangeBounds"...etc
+     * \param attributeValue : the attribute values.
+     *
+     * \return True(1) or false(0) if the set have failed or not.
+     */
+    int setObjectAttributeValue(const std::string & address, const std::string & attribute, std::string & value);
 
     /*!
      * Sends a request to get the type of an object.
@@ -1021,20 +1138,42 @@ public:
     int requestObjectChildren(const std::string & address, std::vector<std::string>& children);
 
     /*!
-     * Refresh the namespace, rebuilding the mirror
+     * Refresh the namespace by rebuilding the mirror (Minuit protocol case) or reloading the namesapce from the last project file (OSC protocol case)
      *
-     * \param application : the application's address. ex : /MinuitDevice1
+     * \param deviceName : the device name to rebuild
      * \param address : the object's address
+     * \return 0 if no error, else 1.
      */
-    void refreshNetworkNamespace(const std::string& application, const std::string& address = "/");
+    bool rebuildNetworkNamespace(const std::string& deviceName, const std::string& address = "/");
     
     /*!
      * Load a namespace from a namespace file
      *
-     * \param application : the application to setup
+     * \param deviceName : the devine name to setup
      * \param filepath : the path to a namespace file
      */
-    bool loadNetworkNamespace(const std::string &application, const std::string &filepath);
+    bool loadNetworkNamespace(const std::string &deviceName, const std::string &filepath);
+    
+    /*!
+     * append a new address to a network device
+     *
+     * \param address : the address to add
+     * \param service : service provided by the address (parameter, message, return)
+     * \param type : type of the value handled by the address (none, generic, boolean, decimal, integer, string, array)
+     * \param priority : the priority order of this address
+     * \param description : description of the address
+     * \param range : for numericla value it is the min and the max, for string value it could be an enumeration
+     * \param clipmode : the behavior of the value at min or max bounds (none, low, high, both, wrap, fold)
+     * \param tags : any words
+     */
+    int appendToNetWorkNamespace(const std::string & address, const std::string & service = "parameter", const std::string & type = "generic", const std::string & priority = "0", const std::string & description = "", const std::string & range = "0. 1.", const std::string & clipmode = "none", const std::string & tags = "");
+    
+    /*!
+     * remove an new address from a network device
+     *
+     * \param address : the address to remove
+     */
+    int removeFromNetWorkNamespace(const std::string & address);
 
     /*!
      * Gets an integer parameter associated to the protocol and the device.
@@ -1104,22 +1243,42 @@ public:
      * \return 0 if no error, else 1.
      */
     bool setDeviceProtocol(std::string deviceName, std::string protocol);
+    
+    /*!
+     * Sets the device in learn mode.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \param newLearn : a boolean to set the device in learn mode
+     * \return 0 if no error, else 1.
+     */
+    bool setDeviceLearn(std::string deviceName, bool newLearn);
+    
+    /*!
+     * Sets the device in learn mode.
+     *
+     * \param device : the device's name. ex: MinuitDevice1
+     * \return the learn status of the device.
+     */
+    bool getDeviceLearn(std::string deviceName);
 
 	//Store and load ////////////////////////////////////////////////////////////////////////////////////
     
 	/*!
 	 * Store Engine.
 	 *
-	 * \param fileName : the fileName to store the engines.
+	 * \param filepath : the filepath to use.
+     * \return 1 if the storage succeed
 	 */
-	void store(std::string fileName);
+	int store(std::string filepath);
     
 	/*!
 	 * Load Engine.
 	 *
-	 * \param fileName : the fileName to load.
+	 * \param filepath : the filepath to use.
+     * \return 1 if the load succeed
 	 */
-	void load(std::string fileName);
+	int load(std::string filepath);
+    void buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress);
     
 	/*!
 	 * Prints on standard output both engines. Useful only for debug purpose.
@@ -1127,11 +1286,11 @@ public:
 	void print();
     void printExecutionInLinuxConsole();
     
-    friend void TimeEventStatusAttributeCallback(TTPtr baton, const TTValue& value);
-    friend void TimeProcessStartCallback(TTPtr baton, const TTValue& value);
-    friend void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
-    friend void TransportDataValueCallback(TTPtr baton, const TTValue& value);
-    friend void TriggerReceiverValueCallback(TTPtr baton, const TTValue& value);
+    friend void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value);
+    friend void TimeProcessStartCallback(const TTValue& baton, const TTValue& value);
+    friend void TimeProcessEndCallback(const TTValue& baton, const TTValue& value);
+    friend void TriggerReceiverValueCallback(const TTValue& baton, const TTValue& value);
+    friend void NamespaceCallback(const TTValue& baton, const TTValue& value);
     
 private:
     
@@ -1155,50 +1314,33 @@ private:
 typedef Engine* EnginePtr;
 
 /** time event status attribute callback
- @param	baton			a TTValuePtr containing an EnginePtr and an ConditionedProcessId
+ @param	baton			an EnginePtr and a ConditionedProcessId
  @param	value			a time event
  @return                an error code */
-void TimeEventStatusAttributeCallback(TTPtr baton, const TTValue& value);
+void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value);
 
 /** Callback used each time a process starts
- @param	baton			a TTValuePtr containing an EnginePtr and an TimeProcessId
+ @param	baton			an EnginePtr and a TimeProcessId
  @param	value			nothing
  @return                an error code */
-void TimeProcessStartCallback(TTPtr baton, const TTValue& value);
+void TimeProcessStartCallback(const TTValue& baton, const TTValue& value);
 
 /** Callback used each time a process ends
- @param	baton			a TTValuePtr containing an EnginePtr and an TimeProcessId
- @param	value			the time process running state
- @return                an error code */
-void TimeProcessEndCallback(TTPtr baton, const TTValue& value);
-
-/** Any transport data value callback
- @param	baton			a TTValuePtr containing an EnginePtr and a TTDataPtr
+ @param	baton			an EnginePtr and a TimeProcessId
  @param	value			nothing
  @return                an error code */
-void TransportDataValueCallback(TTPtr baton, const TTValue& value);
+void TimeProcessEndCallback(const TTValue& baton, const TTValue& value);
 
-
-// TODO : this should move into a TTModularAPI file
-/** Create a TTData object
- @param	service			a symbol to tell if the data have to be a "parameter", a "message" or a "return"
- @param	TTValuePtr      a value pointer to return back
- @param valueCallback   a pointer to a void function(TTPtr baton, TTValue& value) to return the value back
- @param returnedData    a new data object
- @return                an error code if the creation fails */
-TTErr TTModularCreateData(TTSymbol service, TTValuePtr baton, TTFunctionWithBatonAndValue valueCallback, TTObjectBasePtr *returnedData);
-
-// TODO : this should move into a TTModularAPI file
-/** Register a TTObject
- @param	address			the absolute address where to register the object
- @param	object          the object to register
- @return                an error code if the registration fails */
-TTErr TTModularRegisterObject(TTAddress address, TTObjectBasePtr object);
+/** Callback used for namespace observation
+ @param	baton			an EnginePtr and an application name
+ @param	value			...
+ @return                an error code */
+void NamespaceCallback(const TTValue& baton, const TTValue& value);
 
 // TODO : this should move into a TTModularAPI file
 /** compare priority attribute of object's node
- @param	v1				a pointer to a value containing a pointer to a TTNode >
- @param	v2				a pointer to a value containing a pointer to a TTNode >
+ @param	v1				a value containing a pointer to a #TTNode >
+ @param	v2				a value containing a pointer to a #TTNode >
  @return				is the priority of v1 is smaller than v2 (except if equal 0) ? */
 TTBoolean TTModularCompareNodePriorityThenNameThenInstance(TTValue& v1, TTValue& v2);
 

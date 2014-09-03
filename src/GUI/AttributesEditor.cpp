@@ -43,6 +43,7 @@
 #include "BasicBox.hpp"
 #include "AttributesEditor.hpp"
 #include <QColorDialog>
+#include <QErrorMessage>
 #include "NetworkMessages.hpp"
 #include "NetworkTree.hpp"
 
@@ -151,8 +152,19 @@ AttributesEditor::nameWidgets()
   assignStart = tr("Start");
   assignEnd = tr("End");
 
+  QFont font;
+  font.setPointSize(10);
+  _snapshotAssignStart->setFont(font);
+  _snapshotAssignEnd->setFont(font);
+//  font.setPointSize(1);
+//  _updateLabel->setFont(font);
+  _updateLabel->setStyleSheet("QLabel { color : gray;"
+                              "font-size: 10pt;} "
+                              );
+
   _snapshotAssignStart->setText(assignStart);
   _snapshotAssignEnd->setText(assignEnd);
+  _updateLabel->setText("update");
 }
 
 void
@@ -162,21 +174,23 @@ AttributesEditor::createWidgets()
   _centralLayout = new QGridLayout;
   _centralLayout->setContentsMargins(LEFT_MARGIN, TOP_MARGIN, RIGHT_MARGIN, BOTTOM_MARGIN);
 
+  //udpate label
+  _updateLabel = new QLabel;
+
   //Color button
   _generalColorButton = new QPushButton;
   _generalColorButton->setIconSize(QSize(COLOR_ICON_SIZE, COLOR_ICON_SIZE));
   _colorButtonPixmap = new QPixmap(4 * COLOR_ICON_SIZE / 3, 4 * COLOR_ICON_SIZE / 3);
   _colorButtonPixmap->fill(QColor(Qt::gray));
-  _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
+  _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));  
 
   _generalColorButton->setStyleSheet(
-  " QPushButton {"
-  "border: 2px solid #6f6f80;"
-  "border-radius: 6px;"
+              " QPushButton {"
+              "border: 2px solid #6f6f80;"
+              "border-radius: 6px;"
               "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
               "stop: 0 #909090, stop: 1 #909090);"
-
-  "}"
+              "}"
               );
 
   //Box name
@@ -186,63 +200,63 @@ AttributesEditor::createWidgets()
                           "selection-color: black;"
                           "selection-background-color: (170,100,100);"
                           );  
-  _boxSettingsLayout = new QHBoxLayout;
+  _boxSettingsLayout = new QGridLayout;
 
   //Start&End buttons
   _snapshotAssignStart = new QPushButton;
+  _snapshotAssignStart->setToolTip("Update start state");
   _snapshotAssignStart->setStyleSheet(
-  " QPushButton {"
-  "border: 2px solid #6f6f80;"
-  "border-radius: 6px;"
+              " QPushButton {"
+              "border: 2px solid #6f6f80;"
+              "border-radius: 6px;"
               "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
               "stop: 0 #808080, stop: 1 #909090);"
-              "padding-bottom: 3px;"
-              "padding-top: 3px;"
+              "padding-bottom: 1px;"
+              "padding-top: 1px;"
 
-  "min-width: 80px;"
-  "}"
+              "min-width: 22px;"
+              "}"
 
-  "QPushButton:pressed {"
+              "QPushButton:pressed {"
               "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
               "stop: 0 #606060, stop: 1 #808080);"
-  "}"
+              "}"
 
-  "QPushButton:flat {"
-  "border: none; /* no border for a flat push button */"
-  "}"
+              "QPushButton:flat {"
+              "border: none; /* no border for a flat push button */"
+              "}"
 
-  "QPushButton:default {"
-  "border-color: navy; /* make the default button prominent */"
-  "}"
+              "QPushButton:default {"
+              "border-color: navy; /* make the default button prominent */"
+              "}"
               );
 
   _snapshotAssignEnd = new QPushButton;
+  _snapshotAssignEnd->setToolTip("Update end state");
   _snapshotAssignEnd->setStyleSheet(
-  " QPushButton {"
-  "border: 2px solid #6f6f80;"
-  "border-radius: 6px;"
+              " QPushButton {"
+              "border: 2px solid #6f6f80;"
+              "border-radius: 6px;"
               "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
               "stop: 0 #808080, stop: 1 #909090);"
-              "padding-bottom: 3px;"
-              "padding-top: 3px;"
+              "padding-bottom: 1px;"
+              "padding-top: 1px;"
 
-  "min-width: 80px;"
-  "}"
-
-  "QPushButton:pressed {"
+              "min-width: 22px;"
+              "}"
+              "QPushButton:pressed {"
               "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
               "stop: 0 #606060, stop: 1 #808080);"
-  "}"
+              "}"
 
-  "QPushButton:flat {"
-  "border: none; /* no border for a flat push button */"
-  "}"
+              "QPushButton:flat {"
+              "border: none; /* no border for a flat push button */"
+              "}"
 
-  "QPushButton:default {"
-  "border-color: navy; /* make the default button prominent */"
-  "}"
-);
-
+              "QPushButton:default {"
+              "border-color: navy; /* make the default button prominent */"
+              "}"
+              );
   //NetworkTree
   _networkTree = new NetworkTree(this);
   //_networkTree->load();
@@ -257,7 +271,7 @@ AttributesEditor::addWidgetsToLayout()
 {
   static const unsigned int BOX_EXTREMITY_PRECISION = 3;
   const int verticalSpacing = 0;
-  const int horizontalSpacing = 27;
+  const int horizontalSpacing = 24;
 
   _boxStartValue->setRange(0., _scene->getMaxSceneWidth() * MaquetteScene::MS_PER_PIXEL / S_TO_MS);
   _boxStartValue->setDecimals(BOX_EXTREMITY_PRECISION);
@@ -266,11 +280,13 @@ AttributesEditor::addWidgetsToLayout()
   _boxLengthValue->setDecimals(BOX_EXTREMITY_PRECISION);
   _boxLengthValue->setKeyboardTracking(false);
 
-  _boxSettingsLayout->addWidget(_snapshotAssignStart,Qt::AlignTop);
-  _boxSettingsLayout->addWidget(_boxName,Qt::AlignBottom);
-  _boxSettingsLayout->addWidget(_generalColorButton,Qt::AlignTop);
-  _boxSettingsLayout->addWidget(_snapshotAssignEnd,Qt::AlignTop);
-  _boxSettingsLayout->setSpacing(horizontalSpacing);
+  _boxSettingsLayout->addWidget(_generalColorButton,0,0,2,1);
+  _boxSettingsLayout->addWidget(_boxName,0,1,2,1);
+//  _boxSettingsLayout->addWidget(_updateLabel,0,2,1,2,Qt::AlignCenter);
+  _boxSettingsLayout->addWidget(_snapshotAssignStart,0,2,2,1);
+  _boxSettingsLayout->addWidget(_snapshotAssignEnd,0,3,2,1);
+  _boxSettingsLayout->setVerticalSpacing(0);
+  _boxSettingsLayout->setHorizontalSpacing(horizontalSpacing);
 
   // Set Central Widget
   _centralLayout->addLayout(_boxSettingsLayout, 0, 1, Qt::AlignTop);
@@ -293,8 +309,11 @@ AttributesEditor::connectSlots()
 
   connect(_snapshotAssignStart, SIGNAL(clicked()), this, SLOT(snapshotStartAssignment()));
   connect(_snapshotAssignEnd, SIGNAL(clicked()), this, SLOT(snapshotEndAssignment()));
+  connect(_networkTree, SIGNAL(requestSnapshotStart(QList<QTreeWidgetItem *>)), this, SLOT(snapshotStartAssignment(QList<QTreeWidgetItem *>)));
+  connect(_networkTree, SIGNAL(requestSnapshotEnd(QList<QTreeWidgetItem *>)), this, SLOT(snapshotEndAssignment(QList<QTreeWidgetItem *>)));
 
   connect(_networkTree, SIGNAL(itemExpanded(QTreeWidgetItem *)), this, SLOT(addToExpandedItemsList(QTreeWidgetItem*)));
+  connect(_networkTree, SIGNAL(treeSelectionChanged(QList<QTreeWidgetItem *>)), this, SLOT(addToSelectedItemsList(QList<QTreeWidgetItem *>)));
   connect(_networkTree, SIGNAL(itemCollapsed(QTreeWidgetItem *)), this, SLOT(removeFromExpandedItemsList(QTreeWidgetItem*)));
   connect(_networkTree, SIGNAL(curveActivationChanged(QTreeWidgetItem*, bool)), this, SLOT(curveActivationChanged(QTreeWidgetItem*, bool)));
   connect(_networkTree, SIGNAL(curveRedundancyChanged(QTreeWidgetItem*, bool)), this, SLOT(curveRedundancyChanged(QTreeWidgetItem*, bool)));
@@ -329,8 +348,7 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
               endMessagesChanged();
             }
           else {
-              _networkTree->setAssignedItems(abBox->networkTreeItems());
-              _networkTree->expandItems(abBox->networkTreeExpandedItems());              
+              _networkTree->setAssignedItems(abBox->networkTreeItems());             
             }
 
           _networkTree->displayBoxContent(abBox);
@@ -441,6 +459,26 @@ void
 AttributesEditor::nameChanged()
 {
   BasicBox * box = _scene->getBox(_boxEdited);
+
+  //provisional : "<" ">" are forbidden, problem on .score writing.
+  if(_boxName->text().contains(">") || _boxName->text().contains("<")){
+      QString msg = "> and < characters are forbidden";
+      QMessageBox::warning(this, "", msg);
+      _boxName->setText(box->name());
+  }
+  if(_boxName->text().contains(" ")){//provisional : Spaces are replaced by _ (problem on .score writing/load).
+      QString newName,
+              name = _boxName->text();
+      QStringList splitList = name.split(" ");
+      for(QStringList::iterator it=splitList.begin() ; it!=splitList.end() ; it++){
+          newName.append(*it);
+          if(it!=splitList.end()-1)
+              newName.append("_");
+      }
+
+      _boxName->setText(newName);
+  }
+
   if (box != NULL) {
       box->setName(_boxName->text());
       _scene->update(box->getTopLeft().x(), box->getTopLeft().y(), box->width(), box->height() + 10);
@@ -528,8 +566,8 @@ AttributesEditor::startMessageChanged(QTreeWidgetItem *item)
     if (_scene->paused()) {
           _scene->stopAndGoToCurrentTime();
       }
-  if (_boxEdited != NO_ID) {
-
+  if (_boxEdited != NO_ID)
+  {
       //PAS OPTIMAL, NE DEVRAIT MODIFIER QU'UN SEUL ITEM
       QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
       Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
@@ -707,6 +745,38 @@ AttributesEditor::snapshotStartAssignment()
       _scene->displayMessage("No box selected during treeSnapshot assignment", INDICATION_LEVEL);
     }
 }
+void
+AttributesEditor::snapshotStartAssignment(QList<QTreeWidgetItem *> itemsList)
+{
+    QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot = _networkTree->treeSnapshot(_boxEdited,itemsList);
+
+    _networkTree->clearDevicesStartMsgs(treeSnapshot.second);
+
+    if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
+
+        //--- Pour réassigner les items des autres devices (qui n'ont pas été supprimés) ---
+        QList<QTreeWidgetItem *> itemsNotModified = _networkTree->startMessages()->getItems();
+
+        if (!treeSnapshot.first.empty()) {
+            _networkTree->startMessages()->setMessages(treeSnapshot.first);
+
+            //clear tous les messages assignés et set les nouveaux
+            _networkTree->assignItems(treeSnapshot.first);
+
+            //ajoute les messages sauvegardés dans les assignés
+            _networkTree->assignItems(itemsNotModified);
+
+            startMessagesChanged(true);
+            _scene->displayMessage("treeSnapshot successfully captured and applied to box start", INDICATION_LEVEL);
+          }
+        else {
+            _scene->displayMessage("No treeSnapshot taken for selection", INDICATION_LEVEL);
+          }
+      }
+    else {
+        _scene->displayMessage("No box selected during treeSnapshot assignment", INDICATION_LEVEL);
+      }
+}
 
 void
 AttributesEditor::snapshotEndAssignment()
@@ -740,18 +810,61 @@ AttributesEditor::snapshotEndAssignment()
 }
 
 void
+AttributesEditor::snapshotEndAssignment(QList<QTreeWidgetItem *> itemsList)
+{
+  QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot = _networkTree->treeSnapshot(_boxEdited, itemsList);
+  _networkTree->clearDevicesEndMsgs(treeSnapshot.second);
+
+  if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
+
+      //--- Pour réassigner les items des autres devices (qui n'ont pas été supprimés) ---
+      QList<QTreeWidgetItem *> itemsNotModified = _networkTree->endMessages()->getItems();
+
+      if (!treeSnapshot.first.empty()) {
+          _networkTree->endMessages()->setMessages(treeSnapshot.first);
+
+          _networkTree->assignItems(treeSnapshot.first);
+
+          //ajoute les messages sauvegardés dans les assignés
+          _networkTree->assignItems(itemsNotModified);
+
+          endMessagesChanged(true);
+          _scene->displayMessage("treeSnapshot successfully captured and applied to box start", INDICATION_LEVEL);
+        }
+      else {
+          _scene->displayMessage("No treeSnapshot taken for selection", INDICATION_LEVEL);
+        }
+    }
+  else {
+      _scene->displayMessage("No box selected during treeSnapshot assignment", INDICATION_LEVEL);
+    }
+}
+
+void
 AttributesEditor::addToExpandedItemsList(QTreeWidgetItem *item)
 {
-  if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
-      Maquette::getInstance()->addToExpandedItemsList(_boxEdited, item);
+    BasicBox * box = _scene->getBox(_boxEdited);
+    if (box != NULL) {
+        box->addToExpandedItemsList(item);
     }
+}
+
+void
+AttributesEditor::addToSelectedItemsList(QList<QTreeWidgetItem *> selectedItems)
+{
+    if(_boxEdited != NO_ID){
+        BasicBox * box = _scene->getBox(_boxEdited);
+        box->setSelectedTreeItems(selectedItems);
+    }
+
 }
 
 void
 AttributesEditor::removeFromExpandedItemsList(QTreeWidgetItem *item)
 {
-  if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
-      Maquette::getInstance()->removeFromExpandedItemsList(_boxEdited, item);
+    BasicBox * box = _scene->getBox(_boxEdited);
+    if (box != NULL) {
+        box->removeFromExpandedItemsList(item);
     }
 }
 

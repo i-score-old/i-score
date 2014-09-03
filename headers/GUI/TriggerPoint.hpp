@@ -53,6 +53,7 @@
 #include "AbstractTriggerPoint.hpp"
 #include <string>
 #include <QInputDialog>
+#include "TriggerPointEdit.hpp"
 
 class MaquetteScene;
 class Abstract;
@@ -74,6 +75,8 @@ class TriggerPoint : public QGraphicsItem
                  const std::string &message, unsigned int ID, MaquetteScene *parent);
 
     TriggerPoint(const AbstractTriggerPoint &abstract, MaquetteScene *parent);
+
+    bool isConditioned();
 
     virtual
     ~TriggerPoint();
@@ -267,5 +270,7 @@ class TriggerPoint : public QGraphicsItem
     MaquetteScene * _scene;          //!< The scene containing trigger point.
 
     AbstractTriggerPoint *_abstract; //!< The abstract trigger point containing main information.
+
+    TriggerPointEdit *_edit;
 };
 #endif

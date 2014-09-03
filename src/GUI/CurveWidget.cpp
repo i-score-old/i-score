@@ -553,11 +553,6 @@ CurveWidget::resizeEvent(QResizeEvent * event)
 }
 
 void
-CurveWidget::paintEngine()
-{
-}
-
-void
 CurveWidget::paintEvent(QPaintEvent * /* event */)
 {        
   QPainter *painter = new QPainter(this);
@@ -570,8 +565,9 @@ CurveWidget::paintEvent(QPaintEvent * /* event */)
   static const QColor MOVING_BREAKPOINT_COLOR(Qt::darkBlue);
   static const QColor UNACTIVE_COLOR(Qt::darkGray);
 
-  // Abcisses line
-  QPen penXAxis(_unactive ? UNACTIVE_COLOR : AXE_COLOR);
+  // Abcisses line 
+    QPen penXAxis((_unactive) ? UNACTIVE_COLOR : AXE_COLOR);
+
   painter->setPen(penXAxis);
   painter->drawLine(0, _xAxisPos, width(), _xAxisPos);  
 
@@ -596,6 +592,7 @@ CurveWidget::paintEvent(QPaintEvent * /* event */)
       if (precPoint != QPointF(-1, -1)) {
           QPen pen(_unactive ? UNACTIVE_COLOR : CURVE_COLOR);
           pen.setWidth(_unactive ? 1 : 2);
+
           painter->setPen(pen);
           painter->drawLine(precPoint, curPoint);  // Draw lines between values
 

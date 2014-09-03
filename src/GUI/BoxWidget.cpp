@@ -170,12 +170,19 @@ BoxWidget::updateDisplay(const QString &address)
 }
 
 void
+BoxWidget::setCurveLowerStyle(std::string curveAddress, bool state){
+    CurveWidget *curCurve = getCurveWidget(curveAddress);
+    if(curCurve!=NULL){
+        curCurve->setLowerStyle(state);
+    }
+}
+
+void
 BoxWidget::displayCurve(const QString &address)
 {    
   std::string add = address.toStdString();
   QMap<string, CurveWidget *>::iterator curveIt;
   CurveWidget *curveWidget;
-
 
   //Unactive curves
   QList<CurveWidget *> values = _curveMap->values();
@@ -188,7 +195,7 @@ BoxWidget::displayCurve(const QString &address)
       cur->setLowerStyle(true);      
     }
 
-  if (address != BasicBox::SUB_SCENARIO_MODE_TEXT) {
+  if (address != BasicBox::SCENARIO_MODE_TEXT && address != BasicBox::DEFAULT_MODE_TEXT) {
       setEnabled(true);
       curveIt = _curveMap->find(add);
       bool curveFound = (curveIt != _curveMap->end());
@@ -285,7 +292,11 @@ void
 BoxWidget::addToComboBox(const QString address)
 {
   if (_comboBox->findText(address, Qt::MatchExactly) == -1) {
-      _comboBox->addItem(address);
+      _comboBox->addItem(address);      
+
+      //push down the "scenario" item
+      _comboBox->removeItem(_comboBox->findText(BasicBox::SCENARIO_MODE_TEXT, Qt::MatchExactly));
+      _comboBox->addItem(BasicBox::SCENARIO_MODE_TEXT);
     }
 }
 
@@ -294,7 +305,9 @@ BoxWidget::getCurveWidget(std::string address){
     CurveWidget *curve = NULL;
     QMap<string, CurveWidget *>::iterator curveIt = _curveMap->find(address);
     bool curveFound = (curveIt != _curveMap->end());
-    curve = curveIt.value();
+    if(curveFound)
+        curve = curveIt.value();
+
     return curve;
 }
 
@@ -409,8 +422,12 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
                     }
                 }
             }
+          else{
+              removeCurve(address);
+              return false;
+          }
       }
-      else {
+      else {          
           return false;
       }
     }
@@ -528,6 +545,35 @@ BoxWidget::updateEndCue()
   _box->setSelected(true);
   _box->update();
   _box->maquetteScene()->editor()->snapshotEndAssignment();
+}
+
+void
+BoxWidget::play()
+{
+    QList<unsigned int> boxesId;
+
+    QList<QGraphicsItem *> selectedItems = _box->maquetteScene()->selectedItems();
+    for(QList<QGraphicsItem *>::iterator it=selectedItems.begin(); it!=selectedItems.end(); it++){
+        boxesId<<((BasicBox *)(*it))->ID();
+    }
+
+    if(!boxesId.contains(_boxID)){
+        boxesId.clear();
+        boxesId<<_boxID;
+    }
+
+    _box->maquetteScene()->playOrResume(boxesId);
+    _box->updatePlayingModeButtons();
+}
+
+void
+BoxWidget::stop()
+{
+    QList<unsigned int> boxesId;
+    boxesId << _boxID;
+
+    _box->maquetteScene()->stopOrPause(boxesId);
+    _box->updatePlayingModeButtons();
 }
 
 void

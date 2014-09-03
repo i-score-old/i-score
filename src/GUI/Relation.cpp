@@ -105,7 +105,7 @@ Relation::init()
   setFlag(QGraphicsItem::ItemIsFocusable, true);
 
   setVisible(true);
-  setAcceptsHoverEvents(true);
+  setAcceptHoverEvents(true);
   setZValue(1);
   _leftHandleSelected = false;
   _rightHandleSelected = false;
@@ -183,7 +183,7 @@ Relation::updateCoordinates()
   if (box != NULL) {
       switch (_abstract->firstExtremity()) {
           case BOX_START:
-            _start = box->getLeftGripPoint();
+            _start = box->getLeftGripPoint();            
             break;
 
           case BOX_END:

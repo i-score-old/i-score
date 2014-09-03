@@ -83,7 +83,7 @@ Comment::~Comment()
 void
 Comment::init()
 {
-  setCacheMode(QGraphicsItem::ItemCoordinateCache);
+  setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 
   setTextInteractionFlags(Qt::TextEditable);
   setTextInteractionFlags(Qt::TextEditorInteraction);

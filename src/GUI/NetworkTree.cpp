@@ -55,18 +55,20 @@
 
 int NetworkTree::NAME_COLUMN = 0;
 int NetworkTree::VALUE_COLUMN = 1;
-int NetworkTree::START_COLUMN = 2;
-int NetworkTree::END_COLUMN = 4;
-int NetworkTree::INTERPOLATION_COLUMN = 3;
-int NetworkTree::REDUNDANCY_COLUMN = 5;
-int NetworkTree::SR_COLUMN = 6;
-int NetworkTree::TYPE_COLUMN = 7;
-int NetworkTree::MIN_COLUMN = 8;
-int NetworkTree::MAX_COLUMN = 9;
-unsigned int NetworkTree::PRIORITY_COLUMN = 10;
+int NetworkTree::START_ASSIGNATION_COLUMN = 2;
+int NetworkTree::START_COLUMN = 3;
+int NetworkTree::INTERPOLATION_COLUMN = 4;
+int NetworkTree::END_ASSIGNATION_COLUMN = 5;
+int NetworkTree::END_COLUMN = 6;
+int NetworkTree::REDUNDANCY_COLUMN = 7;
+int NetworkTree::SR_COLUMN = 8;
+int NetworkTree::TYPE_COLUMN = 9;
+int NetworkTree::MIN_COLUMN = 10;
+int NetworkTree::MAX_COLUMN = 11;
+unsigned int NetworkTree::PRIORITY_COLUMN = 12;
 
-const QColor NetworkTree::TEXT_COLOR = QColor(0, 0, 0);
-const QColor NetworkTree::TEXT_DISABLED_COLOR = QColor(100, 100, 100);
+const QColor NetworkTree::TEXT_COLOR = QColor(100, 100, 100);
+const QColor NetworkTree::TEXT_DISABLED_COLOR = QColor(50, 50, 50);
 
 QString NetworkTree::OSC_ADD_NODE_TEXT = QString("Add a node");
 QString NetworkTree::ADD_A_DEVICE_TEXT = QString("Add a device");
@@ -79,11 +81,13 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 
   setColumnCount(10);
   QStringList list;
-  list << "Address" << "Value" << "Start" << " ~ " << "End" << " = " << " % "<<" type "<<"min "<<"max ";
+  list << "Address" << "Value" << "   v" <<"Start" << " ~ " << "   v" <<"End" << " = " << " % "<<" type "<<"min "<<"max ";
   // removed <<"priority " and column
   setColumnWidth(NAME_COLUMN, 115);
   setColumnWidth(VALUE_COLUMN, 63);
+  setColumnWidth(START_ASSIGNATION_COLUMN, 30);
   setColumnWidth(START_COLUMN, 60);
+  setColumnWidth(END_ASSIGNATION_COLUMN, 30);
   setColumnWidth(END_COLUMN, 60);
   setColumnWidth(INTERPOLATION_COLUMN, 23);
   setColumnWidth(REDUNDANCY_COLUMN, 23);
@@ -91,10 +95,11 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   setColumnWidth(TYPE_COLUMN, 34);
   setColumnWidth(MIN_COLUMN, 30);
   setColumnWidth(MAX_COLUMN, 30);
-  setColumnWidth(PRIORITY_COLUMN, 30);
+  setColumnWidth(PRIORITY_COLUMN, 30);  
 
   setIndentation(13);
   setHeaderLabels(list);
+
   list.clear();
   QFont font;
   font.setPointSize(TEXT_POINT_SIZE);
@@ -113,6 +118,8 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   connect(this, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(valueChanged(QTreeWidgetItem*, int)));
   connect(this, SIGNAL(startValueChanged(QTreeWidgetItem*, QString)), this, SLOT(changeStartValue(QTreeWidgetItem*, QString)));
   connect(this, SIGNAL(endValueChanged(QTreeWidgetItem*, QString)), this, SLOT(changeEndValue(QTreeWidgetItem*, QString)));
+  connect(this,SIGNAL(itemExpanded(QTreeWidgetItem*)),this, SLOT(addToExpandedItems(QTreeWidgetItem*)));
+  connect(this,SIGNAL(itemCollapsed(QTreeWidgetItem*)),this, SLOT(removeFromExpandedItems(QTreeWidgetItem*)));
   connect(_deviceEdit, SIGNAL(deviceChanged(QString)), this, SLOT(refreshCurrentItemNamespace()));
   connect(_deviceEdit, SIGNAL(deviceNameChanged(QString,QString)), this, SLOT(updateDeviceName(QString, QString)));
   connect(_deviceEdit, SIGNAL(deviceProtocolChanged(QString)), this, SLOT(updateDeviceProtocol(QString)));
@@ -138,62 +145,64 @@ NetworkTree::~NetworkTree(){
 void
 NetworkTree::init()
 {
-   setSelectionMode(QAbstractItemView:: MultiSelection);
+    setSelectionMode(QAbstractItemView::SingleSelection);
 
-  _treeFilterActive = true;
-  _deviceEdit = new DeviceEdit(topLevelWidget());
+    _treeFilterActive = true;
+    _deviceEdit = new DeviceEdit(topLevelWidget());
 
-  _startMessages = new NetworkMessages;
-  _endMessages = new NetworkMessages;
-  _OSCMessageCount = 0;
-  _OSCStartMessages = new NetworkMessages;
-  _OSCEndMessages = new NetworkMessages;
-  _recMessages = QList<QTreeWidgetItem*>();
+    _startMessages = new NetworkMessages;
+    _endMessages = new NetworkMessages;
+    _OSCMessageCount = 0;
+    _OSCStartMessages = new NetworkMessages;
+    _OSCEndMessages = new NetworkMessages;
+    _recMessages = QList<QTreeWidgetItem*>();
+    _expandedItems = QList<QTreeWidgetItem*>();
 
-  setStyleSheet(
-    "QTreeView {"
-    "show-decoration-selected: 1;"
-    "background-color: #5a5a5a;"
-    "}"
+    setStyleSheet(
+                "QTreeView {"
+                "show-decoration-selected: 1;"
+                "background-color: #5a5a5a;"
+                "}"
 
-    "QTreeView::item {"
-    "border-right: 1px solid #000000;"
-    "border-top-color: transparent;"
-    "border-bottom-color: transparent;"
-    "}"
-    
-    "QTreeView::item:disabled {"
-    "background: transparent;"
-    "}"
+                "QTreeView::item {"
+                "border-right: 1px solid #000000;"
+                "border-top-color: transparent;"
+                "border-bottom-color: transparent;"
+                "}"
+
+                "QTreeView::item:disabled {"
+                "background: transparent;"
+                "}"
                 
-    "QTreeView::item:hover {"
-    "background: qlineargradient(x1: -5, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);"
-    "border: 1px solid #bfcde4;"
-    "}"
+                "QTreeView::item:hover {"
+                "background: qlineargradient(x1: -5, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);"
+                "color: #5a5a5a;"
+                "border: 1px solid #bfcde4;"
+                "}"
 
-    "QTreeView::item:selected {"
-    "border: 1px solid #567dbc;"
-    "}"
+                "QTreeView::item:selected {"
+                "border: 1px solid #567dbc;"
+                "}"
 
-    "QTreeView::item:selected:active{"
-    "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6ea1f1, stop: 1 #567dbc);"
-    "}"
+                "QTreeView::item:selected:active{"
+                "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6ea1f1, stop: 1 #567dbc);"
+                "}"
 
-    "QTreeView::item:selected:!active {"
-    "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6b9be8, stop: 1 #577fbf);"
-    "}"
+                "QTreeView::item:selected:!active {"
+                "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6b9be8, stop: 1 #577fbf);"
+                "}"
 
-              "  QHeaderView::section {"
-              "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-              "stop:0 #a1a1a1, stop: 0.5 #909090,"
-              "stop: 0.6 #808080, stop:1 #a3a3a3);"
-              "color: black;"
-              "padding-left: 1px;"
-              "padding-top: 2px;"
-              "padding-bottom: 1px;"
-              "border: 1px solid #606060;"
-              "}"
-    );
+                "  QHeaderView::section {"
+                "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+                "stop:0 #a1a1a1, stop: 0.5 #909090,"
+                "stop: 0.6 #808080, stop:1 #a3a3a3);"
+                "color: black;"
+                "padding-left: 1px;"
+                "padding-top: 2px;"
+                "padding-bottom: 1px;"
+                "border: 1px solid #606060;"
+                "}"
+                );
 }
 
 void
@@ -228,14 +237,20 @@ NetworkTree::load()
   vector<string>::iterator nameIt;
   QList<QTreeWidgetItem*> itemsList;
   _addADeviceItem = addADeviceNode();
+  string protocol;
 
   for (nameIt = deviceNames.begin(); nameIt != deviceNames.end(); ++nameIt) {      
 
       QString deviceName = QString::fromStdString(*nameIt);
       QTreeWidgetItem *curItem = new QTreeWidgetItem(DeviceNode);
       curItem->setText(NAME_COLUMN , deviceName);
+      curItem->setCheckState(NAME_COLUMN,Qt::Unchecked);
       treeRecursiveExploration(curItem, true);
       itemsList << curItem;
+
+      Maquette::getInstance()->getDeviceProtocol(deviceName.toStdString(),protocol);
+      if(protocol=="OSC")
+          createOCSBranch(curItem);
     }
 
   itemsList<<_addADeviceItem;
@@ -280,31 +295,6 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
               msg.message = tr("/");
               msg.message += curName.section('/', 1, nbSection);
             }
-
-          //--------------------PROVISOIRE--------------------
-//        Considère les noeuds avec un nombre fixe de parents, NB_PARENT_MAX. Mis en place pour le cas de l'ancienne version de jamoma où peut mettre des noms contenant des "/"
-//        int NB_PARENT_MAX = 2;
-//        int i;
-
-//        if(address.size()>NB_PARENT_MAX+1){
-//            std::cout<<"address concat :"<<address.size()<<std::endl;
-
-//            QString concat = address.at(NB_PARENT_MAX);
-//            for(i=NB_PARENT_MAX+1; i<address.size(); i++){
-//                concat+="/";
-//                concat+=address.at(i);
-//            }
-
-//            address.replace(NB_PARENT_MAX,concat);
-
-//            for(i=NB_PARENT_MAX+1; i<=address.size(); i++)
-//                address.pop_back();
-
-//            for(i=0;i<address.size();i++)
-//                std::cout<<address.at(i).toStdString()<<" ";
-//            std::cout<<std::endl<<std::endl;
-//         }
-          //--------------------------------------------------
 
           itemsFound = this->findItems(splitAddress.last(), Qt::MatchRecursive, 0);
           if (itemsFound.size() > 1) {
@@ -403,8 +393,8 @@ NetworkTree::createItemFromMessage(QString message)
 void
 NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
 {  
-  rootNode->setCheckState(START_COLUMN, Qt::Unchecked);
-  rootNode->setCheckState(END_COLUMN, Qt::Unchecked);
+  rootNode->setCheckState(START_ASSIGNATION_COLUMN, Qt::Unchecked);
+  rootNode->setCheckState(END_ASSIGNATION_COLUMN, Qt::Unchecked);
 
   QString number = QString("%1").arg(_OSCMessageCount++);
   QString name = QString("OSCMessage" + number);
@@ -418,13 +408,18 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
   rootNode->insertChild(rootNode->childCount() - 1, newItem);
   QString address = getAbsoluteAddress(newItem);
   _OSCMessages.insert(newItem, address);
+
+  //Edits automatically the new item's name.
+//  Maquette::getInstance()->appendToNetWorkNamespace(address.toStdString()); crash
+  NAME_MODIFIED = true;
+  editItem(newItem, NAME_COLUMN);
 }
 
 void
 NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode, QString message)
 {
-  rootNode->setCheckState(START_COLUMN, Qt::Unchecked);
-  rootNode->setCheckState(END_COLUMN, Qt::Unchecked);
+  rootNode->setCheckState(START_ASSIGNATION_COLUMN, Qt::Unchecked);
+  rootNode->setCheckState(END_ASSIGNATION_COLUMN, Qt::Unchecked);
 
   QStringList OSCname = QStringList(message);
 
@@ -441,10 +436,17 @@ void
 NetworkTree::setOSCMessageName(QTreeWidgetItem *item, QString name)
 {
   QMap<QTreeWidgetItem *, QString> ::iterator it = _OSCMessages.find(item);
+  string oldAddress = getAbsoluteAddress(item).toStdString();
   item->setText(NAME_COLUMN, name);
+  QString newAddress = getAbsoluteAddress(item);
+
   if (it != _OSCMessages.end()) {
       _OSCMessages.erase(it);
-      _OSCMessages.insert(item, getAbsoluteAddress(item));
+      Maquette::getInstance()->removeFromNetWorkNamespace(oldAddress);
+      _OSCMessages.insert(item, newAddress);
+      Maquette::getInstance()->appendToNetWorkNamespace(newAddress.toStdString());
+
+      /// \todo reload tree - Redemander à score le nouvel arbre (après ajout de cet item). Ainsi il ira se placer en fonction des / dans son nom comme fils ou parent des autres noeuds dans l'arbre.
     }
 }
 
@@ -497,12 +499,12 @@ NetworkTree::loadNetworkTree(AbstractBox *abBox)
 
 void
 NetworkTree::createOCSBranch(QTreeWidgetItem *curItem)
-{
+{    
   QTreeWidgetItem *addANodeItem = new QTreeWidgetItem(QStringList(OSC_ADD_NODE_TEXT), addOSCNode);
   addANodeItem->setFlags(Qt::ItemIsEnabled);
   addANodeItem->setIcon(0, QIcon(":/resources/images/addANode.png"));
   curItem->addChild(addANodeItem);
-  curItem->setFlags(Qt::ItemIsEnabled);
+//  curItem->setFlags(Qt::ItemIsEnabled);
 }
 
 QTreeWidgetItem *
@@ -569,7 +571,7 @@ NetworkTree::treeSnapshot(unsigned int boxID)
   QMap<QTreeWidgetItem *, Data> snapshots;
   QList<QString> devicesConcerned;
 
-  QList<QTreeWidgetItem*> selection = selectedItems();
+  QList<QTreeWidgetItem*> selection = assignedItems().keys();
   if (!selection.empty()) {
       QList<QTreeWidgetItem*>::iterator it;
       vector<string>::iterator it2;
@@ -588,6 +590,51 @@ NetworkTree::treeSnapshot(unsigned int boxID)
               QPair<QTreeWidgetItem *, Data> curPair;
 
               if (!address.isEmpty()) {                  
+                  vector<string> snapshot = Maquette::getInstance()->requestNetworkSnapShot(address.toStdString());
+
+                  Data data;
+                  for (it2 = snapshot.begin(); it2 != snapshot.end(); it2++) {
+                      data.msg = QString::fromStdString(*it2);
+                      data.address = address;
+//                        data.sampleRate = Maquette::getInstance()->getCurveSampleRate(boxID,address.toStdString());
+                      data.hasCurve = false;
+                      snapshots.insert(*it, data);
+                    }
+                }
+            }
+        }
+    }
+
+  return qMakePair(snapshots, devicesConcerned);
+}
+
+QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> >
+NetworkTree::treeSnapshot(unsigned int boxID, QList<QTreeWidgetItem *> itemsList)
+{
+  Q_UNUSED(boxID);
+
+  QMap<QTreeWidgetItem *, Data> snapshots;
+  QList<QString> devicesConcerned;
+
+  QList<QTreeWidgetItem*> selection = itemsList;
+  if (!selection.empty()) {
+      QList<QTreeWidgetItem*>::iterator it;
+      vector<string>::iterator it2;
+      QTreeWidgetItem *curItem;
+      for (it = selection.begin(); it != selection.end(); ++it) {
+          curItem = *it;
+          if (curItem->type() != DeviceNode && curItem->type() != NodeNoNamespaceType){
+              QString address = getAbsoluteAddress(*it);
+
+              //get device concerned
+              QString deviceName = getDeviceName(*it);
+              if (!devicesConcerned.contains(deviceName)) {
+                  devicesConcerned.append(deviceName);
+                }
+
+              QPair<QTreeWidgetItem *, Data> curPair;
+
+              if (!address.isEmpty()) {
                   vector<string> snapshot = Maquette::getInstance()->requestNetworkSnapShot(address.toStdString());
 
                   Data data;
@@ -642,6 +689,14 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
          //TOTO : check if necessary (unused for the moment) NH.
          _addressMap.insert(curItem, address);
 
+         QFont curFont = curItem->font(NAME_COLUMN);
+         curFont.setItalic(false);
+         curItem->setFont(NAME_COLUMN,curFont);
+
+         QBrush brush(Qt::lightGray);
+         curItem->setForeground(NAME_COLUMN, brush);
+         curItem->setForeground(VALUE_COLUMN, brush);
+
          //Gets object's type
          requestResult = Maquette::getInstance()->getObjectType(address,nodeType);
          requestSuccess = requestResult > 0;
@@ -660,7 +715,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                  delete(curItem);
                  return;
              }
-             if(Maquette::getInstance()->requestObjectAttribruteValue(address,"tag",attributesValues) > 0){
+             if(Maquette::getInstance()->requestObjectAttribruteValue(address,"tags",attributesValues) > 0){
                  if(attributesValues[0] == "setup"){
                      delete(curItem);
                      return;
@@ -673,7 +728,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                  curFont.setItalic(true);
                  curItem->setFont(NAME_COLUMN,curFont);
 
-                 QBrush brush(Qt::lightGray);
+                 QBrush brush(Qt::black);
                  curItem->setForeground(NAME_COLUMN, brush);
                  curItem->setForeground(VALUE_COLUMN, brush);
 
@@ -696,6 +751,8 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
              else{
                  curItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
                  curItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
+                 curItem->setCheckState(START_ASSIGNATION_COLUMN, Qt::Unchecked);
+                 curItem->setCheckState(END_ASSIGNATION_COLUMN, Qt::Unchecked);
 
                  //Case type return
                  if(attributesValues[0] == "return"){
@@ -705,7 +762,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                      curFont.setItalic(true);
                      curItem->setFont(NAME_COLUMN,curFont);
 
-                     QBrush brush(Qt::lightGray);
+                     QBrush brush(Qt::black);
                      curItem->setForeground(NAME_COLUMN, brush);
                      curItem->setForeground(VALUE_COLUMN, brush);
 
@@ -722,7 +779,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                      curFont.setItalic(true);
                      curItem->setFont(NAME_COLUMN,curFont);
 
-                     QBrush brush(Qt::lightGray);
+                     QBrush brush(Qt::black);
                      curItem->setForeground(NAME_COLUMN, brush);
                      curItem->setForeground(VALUE_COLUMN, brush);
 
@@ -735,9 +792,11 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
 
                  //Case type parameter
                  if(attributesValues[0] == "parameter"){
+
                      curItem->setText(TYPE_COLUMN,QString("<->"));
                      curItem->setToolTip(TYPE_COLUMN, tr("Type parameter"));
                  }
+
                  curItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
              }
          }
@@ -776,8 +835,8 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                  }
                  name.clear();
                  curItem->addChild(childItem);
-                 curItem->setCheckState(START_COLUMN, Qt::Unchecked);
-                 curItem->setCheckState(END_COLUMN, Qt::Unchecked);
+                 curItem->setCheckState(START_ASSIGNATION_COLUMN, Qt::Unchecked);
+                 curItem->setCheckState(END_ASSIGNATION_COLUMN, Qt::Unchecked);
                  treeRecursiveExploration(childItem, conflict);
              }
          }
@@ -809,7 +868,7 @@ NetworkTree::clearColumn(unsigned int column, bool fullCleaning)
     }
 
   //clear record icon
-  if(column == INTERPOLATION_COLUMN && !_recMessages.isEmpty()){
+  if(int(column) == INTERPOLATION_COLUMN && !_recMessages.isEmpty()){
       QList<QTreeWidgetItem *>::iterator it;
       for(it = _recMessages.begin(); it != _recMessages.end() ; it++)
           (*it)->setCheckState(column, Qt::Unchecked);
@@ -851,8 +910,21 @@ NetworkTree::displayBoxContent(AbstractBox *abBox)
   setEndMessages(abBox->endMessages());
   updateStartMsgsDisplay();
   updateEndMsgsDisplay();
-  assignItems(assignedItems());  
+  assignItems(assignedItems());
   setRecMode(abBox->messagesToRecord());
+
+  //Expand items
+  QList<QTreeWidgetItem *> expandedItems = abBox->networkTreeExpandedItems();
+  if(abBox->justCreated()){ //Items are not collapsed at each new box. We save the tree current state.
+      expandedItems = _expandedItems;
+      abBox->setNetworkTreeExpandedItems(expandedItems);
+  }
+  else
+      expandItems(expandedItems);
+
+  QList<QTreeWidgetItem *> selectedItems = abBox->getNetworkTreeSelectedItems();
+  for(int i=0; i<selectedItems.size(); i++)
+      setItemSelected(selectedItems.at(i),true);
 }
 
 void
@@ -904,7 +976,8 @@ NetworkTree::updateStartMsgsDisplay()
       curItem = *it;
       currentMsg = _startMessages->getMessages().value(curItem);            
       curItem->setText(START_COLUMN, currentMsg.value);
-      fatherColumnCheck(curItem, START_COLUMN);
+      curItem->setCheckState(START_ASSIGNATION_COLUMN, Qt::Checked);
+      fatherColumnCheck(curItem, START_ASSIGNATION_COLUMN);
     }
 }
 
@@ -941,40 +1014,33 @@ NetworkTree::updateEndMsgsDisplay()
       curItem = *it;
       currentMsg = _endMessages->getMessages().value(curItem);
       curItem->setText(END_COLUMN, currentMsg.value);
-
-      fatherColumnCheck(curItem, END_COLUMN);
+      curItem->setCheckState(END_ASSIGNATION_COLUMN, Qt::Checked);
+      fatherColumnCheck(curItem, END_ASSIGNATION_COLUMN);
     }
 }
 
 bool
 NetworkTree::brothersPartiallyChecked(QTreeWidgetItem *item, int column)
 {
-  QTreeWidgetItem *father, *child;
-  int countCheckedItems = 0;
-  int childrenCount = 0;
+    QTreeWidgetItem *father, *child;
+    int countCheckedItems = 0;
+    int childrenCount = 0;
 
-  if (item->parent() != NULL) {
-      father = item->parent();
-      childrenCount = father->childCount();
-      for (int i = 0; i < childrenCount; i++) {
-          child = father->child(i);
-          if (child->type() == NodeNoNamespaceType) {
-              if (child->checkState(column) == Qt::Checked || child->checkState(column) == Qt::PartiallyChecked) {
-                  countCheckedItems++;
-                }
-            }
-          else {
-              if (!child->text(column).isEmpty()) {
-                  countCheckedItems++;
-                }
+    if (item->parent() != NULL) {
+        father = item->parent();
+        childrenCount = father->childCount();
+        for (int i = 0; i < childrenCount; i++) {
+            child = father->child(i);
+            if (child->checkState(column) == Qt::Checked || child->checkState(column) == Qt::PartiallyChecked) {
+                countCheckedItems++;
             }
         }
     }
-  if (countCheckedItems > 0 && countCheckedItems < childrenCount) {
-      return true;
+    if (countCheckedItems > 0 && countCheckedItems < childrenCount) {
+        return true;
     }
-  else {
-      return false;
+    else {
+        return false;
     }
 }
 
@@ -984,6 +1050,7 @@ NetworkTree::expandItems(QList<QTreeWidgetItem*> expandedItems)
   QList<QTreeWidgetItem *>::iterator it;
   QTreeWidgetItem *curItem;
 
+  collapseAll();
   for (it = expandedItems.begin(); it != expandedItems.end(); ++it) {
       curItem = *it;
       expandItem(curItem);
@@ -1082,14 +1149,7 @@ NetworkTree::resetNetworkTree()
 void
 NetworkTree::assignItem(QTreeWidgetItem *item, Data data)
 {
-  QFont font= item->font(NAME_COLUMN);
-  font.setBold(true);
-  if (item->type() == OSCNode) {
-      item->setFont(NAME_COLUMN, font);
-    }
-  else {
-      item->setSelected(true);
-    }
+    setTotallyAssignedStyle(item);
 
   if (hasStartEndMsg(item)) {
       data.hasCurve = true;
@@ -1106,7 +1166,6 @@ NetworkTree::assignItems(QList<QTreeWidgetItem*> selectedItems)
   QTreeWidgetItem *curItem;
   Data data;
   data.hasCurve = false;
-
 
   for (it = selectedItems.begin(); it != selectedItems.end(); ++it) {
       curItem = *it;
@@ -1135,26 +1194,56 @@ NetworkTree::assignItems(QMap<QTreeWidgetItem*, Data> selectedItems)
 }
 
 void
-NetworkTree::unassignItem(QTreeWidgetItem *item)
+NetworkTree::unassignItem(QTreeWidgetItem *item, bool recursive)
 {
-  QFont font = item->font(NAME_COLUMN);
-  font.setBold(false);
-  item->setFont(NAME_COLUMN, font);
+    if(isAssigned(item)){
+            item->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
+            emit(curveActivationChanged(item, false));
+            item->setText(START_COLUMN, "");
+            emit(startValueChanged(item, ""));
+            item->setText(END_COLUMN, "");
+            emit(endValueChanged(item, ""));
+            fatherColumnCheck(item, START_ASSIGNATION_COLUMN);
+            fatherColumnCheck(item, END_ASSIGNATION_COLUMN);
+    }
 
-//    item->setCheckState(0,Qt::Unchecked);
-  removeAssignItem(item);
+    int i;
+    QTreeWidgetItem *child;
 
-  //bold
+    if(recursive){
+        if (!item->isDisabled()) {
+            int childrenCount = item->childCount();
+            for (i = 0; i < childrenCount; i++) {
+                child = item->child(i);
+                if (child->type() == NodeNoNamespaceType) {
+                    unassignItem(child);
+                    recursiveChildrenSelection(child, recursive);
+                }
+                if (child->type() == LeaveType) {
+                    unassignItem(child);
+                }
+            }
+        }
+    }
 }
 
 void
-NetworkTree::assignTotally(QTreeWidgetItem *item)
+NetworkTree::setUnassignedStyle(QTreeWidgetItem *item)
+{
+    QFont font = item->font(NAME_COLUMN);
+    font.setBold(false);
+    item->setFont(NAME_COLUMN, font);
+    removeAssignItem(item);
+}
+
+void
+NetworkTree::setTotallyAssignedStyle(QTreeWidgetItem *item)
 {
 //  std::cout << getAbsoluteAddress(item).toStdString() << " > assignTotally" << std::endl;
   QFont font = item->font(NAME_COLUMN);
-  if (item->type() != OSCNode) {
-      item->setSelected(true);
-    }
+//  if (item->type() != OSCNode) {
+//      item->setSelected(true);
+//    }
   font.setBold(true);
   item->setFont(NAME_COLUMN, font);
 
@@ -1163,7 +1252,7 @@ NetworkTree::assignTotally(QTreeWidgetItem *item)
 }
 
 void
-NetworkTree::assignPartially(QTreeWidgetItem *item)
+NetworkTree::setPartiallyAssign(QTreeWidgetItem *item)
 {
 //  std::cout << getAbsoluteAddress(item).toStdString() << " > assignPartially" << std::endl;
 
@@ -1191,8 +1280,8 @@ NetworkTree::unassignPartially(QTreeWidgetItem *item)
     }
 
 //    item->setCheckState(0,Qt::Unchecked);
-  item->setCheckState(START_COLUMN, Qt::Unchecked);
-  item->setCheckState(END_COLUMN, Qt::Unchecked);
+  item->setCheckState(START_ASSIGNATION_COLUMN, Qt::Unchecked);
+  item->setCheckState(END_ASSIGNATION_COLUMN, Qt::Unchecked);
   removeNodePartiallyAssigned(item);
 }
 
@@ -1208,8 +1297,8 @@ NetworkTree::unassignTotally(QTreeWidgetItem *item)
 
 //    item->setCheckState(0,Qt::Unchecked);
   item->setSelected(false);
-  item->setCheckState(START_COLUMN, Qt::Unchecked);
-  item->setCheckState(END_COLUMN, Qt::Unchecked);
+  item->setCheckState(START_ASSIGNATION_COLUMN, Qt::Unchecked);
+  item->setCheckState(END_ASSIGNATION_COLUMN, Qt::Unchecked);
   removeNodeTotallyAssigned(item);
 }
 
@@ -1223,13 +1312,13 @@ NetworkTree::fathersAssignation(QTreeWidgetItem *item)
       father = item->parent();
 
       if (!allBrothersAssigned(item)) {
-          assignPartially(father);
+          setPartiallyAssign(father);
         }
       else
       if (allBrothersAssigned(item)) {
           QTreeWidgetItem *father;
           father = item->parent();
-          assignTotally(father);
+          setTotallyAssignedStyle(father);
         }
       fathersAssignation(father);
     }
@@ -1272,32 +1361,26 @@ NetworkTree::allBrothersAssigned(QTreeWidgetItem *item)
 bool
 NetworkTree::allBrothersChecked(QTreeWidgetItem *item, int column)
 {
-  /*
+    /*
    * Tool for columns' values
    */
-  QTreeWidgetItem *father, *child;
+    QTreeWidgetItem *father, *child;
 
-  if (item->parent() != NULL) {
-      father = item->parent();
-      int childrenCount = father->childCount();
-      for (int i = 0; i < childrenCount; i++) {
-          child = father->child(i);
+    if (item->parent() != NULL) {
+        father = item->parent();
+        int childrenCount = father->childCount();
+        for (int i = 0; i < childrenCount; i++) {
+            child = father->child(i);
 
-          if (child->type() == NodeNoNamespaceType) {
-              if (child->checkState(column) == Qt::Unchecked || child->checkState(column) == Qt::PartiallyChecked) {
-                  return false;
-                }
+            if (child->checkState(column) == Qt::Unchecked || child->checkState(column) == Qt::PartiallyChecked) {
+                return false;
             }
-          else {
-              if (child->text(column).isEmpty()) {
-                  return false;
-                }
-            }
+
         }
-      return true;
+        return true;
     }
-  else {
-      return true;
+    else {
+        return true;
     }
 }
 
@@ -1311,7 +1394,7 @@ NetworkTree::resetAssignedItems()
 
   for (it = assignedLeaves.begin(); it != assignedLeaves.end(); it++) {
       curItem = *it;
-      unassignItem(curItem);
+      setUnassignedStyle(curItem);
     }
 
   _assignedItems.clear();
@@ -1348,16 +1431,18 @@ NetworkTree::resetAssignedNodes()
 }
 
 void
-NetworkTree::refreshItemNamespace(QTreeWidgetItem *item){
+NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes){
     if(item != NULL){
         if(item->type()==DeviceNode){
+            collapseItem(item);
             string application = getAbsoluteAddress(item).toStdString();
-            item->takeChildren();
+            item->takeChildren();            
 
             /// \todo récupérer la valeur de retour. Qui peut être false en cas de OSC (traitement différent dans ce cas là).
-            Maquette::getInstance()->refreshNetworkNamespace(application);
+            Maquette::getInstance()->rebuildNetworkNamespace(application);
             treeRecursiveExploration(item,true);
-            Maquette::getInstance()->updateBoxesAttributes();
+            if(updateBoxes)
+                Maquette::getInstance()->updateBoxesAttributes();
         }
     }
 }
@@ -1433,7 +1518,7 @@ NetworkTree::unselectPartially(QTreeWidgetItem *item)
 
 void
 NetworkTree::recursiveFatherSelection(QTreeWidgetItem *item, bool select)
-{
+{    
   if (item->parent() != NULL) {
       QTreeWidgetItem *father;
       father = item->parent();
@@ -1448,8 +1533,8 @@ NetworkTree::recursiveFatherSelection(QTreeWidgetItem *item, bool select)
               recursiveFatherSelection(father, true);
             }
 
-          else {
-              father->setSelected(true);
+          else {              
+              setTotallyAssignedStyle(father);
               recursiveFatherSelection(father, true);
             }
         }
@@ -1552,9 +1637,9 @@ NetworkTree::resetSelectedItems()
           curItem->setBackground(i, QBrush(Qt::NoBrush));
         }
 
-      curItem->setSelected(false);
-      curItem->setCheckState(START_COLUMN, Qt::Unchecked);
-      curItem->setCheckState(END_COLUMN, Qt::Unchecked);
+      curItem->setSelected(false);      
+      curItem->setCheckState(START_ASSIGNATION_COLUMN, Qt::Unchecked);
+      curItem->setCheckState(END_ASSIGNATION_COLUMN, Qt::Unchecked);
     }
   _nodesWithSelectedChildren.clear();
 }
@@ -1569,7 +1654,7 @@ NetworkTree::getSelectedItems()
 }
 
 void
-NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select)
+NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool b_select)
 {
   int i;
   QTreeWidgetItem *child;
@@ -1579,17 +1664,15 @@ NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select)
       for (i = 0; i < childrenCount; i++) {
           child = curItem->child(i);
           if (child->type() == NodeNoNamespaceType) {
-              child->setSelected(select);
-              recursiveChildrenSelection(child, select);
+              child->setSelected(b_select);
+              recursiveChildrenSelection(child, b_select);
             }
           if (child->type() == LeaveType) {
-              child->setSelected(select);
+              child->setSelected(b_select);
             }
         }
     }
 }
-
-
 
 /*************************************************************************
  *                         SLOTS - Virtual methods
@@ -1598,7 +1681,9 @@ NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select)
 void
 NetworkTree::mousePressEvent(QMouseEvent *event)
 {
+    _noItemClicked = true;
     QTreeWidget::mousePressEvent(event);
+
     if(currentItem()!=NULL){
         if(event->button()==Qt::RightButton){
             if(currentItem()->type() == DeviceNode){
@@ -1624,10 +1709,20 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
         if(event->button()==Qt::LeftButton){
             if(currentItem()->type() == addDeviceNode){                
                  _deviceEdit->edit();
-                 setCurrentItem(NULL);
+                 setCurrentItem(NULL);                 
+            }            
+            else if(event->modifiers()==Qt::AltModifier){
+                unassignItem(currentItem());
             }
         }
     }
+}
+
+void
+NetworkTree::mouseReleaseEvent(QMouseEvent *event){
+    QTreeWidget::mouseReleaseEvent(event);
+    if(_noItemClicked)
+        unselectAll();
 }
 
 void
@@ -1697,113 +1792,83 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
 
 void
 NetworkTree::keyReleaseEvent(QKeyEvent *event)
-{
-  if (event->key() == Qt::Key_Shift) {
-      setSelectionMode(QAbstractItemView::MultiSelection);
-    }
+{  
+    if (event->key() == Qt::Key_Shift ||event->key() == Qt::Key_Control) {
+          setSelectionMode(QAbstractItemView::SingleSelection);
+        }
 }
 
 void
 NetworkTree::keyPressEvent(QKeyEvent *event)
-{
-  if (event->key() == Qt::Key_Shift) {
-      setSelectionMode(QAbstractItemView::ContiguousSelection);
+{  
+    if (event->key() == Qt::Key_Shift) {
+        setSelectionMode(QAbstractItemView::ContiguousSelection);
     }
-  if (event->key() == Qt::Key_Backtab) {
-      if (VALUE_MODIFIED) {
-          if (currentColumn() == START_COLUMN) {
-              editItem(currentItem(), END_COLUMN);
+    else if(event->key() == Qt::Key_Control)
+        setSelectionMode(QAbstractItemView::MultiSelection);
+
+    else if (event->key() == Qt::Key_Backtab) {
+        if (VALUE_MODIFIED) {
+            if (currentColumn() == START_COLUMN) {
+                editItem(currentItem(), END_COLUMN);
             }
+        }
+    }
+    else if(event->key() == Qt::Key_Backspace){
+        for(auto& item : selectedItems()){
+            unassignItem(item);
         }
     }
 }
 
+
 void
 NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
-{        
-  if (item != NULL) {      
-      if (item->isSelected()) {
-          recursiveChildrenSelection(item, true);
-          recursiveFatherSelection(item, true);
+{
+    _noItemClicked = false;
+    if (item != NULL) {
+        if(item->type()==DeviceNode && column == NAME_COLUMN){
+            Maquette::getInstance()->setDeviceLearn(item->text(NAME_COLUMN).toStdString(),item->checkState(NAME_COLUMN));
         }
 
-      if (!item->isSelected() && item->type() != OSCNode) {
-          unselectPartially(item);
-          recursiveChildrenSelection(item, false);
-          recursiveFatherSelection(item, false);
+        execClickAction(item, selectedItems(), column);
+
+        if (item->isSelected()) {
+            recursiveChildrenSelection(item, true);
+            recursiveFatherSelection(item, true);
         }
 
-      if ((item->type() == LeaveType || item->type() == OSCNode) && column == INTERPOLATION_COLUMN) {
-
-          if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
-              emit recModeChanged(item);
-          }
-          else{
-              if (isAssigned(item) && hasStartMsg(item) && hasEndMsg(item)) {
-                  bool activated = item->checkState(column) == Qt::Checked;
-                  emit(curveActivationChanged(item, activated));
-              }
-              else {
-                  float start = 0., end = 1.;
-                  vector<float> rangeBounds;
-                  std::string address = getAbsoluteAddress(item).toStdString();
-
-                  if(!Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0)
-                    return;
-
-                  if(!hasStartEndMsg(item)){ //Creates curve with start=minBound and end=maxBound (default 0 1)
-                          start = rangeBounds[0];
-                          end = rangeBounds[1];
-                  }
-                  else if (hasStartMsg(item)){
-                      start = _startMessages->getMessage(item).value.toFloat();
-                      end = rangeBounds[1];
-                  }
-                  else if(hasEndMsg(item)){
-                      start = rangeBounds[0];
-                      end = _endMessages->getMessage(item).value.toFloat();
-                  }
-
-                  VALUE_MODIFIED = true;
-                  item->setText(START_COLUMN,QString("%1").arg(start));
-                  VALUE_MODIFIED = true;
-                  item->setText(END_COLUMN,QString("%1").arg(end));
-              }
-          }
-      }
-      if ((item->type() == LeaveType || item->type() == OSCNode) && column == REDUNDANCY_COLUMN) {
-          if (isAssigned(item) && hasCurve(item)) {
-              bool activated = item->checkState(column) == Qt::Checked;
-              emit(curveRedundancyChanged(item, activated));
-          }
-          else {
-              item->setCheckState(column, Qt::Unchecked);
-          }
-      }
-  }
-
-  if (selectionMode() == QAbstractItemView::ContiguousSelection) {
-      QList<QTreeWidgetItem*> selection = selectedItems();
-      QList<QTreeWidgetItem*>::iterator it;
-      QTreeWidgetItem *curIt;
-      for (it = selection.begin(); it != selection.end(); it++) {
-          curIt = *it;
-          recursiveChildrenSelection(curIt, true);
+        if (!item->isSelected() && item->type() != OSCNode) {
+            unselectPartially(item);
+            recursiveChildrenSelection(item, false);
+            recursiveFatherSelection(item, false);
         }
-    }
 
-  if (item->type() == addOSCNode) {
-      addOSCMessage(item->parent());
+        if (selectionMode() == QAbstractItemView::ContiguousSelection) {
+            QList<QTreeWidgetItem*> selection = selectedItems();
+            QList<QTreeWidgetItem*>::iterator it;
+            QTreeWidgetItem *curIt;
+            for (it = selection.begin(); it != selection.end(); it++) {
+                curIt = *it;
+                recursiveChildrenSelection(curIt, true);
+            }
+        }
+
+        emit(treeSelectionChanged(selectedItems()));
+
+        if (item->type() == addOSCNode) {
+            addOSCMessage(item->parent());
+        }
     }
 }
 
 void
 NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
-{    
+{                    
     Data data;
     data.hasCurve = false;
     QString qaddress = getAbsoluteAddress(item);
-    data.address = qaddress;
+    data.address = qaddress;    
 
     if (item->type() == LeaveType && column == START_COLUMN && VALUE_MODIFIED) {
         VALUE_MODIFIED = false;
@@ -1908,7 +1973,8 @@ void
 NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue)
 {
   if (newValue.isEmpty()) {
-      _startMessages->removeMessage(item);
+      item->setCheckState(START_ASSIGNATION_COLUMN,Qt::Unchecked);
+      _startMessages->removeMessage(item);      
       if (item->type() == OSCNode) {
           _OSCStartMessages->removeMessage(item);
         }
@@ -1951,6 +2017,7 @@ NetworkTree::changeEndValue(QTreeWidgetItem *item, QString newValue)
   //Prévoir un assert. Vérifier, le type, range...etc
 
   if (newValue.isEmpty()) {
+      item->setCheckState(END_ASSIGNATION_COLUMN,Qt::Unchecked);
       _endMessages->removeMessage(item);
       if (item->type() == OSCNode) {
           _OSCEndMessages->removeMessage(item);
@@ -1987,7 +2054,7 @@ void
 NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue)
 {
   if (item->type() == OSCNode) {
-      if (newValue.isEmpty()) {
+      if (newValue.isEmpty()) { //remove message
           _startMessages->removeMessage(item);
           _endMessages->removeMessage(item);
           _OSCEndMessages->removeMessage(item);
@@ -1995,6 +2062,7 @@ NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue)
           item->parent()->removeChild(item);
           _OSCMessages.remove(item);
           removeAssignItem(item);
+          Maquette::getInstance()->removeFromNetWorkNamespace(getAbsoluteAddress(item).toStdString());
         }
       else {
           setOSCMessageName(item, newValue);
@@ -2055,8 +2123,8 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
   if (box != NULL) { // Box Found
       if (box->hasCurve(address) && !_recMessages.contains(item) ) {
           if (_assignedItems.value(item).hasCurve) {
-              unsigned int sampleRate;
-              bool redundancy, interpolate;
+              unsigned int sampleRate = 0;
+              bool redundancy =  false, interpolate = false;
               vector<float> values, xPercents, yValues, coeff;
               vector<string> argTypes;
               vector<short> sectionType;
@@ -2068,7 +2136,10 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
                   if(getCurveSuccess){
                       if (forceUpdate) {
                           if (interpolate) {
-                              interpolate = !(startMessages()->getMessage(item).value == endMessages()->getMessage(item).value);
+                              //if startValue!=endValue &&  startValue is not empty && endValue is not empty
+                              interpolate = !(startMessages()->getMessage(item).value == endMessages()->getMessage(item).value)
+                                      /*&& startMessages()->getItems().contains(item)
+                                      && endMessages()->getItems().contains(item); */;
                               Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);                              
                           }
                       }
@@ -2079,8 +2150,9 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
                       Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
                   }
 
-                  updateLine(item, interpolate, sampleRate, redundancy);
+
               }
+              updateLine(item, interpolate, sampleRate, redundancy);
           }
         }
     }
@@ -2162,14 +2234,15 @@ NetworkTree::updateLine(QTreeWidgetItem *item, bool interpolationState, int samp
   setCurveActivated(item, interpolationState);
   if (interpolationState) {
       item->setCheckState(INTERPOLATION_COLUMN, Qt::Checked);
+      //SAMPLE RATE
+      setSampleRate(item, sampleRate);
+      item->setText(SR_COLUMN, QString::number(getSampleRate(item)));
     }
   else {
       item->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
+      item->setText(SR_COLUMN, "");
     }
 
-  //SAMPLE RATE
-  setSampleRate(item, sampleRate);
-  item->setText(SR_COLUMN, QString::number(getSampleRate(item)));
 
   //REDUNDANCY
   setRedundancy(item, redundancy);
@@ -2222,14 +2295,20 @@ NetworkTree::updateDeviceName(QString oldName, QString newName)
 }
 
 void
-NetworkTree::addNewDevice(QString deviceName){
+NetworkTree::addNewDevice(QString deviceName)
+{
     QTreeWidgetItem *newItem = addDeviceItem(deviceName);
+    newItem->setCheckState(NAME_COLUMN,Qt::Unchecked);
     refreshItemNamespace(newItem);
+    string protocol;
+    Maquette::getInstance()->getDeviceProtocol(deviceName.toStdString(),protocol);    
+    if(protocol=="OSC")
+        createOCSBranch(newItem);
 }
 
 void
 NetworkTree::updateDeviceProtocol(QString newName)
-{
+{           
   QString deviceName = currentItem()->text(NAME_COLUMN);
   QTreeWidgetItem *item = currentItem();
   if (newName == "OSC") {
@@ -2295,4 +2374,163 @@ NetworkTree::setRecMode(QList<std::string> address){
     QList<std::string>::iterator it;
     for(it=address.begin() ; it!=address.end() ; it++)
         setRecMode(*it);
+}
+
+void
+NetworkTree::addToExpandedItems(QTreeWidgetItem *item){
+    _expandedItems<<item;
+}
+
+void
+NetworkTree::removeFromExpandedItems(QTreeWidgetItem *item){
+    if(_expandedItems.contains(item))
+        _expandedItems.removeAll(item);
+}
+
+void
+NetworkTree::getChildren(QTreeWidgetItem *item, QList<QTreeWidgetItem *> & items)
+{
+    QTreeWidgetItem *child;
+
+    if (!item->isDisabled()) {
+        int childrenCount = item->childCount();
+        for (int i = 0; i < childrenCount; i++) {
+            child = item->child(i);
+            if (child->type() == NodeNoNamespaceType) {
+                items<<child;
+                getChildren(child, items);
+            }
+            else
+                items<<child;
+        }
+    }
+}
+void
+NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> selectedItems, int column)
+{                
+    QTreeWidgetItem *item;
+    QList<QTreeWidgetItem *>::iterator it;    
+
+    //si le curItem n'est pas sélectionné, on n'applique l'action seulement sur celui-ci (pas sur les items sélectionnés)
+    if(!selectedItems.contains(curItem)){
+        selectedItems.clear();
+        selectedItems<<curItem;
+    }
+
+    //adding children of each node
+    QList<QTreeWidgetItem *> children, allChildren;
+
+    for(it=selectedItems.begin(); it!=selectedItems.end(); it++){
+        item = *it;        
+        children.clear();
+        getChildren(item, children);
+        allChildren<<children;
+    }
+    selectedItems<<allChildren;
+
+    if(column == START_ASSIGNATION_COLUMN){
+        if(hasStartMsg(curItem)){
+            //cmd+click update values
+            if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
+                emit(requestSnapshotStart(selectedItems));
+            }
+            else{
+                //remove all start messages
+                for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++){
+                    item = *it;
+                    item->setText(START_COLUMN, "");
+                    emit(startValueChanged(item, ""));
+                }
+            }
+        }
+        else
+            emit(requestSnapshotStart(selectedItems));
+    }
+    else if(column == END_ASSIGNATION_COLUMN){
+        if(hasEndMsg(curItem)){
+            //cmd+click update values
+            if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
+                emit(requestSnapshotEnd(selectedItems));
+            }
+            else{
+                //remove all start messages
+                for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++){
+                    item = *it;
+                    item->setText(END_COLUMN, "");
+                    emit(endValueChanged(item, ""));
+                }
+            }
+        }
+        else
+            emit(requestSnapshotEnd(selectedItems));
+    }
+
+    else if ((curItem->type() == LeaveType || curItem->type() == OSCNode) && column == INTERPOLATION_COLUMN) {
+        if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
+            for(int i = 0; i<selectedItems.size(); i++)
+                emit recModeChanged(selectedItems.at(i));
+        }
+        else{
+            for(int i = 0; i<selectedItems.size(); i++){
+                item = selectedItems.at(i);
+
+                //INTERPOLATION
+                if (isAssigned(item) && hasStartMsg(item) && hasEndMsg(item)) {
+                    //we set the curItem's state to item.
+                    bool activated = curItem->checkState(INTERPOLATION_COLUMN) == Qt::Checked;
+                    emit(curveActivationChanged(item, activated));
+                    item->setCheckState(INTERPOLATION_COLUMN, curItem->checkState(INTERPOLATION_COLUMN));
+                }
+                else {
+                    float start = 0., end = 1.;
+                    vector<float> rangeBounds;
+                    std::string address = getAbsoluteAddress(item).toStdString();
+
+                    if(Maquette::getInstance()->getRangeBounds(address,rangeBounds)>0)
+                    {
+                        if(!hasStartEndMsg(item)){ //Creates curve with start=minBound and end=maxBound (default 0 1)
+                            start = rangeBounds[0];
+                            end = rangeBounds[1];
+                        }
+                        else if (hasStartMsg(item)){
+                            start = _startMessages->getMessage(item).value.toFloat();
+                            end = rangeBounds[1];
+                        }
+                        else if(hasEndMsg(item)){
+                            start = rangeBounds[0];
+                            end = _endMessages->getMessage(item).value.toFloat();
+                        }
+                    }
+                    VALUE_MODIFIED = true;
+                    item->setText(START_COLUMN,QString("%1").arg(start));
+                    VALUE_MODIFIED = true;
+                    item->setText(END_COLUMN,QString("%1").arg(end));
+                }
+            }
+        }
+    }
+
+    //REDUNDANCY
+    else if ((curItem->type() == LeaveType || curItem->type() == OSCNode) && column == REDUNDANCY_COLUMN) {
+        for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++){
+            item = *it;
+            if (isAssigned(item) && hasCurve(item)) {
+                bool activated = curItem->checkState(column) == Qt::Checked;
+                emit(curveRedundancyChanged(item, activated));
+                item->setCheckState(REDUNDANCY_COLUMN, curItem->checkState(REDUNDANCY_COLUMN));
+            }
+            else {
+                item->setCheckState(column, Qt::Unchecked);
+            }
+        }
+    }
+}
+
+void
+NetworkTree::unselectAll()
+{
+    for(auto& item : selectedItems())
+        item->setSelected(false);
+
+    emit(treeSelectionChanged(selectedItems()));
 }

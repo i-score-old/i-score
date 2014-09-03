@@ -56,7 +56,7 @@
 #include <QKeyEvent>
 #include <QScrollBar>
 #include <QPushButton>
-
+#include <QPixmapCache>
 static const int SCROLL_BAR_INCREMENT = 1000 / MaquetteScene::MS_PER_PIXEL;
 const QColor MaquetteView::BACKGROUND_COLOR = QColor(60, 60, 60);
 
@@ -64,6 +64,9 @@ MaquetteView::MaquetteView(MainWindow *mw)
   : QGraphicsView(mw)
 {
   _mainWindow = mw;
+
+  /// \todo Affiner la limite du cache. Cette ligne permet de résoudre le bug de latence (toutes les boîtes automatiquement repeintes au scroll/move/resize).
+  QPixmapCache::setCacheLimit(800000);
 
   setRenderHint(QPainter::Antialiasing);
   setBackgroundBrush(QColor(BACKGROUND_COLOR));
@@ -277,6 +280,9 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
   else if (event->key() == Qt::Key_1 || event->key() == Qt::Key_2 || event->key() == Qt::Key_3) {
       triggerShortcut(event->key());
     }
+  else if(event->key() == Qt::Key_M ){
+      _scene->muteBoxes();
+  }
 }
 
 void
@@ -289,6 +295,16 @@ void
 MaquetteView::keyReleaseEvent(QKeyEvent *event)
 {
   QGraphicsView::keyReleaseEvent(event);
+  if(event->key() == Qt::Key_Control)
+  {
+      QList<TriggerPoint *> triggerPointsSelected;
+      QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+      QList<QGraphicsItem *>::iterator it;
+      for(it = selectedItems.begin() ; it!=selectedItems.end() ; it++){
+          if((*it)->type() == TRIGGER_POINT_TYPE)
+              triggerPointsSelected<<static_cast<TriggerPoint *>(*it);
+      }
+  }
 }
 
 QList<TriggerPoint *> *
@@ -395,4 +411,10 @@ MaquetteView::setScenarioSelected(bool selected){
     _scenarioSelected = selected;
     resetCachedContent();
     update();
+}
+
+void MaquetteView::resizeEvent(QResizeEvent * evt)
+{
+  emit sizeChanged();
+  QGraphicsView::resizeEvent(evt);
 }

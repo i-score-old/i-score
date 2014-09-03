@@ -296,7 +296,10 @@ class Maquette : public QObject
 
     void setCurveMuteState(unsigned int boxID, const std::string &address, bool muteState);
     bool getCurveMuteState(unsigned int boxID, const std::string &address);
-
+    void setBoxMuteState(unsigned int boxID, bool muteState);
+    bool getBoxMuteState(unsigned int boxID);
+    void setStartEventMuteState(unsigned int boxID, bool muteState);
+    void setEndEventMuteState(unsigned int boxID, bool muteState);
 
     /*!
      * \brief Sets sections of a curve at a specific address in a box.
@@ -332,7 +335,7 @@ class Maquette : public QObject
      * \return if curves were set correctly
      */
     bool getCurveAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition, unsigned int & sampleRate,
-                            bool &redundancy, bool &interpolate, std::vector<float>& values, std::vector<std::string> & argTypes, std::vector<float> &xPercents,
+                            bool &redundancy, bool &interpolate, std::vector<float>& values, std::vector<std::string> &, std::vector<float> &xPercents,
                             std::vector<float> &yValues, std::vector<short> &sectionType, std::vector<float> &coeff);
 
     bool getCurveValues(unsigned int boxID, const std::string &address, unsigned int argPosition, std::vector<float> &values);
@@ -340,7 +343,7 @@ class Maquette : public QObject
     /*!
      * \brief Raised when execution is finished
      */
-    void executionFinished();
+    void udpatePlayModeView();
 
     /*!
      * \brief Gets the set of messages to send for the beginning of a box.
@@ -592,6 +595,44 @@ class Maquette : public QObject
     bool setTriggerPointMessage(unsigned int trgID, const std::string &message);
 
     /*!
+     * \brief Create a time condition between boxes.
+     *
+     * \param boxes : the boxes to condition.
+     */
+    unsigned int createCondition(QList<BasicBox *> boxes);
+
+    /*!
+     * Add a box to the condition.
+     *
+     * \param conditionId : the ID of the condition
+     * \param box : the box to add
+     */
+    void attachToCondition(unsigned int conditionId, BasicBox *box);
+
+    /*!
+     * Dettach a box from the condition.
+     *
+     * \param conditionId : the ID of the condition
+     * \param box : the box to detach
+     */
+    void detachFromCondition(unsigned int conditionId, BasicBox *box);
+
+    void setConditionMessage(unsigned int conditionId, std::string disposeMessage);
+    std::string getConditionMessage(TimeConditionId conditionId);
+
+    /*!
+     * Delete the specified TimeCondition.
+     *
+     * \param conditionId : the ID of the condition to delete
+     */
+    void deleteCondition(TimeConditionId conditionId);
+
+    void getConditionsId(std::vector<unsigned int> &conditionsId);
+
+    void getBoxesIdFromCondition(TimeConditionId conditionId, std::vector<unsigned int> &boxesId);
+
+
+    /*!
      * \brief Perform moving or resizing for a set of boxes.
      *
      * \param boxes : the boxes that have to be transformed with their new coordinates
@@ -690,7 +731,7 @@ class Maquette : public QObject
      *
      * \return the box progress ratio
      */
-    float getProgression(unsigned int boxID);
+    float getPosition(unsigned int boxID);
 
     /*!
      * \brief Requests a snapshot of the network on a namespace.
@@ -707,7 +748,7 @@ class Maquette : public QObject
     /*!
      * \brief Refresh the network's namespace.
      */
-    void refreshNetworkNamespace(const std::string &application);
+    void rebuildNetworkNamespace(const std::string &application);
 
     /*!
      * \brief Requests a snapshot of the network on a namespace.
@@ -749,8 +790,11 @@ class Maquette : public QObject
     bool setDevicePort(std::string device, int destinationPort, int receptionPort = 0);
     bool setDeviceLocalHost(std::string device, std::string localHost);
     bool setDeviceProtocol(std::string device, std::string protocol);
+    bool setDeviceLearn(std::string deviceName, bool newLearn);
 
     bool loadNetworkNamespace(const string &application, const string &filepath);
+    int appendToNetWorkNamespace(const std::string & address, const std::string & service = "parameter", const std::string & type = "generic", const std::string & priority = "0", const std::string & description = "", const std::string & range = "0. 1.", const std::string & clipmode = "none", const std::string & tags = "");
+    int removeFromNetWorkNamespace(const std::string & address);
 
   public slots:
     
@@ -765,6 +809,7 @@ class Maquette : public QObject
      * \brief Turn engine execution on depending on the context
      */
     void turnExecutionOn();
+    void turnExecutionOn(unsigned int boxId);
     
     /*!
      * \brief Is the engine running ?
@@ -778,6 +823,8 @@ class Maquette : public QObject
      * \brief Turn engine execution off depending on the context
      */
     void turnExecutionOff();
+    void turnExecutionOff(unsigned int boxId);
+
     void stopPlayingAndGoToStart();
     void stopPlayingAndGoToTimeOffset(unsigned int timeOffset);
     void stopPlayingAndGoToCurrentTime();
@@ -825,6 +872,9 @@ class Maquette : public QObject
      * \param trgID : trigger point ID
      */
     void updateTriggerPointActiveStatus(unsigned int trgID, bool active);
+
+    void setTriggerPointDefault(unsigned int triggerId, bool dflt);
+    bool getTriggerPointDefault(unsigned int triggerId);
     
     inline std::map<unsigned int, BasicBox*> getBoxes(){ return _boxes; }
     inline QList<BasicBox *> getRecordingBoxes(){return _recordingBoxes ;}
@@ -1004,4 +1054,11 @@ void transportCallback(TTSymbol& transport, const TTValue& value);
  * \brief Callback called when the execution is finished.
  */
 void executionFinishedCallback();
+
+/*!
+ * \brief Callback called when device namespace have to be refreshed
+ *
+ * \param deviceName : the name of the device to refresh
+ */
+void deviceCallback(TTSymbol& deviceName);
 #endif

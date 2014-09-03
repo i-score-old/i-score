@@ -21,7 +21,8 @@ MOC_DIR = moc
 RESOURCES += i-score.qrc
 
 # qmake adds the values of this variable as compiler C preprocessor macros (-D option).
-DEFINES += __Types__ QT_DISABLE_DEPRECATED_BEFORE=0x000000
+
+DEFINES += __Types__ QT_DISABLE_DEPRECATED_BEFORE=0x000000 TT_NO_DSP
 
 ICON = resources/images/i-score.icns
 
@@ -54,7 +55,7 @@ macx-clang {
 }
 
 # Input
-HEADERS += /usr/local/jamoma/includes/TTScoreAPI.h \
+HEADERS += /usr/local/jamoma/includes/TTScore.h \
 /usr/local/jamoma/includes/TTModular.h \
 /usr/local/jamoma/includes/TTDSP.h \
 headers/data/Abstract.hpp \
@@ -97,7 +98,9 @@ headers/GUI/BoxWidget.hpp \
 headers/GUI/BoxCurveEdit.hpp \
 headers/GUI/TimeBarWidget.hpp \
 headers/GUI/DeviceEdit.hpp \
-headers/GUI/HeaderPanelWidget.hpp
+headers/GUI/HeaderPanelWidget.hpp \
+headers/GUI/ConditionalRelation.hpp \
+    headers/GUI/TriggerPointEdit.hpp
 
 SOURCES += src/main.cpp \
 src/data/Abstract.cpp \
@@ -140,4 +143,6 @@ src/GUI/BoxWidget.cpp \
 src/GUI/BoxCurveEdit.cpp \
 src/GUI/TimeBarWidget.cpp \
 src/GUI/DeviceEdit.cpp \
-src/GUI/HeaderPanelWidget.cpp
+src/GUI/HeaderPanelWidget.cpp \
+src/GUI/ConditionalRelation.cpp \ 
+    src/GUI/TriggerPointEdit.cpp

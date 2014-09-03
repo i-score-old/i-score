@@ -74,6 +74,7 @@ class Comment;
 class TriggerPoint;
 class TextEdit;
 class Relation;
+class ConditionalRelation;
 class AbstractCurve;
 class QObject;
 
@@ -201,6 +202,14 @@ class BasicBox : public QObject, public QGraphicsItem
      * \param relation : the relation to store
      */
     void addRelation(BoxExtremity extremity, Relation *relation);
+
+    /*!
+     * \brief Adds a conditional relation to the start extremity
+     *
+     * \param condRel : the conditional relation to store
+     */
+    void addConditionalRelation(ConditionalRelation *condRel);
+
     /*!
      * \brief Removes a relation from an extremity
      *
@@ -209,6 +218,17 @@ class BasicBox : public QObject, public QGraphicsItem
      */
     void removeRelation(BoxExtremity extremity, unsigned int relID);
     void removeRelations(BoxExtremity extremity);
+
+    /*!
+     * \brief Removes a conditional relation from the start extremity
+     *
+     * \param condRelID : the conditional relation ID to remove
+     */
+    void removeConditionalRelation(ConditionalRelation *condRel);
+    void removeConditionalRelations();
+
+    void detachFromCondition();
+
     /*!
      * \brief Returns Relations associated to the start box extremity.
      */
@@ -327,6 +347,13 @@ class BasicBox : public QObject, public QGraphicsItem
      * \param extremity : the box extremity to get message from
      */
     std::string triggerPointMessage(BoxExtremity extremity);
+
+    /*!
+     * \brief Gets trigger point on the extremity.
+     *
+     * \param extremity : the box extremity to get trigger point from.
+     */
+    TriggerPoint *getTriggerPoint(BoxExtremity extremity);
 
     AbstractCurve *getCurve(const std::string &address);
     void setCurve(const std::string &address, AbstractCurve *curve);
@@ -598,6 +625,8 @@ class BasicBox : public QObject, public QGraphicsItem
      */
     void addToExpandedItemsList(QTreeWidgetItem* item);
 
+    void setSelectedTreeItems(QList<QTreeWidgetItem *> selectedItems);
+
     /*!
      * \brief Send the items to be removed from the networkTreeExpandedItems.
      *
@@ -654,7 +683,8 @@ class BasicBox : public QObject, public QGraphicsItem
     static const int COMBOBOX_HEIGHT;
     static const float MSGS_INDICATOR_WIDTH;
     static const float GRIP_CIRCLE_SIZE;
-    static const QString SUB_SCENARIO_MODE_TEXT;    
+    static const QString SCENARIO_MODE_TEXT;
+    static const QString DEFAULT_MODE_TEXT;
 
     /*!
      * \brief Painting method, redefinition of QGraphicsItem::paint().
@@ -721,8 +751,15 @@ class BasicBox : public QObject, public QGraphicsItem
     currentColor(){ return _color; }
     void select();
     void setRecMode(bool activated);
+    void setMuteState(bool activated);
     inline bool recording(){return _recording;}
+    inline bool getMuteState(){return _mute;}
+    inline bool isConditioned(){return !_conditionalRelation.isEmpty();}
+    inline QList<ConditionalRelation *> getConditionalRelations(){return _conditionalRelation;}
+
     void updateRecordingCurves();
+    void setButtonsVisible(bool value);
+    void updatePlayingModeButtons();
 
     /*!
      * \brief Return the messages list, like if the box just ended its execution.
@@ -822,11 +859,13 @@ class BasicBox : public QObject, public QGraphicsItem
     bool _shift;                                                                //!< State of Shift Key.
     bool _playing;                                                              //!< State of playing.
     bool _recording;                                                            //!< State of recording.
+    bool _mute;                                                                 //!< State of mute.    
     TextEdit *_trgPntMsgEdit;                                                   //!< The trigger point editing dialog.
     Comment *_comment;                                                          //!< The box comment.
     QMap<BoxExtremity, TriggerPoint*> *_triggerPoints;                          //!< The trigger points.
     std::map < BoxExtremity, std::map < unsigned int, Relation* > > _relations; //!< The relations.
-    std::map<std::string, AbstractCurve*> _abstractCurves;                      //!< The Curves
+    QList<ConditionalRelation *> _conditionalRelation;                          //!< The conditional relations attached.
+    std::map<std::string, AbstractCurve*> _abstractCurves;                      //!< The Curves.
     BoxWidget *_boxContentWidget;
 
     QRectF _boxRect;
@@ -861,5 +900,8 @@ class BasicBox : public QObject, public QGraphicsItem
 
     QPushButton *_startMenuButton;
     QPushButton *_endMenuButton;
+    QPushButton *_playButton;
+    QPushButton *_stopButton;
+
 };
 #endif

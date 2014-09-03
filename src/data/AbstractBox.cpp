@@ -53,6 +53,7 @@ AbstractBox::AbstractBox(const QPointF &newTopLeft, const float &newWidth, const
 {
     _networkTreeExpandedItems = QList<QTreeWidgetItem*>();
     _messagesToRecord = QList<std::string>();
+    _justCreated = true;
 }
 
 AbstractBox::AbstractBox(const AbstractBox &other) :
@@ -62,6 +63,7 @@ AbstractBox::AbstractBox(const AbstractBox &other) :
 {
     _networkTreeExpandedItems = QList<QTreeWidgetItem*>();
     _messagesToRecord = QList<std::string>();
+    _justCreated = true;
 }
 
 void

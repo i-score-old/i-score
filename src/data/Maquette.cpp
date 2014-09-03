@@ -54,10 +54,12 @@
 #include "AbstractRelation.hpp"
 #include "Relation.hpp"
 #include "TriggerPoint.hpp"
+#include "ConditionalRelation.hpp"
 #include <algorithm>
 #include <QTextStream>
 #include "AttributesEditor.hpp"
 #include "NetworkTree.hpp"
+#include <QThread>
 
 #include <stdio.h>
 #include <assert.h>
@@ -76,6 +78,8 @@ typedef map<unsigned int, TriggerPoint*> TrgPntMap;
 
 #define NO_PAINT false
 
+#define MUTE_GOTO_SCORE
+
 void
 Maquette::init()
 {
@@ -87,7 +91,7 @@ Maquette::init()
 
     // create a ScoreEngine instance
     // note : this is a temporary solution to test new Score framework easily
-    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, jamomaFolder);
+    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, &deviceCallback, jamomaFolder);
 
     //Creating rootBox as the mainScenario
     AbstractBox *scenarioAb = new AbstractBox();
@@ -336,8 +340,8 @@ Maquette::requestNetworkNamespace(const string &address, string &nodeType, vecto
 }
 
 void
-Maquette::refreshNetworkNamespace(const std::string &application){
-    _engines->refreshNetworkNamespace(application);
+Maquette::rebuildNetworkNamespace(const std::string &application){
+    _engines->rebuildNetworkNamespace(application);
 }
 
 void
@@ -443,20 +447,10 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
             }
         }
       endMessages.insert(currentAddress, currentValue);
+      std::cout<<"Insert "<<currentAddress<<std::endl;
     }
 
 
-  /************    Pour le cas open file   ************/
-  for (it = curvesAddresses.begin(); it != curvesAddresses.end(); ++it) {
-      currentMsg = *it;
-      getBox(boxID)->addCurveAddress(currentMsg);
-      if (startMessages.contains(currentMsg)) {
-          startMessages.remove(currentMsg);
-        }
-      if (endMessages.contains(currentMsg)) {
-          endMessages.remove(currentMsg);
-        }
-    }
 
 
   /************  addCurve if endAddress contains startAddress && endValue != startValue ************/
@@ -506,6 +500,20 @@ Maquette::updateCurves(unsigned int boxID, const vector<string> &startMsgs, cons
             }
         }
     }
+
+  /************    Pour le cas open file   ************/
+  curvesAddresses = getCurvesAddresses(boxID);
+  for (it = curvesAddresses.begin(); it != curvesAddresses.end(); ++it) {
+      currentMsg = *it;
+      getBox(boxID)->addCurveAddress(currentMsg);
+      if (startMessages.contains(currentMsg)) {
+          startMessages.remove(currentMsg);
+        }
+      if (endMessages.contains(currentMsg)) {
+          endMessages.remove(currentMsg);
+        }
+    }
+
 }
 
 bool
@@ -527,7 +535,6 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages, 
       vector<string> lastMsgs;
       _engines->getCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, lastMsgs);
       updateCurves(boxID, firstMsgs, lastMsgs);
-
       return true;
     }
   return false;
@@ -778,20 +785,19 @@ bool
 Maquette::updateBox(unsigned int boxID, const Coords &coord)
 {
     //  std::cout<<"--- updateBox ---"<<std::endl;
-    bool moveAccepted;
+    bool moveAccepted{};
     vector<unsigned int> moved;
     vector<unsigned int>::iterator it;
     int boxBeginTime;
     if (boxID != NO_ID && boxID != ROOT_BOX_ID) {
         BasicBox *box = _boxes[boxID];
         
-        if (moveAccepted = _engines->performBoxEditing(boxID, coord.topLeftX * MaquetteScene::MS_PER_PIXEL,
+        if ((moveAccepted = _engines->performBoxEditing(boxID, coord.topLeftX * MaquetteScene::MS_PER_PIXEL,
                                                        coord.topLeftX * MaquetteScene::MS_PER_PIXEL +
-                                                       coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
+                                                       coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved))) {
 
             _engines->setBoxVerticalPosition(boxID, coord.topLeftY);
             _engines->setBoxVerticalSize(boxID, coord.sizeY);
-            
             box->setRelativeTopLeft(QPoint((int)coord.topLeftX, (int)coord.topLeftY));
             box->setSize(QPoint((int)coord.sizeX, (int)coord.sizeY));
             box->setPos(box->getCenter());
@@ -846,16 +852,16 @@ Maquette::updateBox(unsigned int boxID, const Coords &coord)
 bool
 Maquette::updateBoxes(const map<unsigned int, Coords> &boxes)
 {
-  bool moveAccepted;
+  bool moveAccepted{};
   vector<unsigned int> moved;
   map<unsigned int, Coords >::const_iterator it;
   vector<unsigned int>::iterator it2;
   for (it = boxes.begin(); it != boxes.end(); it++) {
       if (it->first != NO_ID && it->first != ROOT_BOX_ID) {
           BasicBox *curBox = _boxes[it->first];
-          if (moveAccepted = _engines->performBoxEditing(it->first, it->second.topLeftX * MaquetteScene::MS_PER_PIXEL,
+          if ((moveAccepted = _engines->performBoxEditing(it->first, it->second.topLeftX * MaquetteScene::MS_PER_PIXEL,
                                                          it->second.topLeftX * MaquetteScene::MS_PER_PIXEL +
-                                                         it->second.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
+                                                         it->second.sizeX * MaquetteScene::MS_PER_PIXEL, moved))) {
               curBox->setRelativeTopLeft(QPoint(it->second.topLeftX, it->second.topLeftY));
               curBox->setSize(QPoint(it->second.sizeX, it->second.sizeY));
               curBox->setPos(_boxes[it->first]->getCenter());
@@ -995,6 +1001,75 @@ Maquette::setTriggerPointMessage(unsigned int trgID, const string &message)
   return ret;
 }
 
+unsigned int
+Maquette::createCondition(QList<BasicBox *> boxes)
+{
+    //Engine needs a vector with start trigger points' ids.
+    std::vector<unsigned int>       triggerIds;
+    TriggerPoint                    *curTriggerPoint;
+    unsigned int                    curTriggerId;
+
+    for(auto& curBox : boxes)
+    {
+        curTriggerPoint = curBox->getTriggerPoint(BOX_START);
+
+        if(curTriggerPoint != NULL){
+            curTriggerId = curTriggerPoint->ID();
+            triggerIds.push_back(curTriggerId);
+        }
+    }
+
+    return _engines->createCondition(triggerIds);
+}
+
+void
+Maquette::attachToCondition(unsigned int conditionId, BasicBox *box)
+{
+    unsigned int triggerId = box->getTriggerPoint(BOX_START)->ID();
+    _engines->attachToCondition(conditionId,triggerId);
+}
+
+void
+Maquette::detachFromCondition(unsigned int conditionId, BasicBox *box)
+{
+    unsigned int triggerId = box->getTriggerPoint(BOX_START)->ID();
+    _engines->detachFromCondition(conditionId,triggerId);
+}
+
+void
+Maquette::setConditionMessage(unsigned int conditionId, std::string disposeMessage)
+{
+    _engines->setConditionMessage(conditionId, disposeMessage);
+}
+
+std::string
+Maquette::getConditionMessage(TimeConditionId conditionId)
+{
+    return _engines->getConditionMessage(conditionId);
+}
+
+void
+Maquette::deleteCondition(TimeConditionId conditionId)
+{
+    _engines->deleteCondition(conditionId);
+}
+
+void
+Maquette::getConditionsId(std::vector<unsigned int> &conditionsId){
+    _engines->getConditionsId(conditionsId);
+}
+
+void
+Maquette::getBoxesIdFromCondition(TimeConditionId conditionId, std::vector<unsigned int> &boxesId)
+{
+    std::vector<unsigned int> triggerPointsIds;
+
+    _engines->getConditionTriggerIds(conditionId,triggerPointsIds);
+
+    for(auto& triggerId : triggerPointsIds)
+        boxesId.push_back(getTriggerPoint(triggerId)->boxID());
+}
+
 void
 Maquette::addCurve(unsigned int boxID, const string &address)
 {
@@ -1055,6 +1130,30 @@ Maquette::getCurveMuteState(unsigned int boxID, const string &address)
   return _engines->getCurveMuteState(boxID, address);
 }
 
+void
+Maquette::setBoxMuteState(unsigned int boxID, bool muteState)
+{
+  _engines->setBoxMuteState(boxID, muteState);
+}
+
+bool
+Maquette::getBoxMuteState(unsigned int boxID)
+{
+    return _engines->getBoxMuteState(boxID);
+}
+
+void
+Maquette::setStartEventMuteState(unsigned int boxID, bool muteState)
+{
+    _engines->setCtrlPointMutingState(boxID,BOX_START,muteState);
+}
+
+void
+Maquette::setEndEventMuteState(unsigned int boxID, bool muteState)
+{
+    _engines->setCtrlPointMutingState(boxID,BOX_END,muteState);
+}
+
 bool
 Maquette::setCurveSections(unsigned int boxID, const string &address, unsigned int argPosition,
                            const vector<float> &xPercents, const vector<float> &yValues, const vector<short> &sectionType, const vector<float> &coeff)
@@ -1064,7 +1163,7 @@ Maquette::setCurveSections(unsigned int boxID, const string &address, unsigned i
 
 bool
 Maquette::getCurveAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition,
-                             unsigned int &sampleRate, bool &redundancy, bool &interpolate, vector<float>& values, vector<string> &argTypes,
+                             unsigned int &sampleRate, bool &redundancy, bool &interpolate, vector<float>& values, vector<string> &/*argTypes*/,
                              vector<float> &xPercents, vector<float> &yValues, vector<short> &sectionType, vector<float> &coeff)
 {
   if (_engines->getCurveValues(boxID, address, argPosition, values)) {
@@ -1276,13 +1375,13 @@ Maquette::duration()
 unsigned int
 Maquette::getCurrentTime() const
 {
-  return _engines->getCurrentExecutionTime();
+  return _engines->getCurrentExecutionDate();
 }
 
 float
-Maquette::getProgression(unsigned int boxID)
+Maquette::getPosition(unsigned int boxID)
 {
-  return (float)_engines->getProcessProgression(boxID);
+  return (float)_engines->getCurrentExecutionPosition(boxID);
 }
 
 void
@@ -1327,51 +1426,54 @@ Maquette::initSceneState()
   unsigned int boxID;
   QMap<QString, QPair<QString, unsigned int> > msgs, boxMsgs;
   QList<QString> boxAddresses;
-  BasicBox *currentBox;
+  BasicBox *currentBox;  
   std::vector<string> curvesList;
 
   //Pour toutes les boîtes avant le goto, on récupère leur état final (on simule leur exécution)
-  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {     
+  for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); it++) {
       boxID = it->first;
       currentBox = (*it).second;
 
-      if (currentBox->date() < timeOffset && (currentBox->date() + currentBox->duration()) <= timeOffset) {
-          boxMsgs = currentBox->getFinalState();
-        }
-      else if (timeOffset > currentBox->date() && timeOffset < (currentBox->date() + currentBox->duration())) {
-          //goto au milieu d'une boîte : On envoie la valeur du début de boîte
-          boxMsgs = currentBox->getStartState();
-          curvesList = _engines->getCurvesAddress(boxID);
+      //Si la boîte n'est pas muted
+      if(!currentBox->getMuteState()){
 
-          //On supprime les messages si ils sont déjà associés à une courbe (le moteur les envoie automatiquement)
-          for (unsigned int i = 0; i < curvesList.size(); i++) {
-              //sauf si la courbe a été désactivée manuellement
-              if (!getCurveMuteState(boxID, curvesList[i])) {
-                  msgs.remove(QString::fromStdString(curvesList[i]));
-                }
-            }
-        }
-      else if (timeOffset == currentBox->date() && timeOffset > 0) { // <timeOffset to avoid rootBox cue duplication
-          boxMsgs = currentBox->getStartState();
-        }
-      boxAddresses = boxMsgs.keys();
+          if (currentBox->date() < timeOffset && (currentBox->date() + currentBox->duration()) <= timeOffset) {
+              boxMsgs = currentBox->getFinalState();
+          }
+          else if (timeOffset > currentBox->date() && timeOffset < (currentBox->date() + currentBox->duration())) {
+              //goto au milieu d'une boîte : On envoie la valeur du début de boîte
+              boxMsgs = currentBox->getStartState();
+              curvesList = _engines->getCurvesAddress(boxID);
 
-      //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
-      for (QList<QString>::iterator it2 = boxAddresses.begin(); it2 != boxAddresses.end(); it2++) {
-          if (msgs.contains(*it2)) {
-              if (msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second <= timeOffset) {
-                  msgs.insert(*it2, boxMsgs.value(*it2));
-                }
-            }
+              //On supprime les messages si ils sont déjà associés à une courbe (le moteur les envoie automatiquement)
+              for (unsigned int i = 0; i < curvesList.size(); i++) {
+                  //sauf si la courbe a été désactivée manuellement
+                  if (!getCurveMuteState(boxID, curvesList[i])) {
+                      msgs.remove(QString::fromStdString(curvesList[i]));
+                  }
+              }
+          }
+          else if (timeOffset == currentBox->date() && timeOffset > 0) { // <timeOffset to avoid rootBox cue duplication
+              boxMsgs = currentBox->getStartState();
+          }
+          boxAddresses = boxMsgs.keys();
 
-          //sinon on ajoute dans la liste de messages
-          else
-          if (boxMsgs.value(*it2).second <= timeOffset) {
-              msgs.insert(*it2, boxMsgs.value(*it2));
-            }
-        }
-    }
+          //Pour le cas où le même paramètre est modifié par plusieurs boîtes (avant le goto), on ne garde que la dernière modif.
+          for (QList<QString>::iterator it2 = boxAddresses.begin(); it2 != boxAddresses.end(); it2++) {
+              if (msgs.contains(*it2)) {
+                  if (msgs.value(*it2).second < boxMsgs.value(*it2).second && boxMsgs.value(*it2).second <= timeOffset) {
+                      msgs.insert(*it2, boxMsgs.value(*it2));
+                  }
+              }
 
+              //sinon on ajoute dans la liste de messages
+              else
+                  if (boxMsgs.value(*it2).second <= timeOffset) {
+                      msgs.insert(*it2, boxMsgs.value(*it2));
+                  }
+          }
+      }
+  }
   //traduction en QMap<QString,QString>, on supprime le champs date des messages
   QList<QString> addresses = msgs.keys();
 
@@ -1419,6 +1521,11 @@ Maquette::turnExecutionOn()
     _engines->play();
 }
 
+void
+Maquette::turnExecutionOn(unsigned int boxId){
+    _engines->play(boxId);
+}
+
 bool
 Maquette::isExecutionOn()
 {
@@ -1439,7 +1546,12 @@ Maquette::turnExecutionOff()
     }
 
     // Clear the trigger queue list
-    _scene->triggersQueueList()->clear();
+    _scene->triggersQueueList()->clear(); 
+}
+
+void
+Maquette::turnExecutionOff(unsigned int boxId){
+    _engines->stop(boxId);
 }
 
 void
@@ -1464,6 +1576,13 @@ void
 Maquette::stopPlayingAndGoToStart()
 {    
     turnExecutionOff();
+    
+#ifdef MUTE_GOTO_SCORE
+    setTimeOffset(0, YES);
+    initSceneState(); // and use the goto Nico's algorithm Nico
+#else
+    setTimeOffset(0, NO);
+#endif
 
     _scene->view()->updateTimeOffsetView();
 }
@@ -1471,19 +1590,28 @@ Maquette::stopPlayingAndGoToStart()
 void
 Maquette::stopPlayingAndGoToTimeOffset(unsigned int timeOffset)
 {
-  turnExecutionOff();    
-  setTimeOffset(timeOffset,NO);
-  //initSceneState();
+    turnExecutionOff();
+  
+#ifdef MUTE_GOTO_SCORE
+    setTimeOffset(timeOffset, YES);
+    initSceneState(); // and use the goto Nico's algorithm Nico
+#else
+    setTimeOffset(timeOffset, NO);
+#endif
 }
 
 void
 Maquette::stopPlayingAndGoToCurrentTime()
 {
-    unsigned int timeOffset = _engines->getCurrentExecutionTime();
+    unsigned int timeOffset = _engines->getCurrentExecutionDate();
     
     turnExecutionOff();
     
-    setTimeOffset(timeOffset,NO);
+#ifdef MUTE_GOTO_SCORE
+    setTimeOffset(timeOffset, YES);
+#else
+    setTimeOffset(timeOffset, NO);
+#endif
 }
 
 void
@@ -1666,11 +1794,12 @@ Maquette::load(const string &fileName)
     
     // BOXES
     {
-        vector<unsigned int>    boxesID;
-        unsigned int            boxID;
-        string                  name;
-        QColor                  color;
-        unsigned int            date, duration, topLeftY, sizeY;
+        vector<unsigned int>                        boxesID;
+        unsigned int                                boxID, parentID;
+        string                                      name;
+        QColor                                      color;
+        unsigned int                                date, duration, topLeftY, sizeY;        
+        bool                                        muteState;
         
         // get all boxes ID
         _engines->getBoxesId(boxesID);
@@ -1689,6 +1818,8 @@ Maquette::load(const string &fileName)
             topLeftY = _engines->getBoxVerticalPosition(boxID);
             sizeY = _engines->getBoxVerticalSize(boxID);
             color = _engines->getBoxColor(boxID);
+            parentID = _engines->getParentId(boxID);
+            muteState = _engines->getBoxMuteState(boxID);
             
             QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
             QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);           
@@ -1698,9 +1829,16 @@ Maquette::load(const string &fileName)
             newBox->setID(boxID);
             newBox->setName(QString::fromStdString(name));
             newBox->setColor(color);
+            newBox->setMuteState(muteState);
 
-            _boxes[boxID] = newBox;
+            _boxes[boxID] = newBox;            
             _parentBoxes[boxID] = newBox;
+
+            if(parentID != ROOT_BOX_ID){
+                newBox->setMother(parentID);
+                ((ParentBox *)getBox(parentID))->addChild(boxID);
+                _scene->boxMoved(boxID);
+            }
 
             if(!NO_PAINT)
                 _scene->addParentBox(boxID);
@@ -1826,7 +1964,7 @@ Maquette::load(const string &fileName)
                 
                 //maxBoundMS == 0 and minBoundMS > 0 means there is no max bound (we have to return -1)
                 if(!(maxBoundMS == 0 && minBoundPXL > 0)){
-                    if (maxBoundMS != NO_BOUND)
+                    if (maxBoundMS != 0 ) /// \todo La valeur de NO_BOUND de Score est 0, celle de i-score -1. NH
                         maxBoundPXL = (float)maxBoundMS / (MaquetteScene::MS_PER_PIXEL * zoom);
                 }
                 
@@ -1837,6 +1975,28 @@ Maquette::load(const string &fileName)
                 addRelation(abstractRel);
             }
         }
+    }
+
+    // CONDITIONAL RELATIONS
+    std::vector<unsigned int>   conditionsId,
+                                boxesId;
+    QList<BasicBox *>           boxes;
+
+    getConditionsId(conditionsId);
+
+    for(auto& conditionId : conditionsId)
+    {
+        //get boxes' ids
+        boxesId.clear();
+        getBoxesIdFromCondition(conditionId,boxesId);
+
+        //transform in list of BasicBox
+        boxes.clear();
+        for(auto& boxId : boxesId){
+            boxes<<getBox(boxId);
+        }
+
+        new ConditionalRelation(conditionId, boxes,_scene);
     }
 }
 
@@ -1884,6 +2044,16 @@ Maquette::updateTriggerPointActiveStatus(unsigned int trgID, bool active)
     }
 }
 
+void Maquette::setTriggerPointDefault(unsigned int triggerId, bool dflt)
+{
+    _engines->setTriggerPointDefault(triggerId, dflt);
+}
+
+bool Maquette::getTriggerPointDefault(unsigned int triggerId)
+{
+    return _engines->getTriggerPointDefault(triggerId);
+}
+
 void Maquette::setViewZoom(const QPointF zoom)
 {
     _engines->setViewZoom(zoom);
@@ -1898,7 +2068,12 @@ void
 Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
 {
     int type = getBox(boxID)->type();
-    BasicBox *box = static_cast<BasicBox*>(_boxes[boxID]);
+    BasicBox *box = static_cast<BasicBox*>(_boxes[boxID]);    
+
+    if(boxID == ROOT_BOX_ID){
+        if(!Maquette::getInstance()->scene()->thread()->isRunning())
+            Maquette::getInstance()->scene()->thread()->start();
+    }
 
     if (type == PARENT_BOX_TYPE) {        
         if (running){
@@ -1911,9 +2086,9 @@ Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
 }
 
 void
-Maquette::executionFinished()
+Maquette::udpatePlayModeView()
 {
-  _scene->timeEndReached();
+    _scene->updatePlayModeView();
 }
 
 void
@@ -1926,10 +2101,9 @@ void
 boxIsRunningCallback(unsigned int boxID, bool running)
 {
   Maquette::getInstance()->updateBoxRunningStatus(boxID, running);
-    
-    // if the execution of the upper box ends
-    if (boxID == ROOT_BOX_ID)
-        Maquette::getInstance()->executionFinished();
+
+  if(boxID==ROOT_BOX_ID)
+      Maquette::getInstance()->udpatePlayModeView();
 }
 
 void
@@ -1973,6 +2147,13 @@ transportCallback(TTSymbol& transport, const TTValue& value)
         std::cerr << "Maquette::enginesNetworkCallback : attribute _scene == NULL" << std::endl;
     }
 #endif
+}
+
+void
+deviceCallback(TTSymbol& deviceName)
+{
+    Maquette::getInstance()->scene()->editor()->networkTree()->refreshItemNamespace(Maquette::getInstance()->scene()->editor()->networkTree()->getItemFromAddress(deviceName.c_str()), false);
+    std::cerr << "Maquette::deviceCallback : " << deviceName.c_str() << std::endl;
 }
 
 void
@@ -2036,7 +2217,7 @@ Maquette::getObjectChildren(const std::string & address, std::vector<std::string
 {
     return _engines->requestObjectChildren(address,children);
 }
-
+/*
 void
 Maquette::setRangeBoundMin(unsigned int boxID, const string &address, float value){
     /// \todo
@@ -2046,7 +2227,7 @@ void
 Maquette::setRangeBoundMax(unsigned int boxID, const string &address, float value){
     /// \todo
 }
-
+*/
 void
 Maquette::setCurveRecording(unsigned int boxID, const string address, bool activated){
     _engines->setCurveRecording(boxID,address,activated);
@@ -2075,6 +2256,8 @@ Maquette::getDeviceLocalHost(std::string deviceName, std::string &localHost)
         return getDeviceLocalHost(deviceName,protocol,localHost);
 
     }
+    qDebug() << "Warning : reached the end of getDeviceLocalHost";
+    return false;
 }
 
 bool
@@ -2105,6 +2288,9 @@ Maquette::getDevicePort(std::string deviceName, unsigned int &port)
     string protocol;
     if (_engines->getDeviceProtocol(deviceName,protocol) == 0)
         return getDevicePort(deviceName,protocol,port);
+
+    qDebug() << "Warning : reached the end of getDevicePort";
+    return false;
 }
 
 int
@@ -2156,6 +2342,21 @@ Maquette::setDeviceProtocol(std::string device, std::string protocol){
 }
 
 bool
+Maquette::setDeviceLearn(std::string deviceName, bool newLearn){
+    return _engines->setDeviceLearn(deviceName, newLearn);
+}
+
+bool
 Maquette::loadNetworkNamespace(const string &application, const string &filepath){
     return _engines->loadNetworkNamespace(application,filepath);
+}
+
+int
+Maquette::appendToNetWorkNamespace(const std::string & address, const std::string & service, const std::string & type, const std::string & priority, const std::string & description, const std::string & range, const std::string & clipmode, const std::string & tags){
+    return _engines->appendToNetWorkNamespace(address,service,type,priority,description,range,clipmode,tags);
+}
+
+int
+Maquette::removeFromNetWorkNamespace(const std::string & address){
+    return _engines->removeFromNetWorkNamespace(address);
 }
