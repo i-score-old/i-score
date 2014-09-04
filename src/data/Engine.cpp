@@ -2208,7 +2208,8 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
             aProtocol.send("ApplicationRegister", applicationName, out);
             
             aProtocol.send("ApplicationSelect", applicationName, out);
-            aProtocol.set("port", TTUInt16(destinationPort));
+            args = TTValue(TTUInt16(destinationPort), TTUInt16(receptionPort));
+            aProtocol.set("port", args);
             aProtocol.set("ip", TTSymbol(DeviceIp));
             
             // run the protocol
