@@ -29,12 +29,11 @@ class TimeBarWidget : public QWidget {
     MaquetteScene *_scene;
     QRect _rect;
     QPixmap _pixmap;
-    QFont _font{QFont("", NUMBERS_POINT_SIZE)};
+    QFont _font{"helvetica", 11};
 
     QPainter _painter;
 
     static const float TIME_BAR_HEIGHT;
     static const float LEFT_MARGIN;
-    static const float NUMBERS_POINT_SIZE;
 };
 #endif // TIMEBARWIDGET_HPP
