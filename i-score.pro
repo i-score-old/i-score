@@ -50,7 +50,7 @@ macx-clang {
     LIBS += /usr/local/jamoma/lib/JamomaDSP.dylib
     LIBS += /usr/local/jamoma/lib/JamomaScore.dylib
     LIBS += /usr/local/jamoma/lib/JamomaModular.dylib
-    LIBS += -framework gecode
+
     LIBS += -lxml2
 }
 
