@@ -49,7 +49,6 @@ class MaquetteScene;
 
 const float TimeBarWidget::TIME_BAR_HEIGHT = 15.;
 const float TimeBarWidget::LEFT_MARGIN = 0.5;
-const float TimeBarWidget::NUMBERS_POINT_SIZE = 10.;
 static const int S_TO_MS = 1000;
 
 TimeBarWidget::TimeBarWidget(QWidget *parent, MaquetteScene *scene)
