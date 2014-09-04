@@ -64,8 +64,6 @@
 #include <QErrorMessage>
 #include <QStatusBar>
 #include <QFileDialog>
-#include <QtPrintSupport/QPrintDialog>
-#include <QtPrintSupport/QPrinter>
 #include <QSettings>
 #include <QApplication>
 #include <QCloseEvent>
@@ -74,6 +72,14 @@
 #include <QDoubleSpinBox>
 #include <QScrollBar>
 #include <QtGui>
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+#include <QPrintDialog>
+#include <QPrinter>
+#else
+#include <QtPrintSupport/QPrintDialog>
+#include <QtPrintSupport/QPrinter>
+#endif
 
 #include <iostream>
 #include <math.h>
