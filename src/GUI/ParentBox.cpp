@@ -220,7 +220,7 @@ ParentBox::empty() const
 //}
 
 void
-ParentBox::resizeWidthEdition(int width)
+ParentBox::resizeWidthEdition(float width)
 {    
   BasicBox::resizeWidthEdition(width);
   float newWidth = _abstract->width();
@@ -234,7 +234,7 @@ ParentBox::resizeWidthEdition(int width)
 }
 
 void
-ParentBox::resizeHeightEdition(int height)
+ParentBox::resizeHeightEdition(float height)
 {
 
     std::map<unsigned int, BasicBox *>::iterator it;

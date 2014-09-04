@@ -51,11 +51,11 @@ PlayingThread::PlayingThread(MaquetteScene *scene)
 {
   _scene = scene;
 
-  _thread.start();
+// _thread.start();
   connect(&_timer, SIGNAL(timeout()),
           this, SLOT(update()));
 
-  this->moveToThread(&_thread);
+//  this->moveToThread(&_thread);
 }
 
 bool PlayingThread::isRunning() const

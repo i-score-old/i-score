@@ -21,7 +21,7 @@ MOC_DIR = moc
 RESOURCES += i-score.qrc
 
 # qmake adds the values of this variable as compiler C preprocessor macros (-D option).
-DEFINES += __Types__
+DEFINES += __Types__ TT_NO_DSP
 
 ICON = resources/images/i-score.icns
 

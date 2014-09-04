@@ -101,7 +101,7 @@ MainWindow::MainWindow()
   _view->setScene(_scene);
   _view->updateScene();  
 
-  _scene->updateView();
+  _scene->initView();
   _scene->init(); /// \todo Les méthodes init() sont à bannir, il y a des constructeurs pour ça !!! (par jaime Chao)
 
   _editor->setScene(_scene);
@@ -135,7 +135,10 @@ MainWindow::MainWindow()
   setAcceptDrops(false);
 
   connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, unsigned int)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, unsigned int)));
-  connect(_view->verticalScrollBar(), SIGNAL(valueChanged(int)), _scene, SLOT(verticalScroll(int)));  //TimeBar is painted on MaquetteScene, so a vertical scroll has to move the timeBar.
+  connect(_view->verticalScrollBar(), SIGNAL(valueChanged(int)),
+          _scene, SLOT(verticalScroll(int)));  //TimeBar is painted on MaquetteScene, so a vertical scroll has to move the timeBar.
+  connect(_view->horizontalScrollBar(), SIGNAL(valueChanged(int)),
+          _scene, SLOT(horizontalScroll(int)));  //TimeBar is painted on MaquetteScene, so a vertical scroll has to move the timeBar.
   connect(_scene, SIGNAL(stopPlaying()), _headerPanelWidget, SLOT(stop()));
   connect(_view, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
   connect(_scene, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));

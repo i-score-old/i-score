@@ -219,7 +219,7 @@ TreeMapElement::addChildren(const vector<string>& nodes, const vector<string>& l
       Maquette::getInstance()->requestNetworkNamespace(child->address(), nodeType, childNodes, childLeaves, childAttributes, childAttributesvalues);
       child->addChildren(childNodes, childLeaves, childAttributes, childAttributesvalues);
     }
-  for (it = attributes.begin(), it2 = attributesValue.begin(); it != attributes.end(), it2 != attributesValue.end(); ++it, ++it2) {
+  for (it = attributes.begin(), it2 = attributesValue.begin(); it != attributes.end() && it2 != attributesValue.end(); ++it, ++it2) {
       TreeMapElement *child = addChild(*it, Attribute);
       child->setValue(*it2);
     }

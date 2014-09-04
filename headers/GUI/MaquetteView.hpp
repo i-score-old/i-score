@@ -87,6 +87,7 @@ class MaquetteView : public QGraphicsView
   signals:
     void zoomChanged(float newValue);
     void playModeChanged();
+    void sizeChanged();
 
   public slots:
     /*!
@@ -129,6 +130,7 @@ class MaquetteView : public QGraphicsView
     void setScenarioSelected(bool selected);
 
   protected:
+    void resizeEvent(QResizeEvent *);
 
     /*!
      * \brief Draws the indicator of a start cue (as a linearGradient for example)

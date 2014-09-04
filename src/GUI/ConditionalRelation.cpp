@@ -129,7 +129,6 @@ ConditionalRelation::updateBoxesCoordinates(unsigned int boxId){
     QList<BasicBox *>::iterator     it;
     BasicBox                        *box = _scene->getBox(boxId),
                                     *curBox;
-    unsigned int                    curId;
     float                           curBoxX,
                                     boxX = box->getLeftGripPoint().x();
 

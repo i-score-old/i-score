@@ -560,6 +560,7 @@ BasicBox::getRightGripPoint()
     }
   catch (const std::exception & e) {
       std::cerr << "BasicBox::getRightGripPoint() : " << e.what();
+      return QPointF();
     }
 }
 

@@ -785,16 +785,16 @@ bool
 Maquette::updateBox(unsigned int boxID, const Coords &coord)
 {
     //  std::cout<<"--- updateBox ---"<<std::endl;
-    bool moveAccepted;
+    bool moveAccepted{};
     vector<unsigned int> moved;
     vector<unsigned int>::iterator it;
     int boxBeginTime;
     if (boxID != NO_ID && boxID != ROOT_BOX_ID) {
         BasicBox *box = _boxes[boxID];
         
-        if (moveAccepted = _engines->performBoxEditing(boxID, coord.topLeftX * MaquetteScene::MS_PER_PIXEL,
+        if ((moveAccepted = _engines->performBoxEditing(boxID, coord.topLeftX * MaquetteScene::MS_PER_PIXEL,
                                                        coord.topLeftX * MaquetteScene::MS_PER_PIXEL +
-                                                       coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
+                                                       coord.sizeX * MaquetteScene::MS_PER_PIXEL, moved))) {
 
             _engines->setBoxVerticalPosition(boxID, coord.topLeftY);
             _engines->setBoxVerticalSize(boxID, coord.sizeY);
@@ -852,16 +852,16 @@ Maquette::updateBox(unsigned int boxID, const Coords &coord)
 bool
 Maquette::updateBoxes(const map<unsigned int, Coords> &boxes)
 {
-  bool moveAccepted;
+  bool moveAccepted{};
   vector<unsigned int> moved;
   map<unsigned int, Coords >::const_iterator it;
   vector<unsigned int>::iterator it2;
   for (it = boxes.begin(); it != boxes.end(); it++) {
       if (it->first != NO_ID && it->first != ROOT_BOX_ID) {
           BasicBox *curBox = _boxes[it->first];
-          if (moveAccepted = _engines->performBoxEditing(it->first, it->second.topLeftX * MaquetteScene::MS_PER_PIXEL,
+          if ((moveAccepted = _engines->performBoxEditing(it->first, it->second.topLeftX * MaquetteScene::MS_PER_PIXEL,
                                                          it->second.topLeftX * MaquetteScene::MS_PER_PIXEL +
-                                                         it->second.sizeX * MaquetteScene::MS_PER_PIXEL, moved)) {
+                                                         it->second.sizeX * MaquetteScene::MS_PER_PIXEL, moved))) {
               curBox->setRelativeTopLeft(QPoint(it->second.topLeftX, it->second.topLeftY));
               curBox->setSize(QPoint(it->second.sizeX, it->second.sizeY));
               curBox->setPos(_boxes[it->first]->getCenter());
@@ -1006,14 +1006,11 @@ Maquette::createCondition(QList<BasicBox *> boxes)
 {
     //Engine needs a vector with start trigger points' ids.
     std::vector<unsigned int>       triggerIds;
-    QList<BasicBox *>::iterator     it = boxes.begin();
-    BasicBox                        *curBox;
     TriggerPoint                    *curTriggerPoint;
     unsigned int                    curTriggerId;
 
-    for(it ; it!=boxes.end() ; it++)
+    for(auto& curBox : boxes)
     {
-        curBox = *it;
         curTriggerPoint = curBox->getTriggerPoint(BOX_START);
 
         if(curTriggerPoint != NULL){
@@ -1069,8 +1066,8 @@ Maquette::getBoxesIdFromCondition(TimeConditionId conditionId, std::vector<unsig
 
     _engines->getConditionTriggerIds(conditionId,triggerPointsIds);
 
-    for(int i=0 ; i<triggerPointsIds.size() ; i++)
-        boxesId.push_back(getTriggerPoint(triggerPointsIds.at(i))->boxID());
+    for(auto& triggerId : triggerPointsIds)
+        boxesId.push_back(getTriggerPoint(triggerId)->boxID());
 }
 
 void
@@ -1166,7 +1163,7 @@ Maquette::setCurveSections(unsigned int boxID, const string &address, unsigned i
 
 bool
 Maquette::getCurveAttributes(unsigned int boxID, const std::string &address, unsigned int argPosition,
-                             unsigned int &sampleRate, bool &redundancy, bool &interpolate, vector<float>& values, vector<string> &argTypes,
+                             unsigned int &sampleRate, bool &redundancy, bool &interpolate, vector<float>& values, vector<string> &/*argTypes*/,
                              vector<float> &xPercents, vector<float> &yValues, vector<short> &sectionType, vector<float> &coeff)
 {
   if (_engines->getCurveValues(boxID, address, argPosition, values)) {
@@ -1984,22 +1981,19 @@ Maquette::load(const string &fileName)
     std::vector<unsigned int>   conditionsId,
                                 boxesId;
     QList<BasicBox *>           boxes;
-    unsigned int                conditionId;
 
     getConditionsId(conditionsId);
 
-    for(int i=0 ; i<conditionsId.size() ; i++)
+    for(auto& conditionId : conditionsId)
     {
-        conditionId = conditionsId.at(i);
-
         //get boxes' ids
         boxesId.clear();
         getBoxesIdFromCondition(conditionId,boxesId);
 
         //transform in list of BasicBox
         boxes.clear();
-        for(int i=0 ; i<boxesId.size() ; i++){
-            boxes<<getBox(boxesId.at(i));
+        for(auto& boxId : boxesId){
+            boxes<<getBox(boxId);
         }
 
         new ConditionalRelation(conditionId, boxes,_scene);
@@ -2223,7 +2217,7 @@ Maquette::getObjectChildren(const std::string & address, std::vector<std::string
 {
     return _engines->requestObjectChildren(address,children);
 }
-
+/*
 void
 Maquette::setRangeBoundMin(unsigned int boxID, const string &address, float value){
     /// \todo
@@ -2233,7 +2227,7 @@ void
 Maquette::setRangeBoundMax(unsigned int boxID, const string &address, float value){
     /// \todo
 }
-
+*/
 void
 Maquette::setCurveRecording(unsigned int boxID, const string address, bool activated){
     _engines->setCurveRecording(boxID,address,activated);
@@ -2262,6 +2256,8 @@ Maquette::getDeviceLocalHost(std::string deviceName, std::string &localHost)
         return getDeviceLocalHost(deviceName,protocol,localHost);
 
     }
+    qDebug() << "Warning : reached the end of getDeviceLocalHost";
+    return false;
 }
 
 bool
@@ -2292,6 +2288,9 @@ Maquette::getDevicePort(std::string deviceName, unsigned int &port)
     string protocol;
     if (_engines->getDeviceProtocol(deviceName,protocol) == 0)
         return getDevicePort(deviceName,protocol,port);
+
+    qDebug() << "Warning : reached the end of getDevicePort";
+    return false;
 }
 
 int
