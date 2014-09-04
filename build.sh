@@ -1,5 +1,5 @@
 #!/bin/sh
 
 make distclean;
-qmake -nocache -spec unsupported/macx-clang i-score.pro;
+qmake -nocache -spec macx-clang i-score.pro;
 make;
