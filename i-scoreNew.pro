@@ -19,7 +19,7 @@ QMAKE_LFLAGS   += -stdlib=libc++ -lc++
 }
 
 # This variable specifies the #include directories which should be searched when compiling the project.
-INCLUDEPATH += headers/GUI headers/data /usr/local/include/libxml2  /usr/include/libxml2
+INCLUDEPATH += headers/GUI headers/data
 
 QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -msse3 -std=c++11
 QMAKE_LFLAGS += -L/usr/local/lib/jamoma/lib -L/usr/local/lib/ -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
@@ -41,15 +41,7 @@ QMAKE_LFLAGS   += -stdlib=libc++ -lc++
 
 unix {
 message("Unix build")
-INCLUDEPATH +=	/usr/local/jamoma/includes \
-		$$(JAMOMA_INCLUDE_PATH)/Score/library/tests/ \
-		$$(JAMOMA_INCLUDE_PATH)/Modular/library/PeerObject \
-		$$(JAMOMA_INCLUDE_PATH)/Modular/library/ProtocolLib \
-		$$(JAMOMA_INCLUDE_PATH)/Modular/library/SchedulerLib \
-		$$(JAMOMA_INCLUDE_PATH)/DSP/library/includes \
-		$$(JAMOMA_INCLUDE_PATH)/Modular/library/includes \
-		$$(JAMOMA_INCLUDE_PATH)/Score/library/includes \
-		$$(JAMOMA_INCLUDE_PATH)/Foundation/library/includes
+INCLUDEPATH +=	/usr/local/jamoma/include
 
 linux-clang{
 	QMAKE_CXXFLAGS += -stdlib=libc++
