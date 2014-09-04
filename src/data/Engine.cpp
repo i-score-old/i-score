@@ -2208,7 +2208,8 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
             aProtocol.send("ApplicationRegister", applicationName, out);
             
             aProtocol.send("ApplicationSelect", applicationName, out);
-            aProtocol.set("port", TTUInt16(destinationPort));
+            args = TTValue(TTUInt16(destinationPort), TTUInt16(receptionPort));
+            aProtocol.set("port", args);
             aProtocol.set("ip", TTSymbol(DeviceIp));
             
             // run the protocol
@@ -2350,13 +2351,21 @@ std::vector<std::string> Engine::requestNetworkSnapShot(const std::string & addr
                 if (anObject.name() == TTSymbol("Data") ||
                     (anObject.name() == kTTSym_Mirror && TTMirrorPtr(anObject.instance())->getName() == TTSymbol("Data")))
                 {
-                    // get the value attribute
-                    anObject.get("value", v);
-                    v.toString();
-                    s = TTString(v[0]);
+                    // get the service attribute
+                    anObject.get("service", v);
+                    TTSymbol service = v[0];
                     
-                    // append address value to the snapshot
-                    snapshot.push_back(address + " " + s.data());
+                    // ask the value only for parameter
+                    if (service == kTTSym_parameter) {
+                        
+                        // get the value attribute
+                        anObject.get("value", v);
+                        v.toString();
+                        s = TTString(v[0]);
+                        
+                        // append address value to the snapshot
+                        snapshot.push_back(address + " " + s.data());
+                    }
                 }
             }
         }
