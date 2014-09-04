@@ -1012,7 +1012,11 @@ std::string Engine::getBoxName(TimeProcessId boxId)
     
 	getTimeProcess(boxId).get("name", name);
     
-    return name.c_str();
+    // format name replacing '_' by '.'
+    TTString s_toParse = name.c_str();
+    std::replace(s_toParse.begin(), s_toParse.end(), '_', ' ');
+    
+    return s_toParse.c_str();
 }
 
 unsigned int Engine::getBoxVerticalPosition(TimeProcessId boxId)
@@ -1086,7 +1090,11 @@ void Engine::setBoxName(TimeProcessId boxId, string name)
     
     getTimeProcess(boxId).get("name", oldName);
     
-    newName = TTSymbol(name);
+    // format name replacing ' ' by '_'
+    TTString s_toParse = name;
+    std::replace(s_toParse.begin(), s_toParse.end(), ' ', '_');
+    
+    newName = TTSymbol(s_toParse);
     
     // filter repetitions
     if (newName != oldName) {
