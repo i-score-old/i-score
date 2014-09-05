@@ -3,45 +3,29 @@ TARGET = i-score
 
 QT += core network xml svg printsupport
 
-
-QMAKE_CXXFLAGS -= -W
-QMAKE_CXXFLAGS -= -Wall
-QMAKE_CXXFLAGS += -W -Wall -Wno-unused-parameter -Wno-unused-variable  -Wno-deprecated-register -O3 -fPIC -std=c++11
-contains(QMAKE_HOST.arch, 86) {
-	QMAKE_CXXFLAGS += -msse3
-}
-
-macx {
-QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
-CONFIG += x86_64
-QMAKE_CXXFLAGS += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET -stdlib=libc++
-QMAKE_LFLAGS   += -stdlib=libc++ -lc++
-}
-
-# This variable specifies the #include directories which should be searched when compiling the project.
 INCLUDEPATH += headers/GUI headers/data
-
-QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -msse3 -std=c++11
-QMAKE_LFLAGS += -L/usr/local/lib/jamoma/lib -L/usr/local/lib/ -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
-
 RESOURCES += i-score.qrc
-
-# qmake adds the values of this variable as compiler C preprocessor macros (-D option).
 DEFINES += __Types__ TT_NO_DSP
 
 ICON = resources/images/i-score.icns
 resources/translations = i-score_en.ts i-score_fr.ts
 
-macx {
-QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
-CONFIG += x86_64
-QMAKE_CXXFLAGS += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET -stdlib=libc++
-QMAKE_LFLAGS   += -stdlib=libc++ -lc++
+
+QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -msse3 -std=c++11
+QMAKE_LFLAGS += -L/usr/local/lib/jamoma/lib -L/usr/local/lib/ -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
+
+contains(QMAKE_HOST.arch, 86) {
+        QMAKE_CXXFLAGS += -msse3
 }
 
 unix {
-message("Unix build")
 INCLUDEPATH +=	/usr/local/jamoma/include
+
+macx {
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
+QMAKE_CXXFLAGS += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET -stdlib=libc++
+QMAKE_LFLAGS   += -stdlib=libc++ -lc++
+}
 
 linux-clang{
 	QMAKE_CXXFLAGS += -stdlib=libc++
