@@ -72,6 +72,7 @@ void Engine::initModular(const char* pathToTheJamomaFolder)
     // create application manager
     m_applicationManager = TTObject("ApplicationManager");
     
+    m_applicationManager.track(YES);
     
     TTLogMessage("\n*** Creation of i-score application ***\n");
     ////////////////////////////////////////////////////////////////////////////////
@@ -206,6 +207,28 @@ Engine::~Engine()
     clearInterval();
     clearConditionedProcess();
     clearTimeCondition();
+    
+    TTValue out;
+    
+    TTLogMessage("\n*** Release protocols ***\n");
+    ///////////////////////////////////////////////
+    
+    // Get protocol names
+    m_applicationManager.get("protocolNames", out);
+    for (TTElementIter it = out.begin() ; it != out.end() ; it++) {
+        TTSymbol name = TTElement(*it);
+        m_applicationManager.send("ProtocolRelease", name, out);
+    }
+    
+    TTLogMessage("\n*** Release applications ***\n");
+    //////////////////////////////////////////////////
+    
+    // Get registered application names
+    m_applicationManager.get("applicationNames", out);
+    for (TTElementIter it = out.begin() ; it != out.end() ; it++) {
+        TTSymbol name = TTElement(*it);
+        m_applicationManager.send("ApplicationRelease", name, out);
+    }
 }
 
 TimeProcessId Engine::cacheTimeProcess(TTObject& timeProcess, TTAddress& anAddress, TTObject& subScenario)
