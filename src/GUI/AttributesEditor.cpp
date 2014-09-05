@@ -313,7 +313,7 @@ AttributesEditor::connectSlots()
   connect(_networkTree, SIGNAL(requestSnapshotEnd(QList<QTreeWidgetItem *>)), this, SLOT(snapshotEndAssignment(QList<QTreeWidgetItem *>)));
 
   connect(_networkTree, SIGNAL(itemExpanded(QTreeWidgetItem *)), this, SLOT(addToExpandedItemsList(QTreeWidgetItem*)));
-  connect(_networkTree, SIGNAL(selectionChanged(QList<QTreeWidgetItem *>)), this, SLOT(addToSelectedItemsList(QList<QTreeWidgetItem *>)));
+  connect(_networkTree, SIGNAL(treeSelectionChanged(QList<QTreeWidgetItem *>)), this, SLOT(addToSelectedItemsList(QList<QTreeWidgetItem *>)));
   connect(_networkTree, SIGNAL(itemCollapsed(QTreeWidgetItem *)), this, SLOT(removeFromExpandedItemsList(QTreeWidgetItem*)));
   connect(_networkTree, SIGNAL(curveActivationChanged(QTreeWidgetItem*, bool)), this, SLOT(curveActivationChanged(QTreeWidgetItem*, bool)));
   connect(_networkTree, SIGNAL(curveRedundancyChanged(QTreeWidgetItem*, bool)), this, SLOT(curveRedundancyChanged(QTreeWidgetItem*, bool)));

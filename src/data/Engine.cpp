@@ -1171,17 +1171,17 @@ int Engine::getBoxNbCtrlPoints(TimeProcessId boxId)
     return v.size() + 2; // because there is always a start and an end event too
 }
 
-TimeEventIndex Engine::getBoxFirstCtrlPointIndex(TimeProcessId boxId)
+TimeEventIndex Engine::getBoxFirstCtrlPointIndex(TimeProcessId /*boxId*/)
 {
 	return BEGIN_CONTROL_POINT_INDEX;
 }
 
-TimeEventIndex Engine::getBoxLastCtrlPointIndex(TimeProcessId boxId)
+TimeEventIndex Engine::getBoxLastCtrlPointIndex(TimeProcessId /*boxId*/)
 {
 	return END_CONTROL_POINT_INDEX;
 }
 
-void Engine::setCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex controlPointIndex, std::vector<std::string> messageToSend, bool muteState)
+void Engine::setCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex controlPointIndex, std::vector<std::string> messageToSend, bool /*muteState*/)
 {
     TTValue     out;
     TTObject    event;
@@ -1500,7 +1500,7 @@ void Engine::setCurveRecording(TimeProcessId boxId, const std::string & address,
     getTimeProcess(boxId).send("CurveRecord", args, out);
 }
 
-bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned int argNb, const std::vector<float> & percent, const std::vector<float> & y, const std::vector<short> & sectionType, const std::vector<float> & coeff)
+bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned int /*argNb*/, const std::vector<float> & percent, const std::vector<float> & y, const std::vector<short> & sectionType, const std::vector<float> & coeff)
 {
     TTObject    curve;
     TTValue     parameters, objects;

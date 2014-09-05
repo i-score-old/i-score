@@ -2,6 +2,7 @@
 #define TIMEBARWIDGET_HPP
 
 #include <QWidget>
+#include <QPainter>
 
 #include "MaquetteScene.hpp"
 
@@ -10,30 +11,29 @@ class TimeBarWidget : public QWidget {
 
   public:
     TimeBarWidget(QWidget *parent, MaquetteScene *scene);
-    ~TimeBarWidget();
-    static const float TIME_BAR_HEIGHT;
-    static const float LEFT_MARGIN;
-    static const float NUMBERS_POINT_SIZE;
-    void init();
-    void setZoomValue(float value); /// \todo setZoomValue() fait la même chose que le slot updateZoom(), et n'ai jamais appelée. (par jaime Chao)
-
 
   signals:
     void timeOffsetEntered(unsigned int timeOffset);
 
   public slots:
-    void updateZoom(float newValue);
+    void updateZoom(float); // Called if the zoom changes
+    void updateSize(); // Called if the window is resized
 
   protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
-    virtual void drawBackground(QPainter *painter, QRect rect);
-    float _zoom;
+    virtual void moveEvent(QMoveEvent*); // Called when a scrollbar is moved
 
   private:    
-
+    void redrawPixmap();
     MaquetteScene *_scene;
-    float _sceneHeight;
     QRect _rect;
+    QPixmap _pixmap;
+    QFont _font{"helvetica", 11};
+
+    QPainter _painter;
+
+    static const float TIME_BAR_HEIGHT;
+    static const float LEFT_MARGIN;
 };
 #endif // TIMEBARWIDGET_HPP

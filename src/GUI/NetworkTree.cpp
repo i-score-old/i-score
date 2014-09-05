@@ -868,7 +868,7 @@ NetworkTree::clearColumn(unsigned int column, bool fullCleaning)
     }
 
   //clear record icon
-  if(column == INTERPOLATION_COLUMN && !_recMessages.isEmpty()){
+  if(int(column) == INTERPOLATION_COLUMN && !_recMessages.isEmpty()){
       QList<QTreeWidgetItem *>::iterator it;
       for(it = _recMessages.begin(); it != _recMessages.end() ; it++)
           (*it)->setCheckState(column, Qt::Unchecked);
@@ -1217,7 +1217,7 @@ NetworkTree::unassignItem(QTreeWidgetItem *item, bool recursive)
                 child = item->child(i);
                 if (child->type() == NodeNoNamespaceType) {
                     unassignItem(child);
-                    recursiveChildrenSelection(child, select);
+                    recursiveChildrenSelection(child, recursive);
                 }
                 if (child->type() == LeaveType) {
                     unassignItem(child);
@@ -1654,7 +1654,7 @@ NetworkTree::getSelectedItems()
 }
 
 void
-NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select)
+NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool b_select)
 {
   int i;
   QTreeWidgetItem *child;
@@ -1664,11 +1664,11 @@ NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select)
       for (i = 0; i < childrenCount; i++) {
           child = curItem->child(i);
           if (child->type() == NodeNoNamespaceType) {
-              child->setSelected(select);
-              recursiveChildrenSelection(child, select);
+              child->setSelected(b_select);
+              recursiveChildrenSelection(child, b_select);
             }
           if (child->type() == LeaveType) {
-              child->setSelected(select);
+              child->setSelected(b_select);
             }
         }
     }
@@ -1815,10 +1815,8 @@ NetworkTree::keyPressEvent(QKeyEvent *event)
         }
     }
     else if(event->key() == Qt::Key_Backspace){
-        QList<QTreeWidgetItem *> items = selectedItems();
-        QList<QTreeWidgetItem *>::iterator it = items.begin();
-        for(it; it!=items.end(); it++){
-            unassignItem(*it);
+        for(auto& item : selectedItems()){
+            unassignItem(item);
         }
     }
 }
@@ -1856,7 +1854,7 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
             }
         }
 
-        emit(selectionChanged(selectedItems()));
+        emit(treeSelectionChanged(selectedItems()));
 
         if (item->type() == addOSCNode) {
             addOSCMessage(item->parent());
@@ -2531,12 +2529,8 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
 void
 NetworkTree::unselectAll()
 {
-    QList<QTreeWidgetItem *> items = selectedItems();
-    QList<QTreeWidgetItem *>::iterator it = items.begin();
-    QTreeWidgetItem *curItem;
-    for(it; it!=items.end(); it++){
-        curItem=*it;
-        curItem->setSelected(false);
-    }
-    emit(selectionChanged(selectedItems()));
+    for(auto& item : selectedItems())
+        item->setSelected(false);
+
+    emit(treeSelectionChanged(selectedItems()));
 }

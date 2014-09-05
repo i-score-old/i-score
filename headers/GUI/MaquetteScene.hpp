@@ -122,7 +122,7 @@ class MaquetteScene : public QGraphicsScene
     /*!
      * \brief Updates current view.
      */
-    void updateView();
+    void initView();
 
     /*!
      * \brief Returns the current interaction mode.
@@ -645,6 +645,7 @@ class MaquetteScene : public QGraphicsScene
 
   public slots:
     void verticalScroll(int value);
+    void horizontalScroll(int value);
     void changeTimeOffset(unsigned int timeOffset);
     void zoomChanged(float value);
     void speedChanged(double value);

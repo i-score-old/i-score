@@ -393,7 +393,7 @@ class NetworkTree : public QTreeWidget
     static int NAME_COLUMN;
     static int VALUE_COLUMN;
     static int START_ASSIGNATION_COLUMN;
-    static int START_COLUMN;	
+    static int START_COLUMN;
     static int END_ASSIGNATION_COLUMN;
     static int END_COLUMN;
     static int INTERPOLATION_COLUMN;
@@ -437,7 +437,7 @@ class NetworkTree : public QTreeWidget
     void recModeChanged(QTreeWidgetItem *item);
     void requestSnapshotStart(QList<QTreeWidgetItem *> itemsList);
     void requestSnapshotEnd(QList<QTreeWidgetItem *> itemsLists);
-    void selectionChanged(QList<QTreeWidgetItem *> selectedItems);
+    void treeSelectionChanged(QList<QTreeWidgetItem *> selectedItems);
 
   private:
     void treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict);
@@ -474,7 +474,7 @@ class NetworkTree : public QTreeWidget
     void recursiveFatherSelection(QTreeWidgetItem *item, bool select);
     bool allBrothersSelected(QTreeWidgetItem *item, QList<QTreeWidgetItem *> assignedItems);
     bool allBrothersSelected(QTreeWidgetItem *item);
-    void recursiveChildrenSelection(QTreeWidgetItem *curItem, bool select);
+    void recursiveChildrenSelection(QTreeWidgetItem *curItem, bool b_select);
 
 
     /***********************************************************************

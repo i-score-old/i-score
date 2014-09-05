@@ -91,7 +91,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 
   _relation = new AbstractRelation; /// \todo pourquoi instancier une AbstractRelation ici ? (par jaime Chao)
   _playThread = new PlayingThread(this);
-  _timeBar = new TimeBarWidget(0, this);  
+  _timeBar = new TimeBarWidget(0, this);
   _timeBarProxy = addWidget(_timeBar);/// \todo Vérifier ajout si classe TimeBarWidget hérite de GraphicsProxyWidget ou GraphicsObject. Notamment pour lier avec background. (par jaime Chao)
 
   _progressLine = new QGraphicsLineItem(QLineF(sceneRect().topLeft().x(), sceneRect().topLeft().y(), sceneRect().bottomLeft().x(), MAX_SCENE_HEIGHT));
@@ -111,7 +111,6 @@ MaquetteScene::init()
   _triggersQueueList = new QList<TriggerPoint *>();
   _progressLine->setZValue(2);
   _timeBarProxy->setZValue(3);
-  _timeBarProxy->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
   _timeBarProxy->setFlag(QGraphicsItem::ItemClipsToShape);    
 
   _currentInteractionMode = SELECTION_MODE;
@@ -174,9 +173,11 @@ MaquetteScene::changeTimeOffset(unsigned int timeOffset)
 }
 
 void
-MaquetteScene::updateView()
+MaquetteScene::initView()
 {
   _view = static_cast<MaquetteView*>(views().front());
+  connect(_view, SIGNAL(sizeChanged()),
+          _timeBar, SLOT(updateSize()));
 }
 
 /// \todo Vérifier l'utilité de faire une surcouche d'appels de méthodes de AttributesEditor (_editor). (par jaime Chao)
@@ -1707,8 +1708,8 @@ MaquetteScene::stopAndGoToStart()
 
     //send root box start messages
     std::vector<std::string> startCue = _maquette->getBox(ROOT_BOX_ID)->getStartMessages();
-    for(int i=0; i<startCue.size(); i++)
-        sendMessage(startCue.at(i));
+    for(auto& cue : startCue)
+        sendMessage(cue);
 
     update();
     
@@ -1829,8 +1830,15 @@ MaquetteScene::addToTriggerQueue(TriggerPoint *trigger)
 void
 MaquetteScene::verticalScroll(int value)
 {
-  _timeBar->move(0, value);
-  _view->repaint();
+  _timeBar->move(_timeBar->pos().x(), value);
+  _view->update();
+}
+
+void
+MaquetteScene::horizontalScroll(int value)
+{
+  _timeBar->move(value, _timeBar->pos().y());
+  _view->update();
 }
 
 void
@@ -1846,20 +1854,21 @@ MaquetteScene::getMaxSceneWidth(){
 void
 MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
 {
-    QList<BasicBox *>::iterator     it = boxesToCondition.begin();
-    BasicBox                        *box,
-                                    *earliestBox = *it;
-    unsigned int                    earliestDate = earliestBox->date();
+    if(boxesToCondition.isEmpty())
+    {
+        qWarning() << "MaquetteScene::conditionBoxes : boxesToCondition is empty";
+        return;
+    }
+
+    unsigned int                    earliestDate = boxesToCondition.first()->date();
     bool                            conditionalRelationFound = false;
     ConditionalRelation             *condRel;
 
 
     //Check if all boxes have a trigger point on start and force to move to the same date.
     //Check if boxes have to be simply attached to an existing conditional relation, else create a new one.
-    for(it ; it!=boxesToCondition.end() ; it++)
+    for(auto& box : boxesToCondition)
     {
-        box = *it;
-
         if(!box->hasTriggerPoint(BOX_START)) //Force trigger point creation
             box->addTriggerPoint(BOX_START);
 
@@ -1871,16 +1880,14 @@ MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
 
         //Find the earliest box
         if(box->date()<earliestDate){
-            earliestBox = box;
             earliestDate = box->date();
         }
     }
 
     //Force boxes to move to the earliest box date.
     /// \todo This is provisional, has to be done automatically by Score. NH
-    for(it=boxesToCondition.begin() ; it!=boxesToCondition.end() ; it++)
+    for(auto& box : boxesToCondition)
     {
-        box = *it;
         box->moveBy((qreal)(earliestDate/MS_PER_PIXEL) -(qreal)(box->date() / MS_PER_PIXEL), 0.);
         boxMoved(box->ID());
     }

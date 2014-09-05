@@ -1,7 +1,8 @@
 TEMPLATE = app
 TARGET = i-score
-
-QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -std=c++11
+QMAKE_CXXFLAGS -= -W
+QMAKE_CXXFLAGS -= -Wall
+QMAKE_CXXFLAGS += -W -Wall -Wno-unused-parameter -Wno-unused-variable  -Wno-deprecated-register -O3 -fPIC -std=c++11
 contains(QMAKE_HOST.arch, 86) {
 	QMAKE_CXXFLAGS += -msse3
 }
@@ -29,7 +30,7 @@ MOC_DIR = moc
 RESOURCES += i-score.qrc
 
 # qmake adds the values of this variable as compiler C preprocessor macros (-D option).
-DEFINES += __Types__
+DEFINES += __Types__ TT_NO_DSP
 
 ICON = resources/images/i-score.icns
 
