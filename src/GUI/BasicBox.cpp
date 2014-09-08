@@ -47,7 +47,7 @@
 #include "AbstractTriggerPoint.hpp"
 #include "Comment.hpp"
 #include "TriggerPoint.hpp"
-#include "TextEdit.hpp"
+
 #include "MainWindow.hpp"
 #include "Relation.hpp"
 #include "ConditionalRelation.hpp"
@@ -1527,6 +1527,7 @@ BasicBox::lower(bool state)
   updateRelations(BOX_END);
 }
 
+#include <QDebug>
 void
 BasicBox::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
