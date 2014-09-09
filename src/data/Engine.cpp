@@ -71,8 +71,7 @@ void Engine::initModular(const char* pathToTheJamomaFolder)
     
     // create application manager
     m_applicationManager = TTObject("ApplicationManager");
-    
-    m_applicationManager.track(YES);
+
     
     TTLogMessage("\n*** Creation of i-score application ***\n");
     ////////////////////////////////////////////////////////////////////////////////
