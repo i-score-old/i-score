@@ -788,7 +788,7 @@ bool
 Maquette::updateBox(unsigned int boxID, const Coords &coord)
 {
     //  std::cout<<"--- updateBox ---"<<std::endl;
-    bool moveAccepted{};
+    bool moveAccepted = false;
     vector<unsigned int> moved;
     vector<unsigned int>::iterator it;
     int boxBeginTime;
