@@ -517,13 +517,15 @@ NetworkMessages::setDeviceMessages(QString deviceName, QMap<QTreeWidgetItem *, M
 {
   Q_UNUSED(messages);
   QMap<QTreeWidgetItem *, Message>::iterator it;
-  Message curMsg;
 
-  for (it = _messages.begin(); it != _messages.end(); it++) {
-      curMsg = *it;
+  for (it = _messages.begin(); it != _messages.end(); ) {
+      const Message &curMsg = *it;
       if (curMsg.device == deviceName) {
-          _messages.erase(it);
-        }
+	it = _messages.erase(it);
+      }
+      else {
+	++it;
+      }
     }
 }
 
