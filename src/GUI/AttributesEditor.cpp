@@ -460,25 +460,6 @@ AttributesEditor::nameChanged()
 {
   BasicBox * box = _scene->getBox(_boxEdited);
 
-  //provisional : "<" ">" are forbidden, problem on .score writing.
-  if(_boxName->text().contains(">") || _boxName->text().contains("<")){
-      QString msg = "> and < characters are forbidden";
-      QMessageBox::warning(this, "", msg);
-      _boxName->setText(box->name());
-  }
-  if(_boxName->text().contains(" ")){//provisional : Spaces are replaced by _ (problem on .score writing/load).
-      QString newName,
-              name = _boxName->text();
-      QStringList splitList = name.split(" ");
-      for(QStringList::iterator it=splitList.begin() ; it!=splitList.end() ; it++){
-          newName.append(*it);
-          if(it!=splitList.end()-1)
-              newName.append("_");
-      }
-
-      _boxName->setText(newName);
-  }
-
   if (box != NULL) {
       box->setName(_boxName->text());
       _scene->update(box->getTopLeft().x(), box->getTopLeft().y(), box->width(), box->height() + 10);

@@ -55,7 +55,6 @@
 #include <string>
 #include <QInputDialog>
 #include "AbstractBox.hpp"
-#include "CurvesWidget.hpp"
 #include "BoxWidget.hpp"
 #include <QComboBox>
 #include <QGraphicsProxyWidget>
@@ -72,7 +71,6 @@ class AbstractComment;
 class AbstractTriggerPoint;
 class Comment;
 class TriggerPoint;
-class TextEdit;
 class Relation;
 class ConditionalRelation;
 class AbstractCurve;
@@ -860,7 +858,6 @@ class BasicBox : public QObject, public QGraphicsItem
     bool _playing;                                                              //!< State of playing.
     bool _recording;                                                            //!< State of recording.
     bool _mute;                                                                 //!< State of mute.    
-    TextEdit *_trgPntMsgEdit;                                                   //!< The trigger point editing dialog.
     Comment *_comment;                                                          //!< The box comment.
     QMap<BoxExtremity, TriggerPoint*> *_triggerPoints;                          //!< The trigger points.
     std::map < BoxExtremity, std::map < unsigned int, Relation* > > _relations; //!< The relations.

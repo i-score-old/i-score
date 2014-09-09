@@ -91,6 +91,9 @@ Maquette::init()
 
     // create a ScoreEngine instance
     // note : this is a temporary solution to test new Score framework easily
+    if (_engines)
+        delete _engines;
+        
     _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, &deviceCallback, jamomaFolder);
 
     //Creating rootBox as the mainScenario

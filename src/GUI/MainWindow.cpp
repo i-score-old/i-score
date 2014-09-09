@@ -40,13 +40,11 @@
  */
 #include "AttributesEditor.hpp"
 #include "BasicBox.hpp"
-#include "ChooseTemporalRelation.hpp"
 #include "Help.hpp"
 #include "LogarithmicSlider.hpp"
 #include "MainWindow.hpp"
 #include "MaquetteScene.hpp"
 #include "MaquetteView.hpp"
-#include "NetworkConfig.hpp"
 #include "ViewRelations.hpp"
 #include "HeaderPanelWidget.hpp"
 #include "NetworkTree.hpp"
@@ -125,7 +123,6 @@ MainWindow::MainWindow()
   _centralLayout->setVerticalSpacing(0);
   _centralWidget->setLayout(_centralLayout);
 
-  _networkConfig = new NetworkConfig(_scene, this);
   setCentralWidget(_centralWidget);
 
   // Creation of widgets
@@ -140,7 +137,6 @@ MainWindow::MainWindow()
   setCurrentFile("");
   setAcceptDrops(false);
 
-  connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, unsigned int)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, unsigned int)));
   connect(_view->verticalScrollBar(), SIGNAL(valueChanged(int)),
           _scene, SLOT(verticalScroll(int)));  //TimeBar is painted on MaquetteScene, so a vertical scroll has to move the timeBar.
   connect(_view->horizontalScrollBar(), SIGNAL(valueChanged(int)),
@@ -190,7 +186,6 @@ MainWindow::~MainWindow()
 //    delete _commentModeAct;
 
     delete _helpDialog;
-    delete _networkConfig;
 }
 
 void
@@ -483,12 +478,6 @@ MainWindow::selectMode(const InteractionMode &mode, const BoxCreationMode &boxMo
     selectMode();
 }
 
-void
-MainWindow::networkConfig()
-{
-  _networkConfig->exec();
-}
-
 bool
 MainWindow::documentModified() const
 {
@@ -543,10 +532,6 @@ MainWindow::createActions()
   _helpAct->setShortcut(QKeySequence::HelpContents);
   _helpAct->setStatusTip(tr("Show the application's Help"));
   connect(_helpAct, SIGNAL(triggered()), this, SLOT(help()));
-
-  _networkAct = new QAction(QIcon(":/resources/images/network.svg"), tr("&Network"), this);
-  _networkAct->setStatusTip(tr("Configure network preferences"));
-  connect(_networkAct, SIGNAL(triggered()), this, SLOT(networkConfig()));
 
   _zoomInAct = new QAction(tr("Zoom in"), this);
   _zoomInAct->setShortcut(QKeySequence::ZoomIn);
@@ -776,12 +761,6 @@ QString
 MainWindow::strippedName(const QString &fullFileName)
 {
   return QFileInfo(fullFileName).fileName();
-}
-
-void
-MainWindow::changeNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, unsigned int port)
-{
-  _networkConfig->setNetworkConfig(deviceName, pluginName, IP, port);
 }
 
 void

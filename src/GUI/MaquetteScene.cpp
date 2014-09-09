@@ -51,7 +51,6 @@
 #include <limits>
 #include "BasicBox.hpp"
 #include "ParentBox.hpp"
-#include "ChooseTemporalRelation.hpp"
 #include "MaquetteView.hpp"
 #include "MainWindow.hpp"
 #include "Relation.hpp"
@@ -62,9 +61,7 @@
 #include "AttributesEditor.hpp"
 #include "AbstractRelation.hpp"
 #include "AbstractComment.hpp"
-#include "TextEdit.hpp"
 #include "PlayingThread.hpp"
-#include "CurvesWidget.hpp"
 #include "TimeBarWidget.hpp"
 #include <QGraphicsProxyWidget>
 #include <QGraphicsLineItem>
@@ -169,8 +166,6 @@ void
 MaquetteScene::changeTimeOffset(unsigned int timeOffset)
 {
     stopAndGoToTimeOffset(timeOffset);
-    
-//    _view->repaint();
 }
 
 void
@@ -192,25 +187,6 @@ void
 MaquetteScene::setAttributes(AbstractBox *abstract)
 {
   _editor->setAttributes(abstract);
-}
-
-map<string, MyDevice>
-MaquetteScene::getNetworkDevices()
-{
-  return _maquette->getNetworkDevices();
-}
-
-void
-MaquetteScene::changeNetworkDevice(std::string deviceName, std::string pluginName, std::string IP, unsigned int port)
-{
-  _maquette->changeNetworkDevice(deviceName, pluginName, IP, port);
-  setModified(true);
-}
-
-void
-MaquetteScene::setNetworDeviceConfig(string deviceName, string pluginName, string IP, unsigned int port)
-{
-  emit(networkConfigChanged(deviceName, pluginName, IP, port));
 }
 
 bool

@@ -71,7 +71,7 @@ void Engine::initModular(const char* pathToTheJamomaFolder)
     
     // create application manager
     m_applicationManager = TTObject("ApplicationManager");
-    
+
     
     TTLogMessage("\n*** Creation of i-score application ***\n");
     ////////////////////////////////////////////////////////////////////////////////
@@ -206,6 +206,28 @@ Engine::~Engine()
     clearInterval();
     clearConditionedProcess();
     clearTimeCondition();
+    
+    TTValue out;
+    
+    TTLogMessage("\n*** Release protocols ***\n");
+    ///////////////////////////////////////////////
+    
+    // Get protocol names
+    m_applicationManager.get("protocolNames", out);
+    for (TTElementIter it = out.begin() ; it != out.end() ; it++) {
+        TTSymbol name = TTElement(*it);
+        m_applicationManager.send("ProtocolRelease", name, out);
+    }
+    
+    TTLogMessage("\n*** Release applications ***\n");
+    //////////////////////////////////////////////////
+    
+    // Get registered application names
+    m_applicationManager.get("applicationNames", out);
+    for (TTElementIter it = out.begin() ; it != out.end() ; it++) {
+        TTSymbol name = TTElement(*it);
+        m_applicationManager.send("ApplicationRelease", name, out);
+    }
 }
 
 TimeProcessId Engine::cacheTimeProcess(TTObject& timeProcess, TTAddress& anAddress, TTObject& subScenario)
@@ -1012,7 +1034,11 @@ std::string Engine::getBoxName(TimeProcessId boxId)
     
 	getTimeProcess(boxId).get("name", name);
     
-    return name.c_str();
+    // format name replacing '_' by '.'
+    TTString s_toParse = name.c_str();
+    std::replace(s_toParse.begin(), s_toParse.end(), '_', ' ');
+    
+    return s_toParse.c_str();
 }
 
 unsigned int Engine::getBoxVerticalPosition(TimeProcessId boxId)
@@ -1086,7 +1112,11 @@ void Engine::setBoxName(TimeProcessId boxId, string name)
     
     getTimeProcess(boxId).get("name", oldName);
     
-    newName = TTSymbol(name);
+    // format name replacing ' ' by '_'
+    TTString s_toParse = name;
+    std::replace(s_toParse.begin(), s_toParse.end(), ' ', '_');
+    
+    newName = TTSymbol(s_toParse);
     
     // filter repetitions
     if (newName != oldName) {
