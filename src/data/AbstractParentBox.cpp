@@ -45,18 +45,18 @@ using std::string;
 
 AbstractParentBox::AbstractParentBox(const QPointF &newTopLeft, const float &newLength, const float &newHeight,
                                      const string &newName, const QColor &newColor, unsigned int newID, unsigned int motherID) :
-  AbstractBox::AbstractBox(newTopLeft, newLength, newHeight, newName, newColor, newID, motherID)
+  AbstractBox(newTopLeft, newLength, newHeight, newName, newColor, newID, motherID)
 {
 }
 
 AbstractParentBox::AbstractParentBox(const AbstractParentBox &other) :
-  AbstractBox::AbstractBox(other._topLeft, other._width, other._height, other._name, other._color, other._ID, other._motherID,
+  AbstractBox(other._topLeft, other._width, other._height, other._name, other._color, other._ID, other._motherID,
                            other._startMessages, other._endMessages)
 {
 }
 
 AbstractParentBox::AbstractParentBox(const AbstractBox &other) :
-  AbstractBox::AbstractBox(other.topLeft(), other.width(), other.height(), other.name(),
+  AbstractBox(other.topLeft(), other.width(), other.height(), other.name(),
                            other.color(), other.ID(), other.mother(),
                            other.startMessages(), other.endMessages())
 {

@@ -370,14 +370,14 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
                     float min = 100;
                     float div;
                     float rigidity = 2;
-                    float ratio = std::max(0.1, fabs(std::log(it->second.first)));
+                    float ratio = std::max<double>(0.1, fabs(std::log(it->second.first)));
 
                     if (mousePosY > it->second.first) { // mouse under : pow between 0 and 1
                         div = std::min((double)min, (double)std::max(fabs(_maxY), fabs(_minY)));
                         pow = std::max(1 - std::min((mousePosY - it->second.first)/(rigidity*ratio), min) / (double)div, 0.01);
                     }
                     else if (it->second.first > mousePosY) { // mouse above : pow between 1 and 6
-                        div = std::min((double)min, std::max(fabs(_maxY), fabs(_minY))) / 10;
+                        div = std::min<double>((double)min, std::max(fabs(_maxY), fabs(_minY))) / 10;
                         pow = 1 + std::min((it->second.first - mousePosY)/(rigidity*ratio), min) / div;
                     }
                     it->second = std::make_pair(it->second.first, pow);

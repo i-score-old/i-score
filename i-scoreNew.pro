@@ -10,34 +10,44 @@ DEFINES += __Types__ TT_NO_DSP
 ICON = resources/images/i-score.icns
 resources/translations = i-score_en.ts i-score_fr.ts
 
-
-QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -msse3 -std=c++11
-QMAKE_LFLAGS += -L/usr/local/lib/jamoma/lib -L/usr/local/lib/ -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
-
-contains(QMAKE_HOST.arch, 86) {
-        QMAKE_CXXFLAGS += -msse3
-}
-
 unix {
-INCLUDEPATH +=	/usr/local/jamoma/include
+    INCLUDEPATH += /usr/local/jamoma/include
+    QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -msse3 -std=c++11
+    QMAKE_LFLAGS += -L/usr/local/lib/jamoma/lib -L/usr/local/lib/ -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
 
-macx {
-QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
-QMAKE_CXXFLAGS += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET -stdlib=libc++
-QMAKE_LFLAGS   += -stdlib=libc++ -lc++
-}
+    LIBS += -L/usr/local/jamoma/lib -lJamomaFoundation -lJamomaDSP -lJamomaScore -lJamomaModular
+    LIBS += -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodeset -lgecodesupport
+  
+    contains(QMAKE_HOST.arch, 86){
+        QMAKE_CXXFLAGS += -msse3
+    }
 
-linux-clang{
+    macx{
+        QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
+        QMAKE_CXXFLAGS += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET -stdlib=libc++
+        QMAKE_LFLAGS   += -stdlib=libc++ -lc++
+    }
+
+    linux-clang{
 	QMAKE_CXXFLAGS += -stdlib=libc++
 	QMAKE_LFLAGS += -stdlib=libc++
-}
-linux-clang:contains(QMAKE_HOST.arch, x86):{
+    }
+
+    linux-clang:contains(QMAKE_HOST.arch, x86):{
 	INCLUDEPATH += /usr/include/i386-linux-gnu/c++/4.8/
+    }
 }
 
-LIBS += -L/usr/local/jamoma/lib -lJamomaFoundation -lJamomaDSP -lJamomaScore -lJamomaModular
-LIBS += -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodeset -lgecodesupport
+win32 {
+    DEFINES += NOMINMAX
+    INCLUDEPATH += "C:/Program Files (x86)/GnuWin32/include" \
+                   "C:/Program Files (x86)/libxml2-2.7.8.win32/include" \
+                   "C:/Program Files (x86)/JamomaCore 0.6-dev/include" 
 
+                    
+    LIBS += "C:/Program Files (x86)/JamomaCore 0.6-dev/lib/JamomaFoundation.lib" \ 
+            "C:/Program Files (x86)/JamomaCore 0.6-dev/lib/JamomaScore.lib" \
+            "C:/Program Files (x86)/JamomaCore 0.6-dev/lib/JamomaModular.lib"
 }
 
 # Input
