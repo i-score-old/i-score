@@ -171,7 +171,7 @@ AttributesEditor::nameWidgets()
 void
 AttributesEditor::createWidgets()
 {
-  class CustomResizingWidget : public QWidget { QSize sizeHint() const override { return {520, 10}; } }; 
+  class CustomResizingWidget : public QWidget { QSize sizeHint() const override { return {340, 10}; } };
   _centralWidget = new CustomResizingWidget;
   _centralLayout = new QGridLayout;
   _centralLayout->setContentsMargins(LEFT_MARGIN, TOP_MARGIN, RIGHT_MARGIN, BOTTOM_MARGIN);
