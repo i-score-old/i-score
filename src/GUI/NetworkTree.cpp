@@ -79,7 +79,7 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 {
   class CustomHeaderView : public QHeaderView {
     using QHeaderView::QHeaderView;
-    QSize sizeHint() const override { return {500, 30}; }
+    QSize sizeHint() const override { return {500, 15}; }
   };
 
   this->setHeader(new CustomHeaderView(Qt::Horizontal));
