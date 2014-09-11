@@ -11,7 +11,7 @@ ICON = resources/images/i-score.icns
 resources/translations = i-score_en.ts i-score_fr.ts
 
 unix {
-    INCLUDEPATH += /usr/local/jamoma/include
+    INCLUDEPATH += /usr/local/jamoma/include /usr/include/libxml2
     QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -msse3 -std=c++11
     QMAKE_LFLAGS += -L/usr/local/lib/jamoma/lib -L/usr/local/lib/ -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
 
