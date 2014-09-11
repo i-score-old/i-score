@@ -65,7 +65,6 @@ enum { DeviceNode = QTreeWidgetItem::UserType + 1, NodeNoNamespaceType = QTreeWi
        MessageType = QTreeWidgetItem::UserType + 8, addDeviceNode = QTreeWidgetItem::UserType + 9};
 
 
-
 class NetworkTree : public QTreeWidget
 {
   Q_OBJECT

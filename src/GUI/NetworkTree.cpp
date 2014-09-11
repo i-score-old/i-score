@@ -74,9 +74,15 @@ QString NetworkTree::OSC_ADD_NODE_TEXT = QString("Add a node");
 QString NetworkTree::ADD_A_DEVICE_TEXT = QString("Add a device");
 
 unsigned int NetworkTree::TEXT_POINT_SIZE = 10;
-
+#include <QHeaderView>
 NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 {
+  class CustomHeaderView : public QHeaderView {
+    using QHeaderView::QHeaderView;
+    QSize sizeHint() const override { return {500, 30}; }
+  };
+
+  this->setHeader(new CustomHeaderView(Qt::Horizontal));
   init();
 
   setColumnCount(10);
