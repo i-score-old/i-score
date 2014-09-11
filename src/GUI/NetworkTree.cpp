@@ -1719,13 +1719,6 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
 }
 
 void
-NetworkTree::mouseReleaseEvent(QMouseEvent *event){
-    QTreeWidget::mouseReleaseEvent(event);
-    if(_noItemClicked)
-        unselectAll();
-}
-
-void
 NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
@@ -1818,6 +1811,10 @@ NetworkTree::keyPressEvent(QKeyEvent *event)
         for(auto& item : selectedItems()){
             unassignItem(item);
         }
+    }
+    else if(event->key() == Qt::Key_Escape)
+    {
+        unselectAll();
     }
 }
 
