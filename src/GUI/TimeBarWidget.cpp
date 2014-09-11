@@ -47,7 +47,7 @@
 
 class MaquetteScene;
 
-const float TimeBarWidget::TIME_BAR_HEIGHT = 15.;
+const float TimeBarWidget::TIME_BAR_HEIGHT = 21.;
 const float TimeBarWidget::LEFT_MARGIN = 0.5;
 static const int S_TO_MS = 1000;
 
