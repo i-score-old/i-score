@@ -6,7 +6,7 @@ QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
 QMAKE_CXXFLAGS += -O0 -fPIC -msse3
 
 # This variable specifies the #include directories which should be searched when compiling the project.
-INCLUDEPATH += headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2
+INCLUDEPATH += headers headers/GUI headers/data /usr/local/include/IScore /usr/local/include/libxml2
 
 # This variable contains a general set of flags that are passed to the linker.
 QMAKE_LFLAGS += -L/usr/local/lib/
@@ -40,6 +40,7 @@ macx-clang {
     QMAKE_LFLAGS += -L/usr/local/lib/ -L/usr/local/jamoma/lib -L/System/Library/Frameworks/ -L/Library/Frameworks/
 
     INCLUDEPATH += .
+    INCLUDEPATH += headers
     INCLUDEPATH += headers/GUI
     INCLUDEPATH += headers/data
     INCLUDEPATH += /Library/Frameworks/
@@ -93,7 +94,8 @@ headers/GUI/TimeBarWidget.hpp \
 headers/GUI/DeviceEdit.hpp \
 headers/GUI/HeaderPanelWidget.hpp \
 headers/GUI/ConditionalRelation.hpp \
-    headers/GUI/TriggerPointEdit.hpp
+    headers/GUI/TriggerPointEdit.hpp \
+headers/IScoreApplication.hpp
 
 SOURCES += src/main.cpp \
 src/data/Abstract.cpp \
@@ -131,4 +133,5 @@ src/GUI/TimeBarWidget.cpp \
 src/GUI/DeviceEdit.cpp \
 src/GUI/HeaderPanelWidget.cpp \
 src/GUI/ConditionalRelation.cpp \ 
-    src/GUI/TriggerPointEdit.cpp
+    src/GUI/TriggerPointEdit.cpp \
+src/IScoreApplication.cpp
