@@ -258,6 +258,7 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
 {    
   QWidget::mousePressEvent(event);
   _clicked = true;
+  _shiftModifierWasEnabled = (event->modifiers() == Qt::ShiftModifier);
 
   switch (event->modifiers()) {
       case Qt::ShiftModifier:
@@ -358,6 +359,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
     // Handle interactions
     if (_clicked) {
         QPointF relativePoint = relativeCoordinates(event->pos());
+
         switch (event->modifiers()) {
         case Qt::ShiftModifier: // POW
         {
@@ -447,7 +449,7 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event)
   QWidget::mouseReleaseEvent(event);
 
   if (_clicked) {
-      if (event->modifiers() == Qt::NoModifier) {
+      if (event->modifiers() == Qt::NoModifier && !_shiftModifierWasEnabled) {
           QPointF relativePoint = relativeCoordinates(event->pos());
 
           if(relativePoint.y() > _maxY){
@@ -492,6 +494,7 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event)
   _movingBreakpointX = -1.;
   _movingBreakpointY = -1.;
   _lastPointSelected = false;
+  _shiftModifierWasEnabled = false;
 
   update();
 }

@@ -185,6 +185,7 @@ class CurveWidget : public QWidget
     float _movingBreakpointY; //!< Moved break point y coordinate.
 
     bool _clicked;            //!< Clicked state.
+    bool _shiftModifierWasEnabled{};
     bool _unactive;
     bool _minYModified;
     bool _maxYModified;
