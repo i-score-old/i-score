@@ -97,7 +97,7 @@ const float BasicBox::EAR_HEIGHT = 30;
 const float BasicBox::GRIP_CIRCLE_SIZE = 5;
 unsigned int BasicBox::BOX_MARGIN = 25;
 const QString BasicBox::SCENARIO_MODE_TEXT = tr("Scenario");
-const QString BasicBox::DEFAULT_MODE_TEXT = "";
+const QString BasicBox::DEFAULT_MODE_TEXT = "Select content to edit";
 const QColor BasicBox::BOX_COLOR = QColor(60, 60, 60);
 const QColor BasicBox::TEXT_COLOR = QColor(0, 0, 0);
 
@@ -344,10 +344,10 @@ BasicBox::createWidget()
               "color: black;"
               "}"
 
-              "QComboBox::down-arrow {"
-              "image: url(:/resources/images/downArrow.png);"
-              "padding-right: 10px;"
-              "}"
+              //"QComboBox::down-arrow {"
+              //"image: url(:/resources/images/downArrow.png);"
+              //"padding-right: 10px;"
+              //"}"
 
               "QComboBox QAbstractItemView{"
               "background: gray;"
