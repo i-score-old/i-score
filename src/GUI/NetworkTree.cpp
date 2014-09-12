@@ -2083,12 +2083,6 @@ NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue)
     }
 }
 
-void
-NetworkTree::itemCollapsed()
-{
-  currentItem()->setExpanded(!currentItem()->isExpanded());
-}
-
 /***********************************************************************
 *                              Curves
 ***********************************************************************/

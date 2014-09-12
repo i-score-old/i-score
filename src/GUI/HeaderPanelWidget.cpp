@@ -31,7 +31,6 @@ HeaderPanelWidget::HeaderPanelWidget(QWidget *parent, MaquetteScene *scene)
 
 HeaderPanelWidget::~HeaderPanelWidget()
 {
-    delete _scene;
     delete _toolBar;
     delete _nameLabel;
     delete _playAction;

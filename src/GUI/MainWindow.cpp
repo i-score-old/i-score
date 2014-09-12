@@ -160,10 +160,6 @@ MainWindow::~MainWindow()
 
 #ifdef __APPLE__
     delete _menuBar;
-    delete _fileMenu;
-    delete _editMenu;
-	delete _viewMenu;
-    //  delete _helpMenu;
 #endif
 
     delete _newAct;
@@ -320,6 +316,35 @@ MainWindow::open()
       QCoreApplication::processEvents();//permet de fermer la fenêtre de dialogue avant de lancer le chargement.
       loadFile(fileName);      
     }
+}
+
+void
+MainWindow::open(QString s)
+{
+  if (_scene->documentModified()) {
+      int ret = QMessageBox::question(_view, tr("Document modified"),
+                                      tr("The document was modified.\n\nDo you want to save before opening another file ?"),
+                                      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                                      QMessageBox::Cancel);
+      switch (ret) {
+          case QMessageBox::Yes:
+            if (!saveAs()) {
+                return;
+              }
+            break;
+
+          case QMessageBox::No:
+            break;
+
+          case QMessageBox::Cancel:
+            return;
+
+            break;
+        }
+    }
+
+    loadFile(s);
+
 }
 
 bool

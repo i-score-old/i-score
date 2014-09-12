@@ -26,6 +26,7 @@ unix {
         QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
         QMAKE_CXXFLAGS += -mmacosx-version-min=$$QMAKE_MACOSX_DEPLOYMENT_TARGET -stdlib=libc++
         QMAKE_LFLAGS   += -stdlib=libc++ -lc++
+        QMAKE_INFO_PLIST = Info.plist
     }
 
     linux-clang{
@@ -87,7 +88,8 @@ headers/GUI/TimeBarWidget.hpp \
 headers/GUI/DeviceEdit.hpp \
 headers/GUI/HeaderPanelWidget.hpp \
 headers/GUI/ConditionalRelation.hpp \
-headers/GUI/TriggerPointEdit.hpp
+headers/GUI/TriggerPointEdit.hpp \
+    IScoreApplication.hpp
 
 SOURCES += src/main.cpp \
 src/data/Abstract.cpp \
@@ -125,4 +127,5 @@ src/GUI/TimeBarWidget.cpp \
 src/GUI/DeviceEdit.cpp \
 src/GUI/HeaderPanelWidget.cpp \
 src/GUI/ConditionalRelation.cpp \
-src/GUI/TriggerPointEdit.cpp
+src/GUI/TriggerPointEdit.cpp \
+    src/IScoreApplication.cpp

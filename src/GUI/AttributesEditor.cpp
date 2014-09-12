@@ -107,7 +107,6 @@ AttributesEditor::init()
 AttributesEditor::~AttributesEditor()
 {
   delete _centralWidget;
-  delete _centralLayout;
 }
 
 void

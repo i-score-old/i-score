@@ -122,6 +122,18 @@ class MainWindow : public QMainWindow
     inline HeaderPanelWidget *
     headerPanelWidget(){ return _headerPanelWidget; }
 
+  public slots:
+    /*!
+     * \brief Loads a file.
+     *
+     * \param fileName : the file to open
+     */
+    void loadFile(const QString &fileName);
+    /*!
+     * \brief Opens an existing file.
+     */
+    void open(QString);
+
   protected:
     /*!
      * \brief Redefinition of QMainWindow::closeEvent(QCloseEvent *event).
@@ -234,13 +246,6 @@ class MainWindow : public QMainWindow
      * \brief Writes persistent settings for our application, see QSettings doc.
      */
     void writeSettings();
-
-    /*!
-     * \brief Loads a file.
-     *
-     * \param fileName : the file to open
-     */
-    void loadFile(const QString &fileName);
 
     /*!
      * \brief Saves a file.

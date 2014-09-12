@@ -306,9 +306,22 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
           }
         if (!found) { //new breakpoint
             _abstract->_breakpoints[relativePoint.x()] = std::make_pair<float, float>(relativePoint.y(), 1.);
-            _clicked = false;
-            curveChanged();
-            update();
+            for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
+                if (fabs(it->first - relativePoint.x()) < 0.01) {
+                    found = true; //existing breakpoint
+                    _movingBreakpointX = it->first;
+                    _movingBreakpointY = it->second.first;
+                    _lastPowSave = it->second.second;
+                    map<float, pair<float, float> >::iterator it;
+                    if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
+                        _abstract->_breakpoints.erase(it);
+                    }
+                    _savedMap = _abstract->_breakpoints;
+                    curveChanged();
+                    update();
+                    break;
+                  }
+              }
           }
         break;
       }

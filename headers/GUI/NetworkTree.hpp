@@ -553,7 +553,6 @@ class NetworkTree : public QTreeWidget
     void refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes = true);
     void refreshCurrentItemNamespace();
     void deleteCurrentItemNamespace();
-    void itemCollapsed();
     void clickInNetworkTree(QTreeWidgetItem *item, int column);
     void valueChanged(QTreeWidgetItem* item, int column);
     void changeStartValue(QTreeWidgetItem* item, QString newValue);    
