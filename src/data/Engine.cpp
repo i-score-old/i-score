@@ -2277,6 +2277,9 @@ void Engine::removeNetworkDevice(const std::string & deviceName)
         
         // unregister the application to the protocol
         aProtocol.send("ApplicationUnregister", applicationName, out);
+        
+        // realease the application
+        m_applicationManager.send("ApplicationRelease", applicationName, out);
     }
 }
 
@@ -2597,6 +2600,10 @@ Engine::rebuildNetworkNamespace(const string &deviceName, const string &address)
         // OSC case : reload the namespace from the last project file if exist
         else if (protocolName == TTSymbol("OSC")) {
             
+            // mute learning when refreshing
+            TTBoolean memoLearn = getDeviceLearn(deviceName);
+            setDeviceLearn(deviceName, NO);
+            
             if (m_namespaceFilesPath.find(deviceName) == m_namespaceFilesPath.end())
                 return 1;
             
@@ -2608,6 +2615,9 @@ Engine::rebuildNetworkNamespace(const string &deviceName, const string &address)
             // read the file to setup TTModularApplications
             aXmlHandler.set(kTTSym_object, anApplication);
             aXmlHandler.send(kTTSym_Read, namespaceFilePath, none);
+            
+            // demute learning after refreshing
+            setDeviceLearn(deviceName, memoLearn);
             
             return 0;
         }

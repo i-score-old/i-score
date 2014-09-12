@@ -293,7 +293,7 @@ BoxWidget::addToComboBox(const QString address)
   if (_comboBox->findText(address, Qt::MatchExactly) == -1) {
       _comboBox->addItem(address);      
 
-      //push down the "scenario" item
+      //push down the "scenario" item     
       _comboBox->removeItem(_comboBox->findText(BasicBox::SCENARIO_MODE_TEXT, Qt::MatchExactly));
       _comboBox->addItem(BasicBox::SCENARIO_MODE_TEXT);
     }
