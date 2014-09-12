@@ -2277,6 +2277,9 @@ void Engine::removeNetworkDevice(const std::string & deviceName)
         
         // unregister the application to the protocol
         aProtocol.send("ApplicationUnregister", applicationName, out);
+        
+        // realease the application
+        m_applicationManager.send("ApplicationRelease", applicationName, out);
     }
 }
 
