@@ -51,7 +51,7 @@
 #include <QToolTip>
 #include <QGraphicsOpacityEffect>
 #include <MaquetteScene.hpp>
-
+#include <QDebug>
 using std::map;
 using std::string;
 using std::vector;
@@ -294,8 +294,13 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
                 _movingBreakpointX = it->first;
                 _movingBreakpointY = it->second.first;
                 _lastPowSave = it->second.second;
-                curveChanged();
-                update();
+                map<float, pair<float, float> >::iterator it;
+                if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
+                    _abstract->_breakpoints.erase(it);
+                }
+                _savedMap = _abstract->_breakpoints;
+                //curveChanged();
+                //update();
                 break;
               }
           }
@@ -400,14 +405,17 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 
         case Qt::NoModifier: //move
         {
-            map<float, pair<float, float> >::iterator it;
-            if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
-                _abstract->_breakpoints.erase(it);
-            }
             _movingBreakpointX = relativePoint.x();
             _movingBreakpointY = relativePoint.y();
+
+            _abstract->_breakpoints = _savedMap;
+
+            _abstract->_breakpoints[static_cast<qreal>(relativePoint.x())] = std::make_pair<float, float>(static_cast<qreal>(_movingBreakpointY),
+                                                                                                          static_cast<qreal>(_lastPowSave));
             curveChanged();
             update();
+
+
             break;
         }
 
@@ -439,6 +447,8 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
             break;
         }
         }
+
+        _previousPoint = relativePoint;
     }
     update();
 }
@@ -452,32 +462,39 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event)
       if (event->modifiers() == Qt::NoModifier && !_shiftModifierWasEnabled) {
           QPointF relativePoint = relativeCoordinates(event->pos());
 
-          if(relativePoint.y() > _maxY){
-              if(_maxRangeBoundLocked){
+          if(relativePoint.y() > _maxY)
+          {
+              if(_maxRangeBoundLocked)
+              {
                   _movingBreakpointX = relativePoint.x();
                   _movingBreakpointY = _maxY;
 
                   curveChanged();
                   update();
               }
-              else{
+              else
+              {
                   Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (high range clipMode)").toStdString(), INDICATION_LEVEL);
               }
 
           }
           else
-              if(relativePoint.y() < _minY){
-                  if(_minRangeBoundLocked){
+          {
+              if(relativePoint.y() < _minY)
+              {
+                  if(_minRangeBoundLocked)
+                  {
                       _movingBreakpointX = relativePoint.x();
                       _movingBreakpointY = _minY;
                       curveChanged();
                       update();
                   }
-                  else{
+                  else
+                  {
                       Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (low range clipMode)").toStdString(), INDICATION_LEVEL);
                   }
               }
-
+          }
           map<float, pair<float, float> >::iterator it;
 
           if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
