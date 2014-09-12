@@ -3,7 +3,7 @@ TARGET = i-score
 
 QT += core network xml svg printsupport
 
-INCLUDEPATH += headers/GUI headers/data
+INCLUDEPATH += headers headers/GUI headers/data
 RESOURCES += i-score.qrc
 DEFINES += __Types__ TT_NO_DSP
 
@@ -89,7 +89,7 @@ headers/GUI/DeviceEdit.hpp \
 headers/GUI/HeaderPanelWidget.hpp \
 headers/GUI/ConditionalRelation.hpp \
 headers/GUI/TriggerPointEdit.hpp \
-    IScoreApplication.hpp
+headers/IScoreApplication.hpp
 
 SOURCES += src/main.cpp \
 src/data/Abstract.cpp \

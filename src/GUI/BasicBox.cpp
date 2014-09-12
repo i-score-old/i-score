@@ -330,13 +330,14 @@ BasicBox::createWidget()
   _comboBox->setFont(font);
   _comboBox->setStyleSheet(
               "QComboBox {"
-              "color: lightgray;"
-              "border: none;"
-              "border-radius: none;"
-              "background-color: transparent;"
-              "selection-color: black;"
+              "color: black;"
+//              "border: none;"
+//              "border-radius: none;"
+//              "background-color: red;"
+//              "selection-color: black;"
               "selection-background-color: gray;"
               "}"
+//        "QComboBox:editable { background: red; }"
 
               "QComboBox::drop-down {"
               "border-color: gray;"
@@ -353,6 +354,9 @@ BasicBox::createWidget()
               "}"
               );
 
+  QPalette p = _comboBox->palette();
+  p.setColor(QPalette::Window, Qt::transparent);
+  _comboBox->setPalette(p);
   _comboBoxProxy = new QGraphicsProxyWidget(this);
   _comboBoxProxy->setWidget(_comboBox);
   _comboBoxProxy->setPalette(palette);

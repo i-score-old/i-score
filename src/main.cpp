@@ -30,7 +30,7 @@
 #include <iostream>
 #include <QTranslator>
 
-#include "IScoreApplication.hpp"
+#include <IScoreApplication.hpp>
 
 int
 main(int argc, char *argv[])
