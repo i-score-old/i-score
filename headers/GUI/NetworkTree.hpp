@@ -255,7 +255,7 @@ class NetworkTree : public QTreeWidget
      *
      * \param expandedItems : items to expand in the tree
      */
-    void expandItems(QList<QTreeWidgetItem*> expandedItems);
+    void expandItems(QList<QTreeWidgetItem *> &expandedItems);
 
     /*!
      * \brief Loads assigned items and messages' value requesting engine.

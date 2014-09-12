@@ -921,6 +921,13 @@ NetworkTree::displayBoxContent(AbstractBox *abBox)
 
   //Expand items
   QList<QTreeWidgetItem *> expandedItems = abBox->networkTreeExpandedItems();
+  QList<QTreeWidgetItem *> selectedItems = abBox->getNetworkTreeSelectedItems();
+
+  if(selectedItems.isEmpty() && expandedItems.isEmpty())
+  {
+    expandedItems = _expandedItems;
+    abBox->setNetworkTreeExpandedItems(expandedItems);;
+  }
   if(abBox->justCreated()){ //Items are not collapsed at each new box. We save the tree current state.
       expandedItems = _expandedItems;
       abBox->setNetworkTreeExpandedItems(expandedItems);
@@ -928,7 +935,7 @@ NetworkTree::displayBoxContent(AbstractBox *abBox)
   else
       expandItems(expandedItems);
 
-  QList<QTreeWidgetItem *> selectedItems = abBox->getNetworkTreeSelectedItems();
+
   for(int i=0; i<selectedItems.size(); i++)
       setItemSelected(selectedItems.at(i),true);
 }
@@ -1051,16 +1058,12 @@ NetworkTree::brothersPartiallyChecked(QTreeWidgetItem *item, int column)
 }
 
 void
-NetworkTree::expandItems(QList<QTreeWidgetItem*> expandedItems)
+NetworkTree::expandItems(QList<QTreeWidgetItem*>& expandedItems)
 {
-  QList<QTreeWidgetItem *>::iterator it;
-  QTreeWidgetItem *curItem;
-
   collapseAll();
-  for (it = expandedItems.begin(); it != expandedItems.end(); ++it) {
-      curItem = *it;
-      expandItem(curItem);
-    }
+
+  for(QTreeWidgetItem* item : expandedItems)
+    expandItem(item);
 }
 
 void
