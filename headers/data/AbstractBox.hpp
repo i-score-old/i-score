@@ -252,7 +252,7 @@ class AbstractBox : public Abstract
     inline void
     setNetworkTreeExpandedItems(QList<QTreeWidgetItem*> &items)
     {
-        _justCreated = false;
+      _justCreated = false;
       _networkTreeExpandedItems.clear();
       _networkTreeExpandedItems = items;
     }
@@ -264,7 +264,7 @@ class AbstractBox : public Abstract
     inline void
     addToNetworkTreeExpandedItems(QTreeWidgetItem *item)
     {
-        _justCreated = false;
+      _justCreated = false;
       if (!_networkTreeExpandedItems.contains(item)) {
           _networkTreeExpandedItems << item;
         }
@@ -289,7 +289,7 @@ class AbstractBox : public Abstract
     inline void
     removeFromNetworkTreeExpandedItems(QTreeWidgetItem *item)
     {
-        _justCreated = false;
+      _justCreated = false;
       _networkTreeExpandedItems.removeAt(_networkTreeExpandedItems.indexOf(item));
     }
     inline void

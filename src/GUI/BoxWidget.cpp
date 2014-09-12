@@ -88,7 +88,6 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
   update();
 
   _box = box;
-  _comboBox = new QComboBox;
 
   _stackedLayout = new QStackedLayout;
   _stackedLayout->setStackingMode(QStackedLayout::StackAll);  
