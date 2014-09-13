@@ -29,7 +29,7 @@ class TimeBarWidget : public QWidget {
     MaquetteScene *_scene;
     QRect _rect;
     QPixmap _pixmap;
-    QFont _font{"helvetica", 11};
+    QFont _font{"helvetica", 9};
 
     QPainter _painter;
 

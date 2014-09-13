@@ -43,7 +43,7 @@
 #include "MaquetteScene.hpp"
 #include "BasicBox.hpp"
 #include "Comment.hpp"
-#include "TextEdit.hpp"
+
 
 #include <iostream>
 #include <math.h>

@@ -47,7 +47,7 @@
 #include "AbstractTriggerPoint.hpp"
 #include "Comment.hpp"
 #include "TriggerPoint.hpp"
-#include "TextEdit.hpp"
+
 #include "MainWindow.hpp"
 #include "Relation.hpp"
 #include "ConditionalRelation.hpp"
@@ -97,7 +97,7 @@ const float BasicBox::EAR_HEIGHT = 30;
 const float BasicBox::GRIP_CIRCLE_SIZE = 5;
 unsigned int BasicBox::BOX_MARGIN = 25;
 const QString BasicBox::SCENARIO_MODE_TEXT = tr("Scenario");
-const QString BasicBox::DEFAULT_MODE_TEXT = "";
+const QString BasicBox::DEFAULT_MODE_TEXT = "Select content to edit";
 const QColor BasicBox::BOX_COLOR = QColor(60, 60, 60);
 const QColor BasicBox::TEXT_COLOR = QColor(0, 0, 0);
 
@@ -317,7 +317,7 @@ BasicBox::createWidget()
   _curveProxy->setFlag(QGraphicsItem::ItemIsMovable, false);
   _curveProxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
   _curveProxy->setVisible(true);
-  _curveProxy->setAcceptsHoverEvents(true);
+  _curveProxy->setAcceptHoverEvents(true);
   _curveProxy->setWidget(_boxWidget);
   _curveProxy->setPalette(palette);
 
@@ -325,35 +325,38 @@ BasicBox::createWidget()
   _comboBox = new QComboBox;
   _comboBox->view()->setTextElideMode(Qt::ElideMiddle);
   _comboBox->setInsertPolicy(QComboBox::InsertAtTop);
-//  _comboBox->setBaseSize(_comboBox->width(), COMBOBOX_HEIGHT);
   QFont font;
   font.setPointSize(10);
   _comboBox->setFont(font);
   _comboBox->setStyleSheet(
               "QComboBox {"
-              "color: lightgray;"
-              "border: none;"
-              "border-radius: none;"
-              "background-color: transparent;"
-              "selection-color: black;"
+              "color: black;"
+//              "border: none;"
+//              "border-radius: none;"
+//              "background-color: red;"
+//              "selection-color: black;"
               "selection-background-color: gray;"
               "}"
+//        "QComboBox:editable { background: red; }"
 
               "QComboBox::drop-down {"
               "border-color: gray;"
               "color: black;"
               "}"
 
-              "QComboBox::down-arrow {"
-              "image: url(:/resources/images/downArrow.png);"
-              "padding-right: 10px;"
-              "}"
+              //"QComboBox::down-arrow {"
+              //"image: url(:/resources/images/downArrow.png);"
+              //"padding-right: 10px;"
+              //"}"
 
               "QComboBox QAbstractItemView{"
               "background: gray;"
               "}"
               );
 
+  QPalette p = _comboBox->palette();
+  p.setColor(QPalette::Window, Qt::transparent);
+  _comboBox->setPalette(p);
   _comboBoxProxy = new QGraphicsProxyWidget(this);
   _comboBoxProxy->setWidget(_comboBox);
   _comboBoxProxy->setPalette(palette);
@@ -441,7 +444,7 @@ BasicBox::init()
   setFlag(QGraphicsItem::ItemIsFocusable, true);
   setFlag(ItemSendsGeometryChanges, true);
   setVisible(true);
-  setAcceptsHoverEvents(true);
+  setAcceptHoverEvents(true);
   _currentZvalue = 0;
   setZValue(_currentZvalue);
   updateFlexibility();
@@ -1527,6 +1530,7 @@ BasicBox::lower(bool state)
   updateRelations(BOX_END);
 }
 
+#include <QDebug>
 void
 BasicBox::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {

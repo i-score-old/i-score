@@ -356,23 +356,8 @@ class MaquetteScene : public QGraphicsScene
      */
     void setAttributes(AbstractBox *abBox);
 
-    /*!
-     * \brief Gets a set of the available network devices.
-     *
-     * \return a set of the available network devices
-     */
-    std::map<std::string, MyDevice> getNetworkDevices();
 
-    /*!
-     * \brief Changes the network configuration.
-     *
-     * \param deviceName : device to be modified
-     * \param pluginName : the new plugin for device
-     * \param IP : the new IP for device
-     * \param port : the new port for device
-     */
-    void changeNetworkDevice(string deviceName, string pluginName, string IP, unsigned int port);
-    void setNetworDeviceConfig(string deviceName, string pluginName, string IP, unsigned int port);
+
 
     /*!
      * \brief Sends a specific message with current device.
@@ -639,7 +624,6 @@ class MaquetteScene : public QGraphicsScene
   signals:
     void stopPlaying();
     void accelerationValueChanged(double value);
-    void networkConfigChanged(std::string deviceName, std::string pluginName, std::string IP, unsigned int port);
     void playModeChanged();
     void updateRecordingBoxes();
 

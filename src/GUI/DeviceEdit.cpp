@@ -124,7 +124,6 @@ DeviceEdit::~DeviceEdit()
     delete _deviceNameLabel;
     delete _nameEdit;
 
-    delete _devicesLabel;
     delete _protocolsLabel;
     delete _portOutputLabel;
     delete _portInputLabel;
@@ -261,7 +260,7 @@ DeviceEdit::setChanged()
 void
 DeviceEdit::updateNetworkConfiguration()
 {
-    setModal(false);
+    //setModal(false);
     if(_newDevice){
         string          name = _nameEdit->text().toStdString(),
                         ip   = _localHostBox->text().toStdString(),
@@ -319,6 +318,7 @@ DeviceEdit::updateNetworkConfiguration()
         }
     }
     accept();
+    close();
 
     _changed = false;
     _nameChanged = false;

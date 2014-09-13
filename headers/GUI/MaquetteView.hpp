@@ -75,14 +75,14 @@ class MaquetteView : public QGraphicsView
     void updateTimeOffsetView();
 
     //! \brief Handles gradient width, indicates if the scenario (box1) has start messages or not.
-    static constexpr float GRADIENT_WIDTH = 50;
+    const float GRADIENT_WIDTH = 50;
 
     QList<TriggerPoint *> *triggersQueueList();
     inline MainWindow *
     mainWindow(){ return _mainWindow; }
     void triggerShortcut(int shortcut);
     void emitPlayModeChanged();
-    static const QColor BACKGROUND_COLOR;
+    const QColor BACKGROUND_COLOR{60, 60, 60};
 
   signals:
     void zoomChanged(float newValue);

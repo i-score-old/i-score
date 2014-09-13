@@ -92,7 +92,7 @@ ConditionalRelation::init (){
 
     _mousePressed = false;
 
-    setAcceptsHoverEvents(true);
+    setAcceptHoverEvents(true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
     setFlag(QGraphicsItem::ItemIsMovable, false); /// \todo Implement the relation move on mousePressed && moving

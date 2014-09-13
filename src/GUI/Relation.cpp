@@ -105,7 +105,7 @@ Relation::init()
   setFlag(QGraphicsItem::ItemIsFocusable, true);
 
   setVisible(true);
-  setAcceptsHoverEvents(true);
+  setAcceptHoverEvents(true);
   setZValue(1);
   _leftHandleSelected = false;
   _rightHandleSelected = false;

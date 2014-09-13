@@ -39,7 +39,10 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 #include <iostream>
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #include <stdlib.h>
 
 #include "Maquette.hpp"

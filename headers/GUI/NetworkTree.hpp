@@ -65,7 +65,6 @@ enum { DeviceNode = QTreeWidgetItem::UserType + 1, NodeNoNamespaceType = QTreeWi
        MessageType = QTreeWidgetItem::UserType + 8, addDeviceNode = QTreeWidgetItem::UserType + 9};
 
 
-
 class NetworkTree : public QTreeWidget
 {
   Q_OBJECT
@@ -256,7 +255,7 @@ class NetworkTree : public QTreeWidget
      *
      * \param expandedItems : items to expand in the tree
      */
-    void expandItems(QList<QTreeWidgetItem*> expandedItems);
+    void expandItems(QList<QTreeWidgetItem *> &expandedItems);
 
     /*!
      * \brief Loads assigned items and messages' value requesting engine.
@@ -388,7 +387,6 @@ class NetworkTree : public QTreeWidget
     virtual void keyReleaseEvent(QKeyEvent *event);
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
-    virtual void mouseReleaseEvent(QMouseEvent *event);
 
     static int NAME_COLUMN;
     static int VALUE_COLUMN;
@@ -555,7 +553,6 @@ class NetworkTree : public QTreeWidget
     void refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes = true);
     void refreshCurrentItemNamespace();
     void deleteCurrentItemNamespace();
-    void itemCollapsed();
     void clickInNetworkTree(QTreeWidgetItem *item, int column);
     void valueChanged(QTreeWidgetItem* item, int column);
     void changeStartValue(QTreeWidgetItem* item, QString newValue);    

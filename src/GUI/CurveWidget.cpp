@@ -51,7 +51,7 @@
 #include <QToolTip>
 #include <QGraphicsOpacityEffect>
 #include <MaquetteScene.hpp>
-
+#include <QDebug>
 using std::map;
 using std::string;
 using std::vector;
@@ -258,6 +258,7 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
 {    
   QWidget::mousePressEvent(event);
   _clicked = true;
+  _shiftModifierWasEnabled = (event->modifiers() == Qt::ShiftModifier);
 
   switch (event->modifiers()) {
       case Qt::ShiftModifier:
@@ -293,16 +294,34 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
                 _movingBreakpointX = it->first;
                 _movingBreakpointY = it->second.first;
                 _lastPowSave = it->second.second;
-                curveChanged();
-                update();
+                map<float, pair<float, float> >::iterator it;
+                if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
+                    _abstract->_breakpoints.erase(it);
+                }
+                _savedMap = _abstract->_breakpoints;
+                //curveChanged();
+                //update();
                 break;
               }
           }
         if (!found) { //new breakpoint
             _abstract->_breakpoints[relativePoint.x()] = std::make_pair<float, float>(relativePoint.y(), 1.);
-            _clicked = false;
-            curveChanged();
-            update();
+            for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
+                if (fabs(it->first - relativePoint.x()) < 0.01) {
+                    found = true; //existing breakpoint
+                    _movingBreakpointX = it->first;
+                    _movingBreakpointY = it->second.first;
+                    _lastPowSave = it->second.second;
+                    map<float, pair<float, float> >::iterator it;
+                    if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
+                        _abstract->_breakpoints.erase(it);
+                    }
+                    _savedMap = _abstract->_breakpoints;
+                    curveChanged();
+                    update();
+                    break;
+                  }
+              }
           }
         break;
       }
@@ -358,6 +377,7 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
     // Handle interactions
     if (_clicked) {
         QPointF relativePoint = relativeCoordinates(event->pos());
+
         switch (event->modifiers()) {
         case Qt::ShiftModifier: // POW
         {
@@ -370,14 +390,14 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
                     float min = 100;
                     float div;
                     float rigidity = 2;
-                    float ratio = std::max(0.1, fabs(std::log(it->second.first)));
+                    float ratio = std::max<double>(0.1, fabs(std::log(it->second.first)));
 
                     if (mousePosY > it->second.first) { // mouse under : pow between 0 and 1
                         div = std::min((double)min, (double)std::max(fabs(_maxY), fabs(_minY)));
                         pow = std::max(1 - std::min((mousePosY - it->second.first)/(rigidity*ratio), min) / (double)div, 0.01);
                     }
                     else if (it->second.first > mousePosY) { // mouse above : pow between 1 and 6
-                        div = std::min((double)min, std::max(fabs(_maxY), fabs(_minY))) / 10;
+                        div = std::min<double>((double)min, std::max(fabs(_maxY), fabs(_minY))) / 10;
                         pow = 1 + std::min((it->second.first - mousePosY)/(rigidity*ratio), min) / div;
                     }
                     it->second = std::make_pair(it->second.first, pow);
@@ -398,14 +418,17 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 
         case Qt::NoModifier: //move
         {
-            map<float, pair<float, float> >::iterator it;
-            if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
-                _abstract->_breakpoints.erase(it);
-            }
             _movingBreakpointX = relativePoint.x();
             _movingBreakpointY = relativePoint.y();
+
+            _abstract->_breakpoints = _savedMap;
+
+            _abstract->_breakpoints[static_cast<qreal>(relativePoint.x())] = std::make_pair<float, float>(static_cast<qreal>(_movingBreakpointY),
+                                                                                                          static_cast<qreal>(_lastPowSave));
             curveChanged();
             update();
+
+
             break;
         }
 
@@ -437,6 +460,8 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
             break;
         }
         }
+
+        _previousPoint = relativePoint;
     }
     update();
 }
@@ -447,35 +472,42 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event)
   QWidget::mouseReleaseEvent(event);
 
   if (_clicked) {
-      if (event->modifiers() == Qt::NoModifier) {
+      if (event->modifiers() == Qt::NoModifier && !_shiftModifierWasEnabled) {
           QPointF relativePoint = relativeCoordinates(event->pos());
 
-          if(relativePoint.y() > _maxY){
-              if(_maxRangeBoundLocked){
+          if(relativePoint.y() > _maxY)
+          {
+              if(_maxRangeBoundLocked)
+              {
                   _movingBreakpointX = relativePoint.x();
                   _movingBreakpointY = _maxY;
 
                   curveChanged();
                   update();
               }
-              else{
+              else
+              {
                   Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (high range clipMode)").toStdString(), INDICATION_LEVEL);
               }
 
           }
           else
-              if(relativePoint.y() < _minY){
-                  if(_minRangeBoundLocked){
+          {
+              if(relativePoint.y() < _minY)
+              {
+                  if(_minRangeBoundLocked)
+                  {
                       _movingBreakpointX = relativePoint.x();
                       _movingBreakpointY = _minY;
                       curveChanged();
                       update();
                   }
-                  else{
+                  else
+                  {
                       Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (low range clipMode)").toStdString(), INDICATION_LEVEL);
                   }
               }
-
+          }
           map<float, pair<float, float> >::iterator it;
 
           if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
@@ -492,6 +524,7 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event)
   _movingBreakpointX = -1.;
   _movingBreakpointY = -1.;
   _lastPointSelected = false;
+  _shiftModifierWasEnabled = false;
 
   update();
 }

@@ -80,10 +80,8 @@
 		466B9E8A19338DCC00EC8460 /* BoxContextMenu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BoxContextMenu.cpp; sourceTree = "<group>"; };
 		466B9E8B19338DCC00EC8460 /* BoxCurveEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BoxCurveEdit.cpp; sourceTree = "<group>"; };
 		466B9E8C19338DCC00EC8460 /* BoxWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BoxWidget.cpp; sourceTree = "<group>"; };
-		466B9E8D19338DCC00EC8460 /* ChooseTemporalRelation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChooseTemporalRelation.cpp; sourceTree = "<group>"; };
 		466B9E8E19338DCC00EC8460 /* Comment.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Comment.cpp; sourceTree = "<group>"; };
 		466B9E8F19338DCC00EC8460 /* ConditionalRelation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ConditionalRelation.cpp; sourceTree = "<group>"; };
-		466B9E9019338DCC00EC8460 /* CurvesWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CurvesWidget.cpp; sourceTree = "<group>"; };
 		466B9E9119338DCC00EC8460 /* CurveWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CurveWidget.cpp; sourceTree = "<group>"; };
 		466B9E9219338DCC00EC8460 /* DeviceEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DeviceEdit.cpp; sourceTree = "<group>"; };
 		466B9E9319338DCC00EC8460 /* HeaderPanelWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = HeaderPanelWidget.cpp; sourceTree = "<group>"; };
@@ -94,18 +92,13 @@
 		466B9E9819338DCC00EC8460 /* MaquetteScene.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MaquetteScene.cpp; sourceTree = "<group>"; };
 		466B9E9919338DCC00EC8460 /* MaquetteView.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MaquetteView.cpp; sourceTree = "<group>"; };
 		466B9E9A19338DCC00EC8460 /* MaquetteWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MaquetteWidget.cpp; sourceTree = "<group>"; };
-		466B9E9B19338DCC00EC8460 /* NetworkConfig.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkConfig.cpp; sourceTree = "<group>"; };
-		466B9E9C19338DCC00EC8460 /* NetworkMessagesEditor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkMessagesEditor.cpp; sourceTree = "<group>"; };
 		466B9E9D19338DCC00EC8460 /* NetworkTree.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkTree.cpp; sourceTree = "<group>"; };
 		466B9E9E19338DCC00EC8460 /* ParentBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParentBox.cpp; sourceTree = "<group>"; };
 		466B9E9F19338DCC00EC8460 /* ParentBoxContextMenu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParentBoxContextMenu.cpp; sourceTree = "<group>"; };
 		466B9EA019338DCC00EC8460 /* PlayingThread.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PlayingThread.cpp; sourceTree = "<group>"; };
 		466B9EA119338DCC00EC8460 /* Relation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Relation.cpp; sourceTree = "<group>"; };
 		466B9EA219338DCC00EC8460 /* RelationEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RelationEdit.cpp; sourceTree = "<group>"; };
-		466B9EA319338DCC00EC8460 /* TextEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TextEdit.cpp; sourceTree = "<group>"; };
 		466B9EA419338DCC00EC8460 /* TimeBarWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TimeBarWidget.cpp; sourceTree = "<group>"; };
-		466B9EA519338DCC00EC8460 /* TreeMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TreeMap.cpp; sourceTree = "<group>"; };
-		466B9EA619338DCC00EC8460 /* TreeMapElement.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TreeMapElement.cpp; sourceTree = "<group>"; };
 		466B9EA719338DCC00EC8460 /* TriggerPoint.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TriggerPoint.cpp; sourceTree = "<group>"; };
 		466B9EA819338DCC00EC8460 /* ViewRelations.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ViewRelations.cpp; sourceTree = "<group>"; };
 		466B9EA919338DCC00EC8460 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -236,10 +229,8 @@
 				466B9E8A19338DCC00EC8460 /* BoxContextMenu.cpp */,
 				466B9E8B19338DCC00EC8460 /* BoxCurveEdit.cpp */,
 				466B9E8C19338DCC00EC8460 /* BoxWidget.cpp */,
-				466B9E8D19338DCC00EC8460 /* ChooseTemporalRelation.cpp */,
 				466B9E8E19338DCC00EC8460 /* Comment.cpp */,
 				466B9E8F19338DCC00EC8460 /* ConditionalRelation.cpp */,
-				466B9E9019338DCC00EC8460 /* CurvesWidget.cpp */,
 				466B9E9119338DCC00EC8460 /* CurveWidget.cpp */,
 				466B9E9219338DCC00EC8460 /* DeviceEdit.cpp */,
 				466B9E9319338DCC00EC8460 /* HeaderPanelWidget.cpp */,
@@ -250,18 +241,13 @@
 				466B9E9819338DCC00EC8460 /* MaquetteScene.cpp */,
 				466B9E9919338DCC00EC8460 /* MaquetteView.cpp */,
 				466B9E9A19338DCC00EC8460 /* MaquetteWidget.cpp */,
-				466B9E9B19338DCC00EC8460 /* NetworkConfig.cpp */,
-				466B9E9C19338DCC00EC8460 /* NetworkMessagesEditor.cpp */,
 				466B9E9D19338DCC00EC8460 /* NetworkTree.cpp */,
 				466B9E9E19338DCC00EC8460 /* ParentBox.cpp */,
 				466B9E9F19338DCC00EC8460 /* ParentBoxContextMenu.cpp */,
 				466B9EA019338DCC00EC8460 /* PlayingThread.cpp */,
 				466B9EA119338DCC00EC8460 /* Relation.cpp */,
 				466B9EA219338DCC00EC8460 /* RelationEdit.cpp */,
-				466B9EA319338DCC00EC8460 /* TextEdit.cpp */,
 				466B9EA419338DCC00EC8460 /* TimeBarWidget.cpp */,
-				466B9EA519338DCC00EC8460 /* TreeMap.cpp */,
-				466B9EA619338DCC00EC8460 /* TreeMapElement.cpp */,
 				466B9EA719338DCC00EC8460 /* TriggerPoint.cpp */,
 				466B9EA819338DCC00EC8460 /* ViewRelations.cpp */,
 			);

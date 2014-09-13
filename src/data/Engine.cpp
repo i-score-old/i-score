@@ -2277,6 +2277,9 @@ void Engine::removeNetworkDevice(const std::string & deviceName)
         
         // unregister the application to the protocol
         aProtocol.send("ApplicationUnregister", applicationName, out);
+        
+        // realease the application
+        m_applicationManager.send("ApplicationRelease", applicationName, out);
     }
 }
 
@@ -2596,6 +2599,10 @@ Engine::rebuildNetworkNamespace(const string &deviceName, const string &address)
         }
         // OSC case : reload the namespace from the last project file if exist
         else if (protocolName == TTSymbol("OSC")) {
+            
+            // can't refresh when learning
+            if (getDeviceLearn(deviceName))
+                return 1;
             
             if (m_namespaceFilesPath.find(deviceName) == m_namespaceFilesPath.end())
                 return 1;

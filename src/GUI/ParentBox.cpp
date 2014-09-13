@@ -54,7 +54,7 @@
 #include <QMimeData>
 #include <QBuffer>
 #include <QPainter>
-#include "TextEdit.hpp"
+
 
 #include <vector>
 #include <map>

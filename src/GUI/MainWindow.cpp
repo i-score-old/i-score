@@ -40,13 +40,11 @@
  */
 #include "AttributesEditor.hpp"
 #include "BasicBox.hpp"
-#include "ChooseTemporalRelation.hpp"
 #include "Help.hpp"
 #include "LogarithmicSlider.hpp"
 #include "MainWindow.hpp"
 #include "MaquetteScene.hpp"
 #include "MaquetteView.hpp"
-#include "NetworkConfig.hpp"
 #include "ViewRelations.hpp"
 #include "HeaderPanelWidget.hpp"
 #include "NetworkTree.hpp"
@@ -64,8 +62,6 @@
 #include <QErrorMessage>
 #include <QStatusBar>
 #include <QFileDialog>
-#include <QPrintDialog>
-#include <QPrinter>
 #include <QSettings>
 #include <QApplication>
 #include <QCloseEvent>
@@ -74,6 +70,14 @@
 #include <QDoubleSpinBox>
 #include <QScrollBar>
 #include <QtGui>
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+#include <QPrintDialog>
+#include <QPrinter>
+#else
+#include <QtPrintSupport/QPrintDialog>
+#include <QtPrintSupport/QPrinter>
+#endif
 
 #include <iostream>
 #include <math.h>
@@ -119,7 +123,6 @@ MainWindow::MainWindow()
   _centralLayout->setVerticalSpacing(0);
   _centralWidget->setLayout(_centralLayout);
 
-  _networkConfig = new NetworkConfig(_scene, this);
   setCentralWidget(_centralWidget);
 
   // Creation of widgets
@@ -134,7 +137,6 @@ MainWindow::MainWindow()
   setCurrentFile("");
   setAcceptDrops(false);
 
-  connect(_scene, SIGNAL(networkConfigChanged(std::string, std::string, std::string, unsigned int)), this, SLOT(changeNetworkConfig(std::string, std::string, std::string, unsigned int)));
   connect(_view->verticalScrollBar(), SIGNAL(valueChanged(int)),
           _scene, SLOT(verticalScroll(int)));  //TimeBar is painted on MaquetteScene, so a vertical scroll has to move the timeBar.
   connect(_view->horizontalScrollBar(), SIGNAL(valueChanged(int)),
@@ -158,10 +160,6 @@ MainWindow::~MainWindow()
 
 #ifdef __APPLE__
     delete _menuBar;
-    delete _fileMenu;
-    delete _editMenu;
-	delete _viewMenu;
-    //  delete _helpMenu;
 #endif
 
     delete _newAct;
@@ -184,7 +182,6 @@ MainWindow::~MainWindow()
 //    delete _commentModeAct;
 
     delete _helpDialog;
-    delete _networkConfig;
 }
 
 void
@@ -319,6 +316,35 @@ MainWindow::open()
       QCoreApplication::processEvents();//permet de fermer la fenêtre de dialogue avant de lancer le chargement.
       loadFile(fileName);      
     }
+}
+
+void
+MainWindow::open(QString s)
+{
+  if (_scene->documentModified()) {
+      int ret = QMessageBox::question(_view, tr("Document modified"),
+                                      tr("The document was modified.\n\nDo you want to save before opening another file ?"),
+                                      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                                      QMessageBox::Cancel);
+      switch (ret) {
+          case QMessageBox::Yes:
+            if (!saveAs()) {
+                return;
+              }
+            break;
+
+          case QMessageBox::No:
+            break;
+
+          case QMessageBox::Cancel:
+            return;
+
+            break;
+        }
+    }
+
+    loadFile(s);
+
 }
 
 bool
@@ -477,12 +503,6 @@ MainWindow::selectMode(const InteractionMode &mode, const BoxCreationMode &boxMo
     selectMode();
 }
 
-void
-MainWindow::networkConfig()
-{
-  _networkConfig->exec();
-}
-
 bool
 MainWindow::documentModified() const
 {
@@ -537,10 +557,6 @@ MainWindow::createActions()
   _helpAct->setShortcut(QKeySequence::HelpContents);
   _helpAct->setStatusTip(tr("Show the application's Help"));
   connect(_helpAct, SIGNAL(triggered()), this, SLOT(help()));
-
-  _networkAct = new QAction(QIcon(":/resources/images/network.svg"), tr("&Network"), this);
-  _networkAct->setStatusTip(tr("Configure network preferences"));
-  connect(_networkAct, SIGNAL(triggered()), this, SLOT(networkConfig()));
 
   _zoomInAct = new QAction(tr("Zoom in"), this);
   _zoomInAct->setShortcut(QKeySequence::ZoomIn);
@@ -770,12 +786,6 @@ QString
 MainWindow::strippedName(const QString &fullFileName)
 {
   return QFileInfo(fullFileName).fileName();
-}
-
-void
-MainWindow::changeNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, unsigned int port)
-{
-  _networkConfig->setNetworkConfig(deviceName, pluginName, IP, port);
 }
 
 void

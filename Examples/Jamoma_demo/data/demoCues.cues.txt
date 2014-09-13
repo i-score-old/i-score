@@ -1,0 +1,1357 @@
+- cue "init"
+- description "something about this cue"
+# ###########################################
+# 
+# 
+/audio/output/audio/gain 100.000000
+/audio/output/audio/mute 0
+# 
+/audio/output/balance/mode FastMode
+/audio/output/balance/position 0.000000
+/audio/output/balance/shape EqualPower
+/audio/output/ch.1 1
+/audio/output/ch.2 2
+# 
+/audio/output/limiter/active 1
+/audio/output/limiter/lookahead 64
+/audio/output/limiter/mode exponential
+/audio/output/limiter/postamp 0.000000
+/audio/output/limiter/preamp 6.000000
+/audio/output/limiter/release 300.000000
+/audio/output/limiter/threshold -1.000000
+# 
+/audio/output/record/file/type aiff
+/audio/output/record/samptype int24
+# 
+/audio/output/saturation/active 1
+/audio/output/saturation/depth 10.000000
+# 
+# 
+/audio/track.1/echo/audio/bypass 0
+/audio/track.1/echo/audio/gain 100.000000
+/audio/track.1/echo/audio/mix 100.000000
+/audio/track.1/echo/audio/mute 0
+/audio/track.1/echo/delay/left 250
+/audio/track.1/echo/delay/right 750
+/audio/track.1/echo/feedback/gain -9.000000
+/audio/track.1/echo/feedback/mode stereo
+# 
+/audio/track.1/echo/filter/type lowpass
+/audio/track.1/echo/filter/frequency 8571.957031
+/audio/track.1/echo/filter/gain 1.000000
+/audio/track.1/echo/filter/octave_bandwidth 2.000000
+# 
+/audio/track.1/echo/limiter/active 1
+/audio/track.1/echo/limiter/dcblocker/active 1
+/audio/track.1/echo/limiter/lookahead 100
+/audio/track.1/echo/limiter/postamp 0.000000
+/audio/track.1/echo/limiter/preamp 0.000000
+/audio/track.1/echo/limiter/release 1000.000000
+/audio/track.1/echo/limiter/threshold 0.000000
+# 
+/audio/track.1/eq/bands 4
+/audio/track.1/eq/audio/bypass 0
+/audio/track.1/eq/audio/gain 100.000000
+/audio/track.1/eq/audio/mix 100.000000
+/audio/track.1/eq/audio/mute 0
+/audio/track.1/eq/filter.1/type lowshelf
+/audio/track.1/eq/filter.1/frequency 75
+/audio/track.1/eq/filter.1/gain 0.000000
+/audio/track.1/eq/filter.1/octave_bandwidth 1.000000
+/audio/track.1/eq/filter.2/type peaknotch
+/audio/track.1/eq/filter.2/frequency 300
+/audio/track.1/eq/filter.2/gain 0.000000
+/audio/track.1/eq/filter.2/octave_bandwidth 1.000000
+/audio/track.1/eq/filter.3/type peaknotch
+/audio/track.1/eq/filter.3/frequency 1000.000000
+/audio/track.1/eq/filter.3/gain 0.000000
+/audio/track.1/eq/filter.3/octave_bandwidth 1.000000
+/audio/track.1/eq/filter.4/type highshelf
+/audio/track.1/eq/filter.4/frequency 5000
+/audio/track.1/eq/filter.4/gain 0.000000
+/audio/track.1/eq/filter.4/octave_bandwidth 1.000000
+# 
+/audio/track.1/input/source none
+/audio/track.1/input/audio/gain 0.000000
+/audio/track.1/input/audio/mute 0
+# 
+/audio/track.1/input/balance/mode FastMode
+/audio/track.1/input/balance/position 0.000000
+/audio/track.1/input/balance/shape EqualPower
+/audio/track.1/input/clicktrain/rate 1.000000
+/audio/track.1/input/file/loop 1
+/audio/track.1/input/file/play 0
+/audio/track.1/input/file/transpose 0.000000
+# 
+/audio/track.1/input/input/channel.L 1
+/audio/track.1/input/input/channel.R 2
+# 
+/audio/track.1/input/input/limiter/active 1
+/audio/track.1/input/input/limiter/dcblocker/active 1
+/audio/track.1/input/input/limiter/lookahead 100
+/audio/track.1/input/input/limiter/postamp 0.000000
+/audio/track.1/input/input/limiter/preamp 0.000000
+/audio/track.1/input/input/limiter/release 1000.000000
+/audio/track.1/input/input/limiter/threshold 0.000000
+/audio/track.1/input/testtone/frequency 1000
+# 
+# 
+/audio/track.2/echo/audio/bypass 0
+/audio/track.2/echo/audio/gain 100.000000
+/audio/track.2/echo/audio/mix 100.000000
+/audio/track.2/echo/audio/mute 0
+/audio/track.2/echo/delay/left 250
+/audio/track.2/echo/delay/right 750
+/audio/track.2/echo/feedback/gain -9.000000
+/audio/track.2/echo/feedback/mode stereo
+# 
+/audio/track.2/echo/filter/type lowpass
+/audio/track.2/echo/filter/frequency 8571.957031
+/audio/track.2/echo/filter/gain 1.000000
+/audio/track.2/echo/filter/octave_bandwidth 2.000000
+# 
+/audio/track.2/echo/limiter/active 1
+/audio/track.2/echo/limiter/dcblocker/active 1
+/audio/track.2/echo/limiter/lookahead 100
+/audio/track.2/echo/limiter/postamp 0.000000
+/audio/track.2/echo/limiter/preamp 0.000000
+/audio/track.2/echo/limiter/release 1000.000000
+/audio/track.2/echo/limiter/threshold 0.000000
+# 
+/audio/track.2/eq/bands 4
+/audio/track.2/eq/audio/bypass 0
+/audio/track.2/eq/audio/gain 100.000000
+/audio/track.2/eq/audio/mix 100.000000
+/audio/track.2/eq/audio/mute 0
+/audio/track.2/eq/filter.1/type lowshelf
+/audio/track.2/eq/filter.1/frequency 75
+/audio/track.2/eq/filter.1/gain 0.000000
+/audio/track.2/eq/filter.1/octave_bandwidth 1.000000
+/audio/track.2/eq/filter.2/type peaknotch
+/audio/track.2/eq/filter.2/frequency 300
+/audio/track.2/eq/filter.2/gain 0.000000
+/audio/track.2/eq/filter.2/octave_bandwidth 1.000000
+/audio/track.2/eq/filter.3/type peaknotch
+/audio/track.2/eq/filter.3/frequency 1000.000000
+/audio/track.2/eq/filter.3/gain 0.000000
+/audio/track.2/eq/filter.3/octave_bandwidth 1.000000
+/audio/track.2/eq/filter.4/type highshelf
+/audio/track.2/eq/filter.4/frequency 5000
+/audio/track.2/eq/filter.4/gain 0.000000
+/audio/track.2/eq/filter.4/octave_bandwidth 1.000000
+# 
+/audio/track.2/input/source none
+/audio/track.2/input/audio/gain 0.000000
+/audio/track.2/input/audio/mute 0
+# 
+/audio/track.2/input/balance/mode FastMode
+/audio/track.2/input/balance/position 0.000000
+/audio/track.2/input/balance/shape EqualPower
+/audio/track.2/input/clicktrain/rate 1.000000
+/audio/track.2/input/file/loop 1
+/audio/track.2/input/file/play 0
+/audio/track.2/input/file/transpose 0.000000
+# 
+/audio/track.2/input/input/channel.L 1
+/audio/track.2/input/input/channel.R 2
+# 
+/audio/track.2/input/input/limiter/active 1
+/audio/track.2/input/input/limiter/dcblocker/active 1
+/audio/track.2/input/input/limiter/lookahead 100
+/audio/track.2/input/input/limiter/postamp 0.000000
+/audio/track.2/input/input/limiter/preamp 0.000000
+/audio/track.2/input/input/limiter/release 1000.000000
+/audio/track.2/input/input/limiter/threshold 0.000000
+/audio/track.2/input/testtone/frequency 1000
+# 
+# 
+/video/window%/border 1
+/video/window%/data/active 1
+/video/window%/depthbuffer 1
+/video/window%/doublebuffer 1
+/video/window%/floating 0
+/video/window%/fsaa 0
+/video/window%/fsmenubar 1
+/video/window%/fullscreen 0
+/video/window%/fullscreen/shortcut 27
+/video/window%/grow 1
+/video/window%/name my_context
+/video/window%/position 0.000000 45.000000
+/video/window%/shared 0
+/video/window%/size 320 240
+/video/window%/sync 0
+# 
+# 
+/video/gl_render/GL/context my_context
+/video/gl_render/GL/alpha 1.000000
+/video/gl_render/GL/anchor 0.000000 0.000000 0.000000
+/video/gl_render/GL/anim UID
+/video/gl_render/GL/antialias 0
+/video/gl_render/GL/automatic 1
+/video/gl_render/GL/aux_alpha 1.000000
+/video/gl_render/GL/aux_color 1.000000 1.000000 1.000000
+/video/gl_render/GL/axes 0
+/video/gl_render/GL/blend/enable 0
+/video/gl_render/GL/blend/mode 6 7
+/video/gl_render/GL/color 1.000000 1.000000 1.000000
+/video/gl_render/GL/color/inherit 0
+/video/gl_render/GL/cull_face 0
+/video/gl_render/GL/depth/clear 0
+/video/gl_render/GL/depth/enable 1
+/video/gl_render/GL/depth/inherit 0
+/video/gl_render/GL/depth/write 1
+/video/gl_render/GL/enable 1
+/video/gl_render/GL/filterclass default
+/video/gl_render/GL/fog/amount 0.000000
+/video/gl_render/GL/fog/params 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/inherit_all 0
+/video/gl_render/GL/inherit_texture 0
+/video/gl_render/GL/layer 0
+/video/gl_render/GL/light/enable 0
+/video/gl_render/GL/line_width 1.000000
+/video/gl_render/GL/material/ambient 0.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/material/automatic 1
+/video/gl_render/GL/material/diffuse 0.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/material/emission 0.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/material/inherit 0
+/video/gl_render/GL/material/matfile none
+/video/gl_render/GL/material/name none
+/video/gl_render/GL/material/shininess 10.000000
+/video/gl_render/GL/material/specular 0.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/matrixoutput 0
+/video/gl_render/GL/point_size 1.000000
+/video/gl_render/GL/poly_mode 0 0
+/video/gl_render/GL/position 0.000000 0.000000 0.000000
+/video/gl_render/GL/rotate 0.000000 0.000000 0.000000 1.000000
+/video/gl_render/GL/scale 1.000000 1.000000 1.000000
+/video/gl_render/GL/shader none
+/video/gl_render/GL/smooth_shading 0
+/video/gl_render/GL/tex_map 0
+/video/gl_render/GL/tex_plane_s 1.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/tex_plane_t 0.000000 1.000000 0.000000 0.000000
+/video/gl_render/GL/texture none
+/video/gl_render/GL/transform_reset 0
+/video/gl_render/GL/viewalign 0
+/video/gl_render/camera/lens_angle 45.000000
+/video/gl_render/camera/lookat 0.000000 0.000000 0.000000
+/video/gl_render/camera/position 0.000000 0.000000 2.000000
+/video/gl_render/camera/up 0.000000 1.000000 0.000000
+/video/gl_render/data/active 1
+/video/gl_render/data/bypass 0
+/video/gl_render/doublebuffer 1
+/video/gl_render/draw_buffer default
+/video/gl_render/erase_color 0.200000 0.200000 0.200000
+/video/gl_render/erase_color_alpha 1.000000
+/video/gl_render/far_clip 100.000000
+/video/gl_render/framerate 25.000000
+/video/gl_render/fsaa 0
+/video/gl_render/geom_rows 0
+/video/gl_render/light/ambient 0.000000 0.000000 0.000000 1.000000
+/video/gl_render/light/diffuse 1.000000 1.000000 1.000000 1.000000
+/video/gl_render/light/global_ambient 0.000000 0.000000 0.000000 1.000000
+/video/gl_render/light/position 1.000000 1.000000 1.000000 0.000000
+/video/gl_render/light/specular 1.000000 1.000000 1.000000 1.000000
+/video/gl_render/near_clip 0.100000
+/video/gl_render/point_atten 1.000000 0.000000 0.100000
+/video/gl_render/point_fade 60.000000
+/video/gl_render/rotate_order auto
+/video/gl_render/stereo 0
+/video/gl_render/sync 1
+/video/gl_render/verbose 1
+# 
+# 
+/video/track.1/brcosa/context my_context
+/video/track.1/brcosa/active 1
+/video/track.1/brcosa/adapt 1
+/video/track.1/brcosa/antialias 0
+/video/track.1/brcosa/automatic 1
+/video/track.1/brcosa/brightness 1.000000
+/video/track.1/brcosa/contrast 1.000000
+/video/track.1/brcosa/data/active 1
+/video/track.1/brcosa/data/bypass 0
+/video/track.1/brcosa/dim 720 480
+/video/track.1/brcosa/rect 0 0 1 1
+/video/track.1/brcosa/saturation 1.000000
+/video/track.1/brcosa/texrect 0 0 1 1
+# 
+# 
+/video/track.1/input/cam/dim 640 480
+/video/track.1/input/data/active 1
+/video/track.1/input/data/bypass 0
+/video/track.1/input/dim 640 480
+# 
+/video/track.1/input/file/dim 640 480
+/video/track.1/input/file/loop/mode loop
+/video/track.1/input/file/loop/points 0 1000
+/video/track.1/input/file/path wheel.mov
+/video/track.1/input/framemotor 1
+/video/track.1/input/framemotor/fps 25
+# 
+/video/track.1/input/noise/dim 640 480
+/video/track.1/input/source file
+# 
+# 
+/video/track.1/plane/GL/context my_context
+/video/track.1/plane/GL/alpha 1.000000
+/video/track.1/plane/GL/anchor 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/anim UID
+/video/track.1/plane/GL/antialias 0
+/video/track.1/plane/GL/automatic 1
+/video/track.1/plane/GL/aux_alpha 1.000000
+/video/track.1/plane/GL/aux_color 1.000000 1.000000 1.000000
+/video/track.1/plane/GL/axes 0
+/video/track.1/plane/GL/blend/enable 0
+/video/track.1/plane/GL/blend/mode 6 7
+/video/track.1/plane/GL/color 1.000000 1.000000 1.000000
+/video/track.1/plane/GL/color/inherit 0
+/video/track.1/plane/GL/cull_face 0
+/video/track.1/plane/GL/depth/clear 0
+/video/track.1/plane/GL/depth/enable 1
+/video/track.1/plane/GL/depth/inherit 0
+/video/track.1/plane/GL/depth/write 1
+/video/track.1/plane/GL/enable 1
+/video/track.1/plane/GL/filterclass default
+/video/track.1/plane/GL/fog/amount 0.000000
+/video/track.1/plane/GL/fog/params 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/inherit_all 0
+/video/track.1/plane/GL/inherit_texture 0
+/video/track.1/plane/GL/layer 0
+/video/track.1/plane/GL/light/enable 0
+/video/track.1/plane/GL/line_width 1.000000
+/video/track.1/plane/GL/material/ambient 0.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/material/automatic 1
+/video/track.1/plane/GL/material/diffuse 0.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/material/emission 0.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/material/inherit 0
+/video/track.1/plane/GL/material/matfile none
+/video/track.1/plane/GL/material/name none
+/video/track.1/plane/GL/material/shininess 10.000000
+/video/track.1/plane/GL/material/specular 0.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/matrixoutput 0
+/video/track.1/plane/GL/point_size 1.000000
+/video/track.1/plane/GL/poly_mode 0 0
+/video/track.1/plane/GL/position 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/rotate 0.000000 0.000000 0.000000 1.000000
+/video/track.1/plane/GL/scale 1.000000 1.000000 1.000000
+/video/track.1/plane/GL/shader none
+/video/track.1/plane/GL/smooth_shading 0
+/video/track.1/plane/GL/tex_map 0
+/video/track.1/plane/GL/tex_plane_s 1.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/tex_plane_t 0.000000 1.000000 0.000000 0.000000
+/video/track.1/plane/GL/texture none
+/video/track.1/plane/GL/transform_reset 0
+/video/track.1/plane/GL/viewalign 0
+/video/track.1/plane/data/active 1
+/video/track.1/plane/data/bypass 0
+/video/track.1/plane/videoplane/client_storage 1
+/video/track.1/plane/videoplane/colormode argb
+/video/track.1/plane/videoplane/dim 20 20
+/video/track.1/plane/videoplane/displaylist 0
+/video/track.1/plane/videoplane/gridmode 0
+/video/track.1/plane/videoplane/interpolate 1
+/video/track.1/plane/videoplane/nudge 0.010000
+/video/track.1/plane/videoplane/texture/offset 0.000000 0.000000
+/video/track.1/plane/videoplane/texture/scale 1.000000 1.000000
+# 
+# 
+/video/track.2/brcosa/context my_context
+/video/track.2/brcosa/active 1
+/video/track.2/brcosa/adapt 1
+/video/track.2/brcosa/antialias 0
+/video/track.2/brcosa/automatic 1
+/video/track.2/brcosa/brightness 1.000000
+/video/track.2/brcosa/contrast 1.000000
+/video/track.2/brcosa/data/active 1
+/video/track.2/brcosa/data/bypass 0
+/video/track.2/brcosa/dim 720 480
+/video/track.2/brcosa/rect 0 0 1 1
+/video/track.2/brcosa/saturation 1.000000
+/video/track.2/brcosa/texrect 0 0 1 1
+# 
+# 
+/video/track.2/input/cam/dim 640 480
+/video/track.2/input/data/active 1
+/video/track.2/input/data/bypass 0
+/video/track.2/input/dim 640 480
+# 
+/video/track.2/input/file/dim 640 480
+/video/track.2/input/file/loop/mode loop
+/video/track.2/input/file/loop/points 0 1000
+/video/track.2/input/file/path wheel.mov
+/video/track.2/input/framemotor 1
+/video/track.2/input/framemotor/fps 25
+# 
+/video/track.2/input/noise/dim 640 480
+/video/track.2/input/source file
+# 
+# 
+/video/track.2/plane/GL/context my_context
+/video/track.2/plane/GL/alpha 1.000000
+/video/track.2/plane/GL/anchor 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/anim UID
+/video/track.2/plane/GL/antialias 0
+/video/track.2/plane/GL/automatic 1
+/video/track.2/plane/GL/aux_alpha 1.000000
+/video/track.2/plane/GL/aux_color 1.000000 1.000000 1.000000
+/video/track.2/plane/GL/axes 0
+/video/track.2/plane/GL/blend/enable 0
+/video/track.2/plane/GL/blend/mode 6 7
+/video/track.2/plane/GL/color 1.000000 1.000000 1.000000
+/video/track.2/plane/GL/color/inherit 0
+/video/track.2/plane/GL/cull_face 0
+/video/track.2/plane/GL/depth/clear 0
+/video/track.2/plane/GL/depth/enable 1
+/video/track.2/plane/GL/depth/inherit 0
+/video/track.2/plane/GL/depth/write 1
+/video/track.2/plane/GL/enable 1
+/video/track.2/plane/GL/filterclass default
+/video/track.2/plane/GL/fog/amount 0.000000
+/video/track.2/plane/GL/fog/params 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/inherit_all 0
+/video/track.2/plane/GL/inherit_texture 0
+/video/track.2/plane/GL/layer 0
+/video/track.2/plane/GL/light/enable 0
+/video/track.2/plane/GL/line_width 1.000000
+/video/track.2/plane/GL/material/ambient 0.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/material/automatic 1
+/video/track.2/plane/GL/material/diffuse 0.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/material/emission 0.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/material/inherit 0
+/video/track.2/plane/GL/material/matfile none
+/video/track.2/plane/GL/material/name none
+/video/track.2/plane/GL/material/shininess 10.000000
+/video/track.2/plane/GL/material/specular 0.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/matrixoutput 0
+/video/track.2/plane/GL/point_size 1.000000
+/video/track.2/plane/GL/poly_mode 0 0
+/video/track.2/plane/GL/position 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/rotate 0.000000 0.000000 0.000000 1.000000
+/video/track.2/plane/GL/scale 1.000000 1.000000 1.000000
+/video/track.2/plane/GL/shader none
+/video/track.2/plane/GL/smooth_shading 0
+/video/track.2/plane/GL/tex_map 0
+/video/track.2/plane/GL/tex_plane_s 1.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/tex_plane_t 0.000000 1.000000 0.000000 0.000000
+/video/track.2/plane/GL/texture none
+/video/track.2/plane/GL/transform_reset 0
+/video/track.2/plane/GL/viewalign 0
+/video/track.2/plane/data/active 1
+/video/track.2/plane/data/bypass 0
+/video/track.2/plane/videoplane/client_storage 1
+/video/track.2/plane/videoplane/colormode argb
+/video/track.2/plane/videoplane/dim 20 20
+/video/track.2/plane/videoplane/displaylist 0
+/video/track.2/plane/videoplane/gridmode 0
+/video/track.2/plane/videoplane/interpolate 1
+/video/track.2/plane/videoplane/nudge 0.010000
+/video/track.2/plane/videoplane/texture/offset 0.000000 0.000000
+/video/track.2/plane/videoplane/texture/scale 1.000000 1.000000
+# 
+# ###########################################
+
+- cue "loadingMedias"
+- description "something about this cue"
+# ###########################################
+# 
+# 
+/audio/output/audio/gain 100.000000
+/audio/output/audio/mute 0
+# 
+/audio/output/balance/mode FastMode
+/audio/output/balance/position 0.000000
+/audio/output/balance/shape EqualPower
+/audio/output/ch.1 1
+/audio/output/ch.2 2
+# 
+/audio/output/limiter/active 1
+/audio/output/limiter/lookahead 64
+/audio/output/limiter/mode exponential
+/audio/output/limiter/postamp 0.000000
+/audio/output/limiter/preamp 6.000000
+/audio/output/limiter/release 300.000000
+/audio/output/limiter/threshold -1.000000
+# 
+/audio/output/record/file/type aiff
+/audio/output/record/samptype int24
+# 
+/audio/output/saturation/active 1
+/audio/output/saturation/depth 10.000000
+# 
+# 
+/audio/track.1/echo/audio/bypass 0
+/audio/track.1/echo/audio/gain 100.000000
+/audio/track.1/echo/audio/mix 100.000000
+/audio/track.1/echo/audio/mute 0
+/audio/track.1/echo/delay/left 250
+/audio/track.1/echo/delay/right 750
+/audio/track.1/echo/feedback/gain -9.000000
+/audio/track.1/echo/feedback/mode stereo
+# 
+/audio/track.1/echo/filter/type lowpass
+/audio/track.1/echo/filter/frequency 8571.957031
+/audio/track.1/echo/filter/gain 1.000000
+/audio/track.1/echo/filter/octave_bandwidth 2.000000
+# 
+/audio/track.1/echo/limiter/active 1
+/audio/track.1/echo/limiter/dcblocker/active 1
+/audio/track.1/echo/limiter/lookahead 100
+/audio/track.1/echo/limiter/postamp 0.000000
+/audio/track.1/echo/limiter/preamp 0.000000
+/audio/track.1/echo/limiter/release 1000.000000
+/audio/track.1/echo/limiter/threshold 0.000000
+# 
+/audio/track.1/eq/bands 4
+/audio/track.1/eq/audio/bypass 0
+/audio/track.1/eq/audio/gain 100.000000
+/audio/track.1/eq/audio/mix 100.000000
+/audio/track.1/eq/audio/mute 0
+/audio/track.1/eq/filter.1/type lowshelf
+/audio/track.1/eq/filter.1/frequency 75
+/audio/track.1/eq/filter.1/gain 0.000000
+/audio/track.1/eq/filter.1/octave_bandwidth 1.000000
+/audio/track.1/eq/filter.2/type peaknotch
+/audio/track.1/eq/filter.2/frequency 300
+/audio/track.1/eq/filter.2/gain 0.000000
+/audio/track.1/eq/filter.2/octave_bandwidth 1.000000
+/audio/track.1/eq/filter.3/type peaknotch
+/audio/track.1/eq/filter.3/frequency 1000.000000
+/audio/track.1/eq/filter.3/gain 0.000000
+/audio/track.1/eq/filter.3/octave_bandwidth 1.000000
+/audio/track.1/eq/filter.4/type highshelf
+/audio/track.1/eq/filter.4/frequency 5000
+/audio/track.1/eq/filter.4/gain 0.000000
+/audio/track.1/eq/filter.4/octave_bandwidth 1.000000
+# 
+/audio/track.1/input/source soundfile
+/audio/track.1/input/audio/gain 0.000000
+/audio/track.1/input/audio/mute 0
+# 
+/audio/track.1/input/balance/mode FastMode
+/audio/track.1/input/balance/position 0.000000
+/audio/track.1/input/balance/shape EqualPower
+/audio/track.1/input/clicktrain/rate 1.000000
+/audio/track.1/input/file/path "/Applications/Max 6.1.8/examples/sounds/rainstick.aif"
+/audio/track.1/input/file/loop 1
+/audio/track.1/input/file/play 0
+/audio/track.1/input/file/transpose 0.000000
+# 
+/audio/track.1/input/input/channel.L 1
+/audio/track.1/input/input/channel.R 2
+# 
+/audio/track.1/input/input/limiter/active 1
+/audio/track.1/input/input/limiter/dcblocker/active 1
+/audio/track.1/input/input/limiter/lookahead 100
+/audio/track.1/input/input/limiter/postamp 0.000000
+/audio/track.1/input/input/limiter/preamp 0.000000
+/audio/track.1/input/input/limiter/release 1000.000000
+/audio/track.1/input/input/limiter/threshold 0.000000
+/audio/track.1/input/testtone/frequency 1000
+# 
+# 
+/audio/track.2/echo/audio/bypass 0
+/audio/track.2/echo/audio/gain 100.000000
+/audio/track.2/echo/audio/mix 100.000000
+/audio/track.2/echo/audio/mute 0
+/audio/track.2/echo/delay/left 250
+/audio/track.2/echo/delay/right 750
+/audio/track.2/echo/feedback/gain -9.000000
+/audio/track.2/echo/feedback/mode stereo
+# 
+/audio/track.2/echo/filter/type lowpass
+/audio/track.2/echo/filter/frequency 8571.957031
+/audio/track.2/echo/filter/gain 1.000000
+/audio/track.2/echo/filter/octave_bandwidth 2.000000
+# 
+/audio/track.2/echo/limiter/active 1
+/audio/track.2/echo/limiter/dcblocker/active 1
+/audio/track.2/echo/limiter/lookahead 100
+/audio/track.2/echo/limiter/postamp 0.000000
+/audio/track.2/echo/limiter/preamp 0.000000
+/audio/track.2/echo/limiter/release 1000.000000
+/audio/track.2/echo/limiter/threshold 0.000000
+# 
+/audio/track.2/eq/bands 4
+/audio/track.2/eq/audio/bypass 0
+/audio/track.2/eq/audio/gain 100.000000
+/audio/track.2/eq/audio/mix 100.000000
+/audio/track.2/eq/audio/mute 0
+/audio/track.2/eq/filter.1/type lowshelf
+/audio/track.2/eq/filter.1/frequency 75
+/audio/track.2/eq/filter.1/gain 0.000000
+/audio/track.2/eq/filter.1/octave_bandwidth 1.000000
+/audio/track.2/eq/filter.2/type peaknotch
+/audio/track.2/eq/filter.2/frequency 300
+/audio/track.2/eq/filter.2/gain 0.000000
+/audio/track.2/eq/filter.2/octave_bandwidth 1.000000
+/audio/track.2/eq/filter.3/type peaknotch
+/audio/track.2/eq/filter.3/frequency 1000.000000
+/audio/track.2/eq/filter.3/gain 0.000000
+/audio/track.2/eq/filter.3/octave_bandwidth 1.000000
+/audio/track.2/eq/filter.4/type highshelf
+/audio/track.2/eq/filter.4/frequency 5000
+/audio/track.2/eq/filter.4/gain 0.000000
+/audio/track.2/eq/filter.4/octave_bandwidth 1.000000
+# 
+/audio/track.2/input/source pink
+/audio/track.2/input/audio/gain 0.000000
+/audio/track.2/input/audio/mute 0
+# 
+/audio/track.2/input/balance/mode FastMode
+/audio/track.2/input/balance/position 0.000000
+/audio/track.2/input/balance/shape EqualPower
+/audio/track.2/input/clicktrain/rate 1.000000
+/audio/track.2/input/file/loop 1
+/audio/track.2/input/file/play 0
+/audio/track.2/input/file/transpose 0.000000
+# 
+/audio/track.2/input/input/channel.L 1
+/audio/track.2/input/input/channel.R 2
+# 
+/audio/track.2/input/input/limiter/active 1
+/audio/track.2/input/input/limiter/dcblocker/active 1
+/audio/track.2/input/input/limiter/lookahead 100
+/audio/track.2/input/input/limiter/postamp 0.000000
+/audio/track.2/input/input/limiter/preamp 0.000000
+/audio/track.2/input/input/limiter/release 1000.000000
+/audio/track.2/input/input/limiter/threshold 0.000000
+/audio/track.2/input/testtone/frequency 1000
+# 
+# 
+/video/window%/border 1
+/video/window%/data/active 1
+/video/window%/depthbuffer 1
+/video/window%/doublebuffer 1
+/video/window%/floating 0
+/video/window%/fsaa 0
+/video/window%/fsmenubar 1
+/video/window%/fullscreen 0
+/video/window%/fullscreen/shortcut 27
+/video/window%/grow 1
+/video/window%/name my_context
+/video/window%/position 0.000000 45.000000
+/video/window%/shared 0
+/video/window%/size 320 240
+/video/window%/sync 0
+# 
+# 
+/video/gl_render/GL/context my_context
+/video/gl_render/GL/alpha 1.000000
+/video/gl_render/GL/anchor 0.000000 0.000000 0.000000
+/video/gl_render/GL/anim UID
+/video/gl_render/GL/antialias 0
+/video/gl_render/GL/automatic 1
+/video/gl_render/GL/aux_alpha 1.000000
+/video/gl_render/GL/aux_color 1.000000 1.000000 1.000000
+/video/gl_render/GL/axes 0
+/video/gl_render/GL/blend/enable 0
+/video/gl_render/GL/blend/mode 6 7
+/video/gl_render/GL/color 1.000000 1.000000 1.000000
+/video/gl_render/GL/color/inherit 0
+/video/gl_render/GL/cull_face 0
+/video/gl_render/GL/depth/clear 0
+/video/gl_render/GL/depth/enable 1
+/video/gl_render/GL/depth/inherit 0
+/video/gl_render/GL/depth/write 1
+/video/gl_render/GL/enable 1
+/video/gl_render/GL/filterclass default
+/video/gl_render/GL/fog/amount 0.000000
+/video/gl_render/GL/fog/params 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/inherit_all 0
+/video/gl_render/GL/inherit_texture 0
+/video/gl_render/GL/layer 0
+/video/gl_render/GL/light/enable 0
+/video/gl_render/GL/line_width 1.000000
+/video/gl_render/GL/material/ambient 0.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/material/automatic 1
+/video/gl_render/GL/material/diffuse 0.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/material/emission 0.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/material/inherit 0
+/video/gl_render/GL/material/matfile none
+/video/gl_render/GL/material/name none
+/video/gl_render/GL/material/shininess 10.000000
+/video/gl_render/GL/material/specular 0.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/matrixoutput 0
+/video/gl_render/GL/point_size 1.000000
+/video/gl_render/GL/poly_mode 0 0
+/video/gl_render/GL/position 0.000000 0.000000 0.000000
+/video/gl_render/GL/rotate 0.000000 0.000000 0.000000 1.000000
+/video/gl_render/GL/scale 1.000000 1.000000 1.000000
+/video/gl_render/GL/shader none
+/video/gl_render/GL/smooth_shading 0
+/video/gl_render/GL/tex_map 0
+/video/gl_render/GL/tex_plane_s 1.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/tex_plane_t 0.000000 1.000000 0.000000 0.000000
+/video/gl_render/GL/texture none
+/video/gl_render/GL/transform_reset 0
+/video/gl_render/GL/viewalign 0
+/video/gl_render/camera/lens_angle 45.000000
+/video/gl_render/camera/lookat 0.000000 0.000000 0.000000
+/video/gl_render/camera/position 0.000000 0.000000 2.000000
+/video/gl_render/camera/up 0.000000 1.000000 0.000000
+/video/gl_render/data/active 1
+/video/gl_render/data/bypass 0
+/video/gl_render/doublebuffer 1
+/video/gl_render/draw_buffer default
+/video/gl_render/erase_color 0.200000 0.200000 0.200000
+/video/gl_render/erase_color_alpha 1.000000
+/video/gl_render/far_clip 100.000000
+/video/gl_render/framerate 25.000000
+/video/gl_render/fsaa 0
+/video/gl_render/geom_rows 0
+/video/gl_render/light/ambient 0.000000 0.000000 0.000000 1.000000
+/video/gl_render/light/diffuse 1.000000 1.000000 1.000000 1.000000
+/video/gl_render/light/global_ambient 0.000000 0.000000 0.000000 1.000000
+/video/gl_render/light/position 1.000000 1.000000 1.000000 0.000000
+/video/gl_render/light/specular 1.000000 1.000000 1.000000 1.000000
+/video/gl_render/near_clip 0.100000
+/video/gl_render/point_atten 1.000000 0.000000 0.100000
+/video/gl_render/point_fade 60.000000
+/video/gl_render/rotate_order auto
+/video/gl_render/stereo 0
+/video/gl_render/sync 1
+/video/gl_render/verbose 1
+# 
+# 
+/video/track.1/brcosa/context my_context
+/video/track.1/brcosa/active 1
+/video/track.1/brcosa/adapt 1
+/video/track.1/brcosa/antialias 0
+/video/track.1/brcosa/automatic 1
+/video/track.1/brcosa/brightness 0.000000
+/video/track.1/brcosa/contrast 1.000000
+/video/track.1/brcosa/data/active 1
+/video/track.1/brcosa/data/bypass 0
+/video/track.1/brcosa/dim 720 480
+/video/track.1/brcosa/rect 0 0 1 1
+/video/track.1/brcosa/saturation 1.000000
+/video/track.1/brcosa/texrect 0 0 1 1
+# 
+# 
+/video/track.1/input/cam/dim 640 480
+/video/track.1/input/data/active 1
+/video/track.1/input/data/bypass 0
+/video/track.1/input/dim 640 480
+# 
+/video/track.1/input/file/dim 640 480
+/video/track.1/input/file/loop/mode loop
+/video/track.1/input/file/loop/points 0 707
+/video/track.1/input/file/path "Mac HD:/Applications/Max 6.1.8/patches/media/rain.mov"
+/video/track.1/input/framemotor 1
+/video/track.1/input/framemotor/fps 25
+# 
+/video/track.1/input/noise/dim 640 480
+/video/track.1/input/source file
+# 
+# 
+/video/track.1/plane/GL/context my_context
+/video/track.1/plane/GL/alpha 1.000000
+/video/track.1/plane/GL/anchor 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/anim UID
+/video/track.1/plane/GL/antialias 0
+/video/track.1/plane/GL/automatic 1
+/video/track.1/plane/GL/aux_alpha 1.000000
+/video/track.1/plane/GL/aux_color 1.000000 1.000000 1.000000
+/video/track.1/plane/GL/axes 0
+/video/track.1/plane/GL/blend/enable 0
+/video/track.1/plane/GL/blend/mode 6 7
+/video/track.1/plane/GL/color 1.000000 1.000000 1.000000
+/video/track.1/plane/GL/color/inherit 0
+/video/track.1/plane/GL/cull_face 0
+/video/track.1/plane/GL/depth/clear 0
+/video/track.1/plane/GL/depth/enable 1
+/video/track.1/plane/GL/depth/inherit 0
+/video/track.1/plane/GL/depth/write 1
+/video/track.1/plane/GL/enable 1
+/video/track.1/plane/GL/filterclass default
+/video/track.1/plane/GL/fog/amount 0.000000
+/video/track.1/plane/GL/fog/params 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/inherit_all 0
+/video/track.1/plane/GL/inherit_texture 0
+/video/track.1/plane/GL/layer 1
+/video/track.1/plane/GL/light/enable 0
+/video/track.1/plane/GL/line_width 1.000000
+/video/track.1/plane/GL/material/ambient 0.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/material/automatic 1
+/video/track.1/plane/GL/material/diffuse 0.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/material/emission 0.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/material/inherit 0
+/video/track.1/plane/GL/material/matfile none
+/video/track.1/plane/GL/material/name none
+/video/track.1/plane/GL/material/shininess 10.000000
+/video/track.1/plane/GL/material/specular 0.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/matrixoutput 0
+/video/track.1/plane/GL/point_size 1.000000
+/video/track.1/plane/GL/poly_mode 0 0
+/video/track.1/plane/GL/position 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/rotate 0.000000 0.000000 0.000000 1.000000
+/video/track.1/plane/GL/scale 1.000000 1.000000 1.000000
+/video/track.1/plane/GL/shader none
+/video/track.1/plane/GL/smooth_shading 0
+/video/track.1/plane/GL/tex_map 0
+/video/track.1/plane/GL/tex_plane_s 1.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/tex_plane_t 0.000000 1.000000 0.000000 0.000000
+/video/track.1/plane/GL/texture none
+/video/track.1/plane/GL/transform_reset 0
+/video/track.1/plane/GL/viewalign 0
+/video/track.1/plane/data/active 1
+/video/track.1/plane/data/bypass 0
+/video/track.1/plane/videoplane/client_storage 1
+/video/track.1/plane/videoplane/colormode argb
+/video/track.1/plane/videoplane/dim 20 20
+/video/track.1/plane/videoplane/displaylist 0
+/video/track.1/plane/videoplane/gridmode 0
+/video/track.1/plane/videoplane/interpolate 1
+/video/track.1/plane/videoplane/nudge 0.010000
+/video/track.1/plane/videoplane/texture/offset 0.000000 0.000000
+/video/track.1/plane/videoplane/texture/scale 1.000000 1.000000
+# 
+# 
+/video/track.2/brcosa/context my_context
+/video/track.2/brcosa/active 1
+/video/track.2/brcosa/adapt 1
+/video/track.2/brcosa/antialias 0
+/video/track.2/brcosa/automatic 1
+/video/track.2/brcosa/brightness 1.000000
+/video/track.2/brcosa/contrast 1.000000
+/video/track.2/brcosa/data/active 1
+/video/track.2/brcosa/data/bypass 0
+/video/track.2/brcosa/dim 720 480
+/video/track.2/brcosa/rect 0 0 1 1
+/video/track.2/brcosa/saturation 1.000000
+/video/track.2/brcosa/texrect 0 0 1 1
+# 
+# 
+/video/track.2/input/cam/dim 640 480
+/video/track.2/input/data/active 1
+/video/track.2/input/data/bypass 0
+/video/track.2/input/dim 640 480
+# 
+/video/track.2/input/file/dim 640 480
+/video/track.2/input/file/loop/mode loop
+/video/track.2/input/file/loop/points 0 1000
+/video/track.2/input/file/path wheel.mov
+/video/track.2/input/framemotor 1
+/video/track.2/input/framemotor/fps 25
+# 
+/video/track.2/input/noise/dim 640 480
+/video/track.2/input/noise/planes 1
+/video/track.2/input/source noise
+# 
+# 
+/video/track.2/plane/GL/context my_context
+/video/track.2/plane/GL/alpha 1.000000
+/video/track.2/plane/GL/anchor 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/anim UID
+/video/track.2/plane/GL/antialias 0
+/video/track.2/plane/GL/automatic 1
+/video/track.2/plane/GL/aux_alpha 1.000000
+/video/track.2/plane/GL/aux_color 1.000000 1.000000 1.000000
+/video/track.2/plane/GL/axes 0
+/video/track.2/plane/GL/blend/enable 0
+/video/track.2/plane/GL/blend/mode 6 7
+/video/track.2/plane/GL/color 1.000000 1.000000 1.000000
+/video/track.2/plane/GL/color/inherit 0
+/video/track.2/plane/GL/cull_face 0
+/video/track.2/plane/GL/depth/clear 0
+/video/track.2/plane/GL/depth/enable 1
+/video/track.2/plane/GL/depth/inherit 0
+/video/track.2/plane/GL/depth/write 1
+/video/track.2/plane/GL/enable 1
+/video/track.2/plane/GL/filterclass default
+/video/track.2/plane/GL/fog/amount 0.000000
+/video/track.2/plane/GL/fog/params 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/inherit_all 0
+/video/track.2/plane/GL/inherit_texture 0
+/video/track.2/plane/GL/layer 2
+/video/track.2/plane/GL/light/enable 0
+/video/track.2/plane/GL/line_width 1.000000
+/video/track.2/plane/GL/material/ambient 0.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/material/automatic 1
+/video/track.2/plane/GL/material/diffuse 0.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/material/emission 0.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/material/inherit 0
+/video/track.2/plane/GL/material/matfile none
+/video/track.2/plane/GL/material/name none
+/video/track.2/plane/GL/material/shininess 10.000000
+/video/track.2/plane/GL/material/specular 0.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/matrixoutput 0
+/video/track.2/plane/GL/point_size 1.000000
+/video/track.2/plane/GL/poly_mode 0 0
+/video/track.2/plane/GL/position 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/rotate 0.000000 0.000000 0.000000 1.000000
+/video/track.2/plane/GL/scale 1.000000 1.000000 1.000000
+/video/track.2/plane/GL/shader none
+/video/track.2/plane/GL/smooth_shading 0
+/video/track.2/plane/GL/tex_map 0
+/video/track.2/plane/GL/tex_plane_s 1.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/tex_plane_t 0.000000 1.000000 0.000000 0.000000
+/video/track.2/plane/GL/texture none
+/video/track.2/plane/GL/transform_reset 0
+/video/track.2/plane/GL/viewalign 0
+/video/track.2/plane/data/active 1
+/video/track.2/plane/data/bypass 0
+/video/track.2/plane/videoplane/client_storage 1
+/video/track.2/plane/videoplane/colormode argb
+/video/track.2/plane/videoplane/dim 20 20
+/video/track.2/plane/videoplane/displaylist 0
+/video/track.2/plane/videoplane/gridmode 0
+/video/track.2/plane/videoplane/interpolate 1
+/video/track.2/plane/videoplane/nudge 0.010000
+/video/track.2/plane/videoplane/texture/offset 0.000000 0.000000
+/video/track.2/plane/videoplane/texture/scale 1.000000 1.000000
+# 
+# ###########################################
+
+- cue "raining"
+- description "something about this cue"
+# ###########################################
+# 
+# 
+/audio/output/audio/gain 100.000000
+/audio/output/audio/mute 0
+# 
+/audio/output/balance/mode FastMode
+/audio/output/balance/position 0.000000
+/audio/output/balance/shape EqualPower
+/audio/output/ch.1 1
+/audio/output/ch.2 2
+# 
+/audio/output/limiter/active 1
+/audio/output/limiter/lookahead 64
+/audio/output/limiter/mode exponential
+/audio/output/limiter/postamp 0.000000
+/audio/output/limiter/preamp 6.000000
+/audio/output/limiter/release 300.000000
+/audio/output/limiter/threshold -1.000000
+# 
+/audio/output/record/file/type aiff
+/audio/output/record/samptype int24
+# 
+/audio/output/saturation/active 1
+/audio/output/saturation/depth 10.000000
+# 
+# 
+/audio/track.1/echo/audio/bypass 0
+/audio/track.1/echo/audio/gain 100.000000
+/audio/track.1/echo/audio/mix 0.000000
+/audio/track.1/echo/audio/mute 0
+/audio/track.1/echo/delay/left 0
+/audio/track.1/echo/delay/right 708
+/audio/track.1/echo/feedback/gain -70.000000
+/audio/track.1/echo/feedback/mode pingpong
+# 
+/audio/track.1/echo/filter/type lowpass
+/audio/track.1/echo/filter/frequency 8571.957031
+/audio/track.1/echo/filter/gain 1.000000
+/audio/track.1/echo/filter/octave_bandwidth 2.000000
+# 
+/audio/track.1/echo/limiter/active 1
+/audio/track.1/echo/limiter/dcblocker/active 1
+/audio/track.1/echo/limiter/lookahead 100
+/audio/track.1/echo/limiter/postamp 0.000000
+/audio/track.1/echo/limiter/preamp 0.000000
+/audio/track.1/echo/limiter/release 1000.000000
+/audio/track.1/echo/limiter/threshold 0.000000
+# 
+/audio/track.1/eq/bands 4
+/audio/track.1/eq/audio/bypass 0
+/audio/track.1/eq/audio/gain 100.000000
+/audio/track.1/eq/audio/mix 100.000000
+/audio/track.1/eq/audio/mute 0
+/audio/track.1/eq/filter.1/type lowshelf
+/audio/track.1/eq/filter.1/frequency 75.000000
+/audio/track.1/eq/filter.1/gain 0.000000
+/audio/track.1/eq/filter.1/octave_bandwidth 1.000000
+/audio/track.1/eq/filter.2/type peaknotch
+/audio/track.1/eq/filter.2/frequency 300
+/audio/track.1/eq/filter.2/gain 0.000000
+/audio/track.1/eq/filter.2/octave_bandwidth 1.000000
+/audio/track.1/eq/filter.3/type peaknotch
+/audio/track.1/eq/filter.3/frequency 1000.000000
+/audio/track.1/eq/filter.3/gain 0.000000
+/audio/track.1/eq/filter.3/octave_bandwidth 1.000000
+/audio/track.1/eq/filter.4/type highshelf
+/audio/track.1/eq/filter.4/frequency 5000
+/audio/track.1/eq/filter.4/gain 0.000000
+/audio/track.1/eq/filter.4/octave_bandwidth 1.000000
+# 
+/audio/track.1/input/source soundfile
+/audio/track.1/input/audio/gain 100.250000
+/audio/track.1/input/audio/mute 0
+# 
+/audio/track.1/input/balance/mode FastMode
+/audio/track.1/input/balance/position 0.000000
+/audio/track.1/input/balance/shape EqualPower
+/audio/track.1/input/clicktrain/rate 1.000000
+/audio/track.1/input/file/path "/Applications/Max 6.1.8/examples/sounds/rainstick.aif"
+/audio/track.1/input/file/loop 1
+/audio/track.1/input/file/play 1
+/audio/track.1/input/file/transpose 0.000000
+# 
+/audio/track.1/input/input/channel.L 1
+/audio/track.1/input/input/channel.R 2
+# 
+/audio/track.1/input/input/limiter/active 1
+/audio/track.1/input/input/limiter/dcblocker/active 1
+/audio/track.1/input/input/limiter/lookahead 100
+/audio/track.1/input/input/limiter/postamp 0.000000
+/audio/track.1/input/input/limiter/preamp 0.000000
+/audio/track.1/input/input/limiter/release 1000.000000
+/audio/track.1/input/input/limiter/threshold 0.000000
+/audio/track.1/input/testtone/frequency 1000
+# 
+# 
+/audio/track.2/echo/audio/bypass 0
+/audio/track.2/echo/audio/gain 100.000000
+/audio/track.2/echo/audio/mix 100.000000
+/audio/track.2/echo/audio/mute 0
+/audio/track.2/echo/delay/left 250
+/audio/track.2/echo/delay/right 750
+/audio/track.2/echo/feedback/gain -9.000000
+/audio/track.2/echo/feedback/mode stereo
+# 
+/audio/track.2/echo/filter/type lowpass
+/audio/track.2/echo/filter/frequency 8571.957031
+/audio/track.2/echo/filter/gain 1.000000
+/audio/track.2/echo/filter/octave_bandwidth 2.000000
+# 
+/audio/track.2/echo/limiter/active 1
+/audio/track.2/echo/limiter/dcblocker/active 1
+/audio/track.2/echo/limiter/lookahead 100
+/audio/track.2/echo/limiter/postamp 0.000000
+/audio/track.2/echo/limiter/preamp 0.000000
+/audio/track.2/echo/limiter/release 1000.000000
+/audio/track.2/echo/limiter/threshold 0.000000
+# 
+/audio/track.2/eq/bands 4
+/audio/track.2/eq/audio/bypass 0
+/audio/track.2/eq/audio/gain 100.000000
+/audio/track.2/eq/audio/mix 100.000000
+/audio/track.2/eq/audio/mute 0
+/audio/track.2/eq/filter.1/type lowshelf
+/audio/track.2/eq/filter.1/frequency 75.000000
+/audio/track.2/eq/filter.1/gain 0.000000
+/audio/track.2/eq/filter.1/octave_bandwidth 1.000000
+/audio/track.2/eq/filter.2/type peaknotch
+/audio/track.2/eq/filter.2/frequency 300
+/audio/track.2/eq/filter.2/gain 0.000000
+/audio/track.2/eq/filter.2/octave_bandwidth 1.000000
+/audio/track.2/eq/filter.3/type peaknotch
+/audio/track.2/eq/filter.3/frequency 1000.000000
+/audio/track.2/eq/filter.3/gain 0.000000
+/audio/track.2/eq/filter.3/octave_bandwidth 1.000000
+/audio/track.2/eq/filter.4/type highshelf
+/audio/track.2/eq/filter.4/frequency 5000
+/audio/track.2/eq/filter.4/gain 0.000000
+/audio/track.2/eq/filter.4/octave_bandwidth 1.000000
+# 
+/audio/track.2/input/source pink
+/audio/track.2/input/audio/gain 0.000000
+/audio/track.2/input/audio/mute 0
+# 
+/audio/track.2/input/balance/mode FastMode
+/audio/track.2/input/balance/position 0.000000
+/audio/track.2/input/balance/shape EqualPower
+/audio/track.2/input/clicktrain/rate 1.000000
+/audio/track.2/input/file/loop 1
+/audio/track.2/input/file/play 0
+/audio/track.2/input/file/transpose 0.000000
+# 
+/audio/track.2/input/input/channel.L 1
+/audio/track.2/input/input/channel.R 2
+# 
+/audio/track.2/input/input/limiter/active 1
+/audio/track.2/input/input/limiter/dcblocker/active 1
+/audio/track.2/input/input/limiter/lookahead 100
+/audio/track.2/input/input/limiter/postamp 0.000000
+/audio/track.2/input/input/limiter/preamp 0.000000
+/audio/track.2/input/input/limiter/release 1000.000000
+/audio/track.2/input/input/limiter/threshold 0.000000
+/audio/track.2/input/testtone/frequency 1000
+# 
+# 
+/video/window%/border 1
+/video/window%/data/active 1
+/video/window%/depthbuffer 1
+/video/window%/doublebuffer 1
+/video/window%/floating 0
+/video/window%/fsaa 0
+/video/window%/fsmenubar 1
+/video/window%/fullscreen 0
+/video/window%/fullscreen/shortcut 27
+/video/window%/grow 1
+/video/window%/name my_context
+/video/window%/position 0.000000 45.000000
+/video/window%/shared 0
+/video/window%/size 320 240
+/video/window%/sync 0
+# 
+# 
+/video/gl_render/GL/context my_context
+/video/gl_render/GL/alpha 1.000000
+/video/gl_render/GL/anchor 0.000000 0.000000 0.000000
+/video/gl_render/GL/anim UID
+/video/gl_render/GL/antialias 0
+/video/gl_render/GL/automatic 1
+/video/gl_render/GL/aux_alpha 1.000000
+/video/gl_render/GL/aux_color 1.000000 1.000000 1.000000
+/video/gl_render/GL/axes 0
+/video/gl_render/GL/blend/enable 0
+/video/gl_render/GL/blend/mode 6 7
+/video/gl_render/GL/color 1.000000 1.000000 1.000000
+/video/gl_render/GL/color/inherit 0
+/video/gl_render/GL/cull_face 0
+/video/gl_render/GL/depth/clear 0
+/video/gl_render/GL/depth/enable 1
+/video/gl_render/GL/depth/inherit 0
+/video/gl_render/GL/depth/write 1
+/video/gl_render/GL/enable 1
+/video/gl_render/GL/filterclass default
+/video/gl_render/GL/fog/amount 0.000000
+/video/gl_render/GL/fog/params 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/inherit_all 0
+/video/gl_render/GL/inherit_texture 0
+/video/gl_render/GL/layer 0
+/video/gl_render/GL/light/enable 0
+/video/gl_render/GL/line_width 1.000000
+/video/gl_render/GL/material/ambient 0.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/material/automatic 1
+/video/gl_render/GL/material/diffuse 0.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/material/emission 0.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/material/inherit 0
+/video/gl_render/GL/material/matfile none
+/video/gl_render/GL/material/name none
+/video/gl_render/GL/material/shininess 10.000000
+/video/gl_render/GL/material/specular 0.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/matrixoutput 0
+/video/gl_render/GL/point_size 1.000000
+/video/gl_render/GL/poly_mode 0 0
+/video/gl_render/GL/position 0.000000 0.000000 0.000000
+/video/gl_render/GL/rotate 0.000000 0.000000 0.000000 1.000000
+/video/gl_render/GL/scale 1.000000 1.000000 1.000000
+/video/gl_render/GL/shader none
+/video/gl_render/GL/smooth_shading 0
+/video/gl_render/GL/tex_map 0
+/video/gl_render/GL/tex_plane_s 1.000000 0.000000 0.000000 0.000000
+/video/gl_render/GL/tex_plane_t 0.000000 1.000000 0.000000 0.000000
+/video/gl_render/GL/texture none
+/video/gl_render/GL/transform_reset 0
+/video/gl_render/GL/viewalign 0
+/video/gl_render/camera/lens_angle 45.000000
+/video/gl_render/camera/lookat 0.000000 0.000000 0.000000
+/video/gl_render/camera/position 0.000000 0.000000 2.000000
+/video/gl_render/camera/up 0.000000 1.000000 0.000000
+/video/gl_render/data/active 1
+/video/gl_render/data/bypass 0
+/video/gl_render/doublebuffer 1
+/video/gl_render/draw_buffer default
+/video/gl_render/erase_color 0.200000 0.200000 0.200000
+/video/gl_render/erase_color_alpha 1.000000
+/video/gl_render/far_clip 100.000000
+/video/gl_render/framerate 25.000000
+/video/gl_render/fsaa 0
+/video/gl_render/geom_rows 0
+/video/gl_render/light/ambient 0.000000 0.000000 0.000000 1.000000
+/video/gl_render/light/diffuse 1.000000 1.000000 1.000000 1.000000
+/video/gl_render/light/global_ambient 0.000000 0.000000 0.000000 1.000000
+/video/gl_render/light/position 1.000000 1.000000 1.000000 0.000000
+/video/gl_render/light/specular 1.000000 1.000000 1.000000 1.000000
+/video/gl_render/near_clip 0.100000
+/video/gl_render/point_atten 1.000000 0.000000 0.100000
+/video/gl_render/point_fade 60.000000
+/video/gl_render/rotate_order auto
+/video/gl_render/stereo 0
+/video/gl_render/sync 1
+/video/gl_render/verbose 1
+# 
+# 
+/video/track.1/brcosa/context my_context
+/video/track.1/brcosa/active 1
+/video/track.1/brcosa/adapt 1
+/video/track.1/brcosa/antialias 0
+/video/track.1/brcosa/automatic 1
+/video/track.1/brcosa/brightness 1.000000
+/video/track.1/brcosa/contrast 1.000000
+/video/track.1/brcosa/data/active 1
+/video/track.1/brcosa/data/bypass 0
+/video/track.1/brcosa/dim 720 480
+/video/track.1/brcosa/rect 0 0 1 1
+/video/track.1/brcosa/saturation 1.000000
+/video/track.1/brcosa/texrect 0 0 1 1
+# 
+# 
+/video/track.1/input/cam/dim 640 480
+/video/track.1/input/data/active 1
+/video/track.1/input/data/bypass 0
+/video/track.1/input/dim 640 480
+# 
+/video/track.1/input/file/dim 640 480
+/video/track.1/input/file/loop/mode loop
+/video/track.1/input/file/loop/points 0 707
+/video/track.1/input/file/path "Mac HD:/Applications/Max 6.1.8/patches/media/rain.mov"
+/video/track.1/input/framemotor 1
+/video/track.1/input/framemotor/fps 25
+# 
+/video/track.1/input/noise/dim 640 480
+/video/track.1/input/source file
+# 
+# 
+/video/track.1/plane/GL/context my_context
+/video/track.1/plane/GL/alpha 1.000000
+/video/track.1/plane/GL/anchor 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/anim UID
+/video/track.1/plane/GL/antialias 0
+/video/track.1/plane/GL/automatic 1
+/video/track.1/plane/GL/aux_alpha 1.000000
+/video/track.1/plane/GL/aux_color 1.000000 1.000000 1.000000
+/video/track.1/plane/GL/axes 0
+/video/track.1/plane/GL/blend/enable 0
+/video/track.1/plane/GL/blend/mode 6 7
+/video/track.1/plane/GL/color 1.000000 1.000000 1.000000
+/video/track.1/plane/GL/color/inherit 0
+/video/track.1/plane/GL/cull_face 0
+/video/track.1/plane/GL/depth/clear 0
+/video/track.1/plane/GL/depth/enable 1
+/video/track.1/plane/GL/depth/inherit 0
+/video/track.1/plane/GL/depth/write 1
+/video/track.1/plane/GL/enable 1
+/video/track.1/plane/GL/filterclass default
+/video/track.1/plane/GL/fog/amount 0.000000
+/video/track.1/plane/GL/fog/params 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/inherit_all 0
+/video/track.1/plane/GL/inherit_texture 0
+/video/track.1/plane/GL/layer 1
+/video/track.1/plane/GL/light/enable 0
+/video/track.1/plane/GL/line_width 1.000000
+/video/track.1/plane/GL/material/ambient 0.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/material/automatic 1
+/video/track.1/plane/GL/material/diffuse 0.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/material/emission 0.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/material/inherit 0
+/video/track.1/plane/GL/material/matfile none
+/video/track.1/plane/GL/material/name none
+/video/track.1/plane/GL/material/shininess 10.000000
+/video/track.1/plane/GL/material/specular 0.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/matrixoutput 0
+/video/track.1/plane/GL/point_size 1.000000
+/video/track.1/plane/GL/poly_mode 0 0
+/video/track.1/plane/GL/position 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/rotate 0.000000 0.000000 0.000000 1.000000
+/video/track.1/plane/GL/scale 1.000000 1.000000 1.000000
+/video/track.1/plane/GL/shader none
+/video/track.1/plane/GL/smooth_shading 0
+/video/track.1/plane/GL/tex_map 0
+/video/track.1/plane/GL/tex_plane_s 1.000000 0.000000 0.000000 0.000000
+/video/track.1/plane/GL/tex_plane_t 0.000000 1.000000 0.000000 0.000000
+/video/track.1/plane/GL/texture none
+/video/track.1/plane/GL/transform_reset 0
+/video/track.1/plane/GL/viewalign 0
+/video/track.1/plane/data/active 1
+/video/track.1/plane/data/bypass 0
+/video/track.1/plane/videoplane/client_storage 1
+/video/track.1/plane/videoplane/colormode argb
+/video/track.1/plane/videoplane/dim 20 20
+/video/track.1/plane/videoplane/displaylist 0
+/video/track.1/plane/videoplane/gridmode 0
+/video/track.1/plane/videoplane/interpolate 1
+/video/track.1/plane/videoplane/nudge 0.010000
+/video/track.1/plane/videoplane/texture/offset 0.000000 0.000000
+/video/track.1/plane/videoplane/texture/scale 1.000000 1.000000
+# 
+# 
+/video/track.2/brcosa/context my_context
+/video/track.2/brcosa/active 1
+/video/track.2/brcosa/adapt 1
+/video/track.2/brcosa/antialias 0
+/video/track.2/brcosa/automatic 1
+/video/track.2/brcosa/brightness 1.000000
+/video/track.2/brcosa/contrast 1.000000
+/video/track.2/brcosa/data/active 1
+/video/track.2/brcosa/data/bypass 0
+/video/track.2/brcosa/dim 720 480
+/video/track.2/brcosa/rect 0 0 1 1
+/video/track.2/brcosa/saturation 1.000000
+/video/track.2/brcosa/texrect 0 0 1 1
+# 
+# 
+/video/track.2/input/cam/dim 640 480
+/video/track.2/input/data/active 1
+/video/track.2/input/data/bypass 0
+/video/track.2/input/dim 640 480
+# 
+/video/track.2/input/file/dim 640 480
+/video/track.2/input/file/loop/mode loop
+/video/track.2/input/file/loop/points 0 1000
+/video/track.2/input/file/path wheel.mov
+/video/track.2/input/framemotor 1
+/video/track.2/input/framemotor/fps 25
+# 
+/video/track.2/input/noise/dim 640 480
+/video/track.2/input/noise/planes 1
+/video/track.2/input/source noise
+# 
+# 
+/video/track.2/plane/GL/context my_context
+/video/track.2/plane/GL/alpha 1.000000
+/video/track.2/plane/GL/anchor 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/anim UID
+/video/track.2/plane/GL/antialias 0
+/video/track.2/plane/GL/automatic 1
+/video/track.2/plane/GL/aux_alpha 1.000000
+/video/track.2/plane/GL/aux_color 1.000000 1.000000 1.000000
+/video/track.2/plane/GL/axes 0
+/video/track.2/plane/GL/blend/enable 0
+/video/track.2/plane/GL/blend/mode 6 7
+/video/track.2/plane/GL/color 1.000000 1.000000 1.000000
+/video/track.2/plane/GL/color/inherit 0
+/video/track.2/plane/GL/cull_face 0
+/video/track.2/plane/GL/depth/clear 0
+/video/track.2/plane/GL/depth/enable 1
+/video/track.2/plane/GL/depth/inherit 0
+/video/track.2/plane/GL/depth/write 1
+/video/track.2/plane/GL/enable 1
+/video/track.2/plane/GL/filterclass default
+/video/track.2/plane/GL/fog/amount 0.000000
+/video/track.2/plane/GL/fog/params 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/inherit_all 0
+/video/track.2/plane/GL/inherit_texture 0
+/video/track.2/plane/GL/layer 2
+/video/track.2/plane/GL/light/enable 0
+/video/track.2/plane/GL/line_width 1.000000
+/video/track.2/plane/GL/material/ambient 0.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/material/automatic 1
+/video/track.2/plane/GL/material/diffuse 0.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/material/emission 0.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/material/inherit 0
+/video/track.2/plane/GL/material/matfile none
+/video/track.2/plane/GL/material/name none
+/video/track.2/plane/GL/material/shininess 10.000000
+/video/track.2/plane/GL/material/specular 0.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/matrixoutput 0
+/video/track.2/plane/GL/point_size 1.000000
+/video/track.2/plane/GL/poly_mode 0 0
+/video/track.2/plane/GL/position 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/rotate 0.000000 0.000000 0.000000 1.000000
+/video/track.2/plane/GL/scale 1.000000 1.000000 1.000000
+/video/track.2/plane/GL/shader none
+/video/track.2/plane/GL/smooth_shading 0
+/video/track.2/plane/GL/tex_map 0
+/video/track.2/plane/GL/tex_plane_s 1.000000 0.000000 0.000000 0.000000
+/video/track.2/plane/GL/tex_plane_t 0.000000 1.000000 0.000000 0.000000
+/video/track.2/plane/GL/texture none
+/video/track.2/plane/GL/transform_reset 0
+/video/track.2/plane/GL/viewalign 0
+/video/track.2/plane/data/active 1
+/video/track.2/plane/data/bypass 0
+/video/track.2/plane/videoplane/client_storage 1
+/video/track.2/plane/videoplane/colormode argb
+/video/track.2/plane/videoplane/dim 20 20
+/video/track.2/plane/videoplane/displaylist 0
+/video/track.2/plane/videoplane/gridmode 0
+/video/track.2/plane/videoplane/interpolate 1
+/video/track.2/plane/videoplane/nudge 0.010000
+/video/track.2/plane/videoplane/texture/offset 0.000000 0.000000
+/video/track.2/plane/videoplane/texture/scale 1.000000 1.000000
+# 
+# ###########################################
+

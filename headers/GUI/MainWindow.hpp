@@ -66,7 +66,6 @@ class QLCDNumber;
 class LogarithmicSlider;
 class Help;
 class QDoubleSpinBox;
-class NetworkConfig;
 
 /*!
  * \class MainWindow
@@ -123,6 +122,18 @@ class MainWindow : public QMainWindow
     inline HeaderPanelWidget *
     headerPanelWidget(){ return _headerPanelWidget; }
 
+  public slots:
+    /*!
+     * \brief Loads a file.
+     *
+     * \param fileName : the file to open
+     */
+    void loadFile(const QString &fileName);
+    /*!
+     * \brief Opens an existing file.
+     */
+    void open(QString);
+
   protected:
     /*!
      * \brief Redefinition of QMainWindow::closeEvent(QCloseEvent *event).
@@ -133,11 +144,6 @@ class MainWindow : public QMainWindow
     virtual void closeEvent(QCloseEvent *event); /// \todo virtual seulement si on a besoin d'hériter de MainWindow, ce qui n'est pas le cas. (par jaime Chao)    
 
   private slots:
-    /*!
-     * \brief Opens a network configuration window.
-     */
-    void networkConfig();
-
     /*!
      * \brief Resets current composition and prepares to write into a new file.
      */
@@ -207,7 +213,7 @@ class MainWindow : public QMainWindow
      * \brief Selects the whole set of boxes.
      */
     void selectAll();
-    void changeNetworkConfig(std::string deviceName, std::string pluginName, std::string IP, unsigned int port);
+
     void updatePlayMode();
 
     /*!
@@ -240,13 +246,6 @@ class MainWindow : public QMainWindow
      * \brief Writes persistent settings for our application, see QSettings doc.
      */
     void writeSettings();
-
-    /*!
-     * \brief Loads a file.
-     *
-     * \param fileName : the file to open
-     */
-    void loadFile(const QString &fileName);
 
     /*!
      * \brief Saves a file.
@@ -312,6 +311,5 @@ class MainWindow : public QMainWindow
     Help *_helpDialog;                      //!< Help dialog.
 
     HeaderPanelWidget *_headerPanelWidget;
-    NetworkConfig *_networkConfig; 
 };
 #endif

@@ -74,16 +74,22 @@ QString NetworkTree::OSC_ADD_NODE_TEXT = QString("Add a node");
 QString NetworkTree::ADD_A_DEVICE_TEXT = QString("Add a device");
 
 unsigned int NetworkTree::TEXT_POINT_SIZE = 10;
-
+#include <QHeaderView>
 NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 {
+  class CustomHeaderView : public QHeaderView {
+    using QHeaderView::QHeaderView;
+    QSize sizeHint() const override { return {500, 15}; }
+  };
+
+  this->setHeader(new CustomHeaderView(Qt::Horizontal));
   init();
 
   setColumnCount(10);
   QStringList list;
   list << "Address" << "Value" << "   v" <<"Start" << " ~ " << "   v" <<"End" << " = " << " % "<<" type "<<"min "<<"max ";
   // removed <<"priority " and column
-  setColumnWidth(NAME_COLUMN, 115);
+  setColumnWidth(NAME_COLUMN, 135);
   setColumnWidth(VALUE_COLUMN, 63);
   setColumnWidth(START_ASSIGNATION_COLUMN, 30);
   setColumnWidth(START_COLUMN, 60);
@@ -915,6 +921,13 @@ NetworkTree::displayBoxContent(AbstractBox *abBox)
 
   //Expand items
   QList<QTreeWidgetItem *> expandedItems = abBox->networkTreeExpandedItems();
+  QList<QTreeWidgetItem *> selectedItems = abBox->getNetworkTreeSelectedItems();
+
+  if(selectedItems.isEmpty() && expandedItems.isEmpty())
+  {
+    expandedItems = _expandedItems;
+    abBox->setNetworkTreeExpandedItems(expandedItems);;
+  }
   if(abBox->justCreated()){ //Items are not collapsed at each new box. We save the tree current state.
       expandedItems = _expandedItems;
       abBox->setNetworkTreeExpandedItems(expandedItems);
@@ -922,7 +935,7 @@ NetworkTree::displayBoxContent(AbstractBox *abBox)
   else
       expandItems(expandedItems);
 
-  QList<QTreeWidgetItem *> selectedItems = abBox->getNetworkTreeSelectedItems();
+
   for(int i=0; i<selectedItems.size(); i++)
       setItemSelected(selectedItems.at(i),true);
 }
@@ -1045,16 +1058,12 @@ NetworkTree::brothersPartiallyChecked(QTreeWidgetItem *item, int column)
 }
 
 void
-NetworkTree::expandItems(QList<QTreeWidgetItem*> expandedItems)
+NetworkTree::expandItems(QList<QTreeWidgetItem*>& expandedItems)
 {
-  QList<QTreeWidgetItem *>::iterator it;
-  QTreeWidgetItem *curItem;
-
   collapseAll();
-  for (it = expandedItems.begin(); it != expandedItems.end(); ++it) {
-      curItem = *it;
-      expandItem(curItem);
-    }
+
+  for(QTreeWidgetItem* item : expandedItems)
+    expandItem(item);
 }
 
 void
@@ -1719,13 +1728,6 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
 }
 
 void
-NetworkTree::mouseReleaseEvent(QMouseEvent *event){
-    QTreeWidget::mouseReleaseEvent(event);
-    if(_noItemClicked)
-        unselectAll();
-}
-
-void
 NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
@@ -1819,6 +1821,10 @@ NetworkTree::keyPressEvent(QKeyEvent *event)
             unassignItem(item);
         }
     }
+    else if(event->key() == Qt::Key_Escape)
+    {
+        unselectAll();
+    }
 }
 
 
@@ -1871,19 +1877,19 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
     data.address = qaddress;    
 
     if (item->type() == LeaveType && column == START_COLUMN && VALUE_MODIFIED) {
-        VALUE_MODIFIED = FALSE;
+        VALUE_MODIFIED = false;
         assignItem(item, data);
         emit(startValueChanged(item, item->text(START_COLUMN)));
     }
 
     if (item->type() == LeaveType && column == END_COLUMN && VALUE_MODIFIED) {
-        VALUE_MODIFIED = FALSE;
+        VALUE_MODIFIED = false;
         assignItem(item, data);
         emit(endValueChanged(item, item->text(END_COLUMN)));
     }
 
     if (item->type() == LeaveType && column == SR_COLUMN && SR_MODIFIED) {
-        SR_MODIFIED = FALSE;
+        SR_MODIFIED = false;
         emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
     }
 
@@ -1897,26 +1903,26 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
         emit(rangeBoundMaxChanged(item,item->text(MAX_COLUMN).toFloat()));
     }
     if (item->type() == OSCNode && column == NAME_COLUMN && NAME_MODIFIED) {
-        NAME_MODIFIED = FALSE;
+        NAME_MODIFIED = false;
         changeNameValue(item, item->text(NAME_COLUMN));
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
     if (item->type() == OSCNode && column == START_COLUMN && VALUE_MODIFIED) {
-        VALUE_MODIFIED = FALSE;
+        VALUE_MODIFIED = false;
         assignItem(item, data);
         emit(startValueChanged(item, item->text(START_COLUMN)));
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
 
     if (item->type() == OSCNode && column == END_COLUMN && VALUE_MODIFIED) {
-        VALUE_MODIFIED = FALSE;
+        VALUE_MODIFIED = false;
         assignItem(item, data);
         emit(endValueChanged(item, item->text(END_COLUMN)));
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
     }
 
     if (item->type() == OSCNode && column == SR_COLUMN && SR_MODIFIED) {
-        SR_MODIFIED = FALSE;
+        SR_MODIFIED = false;
         emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
@@ -1924,13 +1930,13 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
     //Case message
     if(item->whatsThis(NAME_COLUMN)=="Message"){
         if (column == START_COLUMN && VALUE_MODIFIED) {
-            VALUE_MODIFIED = FALSE;
+            VALUE_MODIFIED = false;
             assignItem(item, data);
             emit(startValueChanged(item, item->text(START_COLUMN)));
             item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
         }
         else if (column == END_COLUMN && VALUE_MODIFIED) {
-            VALUE_MODIFIED = FALSE;
+            VALUE_MODIFIED = false;
             assignItem(item, data);
             emit(endValueChanged(item, item->text(START_COLUMN)));
             item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
@@ -1938,14 +1944,14 @@ NetworkTree::valueChanged(QTreeWidgetItem* item, int column)
     }
 
     else if (column == END_COLUMN && VALUE_MODIFIED) {
-        VALUE_MODIFIED = FALSE;
+        VALUE_MODIFIED = false;
         assignItem(item, data);
         emit(endValueChanged(item, item->text(END_COLUMN)));
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable| Qt::ItemIsEditable);
     }
 
     else if (column == SR_COLUMN && SR_MODIFIED) {
-        SR_MODIFIED = FALSE;
+        SR_MODIFIED = false;
         emit(curveSampleRateChanged(item, (item->text(SR_COLUMN)).toInt()));
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
     }
@@ -2075,12 +2081,6 @@ NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue)
           assignItem(item, data);
         }
     }
-}
-
-void
-NetworkTree::itemCollapsed()
-{
-  currentItem()->setExpanded(!currentItem()->isExpanded());
 }
 
 /***********************************************************************

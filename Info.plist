@@ -8,6 +8,10 @@
 	<string>i-score.icns</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>CFBundleTypeExtensions</key>
+	<array>
+		<string>sdat</string>
+	</array>
  	<key>CFBundleGetInfoString</key>
 	<string>Created by Qt/QMake</string>
 	<key>CFBundleSignature</key>

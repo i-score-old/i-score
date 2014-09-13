@@ -107,7 +107,6 @@ AttributesEditor::init()
 AttributesEditor::~AttributesEditor()
 {
   delete _centralWidget;
-  delete _centralLayout;
 }
 
 void
@@ -167,10 +166,12 @@ AttributesEditor::nameWidgets()
   _updateLabel->setText("update");
 }
 
+
 void
 AttributesEditor::createWidgets()
 {
-  _centralWidget = new QWidget;
+  class CustomResizingWidget : public QWidget { QSize sizeHint() const override { return {340, 10}; } };
+  _centralWidget = new CustomResizingWidget;
   _centralLayout = new QGridLayout;
   _centralLayout->setContentsMargins(LEFT_MARGIN, TOP_MARGIN, RIGHT_MARGIN, BOTTOM_MARGIN);
 
