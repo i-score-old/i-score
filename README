@@ -1,6 +1,6 @@
 i-score is an interactive intermedia sequencer - read more on http://i-score.org/
 
-In order to build i-score, follow the instructions in INSTALL.txt.
+In order to build i-score, follow the instructions in INSTALL.md.
 Current builds tested on Mac OS X 10.9 and Debian GNU/Linux.
 
 An installer is available on http://i-score.org/

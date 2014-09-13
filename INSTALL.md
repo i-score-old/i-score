@@ -1,7 +1,8 @@
 # INSTALLATION & BUILD INSTRUCTIONS
 
 # OSSIA build instructions
-For a recent documentation : please refer to https://github.com/OSSIA/OSSIA
+
+**For a recent documentation : please refer to https://github.com/OSSIA/OSSIA**
 
 # Doxygen Documentation
 
@@ -13,7 +14,7 @@ load ./doxygen/Doxyfile with Doxygen and run it.
 # Manual installation/build (old way)
 
 - Download and install libraries from :
-	-- Qt (LGPL) 4.8 : http://download.qt-project.org/official_releases/qt/4.8/4.8.6/qt-opensource-mac-4.8.6.dmg 
+	-- Qt (LGPL) 5.3 or higher : http://qt-project.org/downloads
 	-- Gecode 3.2.0 : http://www.gecode.org/download/Gecode-3.2.0.dmg
 	-- LibXml2 : http://www.explain.com.au/download/combo-2007-10-07.dmg.gz -> copy libxml.framework to /Library/Frameworks
 
