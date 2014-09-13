@@ -97,7 +97,7 @@ const float BasicBox::EAR_HEIGHT = 30;
 const float BasicBox::GRIP_CIRCLE_SIZE = 5;
 unsigned int BasicBox::BOX_MARGIN = 25;
 const QString BasicBox::SCENARIO_MODE_TEXT = tr("Scenario");
-const QString BasicBox::DEFAULT_MODE_TEXT = "▼   Select content to edit";
+const QString BasicBox::DEFAULT_MODE_TEXT = "Select content to edit";
 const QColor BasicBox::BOX_COLOR = QColor(60, 60, 60);
 const QColor BasicBox::TEXT_COLOR = QColor(0, 0, 0);
 
