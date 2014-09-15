@@ -311,16 +311,25 @@ ParentBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
   else {
     }
 }
-
+#include <QDebug>
 void
 ParentBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
+  qDebug() << Q_FUNC_INFO;
   QGraphicsItem::mouseMoveEvent(event);
-  if (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::ClosedHandCursor) {
+  const int upper_limit{-30};
+
+  if ((y() - std::abs(boundingRect().y())) < upper_limit)
+    setPos(x(), upper_limit + std::abs(boundingRect().y()));
+
+
+  if (_scene->resizeMode() == NO_RESIZE && event->buttons() == Qt::LeftButton) {
       _scene->selectionMoved();
     }
-  else if (_scene->resizeMode() != NO_RESIZE && (cursor().shape() == Qt::SizeVerCursor
-                                                 || cursor().shape() == Qt::SizeHorCursor || cursor().shape() == Qt::SizeFDiagCursor)) {
+  else if (_scene->resizeMode() != NO_RESIZE && (cursor().shape() == Qt::SizeVerCursor ||
+                                                 cursor().shape() == Qt::SizeHorCursor ||
+                                                 cursor().shape() == Qt::SizeFDiagCursor))
+  {
       switch (_scene->resizeMode()) {
           case HORIZONTAL_RESIZE:
           resizeWidthEdition(std::max(double(_abstract->width() + event->pos().x() - boxRect().topRight().x()), (double)BOX_MARGIN));

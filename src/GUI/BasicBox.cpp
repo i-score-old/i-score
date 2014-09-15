@@ -1593,6 +1593,7 @@ BasicBox::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 void
 BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
+    qDebug() << Q_FUNC_INFO;
   QGraphicsItem::mouseMoveEvent(event);
 
   // Draw cursor coordinates as a tooltip
@@ -1602,10 +1603,15 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 //    QPoint pos = this->getBottomRight().toPoint();
 //    QToolTip::showText(pos, posStr);
 
-  if (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::ClosedHandCursor) {
+  if (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::ClosedHandCursor)
+  {
       _scene->selectionMoved();
-    }
-  else if (_scene->resizeMode() != NO_RESIZE && (cursor().shape() == Qt::SizeVerCursor || cursor().shape() == Qt::SizeHorCursor || cursor().shape() == Qt::SizeFDiagCursor)) {
+  }
+  else if (_scene->resizeMode() != NO_RESIZE &&
+           (cursor().shape() == Qt::SizeVerCursor ||
+            cursor().shape() == Qt::SizeHorCursor ||
+            cursor().shape() == Qt::SizeFDiagCursor))
+  {
       switch (_scene->resizeMode()) {
           case HORIZONTAL_RESIZE:
             resizeWidthEdition(std::max(double(_abstract->width() + event->pos().x() - _boxRect.topRight().x()) , (double)BOX_MARGIN));
@@ -1625,7 +1631,7 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
       _scene->setSelectionArea(nullPath);
       setSelected(true);
       _scene->boxResized();
-    }
+  }
 }
 
 void

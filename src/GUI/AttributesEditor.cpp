@@ -432,6 +432,7 @@ AttributesEditor::updateWidgets(bool boxModified)
 void
 AttributesEditor::startChanged()
 {
+    qDebug() << Q_FUNC_INFO;
 //  std::cout<<"--- startChanged ---"<<std::endl;
   BasicBox * box = _scene->getBox(_boxEdited);
   if (box != NULL) {

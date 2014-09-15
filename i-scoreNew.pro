@@ -2,6 +2,7 @@ TEMPLATE = app
 TARGET = i-score
 
 QT += core network xml svg printsupport
+#DEFINES     += QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT
 
 INCLUDEPATH += headers headers/GUI headers/data
 RESOURCES += i-score.qrc

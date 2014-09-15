@@ -58,7 +58,7 @@
 #include <QString>
 #include <QMenu>
 #include <QToolTip>
-
+#include <QDebug>
 const float Relation::ARROW_SIZE = 12.;
 const float Relation::TOLERANCE_X = 12.;
 const float Relation::TOLERANCE_Y = 12.;
@@ -444,6 +444,7 @@ Relation::mousePressEvent(QGraphicsSceneMouseEvent * event)
 void
 Relation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 {
+  qDebug() << Q_FUNC_INFO;
   QGraphicsItem::mouseMoveEvent(event);
   double eventPosX = mapFromScene(event->scenePos()).x();
   double startX = mapFromScene(_start).x();

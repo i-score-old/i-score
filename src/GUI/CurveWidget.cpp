@@ -299,8 +299,8 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
                     _abstract->_breakpoints.erase(it);
                 }
                 _savedMap = _abstract->_breakpoints;
-                //curveChanged();
-                //update();
+                curveChanged();
+                update();
                 break;
               }
           }
@@ -461,7 +461,6 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
         }
         }
 
-        _previousPoint = relativePoint;
     }
     update();
 }

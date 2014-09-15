@@ -42,7 +42,7 @@
 
 #include "ConditionalRelation.hpp"
 #include "TriggerPoint.hpp"
-
+#include <QDebug>
 const QColor ConditionalRelation::CONDITIONAL_RELATION_COLOR = QColor(0, 0, 0);
 const QColor ConditionalRelation::CONDITIONAL_RELATION_SELECTED_COLOR = QColor(Qt::blue);
 const float ConditionalRelation::BOUNDING_RECT_WIDTH = 10.;
@@ -124,7 +124,9 @@ ConditionalRelation::updateCoordinates(unsigned int boxId)
 }
 
 void
-ConditionalRelation::updateBoxesCoordinates(unsigned int boxId){
+ConditionalRelation::updateBoxesCoordinates(unsigned int boxId)
+{
+  qDebug() << Q_FUNC_INFO;
     // Move related boxes, except boxId's box (already moved by user)
     QList<BasicBox *>::iterator     it;
     BasicBox                        *box = _scene->getBox(boxId),

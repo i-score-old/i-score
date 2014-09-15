@@ -1208,6 +1208,9 @@ NetworkTree::unassignItem(QTreeWidgetItem *item, bool recursive)
     if(isAssigned(item)){
             item->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
             emit(curveActivationChanged(item, false));
+
+            qDebug() << "flop";
+
             item->setText(START_COLUMN, "");
             emit(startValueChanged(item, ""));
             item->setText(END_COLUMN, "");
@@ -2356,6 +2359,7 @@ NetworkTree::updateDeviceNamespace(QString deviceName){
 void
 NetworkTree::setRecMode(std::string address){
     QTreeWidgetItem *item = getItemFromAddress(address);
+    if(!item) return;
 
     if(!_recMessages.contains(item)){
         _recMessages<<item;

@@ -183,7 +183,6 @@ class CurveWidget : public QWidget
 
     float _movingBreakpointX; //!< Moved break point x coordinate.
     float _movingBreakpointY; //!< Moved break point y coordinate.
-    QPointF _previousPoint; //!< Keeps the previous point when moving
 
     bool _clicked;            //!< Clicked state.
     bool _shiftModifierWasEnabled{}; //!<True if shift was pressed when changing the curve

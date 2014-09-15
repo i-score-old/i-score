@@ -112,7 +112,6 @@ class MaquetteScene : public QGraphicsScene
     MaquetteScene(const QRectF & rect, AttributesEditor *palette);
     virtual
     ~MaquetteScene();
-    QTimeLine *_timeLine;
 
     /*!
      * \brief Initialises scene parameters.
