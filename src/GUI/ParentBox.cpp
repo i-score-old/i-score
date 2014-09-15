@@ -323,7 +323,7 @@ ParentBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     setPos(x(), upper_limit + std::abs(boundingRect().y()));
 
 
-  if (_scene->resizeMode() == NO_RESIZE && event->buttons() == Qt::LeftButton) {
+  if (_scene->resizeMode() == NO_RESIZE && cursor().shape() == Qt::ClosedHandCursor) {
       _scene->selectionMoved();
     }
   else if (_scene->resizeMode() != NO_RESIZE && (cursor().shape() == Qt::SizeVerCursor ||
