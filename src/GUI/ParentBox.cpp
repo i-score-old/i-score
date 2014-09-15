@@ -316,6 +316,10 @@ void
 ParentBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
   qDebug() << Q_FUNC_INFO;
+
+  if(cursor().shape() == Qt::ArrowCursor)
+    return;
+
   QGraphicsItem::mouseMoveEvent(event);
   const int upper_limit{-30};
 
