@@ -771,6 +771,9 @@ Maquette::removeBox(unsigned int boxID)
       if (it3 != _parentBoxes.end()) {
           _parentBoxes.erase(it3);
         }
+
+      // Remove the potential "interpolation button clicked" relationships
+      removeManuallyActivatedCurveByBox(boxID);
     }
 
   return removedRelations;
