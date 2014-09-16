@@ -161,8 +161,6 @@ NetworkTree::init()
     _OSCMessageCount = 0;
     _OSCStartMessages = new NetworkMessages;
     _OSCEndMessages = new NetworkMessages;
-    _recMessages = QList<QTreeWidgetItem*>();
-    _expandedItems = QList<QTreeWidgetItem*>();
 
     setStyleSheet(
                 "QTreeView {"
@@ -398,7 +396,7 @@ NetworkTree::createItemFromMessage(QString message)
 
 void
 NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
-{  
+{
   rootNode->setCheckState(START_ASSIGNATION_COLUMN, Qt::Unchecked);
   rootNode->setCheckState(END_ASSIGNATION_COLUMN, Qt::Unchecked);
 
@@ -693,6 +691,9 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
          vector<string>::iterator  it;
 
          //TOTO : check if necessary (unused for the moment) NH.
+         auto preexistingkeys = _addressMap.keys(address);
+         for(auto& key : preexistingkeys) _addressMap.remove(key);
+
          _addressMap.insert(curItem, address);
 
          QFont curFont = curItem->font(NAME_COLUMN);
@@ -1440,9 +1441,18 @@ NetworkTree::resetAssignedNodes()
   _nodesWithAllChildrenAssigned.clear();
 }
 
+#include <vector>
+#include <string>
 void
-NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes){
-    if(item != NULL){
+NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
+{
+  std::vector<std::string> previouslyExpandedAddresses;
+  for(auto& expanded : _expandedItems)
+  {
+    previouslyExpandedAddresses.push_back(_addressMap[expanded]);
+  }
+
+  if(item != NULL){
         if(item->type()==DeviceNode){
             collapseItem(item);
             string application = getAbsoluteAddress(item).toStdString();
@@ -1455,6 +1465,13 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes){
                 Maquette::getInstance()->updateBoxesAttributes();
         }
     }
+
+  _expandedItems.clear();
+  for(auto& addr : previouslyExpandedAddresses)
+  {
+    _expandedItems.append(_addressMap.key(addr));
+  }
+    expandItems(_expandedItems);
 }
 
 void
@@ -2294,7 +2311,8 @@ NetworkTree::updateDeviceName(QString oldName, QString newName)
 }
 
 void
-NetworkTree::addNewDevice(QString deviceName)
+NetworkTree::
+addNewDevice(QString deviceName)
 {
     QTreeWidgetItem *newItem = addDeviceItem(deviceName);
     newItem->setCheckState(NAME_COLUMN,Qt::Unchecked);
