@@ -126,7 +126,6 @@ ConditionalRelation::updateCoordinates(unsigned int boxId)
 void
 ConditionalRelation::updateBoxesCoordinates(unsigned int boxId)
 {
-  qDebug() << Q_FUNC_INFO;
     // Move related boxes, except boxId's box (already moved by user)
     QList<BasicBox *>::iterator     it;
     BasicBox                        *box = _scene->getBox(boxId),

@@ -55,6 +55,7 @@
 #include <string>
 #include <list>
 #include <utility>
+#include <set>
 #include <sstream>
 #include "NetworkMessages.hpp"
 #include "BasicBox.hpp"
@@ -631,6 +632,15 @@ class Maquette : public QObject
 
     void getBoxesIdFromCondition(TimeConditionId conditionId, std::vector<unsigned int> &boxesId);
 
+    /**
+     * @brief curveManuallyActivated
+     *
+     * @return True if the interpolation was activated by a keypress
+     */
+    bool curveIsManuallyActivated(unsigned int boxId, std::string address);
+    void addManuallyActivatedCurve(unsigned int boxId, std::string address);
+    void removeManuallyActivatedCurveByAddress(std::string address);
+    void removeManuallyActivatedCurveByBox(unsigned int boxId);
 
     /*!
      * \brief Perform moving or resizing for a set of boxes.
@@ -1017,6 +1027,8 @@ class Maquette : public QObject
     std::vector<std::string> _plugins;
 
     QList<BasicBox *> _recordingBoxes;
+
+    std::set<std::pair<unsigned int, std::string>> _curvesManuallyActivated;
 
     //Device _defaultDevice; //!< The default network device used.
 

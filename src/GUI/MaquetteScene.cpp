@@ -1420,7 +1420,6 @@ MaquetteScene::boxResized()
 void
 MaquetteScene::selectionMoved()
 {
-  qDebug() << Q_FUNC_INFO;
   for (int i = 0; i < selectedItems().size(); i++) {
       QGraphicsItem *curItem = selectedItems().at(i);
       int type = curItem->type();
@@ -1436,7 +1435,6 @@ MaquetteScene::selectionMoved()
 bool
 MaquetteScene::boxMoved(unsigned int boxID)
 {
-  qDebug() << "bump";
 //  std::cout<<"--- boxMoved ---"<<boxID<<std::endl;
   Coords coord;
   BasicBox * box = _maquette->getBox(boxID);
@@ -1833,7 +1831,6 @@ MaquetteScene::getMaxSceneWidth(){
 void
 MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
 {
-  qDebug() << Q_FUNC_INFO;
     if(boxesToCondition.isEmpty())
     {
         qWarning() << "MaquetteScene::conditionBoxes : boxesToCondition is empty";

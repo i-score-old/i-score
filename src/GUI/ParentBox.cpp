@@ -311,12 +311,10 @@ ParentBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
   else {
     }
 }
-#include <QDebug>
+
 void
 ParentBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-  qDebug() << Q_FUNC_INFO;
-
   if(cursor().shape() == Qt::ArrowCursor)
     return;
 

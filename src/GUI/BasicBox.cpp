@@ -1593,7 +1593,6 @@ BasicBox::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 void
 BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << Q_FUNC_INFO;
   QGraphicsItem::mouseMoveEvent(event);
 
   // Draw cursor coordinates as a tooltip

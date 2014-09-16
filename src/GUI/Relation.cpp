@@ -444,7 +444,6 @@ Relation::mousePressEvent(QGraphicsSceneMouseEvent * event)
 void
 Relation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 {
-  qDebug() << Q_FUNC_INFO;
   QGraphicsItem::mouseMoveEvent(event);
   double eventPosX = mapFromScene(event->scenePos()).x();
   double startX = mapFromScene(_start).x();

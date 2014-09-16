@@ -1076,28 +1076,68 @@ Maquette::getBoxesIdFromCondition(TimeConditionId conditionId, std::vector<unsig
         boxesId.push_back(getTriggerPoint(triggerId)->boxID());
 }
 
+bool Maquette::curveIsManuallyActivated(unsigned int boxId, std::string address)
+{
+    return _curvesManuallyActivated.find({boxId, address}) != _curvesManuallyActivated.end();
+}
+
+void Maquette::addManuallyActivatedCurve(unsigned int boxId, std::string address)
+{
+    _curvesManuallyActivated.insert({boxId, address});
+}
+
+void Maquette::removeManuallyActivatedCurveByAddress(std::string address)
+{
+    for(;;)
+    {
+        auto it= std::find_if(_curvesManuallyActivated.begin(),
+                              _curvesManuallyActivated.end(),
+                              [&address] (const std::pair<unsigned int, std::string>& p)
+        { return p.second == address; });
+        if(it != _curvesManuallyActivated.end())
+            _curvesManuallyActivated.erase(it);
+        else
+            return;
+    }
+}
+
+void Maquette::removeManuallyActivatedCurveByBox(unsigned int boxId)
+{
+    for(;;)
+    {
+        auto it= std::find_if(_curvesManuallyActivated.begin(),
+                              _curvesManuallyActivated.end(),
+                              [&boxId] (const std::pair<unsigned int, std::string>& p)
+        { return p.first == boxId; });
+        if(it != _curvesManuallyActivated.end())
+            _curvesManuallyActivated.erase(it);
+        else
+            return;
+    }
+}
+
 void
 Maquette::addCurve(unsigned int boxID, const string &address)
 {
-  _engines->addCurve(boxID, address);
-  _engines->setCurveSampleRate(boxID, address, 40);  
+    _engines->addCurve(boxID, address);
+    _engines->setCurveSampleRate(boxID, address, 40);
 }
 
 void
 Maquette::removeCurve(unsigned int boxID, const string &address)
 {
-  _engines->removeCurve(boxID, address);
+    _engines->removeCurve(boxID, address);
 }
 
 void
 Maquette::clearCurves(unsigned int boxID)
 {
-  _engines->clearCurves(boxID);
+    _engines->clearCurves(boxID);
 }
 
 vector<string> Maquette::getCurvesAddresses(unsigned int boxID)
 {
-  return _engines->getCurvesAddress(boxID);
+    return _engines->getCurvesAddress(boxID);
 }
 
 void

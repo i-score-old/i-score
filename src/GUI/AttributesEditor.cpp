@@ -432,7 +432,6 @@ AttributesEditor::updateWidgets(bool boxModified)
 void
 AttributesEditor::startChanged()
 {
-    qDebug() << Q_FUNC_INFO;
 //  std::cout<<"--- startChanged ---"<<std::endl;
   BasicBox * box = _scene->getBox(_boxEdited);
   if (box != NULL) {
@@ -857,6 +856,7 @@ AttributesEditor::curveActivationChanged(QTreeWidgetItem *item, bool activated)
   string address = _networkTree->getAbsoluteAddress(item).toStdString();
   if (_boxEdited != NO_ID) {
       Maquette::getInstance()->setCurveMuteState(_boxEdited, address, !activated);
+      Maquette::getInstance()->addManuallyActivatedCurve(_boxEdited, address);
       BasicBox * box = _scene->getBox(_boxEdited);
       box->curveActivationChanged(address, activated);
     }

@@ -1209,8 +1209,6 @@ NetworkTree::unassignItem(QTreeWidgetItem *item, bool recursive)
             item->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
             emit(curveActivationChanged(item, false));
 
-            qDebug() << "flop";
-
             item->setText(START_COLUMN, "");
             emit(startValueChanged(item, ""));
             item->setText(END_COLUMN, "");
@@ -2123,11 +2121,14 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
   string address = getAbsoluteAddress(item).toStdString();  
 
   BasicBox *box = Maquette::getInstance()->getBox(boxID);
-  if (box != NULL) { // Box Found
-      if (box->hasCurve(address) && !_recMessages.contains(item) ) {
-          if (_assignedItems.value(item).hasCurve) {
+  if (box != NULL)
+  { // Box Found
+      if (box->hasCurve(address) && !_recMessages.contains(item) )
+      {
+          if (_assignedItems.value(item).hasCurve)
+          {
               unsigned int sampleRate = 0;
-              bool redundancy =  false, interpolate = false;
+              bool redundancy = false, interpolate = false;
               vector<float> values, xPercents, yValues, coeff;
               vector<string> argTypes;
               vector<short> sectionType;
@@ -2135,33 +2136,28 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
               bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID, address, 0, sampleRate, redundancy, interpolate, values, argTypes, xPercents, yValues, sectionType, coeff);
               bool getCurveValuesSuccess = Maquette::getInstance()->getCurveValues(boxID, address, 0, yValues);
 
-              if (getCurveSuccess || getCurveValuesSuccess) {
-                  if(getCurveSuccess){
-                      if (forceUpdate) {
-                          if (interpolate) {
-                              //if startValue!=endValue &&  startValue is not empty && endValue is not empty
-                              interpolate = !(startMessages()->getMessage(item).value == endMessages()->getMessage(item).value)
-                                      /*&& startMessages()->getItems().contains(item)
-                                      && endMessages()->getItems().contains(item); */;
-                              Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);                              
-                          }
-                      }
-                  }
-
-                  else if (getCurveValuesSuccess){
-                      interpolate = true;
-                      Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
-                  }
+              if(getCurveSuccess && forceUpdate && interpolate)
+              {
+                  interpolate = !(startMessages()->getMessage(item).value == endMessages()->getMessage(item).value)
+                                || Maquette::getInstance()->curveIsManuallyActivated(boxID, address);
 
 
+                  Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
               }
+              else if (getCurveValuesSuccess)
+              {
+                  interpolate = true;
+                  Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
+              }
+
               updateLine(item, interpolate, sampleRate, redundancy);
           }
         }
     }
-  else { // Box Not Found
+  else
+  { // Box Not Found
       return false;
-    }
+  }
 
   return false;
 }
