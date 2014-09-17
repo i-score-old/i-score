@@ -748,7 +748,7 @@ vector<unsigned int>
 Maquette::removeBox(unsigned int boxID)
 {
   vector<unsigned int> removedRelations;
-  if (boxID != NO_ID) {
+  if (boxID != NO_ID && boxID != 1) {
       RelationsMap::iterator it;
       unsigned int relID = NO_ID;
       for (it = _relations.begin(); it != _relations.end(); it++) {
@@ -1828,6 +1828,9 @@ Maquette::load(const string &fileName)
     float zoom;
 
     // Clear the maquette
+    this->clear();
+    _scene->editor()->clear();
+    _scene->editor()->networkTree()->clear();
     _scene->clear();
     
     // Build the engine structure from the Xml file

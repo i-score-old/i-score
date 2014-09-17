@@ -214,6 +214,7 @@ NetworkTree::clear()
 {
   QList<QTreeWidgetItem*>::iterator it;
 
+  _expandedItems.clear();
   _addressMap.clear();
   _nodesWithSelectedChildren.clear();
   _assignedItems.clear();

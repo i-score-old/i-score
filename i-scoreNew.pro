@@ -13,14 +13,15 @@ resources/translations = i-score_en.ts i-score_fr.ts
 
 unix {
     INCLUDEPATH += /usr/local/jamoma/include /usr/include/libxml2
-    QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -msse3 -std=c++11
+    QMAKE_CXXFLAGS += -std=c++11  -Wno-unused-parameter -Wno-deprecated-register
+    QMAKE_CXXFLAGS_RELEASE += -O3 -fPIC
     QMAKE_LFLAGS += -L/usr/local/lib/jamoma/lib -L/usr/local/lib/ -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
 
     LIBS += -L/usr/local/jamoma/lib -lJamomaFoundation -lJamomaDSP -lJamomaScore -lJamomaModular
     LIBS += -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodeset -lgecodesupport
-  
+
     contains(QMAKE_HOST.arch, 86){
-        QMAKE_CXXFLAGS += -msse3
+        QMAKE_CXXFLAGS_RELEASE += -msse3
     }
 
     macx{
