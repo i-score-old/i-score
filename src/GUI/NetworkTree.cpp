@@ -2134,46 +2134,49 @@ NetworkTree::getSampleRate(QTreeWidgetItem *item)
 
 bool
 NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUpdate)
-{    
-  string address = getAbsoluteAddress(item).toStdString();  
+{
+  string address = getAbsoluteAddress(item).toStdString();
 
   BasicBox *box = Maquette::getInstance()->getBox(boxID);
   if (box != NULL)
   { // Box Found
-      if (box->hasCurve(address) && !_recMessages.contains(item) )
+    if (box->hasCurve(address) && !_recMessages.contains(item) )
+    {
+      if (_assignedItems.value(item).hasCurve)
       {
-          if (_assignedItems.value(item).hasCurve)
+        unsigned int sampleRate = 0;
+        bool redundancy = false, interpolate = false;
+        vector<float> values, xPercents, yValues, coeff;
+        vector<string> argTypes;
+        vector<short> sectionType;
+
+        bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID, address, 0, sampleRate, redundancy, interpolate, values, argTypes, xPercents, yValues, sectionType, coeff);
+        bool getCurveValuesSuccess = Maquette::getInstance()->getCurveValues(boxID, address, 0, yValues);
+
+        if(!Maquette::getInstance()->curveIsManuallyActivated(boxID, address))
+        {
+          if(getCurveSuccess && forceUpdate && interpolate)
           {
-              unsigned int sampleRate = 0;
-              bool redundancy = false, interpolate = false;
-              vector<float> values, xPercents, yValues, coeff;
-              vector<string> argTypes;
-              vector<short> sectionType;
-
-              bool getCurveSuccess = Maquette::getInstance()->getCurveAttributes(boxID, address, 0, sampleRate, redundancy, interpolate, values, argTypes, xPercents, yValues, sectionType, coeff);
-              bool getCurveValuesSuccess = Maquette::getInstance()->getCurveValues(boxID, address, 0, yValues);
-
-              if(getCurveSuccess && forceUpdate && interpolate)
-              {
-                  interpolate = !(startMessages()->getMessage(item).value == endMessages()->getMessage(item).value)
-                                || Maquette::getInstance()->curveIsManuallyActivated(boxID, address);
-
-
-                  Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
-              }
-              else if (getCurveValuesSuccess)
-              {
-                  interpolate = true;
-                  Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
-              }
-
-              updateLine(item, interpolate, sampleRate, redundancy);
+            interpolate = !(startMessages()->getMessage(item).value == endMessages()->getMessage(item).value);
+          }
+          else if (getCurveValuesSuccess)
+          {
+            interpolate = true;
           }
         }
+        else
+        {
+          interpolate = item->checkState(INTERPOLATION_COLUMN);
+        }
+
+        Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
+        updateLine(item, interpolate, sampleRate, redundancy);
+      }
     }
+  }
   else
   { // Box Not Found
-      return false;
+    return false;
   }
 
   return false;
@@ -2195,11 +2198,7 @@ void
 NetworkTree::updateCurves(unsigned int boxID, bool forceUpdate)
 {
   if (boxID != NO_ID) {
-      QTreeWidgetItem *item;
-      QList<QTreeWidgetItem *>list = _assignedItems.keys();
-      QList<QTreeWidgetItem *>::iterator it;
-      for (it = list.begin(); it != list.end(); it++) {          
-          item = *it;          
+      for (QTreeWidgetItem*& item : _assignedItems.keys()) {
           updateCurve(item, boxID, forceUpdate);
         }
     }
