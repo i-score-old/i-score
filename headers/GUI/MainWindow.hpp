@@ -219,7 +219,7 @@ class MainWindow : public QMainWindow
     /*!
      * \brief Updates start/end messages and messages to assign, asking to engine.
      */
-    void updateRecordingBoxes();
+    void updateRecordingBoxes(bool onPlay);
 
   private:
     /*!

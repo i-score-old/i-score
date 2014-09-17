@@ -77,7 +77,6 @@ using std::string;
 const string MaquetteScene::DEFAULT_TRIGGER_MSG = "/trigger";
 float MaquetteScene::MS_PER_PIXEL = 16;
 const float MaquetteScene::MS_PRECISION = 10;
-const float LINE_WIDTH = 1.1;
 
 MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
   : QGraphicsScene(rect)
@@ -1595,6 +1594,7 @@ MaquetteScene::playOrResume()
     _startingValue = _maquette->getTimeOffset();
     
     emit(playModeChanged());
+
 }
 
 void
@@ -1609,15 +1609,16 @@ MaquetteScene::playOrResume(QList<unsigned int> boxesId)
 void
 MaquetteScene::stopOrPause()
 {
+    _playThread->stop();
     if (!_maquette->isExecutionPaused()){
         _maquette->pauseExecution();
         emit(playModeChanged());
     }
     else {
-        _playThread->quit();
+
         _maquette->turnExecutionOff();
         emit(playModeChanged());
-        emit(updateRecordingBoxes());
+        emit(updateRecordingBoxes(false));
         _playingBoxes.clear();        
     }        
 }
@@ -1625,7 +1626,7 @@ MaquetteScene::stopOrPause()
 void
 MaquetteScene::stopOrPause(QList<unsigned int> boxesId)
 {
-    _playThread->quit();
+    _playThread->stop();
     for(QList<unsigned int>::iterator it=boxesId.begin(); it!=boxesId.end(); it++){
         _maquette->turnExecutionOff(*it);
     }
@@ -1636,7 +1637,7 @@ MaquetteScene::stopAndGoToTimeOffset(unsigned int timeOffset)
 {
     displayMessage(tr("Stopped").toStdString(), INDICATION_LEVEL);
 
-    _playThread->quit();
+    _playThread->stop();
     _maquette->stopPlayingAndGoToTimeOffset(timeOffset);    
     emit(playModeChanged());
     _playingBoxes.clear();            
@@ -1648,9 +1649,9 @@ MaquetteScene::stopAndGoToCurrentTime()
     displayMessage(tr("Stopped").toStdString(), INDICATION_LEVEL);
     
     _maquette->stopPlayingAndGoToCurrentTime();
-    _playThread->quit();
+    _playThread->stop();
     emit(playModeChanged());
-    emit(updateRecordingBoxes());
+    emit(updateRecordingBoxes(false));
     _playingBoxes.clear();           
 }
 
@@ -1679,7 +1680,7 @@ MaquetteScene::stopAndGoToStart()
     
     _maquette->setAccelerationFactor(1.);
     emit(accelerationValueChanged(1.));
-    _playThread->quit();
+    _playThread->stop();
     _playingBoxes.clear();
     _maquette->stopPlayingAndGoToStart();
 
@@ -1693,7 +1694,7 @@ MaquetteScene::stopAndGoToStart()
     emit(playModeChanged());
 
     if(updateRecBoxes)
-        emit(updateRecordingBoxes());
+        emit(updateRecordingBoxes(false));
 }
 
 void
@@ -1733,14 +1734,14 @@ MaquetteScene::removeSelectedItems()
 }
 
 void
-MaquetteScene::updatePlayModeView()
+MaquetteScene::updatePlayModeView(bool running)
 {
     view()->updateTimeOffsetView();
     
     update();
     
     emit(playModeChanged());
-    emit(updateRecordingBoxes());
+    emit(updateRecordingBoxes(running));
 }
 
 bool

@@ -47,18 +47,13 @@
 #include "NetworkMessages.hpp"
 #include "NetworkTree.hpp"
 
-static const int ENGLISH = 0;
-static const int FRENCH = 1;
 static const float S_TO_MS = 1000.;
 
 static const int TOP_MARGIN = 8;
 static const int BOTTOM_MARGIN = 0;
 static const int LEFT_MARGIN = 1;
 static const int RIGHT_MARGIN = 1;
-static const int MINIMUM_WIDTH = 500;
 static const int COLOR_ICON_SIZE = 21;
-static const int CENTRAL_LAYOUT_VERTICAL_SPACING = 0;
-static const int BOX_SETTING_LAYOUT_SPACING = 15;
 
 AttributesEditor::AttributesEditor(QWidget* parent) : QDockWidget(tr("Inspector"), parent, 0)
 {

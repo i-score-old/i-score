@@ -50,7 +50,7 @@ using std::pair;
 using std::vector;
 
 AbstractCurve::AbstractCurve(unsigned int boxID, const std::string &address, unsigned int argPosition,
-                             unsigned int sampleRate, bool redundancy, bool show, bool interpolate, float lastPointCoeff, const vector<float> &curve,
+                             unsigned int sampleRate, bool redundancy, bool show, bool interpolate, float /*lastPointCoeff*/, const vector<float> &curve,
                              const map<float, pair<float, float> > &breakpoints) :
   _boxID(boxID), _address(address), _argPosition(argPosition), _sampleRate(sampleRate), _redundancy(redundancy), _show(show),
   _interpolate(interpolate), _curve(curve), _breakpoints(breakpoints)

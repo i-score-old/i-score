@@ -69,7 +69,7 @@ class PlayingThread : public QObject
 
     bool isRunning() const;
     void start();
-    void quit();
+    void stop();
 
   private slots:
     void update();

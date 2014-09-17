@@ -1467,7 +1467,6 @@ Maquette::generateTriggerQueue()
 void
 Maquette::initSceneState()
 {
-    std::cout<<">>>InitSceneState<<<"<<std::endl;
   //Pour palier au bug du moteur (qui envoie tous les messages début et fin de toutes les boîtes < time offset)
 
   double timeOffset = (double)_engines->getTimeOffset();
@@ -1535,7 +1534,7 @@ Maquette::initSceneState()
 
 void
 Maquette::turnExecutionOn()
-{    
+{
     // Start execution from where is the time offset is
     unsigned int timeOffset = _engines->getTimeOffset();
 
@@ -1618,7 +1617,7 @@ Maquette::resumeExecution()
 bool
 Maquette::isExecutionPaused()
 {
-    return _engines->isPaused();
+  return _engines->isPaused();
 }
 
 void
@@ -2138,9 +2137,9 @@ Maquette::updateBoxRunningStatus(unsigned int boxID, bool running)
 }
 
 void
-Maquette::udpatePlayModeView()
+Maquette::udpatePlayModeView(bool running)
 {
-    _scene->updatePlayModeView();
+    _scene->updatePlayModeView(running);
 }
 
 void
@@ -2155,7 +2154,7 @@ boxIsRunningCallback(unsigned int boxID, bool running)
   Maquette::getInstance()->updateBoxRunningStatus(boxID, running);
 
   if(boxID==ROOT_BOX_ID)
-      Maquette::getInstance()->udpatePlayModeView();
+      Maquette::getInstance()->udpatePlayModeView(running);
 }
 
 void

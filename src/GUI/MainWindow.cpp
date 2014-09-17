@@ -86,7 +86,6 @@ using std::string;
 #include <sstream>
 using std::stringstream;
 
-static const float S_TO_MS = 1000.;
 
 MainWindow::MainWindow()
 {
@@ -146,7 +145,7 @@ MainWindow::MainWindow()
   connect(_scene, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
   connect(_view, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
   connect(_scene, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
-  connect(_scene, SIGNAL(updateRecordingBoxes()), this, SLOT(updateRecordingBoxes()));
+  connect(_scene, &MaquetteScene::updateRecordingBoxes, this, &MainWindow::updateRecordingBoxes);
 }
 
 MainWindow::~MainWindow()
@@ -796,13 +795,13 @@ MainWindow::updatePlayMode(){
 }
 
 void
-MainWindow::updateRecordingBoxes(){
-
+MainWindow::updateRecordingBoxes(bool onPlay)
+{
     //Update recorded curves
     QList<BasicBox*> boxes = Maquette::getInstance()->getRecordingBoxes();
     QList<BasicBox*>::iterator it;
-    for (it = boxes.begin(); it != boxes.end(); it++){
-
+    for (it = boxes.begin(); it != boxes.end(); it++)
+    {
         //Setting start/end messages
         QList< QPair<QTreeWidgetItem *, Message> > startItemsAndMsgs = _editor->networkTree()->getItemsFromMsg(Maquette::getInstance()->firstMessagesToSend((*it)->ID()));
         QList< QPair<QTreeWidgetItem *, Message> > endItemsAndMsgs = _editor->networkTree()->getItemsFromMsg(Maquette::getInstance()->lastMessagesToSend((*it)->ID()));
@@ -825,6 +824,10 @@ MainWindow::updateRecordingBoxes(){
         Maquette::getInstance()->setSelectedItemsToSend((*it)->ID(), itemsToAssign);
 
         //Updating curve
-        (*it)->updateRecordingCurves();
+        if(!onPlay)
+        {
+          (*it)->updateRecordingCurves();
+        }
+
     }
 }

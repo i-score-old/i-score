@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <QDebug>
 
 using namespace std;
 
@@ -699,7 +700,7 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
                                        TimeEventIndex controlPoint1,
                                        TimeProcessId boxId2,
                                        TimeEventIndex controlPoint2,
-                                       TemporalRelationType type,
+                                       TemporalRelationType /*type*/,
                                        vector<TimeProcessId>& movedBoxes)
 {
     TTObject    timeProcess;
@@ -1499,7 +1500,7 @@ void Engine::setCurveRecording(TimeProcessId boxId, const std::string & address,
     getTimeProcess(boxId).send("CurveRecord", args, out);
 }
 
-bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned int /*argNb*/, const std::vector<float> & percent, const std::vector<float> & y, const std::vector<short> & sectionType, const std::vector<float> & coeff)
+bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned int /*argNb*/, const std::vector<float> & percent, const std::vector<float> & y, const std::vector<short> & /*sectionType*/, const std::vector<float> & coeff)
 {
     TTObject    curve;
     TTValue     parameters, objects;
@@ -1532,7 +1533,7 @@ bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned
     return err == kTTErrNone;
 }
 
-bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned int argNb,
+bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned int /*argNb*/,
                               std::vector<float> & percent,  std::vector<float> & y,  std::vector<short> & sectionType,  std::vector<float> & coeff)
 {
     TTObject    curve;
@@ -1567,7 +1568,7 @@ bool Engine::getCurveSections(TimeProcessId boxId, std::string address, unsigned
     return err == kTTErrNone;
 }
 
-bool Engine::getCurveValues(TimeProcessId boxId, const std::string & address, unsigned int argNb, std::vector<float>& result)
+bool Engine::getCurveValues(TimeProcessId boxId, const std::string & address, unsigned int /*argNb*/, std::vector<float>& result)
 {
     TTObject    curve;
     TTValue     out, duration, curveValues;
@@ -2576,7 +2577,7 @@ Engine::requestObjectChildren(const std::string & address, vector<string>& child
 }
 
 bool
-Engine::rebuildNetworkNamespace(const string &deviceName, const string &address)
+Engine::rebuildNetworkNamespace(const string &deviceName, const string &/*address*/)
 {
     TTValue     v, none;
     TTSymbol    applicationName(deviceName);
@@ -3421,7 +3422,7 @@ void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value
     }
 }
 
-void TimeProcessStartCallback(const TTValue& baton, const TTValue& value)
+void TimeProcessStartCallback(const TTValue& baton, const TTValue& /*value*/)
 {
     EnginePtr       engine;
     TimeProcessId   boxId;
@@ -3438,7 +3439,7 @@ void TimeProcessStartCallback(const TTValue& baton, const TTValue& value)
 
 }
 
-void TimeProcessEndCallback(const TTValue& baton, const TTValue& value)
+void TimeProcessEndCallback(const TTValue& baton, const TTValue& /*value*/)
 {
     EnginePtr       engine;
     TimeProcessId   boxId;
