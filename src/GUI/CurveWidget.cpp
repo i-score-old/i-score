@@ -160,7 +160,7 @@ CurveWidget::setAttributes(unsigned int boxID,
                            bool redundancy,
                            bool show,
                            bool interpolate,
-                           const vector<string> &argType,
+                           const vector<string> &/*argType*/,
                            const vector<float> &xPercents,
                            const vector<float> &yValues,
                            const vector<short> &sectionType,
@@ -194,7 +194,7 @@ CurveWidget::setAttributes(unsigned int boxID,
 void
 CurveWidget::setAttributes(unsigned int boxID,
                            const std::string &address,
-                           unsigned int argPosition,
+                           unsigned int /*argPosition*/,
                            const vector<float> &values,
                            unsigned int sampleRate,
                            bool redundancy,
@@ -607,8 +607,8 @@ CurveWidget::paintEvent(QPaintEvent * /* event */)
 
   vector<float>::iterator it;
   map<float, pair<float, float> >::iterator it2;
-  float pointSizeX = 4;
-  float pointSizeY = 4;
+  float pointSizeX = 6;
+  float pointSizeY = 6;
   QPointF curPoint(0, 0);
   QPointF precPoint(-1, -1);
 

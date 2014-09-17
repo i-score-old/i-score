@@ -392,16 +392,6 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
               else {
                   bool show = true;
 
-                  if(getCurveValuesSuccess)
-                      interpolate = true;
-
-//                    interpolate = !Maquette::getInstance()->getCurveMuteState(_boxID,address);
-//                    if (xPercents.empty() && yValues.empty() && values.size() >= 2) {
-//                        if (values.front() == values.back()) {
-//                            show = false;
-//                            interpolate = false;
-//                        }
-//                    }
                   //Set attributes
                   curveTab = new CurveWidget(NULL);
                   QString curveAddressStr = QString::fromStdString(address);

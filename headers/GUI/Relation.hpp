@@ -246,18 +246,14 @@ class Relation : public QGraphicsItem
   private:
     MaquetteScene * _scene;      //!< The scene containing relation.
 
-    QMenu* _contextMenu;         //!< The contextual menu.
-
     AbstractRelation *_abstract; //!< The abstract relation containing main information.
 
     QPointF _start;              //!< The starting point of the relation.
     QPointF _end;                //!< The ending point of the relation.
-    float _startBound;
-    float _endBound;
+
 
     QRectF _startBoundRect;
     QRectF _endBoundRect;
-    float _zoom;
 
     bool _leftHandleSelected;   //!< Left handle selection state.
     bool _rightHandleSelected;  //!< Right handle selection state.
@@ -268,8 +264,6 @@ class Relation : public QGraphicsItem
     float _lastMaxBound;
     QPointF _mouseClickPosSave;
 
-    bool _leftBoundModified;
-    bool _rightBoundModified;
 
     bool _hover;
 

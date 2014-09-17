@@ -68,7 +68,7 @@ void PlayingThread::start()
   _timer.start(_frameDuration);
 }
 
-void PlayingThread::quit()
+void PlayingThread::stop()
 {
   _timer.stop();
 }

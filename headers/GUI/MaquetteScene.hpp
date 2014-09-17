@@ -564,8 +564,6 @@ class MaquetteScene : public QGraphicsScene
     zoom(){ return _view->zoom(); }
     void updateProgressBar();
     void setAccelerationFactor(double value);
-    inline NetworkTree *
-    networkTreeAssociated(){ return _networkTreeAssociated; }
 
     float getMaxSceneWidth();
     void setMaxSceneWidth(float maxSceneWidth);
@@ -624,7 +622,7 @@ class MaquetteScene : public QGraphicsScene
     void stopPlaying();
     void accelerationValueChanged(double value);
     void playModeChanged();
-    void updateRecordingBoxes();
+    void updateRecordingBoxes(bool onPlay);
 
   public slots:
     void verticalScroll(int value);
@@ -656,7 +654,7 @@ class MaquetteScene : public QGraphicsScene
     /*!
      * \brief Called when the time reaches the end.
      */
-    void updatePlayModeView();
+    void updatePlayModeView(bool running);
 
     /*
      * \brief Called to update the next starting time.
@@ -781,6 +779,5 @@ class MaquetteScene : public QGraphicsScene
     double _accelerationFactor;
 
     QList<TriggerPoint *> *_triggersQueueList; //Lists triggers waiting
-    NetworkTree *_networkTreeAssociated;
 };
 #endif
