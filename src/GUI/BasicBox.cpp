@@ -52,6 +52,7 @@
 #include "Relation.hpp"
 #include "ConditionalRelation.hpp"
 #include "CurveWidget.hpp"
+#include "CurvesComboBox.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -311,44 +312,9 @@ BasicBox::createWidget()
   _curveProxy->setPalette(palette);
 
   //---------------- ComboBox (curves list) ------------------//
-  _comboBox = new QComboBox;
-  _comboBox->view()->setTextElideMode(Qt::ElideMiddle);
-  _comboBox->setInsertPolicy(QComboBox::InsertAtTop);
-  QFont font;
-  font.setPointSize(10);
-  _comboBox->setFont(font);
-  _comboBox->setStyleSheet(
-              "QComboBox {"
-              "color: black;"
-//              "border: none;"
-//              "border-radius: none;"
-//              "background-color: red;"
-//              "selection-color: black;"
-              "selection-background-color: gray;"
-              "}"
-//        "QComboBox:editable { background: red; }"
-
-              "QComboBox::drop-down {"
-              "border-color: gray;"
-              "color: black;"
-              "}"
-
-              //"QComboBox::down-arrow {"
-              //"image: url(:/resources/images/downArrow.png);"
-              //"padding-right: 10px;"
-              //"}"
-
-              "QComboBox QAbstractItemView{"
-              "background: gray;"
-              "}"
-              );
-
-  QPalette p = _comboBox->palette();
-  p.setColor(QPalette::Window, Qt::transparent);
-  _comboBox->setPalette(p);
+  _comboBox = new CurvesComboBox;
   _comboBoxProxy = new QGraphicsProxyWidget(this);
   _comboBoxProxy->setWidget(_comboBox);
-  _comboBoxProxy->setPalette(palette);
   _boxContentWidget->setComboBox(_comboBox);
 }
 
@@ -2163,7 +2129,7 @@ BasicBox::updateRecordingCurves(){
 void
 BasicBox::setButtonsVisible(bool value)
 {
-    _comboBoxProxy->setVisible(value);
+    _comboBoxProxy->setVisible(true);
     _startMenuButton->setVisible(value);
     _endMenuButton->setVisible(value);
     _playButton->setVisible(!_playing && value);

@@ -75,7 +75,7 @@ class Relation;
 class ConditionalRelation;
 class AbstractCurve;
 class QObject;
-
+class CurvesComboBox;
 /*!
  * \brief Enum used to manage various box extremities.
  */
@@ -711,47 +711,36 @@ class BasicBox : public QObject, public QGraphicsItem
     void drawSelectShape(QPainter *painter);
 
     void updateBoxSize();
-    inline QRectF
-    leftEar(){ return _leftEar; }
-    inline QRectF
-    rightEar(){ return _rightEar; }
-    inline BoxWidget *
-    boxContentWidget(){ return _boxContentWidget; }
-    inline QWidget *
-    boxWidget(){ return _boxWidget; }
-    inline MaquetteScene *
-    maquetteScene(){ return _scene; }
-    inline void
-    setStackedLayout(QStackedLayout *slayout){ boxContentWidget()->setStackedLayout(slayout); }
-    inline bool
-    hasCurve(string address){ return _curvesAddresses.contains(address); }
+    QRectF leftEar(){ return _leftEar; }
+    QRectF rightEar(){ return _rightEar; }
+    BoxWidget * boxContentWidget(){ return _boxContentWidget; }
+    QWidget * boxWidget(){ return _boxWidget; }
+    MaquetteScene * maquetteScene(){ return _scene; }
+    void setStackedLayout(QStackedLayout *slayout){ boxContentWidget()->setStackedLayout(slayout); }
+    bool hasCurve(string address){ return _curvesAddresses.contains(address); }
     void addMessageToRecord(std::string address);
     void removeMessageToRecord(std::string address);
 
     QPointF getLeftGripPoint();
     QPointF getRightGripPoint();
     void displayCurveEditWindow();
-    inline bool
-    hasStartMsgs(){ return _abstract->hasFirstMsgs(); }
-    inline bool
-    hasEndMsgs(){ return _abstract->hasLastMsgs(); }
+    bool hasStartMsgs(){ return _abstract->hasFirstMsgs(); }
+    bool hasEndMsgs(){ return _abstract->hasLastMsgs(); }
     void drawMsgsIndicators(QPainter *painter);
     void updateFlexibility();
     void addToComboBox(QString address);
     QString currentText();
-    inline qreal
-    currentZvalue(){ return _currentZvalue; }
+    qreal currentZvalue(){ return _currentZvalue; }
     void lower(bool state);
     void changeColor(QColor color);
-    inline QColor
-    currentColor(){ return _color; }
+    QColor currentColor(){ return _color; }
     void select();
     void setRecMode(bool activated);
     void setMuteState(bool activated);
-    inline bool recording(){return _recording;}
-    inline bool getMuteState(){return _mute;}
-    inline bool isConditioned(){return !_conditionalRelation.isEmpty();}
-    inline QList<ConditionalRelation *> getConditionalRelations(){return _conditionalRelation;}
+    bool recording(){return _recording;}
+    bool getMuteState(){return _mute;}
+    bool isConditioned(){return !_conditionalRelation.isEmpty();}
+    QList<ConditionalRelation *> getConditionalRelations(){return _conditionalRelation;}
 
     void updateRecordingCurves();
     void setButtonsVisible(bool value);
@@ -862,7 +851,7 @@ class BasicBox : public QObject, public QGraphicsItem
     QRectF _endMsgsIndicator;
 
     QWidget *_boxWidget{};
-    QComboBox *_comboBox{};
+    CurvesComboBox *_comboBox{};
     QGraphicsProxyWidget *_curveProxy{};
     QGraphicsProxyWidget *_comboBoxProxy{};
     QList<string> _curvesAddresses;
