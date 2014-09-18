@@ -73,6 +73,7 @@ headers/GUI/AttributesEditor.hpp \
 headers/GUI/BasicBox.hpp \
 headers/GUI/Comment.hpp \
 headers/GUI/CurveWidget.hpp \
+headers/GUI/CurvesComboBox.hpp \
 headers/GUI/Help.hpp \
 headers/GUI/LogarithmicSlider.hpp \
 headers/GUI/MainWindow.hpp \
@@ -108,6 +109,7 @@ src/GUI/AttributesEditor.cpp \
 src/GUI/BasicBox.cpp \
 src/GUI/Comment.cpp \
 src/GUI/CurveWidget.cpp \
+src/GUI/CurvesComboBox.cpp \
 src/GUI/Help.cpp \
 src/GUI/LogarithmicSlider.cpp \
 src/GUI/MainWindow.cpp \
