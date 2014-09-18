@@ -722,8 +722,6 @@ class BasicBox : public QObject, public QGraphicsItem
     inline MaquetteScene *
     maquetteScene(){ return _scene; }
     inline void
-    setComboBox(QComboBox *cbox){ boxContentWidget()->setComboBox(cbox); }
-    inline void
     setStackedLayout(QStackedLayout *slayout){ boxContentWidget()->setStackedLayout(slayout); }
     inline bool
     hasCurve(string address){ return _curvesAddresses.contains(address); }
@@ -841,19 +839,19 @@ class BasicBox : public QObject, public QGraphicsItem
     void displayBoxDuration();
 
     //! Managing main information of the box.
-    AbstractBox *_abstract;
+    AbstractBox *_abstract{};
 
-    MaquetteScene * _scene;                                                     //!< The scene containing box.
+    MaquetteScene * _scene{};                                                     //!< The scene containing box.
     bool _shift;                                                                //!< State of Shift Key.
     bool _playing;                                                              //!< State of playing.
     bool _recording;                                                            //!< State of recording.
     bool _mute;                                                                 //!< State of mute.    
-    Comment *_comment;                                                          //!< The box comment.
-    QMap<BoxExtremity, TriggerPoint*> *_triggerPoints;                          //!< The trigger points.
+    Comment *_comment{};                                                          //!< The box comment.
+    QMap<BoxExtremity, TriggerPoint*> *_triggerPoints{};                          //!< The trigger points.
     std::map < BoxExtremity, std::map < unsigned int, Relation* > > _relations; //!< The relations.
     QList<ConditionalRelation *> _conditionalRelation;                          //!< The conditional relations attached.
     std::map<std::string, AbstractCurve*> _abstractCurves;                      //!< The Curves.
-    BoxWidget *_boxContentWidget;
+    BoxWidget *_boxContentWidget{};
 
     QRectF _boxRect;
     QRectF _leftEar;
@@ -863,32 +861,32 @@ class BasicBox : public QObject, public QGraphicsItem
     QRectF _startMsgsIndicator;
     QRectF _endMsgsIndicator;
 
-    QWidget *_boxWidget;
-    QComboBox *_comboBox;
-    QGraphicsProxyWidget *_curveProxy;
-    QGraphicsProxyWidget *_comboBoxProxy;
+    QWidget *_boxWidget{};
+    QComboBox *_comboBox{};
+    QGraphicsProxyWidget *_curveProxy{};
+    QGraphicsProxyWidget *_comboBoxProxy{};
     QList<string> _curvesAddresses;
     bool _flexible;
     qreal _currentZvalue;
     QColor _color;
     QColor _colorUnselected;
-    QGraphicsColorizeEffect *_recEffect;
+    QGraphicsColorizeEffect *_recEffect{};
 
     bool _low;
     bool _hover;
 
-    QAction *_jumpToStartCue;
-    QAction *_jumpToEndCue;
-    QAction *_updateStartCue;
-    QAction *_updateEndCue;
+    QAction *_jumpToStartCue{};
+    QAction *_jumpToEndCue{};
+    QAction *_updateStartCue{};
+    QAction *_updateEndCue{};
 
-    QMenu *_startMenu;
-    QMenu *_endMenu;
+    QMenu *_startMenu{};
+    QMenu *_endMenu{};
 
-    QPushButton *_startMenuButton;
-    QPushButton *_endMenuButton;
-    QPushButton *_playButton;
-    QPushButton *_stopButton;
+    QPushButton *_startMenuButton{};
+    QPushButton *_endMenuButton{};
+    QPushButton *_playButton{};
+    QPushButton *_stopButton{};
 
 };
 #endif
