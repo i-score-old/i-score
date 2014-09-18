@@ -3074,6 +3074,11 @@ int Engine::appendToNetWorkNamespace(const std::string & address, const std::str
         v.fromString();
         anObject.set("tags", v);
         
+        // initialize the value with a default 0. value
+        anObject.set("valueDefault", 0.);
+        
+        anObject.send("Init");
+        
         return 1;
     }
     

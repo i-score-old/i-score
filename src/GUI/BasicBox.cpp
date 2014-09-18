@@ -1534,12 +1534,12 @@ void
 BasicBox::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
   QGraphicsItem::contextMenuEvent(event);
-
+/*
   if (_hasContextMenu) {
       setSelected(false);
       static_cast<BoxContextMenu *>(_contextMenu)->setDetachActionEnabled(isConditioned());
       _contextMenu->exec(event->screenPos());
-    }
+    }*/
 }
 
 QInputDialog *

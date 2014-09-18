@@ -607,8 +607,8 @@ CurveWidget::paintEvent(QPaintEvent * /* event */)
 
   vector<float>::iterator it;
   map<float, pair<float, float> >::iterator it2;
-  float pointSizeX = 4;
-  float pointSizeY = 4;
+  float pointSizeX = 6;
+  float pointSizeY = 6;
   QPointF curPoint(0, 0);
   QPointF precPoint(-1, -1);
 
