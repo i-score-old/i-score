@@ -52,7 +52,6 @@
 #include "Relation.hpp"
 #include "ConditionalRelation.hpp"
 #include "CurveWidget.hpp"
-#include "BoxCurveEdit.hpp"
 #include "BoxContextMenu.hpp"
 
 #include <algorithm>

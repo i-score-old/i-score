@@ -85,7 +85,6 @@ headers/GUI/RelationEdit.hpp \
 headers/GUI/TriggerPoint.hpp \
 headers/GUI/ViewRelations.hpp \
 headers/GUI/BoxWidget.hpp \
-headers/GUI/BoxCurveEdit.hpp \
 headers/GUI/TimeBarWidget.hpp \
 headers/GUI/DeviceEdit.hpp \
 headers/GUI/HeaderPanelWidget.hpp \
@@ -124,7 +123,6 @@ src/GUI/RelationEdit.cpp \
 src/GUI/TriggerPoint.cpp \
 src/GUI/ViewRelations.cpp \
 src/GUI/BoxWidget.cpp \
-src/GUI/BoxCurveEdit.cpp \
 src/GUI/TimeBarWidget.cpp \
 src/GUI/DeviceEdit.cpp \
 src/GUI/HeaderPanelWidget.cpp \

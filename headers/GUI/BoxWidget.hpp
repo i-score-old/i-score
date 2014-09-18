@@ -62,8 +62,6 @@ class BoxWidget : public QWidget
     void setComboBox(QComboBox *cbox);
     inline QStackedLayout *
     stackedLayout(){ return _stackedLayout; }
-    inline QComboBox *
-    comboBox(){ return _comboBox; }
     inline void
     setStackedLayout(QStackedLayout *slayout){ _stackedLayout = slayout; setLayout(_stackedLayout); }
     void addToComboBox(const QString address);
