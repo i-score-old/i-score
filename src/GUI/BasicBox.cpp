@@ -315,6 +315,7 @@ BasicBox::createWidget()
   _comboBox = new CurvesComboBox;
   _comboBoxProxy = new QGraphicsProxyWidget(this);
   _comboBoxProxy->setWidget(_comboBox);
+  _comboBoxProxy->setZValue(1);
   _boxContentWidget->setComboBox(_comboBox);
 }
 
@@ -2135,7 +2136,8 @@ BasicBox::updateRecordingCurves(){
 void
 BasicBox::setButtonsVisible(bool value)
 {
-    _comboBoxProxy->setVisible(true);
+    _comboBoxProxy->setVisible(value || _comboBox->isShown());
+
     _startMenuButton->setVisible(value);
     _endMenuButton->setVisible(value);
     _playButton->setVisible(!_playing && value);

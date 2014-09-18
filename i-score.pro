@@ -83,9 +83,7 @@ headers/GUI/NetworkTree.hpp \
 headers/GUI/ParentBox.hpp \
 headers/GUI/PlayingThread.hpp \
 headers/GUI/Relation.hpp \
-headers/GUI/RelationEdit.hpp \
 headers/GUI/TriggerPoint.hpp \
-headers/GUI/ViewRelations.hpp \
 headers/GUI/BoxWidget.hpp \
 headers/GUI/TimeBarWidget.hpp \
 headers/GUI/DeviceEdit.hpp \
@@ -95,7 +93,6 @@ headers/GUI/ConditionalRelation.hpp \
 headers/IScoreApplication.hpp
 
 SOURCES += src/main.cpp \
-src/data/Abstract.cpp \
 src/data/AbstractBox.cpp \
 src/data/AbstractComment.cpp \
 src/data/AbstractCurve.cpp \
@@ -119,9 +116,7 @@ src/GUI/NetworkTree.cpp \
 src/GUI/ParentBox.cpp \
 src/GUI/PlayingThread.cpp \
 src/GUI/Relation.cpp \
-src/GUI/RelationEdit.cpp \
 src/GUI/TriggerPoint.cpp \
-src/GUI/ViewRelations.cpp \
 src/GUI/BoxWidget.cpp \
 src/GUI/TimeBarWidget.cpp \
 src/GUI/DeviceEdit.cpp \

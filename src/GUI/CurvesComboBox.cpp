@@ -29,3 +29,22 @@ CurvesComboBox::CurvesComboBox(QWidget *parent):
   p.setColor(QPalette::Window, Qt::transparent);
   setPalette(p);
 }
+
+
+void CurvesComboBox::showPopup()
+{
+  shown = true;
+  QComboBox::showPopup();
+}
+
+
+void CurvesComboBox::hidePopup()
+{
+  shown = false;
+  QComboBox::hidePopup();
+}
+
+bool CurvesComboBox::isShown() const
+{
+  return shown;
+}
