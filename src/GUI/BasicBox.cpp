@@ -315,6 +315,7 @@ BasicBox::createWidget()
   _comboBox = new CurvesComboBox;
   _comboBoxProxy = new QGraphicsProxyWidget(this);
   _comboBoxProxy->setWidget(_comboBox);
+  _comboBoxProxy->setZValue(1);
   _boxContentWidget->setComboBox(_comboBox);
 }
 
