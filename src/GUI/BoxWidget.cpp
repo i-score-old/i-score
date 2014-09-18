@@ -61,7 +61,6 @@ using std::string;
 #include "BasicBox.hpp"
 #include "CurveWidget.hpp"
 #include "BoxWidget.hpp"
-#include "Interpolation.hpp"
 #include "Maquette.hpp"
 #include "MaquetteScene.hpp"
 #include "MaquetteView.hpp"
@@ -580,9 +579,10 @@ BoxWidget::displayEndMenu(QPoint pos)
       _endMenu->exec(pos);
     }
 }
-
+#include <QDebug>
 void
 BoxWidget::updateCurveRangeBoundMin(string address, float value){
+  qDebug() <<Q_FUNC_INFO << value;
     CurveWidget *curve = getCurveWidget(address);
     if(curve != NULL){
         curve->setMinY(value);
@@ -591,6 +591,7 @@ BoxWidget::updateCurveRangeBoundMin(string address, float value){
 
 void
 BoxWidget::updateCurveRangeBoundMax(string address, float value){
+    qDebug() <<Q_FUNC_INFO << value;
     CurveWidget *curve = getCurveWidget(address);
     std::cout<<"BW::updateMAX"<<std::endl;
     if(curve != NULL){

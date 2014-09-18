@@ -147,9 +147,23 @@ CurveWidget::curveRepresentationOutdated()
 
   float halfSizeY = std::max(fabs(_maxY), fabs(_minY));  
   _scaleY = 2 * (_xAxisPos - BORDER_WIDTH) / (2 * halfSizeY);
-
   update();
 }
+
+void CurveWidget::adaptScale()
+{
+  _maxY = *(std::max_element(_abstract->_curve.begin(), _abstract->_curve.end()));
+  _minY = *(std::min_element(_abstract->_curve.begin(), _abstract->_curve.end()));
+
+  _xAxisPos = (_minY >= 0.)? height() - BORDER_WIDTH : (height() - BORDER_WIDTH) / 2.;
+
+  _interspace = (width() - BORDER_WIDTH) / (float)(std::max((unsigned int)2, (unsigned int)(_abstract->_curve.size())) - 1);
+
+  float halfSizeY = std::max(fabs(_maxY), fabs(_minY));
+  _scaleY = 2 * (_xAxisPos - BORDER_WIDTH) / (2 * halfSizeY);
+  update();
+}
+
 
 void
 CurveWidget::setAttributes(unsigned int boxID,
@@ -160,7 +174,7 @@ CurveWidget::setAttributes(unsigned int boxID,
                            bool redundancy,
                            bool show,
                            bool interpolate,
-                           const vector<string> &argType,
+                           const vector<string> &/*argType*/,
                            const vector<float> &xPercents,
                            const vector<float> &yValues,
                            const vector<short> &sectionType,
@@ -194,7 +208,7 @@ CurveWidget::setAttributes(unsigned int boxID,
 void
 CurveWidget::setAttributes(unsigned int boxID,
                            const std::string &address,
-                           unsigned int argPosition,
+                           unsigned int /*argPosition*/,
                            const vector<float> &values,
                            unsigned int sampleRate,
                            bool redundancy,
@@ -353,31 +367,17 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
     QWidget::mouseMoveEvent(event);
 
     // Draw cursor coordinates as a tooltip
-    QPointF mousePos = relativeCoordinates(event->pos());
-    QString posStr = QString("%1 ; %2").arg(mousePos.x(), 0, 'f', 3).arg(mousePos.y(), 0, 'f', 3);
-    Maquette::getInstance()->scene()->displayMessage(posStr.toStdString(), INDICATION_LEVEL);
+    QPointF relativePoint = relativeCoordinates(event->pos());
+    if(relativePoint.y() < std::numeric_limits<int>::min())
+       relativePoint.setY(std::numeric_limits<int>::min());
+    if(relativePoint.y() > std::numeric_limits<int>::max())
+       relativePoint.setY(std::numeric_limits<int>::max());
 
-    /// \todo : Doesn't work (only updated when entering again in the widget). NH
-    //Setting cursor associated to the mode (draw, move, eraser...)
-//    switch (event->modifiers()) {
-//    case Qt::ControlModifier:{
-//        setCursor(Qt::CrossCursor);
-//        break;
-//    }
-//    case Qt::AltModifier:{
-//        setCursor(Qt::ForbiddenCursor);
-//        break;
-//    }
-//    default:{
-//        setCursor(Qt::CrossCursor);
-//        break;
-//    }
-//    }
+    QString posStr = QString("%1 ; %2").arg(relativePoint.x(), 0, 'f', 3).arg(relativePoint.y(), 0, 'f', 3);
+    Maquette::getInstance()->scene()->displayMessage(posStr.toStdString(), INDICATION_LEVEL);
 
     // Handle interactions
     if (_clicked) {
-        QPointF relativePoint = relativeCoordinates(event->pos());
-
         switch (event->modifiers()) {
         case Qt::ShiftModifier: // POW
         {
@@ -607,8 +607,8 @@ CurveWidget::paintEvent(QPaintEvent * /* event */)
 
   vector<float>::iterator it;
   map<float, pair<float, float> >::iterator it2;
-  float pointSizeX = 4;
-  float pointSizeY = 4;
+  float pointSizeX = 6;
+  float pointSizeY = 6;
   QPointF curPoint(0, 0);
   QPointF precPoint(-1, -1);
 
@@ -724,3 +724,4 @@ CurveWidget::updateRangeClipMode(){
         }
     }
 }
+

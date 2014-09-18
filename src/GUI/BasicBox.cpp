@@ -52,8 +52,7 @@
 #include "Relation.hpp"
 #include "ConditionalRelation.hpp"
 #include "CurveWidget.hpp"
-#include "BoxCurveEdit.hpp"
-#include "BoxContextMenu.hpp"
+#include "CurvesComboBox.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -106,15 +105,6 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 {    
 
   _scene = parent;
-  _startMenu = NULL;
-  _endMenu = NULL;
-  _startMenuButton = NULL;
-  _endMenuButton = NULL;
-  _boxContentWidget = NULL;
-  _boxWidget = NULL;
-  _comboBox = NULL;
-  _startMenuButton = NULL;
-  _endMenuButton = NULL;
 
   /// \todo : !! Problème d'arrondi, on cast en int des floats !! A étudier parce que crash (avec 0 notamment) si on remet en float. NH
   int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
@@ -145,26 +135,26 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 void
 BasicBox::centerWidget()
 {
-    if(_boxWidget != NULL){
+    if(_boxWidget != nullptr){
         _boxWidget->move(-(width()) / 2 + LINE_WIDTH, -(height()) / 2 + (1.2 * RESIZE_TOLERANCE));
         _boxWidget->resize(width() - 2 * LINE_WIDTH, height() - 1.5 * RESIZE_TOLERANCE);
     }
 
-    if(_comboBox != NULL){
+    if(_comboBox != nullptr){
         _comboBox->move(0, -(height() / 2 + LINE_WIDTH));
         _comboBox->resize((width() - 4 * LINE_WIDTH - BOX_MARGIN) / 2, COMBOBOX_HEIGHT);
     }
 
-    if(_startMenuButton != NULL)
+    if(_startMenuButton != nullptr)
         _startMenuButton->move(-(width()) / 2 + LINE_WIDTH, -(height()) / 2);
 
-    if(_endMenuButton != NULL)
+    if(_endMenuButton != nullptr)
         _endMenuButton->move((width()) / 2 + 2 * LINE_WIDTH - BOX_MARGIN, -(height()) / 2 + LINE_WIDTH);
 
-    if(_playButton != NULL)
+    if(_playButton != nullptr)
         _playButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN-4, -(height()) / 2);
 
-    if(_stopButton != NULL)
+    if(_stopButton != nullptr)
         _stopButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN-4, -(height()) / 2);
 }
 
@@ -210,7 +200,7 @@ BasicBox::createMenus()
     "background-color: transparent;"
     "};"
     );
-  if(_boxContentWidget != NULL)
+  if(_boxContentWidget != nullptr)
       _boxContentWidget->setStartMenu(_startMenu);
 
   //--- end button ---
@@ -225,7 +215,7 @@ BasicBox::createMenus()
     "background-color: transparent;"
     "}"
     );
-  if(_boxContentWidget != NULL)
+  if(_boxContentWidget != nullptr)
       _boxContentWidget->setEndMenu(_endMenu);
 
 //  Play
@@ -322,44 +312,9 @@ BasicBox::createWidget()
   _curveProxy->setPalette(palette);
 
   //---------------- ComboBox (curves list) ------------------//
-  _comboBox = new QComboBox;
-  _comboBox->view()->setTextElideMode(Qt::ElideMiddle);
-  _comboBox->setInsertPolicy(QComboBox::InsertAtTop);
-  QFont font;
-  font.setPointSize(10);
-  _comboBox->setFont(font);
-  _comboBox->setStyleSheet(
-              "QComboBox {"
-              "color: black;"
-//              "border: none;"
-//              "border-radius: none;"
-//              "background-color: red;"
-//              "selection-color: black;"
-              "selection-background-color: gray;"
-              "}"
-//        "QComboBox:editable { background: red; }"
-
-              "QComboBox::drop-down {"
-              "border-color: gray;"
-              "color: black;"
-              "}"
-
-              //"QComboBox::down-arrow {"
-              //"image: url(:/resources/images/downArrow.png);"
-              //"padding-right: 10px;"
-              //"}"
-
-              "QComboBox QAbstractItemView{"
-              "background: gray;"
-              "}"
-              );
-
-  QPalette p = _comboBox->palette();
-  p.setColor(QPalette::Window, Qt::transparent);
-  _comboBox->setPalette(p);
+  _comboBox = new CurvesComboBox;
   _comboBoxProxy = new QGraphicsProxyWidget(this);
   _comboBoxProxy->setWidget(_comboBox);
-  _comboBoxProxy->setPalette(palette);
   _boxContentWidget->setComboBox(_comboBox);
 }
 
@@ -419,14 +374,13 @@ BasicBox::updateFlexibility()
 void
 BasicBox::init()
 {
-  _hasContextMenu = false;
   _shift = false;
   _playing = false;
   _recording = true;
   _mute = false;
   _low = false;
   _triggerPoints = new QMap<BoxExtremity, TriggerPoint*>();
-  _comment = NULL;
+  _comment = nullptr;
 
   _recEffect = new QGraphicsColorizeEffect(this);
   _recEffect->setColor(Qt::red);
@@ -466,7 +420,7 @@ BasicBox::changeColor(QColor color)
 void
 BasicBox::addToComboBox(QString address)
 {
-    if(_boxContentWidget != NULL){
+    if(_boxContentWidget != nullptr){
         _boxContentWidget->addToComboBox(address);
     }
 }
@@ -474,7 +428,7 @@ BasicBox::addToComboBox(QString address)
 void
 BasicBox::updateCurves()
 {
-    if(_boxContentWidget != NULL){
+    if(_boxContentWidget != nullptr){
         _boxContentWidget->updateMessages(_abstract->ID(), true);
         update();
     }
@@ -483,7 +437,7 @@ BasicBox::updateCurves()
 void
 BasicBox::updateCurve(string address, bool forceUpdate)
 {
-    if(_boxContentWidget != NULL){
+    if(_boxContentWidget != nullptr){
         _boxContentWidget->updateCurve(address, forceUpdate);                
         update();
     }
@@ -492,7 +446,7 @@ BasicBox::updateCurve(string address, bool forceUpdate)
 void
 BasicBox::updateCurveRangeBoundMin(string address, float value)
 {
-    if(_boxContentWidget != NULL){
+    if(_boxContentWidget != nullptr){
         _boxContentWidget->updateCurveRangeBoundMin(address, value);
         update();
     }
@@ -501,7 +455,7 @@ BasicBox::updateCurveRangeBoundMin(string address, float value)
 void
 BasicBox::updateCurveRangeBoundMax(string address, float value)
 {
-    if(_boxContentWidget != NULL){
+    if(_boxContentWidget != nullptr){
         _boxContentWidget->updateCurveRangeBoundMax(address, value);
         update();
     }
@@ -607,7 +561,7 @@ BasicBox::setRelativeTopLeft(const QPointF & rTopLeft)
   int relBeginPos = relTopLeft.x();
   if (_abstract->mother() != NO_ID && _abstract->mother() != ROOT_BOX_ID) {
       BasicBox *motherBox = _scene->getBox(_abstract->mother());
-      if (motherBox != NULL) {
+      if (motherBox != nullptr) {
           relBeginPos += motherBox->beginPos();
           relTopLeft.setX(relBeginPos);
         }
@@ -642,7 +596,7 @@ BasicBox::relativeBeginPos() const
   float relBeginPos = _abstract->topLeft().x();
   if (_abstract->mother() != NO_ID && _abstract->mother() != ROOT_BOX_ID) {
       BasicBox *motherBox = _scene->getBox(_abstract->mother());
-      if (motherBox != NULL) {
+      if (motherBox != nullptr) {
           relBeginPos -= _scene->getBox(_abstract->mother())->beginPos();
         }
       else {
@@ -723,7 +677,7 @@ BasicBox::resizeWidthEdition(float width)
 
   if (hasMother()) {
       BasicBox *motherBox = _scene->getBox(_abstract->mother());
-      if (motherBox != NULL) {
+      if (motherBox != nullptr) {
           if ((motherBox->getBottomRight().x() - width) <= _abstract->topLeft().x()) {
               if (_scene->resizeMode() == HORIZONTAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE) {   // Trying to escape by a resize to the right
                   newWidth = motherBox->getBottomRight().x() - _abstract->topLeft().x();
@@ -744,7 +698,7 @@ BasicBox::resizeHeightEdition(float height)
 
     if (hasMother()) {
         BasicBox *motherBox = _scene->getBox(_abstract->mother());
-        if (motherBox != NULL) {
+        if (motherBox != nullptr) {
             if ((motherBox->getBottomRight().y() - height) <= _abstract->topLeft().y()) {
                 if (_scene->resizeMode() == VERTICAL_RESIZE || _scene->resizeMode() == DIAGONAL_RESIZE) {   // Trying to escape by a resize to the right
                     newHeight = motherBox->getBottomRight().y() - _abstract->topLeft().y();
@@ -821,7 +775,7 @@ void
 BasicBox::updateStuff()
 {
   updateBoxSize();
-  if (_comment != NULL) {
+  if (_comment != nullptr) {
       _comment->updatePos();
     }
 
@@ -955,7 +909,7 @@ BasicBox::addComment(const AbstractComment &abstract)
 bool
 BasicBox::hasComment() const
 {
-  return(_comment != NULL);
+  return(_comment != nullptr);
 }
 
 Comment*
@@ -967,8 +921,8 @@ BasicBox::comment() const
 void
 BasicBox::removeComment()
 {
-  if (_comment != NULL) {
-      _comment = NULL;
+  if (_comment != nullptr) {
+      _comment = nullptr;
     }
 }
 
@@ -1132,7 +1086,7 @@ BasicBox::getTriggerPoint(BoxExtremity extremity)
     }
     else{
         std::cerr<<"BasicBox::getTriggerPoint : Cannot find trigger point on this extremity"<<std::endl;
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -1213,7 +1167,7 @@ BasicBox::setEndMessage(QTreeWidgetItem *item, QString address)
 AbstractCurve *
 BasicBox::getCurve(const std::string &address)
 {
-  AbstractCurve * curve = NULL;
+  AbstractCurve * curve = nullptr;
   map<string, AbstractCurve*>::iterator it;
   if ((it = _abstractCurves.find(address)) != _abstractCurves.end()) {
       curve = it->second;
@@ -1228,7 +1182,7 @@ BasicBox::curveActivationChanged(string address, bool activated)
   if (!hasCurve(address)) {
       addCurve(address);
     }
-  if(_boxContentWidget != NULL){
+  if(_boxContentWidget != nullptr){
       _boxContentWidget->curveActivationChanged(QString::fromStdString(address), activated);
   }
 
@@ -1240,7 +1194,7 @@ BasicBox::curveActivationChanged(string address, bool activated)
 void
 BasicBox::setCurve(const string &address, AbstractCurve *curve)
 {
-  if (curve != NULL) {
+  if (curve != nullptr) {
       _abstractCurves[address] = curve;
     }
   else {
@@ -1359,7 +1313,7 @@ BasicBox::itemChange(GraphicsItemChange change, const QVariant &value)
       QPointF newnewPos(newPos);
       if (hasMother()) {
           BasicBox *motherBox = _scene->getBox(_abstract->mother());
-          if (motherBox != NULL) {
+          if (motherBox != nullptr) {
               if ((motherBox->getTopLeft().y() + _abstract->height() / 2.) >= newPos.y()) {
                   if (_scene->resizeMode() == NO_RESIZE) {   // Trying to escape by a move to the top
                       newnewPos.setY(motherBox->getTopLeft().y() + _abstract->height() / 2.);
@@ -1444,10 +1398,16 @@ BasicBox::boxBody()
 {
   return QRectF(_boxRect.topLeft() + QPointF(0, RESIZE_TOLERANCE), _boxRect.bottomRight());
 }
+#include <QDebug>
 void
 BasicBox::keyPressEvent(QKeyEvent *event)
 {
   QGraphicsItem::keyPressEvent(event);
+  if(event->key() == Qt::Key_R)
+  {
+    CurveWidget *curve = (static_cast<CurveWidget *>(_boxContentWidget->stackedLayout()->currentWidget()));
+    curve->adaptScale();
+  }
 }
 
 void
@@ -1461,10 +1421,10 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
   QGraphicsItem::mousePressEvent(event);
 
-  if (_startMenu != NULL) {
+  if (_startMenu != nullptr) {
       _startMenu->close();
     }
-  if (_endMenu != NULL) {
+  if (_endMenu != nullptr) {
       _endMenu->close();
     }
 
@@ -1528,19 +1488,6 @@ BasicBox::lower(bool state)
     }
   updateRelations(BOX_START);
   updateRelations(BOX_END);
-}
-
-#include <QDebug>
-void
-BasicBox::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
-{
-  QGraphicsItem::contextMenuEvent(event);
-
-  if (_hasContextMenu) {
-      setSelected(false);
-      static_cast<BoxContextMenu *>(_contextMenu)->setDetachActionEnabled(isConditioned());
-      _contextMenu->exec(event->screenPos());
-    }
 }
 
 QInputDialog *
@@ -2188,7 +2135,7 @@ BasicBox::updateRecordingCurves(){
 void
 BasicBox::setButtonsVisible(bool value)
 {
-    _comboBoxProxy->setVisible(value);
+    _comboBoxProxy->setVisible(true);
     _startMenuButton->setVisible(value);
     _endMenuButton->setVisible(value);
     _playButton->setVisible(!_playing && value);

@@ -122,6 +122,10 @@ class CurveWidget : public QWidget
 
     void updateRangeClipMode();
 
+    /**
+     * @brief adaptScale Sets the scale so that the curve spans the whole Y axis
+     */
+    void adaptScale();
   protected:
     /*!
      * \brief Redefinition of QWidget::paintEvent(QPaintEvent *event).

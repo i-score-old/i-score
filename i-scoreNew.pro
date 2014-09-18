@@ -13,14 +13,15 @@ resources/translations = i-score_en.ts i-score_fr.ts
 
 unix {
     INCLUDEPATH += /usr/local/jamoma/include /usr/include/libxml2
-    QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-deprecated-register -O3 -fPIC -msse3 -std=c++11
+    QMAKE_CXXFLAGS += -std=c++11  -Wno-unused-parameter -Wno-deprecated-register
+    QMAKE_CXXFLAGS_RELEASE += -O3 -fPIC
     QMAKE_LFLAGS += -L/usr/local/lib/jamoma/lib -L/usr/local/lib/ -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
 
     LIBS += -L/usr/local/jamoma/lib -lJamomaFoundation -lJamomaDSP -lJamomaScore -lJamomaModular
     LIBS += -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodeset -lgecodesupport
-  
+
     contains(QMAKE_HOST.arch, 86){
-        QMAKE_CXXFLAGS += -msse3
+        QMAKE_CXXFLAGS_RELEASE += -msse3
     }
 
     macx{
@@ -66,31 +67,28 @@ headers/data/Maquette.hpp \
 headers/data/NetworkMessages.hpp \
 headers/GUI/AttributesEditor.hpp \
 headers/GUI/BasicBox.hpp \
-headers/GUI/BoxContextMenu.hpp \
 headers/GUI/Comment.hpp \
 headers/GUI/CurveWidget.hpp \
 headers/GUI/Help.hpp \
-headers/GUI/Interpolation.hpp \
 headers/GUI/LogarithmicSlider.hpp \
 headers/GUI/MainWindow.hpp \
 headers/GUI/MaquetteScene.hpp \
 headers/GUI/MaquetteView.hpp \
 headers/GUI/NetworkTree.hpp \
 headers/GUI/ParentBox.hpp \
-headers/GUI/ParentBoxContextMenu.hpp \
 headers/GUI/PlayingThread.hpp \
 headers/GUI/Relation.hpp \
 headers/GUI/RelationEdit.hpp \
 headers/GUI/TriggerPoint.hpp \
 headers/GUI/ViewRelations.hpp \
 headers/GUI/BoxWidget.hpp \
-headers/GUI/BoxCurveEdit.hpp \
 headers/GUI/TimeBarWidget.hpp \
 headers/GUI/DeviceEdit.hpp \
 headers/GUI/HeaderPanelWidget.hpp \
 headers/GUI/ConditionalRelation.hpp \
 headers/GUI/TriggerPointEdit.hpp \
-headers/IScoreApplication.hpp
+headers/IScoreApplication.hpp \
+    headers/GUI/CurvesComboBox.hpp
 
 SOURCES += src/main.cpp \
 src/data/Abstract.cpp \
@@ -105,28 +103,25 @@ src/data/Maquette.cpp \
 src/data/NetworkMessages.cpp \
 src/GUI/AttributesEditor.cpp \
 src/GUI/BasicBox.cpp \
-src/GUI/BoxContextMenu.cpp \
 src/GUI/Comment.cpp \
 src/GUI/CurveWidget.cpp \
 src/GUI/Help.cpp \
-src/GUI/Interpolation.cpp \
 src/GUI/LogarithmicSlider.cpp \
 src/GUI/MainWindow.cpp \
 src/GUI/MaquetteScene.cpp \
 src/GUI/MaquetteView.cpp \
 src/GUI/NetworkTree.cpp \
 src/GUI/ParentBox.cpp \
-src/GUI/ParentBoxContextMenu.cpp \
 src/GUI/PlayingThread.cpp \
 src/GUI/Relation.cpp \
 src/GUI/RelationEdit.cpp \
 src/GUI/TriggerPoint.cpp \
 src/GUI/ViewRelations.cpp \
 src/GUI/BoxWidget.cpp \
-src/GUI/BoxCurveEdit.cpp \
 src/GUI/TimeBarWidget.cpp \
 src/GUI/DeviceEdit.cpp \
 src/GUI/HeaderPanelWidget.cpp \
 src/GUI/ConditionalRelation.cpp \
 src/GUI/TriggerPointEdit.cpp \
-    src/IScoreApplication.cpp
+    src/IScoreApplication.cpp \
+    src/GUI/CurvesComboBox.cpp

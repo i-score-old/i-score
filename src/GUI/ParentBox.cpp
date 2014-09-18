@@ -40,7 +40,6 @@
 #include <iostream>
 #include "BasicBox.hpp"
 #include "ParentBox.hpp"
-#include "ParentBoxContextMenu.hpp"
 #include "MaquetteScene.hpp"
 #include "Maquette.hpp"
 #include "AbstractParentBox.hpp"
@@ -90,12 +89,9 @@ void
 ParentBox::init()
 {
   BasicBox::init();
-  _contextMenu = new ParentBoxContextMenu(this);
 
   addToComboBox(BasicBox::DEFAULT_MODE_TEXT);
   addToComboBox(BasicBox::SCENARIO_MODE_TEXT);
-
-  _hasContextMenu = true;
 }
 
 Abstract*
