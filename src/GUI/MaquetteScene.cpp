@@ -57,7 +57,6 @@
 #include "ConditionalRelation.hpp"
 #include "Comment.hpp"
 #include "TriggerPoint.hpp"
-#include "ViewRelations.hpp"
 #include "AttributesEditor.hpp"
 #include "AbstractRelation.hpp"
 #include "AbstractComment.hpp"

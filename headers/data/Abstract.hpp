@@ -48,8 +48,6 @@
  * \author Luc Vercellin
  */
 
-#include <iostream>
-
 //! Defines abstract base type.
 enum { ABSTRACT_TYPE = 0 };
 
@@ -61,10 +59,8 @@ enum { ABSTRACT_TYPE = 0 };
 class Abstract
 {
   public:
-    Abstract();
-
-    virtual
-    ~Abstract(){}
+    Abstract() = default;
+    virtual ~Abstract() = default;
 
     /*!
      * \brief Gets the type of the abstract item.

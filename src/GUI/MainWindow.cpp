@@ -45,7 +45,6 @@
 #include "MainWindow.hpp"
 #include "MaquetteScene.hpp"
 #include "MaquetteView.hpp"
-#include "ViewRelations.hpp"
 #include "HeaderPanelWidget.hpp"
 #include "NetworkTree.hpp"
 

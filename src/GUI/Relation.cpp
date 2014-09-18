@@ -40,7 +40,6 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 #include "Relation.hpp"
-#include "RelationEdit.hpp"
 #include "MaquetteScene.hpp"
 #include "Maquette.hpp"
 #include "AbstractRelation.hpp"
