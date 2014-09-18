@@ -1398,10 +1398,16 @@ BasicBox::boxBody()
 {
   return QRectF(_boxRect.topLeft() + QPointF(0, RESIZE_TOLERANCE), _boxRect.bottomRight());
 }
+#include <QDebug>
 void
 BasicBox::keyPressEvent(QKeyEvent *event)
 {
   QGraphicsItem::keyPressEvent(event);
+  if(event->key() == Qt::Key_R)
+  {
+    CurveWidget *curve = (static_cast<CurveWidget *>(_boxContentWidget->stackedLayout()->currentWidget()));
+    curve->adaptScale();
+  }
 }
 
 void

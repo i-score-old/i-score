@@ -70,7 +70,6 @@ headers/GUI/BasicBox.hpp \
 headers/GUI/Comment.hpp \
 headers/GUI/CurveWidget.hpp \
 headers/GUI/Help.hpp \
-headers/GUI/Interpolation.hpp \
 headers/GUI/LogarithmicSlider.hpp \
 headers/GUI/MainWindow.hpp \
 headers/GUI/MaquetteScene.hpp \
@@ -107,7 +106,6 @@ src/GUI/BasicBox.cpp \
 src/GUI/Comment.cpp \
 src/GUI/CurveWidget.cpp \
 src/GUI/Help.cpp \
-src/GUI/Interpolation.cpp \
 src/GUI/LogarithmicSlider.cpp \
 src/GUI/MainWindow.cpp \
 src/GUI/MaquetteScene.cpp \

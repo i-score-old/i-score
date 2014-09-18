@@ -19,7 +19,6 @@
 
 class QGridLayout;
 class CurveWidget;
-class Interpolation;
 class QString;
 class BasicBox;
 
