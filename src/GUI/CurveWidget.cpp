@@ -155,6 +155,12 @@ void CurveWidget::adaptScale()
   _maxY = *(std::max_element(_abstract->_curve.begin(), _abstract->_curve.end()));
   _minY = *(std::min_element(_abstract->_curve.begin(), _abstract->_curve.end()));
 
+  const double min_spacing{0.1};
+  if(std::abs(_maxY - _minY) < min_spacing)
+  {
+    _minY = -min_spacing;
+    _maxY = min_spacing;
+  }
   _xAxisPos = (_minY >= 0.)? height() - BORDER_WIDTH : (height() - BORDER_WIDTH) / 2.;
 
   _interspace = (width() - BORDER_WIDTH) / (float)(std::max((unsigned int)2, (unsigned int)(_abstract->_curve.size())) - 1);
