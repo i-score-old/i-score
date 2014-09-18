@@ -783,14 +783,6 @@ class BasicBox : public QObject, public QGraphicsItem
     virtual void keyReleaseEvent(QKeyEvent *event);
 
     /*!
-     * \brief Redefinition of QGraphicsItem::contextMenuEvent().
-     * Occurs when a right mouse button is pressed (or CTRL + click on MacOS X).
-     *
-     * \param event : the variable containing information about the event
-     */
-    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
-
-    /*!
      * \brief Redefinition of QGraphicsItem::mouseMoveEvent().
      * Occurs when the mouse moves over the box.
      *
@@ -852,8 +844,6 @@ class BasicBox : public QObject, public QGraphicsItem
     AbstractBox *_abstract;
 
     MaquetteScene * _scene;                                                     //!< The scene containing box.
-    bool _hasContextMenu;                                                       //!< True if box has contextual menu.
-    QMenu* _contextMenu;                                                        //!< The contextual menu, if one.
     bool _shift;                                                                //!< State of Shift Key.
     bool _playing;                                                              //!< State of playing.
     bool _recording;                                                            //!< State of recording.

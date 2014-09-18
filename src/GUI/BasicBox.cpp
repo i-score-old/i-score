@@ -52,7 +52,6 @@
 #include "Relation.hpp"
 #include "ConditionalRelation.hpp"
 #include "CurveWidget.hpp"
-#include "BoxContextMenu.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -418,7 +417,6 @@ BasicBox::updateFlexibility()
 void
 BasicBox::init()
 {
-  _hasContextMenu = false;
   _shift = false;
   _playing = false;
   _recording = true;
@@ -1527,19 +1525,6 @@ BasicBox::lower(bool state)
     }
   updateRelations(BOX_START);
   updateRelations(BOX_END);
-}
-
-#include <QDebug>
-void
-BasicBox::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
-{
-  QGraphicsItem::contextMenuEvent(event);
-/*
-  if (_hasContextMenu) {
-      setSelected(false);
-      static_cast<BoxContextMenu *>(_contextMenu)->setDetachActionEnabled(isConditioned());
-      _contextMenu->exec(event->screenPos());
-    }*/
 }
 
 QInputDialog *

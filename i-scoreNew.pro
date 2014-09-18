@@ -67,7 +67,6 @@ headers/data/Maquette.hpp \
 headers/data/NetworkMessages.hpp \
 headers/GUI/AttributesEditor.hpp \
 headers/GUI/BasicBox.hpp \
-headers/GUI/BoxContextMenu.hpp \
 headers/GUI/Comment.hpp \
 headers/GUI/CurveWidget.hpp \
 headers/GUI/Help.hpp \
@@ -78,7 +77,6 @@ headers/GUI/MaquetteScene.hpp \
 headers/GUI/MaquetteView.hpp \
 headers/GUI/NetworkTree.hpp \
 headers/GUI/ParentBox.hpp \
-headers/GUI/ParentBoxContextMenu.hpp \
 headers/GUI/PlayingThread.hpp \
 headers/GUI/Relation.hpp \
 headers/GUI/RelationEdit.hpp \
@@ -105,7 +103,6 @@ src/data/Maquette.cpp \
 src/data/NetworkMessages.cpp \
 src/GUI/AttributesEditor.cpp \
 src/GUI/BasicBox.cpp \
-src/GUI/BoxContextMenu.cpp \
 src/GUI/Comment.cpp \
 src/GUI/CurveWidget.cpp \
 src/GUI/Help.cpp \
@@ -116,7 +113,6 @@ src/GUI/MaquetteScene.cpp \
 src/GUI/MaquetteView.cpp \
 src/GUI/NetworkTree.cpp \
 src/GUI/ParentBox.cpp \
-src/GUI/ParentBoxContextMenu.cpp \
 src/GUI/PlayingThread.cpp \
 src/GUI/Relation.cpp \
 src/GUI/RelationEdit.cpp \
