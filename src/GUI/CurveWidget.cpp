@@ -337,6 +337,7 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
                   }
               }
           }
+        mouseMoveEvent(event);
         break;
       }
 
