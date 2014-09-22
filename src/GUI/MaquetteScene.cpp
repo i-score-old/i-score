@@ -1337,6 +1337,7 @@ void
 MaquetteScene::removeRelation(unsigned int relID)
 {
   Relation *rel = getRelation(relID);
+  removeItem(rel);
   if (rel != NULL) {
       AbstractRelation *abstract = static_cast<AbstractRelation*>(rel->abstract());
 
@@ -1349,7 +1350,6 @@ MaquetteScene::removeRelation(unsigned int relID)
           box->removeRelation(abstract->secondExtremity(), abstract->ID());
         }
 
-      removeItem(rel);
       _maquette->removeRelation(relID);
 
       setModified(true);
