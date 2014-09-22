@@ -777,6 +777,7 @@ BasicBox::updateRelations(BoxExtremity extremity)
 void
 BasicBox::updateStuff()
 {
+  cleanupRelations();
   updateBoxSize();
   if (_comment != nullptr) {
       _comment->updatePos();
@@ -2092,13 +2093,12 @@ void BasicBox::cleanupRelations()
   for(auto& extremity : _relations)
   {
     for(auto relation = extremity.second.begin();
-        relation != extremity.second.end();
-        ++relation)
+        relation != extremity.second.end();)
     {
-
-      Relation* rel = _scene->getRelation(relation->first);
-      if(!rel)
-        extremity.second.erase(relation);
+      if(!_scene->getRelation(relation->first))
+        extremity.second.erase(relation++);
+      else
+        ++relation;
     }
   }
 }
