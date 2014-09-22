@@ -44,6 +44,8 @@
 #include "MainWindow.hpp"
 #include <QList>
 #include <map>
+#include <vector>
+#include <string>
 #include <exception>
 #include <QTreeView>
 #include <QByteArray>
@@ -1442,37 +1444,56 @@ NetworkTree::resetAssignedNodes()
   _nodesWithAllChildrenAssigned.clear();
 }
 
-#include <vector>
-#include <string>
 void
 NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
 {
+  // Make a copy of the addresses which were expanded
   std::vector<std::string> previouslyExpandedAddresses;
-  for(auto& expanded : _expandedItems)
+  for(auto& addr : _expandedItems)
+    previouslyExpandedAddresses.push_back(_addressMap[addr]);
+
+  // Make a copy of all the addresses
+  std::vector<std::string> previousAddressMap;
+  for(auto& addr : _addressMap)
+    previousAddressMap.push_back(addr);
+
+  if(item != NULL)
   {
-    previouslyExpandedAddresses.push_back(_addressMap[expanded]);
+    if(item->type()==DeviceNode)
+    {
+      collapseItem(item);
+      string application = getAbsoluteAddress(item).toStdString();
+      item->takeChildren();
+
+      /// \todo récupérer la valeur de retour.
+      /// Peut être false en cas de OSC (traitement différent dans ce cas là).
+      Maquette::getInstance()->rebuildNetworkNamespace(application);
+      treeRecursiveExploration(item,true);
+      if(updateBoxes)
+        Maquette::getInstance()->updateBoxesAttributes();
+    }
   }
 
-  if(item != NULL){
-        if(item->type()==DeviceNode){
-            collapseItem(item);
-            string application = getAbsoluteAddress(item).toStdString();
-            item->takeChildren();            
-
-            /// \todo récupérer la valeur de retour. Qui peut être false en cas de OSC (traitement différent dans ce cas là).
-            Maquette::getInstance()->rebuildNetworkNamespace(application);
-            treeRecursiveExploration(item,true);
-            if(updateBoxes)
-                Maquette::getInstance()->updateBoxesAttributes();
-        }
-    }
-
+  // Restore the addresses
   _expandedItems.clear();
+
+  // The ones that were expanded
   for(auto& addr : previouslyExpandedAddresses)
   {
     _expandedItems.append(_addressMap.key(addr));
   }
-    expandItems(_expandedItems);
+
+  // The new ones
+  for(auto& addr : _addressMap)
+  {
+    if(std::find(previousAddressMap.begin(),
+                 previousAddressMap.end(),
+                 addr) == previousAddressMap.end())
+      _expandedItems.append(_addressMap.key(addr));
+
+  }
+
+  expandItems(_expandedItems);
 }
 
 void

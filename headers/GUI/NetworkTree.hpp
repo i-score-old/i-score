@@ -455,20 +455,21 @@ class NetworkTree : public QTreeWidget
     void selectPartially(QTreeWidgetItem *item);
     void unselectPartially(QTreeWidgetItem *item);
     bool noBrothersSelected(QTreeWidgetItem *item);
-    inline void
-    addNodePartiallySelected(QTreeWidgetItem *item)
+
+    void addNodePartiallySelected(QTreeWidgetItem *item)
     {
       if (!_nodesWithSelectedChildren.contains(item)) {
           _nodesWithSelectedChildren << item;
         }
     }
-    inline void
-    removeNodePartiallySelected(QTreeWidgetItem *item)
+
+    void removeNodePartiallySelected(QTreeWidgetItem *item)
     {
       if (_nodesWithSelectedChildren.contains(item)) {
           _nodesWithSelectedChildren.removeAll(item);
         }
     }
+
     void recursiveFatherSelection(QTreeWidgetItem *item, bool select);
     bool allBrothersSelected(QTreeWidgetItem *item, QList<QTreeWidgetItem *> assignedItems);
     bool allBrothersSelected(QTreeWidgetItem *item);
@@ -481,34 +482,34 @@ class NetworkTree : public QTreeWidget
     bool allBrothersAssigned(QTreeWidgetItem *item);
     void fathersAssignation(QTreeWidgetItem *item);
     void fathersFullAssignation(QTreeWidgetItem *item);
-    inline void
-    addNodePartiallyAssigned(QTreeWidgetItem *item)
+
+    void addNodePartiallyAssigned(QTreeWidgetItem *item)
     {
       if (!_nodesWithSomeChildrenAssigned.contains(item)) {
           _nodesWithSomeChildrenAssigned << item;
         }
     }
-    inline void
-    removeNodePartiallyAssigned(QTreeWidgetItem *item)
+
+    void removeNodePartiallyAssigned(QTreeWidgetItem *item)
     {
       if (_nodesWithSomeChildrenAssigned.contains(item)) {
           _nodesWithSomeChildrenAssigned.removeAll(item);
         }
     }
+
     void setPartiallyAssign(QTreeWidgetItem *item);
     void unassignPartially(QTreeWidgetItem *item);
     void unassignItem(QTreeWidgetItem *item, bool recursive=true);
     void setUnassignedStyle(QTreeWidgetItem *item);
 
-    inline void
-    addNodeTotallyAssigned(QTreeWidgetItem *item)
+    void addNodeTotallyAssigned(QTreeWidgetItem *item)
     {
       if (!_nodesWithAllChildrenAssigned.contains(item)) {
           _nodesWithAllChildrenAssigned << item;
         }
     }
-    inline void
-    removeNodeTotallyAssigned(QTreeWidgetItem *item)
+
+    void removeNodeTotallyAssigned(QTreeWidgetItem *item)
     {
       if (_nodesWithAllChildrenAssigned.contains(item)) {
           _nodesWithAllChildrenAssigned.removeAll(item);
