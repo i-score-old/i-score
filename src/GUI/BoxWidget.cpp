@@ -56,6 +56,7 @@ using std::string;
 #include <QGraphicsEffect>
 #include <QGraphicsOpacityEffect>
 #include <QApplication>
+#include <QDebug>
 
 #include "AbstractCurve.hpp"
 #include "BasicBox.hpp"
@@ -579,10 +580,9 @@ BoxWidget::displayEndMenu(QPoint pos)
       _endMenu->exec(pos);
     }
 }
-#include <QDebug>
+
 void
 BoxWidget::updateCurveRangeBoundMin(string address, float value){
-  qDebug() <<Q_FUNC_INFO << value;
     CurveWidget *curve = getCurveWidget(address);
     if(curve != NULL){
         curve->setMinY(value);
@@ -591,7 +591,6 @@ BoxWidget::updateCurveRangeBoundMin(string address, float value){
 
 void
 BoxWidget::updateCurveRangeBoundMax(string address, float value){
-    qDebug() <<Q_FUNC_INFO << value;
     CurveWidget *curve = getCurveWidget(address);
     std::cout<<"BW::updateMAX"<<std::endl;
     if(curve != NULL){

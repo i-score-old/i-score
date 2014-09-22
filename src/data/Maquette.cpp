@@ -1364,12 +1364,15 @@ void
 Maquette::removeRelation(unsigned int relationID)
 {
   RelationsMap::iterator it;
-  if ((it = _relations.find(relationID)) != _relations.end()) {
+  if ((it = _relations.find(relationID)) != _relations.end())
+  {
+    Relation* rel = it->second;
+    _engines->removeTemporalRelation(relationID);
 
-      _engines->removeTemporalRelation(relationID);
-
-      _relations.erase(it);
-    }
+    delete rel;
+    it->second = nullptr;
+    _relations.erase(it);
+  }
 }
 
 bool

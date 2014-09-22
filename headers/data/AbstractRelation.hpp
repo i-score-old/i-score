@@ -72,8 +72,7 @@ class AbstractRelation : public Abstract
 
     AbstractRelation(const AbstractRelation &other);
 
-    inline virtual
-    ~AbstractRelation(){}
+    virtual ~AbstractRelation() = default;
 
     /*!
      * \brief Sets the first box of the relation.

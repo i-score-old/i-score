@@ -877,5 +877,10 @@ class BasicBox : public QObject, public QGraphicsItem
     QPushButton *_playButton{};
     QPushButton *_stopButton{};
 
+private:
+    // Check if the relations are still up to date with what is in the maquette, to prevent crashes
+    // due to relations removed elsewhere.
+    void cleanupRelations();
+
 };
 #endif

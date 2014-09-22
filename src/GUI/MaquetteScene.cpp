@@ -1349,7 +1349,7 @@ MaquetteScene::removeRelation(unsigned int relID)
           box->removeRelation(abstract->secondExtremity(), abstract->ID());
         }
 
-      removeItem(getRelation(relID));
+      removeItem(rel);
       _maquette->removeRelation(relID);
 
       setModified(true);

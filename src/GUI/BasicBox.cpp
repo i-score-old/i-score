@@ -78,6 +78,7 @@
 #include <QStyleOptionViewItem>
 #include <cmath>
 #include <QPixmapCache>
+#include <QDebug>
 
 using std::string;
 using std::vector;
@@ -755,6 +756,7 @@ BasicBox::setColor(const QColor & color)
 void
 BasicBox::updateRelations(BoxExtremity extremity)
 {
+  cleanupRelations();
   std::map< BoxExtremity, std::map < unsigned int, Relation* > >::iterator it;
   std::map< unsigned int, Relation* >::iterator it2;
   std::map< unsigned int, Relation* >cur;
@@ -801,30 +803,27 @@ BasicBox::updateStuff()
   setFlag(QGraphicsItem::ItemIsMovable, true);
 }
 
-
-
-
-void
-BasicBox::addRelation(BoxExtremity extremity, Relation *rel)
+void BasicBox::addRelation(BoxExtremity extremity, Relation *rel)
 {
-  map<BoxExtremity, Relation*>::iterator it;
   _relations[extremity][rel->ID()] = rel;
   _relations[extremity][rel->ID()]->updateCoordinates();
 }
 
-void
-BasicBox::removeRelation(BoxExtremity extremity, unsigned int relID)
+void BasicBox::removeRelation(BoxExtremity extremity, unsigned int relID)
 {
-  map<BoxExtremity, map<unsigned int, Relation*> >::iterator it;
-  if ((it = _relations.find(extremity)) != _relations.end()) {
-      map<unsigned int, Relation*>::iterator it2;
-      if ((it2 = it->second.find(relID)) != it->second.end()) {
-          it->second.erase(it2);
-          if (it->second.empty()) {
-              _relations.erase(it);
-            }
-        }
+  auto it = _relations.find(extremity);
+  if (it != _relations.end())
+  {
+    auto it2 = it->second.find(relID);
+    if (it2 != it->second.end())
+    {
+      it->second.erase(it2);
+      if (it->second.empty())
+      {
+        _relations.erase(it);
+      }
     }
+  }
 }
 
 void
@@ -2087,6 +2086,23 @@ BasicBox::displayBoxDuration(){
     QString durationMsg = QString("box duration : %1").arg(duration);
     maquetteScene()->displayMessage(durationMsg.toStdString(),INDICATION_LEVEL);
 }
+
+void BasicBox::cleanupRelations()
+{
+  for(auto& extremity : _relations)
+  {
+    for(auto relation = extremity.second.begin();
+        relation != extremity.second.end();
+        ++relation)
+    {
+
+      Relation* rel = _scene->getRelation(relation->first);
+      if(!rel)
+        extremity.second.erase(relation);
+    }
+  }
+}
+
 void
 BasicBox::select(){
     setSelected(true);
