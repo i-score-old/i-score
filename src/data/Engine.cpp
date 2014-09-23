@@ -308,7 +308,7 @@ void Engine::getChildrenId(TimeProcessId boxId, vector<TimeProcessId>& childrenI
         it->second->object.get("container", v);
         parentScenario = v[0];
         
-        if (parentScenario != NULL && parentScenario == subScenario)
+        if (parentScenario != nullptr && parentScenario == subScenario)
             childrenId.push_back(it->first);
     }
 }
@@ -1234,7 +1234,7 @@ void Engine::getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex cont
     TTObject    event;
     TTObject    state;
     TTBoolean   flattened;
-    TTListPtr   lines = NULL;
+    TTListPtr   lines = nullptr;
     TTDictionaryBasePtr aLine;
     TTAddress   address;
     std::string s;
@@ -2642,12 +2642,18 @@ Engine::loadNetworkNamespace(const string &deviceName, const string &filepath)
     err = aXmlHandler.send(kTTSym_Read, TTSymbol(filepath), out);
     
     if (!err) {
+        
+        // stop OSC protocol
+        m_applicationManager.send("ProtocolStop", TTSymbol("OSC"), out);
     
         // init the application
         anApplication.send("Init");
         
         // store the namespace file for this device
         m_namespaceFilesPath[deviceName] = filepath;
+        
+        // run OSC protocol
+        m_applicationManager.send("ProtocolRun", TTSymbol("OSC"), out);
     }
 
     return err != kTTErrNone;
@@ -3240,7 +3246,7 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
             timeEvent.get("condition", v);
             timeCondition = v[0];
             
-            if (timeCondition != NULL) {
+            if (timeCondition != nullptr) {
             
                 // We cache the time process and the event index instead of the event itself
                 triggerId = cacheConditionedProcess(timeProcessId, BEGIN_CONTROL_POINT_INDEX);
@@ -3264,7 +3270,7 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
             timeEvent.get("condition", v);
             timeCondition = v[0];
             
-            if (timeCondition != NULL) {
+            if (timeCondition != nullptr) {
                 
                 // We cache the time process and the event index instead of the event itself
                 triggerId = cacheConditionedProcess(timeProcessId, END_CONTROL_POINT_INDEX);
@@ -3396,7 +3402,7 @@ void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value
     event.get("status", v);
     status = v[0];
     
-	if (engine->m_TimeEventStatusAttributeCallback != NULL) {
+    if (engine->m_TimeEventStatusAttributeCallback != nullptr) {
         
         if (status == kTTSym_eventWaiting) {
             engine->m_TimeEventStatusAttributeCallback(triggerId, false);
@@ -3441,7 +3447,7 @@ void TimeProcessStartCallback(const TTValue& baton, const TTValue& /*value*/)
     iscoreEngineDebug 
         TTLogMessage("TimeProcess %ld starts at %ld ms\n", boxId, engine->getCurrentExecutionDate());
         
-    if (engine->m_TimeProcessSchedulerRunningAttributeCallback != NULL)
+    if (engine->m_TimeProcessSchedulerRunningAttributeCallback != nullptr)
         engine->m_TimeProcessSchedulerRunningAttributeCallback(boxId, YES);
 
 }
@@ -3459,7 +3465,7 @@ void TimeProcessEndCallback(const TTValue& baton, const TTValue& /*value*/)
         TTLogMessage("TimeProcess %ld ends at %ld ms\n", boxId, engine->getCurrentExecutionDate());
     
     // update all process running state too
-    if (engine->m_TimeProcessSchedulerRunningAttributeCallback != NULL)
+    if (engine->m_TimeProcessSchedulerRunningAttributeCallback != nullptr)
         engine->m_TimeProcessSchedulerRunningAttributeCallback(boxId, NO);
     
 }

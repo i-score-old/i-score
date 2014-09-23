@@ -49,7 +49,7 @@ const float ConditionalRelation::BOUNDING_RECT_WIDTH = 10.;
 const float ConditionalRelation::GRIP_SHIFT = 4.;
 
 ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, MaquetteScene *parent)
-    : QGraphicsItem(), _scene(parent), _boxesAttached(boxesAttached)
+    : QGraphicsObject(), _scene(parent), _boxesAttached(boxesAttached)
 {
     init();
 
@@ -70,7 +70,7 @@ ConditionalRelation::ConditionalRelation(QList<BasicBox *> boxesAttached, Maquet
 }
 
 ConditionalRelation::ConditionalRelation(unsigned int id, QList<BasicBox *> boxesAttached, MaquetteScene *parent)
-    : QGraphicsItem(), _id(id), _scene(parent), _boxesAttached(boxesAttached)
+    : QGraphicsObject(), _id(id), _scene(parent), _boxesAttached(boxesAttached)
 {
     init();
 
@@ -224,21 +224,21 @@ ConditionalRelation::getLowestHighestBoxes()
 void
 ConditionalRelation::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 {
-    QGraphicsItem::hoverEnterEvent(event);
+    QGraphicsObject::hoverEnterEvent(event);
     setCursor(Qt::PointingHandCursor);
 }
 
 void
 ConditionalRelation::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {
-    QGraphicsItem::hoverMoveEvent(event);
+    QGraphicsObject::hoverMoveEvent(event);
     setCursor(Qt::PointingHandCursor);
 }
 
 void
 ConditionalRelation::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
 {
-    QGraphicsItem::hoverLeaveEvent(event);
+    QGraphicsObject::hoverLeaveEvent(event);
     setCursor(Qt::ArrowCursor);
 }
 
@@ -255,7 +255,7 @@ ConditionalRelation::disposeMessageInputDialog()
 void
 ConditionalRelation::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
 {
-    QGraphicsItem::mouseDoubleClickEvent(event);
+    QGraphicsObject::mouseDoubleClickEvent(event);
       if (!_scene->playing())
       {
           QInputDialog *disposeMsgEdit = disposeMessageInputDialog();
@@ -264,14 +264,14 @@ ConditionalRelation::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
           if (ok)
               Maquette::getInstance()->setConditionMessage(_id,disposeMsgEdit->textValue().toStdString());
 
-          delete disposeMsgEdit;
+          disposeMsgEdit->deleteLater();
       }
 }
 
 void
 ConditionalRelation::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
-    QGraphicsItem::mousePressEvent(event);
+    QGraphicsObject::mousePressEvent(event);
     if(cursor().shape() == Qt::PointingHandCursor)
         setSelected(true);
 
@@ -286,7 +286,7 @@ ConditionalRelation::mousePressEvent(QGraphicsSceneMouseEvent * event)
 void
 ConditionalRelation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 {
-    QGraphicsItem::mouseMoveEvent(event);
+    QGraphicsObject::mouseMoveEvent(event);
 
 //    if(cursor().shape() == Qt::ClosedHandCursor){
         /// \todo
@@ -296,7 +296,7 @@ ConditionalRelation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 void
 ConditionalRelation::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 {
-    QGraphicsItem::mouseReleaseEvent(event);
+    QGraphicsObject::mouseReleaseEvent(event);
     _mousePressed = false;
 }
 

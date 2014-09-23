@@ -65,7 +65,7 @@ const float TriggerPoint::HEIGHT = BasicBox::TRIGGER_ZONE_HEIGHT + BasicBox::TRI
 
 TriggerPoint::TriggerPoint(unsigned int boxID, BoxExtremity extremity,
                            const string &message, unsigned int ID, MaquetteScene *parent)
-  : QGraphicsItem()
+  : QGraphicsObject()
 {
   _scene = parent;
 
@@ -75,7 +75,7 @@ TriggerPoint::TriggerPoint(unsigned int boxID, BoxExtremity extremity,
 }
 
 TriggerPoint::TriggerPoint(const AbstractTriggerPoint &abstract, MaquetteScene *parent)
-  : QGraphicsItem()
+  : QGraphicsObject()
 {
   _scene = parent;
 
@@ -87,7 +87,7 @@ TriggerPoint::TriggerPoint(const AbstractTriggerPoint &abstract, MaquetteScene *
 TriggerPoint::~TriggerPoint()
 {
   delete _abstract;
-    delete _edit;
+  _edit->deleteLater();
 }
 
 bool
@@ -119,9 +119,10 @@ TriggerPoint::abstract() const
 void
 TriggerPoint::updatePosition()
 {
+  if(!_abstract) return;
   if (_abstract->boxID() != NO_ID) {
       BasicBox *box = _scene->getBox(_abstract->boxID());
-      if (box != NULL) {
+      if (box != nullptr) {
           if (_abstract->boxExtremity() == BOX_START) {
               setPos(QPointF(box->getShapeTopLeft().x() + WIDTH / 2., box->getShapeTopLeft().y() - HEIGHT / 2.));
             }
@@ -138,21 +139,21 @@ TriggerPoint::updatePosition()
 void
 TriggerPoint::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-  QGraphicsItem::hoverEnterEvent(event);
+  QGraphicsObject::hoverEnterEvent(event);
   setCursor(Qt::PointingHandCursor);
 }
 
 void
 TriggerPoint::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
-  QGraphicsItem::hoverMoveEvent(event);
+  QGraphicsObject::hoverMoveEvent(event);
   setCursor(Qt::PointingHandCursor);
 }
 
 void
 TriggerPoint::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
-  QGraphicsItem::hoverLeaveEvent(event);
+  QGraphicsObject::hoverLeaveEvent(event);
   setCursor(Qt::ArrowCursor);
 }
 
@@ -165,7 +166,7 @@ TriggerPoint::boundingRect() const
 void
 TriggerPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-  QGraphicsItem::mousePressEvent(event);
+  QGraphicsObject::mousePressEvent(event);
 
 }
 
@@ -207,7 +208,7 @@ TriggerPoint::nameInputDialog()
 void
 TriggerPoint::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
 {
-  QGraphicsItem::mouseDoubleClickEvent(event);
+  QGraphicsObject::mouseDoubleClickEvent(event);
 
   if (!_scene->playing()) {
       /*
@@ -254,7 +255,7 @@ TriggerPoint::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
 void
 TriggerPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {    
-    QGraphicsItem::mouseReleaseEvent(event);
+    QGraphicsObject::mouseReleaseEvent(event);
     if (_abstract->waiting() && event->modifiers()!=Qt::ControlModifier) {
         _scene->trigger(this);
     }
@@ -341,9 +342,9 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
   QRectF rect = boundingRect();
   painter->save();
 
-  BasicBox *box = NULL;
+  BasicBox *box = nullptr;
   if (_abstract->boxID() != NO_ID) {
-      if ((box = _scene->getBox(_abstract->boxID())) != NULL) {
+      if ((box = _scene->getBox(_abstract->boxID())) != nullptr) {
           QPen pen = painter->pen();
           QBrush brush = painter->brush();
           pen.setColor(box->color().darker());

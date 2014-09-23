@@ -70,7 +70,7 @@ MaquetteWidget::MaquetteWidget(QWidget *parent, MaquetteView *view, MaquetteScen
   _maquetteLayout = new QGridLayout();
   _nameLabel = new QLabel;
   _toolBar = new QToolBar;
-  _header = new QWidget(NULL);
+  _header = new QWidget;
   _readingSpeedWidget = new QWidget;
   _sliderMoved = false;
 

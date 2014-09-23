@@ -64,6 +64,7 @@
 #include "TimeBarWidget.hpp"
 #include <QGraphicsProxyWidget>
 #include <QGraphicsLineItem>
+#include <DelayedDelete.h>
 
 #include <sstream>
 #include <map>
@@ -80,6 +81,7 @@ const float MaquetteScene::MS_PRECISION = 10;
 MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
   : QGraphicsScene(rect)
 {
+  this->setItemIndexMethod(NoIndex);
   _editor = editor;
   _clicked = false;
   _modified = false;
@@ -97,7 +99,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 
 MaquetteScene::~MaquetteScene()
 {
-  delete _tempBox;
+  delete_later(_tempBox);
   delete _maquette;
 }
 
@@ -124,7 +126,7 @@ MaquetteScene::init()
   _maquette->setScene(this);
   _maquette->init();      
 
-  _tempBox = NULL;
+  _tempBox = nullptr;
   _resizeBox = NO_ID;
 
   _relation->setFirstBox(NO_ID);
@@ -202,12 +204,8 @@ MaquetteScene::displayMessage(const string &message, unsigned int warningLevel)
 void
 MaquetteScene::selectAll()
 {
-  QList<QGraphicsItem *> allItems = items();
-  QList<QGraphicsItem *>::iterator it;
-
-  for (it = allItems.begin(); it != allItems.end(); it++) {
-      (*it)->setSelected(true);
-    }
+  for(auto& item : items())
+    item->setSelected(true);
 }
 
 void
@@ -244,125 +242,154 @@ MaquetteScene::getTimeOffset()
 void
 MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
 {
-  Q_UNUSED(rect);
-  if (!_maquette->isExecutionOn()) {
+    Q_UNUSED(rect);
+    if (!_maquette->isExecutionOn())
+    {
+        if (_currentInteractionMode == RELATION_MODE)
+        {
+            if (_clicked)
+            {
+                if (_relation->firstBox() != NO_ID)
+                {
+                    BasicBox *box = getBox(_relation->firstBox());
+                    if(!box)
+                        qDebug() << "ALERT : bad box (1)." << Q_FUNC_INFO;
 
-      if (_currentInteractionMode == RELATION_MODE) {
-          if (_clicked) {
-              if (_relation->firstBox() != NO_ID) {
-                  BasicBox *box = getBox(_relation->firstBox());
-                  QPointF start;
-                  switch (_relation->firstExtremity()) {
-                      case BOX_START:
-                        start = box->getLeftGripPoint();
-                        break;
+                    QPointF start;
+                    switch (_relation->firstExtremity())
+                    {
+                        case BOX_START:
+                            start = box->getLeftGripPoint();
+                            break;
 
-                      case BOX_END:
-                        start = box->getRightGripPoint();
-                        break;
+                        case BOX_END:
+                            start = box->getRightGripPoint();
+                            break;
 
-                      case NO_EXTREMITY:
-                        start = box->getCenter();
-                        break;
+                        case NO_EXTREMITY:
+                            start = box->getCenter();
+                            break;
                     }
 
-                  if (_mousePos != _releasePoint && _mousePos != QPointF(0., 0)) {
-                      QPainterPath painterPath;
-                      painterPath.moveTo(start);
-                      double startX = start.x(), startY = start.y();
-                      double endX = 0., endY = 0.;
-                      static const double arrowSize = 12.;
-                      BasicBox *box = NULL;
-                      if (itemAt(_mousePos, QTransform()) != 0) {
-                          int type = itemAt(_mousePos, QTransform())->type();
-                          if (type == PARENT_BOX_TYPE) {
-                              box = static_cast<BasicBox*>(itemAt(_mousePos, QTransform()));
-                              if (_mousePos.x() < (box->mapToScene(box->boundingRect().topLeft()).x()
-                                                   + BasicBox::RESIZE_TOLERANCE)) {
-                                  endX = box->getLeftGripPoint().x();
-                                  endY = box->getLeftGripPoint().y();
+                    if (_mousePos != _releasePoint && _mousePos != QPointF(0., 0))
+                    {
+                        QPainterPath painterPath;
+                        painterPath.moveTo(start);
+                        double startX = start.x(), startY = start.y();
+                        double endX = 0., endY = 0.;
+                        static const double arrowSize = 12.;
+                        BasicBox *box = nullptr;
+                        if (itemAt(_mousePos, QTransform()) != 0)
+                        {
+                            int type = itemAt(_mousePos, QTransform())->type();
+                            if (type == PARENT_BOX_TYPE)
+                            {
+                                box = dynamic_cast<ParentBox*>(itemAt(_mousePos, QTransform()));
+                                if(!box)
+                                    qDebug() << "ALERT : bad box (2)." << Q_FUNC_INFO;
+
+                                if (_mousePos.x() < (box->mapToScene(box->boundingRect().topLeft()).x()
+                                                     + BasicBox::RESIZE_TOLERANCE))
+                                {
+                                    endX = box->getLeftGripPoint().x();
+                                    endY = box->getLeftGripPoint().y();
                                 }
-                              else if (_mousePos.x() > (box->mapToScene(box->boundingRect().bottomRight()).x()
-                                                        - BasicBox::RESIZE_TOLERANCE)) {
-                                  endX = box->getRightGripPoint().x();
-                                  endY = box->getRightGripPoint().y();
+                                else if (_mousePos.x() > (box->mapToScene(box->boundingRect().bottomRight()).x()
+                                                          - BasicBox::RESIZE_TOLERANCE))
+                                {
+                                    endX = box->getRightGripPoint().x();
+                                    endY = box->getRightGripPoint().y();
                                 }
-                              else {
-                                  endX = _mousePos.x();
-                                  endY = _mousePos.y();
+                                else
+                                {
+                                    endX = _mousePos.x();
+                                    endY = _mousePos.y();
                                 }
-                              if (_relationBoxFound) {
-                                  painter->drawEllipse(QPointF(endX, endY), arrowSize / 2., arrowSize / 2.);
+                                if (_relationBoxFound)
+                                {
+                                    painter->drawEllipse(QPointF(endX, endY), arrowSize / 2., arrowSize / 2.);
                                 }
                             }
-                          else {
-                              endX = _mousePos.x();
-                              endY = _mousePos.y();
-                              painter->drawEllipse(endX, endY - arrowSize / 2., arrowSize, arrowSize);
-                              painter->drawLine(QPointF(endX, endY - arrowSize / 2.),
-                                                QPointF(endX + arrowSize, endY + arrowSize / 2.));
-                              painter->drawLine(QPointF(endX, endY + arrowSize / 2.),
-                                                QPointF(endX + arrowSize, endY - arrowSize / 2.));
+                            else
+                            {
+                                endX = _mousePos.x();
+                                endY = _mousePos.y();
+                                painter->drawEllipse(endX, endY - arrowSize / 2., arrowSize, arrowSize);
+                                painter->drawLine(QPointF(endX, endY - arrowSize / 2.),
+                                                  QPointF(endX + arrowSize, endY + arrowSize / 2.));
+                                painter->drawLine(QPointF(endX, endY + arrowSize / 2.),
+                                                  QPointF(endX + arrowSize, endY - arrowSize / 2.));
                             }
                         }
-                      else {
-                          endX = _mousePos.x();
-                          endY = _mousePos.y();
+                        else
+                        {
+                            endX = _mousePos.x();
+                            endY = _mousePos.y();
                         }
-                      if (fabs(startX - endX) >= 2 * arrowSize) {
-                          if (startX <= endX) {
-                              painterPath.lineTo(startX + arrowSize, startY);
+                        if (fabs(startX - endX) >= 2 * arrowSize)
+                        {
+                            if (startX <= endX)
+                            {
+                                painterPath.lineTo(startX + arrowSize, startY);
                             }
-                          else {
-                              painterPath.lineTo(startX - arrowSize, startY);
+                            else
+                            {
+                                painterPath.lineTo(startX - arrowSize, startY);
                             }
                         }
 
-                      painterPath.quadTo((startX + endX) / 2., startY, (startX + endX) / 2., (startY + endY) / 2.);
-                      if (fabs(startX - endX) >= 2 * arrowSize) {
-                          if (startX <= endX) {
-                              painterPath.quadTo((startX + endX) / 2., endY, endX - arrowSize, endY);
+                        painterPath.quadTo((startX + endX) / 2., startY, (startX + endX) / 2., (startY + endY) / 2.);
+                        if (fabs(startX - endX) >= 2 * arrowSize)
+                        {
+                            if (startX <= endX)
+                            {
+                                painterPath.quadTo((startX + endX) / 2., endY, endX - arrowSize, endY);
                             }
-                          else {
-                              painterPath.quadTo((startX + endX) / 2., endY, endX + arrowSize, endY);
+                            else
+                            {
+                                painterPath.quadTo((startX + endX) / 2., endY, endX + arrowSize, endY);
                             }
                         }
-                      else {
-                          painterPath.quadTo((startX + endX) / 2., endY, endX, endY);
+                        else
+                        {
+                            painterPath.quadTo((startX + endX) / 2., endY, endX, endY);
                         }
 
-                      //Relation
-                      painter->save();
-                      QPen localPen;
-                      localPen.setWidth(BasicBox::LINE_WIDTH);
-                      localPen.setStyle(Qt::DashDotLine);
-                      painter->setPen(localPen);
-                      painter->drawPath(painterPath);
-                      painter->restore();
-                      painterPath = QPainterPath();
-                      painterPath.moveTo(endX, endY);
-                      painterPath.lineTo(endX - arrowSize, endY - (arrowSize / 2.));
-                      painterPath.lineTo(endX - arrowSize, endY + (arrowSize / 2.));
-                      painterPath.lineTo(endX, endY);
+                        //Relation
+                        painter->save();
+                        QPen localPen;
+                        localPen.setWidth(BasicBox::LINE_WIDTH);
+                        localPen.setStyle(Qt::DashDotLine);
+                        painter->setPen(localPen);
+                        painter->drawPath(painterPath);
+                        painter->restore();
+                        painterPath = QPainterPath();
+                        painterPath.moveTo(endX, endY);
+                        painterPath.lineTo(endX - arrowSize, endY - (arrowSize / 2.));
+                        painterPath.lineTo(endX - arrowSize, endY + (arrowSize / 2.));
+                        painterPath.lineTo(endX, endY);
 
-                      painter->fillPath(painterPath, QColor(60, 60, 60));
+                        painter->fillPath(painterPath, QColor(60, 60, 60));
                     }
                 }
-              else {
+                else
+                {
 #ifdef DEBUG
-                  std::cerr << "MaquetteScene::drawForeground : box with NO_ID found" << std::endl;
+                    std::cerr << "MaquetteScene::drawForeground : box with NO_ID found" << std::endl;
 #endif
                 }
             }
-          else {
+            else
+            {
 #ifdef DEBUG
-              std::cerr << "MaquetteScene::drawForeground : not clicked" << std::endl;
+                std::cerr << "MaquetteScene::drawForeground : not clicked" << std::endl;
 #endif
             }
         }
-      else {
+        else
+        {
 #ifdef DEBUG
-          std::cerr << "MaquetteScene::drawForeground : not in relation mode" << std::endl;
+            std::cerr << "MaquetteScene::drawForeground : not in relation mode" << std::endl;
 #endif
         }
     }
@@ -411,10 +438,10 @@ QGraphicsItem *
 MaquetteScene::getSelectedItem()
 {
   if (noBoxSelected()) {
-      return NULL;
+      return nullptr;
     }
   else if (selectedItems().size() > 1) {
-      return NULL;
+      return nullptr;
     }
   else {
       return selectedItems().first();
@@ -427,15 +454,23 @@ MaquetteScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
   QGraphicsScene::mouseDoubleClickEvent(event);
 }
 
-bool
-MaquetteScene::subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent)
+bool MaquetteScene::subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent)
 {
-  if (getSelectedItem() != NULL && itemAt(mouseEvent->scenePos(), QTransform()) != 0) {
-      return(getSelectedItem()->type() == PARENT_BOX_TYPE && static_cast<BasicBox*>(getSelectedItem())->currentText() == BasicBox::SCENARIO_MODE_TEXT && static_cast<BasicBox*>(getSelectedItem())->boxBody().contains(mouseEvent->pos()) && itemAt(mouseEvent->scenePos(), QTransform())->cursor().shape() == Qt::ArrowCursor);
+    if (getSelectedItem() != nullptr && itemAt(mouseEvent->scenePos(), QTransform()) != 0)
+    {
+        if(getSelectedItem()->type() == PARENT_BOX_TYPE)
+        {
+            if(auto box = dynamic_cast<ParentBox*>(getSelectedItem()))
+            {
+                return box->currentText() == BasicBox::SCENARIO_MODE_TEXT &&
+                        box->boxBody().contains(mouseEvent->pos()) &&
+                        itemAt(mouseEvent->scenePos(), QTransform())->cursor().shape() == Qt::ArrowCursor;
+            }
+        }
+
     }
-  else {
-      return false;
-    }
+
+    return false;
 }
 
 void
@@ -449,7 +484,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
   if (_tempBox) {
       removeItem(_tempBox);
-      _tempBox = NULL;
+      delete_later(_tempBox);
     }
   _savedInteractionMode = _currentInteractionMode;
   _savedBoxMode = _currentBoxMode;
@@ -500,7 +535,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
               }
           }
 
-        else if (getSelectedItem() != NULL ? getSelectedItem()->type() == PARENT_BOX_TYPE : false && subScenarioMode(mouseEvent)) {
+        else if (getSelectedItem() != nullptr ? getSelectedItem()->type() == PARENT_BOX_TYPE : false && subScenarioMode(mouseEvent)) {
             /// \todo Old TODO updated (by jC) : see why creation is possible in a parent box during resize mode
             if (resizeMode() == NO_RESIZE) {
                 // Store the first pressed point
@@ -519,79 +554,93 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     } 
 }
 
-void
-MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
+void MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
 {
-  if (!_maquette->isExecutionOn()) {
+    if (!_maquette->isExecutionOn())
+    {
+        QGraphicsScene::mouseMoveEvent(mouseEvent);
 
-      QGraphicsScene::mouseMoveEvent(mouseEvent);
+        switch (_currentInteractionMode)
+        {
+            case RELATION_MODE:
 
-      switch (_currentInteractionMode) {
-          case RELATION_MODE:
+                if (_clicked)
+                {
+                    _mousePos = mouseEvent->scenePos();
+                    if (_relation->firstBox() != NO_ID)
+                    {
+                        update();
+                    }
 
-            if (_clicked) {
-                _mousePos = mouseEvent->scenePos();
-                if (_relation->firstBox() != NO_ID) {
-                    update();
-                  }
-                if (itemAt(mouseEvent->scenePos(), QTransform()) != 0) {
-                    int type = itemAt(mouseEvent->scenePos(), QTransform())->type();
-                    if (type == PARENT_BOX_TYPE) {
-                        BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos(), QTransform()));
-                        if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE) ||
-                            mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
-                            _relationBoxFound = true;
-                            update();
-                          }
-                        else {
+                    if (itemAt(mouseEvent->scenePos(), QTransform()) != 0)
+                    {
+                        int type = itemAt(mouseEvent->scenePos(), QTransform())->type();
+                        if (type == PARENT_BOX_TYPE)
+                        {
+                            auto secondBox = dynamic_cast<ParentBox*>(itemAt(mouseEvent->scenePos(), QTransform()));
+                            if(!secondBox)
+                            {
+                                qDebug() << "ALERT" << Q_FUNC_INFO;
+                                return;
+                            }
+
+                            if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE) ||
+                                mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE))
+                            {
+                                _relationBoxFound = true;
+                                update();
+                            }
+                            else
+                            {
+                                _relationBoxFound = false;
+                            }
+                        }
+                        else
+                        {
                             _relationBoxFound = false;
-                          }
-                      }
-                    else {
-                        _relationBoxFound = false;
-                      }
-                  }
-              }
-            break;
+                        }
+                    }
+                }
+                break;
 
-          case TEXT_MODE:
-            break;
+            case TEXT_MODE:
+                break;
 
-          case TRIGGER_MODE:
-            break;
+            case TRIGGER_MODE:
+                break;
 
-          case SELECTION_MODE:
-            break;
+            case SELECTION_MODE:
+                break;
 
-          case CREATION_MODE:          
-            if (noBoxSelected() || subScenarioMode(mouseEvent)) {
-                if (resizeMode() == NO_RESIZE && _tempBox) {
-                    int upLeftX, upLeftY, width, height;
+            case CREATION_MODE:
+                if (noBoxSelected() || subScenarioMode(mouseEvent)) {
+                    if (resizeMode() == NO_RESIZE && _tempBox) {
+                        int upLeftX, upLeftY, width, height;
 
-                    if (_pressPoint.x() < mouseEvent->scenePos().x()) {
-                        upLeftX = _pressPoint.x();
-                        width = mouseEvent->scenePos().x() - upLeftX;
-                      }
-                    else {
-                        upLeftX = mouseEvent->scenePos().x();
-                        width = _pressPoint.x() - upLeftX;
-                      }
-                    if (_pressPoint.y() < mouseEvent->scenePos().y()) {
-                        upLeftY = _pressPoint.y();
-                        height = mouseEvent->scenePos().y() - upLeftY;
-                      }
-                    else {
-                        upLeftY = mouseEvent->scenePos().y();
-                        height = _pressPoint.y() - upLeftY;
-                      }
+                        if (_pressPoint.x() < mouseEvent->scenePos().x()) {
+                            upLeftX = _pressPoint.x();
+                            width = mouseEvent->scenePos().x() - upLeftX;
+                        }
+                        else {
+                            upLeftX = mouseEvent->scenePos().x();
+                            width = _pressPoint.x() - upLeftX;
+                        }
+                        if (_pressPoint.y() < mouseEvent->scenePos().y()) {
+                            upLeftY = _pressPoint.y();
+                            height = mouseEvent->scenePos().y() - upLeftY;
+                        }
+                        else {
+                            upLeftY = mouseEvent->scenePos().y();
+                            height = _pressPoint.y() - upLeftY;
+                        }
 
-                    _tempBox->setRect(upLeftX, upLeftY, width, height);
-                  }
-              }
-            break;
+                        _tempBox->setRect(upLeftX, upLeftY, width, height);
+                    }
+                }
+                break;
 
-          case BOX_EDIT_MODE:
-            break;
+            case BOX_EDIT_MODE:
+                break;
         }
     }
 }
@@ -610,13 +659,18 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
             int type = itemAt(mouseEvent->scenePos(), QTransform())->type();
             if (type == PARENT_BOX_TYPE) {
 
-                BasicBox *secondBox = static_cast<BasicBox*>(itemAt(mouseEvent->scenePos(), QTransform()));
                 BasicBox *firstBox = getBox(_relation->firstBox());
+                if(!firstBox)
+                    qDebug() << "ALERT: (1)" << Q_FUNC_INFO;
+
+                ParentBox *secondBox = dynamic_cast<ParentBox*>(itemAt(mouseEvent->scenePos(), QTransform()));
+                if(!secondBox)
+                    qDebug() << "ALERT: (2)" << Q_FUNC_INFO;
 
                 if(mouseEvent->modifiers() == Qt::AltModifier){ //case conditional relation
                     QList<BasicBox *> boxesToCondition;
-                    boxesToCondition<<firstBox;
-                    boxesToCondition<<secondBox;
+                    boxesToCondition << firstBox;
+                    boxesToCondition << secondBox;
                     conditionBoxes(boxesToCondition);
                 }
                 else{
@@ -686,7 +740,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
           }
         if (_tempBox) {
             removeItem(_tempBox);
-            _tempBox = NULL;
+            delete_later(_tempBox);
           }
         break;
     }
@@ -699,7 +753,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
 void
 MaquetteScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
-  _tempBox = NULL;
+  _tempBox = nullptr;
   _resizeBox = NO_ID;
   _relation->setFirstBox(NO_ID);
   _relation->setSecondBox(NO_ID);
@@ -708,7 +762,7 @@ MaquetteScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
   _mousePos = QPointF(0., 0.);
 
   _clicked = false;
-  _tempBox = NULL;
+  _tempBox = nullptr;
 
   QGraphicsScene::contextMenuEvent(event);
 }
@@ -743,6 +797,7 @@ MaquetteScene::getRelation(unsigned int ID)
   return _maquette->getRelation(ID);
 }
 
+/*
 void
 MaquetteScene::cutBoxes()
 {
@@ -760,8 +815,10 @@ MaquetteScene::copyBoxes(bool erasing)
 
     QList<QGraphicsItem *> selected = selectedItems();
     QList<QGraphicsItem *>::iterator it;
-    for (it = selected.begin(); it != selected.end(); it++) {
-        switch ((*it)->type()) {
+    for (it = selected.begin(); it != selected.end(); it++)
+    {
+        switch ((*it)->type())
+        {
 
         case PARENT_BOX_TYPE:
         {
@@ -844,7 +901,7 @@ MaquetteScene::pasteBoxes()
       int type = boxIt->second->type();
       AbstractBox *boxToCopy = boxIt->second;
       unsigned int newID = NO_ID;
-      AbstractBox *absCopyBox = NULL;
+      AbstractBox *absCopyBox = nullptr;
       switch (type) {
           case ABSTRACT_PARENT_BOX_TYPE:
           {
@@ -868,7 +925,7 @@ MaquetteScene::pasteBoxes()
             break;
           }
         }
-      if (newID != NO_ID && absCopyBox != NULL) {
+      if (newID != NO_ID && absCopyBox != nullptr) {
           IDMap[absCopyBox->ID()] = newID;
 #ifdef DEBUG
           std::cerr << "MaquetteScene::pasteBoxes : assigning ID " << newID << " to copy of box " << absCopyBox->ID() << std::endl;
@@ -916,8 +973,8 @@ MaquetteScene::pasteBoxes()
               if (IDMap.find(comment->ID()) != IDMap.end()) {
                   std::cerr << "New ID for Comment : " << IDMap[comment->ID()] << std::endl;
                   comment->setID(IDMap[comment->ID()]);
-                  BasicBox *comBox = NULL;
-                  if ((comBox = getBox(IDMap[comment->ID()])) != NULL) {
+                  BasicBox *comBox = nullptr;
+                  if ((comBox = getBox(IDMap[comment->ID()])) != nullptr) {
                       comBox->addComment(*comment);
                     }
                   else {
@@ -948,18 +1005,22 @@ MaquetteScene::pasteBoxes()
   _copySize = QPointF(0, 0);
   setModified(true);
 }
-
+*/
 void
 MaquetteScene::muteBoxes()
 {
-    for (int i = 0; i < selectedItems().size(); i++)
+    for(auto& curItem : selectedItems())
     {
-        QGraphicsItem *curItem = selectedItems().at(i);
-        int type = curItem->type();
-        BasicBox *curBox = static_cast<BasicBox*>(curItem);
-        if (type == PARENT_BOX_TYPE) {
-            curBox = static_cast<BasicBox*>(curItem);
-            curBox->setMuteState(!curBox->getMuteState());
+        if (curItem->type() == PARENT_BOX_TYPE)
+        {
+            if(auto curBox = dynamic_cast<ParentBox*>(curItem))
+            {
+                curBox->setMuteState(!curBox->getMuteState());
+            }
+            else
+            {
+                qDebug() << "ALERT: " << Q_FUNC_INFO;
+            }
         }
     }
     update();
@@ -1020,13 +1081,14 @@ MaquetteScene::removeComment(Comment *comment)
 {
   unsigned int ID = static_cast<AbstractComment*>(comment->abstract())->ID();
   if (ID != NO_ID) {
-      if (getBox(ID) != NULL) {
+      if (getBox(ID) != nullptr) {
           getBox(ID)->removeComment();
+          qDebug() << "Comment removed: " << (void*) comment;
         }
     }
 
   removeItem(comment);
-  delete comment;
+  comment->deleteLater();
 }
 
 int
@@ -1057,19 +1119,27 @@ MaquetteScene::getTriggerPoint(unsigned int trgID)
   return _maquette->getTriggerPoint(trgID);
 }
 
-void
-MaquetteScene::removeTriggerPoint(unsigned int trgID)
+void MaquetteScene::removeTriggerPoint(unsigned int trgID)
 {
-  TriggerPoint *trgPnt = getTriggerPoint(trgID);
-  BasicBox *box;
-  if (trgPnt != NULL) {
-      box = getBox(trgPnt->boxID());
-      if (box != NULL) {
-          box->removeTriggerPoint(trgPnt->boxExtremity());
+    TriggerPoint *trgPnt = getTriggerPoint(trgID);
+    removeItem(trgPnt);
+
+    if (trgPnt != nullptr)
+    {
+        if (BasicBox *box = getBox(trgPnt->boxID()))
+        {
+            box->removeTriggerPoint(trgPnt->boxExtremity());
         }
-      _triggersQueueList->removeAll(trgPnt);
-//      removeItem(trgPnt);
-      _maquette->removeTriggerPoint(trgID);      
+        else
+        {
+             qDebug() << "ALERT: accessing invalid box." << Q_FUNC_INFO;
+        }
+        _triggersQueueList->removeAll(trgPnt);
+        _maquette->removeTriggerPoint(trgID);
+    }
+    else
+    {
+        qDebug() << "ALERT: accessing invalid trigger point." << Q_FUNC_INFO;
     }
 }
 
@@ -1181,7 +1251,7 @@ MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, 
                                                       std::fabs(bottomRight.y() - topLeft.y())));
 
   /// Searching the mother of parentBox
-  ParentBox *parentBox = NULL;
+  ParentBox *parentBox = nullptr;
   if (motherID != ROOT_BOX_ID && motherID != NO_ID) {
       parentBox = static_cast<ParentBox*>(getBox(motherID));
     }
@@ -1192,7 +1262,7 @@ MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, 
 
   ParentBox *newBox = static_cast<ParentBox*>(getBox(newBoxID));
 
-  if (newBox != NULL && parentBox != NULL) {
+  if (newBox != nullptr && parentBox != nullptr) {
       if (newBox->mother() != motherID) {           // Not yet assigned
           parentBox->addChild(newBoxID);
           newBox->setMother(motherID);
@@ -1243,17 +1313,17 @@ MaquetteScene::addRelation(const AbstractRelation &abstractRel)
   if (ret > NO_ID) {
       unsigned int relationID = (unsigned int)ret;
       Relation *newRel = _maquette->getRelation(relationID);
-      if (newRel != NULL) {
+      if (newRel != nullptr) {
           newRel->setID(relationID);
           newRel->setPos(newRel->getCenter());
           newRel->update();
 
 //			addItem(newRel);
-          BasicBox *box = NULL;
-          if ((box = getBox(abstractRel.firstBox())) != NULL) {
+          BasicBox *box = nullptr;
+          if ((box = getBox(abstractRel.firstBox())) != nullptr) {
               box->addRelation(abstractRel.firstExtremity(), newRel);
             }
-          if ((box = getBox(abstractRel.secondBox())) != NULL) {
+          if ((box = getBox(abstractRel.secondBox())) != nullptr) {
               box->addRelation(abstractRel.secondExtremity(), newRel);
             }
           newRel->updateFlexibility();
@@ -1308,14 +1378,14 @@ void
 MaquetteScene::changeRelationBounds(unsigned int relID, const float &length, const float &minBound, const float &maxBound)
 {
   Relation *rel = getRelation(relID);
-  if (rel != NULL) {      
+  if (rel != nullptr) {
       _maquette->changeRelationBounds(relID, minBound, maxBound);
       rel->changeBounds(minBound, maxBound);
       if (length != NO_LENGTH) {
           AbstractRelation *abRel = static_cast<AbstractRelation*>(rel->abstract());
           float oldLength = abRel->length();
           BasicBox *secondBox = getBox(abRel->secondBox());
-          if (secondBox != NULL) {              
+          if (secondBox != nullptr) {
               secondBox->moveBy(length - oldLength, 0.);
               vector<unsigned int> boxMoved;
               boxMoved.push_back(secondBox->ID());
@@ -1325,55 +1395,63 @@ MaquetteScene::changeRelationBounds(unsigned int relID, const float &length, con
     }
 }
 
-bool
-MaquetteScene::addInterval(unsigned int ID1, unsigned int ID2, int value, int tolerance)
-{
-  setModified(true);
-
-  return _maquette->addInterval(ID1, ID2, value, tolerance);
-}
-
 void
 MaquetteScene::removeRelation(unsigned int relID)
 {
-  Relation *rel = getRelation(relID);
-  removeItem(rel);
-  if (rel != NULL) {
-      AbstractRelation *abstract = static_cast<AbstractRelation*>(rel->abstract());
+    Relation *rel = getRelation(relID);
+    removeItem(rel);
 
-      BasicBox *box = getBox(abstract->firstBox());
-      if (box != NULL) {
-          box->removeRelation(abstract->firstExtremity(), abstract->ID());
+    if (rel != nullptr)
+    {
+        AbstractRelation *abstract = static_cast<AbstractRelation*>(rel->abstract());
+
+        if (BasicBox *box = getBox(abstract->firstBox()))
+        {
+            box->removeRelation(abstract->firstExtremity(), abstract->ID());
         }
-      box = getBox(abstract->secondBox());
-      if (box != NULL) {
-          box->removeRelation(abstract->secondExtremity(), abstract->ID());
+        else
+        {
+            qDebug() << "ALERT: Removing invalid box (1)." << Q_FUNC_INFO;
         }
 
-      _maquette->removeRelation(relID);
+        if (BasicBox *box = getBox(abstract->secondBox()))
+        {
+            box->removeRelation(abstract->secondExtremity(), abstract->ID());
+        }
+        else
+        {
+            qDebug() << "ALERT: Removing invalid box (2)." << Q_FUNC_INFO;
+        }
 
-      setModified(true);
+        _maquette->removeRelation(relID);
+
+        setModified(true);
+    }
+    else
+    {
+         qDebug() << "ALERT: accessing invalid relation." << Q_FUNC_INFO;
     }
 }
 
 void
 MaquetteScene::removeConditionalRelation(ConditionalRelation *condRel)
 {
-    if(condRel != NULL)
-    {
-        QList<BasicBox *>::iterator     it;
-        QList<BasicBox *>               boxes = condRel->getBoxes();
-        BasicBox                        *curBox;
+    removeItem(condRel);
 
-        for(it = boxes.begin() ; it!=boxes.end() ; it++)
+    if(condRel != nullptr)
+    {
+        for(auto box : condRel->getBoxes())
         {
-            curBox = *it;
-            curBox->removeConditionalRelation(condRel);
+            box->removeConditionalRelation(condRel);
         }
 
-        removeItem(condRel);
         Maquette::getInstance()->deleteCondition(condRel->ID());
+        condRel->deleteLater();
         setModified(true);
+    }
+    else
+    {
+         qDebug() << "ALERT: accessing invalid conditional relation." << Q_FUNC_INFO;
     }
 }
 
@@ -1418,16 +1496,22 @@ MaquetteScene::boxResized()
 void
 MaquetteScene::selectionMoved()
 {
-  for (int i = 0; i < selectedItems().size(); i++) {
-      QGraphicsItem *curItem = selectedItems().at(i);
-      int type = curItem->type();
-      if (type == PARENT_BOX_TYPE) {
-          BasicBox *curBox = static_cast<BasicBox*>(curItem);
-          boxMoved(curBox->ID());
-        }
-      else if (type == CONDITIONAL_RELATION_TYPE){
-      }
+  for(auto& curItem : selectedItems())
+  {
+    switch(curItem->type())
+    {
+      case PARENT_BOX_TYPE:
+       {
+         ParentBox *curBox = static_cast<ParentBox*>(curItem);
+         boxMoved(curBox->ID());
+         break;
+       }
+
+      case CONDITIONAL_RELATION_TYPE:
+      default:
+        break;
     }
+  }
 }
 
 bool
@@ -1436,7 +1520,7 @@ MaquetteScene::boxMoved(unsigned int boxID)
 //  std::cout<<"--- boxMoved ---"<<boxID<<std::endl;
   Coords coord;
   BasicBox * box = _maquette->getBox(boxID);
-  if (box != NULL) {
+  if (box != nullptr) {
 
       if (!box->hasMother()) {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x();
@@ -1464,55 +1548,88 @@ MaquetteScene::boxMoved(unsigned int boxID)
 void
 MaquetteScene::boxesMoved(const vector<unsigned int> &moved)
 {
-  for (unsigned int i = 0; i < moved.size(); i++) {
-      boxMoved(moved[i]);
-    }
+    for(auto& id : moved)
+        boxMoved(id);
 }
 
 void
 MaquetteScene::removeBox(unsigned int boxID)
 {
-  BasicBox *box = getBox(boxID);
-  if (box != NULL) {
-      if (boxID == _editor->currentBox()) { /// \todo Uniquement changer cette méthode publique en slot pour pouvoir découpler MaquetteScene et AttributesEditor. (c'est l'unique appel utile de _editor dans MaquetteScene). (par jaime Chao)
-          _editor->noBoxEdited(); /// \todo noBoxEdited() est un public slot. mieux vaux faire appel au mécanisme d'auto-connexion des signaux dans Qt (QMetaObject) que de le garder en attribut de classe (couplage). (par jaime Chao)
-        }
-      removeItem(box);
+    BasicBox* box = getBox(boxID);
+    removeItem(box);
 
-      if (box->type() == PARENT_BOX_TYPE) {
-          ParentBox *pBox = static_cast<ParentBox*>(box);
-          if (pBox != NULL) {
-              map<unsigned int, BasicBox*> children = pBox->children();
-              map<unsigned int, BasicBox*>::iterator child;
-              for (child = children.begin(); child != children.end(); ++child) {
-                  pBox->removeChild(child->first);
-                  removeBox(child->first);
-                }
-            }
-        }
-      if (box->hasMother()) {
-          BasicBox *mother = NULL;
-          if ((mother = getBox(box->mother())) != NULL) {
-              if (mother->type() == PARENT_BOX_TYPE) {
-                  static_cast<ParentBox*>(mother)->removeChild(boxID);
-                }
-            }
+    if (box)
+    {
+        if (boxID == _editor->currentBox())
+        {
+            /// \todo Uniquement changer cette méthode publique en slot
+            /// pour pouvoir découpler MaquetteScene et AttributesEditor.
+            /// (c'est l'unique appel utile de _editor dans MaquetteScene).
+            /// (par jaime Chao)
+            ///
+            _editor->noBoxEdited();
+            /// \todo noBoxEdited() est un public slot.
+            /// mieux vaux faire appel au mécanisme d'auto-connexion des signaux dans Qt (QMetaObject)
+            /// que de le garder en attribut de classe (couplage). (par jaime Chao)
         }
 
-      box->removeComment();
-      box->removeTriggerPoint(BOX_START);
-      box->removeTriggerPoint(BOX_END);
-      
-      vector<unsigned int> removedRelations = _maquette->removeBox(boxID);
-      for (vector<unsigned int>::iterator it = removedRelations.begin(); it != removedRelations.end(); it++) {
-          removeRelation(*it);
+        if (box->type() == PARENT_BOX_TYPE)
+        {
+            if (auto pBox = dynamic_cast<ParentBox*>(box))
+            {
+                for(auto child : pBox->children())
+                    removeBox(child.first);
+
+                pBox->children().clear();
+            }
+            else
+                qDebug() << "ALERT: pBox is not ParentBox (1). " << Q_FUNC_INFO;
         }
-      
-      delete box;
-      setModified(true);
+
+        // Si parenté
+        if (box->hasMother())
+        {
+            if (auto mother = getBox(box->mother()))
+            {
+                if (mother->type() == PARENT_BOX_TYPE)
+                {
+                    if(auto papa = dynamic_cast<ParentBox*>(mother))
+                        papa->removeChild(boxID);
+                    else
+                        qDebug() << "ALERT: pBox is not ParentBox (2). " << Q_FUNC_INFO;
+                }
+                else
+                    qDebug() << "ALERT: mother is not PARENT_BOX_TYPE. " << Q_FUNC_INFO;
+            }
+            else
+                qDebug() << "ALERT: mother does not exist. " << Q_FUNC_INFO;
+        }
+
+        box->removeComment();
+        box->removeTriggerPoint(BOX_START);
+        box->removeTriggerPoint(BOX_END);
+
+        for(auto& rel_id : _maquette->removeBox(boxID))
+            removeRelation(rel_id);
+
+        if (box->type() == PARENT_BOX_TYPE)
+        {
+            if(auto pBox = dynamic_cast<ParentBox*>(box))
+                pBox->deleteLater();
+            else
+                qDebug() << "ALERT: papa is not papa (3). " << Q_FUNC_INFO;
+        }
+        else
+        {
+            box->deleteLater();
+        }
+
+        setModified(true);
     }
-
-  update();
+    else
+    {
+        qDebug() << "ALERT: accessing invalid box." << Q_FUNC_INFO;
+    }
 }
 
 bool
@@ -1550,7 +1667,7 @@ MaquetteScene::setPlaying(unsigned int boxID, bool playing)
     }
   else {
       if (playing) {
-          if (box != NULL) {
+          if (box != nullptr) {
               _playingBoxes[boxID] = box;
 //              box->update();
               if(!_playThread->isRunning())
@@ -1702,34 +1819,103 @@ MaquetteScene::removeFromTriggerQueue(TriggerPoint *trigger)
   _triggersQueueList->removeAll(trigger);
 }
 
-void
-MaquetteScene::removeSelectedItems()
+void MaquetteScene::removeSelectedItems()
 {
-  QList<QGraphicsItem *> toRemove = selectedItems();
-  map<unsigned int, BasicBox*> boxesToRemove;
-  for (QList<QGraphicsItem *>::iterator it = toRemove.begin(); it != toRemove.end(); it++) {
-      int type = (*it)->type();
-      if (type == PARENT_BOX_TYPE) {
-          boxesToRemove[static_cast<BasicBox*>(*it)->ID()] = static_cast<BasicBox*>(*it);
-        }
-      else if ((*it)->type() == RELATION_TYPE) {
-          removeRelation(static_cast<Relation*>(*it)->ID());
-        }
-      else if ((*it)->type() == COMMENT_TYPE) {
-          removeComment(static_cast<Comment*>(*it));
-        }
-      else if ((*it)->type() == TRIGGER_POINT_TYPE) {
-          removeTriggerPoint(static_cast<TriggerPoint*>(*it)->ID());
-        }
-      else if ((*it)->type() == CONDITIONAL_RELATION_TYPE) {
-          removeConditionalRelation(static_cast<ConditionalRelation*>(*it));
+    _view->setUpdatesEnabled(false);
+
+    vector<int> boxesToRemove;
+    vector<int> relationsToRemove;
+    vector<int> triggerPointsToRemove;
+    vector<ConditionalRelation*> conditionalRelationsToRemove;
+
+    for (auto& item : selectedItems())
+    {
+        switch(item->type())
+        {
+            case PARENT_BOX_TYPE:
+            {
+                qDebug() << "Removing a parent box";
+                ParentBox* box = dynamic_cast<ParentBox*>(item);
+                if(box)
+                    boxesToRemove.push_back(box->ID());
+                else
+                    qDebug() << "ALERT: Tried to delete a bad box";
+
+                break;
+            }
+
+            case RELATION_TYPE:
+            {
+                qDebug() << "Removing a relation";
+                Relation* rel = dynamic_cast<Relation*>(item);
+                if(rel)
+                    relationsToRemove.push_back(rel->ID());
+                else
+                    qDebug() << "ALERT: Tried to delete a bad relation";
+
+                break;
+            }
+            case COMMENT_TYPE:
+            {
+                qDebug() << "Removing a comment";
+                Comment* comment = dynamic_cast<Comment*>(item);
+                if(comment)
+                    removeComment(comment);
+                else
+                    qDebug() << "ALERT: Tried to delete a bad comment";
+
+                break;
+            }
+            case TRIGGER_POINT_TYPE:
+            {
+                qDebug() << "Removing a trigger point";
+                TriggerPoint* tp = dynamic_cast<TriggerPoint*>(item);
+                if(tp)
+                    triggerPointsToRemove.push_back(tp->ID());
+                else
+                    qDebug() << "ALERT: Tried to delete a bad trigger point";
+
+                break;
+            }
+            case CONDITIONAL_RELATION_TYPE:
+            {
+                qDebug() << "Removing a conditional relation";
+                ConditionalRelation* cr = qgraphicsitem_cast<ConditionalRelation*>(item);
+                if(cr)
+                    conditionalRelationsToRemove.push_back(cr);
+                else
+                    qDebug() << "ALERT: Tried to delete a bad conditional relation";
+                break;
+            }
+
+            default:
+                qDebug() << "ALERT: not removing unknown item";
+
         }
     }
-  map<unsigned int, BasicBox*>::iterator boxIt;
-  for (boxIt = boxesToRemove.begin(); boxIt != boxesToRemove.end(); ++boxIt) {
-      removeBox(boxIt->first);
+
+    for(auto& rel : relationsToRemove)
+    {
+        removeRelation(rel);
     }
-  setModified(true);
+
+    for(auto& cr : conditionalRelationsToRemove)
+    {
+        removeConditionalRelation(cr);
+    }
+
+    for(auto& tp : triggerPointsToRemove)
+    {
+        removeTriggerPoint(tp);
+    }
+
+    for(auto& box : boxesToRemove)
+    {
+        removeBox(box);
+    }
+
+    _view->setUpdatesEnabled(true);
+    setModified(true);
 }
 
 void
@@ -1879,10 +2065,8 @@ MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
     }    
 }
 
-void
-MaquetteScene::unselectAll(){
-    QList<QGraphicsItem *> items = selectedItems();
-    QList<QGraphicsItem *>::iterator it;
-    for(it = items.begin(); it != items.end() ; it++)
-        (*it)->setSelected(false);
+void MaquetteScene::unselectAll()
+{
+    for(auto& item : items())
+      item->setSelected(false);
 }

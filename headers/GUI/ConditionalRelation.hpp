@@ -7,7 +7,7 @@
  * \author Nicolas Hincker
  */
 
-#include <QGraphicsItem>
+#include <QGraphicsObject>
 #include <QPainter>
 #include "Maquette.hpp"
 #include "MaquetteScene.hpp"
@@ -19,9 +19,9 @@ class BasicBox;
 /*!
  * \brief Enum used to define Relation's item type.
  */
-enum { CONDITIONAL_RELATION_TYPE = QGraphicsItem::UserType + 7 };
+enum { CONDITIONAL_RELATION_TYPE = QGraphicsObject::UserType + 7 };
 
-class ConditionalRelation : public QGraphicsItem
+class ConditionalRelation : public QGraphicsObject
 {
 
 public :

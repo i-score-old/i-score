@@ -284,18 +284,6 @@ class MaquetteScene : public QGraphicsScene
     void changeRelationBounds(unsigned int relID, const float &length, const float &minBound, const float &maxBound);
 
     /*!
-     * \brief Creates a new interval relation between 2 objects.
-     *
-     * \param ID1 : the first box ID in the interval
-     * \param ID2 : the second box ID in the interval
-     * \param value : the interval value
-     * \param tolerance : the interval tolerance
-     *
-     * \return true if the interval could be created
-     */
-    bool addInterval(unsigned int ID1, unsigned int ID2, int value, int tolerance);
-
-    /*!
      * \brief Removes a relation.
      *
      * \param relID : the relation to be removed
@@ -419,7 +407,7 @@ class MaquetteScene : public QGraphicsScene
      *
      * \param position the place to paste boxes to
      */
-    void pasteBoxes(const QPointF &position);
+    //void pasteBoxes(const QPointF &position);
 
     /*!
      * \brief Redefinition of QGraphicsScene::clear(). Clears the scene.
@@ -634,17 +622,17 @@ class MaquetteScene : public QGraphicsScene
     /*!
      * \brief Cuts selected boxes.
      */
-    void cutBoxes();
+    //void cutBoxes();
 
     /*!
      * \brief Copies selected boxes.
      */
-    void copyBoxes(bool erasing = false);    
+    //void copyBoxes(bool erasing = false);
 
     /*!
      * \brief Pastes copied boxes.
      */
-    void pasteBoxes();
+    //void pasteBoxes();
 
     /*!
      * \brief Mutes selected boxes.
@@ -738,11 +726,12 @@ class MaquetteScene : public QGraphicsScene
     Maquette *_maquette;               //!< The logical representation of the Maquette.
     float _maxSceneWidth;
 
+    /*
     std::vector<Abstract*> _toCopy;    //!< Used to store items beeing copied.
     std::map<unsigned int, AbstractBox*> _boxesToCopy;
     QPointF _copyPos;                  //!< Used to store position to copy from.
     QPointF _copySize;                 //!< Used to store size of selection copied.
-
+    */
     bool _modified;                    //!< Handling document 'was modified' state.
 
     QPointF _pressPoint;               //!< Last pression point.

@@ -31,15 +31,15 @@ HeaderPanelWidget::HeaderPanelWidget(QWidget *parent, MaquetteScene *scene)
 
 HeaderPanelWidget::~HeaderPanelWidget()
 {
-    delete _toolBar;
-    delete _nameLabel;
-    delete _playAction;
-    delete _stopAction;
-    delete _rewindAction;
-    delete _accelerationSlider;
-    delete _accelerationDisplay;
-    delete _accelerationWidget;
-    delete _layout;
+    _toolBar->deleteLater();
+    _nameLabel->deleteLater();
+    _playAction->deleteLater();
+    _stopAction->deleteLater();
+    _rewindAction->deleteLater();
+    _accelerationSlider->deleteLater();
+    _accelerationDisplay->deleteLater();
+    _accelerationWidget->deleteLater();
+    _layout->deleteLater();
 }
 
 void

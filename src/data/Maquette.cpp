@@ -63,7 +63,7 @@
 #include "AttributesEditor.hpp"
 #include "NetworkTree.hpp"
 #include <QThread>
-
+#include <DelayedDelete.h>
 #include <stdio.h>
 #include <assert.h>
 #include <QCoreApplication>
@@ -94,21 +94,20 @@ Maquette::init()
 
     // create a ScoreEngine instance
     // note : this is a temporary solution to test new Score framework easily
-    if (_engines)
-        delete _engines;
+    delete _engines;
         
     _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, &deviceCallback, jamomaFolder);
 
     //Creating rootBox as the mainScenario
-    AbstractBox *scenarioAb = new AbstractBox();
+    auto scenarioAb = new AbstractParentBox();
     scenarioAb->setID(ROOT_BOX_ID);
     /// \todo : set root box name. NH
 
-    ParentBox *scenarioBox = new ParentBox(static_cast<AbstractParentBox *>(scenarioAb), _scene);
+    ParentBox *scenarioBox = new ParentBox(scenarioAb, _scene);
     _boxes[ROOT_BOX_ID] = scenarioBox;
 }
 
-Maquette::Maquette() : _engines(NULL)
+Maquette::Maquette() : _engines(nullptr)
 {
 	connect(this, SIGNAL(boxIsRunningSignal(uint,bool)), this, SLOT(boxIsRunningSlot(uint,bool)), Qt::QueuedConnection);
 }
@@ -163,7 +162,7 @@ Maquette::getRelation(unsigned int ID)
       return it->second;
     }
 
-  return NULL;
+  return nullptr;
 }
 
 BasicBox*
@@ -174,7 +173,7 @@ Maquette::getBox(unsigned int ID)
       return it->second;
     }
 
-  return NULL;
+  return nullptr;
 }
 
 void Maquette::setBoxColor(unsigned int ID, QColor newColor)
@@ -198,81 +197,106 @@ Maquette::sequentialID()
 {
   return _boxes.size();
 }
-
-unsigned int
-Maquette::addParentBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
+/*
+void Maquette::addParentBoxToScene(unsigned int ID,
+                                   unsigned int mother,
+                                   ParentBox* newBox)
 {
-  vector<string> firstMsgs;
-  vector<string> lastMsgs;
-
-  _engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-  _engines->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
-
-  ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
-
-  if (ID != NO_ID) {
-      newBox->setName(QString::fromStdString(name));
-
-      _boxes[ID] = newBox;
-      _parentBoxes[ID] = newBox;
-      newBox->setID(ID);
-      if (mother != NO_ID && mother != ROOT_BOX_ID) {
-          BoxesMap::iterator it;
-          if ((it = _boxes.find(mother)) != _boxes.end()) {
-              if (it->second->type() == PARENT_BOX_TYPE) {
-                  newBox->setMother(mother);
-                  static_cast<ParentBox*>(it->second)->addChild(ID);
+    if (mother != NO_ID && mother != ROOT_BOX_ID)
+    {
+        BoxesMap::iterator it;
+        if ((it = _boxes.find(mother)) != _boxes.end())
+        {
+            if (it->second->type() == PARENT_BOX_TYPE)
+            {
+                if(auto papa = dynamic_cast<ParentBox*>(it->second))
+                {
+                    newBox->setMother(mother);
+                    papa->addChild(ID);
                 }
-              else {
-                  newBox->setMother(ROOT_BOX_ID);
+                else
+                {
+                    qDebug() << "ALERT : Trying to add a child to a non-parent." << Q_FUNC_INFO;
                 }
+            }
+            else
+            {
+                newBox->setMother(ROOT_BOX_ID);
             }
         }
     }
-
-  return ID;
 }
 
-unsigned int
-Maquette::addParentBox(unsigned int ID, const unsigned int date, const unsigned int topLeftY, const unsigned int sizeY, const unsigned int duration, const string & name, unsigned int mother, QColor color)
+unsigned int Maquette::addParentBox(unsigned int ID,
+                                    const QPointF & corner1,
+                                    const QPointF & corner2,
+                                    const string & name,
+                                    unsigned int mother)
 {
-  QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
-  QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);
+    vector<string> firstMsgs;
+    vector<string> lastMsgs;
 
-  vector<string> firstMsgs;
-  vector<string> lastMsgs;
+    _engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
+    _engines->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
 
-  _engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-  _engines->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
 
-  ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
+    if (ID != NO_ID)
+    {
+        ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
+        newBox->setName(QString::fromStdString(name));
 
-  if (ID != NO_ID) {
-      newBox->setName(QString::fromStdString(name));
-      newBox->setColor(color);
-      _boxes[ID] = newBox;
-      _parentBoxes[ID] = newBox;
-      newBox->setID(ID);
-      if (mother != NO_ID && mother != ROOT_BOX_ID) {
-          BoxesMap::iterator it;
-          if ((it = _boxes.find(mother)) != _boxes.end()) {
-              if (it->second->type() == PARENT_BOX_TYPE) {
-                  newBox->setMother(mother);
-                  static_cast<ParentBox*>(it->second)->addChild(ID);
-                }
-              else {
-                  newBox->setMother(ROOT_BOX_ID);
-                }
-            }
-        }
+        _boxes[ID] = newBox;
+        _parentBoxes[ID] = newBox;
+        newBox->setID(ID);
+
+        addParentBoxToScene(ID, mother, newBox);
     }
 
-  return ID;
+    return ID;
 }
 
+unsigned int Maquette::addParentBox(unsigned int ID,
+                                    const unsigned int date,
+                                    const unsigned int topLeftY,
+                                    const unsigned int sizeY,
+                                    const unsigned int duration,
+                                    const string & name,
+                                    unsigned int mother,
+                                    QColor color)
+{
+    QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
+    QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);
+
+    vector<string> firstMsgs;
+    vector<string> lastMsgs;
+
+    _engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
+    _engines->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
+
+
+    if (ID != NO_ID)
+    {
+        ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
+
+        newBox->setName(QString::fromStdString(name));
+        newBox->setColor(color);
+
+        _boxes[ID] = newBox;
+        _parentBoxes[ID] = newBox;
+        newBox->setID(ID);
+
+        addParentBoxToScene(ID, mother, newBox);
+    }
+
+    return ID;
+}
+*/
 /// \todo change arguments named corner. this is not comprehensible. (par jaime Chao)
 unsigned int
-Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
+Maquette::addParentBox(const QPointF & corner1,
+                       const QPointF & corner2,
+                       const string & name,
+                       unsigned int mother)
 
 {
   /// \todo called by MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name) with topLeft and bottomRight arguments. No need to recalculate. (par jaime Chao)
@@ -281,7 +305,7 @@ Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const s
 
   ParentBox *newBox = new ParentBox(firstCorner, secondCorner, _scene);
 
-  ParentBox *motherBox = NULL;
+  ParentBox *motherBox = nullptr;
   int motherID = mother;
   if (_boxes.find(mother) == _boxes.end()) {
       motherID = ROOT_BOX_ID;
@@ -313,7 +337,7 @@ Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const s
       newBox->setID(newBoxID);
       newBox->setName(QString::fromStdString(name));
 
-      if (motherBox != NULL) {
+      if (motherBox != nullptr) {
           newBox->setMother(motherID);
           motherBox->addChild(newBoxID);
         }
@@ -328,8 +352,10 @@ Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const s
 unsigned int
 Maquette::addParentBox(const AbstractParentBox &abstract)
 {
-  return addParentBox(abstract.topLeft(), QPointF(abstract.topLeft().x() + abstract.width(),
-                                                  abstract.topLeft().y() + abstract.height()), abstract.name(), abstract.mother());
+  return addParentBox(abstract.topLeft(),
+                      QPointF(abstract.topLeft().x() + abstract.width(), abstract.topLeft().y() + abstract.height()),
+                      abstract.name(),
+                      abstract.mother());
 }
 
 map<string, MyDevice>
@@ -395,7 +421,7 @@ vector<string>
 Maquette::firstMessagesToSend(unsigned int boxID)
 {
   vector<string> messages;
-  if ((boxID != NO_ID && (getBox(boxID) != NULL)) || boxID == ROOT_BOX_ID) {
+  if ((boxID != NO_ID && (getBox(boxID) != nullptr)) || boxID == ROOT_BOX_ID) {
 
       _engines->getCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, messages);
       
@@ -407,7 +433,7 @@ vector<string>
 Maquette::lastMessagesToSend(unsigned int boxID)
 {
   vector<string> messages;
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
 
       _engines->getCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, messages);
 
@@ -534,7 +560,7 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages, 
 
   //sortByPriority(firstMsgs);
 
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       _engines->setCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
       _boxes[boxID]->setStartMessages(messages);
 
@@ -549,12 +575,12 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages, 
 NetworkMessages *
 Maquette::startMessages(unsigned int boxID)
 {
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       return _boxes[boxID]->startMessages();
     }
   else {
       std::cerr << "Maquette::startMessage : wrong boxID" << std::endl;
-      return NULL;
+      return nullptr;
     }
 }
 
@@ -623,7 +649,7 @@ Maquette::sortByPriority(NetworkMessages *messages){
 bool
 Maquette::setSelectedItemsToSend(unsigned int boxID, QMap<QTreeWidgetItem*, Data> itemsSelected)
 {
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       _boxes[boxID]->setSelectedItemsToSend(itemsSelected);
 
       return true;
@@ -634,7 +660,7 @@ Maquette::setSelectedItemsToSend(unsigned int boxID, QMap<QTreeWidgetItem*, Data
 bool
 Maquette::setExpandedItemsList(unsigned int boxID, QList<QTreeWidgetItem*> itemsExpanded)
 {
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       _boxes[boxID]->setExpandedItemsList(itemsExpanded);
 
       return true;
@@ -645,7 +671,7 @@ Maquette::setExpandedItemsList(unsigned int boxID, QList<QTreeWidgetItem*> items
 bool
 Maquette::addToExpandedItemsList(unsigned int boxID, QTreeWidgetItem* item)
 {
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       _boxes[boxID]->addToExpandedItemsList(item);
 
       return true;
@@ -656,7 +682,7 @@ Maquette::addToExpandedItemsList(unsigned int boxID, QTreeWidgetItem* item)
 bool
 Maquette::removeFromExpandedItemsList(unsigned int boxID, QTreeWidgetItem* item)
 {
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       _boxes[boxID]->removeFromExpandedItemsList(item);
 
       return true;
@@ -667,7 +693,7 @@ Maquette::removeFromExpandedItemsList(unsigned int boxID, QTreeWidgetItem* item)
 bool
 Maquette::setStartMessages(unsigned int boxID, NetworkMessages* nm)
 {
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       _boxes[boxID]->setStartMessages(nm);
       return true;
     }
@@ -677,7 +703,7 @@ Maquette::setStartMessages(unsigned int boxID, NetworkMessages* nm)
 bool
 Maquette::setEndMessages(unsigned int boxID, NetworkMessages* nm)
 {
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       _boxes[boxID]->setEndMessages(nm);
       return true;
     }
@@ -687,12 +713,12 @@ Maquette::setEndMessages(unsigned int boxID, NetworkMessages* nm)
 NetworkMessages *
 Maquette::endMessages(unsigned int boxID)
 {
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       return _boxes[boxID]->endMessages();
     }
   else {
       std::cerr << "Maquette::startMessage : wrong boxID" << std::endl;
-      return NULL;
+      return nullptr;
     }
 }
 
@@ -706,7 +732,7 @@ Maquette::setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages, bo
   else
       lastMsgs = messages->computeMessages();
 
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       _engines->setCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, lastMsgs);
       _boxes[boxID]->setEndMessages(messages);
 
@@ -980,8 +1006,7 @@ Maquette::removeTriggerPoint(unsigned int ID)
   if ((it = _triggerPoints.find(ID)) != _triggerPoints.end()) {
 
       _engines->removeTriggerPoint(ID);
-
-      delete it->second;
+      it->second->deleteLater();
       _triggerPoints.erase(it);
     }
 }
@@ -993,7 +1018,7 @@ Maquette::getTriggerPoint(unsigned int ID)
   if ((it = _triggerPoints.find(ID)) != _triggerPoints.end()) {
       return it->second;
     }
-  return NULL;
+  return nullptr;
 }
 
 bool
@@ -1022,7 +1047,7 @@ Maquette::createCondition(QList<BasicBox *> boxes)
     {
         curTriggerPoint = curBox->getTriggerPoint(BOX_START);
 
-        if(curTriggerPoint != NULL){
+        if(curTriggerPoint != nullptr){
             curTriggerId = curTriggerPoint->ID();
             triggerIds.push_back(curTriggerId);
         }
@@ -1353,13 +1378,6 @@ Maquette::addRelation(const AbstractRelation &abstract)
     }
 }
 
-bool
-Maquette::addInterval(unsigned int /*ID1*/, unsigned int /*ID2*/, int /*value*/, int /*tolerance*/)
-{
-    /// \todo Old TODO updated (by jC)
-  return false;
-}
-
 void
 Maquette::removeRelation(unsigned int relationID)
 {
@@ -1369,8 +1387,7 @@ Maquette::removeRelation(unsigned int relationID)
     Relation* rel = it->second;
     _engines->removeTemporalRelation(relationID);
 
-    delete rel;
-    it->second = nullptr;
+    rel->deleteLater();
     _relations.erase(it);
   }
 }
@@ -1739,88 +1756,6 @@ void
 Maquette::save(const string &fileName)
 {
   _engines->store(fileName);
-    
-    /* other stuff to write
-    
-    QFile file(QString::fromStdString(fileName));
-    
-    if (!file.open(QFile::WriteOnly | QFile::Text)) {
-        _scene->displayMessage(((QString("Cannot write file %1:\n%2.")).arg(QString::fromStdString(fileName)).
-                                arg(file.errorString())).toStdString(), WARNING_LEVEL);
-        
-        //return false;
-    }
-    
-    QDomImplementation impl = QDomDocument().implementation();
-    
-    QString publicId = "i-score 2012";
-    QString systemId = "http://scrime.labri.fr";
-    QString typeId = "i-scoreSave";
-    _doc = new QDomDocument(impl.createDocumentType(typeId, publicId, systemId));
-    
-    QDomElement root = _doc->createElement("GRAPHICS");
-    root.setAttribute("zoom", _scene->zoom());
-    root.setAttribute("centerX", _scene->view()->getCenterCoordinates().x());
-    root.setAttribute("centerY", _scene->view()->getCenterCoordinates().y());
-    _doc->appendChild(root);
-    
-    QDomElement boxesNode = _doc->createElement("boxes");
-    root.appendChild(boxesNode);
-    
-    for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); ++it) {
-        saveBox(it->first);
-    }
-    
-    // Devices
-    QDomElement devicesNode = _doc->createElement("Devices");
-    QDomElement deviceNode;
-    
-    std::map<std::string, MyDevice>::iterator it;
-    string deviceName;
-    unsigned int networkPort;
-    string networkHost;
-    string plugin;
-    MyDevice curDevice;
-    
-    for (it = _devices.begin(); it != _devices.end(); it++) {
-        curDevice = it->second;
-        
-        deviceName = curDevice.name;
-        networkPort = curDevice.networkPort;
-        networkHost = curDevice.networkHost;
-        plugin = curDevice.plugin;
-        
-        deviceNode = _doc->createElement("Device");
-        deviceNode.setAttribute("IP", QString::fromStdString(networkHost));
-        deviceNode.setAttribute("port", networkPort);
-        deviceNode.setAttribute("plugin", QString::fromStdString(plugin));
-        deviceNode.setAttribute("name", QString::fromStdString(deviceName));
-        
-        devicesNode.appendChild(deviceNode);
-    }
-    
-    root.appendChild(devicesNode);
-    
-    //OSC Messages
-    QList<QString> OSCMessages = _scene->editor()->networkTree()->getOSCMessages();
-    
-    QDomElement OSCMessagesNode = _doc->createElement("OSCMessages");
-    QDomElement OSCMessageNode;
-    
-    for (QList<QString>::iterator it = OSCMessages.begin(); it != OSCMessages.end(); it++) {
-        OSCMessageNode = _doc->createElement("OSC");
-        OSCMessageNode.setAttribute("message", *it);
-        OSCMessagesNode.appendChild(OSCMessageNode);
-    }
-    root.appendChild(OSCMessagesNode);
-    
-    QTextStream ts(&file);
-    ts << _doc->toString();
-    file.close();
-    
-    delete _doc;
-    
-    */
 }
 
 void
@@ -1917,7 +1852,7 @@ Maquette::load(const string &fileName)
                 
                 BasicBox *tpBox = getBox(tpBoxID);
                 
-                if (tpBox != NULL) {
+                if (tpBox != nullptr) {
                     
                     abstractTrgPnt.setBoxID(tpBoxID);
                     
@@ -1951,7 +1886,7 @@ Maquette::load(const string &fileName)
                 }
                 else {
 #ifdef DEBUG
-                    std::cerr << "Maquette::load : NULL box found for trigger point " << *it << std::endl;
+                    std::cerr << "Maquette::load : nullptr box found for trigger point " << *it << std::endl;
 #endif
                 }
             }
@@ -2079,7 +2014,7 @@ Maquette::updateTriggerPointActiveStatus(unsigned int trgID, bool active)
 {
   TriggerPoint *trgPnt = getTriggerPoint(trgID);
 
-  if (trgPnt != NULL) {
+  if (trgPnt != nullptr) {
       if (active) {
           trgPnt->setWaiting(active);
           if (_scene->triggersQueueList()->isEmpty()) {
@@ -2162,7 +2097,7 @@ transportCallback(TTSymbol& transport, const TTValue& value)
 {
   MaquetteScene *scene = Maquette::getInstance()->scene();
 
-    if (scene != NULL) {
+    if (scene != nullptr) {
         
         if (transport == TTSymbol("Play"))
             scene->playOrResume();
@@ -2195,7 +2130,7 @@ transportCallback(TTSymbol& transport, const TTValue& value)
     }
 #ifdef DEBUG
     else {
-        std::cerr << "Maquette::enginesNetworkCallback : attribute _scene == NULL" << std::endl;
+        std::cerr << "Maquette::enginesNetworkCallback : attribute _scene == nullptr" << std::endl;
     }
 #endif
 }

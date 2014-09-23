@@ -141,7 +141,7 @@ ParentBox::addChild(unsigned int childID)
     }
   else {
       BasicBox *child = _scene->getBox(childID);
-      if (child != NULL) {
+      if (child != nullptr) {
           _children[childID] = _scene->getBox(childID);
           return true;
         }
@@ -157,7 +157,7 @@ ParentBox::removeChild(unsigned int childID)
 
       //BasicBox *child = _scene->getBox(childID);
 
-      /* if (child != NULL) {
+      /* if (child != nullptr) {
        *      child->setParentItem(this);
        * }*/
 
@@ -314,7 +314,7 @@ ParentBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
   if(cursor().shape() == Qt::ArrowCursor)
     return;
 
-  QGraphicsItem::mouseMoveEvent(event);
+  QGraphicsObject::mouseMoveEvent(event);
   const int upper_limit{-30};
 
   if ((y() - std::abs(boundingRect().y())) < upper_limit)
@@ -341,9 +341,9 @@ ParentBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
           resizeAllEdition(std::max(double(_abstract->width() + event->pos().x() - boxRect().topRight().x()), (double)BOX_MARGIN),
                            std::max(double(_abstract->height() + event->pos().y() - boxRect().bottomRight().y()), (double)BOX_MARGIN));
         }
-      QPainterPath nullPath;
-      nullPath.addRect(QRectF(QPointF(0., 0.), QSizeF(0., 0.)));
-      _scene->setSelectionArea(nullPath);
+      QPainterPath nullptrPath;
+      nullptrPath.addRect(QRectF(QPointF(0., 0.), QSizeF(0., 0.)));
+      _scene->setSelectionArea(nullptrPath);
       setSelected(true);
       _scene->boxResized();
     }

@@ -237,16 +237,16 @@ MaquetteView::keyPressEvent(QKeyEvent *event)
   QGraphicsView::keyPressEvent(event);
 
   if (event->matches(QKeySequence::Copy)) {
-      _scene->copyBoxes();
-      _scene->displayMessage(tr("Selection copied").toStdString(), INDICATION_LEVEL);
+ //     _scene->copyBoxes();
+ //     _scene->displayMessage(tr("Selection copied").toStdString(), INDICATION_LEVEL);
     }
   else if (event->matches(QKeySequence::Cut)) {
-      _scene->cutBoxes();
-      _scene->displayMessage(tr("Selection cut").toStdString(), INDICATION_LEVEL);
+ //     _scene->cutBoxes();
+ //     _scene->displayMessage(tr("Selection cut").toStdString(), INDICATION_LEVEL);
     }
   else if (event->matches(QKeySequence::Paste)) {
-      _scene->pasteBoxes();
-      _scene->displayMessage(tr("Copied selection pasted").toStdString(), INDICATION_LEVEL);
+ //     _scene->pasteBoxes();
+ //     _scene->displayMessage(tr("Copied selection pasted").toStdString(), INDICATION_LEVEL);
     }
   else if (event->matches(QKeySequence::SelectAll)) {
       _scene->selectAll();
@@ -294,6 +294,7 @@ void
 MaquetteView::keyReleaseEvent(QKeyEvent *event)
 {
   QGraphicsView::keyReleaseEvent(event);
+  /* Ce code ne fait rien...TODO
   if(event->key() == Qt::Key_Control)
   {
       QList<TriggerPoint *> triggerPointsSelected;
@@ -301,9 +302,10 @@ MaquetteView::keyReleaseEvent(QKeyEvent *event)
       QList<QGraphicsItem *>::iterator it;
       for(it = selectedItems.begin() ; it!=selectedItems.end() ; it++){
           if((*it)->type() == TRIGGER_POINT_TYPE)
-              triggerPointsSelected<<static_cast<TriggerPoint *>(*it);
+              triggerPointsSelected << static_cast<TriggerPoint *>(*it);
       }
   }
+  */
 }
 
 QList<TriggerPoint *> *

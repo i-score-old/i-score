@@ -94,13 +94,13 @@ BoxWidget::BoxWidget(QWidget *parent, BasicBox *box)
 
   setLayout(_stackedLayout);
 
-  _startMenu = NULL;
-  _endMenu = NULL;
+  _startMenu = nullptr;
+  _endMenu = nullptr;
 }
 
 BoxWidget::~BoxWidget()
 {
-    delete _stackedLayout;
+    _stackedLayout->deleteLater();
 }
 
 void
@@ -145,7 +145,7 @@ BoxWidget::curveShowChanged(const QString &address, bool state)
 {
   if (_boxID != NO_ID) {
       AbstractCurve * curve = Maquette::getInstance()->getBox(_boxID)->getCurve(address.toStdString());
-      if (curve != NULL && !state) {
+      if (curve != nullptr && !state) {
           curve->_show = state;
         }
       updateCurve(address.toStdString(), false);
@@ -171,7 +171,7 @@ BoxWidget::updateDisplay(const QString &address)
 void
 BoxWidget::setCurveLowerStyle(std::string curveAddress, bool state){
     CurveWidget *curCurve = getCurveWidget(curveAddress);
-    if(curCurve!=NULL){
+    if(curCurve!=nullptr){
         curCurve->setLowerStyle(state);
     }
 }
@@ -301,7 +301,7 @@ BoxWidget::addToComboBox(const QString address)
 
 CurveWidget *
 BoxWidget::getCurveWidget(std::string address){
-    CurveWidget *curve = NULL;
+    CurveWidget *curve = nullptr;
     QMap<string, CurveWidget *>::iterator curveIt = _curveMap->find(address);
     bool curveFound = (curveIt != _curveMap->end());
     if(curveFound)
@@ -316,14 +316,14 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
   Q_UNUSED(forceUpdate);
   BasicBox *box = Maquette::getInstance()->getBox(_boxID);
 
-  if (box != NULL) { // Box Found
+  if (box != nullptr) { // Box Found
       if (box->hasCurve(address) || box->recording()) {
           AbstractCurve *abCurve = box->getCurve(address);
           QMap<string, CurveWidget *>::iterator curveIt2 = _curveMap->find(address);
           QString curveAddressStr = QString::fromStdString(address);
 
           bool curveFound = (curveIt2 != _curveMap->end());
-          CurveWidget *curveTab = NULL;
+          CurveWidget *curveTab = nullptr;
 
           unsigned int sampleRate;
           bool redundancy, interpolate;
@@ -344,7 +344,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
 
           if (getCurveSuccess || getCurveValuesSuccess) {
               /********** Abstract Curve found ***********/
-              if (abCurve != NULL) {
+              if (abCurve != nullptr) {
                   if (curveFound) {
                       curveTab = curveIt2.value();
 
@@ -362,7 +362,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
                     }
                   else {
                       //Create
-                      curveTab = new CurveWidget(NULL);
+                      curveTab = new CurveWidget(nullptr);
 
                       //get range bounds
                       vector<float> rangeBounds;
@@ -393,7 +393,7 @@ BoxWidget::updateCurve(const string &address, bool forceUpdate)
                   bool show = true;
 
                   //Set attributes
-                  curveTab = new CurveWidget(NULL);
+                  curveTab = new CurveWidget(nullptr);
                   QString curveAddressStr = QString::fromStdString(address);
 
                   //get range bounds
@@ -485,7 +485,7 @@ BoxWidget::execEndAction()
 void
 BoxWidget::jumpToStartCue()
 {
-  if (_startMenu != NULL) {
+  if (_startMenu != nullptr) {
       _startMenu->close();
     }
   _box->select();
@@ -502,7 +502,7 @@ BoxWidget::jumpToStartCue()
 void
 BoxWidget::jumpToEndCue()
 {
-  if (_endMenu != NULL) {
+  if (_endMenu != nullptr) {
       _endMenu->close();
     }
   _box->select();
@@ -517,7 +517,7 @@ BoxWidget::jumpToEndCue()
 void
 BoxWidget::updateStartCue()
 {
-  if (_startMenu != NULL) {
+  if (_startMenu != nullptr) {
       _startMenu->close();
     }
   _box->setSelected(true);
@@ -528,7 +528,7 @@ BoxWidget::updateStartCue()
 void
 BoxWidget::updateEndCue()
 {
-  if (_endMenu != NULL) {
+  if (_endMenu != nullptr) {
       _endMenu->close();
     }
   _box->setSelected(true);
@@ -536,19 +536,20 @@ BoxWidget::updateEndCue()
   _box->maquetteScene()->editor()->snapshotEndAssignment();
 }
 
-void
-BoxWidget::play()
+void BoxWidget::play()
 {
     QList<unsigned int> boxesId;
-
-    QList<QGraphicsItem *> selectedItems = _box->maquetteScene()->selectedItems();
-    for(QList<QGraphicsItem *>::iterator it=selectedItems.begin(); it!=selectedItems.end(); it++){
-        boxesId<<((BasicBox *)(*it))->ID();
+    for(auto& item : _box->maquetteScene()->selectedItems())
+    {
+        if(auto box = dynamic_cast<BasicBox*>(item))
+            boxesId << box->ID();
+        else
+            qDebug() << "ALERT: " << Q_FUNC_INFO;
     }
 
     if(!boxesId.contains(_boxID)){
         boxesId.clear();
-        boxesId<<_boxID;
+        boxesId << _boxID;
     }
 
     _box->maquetteScene()->playOrResume(boxesId);
@@ -568,7 +569,7 @@ BoxWidget::stop()
 void
 BoxWidget::displayStartMenu(QPoint pos)
 {
-  if (_startMenu != NULL) {
+  if (_startMenu != nullptr) {
       _startMenu->exec(pos);
     }
 }
@@ -576,7 +577,7 @@ BoxWidget::displayStartMenu(QPoint pos)
 void
 BoxWidget::displayEndMenu(QPoint pos)
 {
-  if (_endMenu != NULL) {
+  if (_endMenu != nullptr) {
       _endMenu->exec(pos);
     }
 }
@@ -584,7 +585,7 @@ BoxWidget::displayEndMenu(QPoint pos)
 void
 BoxWidget::updateCurveRangeBoundMin(string address, float value){
     CurveWidget *curve = getCurveWidget(address);
-    if(curve != NULL){
+    if(curve != nullptr){
         curve->setMinY(value);
     }
 }
@@ -593,7 +594,7 @@ void
 BoxWidget::updateCurveRangeBoundMax(string address, float value){
     CurveWidget *curve = getCurveWidget(address);
     std::cout<<"BW::updateMAX"<<std::endl;
-    if(curve != NULL){
+    if(curve != nullptr){
         curve->setMaxY(value);
     }
 }

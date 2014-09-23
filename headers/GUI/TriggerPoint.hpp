@@ -48,7 +48,7 @@
  * \author Luc Vercellin
  */
 
-#include <QGraphicsItem>
+#include <QGraphicsObject>
 #include "BasicBox.hpp"
 #include "AbstractTriggerPoint.hpp"
 #include <string>
@@ -61,14 +61,14 @@ class Abstract;
 /*!
  * \brief Enum used to define TriggerPoint's item type.
  */
-enum { TRIGGER_POINT_TYPE = QGraphicsItem::UserType + 6 };
+enum { TRIGGER_POINT_TYPE = QGraphicsObject::UserType + 6 };
 
 /*!
  * \class TriggerPoint
  *
  * \brief TriggerPoint item, derived from Qt's QGraphicsItem.
  */
-class TriggerPoint : public QGraphicsItem
+class TriggerPoint : public QGraphicsObject
 {
   public:
     TriggerPoint(unsigned int boxID, BoxExtremity extremity,

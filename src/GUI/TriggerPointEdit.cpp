@@ -35,12 +35,12 @@ TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *pare
 
 TriggerPointEdit::~TriggerPointEdit()
 {
-    delete _okButton;
-    delete _cancelButton;
-    delete _expressionEdit;
-    delete _expressionLabel;
-    delete _layout;
-    delete _autoTriggerCheckBox;
+  _okButton->deleteLater();
+  _cancelButton->deleteLater();
+  _expressionEdit->deleteLater();
+  _expressionLabel->deleteLater();
+  _layout->deleteLater();
+  _autoTriggerCheckBox->deleteLater();
 }
 
 void

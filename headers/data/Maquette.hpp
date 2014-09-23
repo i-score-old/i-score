@@ -527,17 +527,6 @@ class Maquette : public QObject
     void changeRelationBounds(unsigned int relID, const float &minBound, const float &maxBound);
 
     /*!
-     * \brief Creates a new interval relation between 2 objects.
-     *
-     * \param ID1 : the first box ID in the interval
-     * \param ID2 : the second box ID in the interval
-     * \param value : the interval value
-     * \param tolerance : the interval tolerance
-     * \return true if the interval could be created
-     */
-    bool addInterval(unsigned int ID1, unsigned int ID2, int value, int tolerance);
-
-    /*!
      * \brief Removes a temporal relation.
      * \param relationID : the relation to remove
      */
@@ -972,11 +961,12 @@ class Maquette : public QObject
      * \param mother : the mother to assign to the box
      * \return the ID of created parent box
      */
+    /*
     unsigned int addParentBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const std::string &name,
                               unsigned int mother);
     unsigned int addParentBox(unsigned int ID, const unsigned int date, const unsigned int topLeftY, const unsigned int sizeY, const unsigned int duration, const std::string &name,
                               unsigned int mother, QColor color);
-
+    */
     string extractAddress(string msg);
     string extractValue(string msg);
 
@@ -1044,6 +1034,9 @@ class Maquette : public QObject
     bool _paused;       //!< Handling paused state.
 
     QDomDocument *_doc; //!< Handling document used for saving/loading.
+
+
+//    void addParentBoxToScene(unsigned int ID, unsigned int mother, ParentBox* newBox);
 };
 
 /*!

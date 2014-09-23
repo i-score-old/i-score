@@ -47,7 +47,7 @@
  * \author Pascal Baltazar, Nicolas Hincker, Luc Vercellin and Myriam Desainte-Catherine 
  */
 
-#include <QGraphicsItem>
+#include <QGraphicsObject>
 #include <QGraphicsSvgItem>
 #include <map>
 #include <QMap>
@@ -87,7 +87,7 @@ enum BoxExtremity { NO_EXTREMITY = -1, BOX_START = BEGIN_CONTROL_POINT_INDEX,
  *
  * \brief Base class for all boxes, derived from Qt's QGraphicsItem.
  */
-class BasicBox : public QObject, public QGraphicsItem
+class BasicBox : public QGraphicsObject
 {
   public:
     BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent);
@@ -101,7 +101,7 @@ class BasicBox : public QObject, public QGraphicsItem
     /*!
      * \brief Enum used to define Basic Box's item type.
      */
-    enum { BASIC_BOX_TYPE = QGraphicsItem::UserType + 1 };
+    enum { BASIC_BOX_TYPE = QGraphicsObject::UserType + 1 };
     
     static const QColor BOX_COLOR;
     static const QColor TEXT_COLOR;

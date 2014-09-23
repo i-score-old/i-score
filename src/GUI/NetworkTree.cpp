@@ -54,6 +54,7 @@
 #include <QAbstractItemView>
 #include <QTreeView>
 #include <QApplication>
+#include <DelayedDelete.h>
 
 int NetworkTree::NAME_COLUMN = 0;
 int NetworkTree::VALUE_COLUMN = 1;
@@ -139,13 +140,13 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   addTopLevelItem(_addADeviceItem);
 }
 
-NetworkTree::~NetworkTree(){
-
-    delete _startMessages;
-    delete _endMessages;
-    delete _OSCStartMessages;
-    delete _OSCEndMessages;
-    delete _addADeviceItem;
+NetworkTree::~NetworkTree()
+{
+    _startMessages->deleteLater();
+    _endMessages->deleteLater();
+    _OSCStartMessages->deleteLater();
+    _OSCEndMessages->deleteLater();
+    //delete _addADeviceItem;
 }
 
 /****************************************************************************
@@ -313,7 +314,7 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
               for (it3 = itemsFound.begin(); it3 != itemsFound.end(); ++it3) {
                   curIt = *it3;
                   int i = splitAddress.size() - 2;
-                  while (curIt->parent() != NULL) {
+                  while (curIt->parent() != nullptr) {
                       father = curIt->parent();
                       if (father->text(0) != splitAddress.at(i)) {
                           found = false;
@@ -539,9 +540,9 @@ NetworkTree::getAbsoluteAddress(QTreeWidgetItem *item) const
 {
   QString address;
   QTreeWidgetItem * curItem = item;
-  while (curItem != NULL) {
+  while (curItem != nullptr) {
       QString node;
-      if (curItem->parent() != NULL && !curItem->text(NAME_COLUMN).startsWith("/")) {
+      if (curItem->parent() != nullptr && !curItem->text(NAME_COLUMN).startsWith("/")) {
           node.append("/");
         }
       node.append(curItem->text(NAME_COLUMN));
@@ -557,7 +558,7 @@ NetworkTree::getDeviceName(QTreeWidgetItem *item) const
   QString deviceName;
 
   QTreeWidgetItem * curItem = item;
-  while (curItem->parent() != NULL) {
+  while (curItem->parent() != nullptr) {
       curItem = curItem->parent();
     }
 
@@ -723,12 +724,12 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
          if(treeFilterActive()){
 
              if(nodeType == "Model" || nodeType == "ModelInfo" || nodeType == "Input.audio" || nodeType == "Output.audio" || nodeType == "Viewer"){
-                 delete(curItem);
+                 delete curItem;
                  return;
              }
              if(Maquette::getInstance()->requestObjectAttribruteValue(address,"tags",attributesValues) > 0){
                  if(attributesValues[0] == "setup"){
-                     delete(curItem);
+                     delete curItem;
                      return;
                  }
              }
@@ -755,7 +756,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
              if(nodeType == "Container"){
                  //Case type view
                  if(treeFilterActive() && attributesValues[0] == "view"){
-                     delete(curItem);
+                     delete curItem;
                      return;
                  }
              }
@@ -1002,7 +1003,7 @@ NetworkTree::updateStartMsgsDisplay()
 void
 NetworkTree::fatherColumnCheck(QTreeWidgetItem *item, int column)
 {
-  if (item->parent() != NULL) {
+  if (item->parent() != nullptr) {
       QTreeWidgetItem *father = item->parent();
 
       if (allBrothersChecked(item, column)) {
@@ -1044,7 +1045,7 @@ NetworkTree::brothersPartiallyChecked(QTreeWidgetItem *item, int column)
     int countCheckedItems = 0;
     int childrenCount = 0;
 
-    if (item->parent() != NULL) {
+    if (item->parent() != nullptr) {
         father = item->parent();
         childrenCount = father->childCount();
         for (int i = 0; i < childrenCount; i++) {
@@ -1078,7 +1079,7 @@ NetworkTree::expandNodes(QList<QTreeWidgetItem *> items)
   QTreeWidgetItem *curIt, *father;
   for (it = items.begin(); it < items.end(); ++it) {
       curIt = *it;
-      while (curIt->parent() != NULL) {
+      while (curIt->parent() != nullptr) {
           father = curIt->parent();
           if (father->type() != NodeNoNamespaceType) {
               father->setExpanded(true);
@@ -1193,7 +1194,7 @@ NetworkTree::assignItems(QMap<QTreeWidgetItem*, Data> selectedItems)
 {
   QList<QTreeWidgetItem *>::iterator it;
   QList<QTreeWidgetItem *> items = selectedItems.keys();
-  QTreeWidgetItem *curItem = NULL;
+  QTreeWidgetItem *curItem = nullptr;
 
   resetAssignedItems();
   setAssignedItems(selectedItems);
@@ -1202,7 +1203,7 @@ NetworkTree::assignItems(QMap<QTreeWidgetItem*, Data> selectedItems)
       curItem = *it;
       assignItem(curItem, selectedItems.value(curItem));
     }
-  if (curItem != NULL) {
+  if (curItem != nullptr) {
       recursiveFatherSelection(curItem, true);
     }
 }
@@ -1323,7 +1324,7 @@ NetworkTree::fathersAssignation(QTreeWidgetItem *item)
 //  std::cout << "------- fatherAssignation(" << getAbsoluteAddress(item).toStdString() << ") -------" << std::endl;
   QTreeWidgetItem *father;
 
-  if (item->parent() != NULL) {
+  if (item->parent() != nullptr) {
       father = item->parent();
 
       if (!allBrothersAssigned(item)) {
@@ -1345,7 +1346,7 @@ NetworkTree::allBrothersAssigned(QTreeWidgetItem *item)
 //    std::cout<<"<-- NetworkTree::allBrothersAssigned("<<item->text(0).toStdString()<<")-->"<<std::endl;
   QTreeWidgetItem *father, *child;
 
-  if (item->parent() != NULL) {
+  if (item->parent() != nullptr) {
       father = item->parent();
       int childrenCount = father->childCount();
       for (int i = 0; i < childrenCount; i++) {
@@ -1381,7 +1382,7 @@ NetworkTree::allBrothersChecked(QTreeWidgetItem *item, int column)
    */
     QTreeWidgetItem *father, *child;
 
-    if (item->parent() != NULL) {
+    if (item->parent() != nullptr) {
         father = item->parent();
         int childrenCount = father->childCount();
         for (int i = 0; i < childrenCount; i++) {
@@ -1458,7 +1459,7 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
   for(auto& addr : _addressMap)
     previousAddressMap.push_back(addr);
 
-  if(item != NULL)
+  if(item != nullptr)
   {
     if(item->type()==DeviceNode)
     {
@@ -1499,14 +1500,14 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
 
 void
 NetworkTree::refreshCurrentItemNamespace(){
-    if(currentItem() != NULL)
+    if(currentItem() != nullptr)
         refreshItemNamespace(currentItem());
 }
 
 void
 NetworkTree::deleteCurrentItemNamespace()
 {
-    if(currentItem() != NULL){
+    if(currentItem() != nullptr){
         QString itemName = getAbsoluteAddress(currentItem());
 
         int ret = QMessageBox::warning(this, QString("Delete %1").arg(itemName),
@@ -1569,7 +1570,7 @@ NetworkTree::unselectPartially(QTreeWidgetItem *item)
 void
 NetworkTree::recursiveFatherSelection(QTreeWidgetItem *item, bool select)
 {    
-  if (item->parent() != NULL) {
+  if (item->parent() != nullptr) {
       QTreeWidgetItem *father;
       father = item->parent();
       QFont font = item->font(NAME_COLUMN);
@@ -1607,7 +1608,7 @@ NetworkTree::allBrothersSelected(QTreeWidgetItem *item, QList<QTreeWidgetItem *>
 {
   QTreeWidgetItem *father;
 
-  if (item->parent() != NULL) {
+  if (item->parent() != nullptr) {
       father = item->parent();
       int childrenCount = father->childCount();
       for (int i = 0; i < childrenCount; i++) {
@@ -1627,7 +1628,7 @@ NetworkTree::allBrothersSelected(QTreeWidgetItem *item)
 {
   QTreeWidgetItem *father, *child;
 
-  if (item->parent() != NULL) {
+  if (item->parent() != nullptr) {
       father = item->parent();
       int childrenCount = father->childCount();
       for (int i = 0; i < childrenCount; i++) {
@@ -1648,7 +1649,7 @@ NetworkTree::noBrothersSelected(QTreeWidgetItem *item)
 {
   QTreeWidgetItem *father, *child;
   int countSelectedItems = 0;
-  if (item->parent() != NULL) {
+  if (item->parent() != nullptr) {
       father = item->parent();
       int childrenCount = father->childCount();
       for (int i = 0; i < childrenCount; i++) {
@@ -1734,7 +1735,7 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
     _noItemClicked = true;
     QTreeWidget::mousePressEvent(event);
 
-    if(currentItem()!=NULL){
+    if(currentItem()!=nullptr){
         if(event->button()==Qt::RightButton){
             if(currentItem()->type() == DeviceNode){
 
@@ -1750,16 +1751,16 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
 
                 contextMenu->exec(event->globalPos());
 
-                delete refreshAct;
-                delete deleteAct;
-                delete contextMenu;
+                refreshAct->deleteLater();
+                deleteAct->deleteLater();
+                contextMenu->deleteLater();
             }
         }
 
         if(event->button()==Qt::LeftButton){
             if(currentItem()->type() == addDeviceNode){                
                  _deviceEdit->edit();
-                 setCurrentItem(NULL);                 
+                 setCurrentItem(nullptr);
             }            
             else if(event->modifiers()==Qt::AltModifier){
                 unassignItem(currentItem());
@@ -1772,7 +1773,7 @@ void
 NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
-    if(currentItem()!=NULL){
+    if(currentItem()!=nullptr){
         
         /// \todo : replace by if(item->whatsThis(NAME_COLUMN)=="Message").
         if (currentItem()->type() == OSCNode || currentItem()->text(TYPE_COLUMN) == "->") {
@@ -1873,7 +1874,7 @@ void
 NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 {
     _noItemClicked = false;
-    if (item != NULL) {
+    if (item != nullptr) {
         if(item->type()==DeviceNode && column == NAME_COLUMN){
             Maquette::getInstance()->setDeviceLearn(item->text(NAME_COLUMN).toStdString(),item->checkState(NAME_COLUMN));
         }
@@ -2161,7 +2162,7 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
   string address = getAbsoluteAddress(item).toStdString();
 
   BasicBox *box = Maquette::getInstance()->getBox(boxID);
-  if (box != NULL)
+  if (box != nullptr)
   { // Box Found
     if (box->hasCurve(address) && !_recMessages.contains(item) )
     {
@@ -2306,7 +2307,7 @@ NetworkTree::updateOSCAddresses()
 void
 NetworkTree::updateDeviceName(QString oldName, QString newName)
 {
-    if(currentItem()!=NULL){
+    if(currentItem()!=nullptr){
         if(currentItem()->text(NAME_COLUMN) == oldName){
             currentItem()->setText(NAME_COLUMN, newName);
             return;
@@ -2368,7 +2369,7 @@ void
 NetworkTree::updateDeviceNamespace(QString deviceName){
     QTreeWidgetItem *deviceItem;
 
-    if(currentItem()!=NULL && currentItem()->text(NAME_COLUMN) == deviceName)
+    if(currentItem()!=nullptr && currentItem()->text(NAME_COLUMN) == deviceName)
         deviceItem = currentItem();
 
     else{
@@ -2388,7 +2389,7 @@ NetworkTree::updateDeviceNamespace(QString deviceName){
         }
     }
 
-    if (deviceItem != NULL)
+    if (deviceItem != nullptr)
         treeRecursiveExploration(deviceItem,false);
 }
 

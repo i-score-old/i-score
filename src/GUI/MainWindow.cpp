@@ -113,7 +113,7 @@ MainWindow::MainWindow()
   // Central Widget
   _centralLayout = new QGridLayout;
   _centralWidget = new QWidget;
-  _headerPanelWidget = new HeaderPanelWidget(NULL,_scene);
+  _headerPanelWidget = new HeaderPanelWidget(nullptr,_scene);
 
   _centralLayout->addWidget(_headerPanelWidget);
   _centralLayout->addWidget(_view);
@@ -149,37 +149,38 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow()
 {
-    delete _view;
     delete _scene;
-    delete _editor;
-    delete _headerPanelWidget;
-    delete _centralLayout;
-    delete _centralWidget;
+
+    _view->deleteLater();
+    _editor->deleteLater();
+    _headerPanelWidget->deleteLater();
+    _centralLayout->deleteLater();
+    _centralWidget->deleteLater();
 
 #ifdef __APPLE__
-    delete _menuBar;
+    _menuBar->deleteLater();
 #endif
 
-    delete _newAct;
-    delete _openAct;
-    delete _saveAct;
-    delete _saveAsAct;
-    delete _exportAct;
-    delete _printAct;
-    delete _quitAct;
-    delete _aboutAct;
-	delete _helpAct;
-    delete _zoomInAct;
-    delete _zoomOutAct;
-	delete _editorAct;
+    _newAct->deleteLater();
+    _openAct->deleteLater();
+    _saveAct->deleteLater();
+    _saveAsAct->deleteLater();
+    _exportAct->deleteLater();
+    _printAct->deleteLater();
+    _quitAct->deleteLater();
+    _aboutAct->deleteLater();
+    _helpAct->deleteLater();
+    _zoomInAct->deleteLater();
+    _zoomOutAct->deleteLater();
+    _editorAct->deleteLater();
 
-    delete _cutAct;
-    delete _copyAct;
-    delete _pasteAct;
-    delete _selectAllAct;
+    //delete _cutAct;
+    //delete _copyAct;
+    //delete _pasteAct;
+    _selectAllAct->deleteLater();
 //    delete _commentModeAct;
 
-    delete _helpDialog;
+    _helpDialog->deleteLater();
 }
 
 void
@@ -423,6 +424,7 @@ MainWindow::updateEditor()
     }
 }
 
+/*
 /// \todo Vérifier que la surcouche d'appels a du sens. (par jaime Chao)
 void
 MainWindow::cutSelection()
@@ -441,6 +443,7 @@ MainWindow::pasteSelection()
 {
   _scene->pasteBoxes();
 }
+*/
 
 void
 MainWindow::selectAll()
@@ -573,6 +576,7 @@ MainWindow::createActions()
   _editorAct->setChecked(true);
   connect(_editorAct, SIGNAL(triggered()), this, SLOT(updateEditor()));
 
+  /*
   _cutAct = new QAction(tr("Cut"), this);
   _cutAct->setStatusTip(tr("Cut boxes selection"));
   connect(_cutAct, SIGNAL(triggered()), this, SLOT(cutSelection()));
@@ -586,6 +590,7 @@ MainWindow::createActions()
   _pasteAct->setShortcut(QKeySequence::Paste);
   _pasteAct->setStatusTip(tr("Paste boxes selection"));
   connect(_pasteAct, SIGNAL(triggered()), this, SLOT(pasteSelection()));
+  */
 
   _selectAllAct = new QAction(tr("Select All"), this);
   _selectAllAct->setShortcut(QKeySequence::SelectAll);
@@ -643,11 +648,11 @@ MainWindow::createMenus()
   _fileMenu->addAction(_quitAct);
 
   _editMenu = _menuBar->addMenu(tr("&Edit"));
-  _editMenu->addAction(_copyAct);
-  _editMenu->addAction(_cutAct);
-  _editMenu->addAction(_pasteAct);
+  //_editMenu->addAction(_copyAct);
+  //_editMenu->addAction(_cutAct);
+  //_editMenu->addAction(_pasteAct);
 //  _editMenu->addAction(_commentModeAct);
-  _editMenu->addSeparator();
+  //_editMenu->addSeparator();
   _editMenu->addAction(_selectAllAct);
 
   _viewMenu = _menuBar->addMenu(tr("&View"));

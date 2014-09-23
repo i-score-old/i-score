@@ -192,17 +192,17 @@ class MainWindow : public QMainWindow
     /*!
      * \brief Cut the current selection of boxes.
      */
-    void cutSelection();
+//    void cutSelection();
 
     /*!
      * \brief Copies the current selection of boxes.
      */
-    void copySelection();
+//    void copySelection();
 
     /*!
      * \brief Pastes the current selection of boxes.
      */
-    void pasteSelection();
+//    void pasteSelection();
 
     /*!
      * \brief Switched current interaction mode.
@@ -298,9 +298,9 @@ class MainWindow : public QMainWindow
     QAction *_zoomOutAct;                   //!< Zooming out action.
     QAction *_networkAct;                   //!< Network configuration dialog action.
     QAction *_editorAct;                    //!< Showing/Hidding editor action.
-    QAction *_cutAct;                       //!< Cuting boxes action.
-    QAction *_copyAct;                      //!< Copying boxes action.
-    QAction *_pasteAct;                     //!< Pasting boxes action.
+//    QAction *_cutAct;                       //!< Cuting boxes action.
+//    QAction *_copyAct;                      //!< Copying boxes action.
+//    QAction *_pasteAct;                     //!< Pasting boxes action.
     QAction *_selectModeAct;                //!< Selection mode action.
     QAction *_PBModeAct;                    //!< Selecting parent boxes creation mode action.
     QAction *_commentModeAct;               //!< Selecting comment creation action.
