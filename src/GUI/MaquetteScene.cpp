@@ -1823,7 +1823,7 @@ void MaquetteScene::removeSelectedItems()
 {
     _view->setUpdatesEnabled(false);
 
-    map<unsigned int, BasicBox*> boxesToRemove;
+    vector<int> boxesToRemove;
     vector<int> relationsToRemove;
     vector<int> triggerPointsToRemove;
     vector<ConditionalRelation*> conditionalRelationsToRemove;
@@ -1837,7 +1837,7 @@ void MaquetteScene::removeSelectedItems()
                 qDebug() << "Removing a parent box";
                 ParentBox* box = dynamic_cast<ParentBox*>(item);
                 if(box)
-                    boxesToRemove[box->ID()] = box;
+                    boxesToRemove.push_back(box->ID());
                 else
                     qDebug() << "ALERT: Tried to delete a bad box";
 
@@ -1911,7 +1911,7 @@ void MaquetteScene::removeSelectedItems()
 
     for(auto& box : boxesToRemove)
     {
-        removeBox(box.first);
+        removeBox(box);
     }
 
     _view->setUpdatesEnabled(true);
