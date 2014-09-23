@@ -120,25 +120,25 @@ DeviceEdit::init()
 
 DeviceEdit::~DeviceEdit()
 {
-    delete _layout;
-    delete _deviceNameLabel;
-    delete _nameEdit;
+    _layout->deleteLater();
+    _deviceNameLabel->deleteLater();
+    _nameEdit->deleteLater();
 
-    delete _protocolsLabel;
-    delete _portOutputLabel;
-    delete _portInputLabel;
-    delete _localHostLabel;
+    _protocolsLabel->deleteLater();
+    _portOutputLabel->deleteLater();
+    _portInputLabel->deleteLater();
+    _localHostLabel->deleteLater();
 
-    delete _protocolsComboBox;
-    delete _portOutputBox;
-    delete _portInputBox;
-    delete _localHostBox;
+    _protocolsComboBox->deleteLater();
+    _portOutputBox->deleteLater();
+    _portInputBox->deleteLater();
+    _localHostBox->deleteLater();
 
-    delete _openNamespaceFileButton;
-    delete _namespaceFilePath;
+    _openNamespaceFileButton->deleteLater();
+    _namespaceFilePath->deleteLater();
 
-    delete _okButton;
-    delete _cancelButton;
+    _okButton->deleteLater();
+    _cancelButton->deleteLater();
 }
 
 void

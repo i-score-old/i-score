@@ -264,7 +264,7 @@ ConditionalRelation::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
           if (ok)
               Maquette::getInstance()->setConditionMessage(_id,disposeMsgEdit->textValue().toStdString());
 
-          delete disposeMsgEdit;
+          disposeMsgEdit->deleteLater();
       }
 }
 

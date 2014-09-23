@@ -89,8 +89,9 @@ headers/GUI/TimeBarWidget.hpp \
 headers/GUI/DeviceEdit.hpp \
 headers/GUI/HeaderPanelWidget.hpp \
 headers/GUI/ConditionalRelation.hpp \
-    headers/GUI/TriggerPointEdit.hpp \
-headers/IScoreApplication.hpp
+headers/GUI/TriggerPointEdit.hpp \
+headers/IScoreApplication.hpp \
+headers/DelayedDelete.h
 
 SOURCES += src/main.cpp \
 src/data/AbstractBox.cpp \
@@ -122,5 +123,5 @@ src/GUI/TimeBarWidget.cpp \
 src/GUI/DeviceEdit.cpp \
 src/GUI/HeaderPanelWidget.cpp \
 src/GUI/ConditionalRelation.cpp \ 
-    src/GUI/TriggerPointEdit.cpp \
+src/GUI/TriggerPointEdit.cpp \
 src/IScoreApplication.cpp

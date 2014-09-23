@@ -339,20 +339,20 @@ BasicBox::~BasicBox()
       removeRelations(BOX_END);
       delete static_cast<AbstractBox*>(_abstract);
   }
-  delete _recEffect;
-  delete _boxContentWidget;
-  delete _boxWidget;
-  delete _comboBox;
+  _recEffect->deleteLater();
+  _boxContentWidget->deleteLater();
+  _boxWidget->deleteLater();
+  _comboBox->deleteLater();
 
-  delete _startMenuButton;
-  delete _endMenuButton;
-  delete _playButton;
-  delete _stopButton;
+  _startMenuButton->deleteLater();
+  _endMenuButton->deleteLater();
+  _playButton->deleteLater();
+  _stopButton->deleteLater();
 
-  delete _jumpToStartCue;
-  delete _jumpToEndCue;
-  delete _updateStartCue;
-  delete _updateEndCue;
+  _jumpToStartCue->deleteLater();
+  _jumpToEndCue->deleteLater();
+  _updateStartCue->deleteLater();
+  _updateEndCue->deleteLater();
 
 //  delete _curveProxy;
 //  delete _comboBoxProxy;
@@ -793,9 +793,11 @@ BasicBox::updateStuff()
 
   QList<BoxExtremity> list = _triggerPoints->keys();
   QList<BoxExtremity>::iterator it2;
-  for (it2 = list.begin(); it2 != list.end(); it2++) {
-      _triggerPoints->value(*it2)->updatePosition();
-    }
+  for (it2 = list.begin(); it2 != list.end(); it2++)
+  {
+    auto tp = _triggerPoints->value(*it2);
+    if(tp) tp->updatePosition();
+  }
 
   QList<ConditionalRelation *>::iterator it3;
   for(it3 = _conditionalRelation.begin() ; it3 != _conditionalRelation.end() ; it3++)
@@ -922,9 +924,7 @@ BasicBox::comment() const
 void
 BasicBox::removeComment()
 {
-  if (_comment != nullptr) {
-      _comment = nullptr;
-    }
+  _comment = nullptr;
 }
 
 bool
@@ -1046,13 +1046,14 @@ BasicBox::removeTriggerPoint(BoxExtremity extremity)
       TriggerPoint *trgPoint = _triggerPoints->value(extremity);
       _triggerPoints->remove(extremity);
 
-      Maquette::getInstance()->removeTriggerPoint(trgPoint->ID());
       _scene->removeFromTriggerQueue(trgPoint);
 
       updateFlexibility();
       updateRelations(extremity);
-      _scene->update();
-      update();
+
+      Maquette::getInstance()->removeTriggerPoint(trgPoint->ID());
+      //_scene->update();
+      //update();
     }
 }
 

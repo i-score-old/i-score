@@ -179,7 +179,7 @@ void
 Relation::updateCoordinates()
 {
   BasicBox *box = _scene->getBox(_abstract->firstBox());
-  if (box != NULL) {
+  if (box != nullptr) {
       switch (_abstract->firstExtremity()) {
           case BOX_START:
             _start = box->getLeftGripPoint();            
@@ -196,22 +196,22 @@ Relation::updateCoordinates()
     }
 
   box = _scene->getBox(_abstract->secondBox());
-  if (box != NULL) {
+  if (box != nullptr) {
       switch (_abstract->secondExtremity()) {
           case BOX_START:
-            if (box != NULL) {
+            if (box != nullptr) {
                 _end = box->getLeftGripPoint();
               }
             break;
 
           case BOX_END:
-            if (box != NULL) {
+            if (box != nullptr) {
                 _end = box->getRightGripPoint();
               }
             break;
 
           case NO_EXTREMITY:
-            if (box != NULL) {
+            if (box != nullptr) {
                 _end = box->getCenter();
               }
             break;
@@ -535,7 +535,7 @@ Relation::shape() const
 void
 Relation::updateFlexibility()
 {
-  if (_scene->getBox(_abstract->secondBox()) != NULL) {
+  if (_scene->getBox(_abstract->secondBox()) != nullptr) {
       if (_abstract->secondExtremity() == BOX_START && _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START)) {
           _flexibleRelation = true;
         }

@@ -64,6 +64,7 @@
 #include "TimeBarWidget.hpp"
 #include <QGraphicsProxyWidget>
 #include <QGraphicsLineItem>
+#include <DelayedDelete.h>
 
 #include <sstream>
 #include <map>
@@ -97,7 +98,7 @@ MaquetteScene::MaquetteScene(const QRectF & rect, AttributesEditor *editor)
 
 MaquetteScene::~MaquetteScene()
 {
-  delete _tempBox;
+  delete_later(_tempBox);
   delete _maquette;
 }
 
@@ -124,7 +125,7 @@ MaquetteScene::init()
   _maquette->setScene(this);
   _maquette->init();      
 
-  _tempBox = NULL;
+  _tempBox = nullptr;
   _resizeBox = NO_ID;
 
   _relation->setFirstBox(NO_ID);
@@ -272,7 +273,7 @@ MaquetteScene::drawForeground(QPainter * painter, const QRectF & rect)
                       double startX = start.x(), startY = start.y();
                       double endX = 0., endY = 0.;
                       static const double arrowSize = 12.;
-                      BasicBox *box = NULL;
+                      BasicBox *box = nullptr;
                       if (itemAt(_mousePos, QTransform()) != 0) {
                           int type = itemAt(_mousePos, QTransform())->type();
                           if (type == PARENT_BOX_TYPE) {
@@ -411,10 +412,10 @@ QGraphicsItem *
 MaquetteScene::getSelectedItem()
 {
   if (noBoxSelected()) {
-      return NULL;
+      return nullptr;
     }
   else if (selectedItems().size() > 1) {
-      return NULL;
+      return nullptr;
     }
   else {
       return selectedItems().first();
@@ -430,7 +431,7 @@ MaquetteScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 bool
 MaquetteScene::subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent)
 {
-  if (getSelectedItem() != NULL && itemAt(mouseEvent->scenePos(), QTransform()) != 0) {
+  if (getSelectedItem() != nullptr && itemAt(mouseEvent->scenePos(), QTransform()) != 0) {
       return(getSelectedItem()->type() == PARENT_BOX_TYPE && static_cast<BasicBox*>(getSelectedItem())->currentText() == BasicBox::SCENARIO_MODE_TEXT && static_cast<BasicBox*>(getSelectedItem())->boxBody().contains(mouseEvent->pos()) && itemAt(mouseEvent->scenePos(), QTransform())->cursor().shape() == Qt::ArrowCursor);
     }
   else {
@@ -449,7 +450,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
   if (_tempBox) {
       removeItem(_tempBox);
-      _tempBox = NULL;
+      delete_later(_tempBox);
     }
   _savedInteractionMode = _currentInteractionMode;
   _savedBoxMode = _currentBoxMode;
@@ -500,7 +501,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
               }
           }
 
-        else if (getSelectedItem() != NULL ? getSelectedItem()->type() == PARENT_BOX_TYPE : false && subScenarioMode(mouseEvent)) {
+        else if (getSelectedItem() != nullptr ? getSelectedItem()->type() == PARENT_BOX_TYPE : false && subScenarioMode(mouseEvent)) {
             /// \todo Old TODO updated (by jC) : see why creation is possible in a parent box during resize mode
             if (resizeMode() == NO_RESIZE) {
                 // Store the first pressed point
@@ -686,7 +687,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
           }
         if (_tempBox) {
             removeItem(_tempBox);
-            _tempBox = NULL;
+            delete_later(_tempBox);
           }
         break;
     }
@@ -699,7 +700,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
 void
 MaquetteScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
-  _tempBox = NULL;
+  _tempBox = nullptr;
   _resizeBox = NO_ID;
   _relation->setFirstBox(NO_ID);
   _relation->setSecondBox(NO_ID);
@@ -708,7 +709,7 @@ MaquetteScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
   _mousePos = QPointF(0., 0.);
 
   _clicked = false;
-  _tempBox = NULL;
+  _tempBox = nullptr;
 
   QGraphicsScene::contextMenuEvent(event);
 }
@@ -743,6 +744,7 @@ MaquetteScene::getRelation(unsigned int ID)
   return _maquette->getRelation(ID);
 }
 
+/*
 void
 MaquetteScene::cutBoxes()
 {
@@ -760,8 +762,10 @@ MaquetteScene::copyBoxes(bool erasing)
 
     QList<QGraphicsItem *> selected = selectedItems();
     QList<QGraphicsItem *>::iterator it;
-    for (it = selected.begin(); it != selected.end(); it++) {
-        switch ((*it)->type()) {
+    for (it = selected.begin(); it != selected.end(); it++)
+    {
+        switch ((*it)->type())
+        {
 
         case PARENT_BOX_TYPE:
         {
@@ -844,7 +848,7 @@ MaquetteScene::pasteBoxes()
       int type = boxIt->second->type();
       AbstractBox *boxToCopy = boxIt->second;
       unsigned int newID = NO_ID;
-      AbstractBox *absCopyBox = NULL;
+      AbstractBox *absCopyBox = nullptr;
       switch (type) {
           case ABSTRACT_PARENT_BOX_TYPE:
           {
@@ -868,7 +872,7 @@ MaquetteScene::pasteBoxes()
             break;
           }
         }
-      if (newID != NO_ID && absCopyBox != NULL) {
+      if (newID != NO_ID && absCopyBox != nullptr) {
           IDMap[absCopyBox->ID()] = newID;
 #ifdef DEBUG
           std::cerr << "MaquetteScene::pasteBoxes : assigning ID " << newID << " to copy of box " << absCopyBox->ID() << std::endl;
@@ -916,8 +920,8 @@ MaquetteScene::pasteBoxes()
               if (IDMap.find(comment->ID()) != IDMap.end()) {
                   std::cerr << "New ID for Comment : " << IDMap[comment->ID()] << std::endl;
                   comment->setID(IDMap[comment->ID()]);
-                  BasicBox *comBox = NULL;
-                  if ((comBox = getBox(IDMap[comment->ID()])) != NULL) {
+                  BasicBox *comBox = nullptr;
+                  if ((comBox = getBox(IDMap[comment->ID()])) != nullptr) {
                       comBox->addComment(*comment);
                     }
                   else {
@@ -948,7 +952,7 @@ MaquetteScene::pasteBoxes()
   _copySize = QPointF(0, 0);
   setModified(true);
 }
-
+*/
 void
 MaquetteScene::muteBoxes()
 {
@@ -1020,13 +1024,14 @@ MaquetteScene::removeComment(Comment *comment)
 {
   unsigned int ID = static_cast<AbstractComment*>(comment->abstract())->ID();
   if (ID != NO_ID) {
-      if (getBox(ID) != NULL) {
+      if (getBox(ID) != nullptr) {
           getBox(ID)->removeComment();
+          qDebug() << "Comment removed: " << (void*) comment;
         }
     }
 
   removeItem(comment);
-  delete comment;
+  delete_later(comment);
 }
 
 int
@@ -1061,12 +1066,14 @@ void
 MaquetteScene::removeTriggerPoint(unsigned int trgID)
 {
   TriggerPoint *trgPnt = getTriggerPoint(trgID);
-  BasicBox *box;
-  if (trgPnt != NULL) {
-      box = getBox(trgPnt->boxID());
-      if (box != NULL) {
+
+  if (trgPnt != nullptr)
+  {
+      BasicBox *box = getBox(trgPnt->boxID());
+      if (box != nullptr)
+      {
           box->removeTriggerPoint(trgPnt->boxExtremity());
-        }
+      }
       _triggersQueueList->removeAll(trgPnt);
 //      removeItem(trgPnt);
       _maquette->removeTriggerPoint(trgID);      
@@ -1181,7 +1188,7 @@ MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, 
                                                       std::fabs(bottomRight.y() - topLeft.y())));
 
   /// Searching the mother of parentBox
-  ParentBox *parentBox = NULL;
+  ParentBox *parentBox = nullptr;
   if (motherID != ROOT_BOX_ID && motherID != NO_ID) {
       parentBox = static_cast<ParentBox*>(getBox(motherID));
     }
@@ -1192,7 +1199,7 @@ MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, 
 
   ParentBox *newBox = static_cast<ParentBox*>(getBox(newBoxID));
 
-  if (newBox != NULL && parentBox != NULL) {
+  if (newBox != nullptr && parentBox != nullptr) {
       if (newBox->mother() != motherID) {           // Not yet assigned
           parentBox->addChild(newBoxID);
           newBox->setMother(motherID);
@@ -1243,17 +1250,17 @@ MaquetteScene::addRelation(const AbstractRelation &abstractRel)
   if (ret > NO_ID) {
       unsigned int relationID = (unsigned int)ret;
       Relation *newRel = _maquette->getRelation(relationID);
-      if (newRel != NULL) {
+      if (newRel != nullptr) {
           newRel->setID(relationID);
           newRel->setPos(newRel->getCenter());
           newRel->update();
 
 //			addItem(newRel);
-          BasicBox *box = NULL;
-          if ((box = getBox(abstractRel.firstBox())) != NULL) {
+          BasicBox *box = nullptr;
+          if ((box = getBox(abstractRel.firstBox())) != nullptr) {
               box->addRelation(abstractRel.firstExtremity(), newRel);
             }
-          if ((box = getBox(abstractRel.secondBox())) != NULL) {
+          if ((box = getBox(abstractRel.secondBox())) != nullptr) {
               box->addRelation(abstractRel.secondExtremity(), newRel);
             }
           newRel->updateFlexibility();
@@ -1308,14 +1315,14 @@ void
 MaquetteScene::changeRelationBounds(unsigned int relID, const float &length, const float &minBound, const float &maxBound)
 {
   Relation *rel = getRelation(relID);
-  if (rel != NULL) {      
+  if (rel != nullptr) {
       _maquette->changeRelationBounds(relID, minBound, maxBound);
       rel->changeBounds(minBound, maxBound);
       if (length != NO_LENGTH) {
           AbstractRelation *abRel = static_cast<AbstractRelation*>(rel->abstract());
           float oldLength = abRel->length();
           BasicBox *secondBox = getBox(abRel->secondBox());
-          if (secondBox != NULL) {              
+          if (secondBox != nullptr) {
               secondBox->moveBy(length - oldLength, 0.);
               vector<unsigned int> boxMoved;
               boxMoved.push_back(secondBox->ID());
@@ -1325,28 +1332,20 @@ MaquetteScene::changeRelationBounds(unsigned int relID, const float &length, con
     }
 }
 
-bool
-MaquetteScene::addInterval(unsigned int ID1, unsigned int ID2, int value, int tolerance)
-{
-  setModified(true);
-
-  return _maquette->addInterval(ID1, ID2, value, tolerance);
-}
-
 void
 MaquetteScene::removeRelation(unsigned int relID)
 {
   Relation *rel = getRelation(relID);
   removeItem(rel);
-  if (rel != NULL) {
+  if (rel != nullptr) {
       AbstractRelation *abstract = static_cast<AbstractRelation*>(rel->abstract());
 
       BasicBox *box = getBox(abstract->firstBox());
-      if (box != NULL) {
+      if (box != nullptr) {
           box->removeRelation(abstract->firstExtremity(), abstract->ID());
         }
       box = getBox(abstract->secondBox());
-      if (box != NULL) {
+      if (box != nullptr) {
           box->removeRelation(abstract->secondExtremity(), abstract->ID());
         }
 
@@ -1359,20 +1358,16 @@ MaquetteScene::removeRelation(unsigned int relID)
 void
 MaquetteScene::removeConditionalRelation(ConditionalRelation *condRel)
 {
-    if(condRel != NULL)
+    if(condRel != nullptr)
     {
-        QList<BasicBox *>::iterator     it;
-        QList<BasicBox *>               boxes = condRel->getBoxes();
-        BasicBox                        *curBox;
-
-        for(it = boxes.begin() ; it!=boxes.end() ; it++)
+        for(auto box : condRel->getBoxes())
         {
-            curBox = *it;
-            curBox->removeConditionalRelation(condRel);
+            box->removeConditionalRelation(condRel);
         }
 
         removeItem(condRel);
         Maquette::getInstance()->deleteCondition(condRel->ID());
+        delete_later(condRel);
         setModified(true);
     }
 }
@@ -1436,7 +1431,7 @@ MaquetteScene::boxMoved(unsigned int boxID)
 //  std::cout<<"--- boxMoved ---"<<boxID<<std::endl;
   Coords coord;
   BasicBox * box = _maquette->getBox(boxID);
-  if (box != NULL) {
+  if (box != nullptr) {
 
       if (!box->hasMother()) {
           coord.topLeftX = box->mapToScene(box->boxRect().topLeft()).x();
@@ -1473,44 +1468,55 @@ void
 MaquetteScene::removeBox(unsigned int boxID)
 {
   BasicBox *box = getBox(boxID);
-  if (box != NULL) {
-      if (boxID == _editor->currentBox()) { /// \todo Uniquement changer cette méthode publique en slot pour pouvoir découpler MaquetteScene et AttributesEditor. (c'est l'unique appel utile de _editor dans MaquetteScene). (par jaime Chao)
-          _editor->noBoxEdited(); /// \todo noBoxEdited() est un public slot. mieux vaux faire appel au mécanisme d'auto-connexion des signaux dans Qt (QMetaObject) que de le garder en attribut de classe (couplage). (par jaime Chao)
-        }
-      removeItem(box);
-
-      if (box->type() == PARENT_BOX_TYPE) {
-          ParentBox *pBox = static_cast<ParentBox*>(box);
-          if (pBox != NULL) {
-              map<unsigned int, BasicBox*> children = pBox->children();
-              map<unsigned int, BasicBox*>::iterator child;
-              for (child = children.begin(); child != children.end(); ++child) {
-                  pBox->removeChild(child->first);
-                  removeBox(child->first);
-                }
-            }
-        }
-      if (box->hasMother()) {
-          BasicBox *mother = NULL;
-          if ((mother = getBox(box->mother())) != NULL) {
-              if (mother->type() == PARENT_BOX_TYPE) {
-                  static_cast<ParentBox*>(mother)->removeChild(boxID);
-                }
-            }
-        }
-
-      box->removeComment();
-      box->removeTriggerPoint(BOX_START);
-      box->removeTriggerPoint(BOX_END);
-      
-      vector<unsigned int> removedRelations = _maquette->removeBox(boxID);
-      for (vector<unsigned int>::iterator it = removedRelations.begin(); it != removedRelations.end(); it++) {
-          removeRelation(*it);
-        }
-      
-      delete box;
-      setModified(true);
+  if (box != nullptr)
+  {
+    if (boxID == _editor->currentBox())
+    { /// \todo Uniquement changer cette méthode publique en slot pour pouvoir découpler MaquetteScene et AttributesEditor. (c'est l'unique appel utile de _editor dans MaquetteScene). (par jaime Chao)
+      _editor->noBoxEdited(); /// \todo noBoxEdited() est un public slot. mieux vaux faire appel au mécanisme d'auto-connexion des signaux dans Qt (QMetaObject) que de le garder en attribut de classe (couplage). (par jaime Chao)
     }
+    removeItem(box);
+
+    if (box->type() == PARENT_BOX_TYPE)
+    {
+      ParentBox *pBox = qgraphicsitem_cast<ParentBox*>(box);
+      if (pBox != nullptr)
+      {
+        for(auto child : pBox->children()) removeBox(child.first);
+        pBox->children().clear();
+      }
+    }
+    if (box->hasMother())
+    {
+      BasicBox *mother = nullptr;
+      if ((mother = getBox(box->mother())) != nullptr)
+      {
+        if (mother->type() == PARENT_BOX_TYPE)
+        {
+          qgraphicsitem_cast<ParentBox*>(mother)->removeChild(boxID);
+        }
+      }
+    }
+
+    box->removeComment();
+    box->removeTriggerPoint(BOX_START);
+    box->removeTriggerPoint(BOX_END);
+
+    vector<unsigned int> removedRelations = _maquette->removeBox(boxID);
+    for (vector<unsigned int>::iterator it = removedRelations.begin(); it != removedRelations.end(); it++)
+    {
+      removeRelation(*it);
+    }
+
+    if (box->type() == PARENT_BOX_TYPE)
+    {
+      ParentBox *pBox = qgraphicsitem_cast<ParentBox*>(box);
+      delete_later(pBox);
+    }
+    else
+      delete_later(box);
+
+    setModified(true);
+  }
 
   update();
 }
@@ -1550,7 +1556,7 @@ MaquetteScene::setPlaying(unsigned int boxID, bool playing)
     }
   else {
       if (playing) {
-          if (box != NULL) {
+          if (box != nullptr) {
               _playingBoxes[boxID] = box;
 //              box->update();
               if(!_playThread->isRunning())
@@ -1705,6 +1711,7 @@ MaquetteScene::removeFromTriggerQueue(TriggerPoint *trigger)
 void
 MaquetteScene::removeSelectedItems()
 {
+  _view->setUpdatesEnabled(false);
   QList<QGraphicsItem *> toRemove = selectedItems();
   map<unsigned int, BasicBox*> boxesToRemove;
   for (QList<QGraphicsItem *>::iterator it = toRemove.begin(); it != toRemove.end(); it++) {
@@ -1729,6 +1736,7 @@ MaquetteScene::removeSelectedItems()
   for (boxIt = boxesToRemove.begin(); boxIt != boxesToRemove.end(); ++boxIt) {
       removeBox(boxIt->first);
     }
+  _view->setUpdatesEnabled(true);
   setModified(true);
 }
 

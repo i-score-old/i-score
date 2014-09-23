@@ -101,7 +101,7 @@ AttributesEditor::init()
 
 AttributesEditor::~AttributesEditor()
 {
-  delete _centralWidget;
+  _centralWidget->deleteLater();
 }
 
 void
@@ -402,7 +402,7 @@ AttributesEditor::updateWidgets(bool boxModified)
 
   BasicBox * box = _scene->getBox(_boxEdited);
 
-  if (box != NULL) {
+  if (box != nullptr) {
       box->update();
       box->centerWidget();
 
@@ -429,7 +429,7 @@ AttributesEditor::startChanged()
 {
 //  std::cout<<"--- startChanged ---"<<std::endl;
   BasicBox * box = _scene->getBox(_boxEdited);
-  if (box != NULL) {
+  if (box != nullptr) {
       box->moveBy(_boxStartValue->value() * S_TO_MS / MaquetteScene::MS_PER_PIXEL - box->getTopLeft().x(), 0);
       _scene->boxMoved(_boxEdited);
     }
@@ -440,11 +440,11 @@ AttributesEditor::lengthChanged()
 {
 //  std::cout<<"--- length changed ---"<<std::endl;
   BasicBox * box = _scene->getBox(_boxEdited);
-  if (box != NULL) {
+  if (box != nullptr) {
       box->resizeWidthEdition(_boxLengthValue->value() * S_TO_MS / MaquetteScene::MS_PER_PIXEL);
-      QPainterPath nullPath;
-      nullPath.addRect(QRectF(QPointF(0., 0.), QSizeF(0., 0.)));
-      _scene->setSelectionArea(nullPath);
+      QPainterPath nullptrPath;
+      nullptrPath.addRect(QRectF(QPointF(0., 0.), QSizeF(0., 0.)));
+      _scene->setSelectionArea(nullptrPath);
       box->setSelected(true);
       _scene->setResizeBox(_boxEdited);
       _scene->boxResized();
@@ -456,7 +456,7 @@ AttributesEditor::nameChanged()
 {
   BasicBox * box = _scene->getBox(_boxEdited);
 
-  if (box != NULL) {
+  if (box != nullptr) {
       box->setName(_boxName->text());
       _scene->update(box->getTopLeft().x(), box->getTopLeft().y(), box->width(), box->height() + 10);
     }
@@ -697,7 +697,7 @@ AttributesEditor::snapshotStartAssignment()
 
   _networkTree->clearDevicesStartMsgs(treeSnapshot.second);  
 
-  if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
+  if (Maquette::getInstance()->getBox(_boxEdited) != nullptr) {
 
       //--- Pour réassigner les items des autres devices (qui n'ont pas été supprimés) ---
       QList<QTreeWidgetItem *> itemsNotModified = _networkTree->startMessages()->getItems();
@@ -729,7 +729,7 @@ AttributesEditor::snapshotStartAssignment(QList<QTreeWidgetItem *> itemsList)
 
     _networkTree->clearDevicesStartMsgs(treeSnapshot.second);
 
-    if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
+    if (Maquette::getInstance()->getBox(_boxEdited) != nullptr) {
 
         //--- Pour réassigner les items des autres devices (qui n'ont pas été supprimés) ---
         QList<QTreeWidgetItem *> itemsNotModified = _networkTree->startMessages()->getItems();
@@ -761,7 +761,7 @@ AttributesEditor::snapshotEndAssignment()
   QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot = _networkTree->treeSnapshot(_boxEdited);
   _networkTree->clearDevicesEndMsgs(treeSnapshot.second);
 
-  if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
+  if (Maquette::getInstance()->getBox(_boxEdited) != nullptr) {
 
       //--- Pour réassigner les items des autres devices (qui n'ont pas été supprimés) ---
       QList<QTreeWidgetItem *> itemsNotModified = _networkTree->endMessages()->getItems();
@@ -792,7 +792,7 @@ AttributesEditor::snapshotEndAssignment(QList<QTreeWidgetItem *> itemsList)
   QPair< QMap <QTreeWidgetItem *, Data>, QList<QString> > treeSnapshot = _networkTree->treeSnapshot(_boxEdited, itemsList);
   _networkTree->clearDevicesEndMsgs(treeSnapshot.second);
 
-  if (Maquette::getInstance()->getBox(_boxEdited) != NULL) {
+  if (Maquette::getInstance()->getBox(_boxEdited) != nullptr) {
 
       //--- Pour réassigner les items des autres devices (qui n'ont pas été supprimés) ---
       QList<QTreeWidgetItem *> itemsNotModified = _networkTree->endMessages()->getItems();
@@ -821,7 +821,7 @@ void
 AttributesEditor::addToExpandedItemsList(QTreeWidgetItem *item)
 {
     BasicBox * box = _scene->getBox(_boxEdited);
-    if (box != NULL) {
+    if (box != nullptr) {
         box->addToExpandedItemsList(item);
     }
 }
@@ -840,7 +840,7 @@ void
 AttributesEditor::removeFromExpandedItemsList(QTreeWidgetItem *item)
 {
     BasicBox * box = _scene->getBox(_boxEdited);
-    if (box != NULL) {
+    if (box != nullptr) {
         box->removeFromExpandedItemsList(item);
     }
 }

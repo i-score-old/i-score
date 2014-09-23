@@ -124,9 +124,9 @@ Comment::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidge
   painter->setPen(pen);
   painter->setBrush(Qt::yellow);
 
-  BasicBox *box = NULL;
+  BasicBox *box = nullptr;
   if (_abstract->ID() != NO_ID) {
-      if ((box = _scene->getBox(_abstract->ID())) != NULL) {
+      if ((box = _scene->getBox(_abstract->ID())) != nullptr) {
           QPainterPath path;
           path.moveTo(comRect.topLeft() - QPointF(0., 20.));
           path.lineTo(comRect.topLeft());
@@ -163,7 +163,7 @@ Comment::updatePos()
 {
   if (_abstract->ID() != NO_ID) {
       BasicBox *box = _scene->getBox(_abstract->ID());
-      if (box != NULL) {
+      if (box != nullptr) {
           setPos(QPointF(box->mapFromScene(box->getTopLeft()).x(), box->mapFromScene(box->getBottomRight()).y() + boundingRect().height()));
         }
     }

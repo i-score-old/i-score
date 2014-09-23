@@ -63,7 +63,7 @@
 #include "AttributesEditor.hpp"
 #include "NetworkTree.hpp"
 #include <QThread>
-
+#include <DelayedDelete.h>
 #include <stdio.h>
 #include <assert.h>
 #include <QCoreApplication>
@@ -94,8 +94,7 @@ Maquette::init()
 
     // create a ScoreEngine instance
     // note : this is a temporary solution to test new Score framework easily
-    if (_engines)
-        delete _engines;
+    delete _engines;
         
     _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, &deviceCallback, jamomaFolder);
 
@@ -108,7 +107,7 @@ Maquette::init()
     _boxes[ROOT_BOX_ID] = scenarioBox;
 }
 
-Maquette::Maquette() : _engines(NULL)
+Maquette::Maquette() : _engines(nullptr)
 {
 
 }
@@ -163,7 +162,7 @@ Maquette::getRelation(unsigned int ID)
       return it->second;
     }
 
-  return NULL;
+  return nullptr;
 }
 
 BasicBox*
@@ -174,7 +173,7 @@ Maquette::getBox(unsigned int ID)
       return it->second;
     }
 
-  return NULL;
+  return nullptr;
 }
 
 void Maquette::setBoxColor(unsigned int ID, QColor newColor)
@@ -281,7 +280,7 @@ Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const s
 
   ParentBox *newBox = new ParentBox(firstCorner, secondCorner, _scene);
 
-  ParentBox *motherBox = NULL;
+  ParentBox *motherBox = nullptr;
   int motherID = mother;
   if (_boxes.find(mother) == _boxes.end()) {
       motherID = ROOT_BOX_ID;
@@ -313,7 +312,7 @@ Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const s
       newBox->setID(newBoxID);
       newBox->setName(QString::fromStdString(name));
 
-      if (motherBox != NULL) {
+      if (motherBox != nullptr) {
           newBox->setMother(motherID);
           motherBox->addChild(newBoxID);
         }
@@ -395,7 +394,7 @@ vector<string>
 Maquette::firstMessagesToSend(unsigned int boxID)
 {
   vector<string> messages;
-  if ((boxID != NO_ID && (getBox(boxID) != NULL)) || boxID == ROOT_BOX_ID) {
+  if ((boxID != NO_ID && (getBox(boxID) != nullptr)) || boxID == ROOT_BOX_ID) {
 
       _engines->getCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, messages);
       
@@ -407,7 +406,7 @@ vector<string>
 Maquette::lastMessagesToSend(unsigned int boxID)
 {
   vector<string> messages;
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
 
       _engines->getCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, messages);
 
@@ -534,7 +533,7 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages, 
 
   //sortByPriority(firstMsgs);
 
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       _engines->setCtrlPointMessagesToSend(boxID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
       _boxes[boxID]->setStartMessages(messages);
 
@@ -549,12 +548,12 @@ Maquette::setStartMessagesToSend(unsigned int boxID, NetworkMessages *messages, 
 NetworkMessages *
 Maquette::startMessages(unsigned int boxID)
 {
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       return _boxes[boxID]->startMessages();
     }
   else {
       std::cerr << "Maquette::startMessage : wrong boxID" << std::endl;
-      return NULL;
+      return nullptr;
     }
 }
 
@@ -623,7 +622,7 @@ Maquette::sortByPriority(NetworkMessages *messages){
 bool
 Maquette::setSelectedItemsToSend(unsigned int boxID, QMap<QTreeWidgetItem*, Data> itemsSelected)
 {
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       _boxes[boxID]->setSelectedItemsToSend(itemsSelected);
 
       return true;
@@ -634,7 +633,7 @@ Maquette::setSelectedItemsToSend(unsigned int boxID, QMap<QTreeWidgetItem*, Data
 bool
 Maquette::setExpandedItemsList(unsigned int boxID, QList<QTreeWidgetItem*> itemsExpanded)
 {
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       _boxes[boxID]->setExpandedItemsList(itemsExpanded);
 
       return true;
@@ -645,7 +644,7 @@ Maquette::setExpandedItemsList(unsigned int boxID, QList<QTreeWidgetItem*> items
 bool
 Maquette::addToExpandedItemsList(unsigned int boxID, QTreeWidgetItem* item)
 {
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       _boxes[boxID]->addToExpandedItemsList(item);
 
       return true;
@@ -656,7 +655,7 @@ Maquette::addToExpandedItemsList(unsigned int boxID, QTreeWidgetItem* item)
 bool
 Maquette::removeFromExpandedItemsList(unsigned int boxID, QTreeWidgetItem* item)
 {
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       _boxes[boxID]->removeFromExpandedItemsList(item);
 
       return true;
@@ -667,7 +666,7 @@ Maquette::removeFromExpandedItemsList(unsigned int boxID, QTreeWidgetItem* item)
 bool
 Maquette::setStartMessages(unsigned int boxID, NetworkMessages* nm)
 {
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       _boxes[boxID]->setStartMessages(nm);
       return true;
     }
@@ -677,7 +676,7 @@ Maquette::setStartMessages(unsigned int boxID, NetworkMessages* nm)
 bool
 Maquette::setEndMessages(unsigned int boxID, NetworkMessages* nm)
 {
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       _boxes[boxID]->setEndMessages(nm);
       return true;
     }
@@ -687,12 +686,12 @@ Maquette::setEndMessages(unsigned int boxID, NetworkMessages* nm)
 NetworkMessages *
 Maquette::endMessages(unsigned int boxID)
 {
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       return _boxes[boxID]->endMessages();
     }
   else {
       std::cerr << "Maquette::startMessage : wrong boxID" << std::endl;
-      return NULL;
+      return nullptr;
     }
 }
 
@@ -706,7 +705,7 @@ Maquette::setEndMessagesToSend(unsigned int boxID, NetworkMessages *messages, bo
   else
       lastMsgs = messages->computeMessages();
 
-  if (boxID != NO_ID && (getBox(boxID) != NULL)) {
+  if (boxID != NO_ID && (getBox(boxID) != nullptr)) {
       _engines->setCtrlPointMessagesToSend(boxID, END_CONTROL_POINT_INDEX, lastMsgs);
       _boxes[boxID]->setEndMessages(messages);
 
@@ -980,8 +979,8 @@ Maquette::removeTriggerPoint(unsigned int ID)
   if ((it = _triggerPoints.find(ID)) != _triggerPoints.end()) {
 
       _engines->removeTriggerPoint(ID);
-
-      delete it->second;
+      _scene->removeItem(it->second);
+      delete_later(it->second);
       _triggerPoints.erase(it);
     }
 }
@@ -993,7 +992,7 @@ Maquette::getTriggerPoint(unsigned int ID)
   if ((it = _triggerPoints.find(ID)) != _triggerPoints.end()) {
       return it->second;
     }
-  return NULL;
+  return nullptr;
 }
 
 bool
@@ -1022,7 +1021,7 @@ Maquette::createCondition(QList<BasicBox *> boxes)
     {
         curTriggerPoint = curBox->getTriggerPoint(BOX_START);
 
-        if(curTriggerPoint != NULL){
+        if(curTriggerPoint != nullptr){
             curTriggerId = curTriggerPoint->ID();
             triggerIds.push_back(curTriggerId);
         }
@@ -1353,13 +1352,6 @@ Maquette::addRelation(const AbstractRelation &abstract)
     }
 }
 
-bool
-Maquette::addInterval(unsigned int /*ID1*/, unsigned int /*ID2*/, int /*value*/, int /*tolerance*/)
-{
-    /// \todo Old TODO updated (by jC)
-  return false;
-}
-
 void
 Maquette::removeRelation(unsigned int relationID)
 {
@@ -1369,8 +1361,7 @@ Maquette::removeRelation(unsigned int relationID)
     Relation* rel = it->second;
     _engines->removeTemporalRelation(relationID);
 
-    delete rel;
-    it->second = nullptr;
+    delete_later(rel);
     _relations.erase(it);
   }
 }
@@ -1739,88 +1730,6 @@ void
 Maquette::save(const string &fileName)
 {
   _engines->store(fileName);
-    
-    /* other stuff to write
-    
-    QFile file(QString::fromStdString(fileName));
-    
-    if (!file.open(QFile::WriteOnly | QFile::Text)) {
-        _scene->displayMessage(((QString("Cannot write file %1:\n%2.")).arg(QString::fromStdString(fileName)).
-                                arg(file.errorString())).toStdString(), WARNING_LEVEL);
-        
-        //return false;
-    }
-    
-    QDomImplementation impl = QDomDocument().implementation();
-    
-    QString publicId = "i-score 2012";
-    QString systemId = "http://scrime.labri.fr";
-    QString typeId = "i-scoreSave";
-    _doc = new QDomDocument(impl.createDocumentType(typeId, publicId, systemId));
-    
-    QDomElement root = _doc->createElement("GRAPHICS");
-    root.setAttribute("zoom", _scene->zoom());
-    root.setAttribute("centerX", _scene->view()->getCenterCoordinates().x());
-    root.setAttribute("centerY", _scene->view()->getCenterCoordinates().y());
-    _doc->appendChild(root);
-    
-    QDomElement boxesNode = _doc->createElement("boxes");
-    root.appendChild(boxesNode);
-    
-    for (BoxesMap::iterator it = _boxes.begin(); it != _boxes.end(); ++it) {
-        saveBox(it->first);
-    }
-    
-    // Devices
-    QDomElement devicesNode = _doc->createElement("Devices");
-    QDomElement deviceNode;
-    
-    std::map<std::string, MyDevice>::iterator it;
-    string deviceName;
-    unsigned int networkPort;
-    string networkHost;
-    string plugin;
-    MyDevice curDevice;
-    
-    for (it = _devices.begin(); it != _devices.end(); it++) {
-        curDevice = it->second;
-        
-        deviceName = curDevice.name;
-        networkPort = curDevice.networkPort;
-        networkHost = curDevice.networkHost;
-        plugin = curDevice.plugin;
-        
-        deviceNode = _doc->createElement("Device");
-        deviceNode.setAttribute("IP", QString::fromStdString(networkHost));
-        deviceNode.setAttribute("port", networkPort);
-        deviceNode.setAttribute("plugin", QString::fromStdString(plugin));
-        deviceNode.setAttribute("name", QString::fromStdString(deviceName));
-        
-        devicesNode.appendChild(deviceNode);
-    }
-    
-    root.appendChild(devicesNode);
-    
-    //OSC Messages
-    QList<QString> OSCMessages = _scene->editor()->networkTree()->getOSCMessages();
-    
-    QDomElement OSCMessagesNode = _doc->createElement("OSCMessages");
-    QDomElement OSCMessageNode;
-    
-    for (QList<QString>::iterator it = OSCMessages.begin(); it != OSCMessages.end(); it++) {
-        OSCMessageNode = _doc->createElement("OSC");
-        OSCMessageNode.setAttribute("message", *it);
-        OSCMessagesNode.appendChild(OSCMessageNode);
-    }
-    root.appendChild(OSCMessagesNode);
-    
-    QTextStream ts(&file);
-    ts << _doc->toString();
-    file.close();
-    
-    delete _doc;
-    
-    */
 }
 
 void
@@ -1917,7 +1826,7 @@ Maquette::load(const string &fileName)
                 
                 BasicBox *tpBox = getBox(tpBoxID);
                 
-                if (tpBox != NULL) {
+                if (tpBox != nullptr) {
                     
                     abstractTrgPnt.setBoxID(tpBoxID);
                     
@@ -1951,7 +1860,7 @@ Maquette::load(const string &fileName)
                 }
                 else {
 #ifdef DEBUG
-                    std::cerr << "Maquette::load : NULL box found for trigger point " << *it << std::endl;
+                    std::cerr << "Maquette::load : nullptr box found for trigger point " << *it << std::endl;
 #endif
                 }
             }
@@ -2079,7 +1988,7 @@ Maquette::updateTriggerPointActiveStatus(unsigned int trgID, bool active)
 {
   TriggerPoint *trgPnt = getTriggerPoint(trgID);
 
-  if (trgPnt != NULL) {
+  if (trgPnt != nullptr) {
       if (active) {
           trgPnt->setWaiting(active);
           if (_scene->triggersQueueList()->isEmpty()) {
@@ -2165,7 +2074,7 @@ transportCallback(TTSymbol& transport, const TTValue& value)
 {
   MaquetteScene *scene = Maquette::getInstance()->scene();
 
-    if (scene != NULL) {
+    if (scene != nullptr) {
         
         if (transport == TTSymbol("Play"))
             scene->playOrResume();
@@ -2198,7 +2107,7 @@ transportCallback(TTSymbol& transport, const TTValue& value)
     }
 #ifdef DEBUG
     else {
-        std::cerr << "Maquette::enginesNetworkCallback : attribute _scene == NULL" << std::endl;
+        std::cerr << "Maquette::enginesNetworkCallback : attribute _scene == nullptr" << std::endl;
     }
 #endif
 }

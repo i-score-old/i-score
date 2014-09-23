@@ -87,7 +87,7 @@ TriggerPoint::TriggerPoint(const AbstractTriggerPoint &abstract, MaquetteScene *
 TriggerPoint::~TriggerPoint()
 {
   delete _abstract;
-    delete _edit;
+  _edit->deleteLater();
 }
 
 bool
@@ -119,9 +119,10 @@ TriggerPoint::abstract() const
 void
 TriggerPoint::updatePosition()
 {
+  if(!_abstract) return;
   if (_abstract->boxID() != NO_ID) {
       BasicBox *box = _scene->getBox(_abstract->boxID());
-      if (box != NULL) {
+      if (box != nullptr) {
           if (_abstract->boxExtremity() == BOX_START) {
               setPos(QPointF(box->getShapeTopLeft().x() + WIDTH / 2., box->getShapeTopLeft().y() - HEIGHT / 2.));
             }
@@ -341,9 +342,9 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
   QRectF rect = boundingRect();
   painter->save();
 
-  BasicBox *box = NULL;
+  BasicBox *box = nullptr;
   if (_abstract->boxID() != NO_ID) {
-      if ((box = _scene->getBox(_abstract->boxID())) != NULL) {
+      if ((box = _scene->getBox(_abstract->boxID())) != nullptr) {
           QPen pen = painter->pen();
           QBrush brush = painter->brush();
           pen.setColor(box->color().darker());
