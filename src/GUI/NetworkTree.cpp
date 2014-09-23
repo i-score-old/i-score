@@ -145,7 +145,7 @@ NetworkTree::~NetworkTree()
     _endMessages->deleteLater();
     _OSCStartMessages->deleteLater();
     _OSCEndMessages->deleteLater();
-    delete_later(_addADeviceItem);
+    delete _addADeviceItem;
 }
 
 /****************************************************************************
@@ -723,12 +723,12 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
          if(treeFilterActive()){
 
              if(nodeType == "Model" || nodeType == "ModelInfo" || nodeType == "Input.audio" || nodeType == "Output.audio" || nodeType == "Viewer"){
-                 delete_later(curItem);
+                 delete curItem;
                  return;
              }
              if(Maquette::getInstance()->requestObjectAttribruteValue(address,"tags",attributesValues) > 0){
                  if(attributesValues[0] == "setup"){
-                     delete_later(curItem);
+                     delete curItem;
                      return;
                  }
              }
@@ -755,7 +755,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
              if(nodeType == "Container"){
                  //Case type view
                  if(treeFilterActive() && attributesValues[0] == "view"){
-                     delete_later(curItem);
+                     delete curItem;
                      return;
                  }
              }
@@ -1515,8 +1515,7 @@ NetworkTree::deleteCurrentItemNamespace()
                                         QMessageBox::Cancel);
         switch (ret) {
         case QMessageBox::Yes:{
-            QTreeWidgetItem* item = currentItem();
-            delete_later(item);
+            delete currentItem();
             Maquette::getInstance()->removeNetworkDevice(itemName.toStdString());
             return;
         }
