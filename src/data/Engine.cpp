@@ -2642,12 +2642,18 @@ Engine::loadNetworkNamespace(const string &deviceName, const string &filepath)
     err = aXmlHandler.send(kTTSym_Read, TTSymbol(filepath), out);
     
     if (!err) {
+        
+        // stop OSC protocol
+        m_applicationManager.send("ProtocolStop", TTSymbol("OSC"), out);
     
         // init the application
         anApplication.send("Init");
         
         // store the namespace file for this device
         m_namespaceFilesPath[deviceName] = filepath;
+        
+        // run OSC protocol
+        m_applicationManager.send("ProtocolRun", TTSymbol("OSC"), out);
     }
 
     return err != kTTErrNone;
