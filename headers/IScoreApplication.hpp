@@ -7,7 +7,7 @@ class IScoreApplication : public QApplication
 {
   Q_OBJECT
   public :
-    using QApplication::QApplication;
+    IScoreApplication(int argc, char** argv): QApplication(argc, argv) {}
     virtual ~IScoreApplication()
     {
       delete win;

@@ -110,7 +110,7 @@ Maquette::init()
 
 Maquette::Maquette() : _engines(NULL)
 {
-
+	connect(this, SIGNAL(boxIsRunningSignal(uint,bool)), this, SLOT(boxIsRunningSlot(uint,bool)), Qt::QueuedConnection);
 }
 
 Maquette::~Maquette()
@@ -1585,7 +1585,7 @@ Maquette::isExecutionOn()
 
 void
 Maquette::turnExecutionOff()
-{    
+{
     // Stop engine execution
     _engines->stop();
 
@@ -1625,7 +1625,7 @@ Maquette::isExecutionPaused()
 
 void
 Maquette::stopPlayingAndGoToStart()
-{    
+{
     turnExecutionOff();
     
 #ifdef MUTE_GOTO_SCORE
@@ -2154,10 +2154,7 @@ triggerPointIsActiveCallback(unsigned int trgID, bool active)
 void
 boxIsRunningCallback(unsigned int boxID, bool running)
 {
-  Maquette::getInstance()->updateBoxRunningStatus(boxID, running);
-
-  if(boxID==ROOT_BOX_ID)
-      Maquette::getInstance()->udpatePlayModeView(running);
+	emit Maquette::getInstance()->boxIsRunningSignal(boxID, running);
 }
 
 void
@@ -2412,5 +2409,13 @@ Maquette::appendToNetWorkNamespace(const std::string & address, const std::strin
 
 int
 Maquette::removeFromNetWorkNamespace(const std::string & address){
-    return _engines->removeFromNetWorkNamespace(address);
+	return _engines->removeFromNetWorkNamespace(address);
+}
+
+void Maquette::boxIsRunningSlot(unsigned int boxID, bool running)
+{
+  Maquette::getInstance()->updateBoxRunningStatus(boxID, running);
+
+  if(boxID==ROOT_BOX_ID)
+      Maquette::getInstance()->udpatePlayModeView(running);
 }

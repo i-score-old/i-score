@@ -80,7 +80,8 @@ unsigned int NetworkTree::TEXT_POINT_SIZE = 10;
 NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 {
   class CustomHeaderView : public QHeaderView {
-    using QHeaderView::QHeaderView;
+  public:
+    CustomHeaderView(Qt::Orientation o): QHeaderView(o) {}
     QSize sizeHint() const override { return {500, 15}; }
   };
 

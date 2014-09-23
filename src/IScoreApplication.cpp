@@ -24,6 +24,11 @@ bool IScoreApplication::notify(QObject *receiver_, QEvent *event_)
   {
     std::cerr << "std::exception was caught : " << ex.what() << std::endl;
   }
+  catch(...)
+  {
+    std::cerr << "CRASH";
+    exit(0);
+  }
 
   return false;
 }

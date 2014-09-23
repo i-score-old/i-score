@@ -805,9 +805,17 @@ class Maquette : public QObject
     bool loadNetworkNamespace(const string &application, const string &filepath);
     int appendToNetWorkNamespace(const std::string & address, const std::string & service = "parameter", const std::string & type = "generic", const std::string & priority = "0", const std::string & description = "", const std::string & range = "0. 1.", const std::string & clipmode = "none", const std::string & tags = "");
     int removeFromNetWorkNamespace(const std::string & address);
-
+	
+	
+  signals:
+     void boxIsRunningSignal(unsigned int boxId, bool running);
+  
   public slots:
-    
+    /*
+     * It is necessary to put this in a slot in order to prevent a crash due to inter-thread 
+     * mechanism of qt. 
+     */ 
+    void boxIsRunningSlot(unsigned int boxId, bool running);
     /*!
      * \brief Sets the time offset value in ms where the engine will start from at the nex execution. The boolean "mute" mutes or not the dump of all messages (the scene state at timeOffset).
      */
