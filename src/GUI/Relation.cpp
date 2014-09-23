@@ -70,7 +70,7 @@ const float Relation::RIGID_TOLERANCE = 0.;
 
 Relation::Relation(unsigned int firstBoxID, BoxExtremity firstBoxExt, unsigned int secondBoxID,
                    BoxExtremity secondBoxExt, MaquetteScene *parent)
-  : QGraphicsItem()
+  : QGraphicsObject()
 {
   _scene = parent;
 
@@ -80,7 +80,7 @@ Relation::Relation(unsigned int firstBoxID, BoxExtremity firstBoxExt, unsigned i
 }
 
 Relation::Relation(const AbstractRelation &abstract, MaquetteScene *parent)
-  : QGraphicsItem()
+  : QGraphicsObject()
 {
   _scene = parent;
   _abstract = new AbstractRelation(abstract);
@@ -267,7 +267,7 @@ Relation::changeBounds(const float &minBound, const float &maxBound)
 void
 Relation::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 {
-  QGraphicsItem::hoverEnterEvent(event);
+  QGraphicsObject::hoverEnterEvent(event);
   _hover = true;
   double startX = mapFromScene(_start).x() + BasicBox::EAR_WIDTH / 2;
   double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
@@ -315,7 +315,7 @@ Relation::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 void
 Relation::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {
-  QGraphicsItem::hoverMoveEvent(event);
+  QGraphicsObject::hoverMoveEvent(event);
 
   double startX = mapFromScene(_start).x();
   double endX = mapFromScene(_end).x(), endY = mapFromScene(_end).y();
@@ -362,7 +362,7 @@ Relation::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 void
 Relation::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
 {
-  QGraphicsItem::hoverLeaveEvent(event);
+  QGraphicsObject::hoverLeaveEvent(event);
   _hover = false;
   setCursor(Qt::ArrowCursor);
 }
@@ -370,7 +370,7 @@ Relation::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
 void
 Relation::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
 {
-  QGraphicsItem::mouseDoubleClickEvent(event);
+  QGraphicsObject::mouseDoubleClickEvent(event);
   float maxBound;
   if (!_scene->playing()) {
       if (!_flexibleRelation) {
@@ -408,7 +408,7 @@ Relation::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
 void
 Relation::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
-  QGraphicsItem::mousePressEvent(event);
+  QGraphicsObject::mousePressEvent(event);
 
   if (!_scene->playing()) {
       if (cursor().shape() == Qt::SplitHCursor) {
@@ -443,7 +443,7 @@ Relation::mousePressEvent(QGraphicsSceneMouseEvent * event)
 void
 Relation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 {
-  QGraphicsItem::mouseMoveEvent(event);
+  QGraphicsObject::mouseMoveEvent(event);
   double eventPosX = mapFromScene(event->scenePos()).x();
   double startX = mapFromScene(_start).x();
 
@@ -471,7 +471,7 @@ Relation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 void
 Relation::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 {
-  QGraphicsItem::mouseReleaseEvent(event);
+  QGraphicsObject::mouseReleaseEvent(event);
   if (_middleHandleSelected) {
       double startX = mapFromScene(_start).x();
       double endX = mapFromScene(_end).x();

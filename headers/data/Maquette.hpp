@@ -953,11 +953,12 @@ class Maquette : public QObject
      * \param mother : the mother to assign to the box
      * \return the ID of created parent box
      */
+    /*
     unsigned int addParentBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const std::string &name,
                               unsigned int mother);
     unsigned int addParentBox(unsigned int ID, const unsigned int date, const unsigned int topLeftY, const unsigned int sizeY, const unsigned int duration, const std::string &name,
                               unsigned int mother, QColor color);
-
+    */
     string extractAddress(string msg);
     string extractValue(string msg);
 
@@ -1025,6 +1026,9 @@ class Maquette : public QObject
     bool _paused;       //!< Handling paused state.
 
     QDomDocument *_doc; //!< Handling document used for saving/loading.
+
+
+//    void addParentBoxToScene(unsigned int ID, unsigned int mother, ParentBox* newBox);
 };
 
 /*!

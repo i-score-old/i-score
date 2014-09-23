@@ -48,7 +48,7 @@
  * \author Luc Vercellin
  */
 
-#include <QGraphicsItem>
+#include <QGraphicsObject>
 #include <QPainterPath>
 #include "BasicBox.hpp"
 
@@ -61,7 +61,7 @@ class Abstract;
 /*!
  * \brief Enum used to define Relation's item type.
  */
-enum { RELATION_TYPE = QGraphicsItem::UserType + 4 };
+enum { RELATION_TYPE = QGraphicsObject::UserType + 4 };
 
 #define NO_LENGTH -1
 
@@ -70,7 +70,7 @@ enum { RELATION_TYPE = QGraphicsItem::UserType + 4 };
  *
  * \brief Relation item, derived from Qt's QGraphicsItem.
  */
-class Relation : public QGraphicsItem
+class Relation : public QGraphicsObject
 {
   public:
     Relation(unsigned int firstBoxID, BoxExtremity firstBoxExt, unsigned int secondBoxID,

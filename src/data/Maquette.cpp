@@ -99,11 +99,11 @@ Maquette::init()
     _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, &deviceCallback, jamomaFolder);
 
     //Creating rootBox as the mainScenario
-    AbstractBox *scenarioAb = new AbstractBox();
+    auto scenarioAb = new AbstractParentBox();
     scenarioAb->setID(ROOT_BOX_ID);
     /// \todo : set root box name. NH
 
-    ParentBox *scenarioBox = new ParentBox(static_cast<AbstractParentBox *>(scenarioAb), _scene);
+    ParentBox *scenarioBox = new ParentBox(scenarioAb, _scene);
     _boxes[ROOT_BOX_ID] = scenarioBox;
 }
 
@@ -197,81 +197,106 @@ Maquette::sequentialID()
 {
   return _boxes.size();
 }
-
-unsigned int
-Maquette::addParentBox(unsigned int ID, const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
+/*
+void Maquette::addParentBoxToScene(unsigned int ID,
+                                   unsigned int mother,
+                                   ParentBox* newBox)
 {
-  vector<string> firstMsgs;
-  vector<string> lastMsgs;
-
-  _engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-  _engines->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
-
-  ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
-
-  if (ID != NO_ID) {
-      newBox->setName(QString::fromStdString(name));
-
-      _boxes[ID] = newBox;
-      _parentBoxes[ID] = newBox;
-      newBox->setID(ID);
-      if (mother != NO_ID && mother != ROOT_BOX_ID) {
-          BoxesMap::iterator it;
-          if ((it = _boxes.find(mother)) != _boxes.end()) {
-              if (it->second->type() == PARENT_BOX_TYPE) {
-                  newBox->setMother(mother);
-                  static_cast<ParentBox*>(it->second)->addChild(ID);
+    if (mother != NO_ID && mother != ROOT_BOX_ID)
+    {
+        BoxesMap::iterator it;
+        if ((it = _boxes.find(mother)) != _boxes.end())
+        {
+            if (it->second->type() == PARENT_BOX_TYPE)
+            {
+                if(auto papa = dynamic_cast<ParentBox*>(it->second))
+                {
+                    newBox->setMother(mother);
+                    papa->addChild(ID);
                 }
-              else {
-                  newBox->setMother(ROOT_BOX_ID);
+                else
+                {
+                    qDebug() << "ALERT : Trying to add a child to a non-parent." << Q_FUNC_INFO;
                 }
+            }
+            else
+            {
+                newBox->setMother(ROOT_BOX_ID);
             }
         }
     }
-
-  return ID;
 }
 
-unsigned int
-Maquette::addParentBox(unsigned int ID, const unsigned int date, const unsigned int topLeftY, const unsigned int sizeY, const unsigned int duration, const string & name, unsigned int mother, QColor color)
+unsigned int Maquette::addParentBox(unsigned int ID,
+                                    const QPointF & corner1,
+                                    const QPointF & corner2,
+                                    const string & name,
+                                    unsigned int mother)
 {
-  QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
-  QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);
+    vector<string> firstMsgs;
+    vector<string> lastMsgs;
 
-  vector<string> firstMsgs;
-  vector<string> lastMsgs;
+    _engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
+    _engines->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
 
-  _engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-  _engines->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
 
-  ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
+    if (ID != NO_ID)
+    {
+        ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
+        newBox->setName(QString::fromStdString(name));
 
-  if (ID != NO_ID) {
-      newBox->setName(QString::fromStdString(name));
-      newBox->setColor(color);
-      _boxes[ID] = newBox;
-      _parentBoxes[ID] = newBox;
-      newBox->setID(ID);
-      if (mother != NO_ID && mother != ROOT_BOX_ID) {
-          BoxesMap::iterator it;
-          if ((it = _boxes.find(mother)) != _boxes.end()) {
-              if (it->second->type() == PARENT_BOX_TYPE) {
-                  newBox->setMother(mother);
-                  static_cast<ParentBox*>(it->second)->addChild(ID);
-                }
-              else {
-                  newBox->setMother(ROOT_BOX_ID);
-                }
-            }
-        }
+        _boxes[ID] = newBox;
+        _parentBoxes[ID] = newBox;
+        newBox->setID(ID);
+
+        addParentBoxToScene(ID, mother, newBox);
     }
 
-  return ID;
+    return ID;
 }
 
+unsigned int Maquette::addParentBox(unsigned int ID,
+                                    const unsigned int date,
+                                    const unsigned int topLeftY,
+                                    const unsigned int sizeY,
+                                    const unsigned int duration,
+                                    const string & name,
+                                    unsigned int mother,
+                                    QColor color)
+{
+    QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
+    QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);
+
+    vector<string> firstMsgs;
+    vector<string> lastMsgs;
+
+    _engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
+    _engines->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
+
+
+    if (ID != NO_ID)
+    {
+        ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
+
+        newBox->setName(QString::fromStdString(name));
+        newBox->setColor(color);
+
+        _boxes[ID] = newBox;
+        _parentBoxes[ID] = newBox;
+        newBox->setID(ID);
+
+        addParentBoxToScene(ID, mother, newBox);
+    }
+
+    return ID;
+}
+*/
 /// \todo change arguments named corner. this is not comprehensible. (par jaime Chao)
 unsigned int
-Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const string & name, unsigned int mother)
+Maquette::addParentBox(const QPointF & corner1,
+                       const QPointF & corner2,
+                       const string & name,
+                       unsigned int mother)
 
 {
   /// \todo called by MaquetteScene::addParentBox(const QPointF &topLeft, const QPointF &bottomRight, const string &name) with topLeft and bottomRight arguments. No need to recalculate. (par jaime Chao)
@@ -327,8 +352,10 @@ Maquette::addParentBox(const QPointF & corner1, const QPointF & corner2, const s
 unsigned int
 Maquette::addParentBox(const AbstractParentBox &abstract)
 {
-  return addParentBox(abstract.topLeft(), QPointF(abstract.topLeft().x() + abstract.width(),
-                                                  abstract.topLeft().y() + abstract.height()), abstract.name(), abstract.mother());
+  return addParentBox(abstract.topLeft(),
+                      QPointF(abstract.topLeft().x() + abstract.width(), abstract.topLeft().y() + abstract.height()),
+                      abstract.name(),
+                      abstract.mother());
 }
 
 map<string, MyDevice>
@@ -979,8 +1006,7 @@ Maquette::removeTriggerPoint(unsigned int ID)
   if ((it = _triggerPoints.find(ID)) != _triggerPoints.end()) {
 
       _engines->removeTriggerPoint(ID);
-      _scene->removeItem(it->second);
-      delete_later(it->second);
+      it->second->deleteLater();
       _triggerPoints.erase(it);
     }
 }
@@ -1361,7 +1387,7 @@ Maquette::removeRelation(unsigned int relationID)
     Relation* rel = it->second;
     _engines->removeTemporalRelation(relationID);
 
-    delete_later(rel);
+    rel->deleteLater();
     _relations.erase(it);
   }
 }

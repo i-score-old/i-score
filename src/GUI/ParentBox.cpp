@@ -314,7 +314,7 @@ ParentBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
   if(cursor().shape() == Qt::ArrowCursor)
     return;
 
-  QGraphicsItem::mouseMoveEvent(event);
+  QGraphicsObject::mouseMoveEvent(event);
   const int upper_limit{-30};
 
   if ((y() - std::abs(boundingRect().y())) < upper_limit)

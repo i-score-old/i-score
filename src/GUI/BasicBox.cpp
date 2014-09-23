@@ -102,7 +102,7 @@ const QColor BasicBox::BOX_COLOR = QColor(60, 60, 60);
 const QColor BasicBox::TEXT_COLOR = QColor(0, 0, 0);
 
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
-  : QGraphicsItem()
+  : QGraphicsObject()
 {    
 
   _scene = parent;
@@ -321,7 +321,7 @@ BasicBox::createWidget()
 }
 
 BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
-  : QGraphicsItem()
+  : QGraphicsObject()
 {
   _scene = parent;
 
@@ -334,10 +334,11 @@ BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
 
 BasicBox::~BasicBox()
 {
-  if (_abstract) {
+  if (_abstract)
+  {
       removeRelations(BOX_START);
       removeRelations(BOX_END);
-      delete static_cast<AbstractBox*>(_abstract);
+      delete _abstract;
   }
   _recEffect->deleteLater();
   _boxContentWidget->deleteLater();
@@ -1307,7 +1308,7 @@ BasicBox::hasMother()
 QVariant
 BasicBox::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-  QVariant newValue = QGraphicsItem::itemChange(change, value);
+  QVariant newValue = QGraphicsObject::itemChange(change, value);
 
   //QVariant newValue(value);
   if (change == ItemPositionChange) {
@@ -1404,10 +1405,10 @@ BasicBox::boxBody()
 void
 BasicBox::keyPressEvent(QKeyEvent *event)
 {
-  QGraphicsItem::keyPressEvent(event);
+  QGraphicsObject::keyPressEvent(event);
   if(event->key() == Qt::Key_R)
   {
-    CurveWidget *curve = (static_cast<CurveWidget *>(_boxContentWidget->stackedLayout()->currentWidget()));
+    CurveWidget *curve = dynamic_cast<CurveWidget *>(_boxContentWidget->stackedLayout()->currentWidget());
     if(curve) curve->adaptScale();
   }
 }
@@ -1415,13 +1416,13 @@ BasicBox::keyPressEvent(QKeyEvent *event)
 void
 BasicBox::keyReleaseEvent(QKeyEvent *event)
 {
-  QGraphicsItem::keyReleaseEvent(event);
+  QGraphicsObject::keyReleaseEvent(event);
 }
 
 void
 BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-  QGraphicsItem::mousePressEvent(event);
+  QGraphicsObject::mousePressEvent(event);
 
   if (_startMenu != nullptr) {
       _startMenu->close();
@@ -1509,7 +1510,7 @@ BasicBox::nameInputDialog()
 void
 BasicBox::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-  QGraphicsItem::mouseDoubleClickEvent(event);
+  QGraphicsObject::mouseDoubleClickEvent(event);
   QRectF textRect(mapFromScene(getTopLeft()).x(), mapFromScene(getTopLeft()).y(), width(), RESIZE_TOLERANCE - LINE_WIDTH);
   qreal x1, x2, y1, y2;
   textRect.getCoords(&x1, &y1, &x2, &y2);
@@ -1542,7 +1543,7 @@ BasicBox::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 void
 BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-  QGraphicsItem::mouseMoveEvent(event);
+  QGraphicsObject::mouseMoveEvent(event);
 
   // Draw cursor coordinates as a tooltip
 //    CurveWidget *curve = (static_cast<CurveWidget *>(_boxContentWidget->stackedLayout()->currentWidget()));
@@ -1585,7 +1586,7 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void
 BasicBox::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-  QGraphicsItem::mouseReleaseEvent(event);
+  QGraphicsObject::mouseReleaseEvent(event);
 
   if (event->button() == Qt::LeftButton) {
       if (cursor().shape() == Qt::ClosedHandCursor) {
@@ -1604,7 +1605,7 @@ BasicBox::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void
 BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 {
-  QGraphicsItem::hoverEnterEvent(event);
+  QGraphicsObject::hoverEnterEvent(event);
   _hover = true;
 
   const float RESIZE_ZONE_WIDTH = 3 * LINE_WIDTH;
@@ -1677,7 +1678,7 @@ BasicBox::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
   //  Pour palier à cela il y a une zone "vide" (qui met le curseur à ArrowCursor) avant d'entrer dans le widget.
   //  Seulement si on passe trop vite dessus, il n'a pas le temps de l'affecter.
 
-  QGraphicsItem::hoverEnterEvent(event);
+  QGraphicsObject::hoverEnterEvent(event);
   _hover = true;
   const float RESIZE_ZONE_WIDTH = 3 * LINE_WIDTH;
 
@@ -1739,7 +1740,7 @@ BasicBox::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 void
 BasicBox::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
 { 
-  QGraphicsItem::hoverLeaveEvent(event);
+  QGraphicsObject::hoverLeaveEvent(event);
   setCursor(Qt::ArrowCursor);
   _hover = false;
 

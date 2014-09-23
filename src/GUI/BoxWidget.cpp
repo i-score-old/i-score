@@ -536,19 +536,20 @@ BoxWidget::updateEndCue()
   _box->maquetteScene()->editor()->snapshotEndAssignment();
 }
 
-void
-BoxWidget::play()
+void BoxWidget::play()
 {
     QList<unsigned int> boxesId;
-
-    QList<QGraphicsItem *> selectedItems = _box->maquetteScene()->selectedItems();
-    for(QList<QGraphicsItem *>::iterator it=selectedItems.begin(); it!=selectedItems.end(); it++){
-        boxesId<<((BasicBox *)(*it))->ID();
+    for(auto& item : _box->maquetteScene()->selectedItems())
+    {
+        if(auto box = dynamic_cast<BasicBox*>(item))
+            boxesId << box->ID();
+        else
+            qDebug() << "ALERT: " << Q_FUNC_INFO;
     }
 
     if(!boxesId.contains(_boxID)){
         boxesId.clear();
-        boxesId<<_boxID;
+        boxesId << _boxID;
     }
 
     _box->maquetteScene()->playOrResume(boxesId);

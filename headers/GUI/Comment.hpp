@@ -48,7 +48,7 @@
  * \author Luc Vercellin
  */
 
-#include <QGraphicsItem>
+#include <QGraphicsObject>
 #include <string>
 
 class MaquetteScene;
@@ -58,7 +58,7 @@ class Abstract;
 /*!
  * \brief Enum used to define Comment's item type.
  */
-enum { COMMENT_TYPE = QGraphicsItem::UserType + 5 };
+enum { COMMENT_TYPE = QGraphicsObject::UserType + 5 };
 
 /*!
  * \class Comment

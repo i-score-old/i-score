@@ -145,7 +145,7 @@ NetworkTree::~NetworkTree()
     _endMessages->deleteLater();
     _OSCStartMessages->deleteLater();
     _OSCEndMessages->deleteLater();
-    delete _addADeviceItem;
+    //delete _addADeviceItem;
 }
 
 /****************************************************************************

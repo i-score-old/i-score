@@ -65,7 +65,7 @@ const float TriggerPoint::HEIGHT = BasicBox::TRIGGER_ZONE_HEIGHT + BasicBox::TRI
 
 TriggerPoint::TriggerPoint(unsigned int boxID, BoxExtremity extremity,
                            const string &message, unsigned int ID, MaquetteScene *parent)
-  : QGraphicsItem()
+  : QGraphicsObject()
 {
   _scene = parent;
 
@@ -75,7 +75,7 @@ TriggerPoint::TriggerPoint(unsigned int boxID, BoxExtremity extremity,
 }
 
 TriggerPoint::TriggerPoint(const AbstractTriggerPoint &abstract, MaquetteScene *parent)
-  : QGraphicsItem()
+  : QGraphicsObject()
 {
   _scene = parent;
 
@@ -139,21 +139,21 @@ TriggerPoint::updatePosition()
 void
 TriggerPoint::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-  QGraphicsItem::hoverEnterEvent(event);
+  QGraphicsObject::hoverEnterEvent(event);
   setCursor(Qt::PointingHandCursor);
 }
 
 void
 TriggerPoint::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
-  QGraphicsItem::hoverMoveEvent(event);
+  QGraphicsObject::hoverMoveEvent(event);
   setCursor(Qt::PointingHandCursor);
 }
 
 void
 TriggerPoint::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
-  QGraphicsItem::hoverLeaveEvent(event);
+  QGraphicsObject::hoverLeaveEvent(event);
   setCursor(Qt::ArrowCursor);
 }
 
@@ -166,7 +166,7 @@ TriggerPoint::boundingRect() const
 void
 TriggerPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-  QGraphicsItem::mousePressEvent(event);
+  QGraphicsObject::mousePressEvent(event);
 
 }
 
@@ -208,7 +208,7 @@ TriggerPoint::nameInputDialog()
 void
 TriggerPoint::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
 {
-  QGraphicsItem::mouseDoubleClickEvent(event);
+  QGraphicsObject::mouseDoubleClickEvent(event);
 
   if (!_scene->playing()) {
       /*
@@ -255,7 +255,7 @@ TriggerPoint::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
 void
 TriggerPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {    
-    QGraphicsItem::mouseReleaseEvent(event);
+    QGraphicsObject::mouseReleaseEvent(event);
     if (_abstract->waiting() && event->modifiers()!=Qt::ControlModifier) {
         _scene->trigger(this);
     }

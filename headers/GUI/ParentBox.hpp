@@ -55,7 +55,7 @@
 /*!
  * \brief Enum used to define Parent Box's item type.
  */
-enum { PARENT_BOX_TYPE = QGraphicsItem::UserType + 8 };
+enum { PARENT_BOX_TYPE = QGraphicsObject::UserType + 8 };
 
 class AttributesEditor;
 
