@@ -1950,7 +1950,7 @@ BasicBox::drawSelectShape(QPainter *painter){
 
 void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{    
+{
     Q_UNUSED(widget);
     painter->setClipRect(option->exposedRect);//To increase performance
     bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
@@ -1964,7 +1964,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         _comboBoxProxy->setVisible(false);
         _startMenuButton->setVisible(false);
         _endMenuButton->setVisible(false);
-        _stopButton->setVisible(_playing);
+        _stopButton->setVisible(true);
     }
     else{
         setButtonsVisible(_hover || isSelected());
@@ -2021,24 +2021,20 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     painter->setFont(font);
     painter->translate(textRect.topLeft());
 
-    //rotate if small
-//    if (_abstract->width() <= 3 * RESIZE_TOLERANCE) {
-//        painter->translate(QPointF(RESIZE_TOLERANCE - LINE_WIDTH, 0));
-//        painter->rotate(90);
-//        textRect.setWidth(_abstract->height());
-//    }
-
     //fill header
     painter->fillRect(0, 0, textRect.width(), textRect.height(), isSelected() ? _color : _colorUnselected);
-    painter->save();
-    painter->setPen(QPen(Qt::black));
 
     //draw name
-    painter->translate(0,4);
-    painter->setPen(QPen(Qt::gray));
-    painter->drawText(QRectF(BOX_MARGIN*2, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
-    painter->restore();
+    if(width() > 100)
+    {
+        painter->save();
+        painter->setPen(QPen(Qt::black));
 
+        painter->translate(0,4);
+        painter->setPen(QPen(Qt::gray));
+        painter->drawText(QRectF(BOX_MARGIN*2, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
+        painter->restore();
+    }
     //draw progress bar during execution
     if (_playing) {
         QPen pen = painter->pen();
@@ -2154,12 +2150,32 @@ BasicBox::updateRecordingCurves(){
 void
 BasicBox::setButtonsVisible(bool value)
 {
-    _comboBoxProxy->setVisible(value || _comboBox->isShown());
+    if(width() > 230)
+        _comboBoxProxy->setVisible(value || _comboBox->isShown());
+    else
+        _comboBoxProxy->setVisible(false);
 
-    _startMenuButton->setVisible(value);
-    _endMenuButton->setVisible(value);
-    _playButton->setVisible(!_playing && value);
-    _stopButton->setVisible(_playing && value);
+    if(width() > 90)
+    {
+        _startMenuButton->setVisible(value);
+        _endMenuButton->setVisible(value);
+    }
+    else
+    {
+        _startMenuButton->setVisible(false);
+        _endMenuButton->setVisible(false);
+    }
+
+    if(width() > 50)
+    {
+        _playButton->setVisible(!_playing && value);
+        _stopButton->setVisible(_playing && value);
+    }
+    else
+    {
+        _playButton->setVisible(false);
+        _stopButton->setVisible(false);
+    }
 }
 
 void
