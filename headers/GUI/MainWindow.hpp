@@ -60,13 +60,7 @@ class MaquetteView;
 class AttributesEditor;
 class BasicBox;
 class QActionGroup;
-class QVBoxLayout;
-class QLabel;
-class QTabWidget;
-class QLCDNumber;
-class LogarithmicSlider;
 class Help;
-class QDoubleSpinBox;
 
 /*!
  * \class MainWindow

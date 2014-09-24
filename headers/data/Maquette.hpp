@@ -847,7 +847,7 @@ class Maquette : public QObject
      *
      * \param factor : the new acceleration factor value between 0 and 1
      */
-    void setAccelerationFactor(const float &factor);
+    void setAccelerationFactor(double value, unsigned int boxID = ROOT_BOX_ID);
     double accelerationFactor();
     
     /*!

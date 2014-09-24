@@ -2004,9 +2004,9 @@ Maquette::accelerationFactor()
 }
 
 void
-Maquette::setAccelerationFactor(const float &factor)
+Maquette::setAccelerationFactor(double factor, unsigned int boxID)
 {
-  _engines->setExecutionSpeedFactor(factor);
+  _engines->setExecutionSpeedFactor(factor, boxID);
 }
 
 void

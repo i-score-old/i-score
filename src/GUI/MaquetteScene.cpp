@@ -1772,10 +1772,11 @@ MaquetteScene::stopAndGoToCurrentTime()
 }
 
 void
-MaquetteScene::setAccelerationFactor(double value)
+MaquetteScene::setAccelerationFactor(double value, unsigned int boxID)
 {
-  _maquette->setAccelerationFactor(value);
-  _accelerationFactor = value;
+  _maquette->setAccelerationFactor(value, boxID);
+  if(boxID == ROOT_BOX_ID)
+      _accelerationFactor = value;
 }
 
 void

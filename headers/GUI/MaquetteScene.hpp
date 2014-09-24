@@ -552,7 +552,7 @@ class MaquetteScene : public QGraphicsScene
     inline float
     zoom(){ return _view->zoom(); }
     void updateProgressBar();
-    void setAccelerationFactor(double value);
+    void setAccelerationFactor(double value, unsigned int boxID = ROOT_BOX_ID);
 
     float getMaxSceneWidth();
     void setMaxSceneWidth(float maxSceneWidth);
