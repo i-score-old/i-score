@@ -1069,7 +1069,8 @@ NetworkTree::expandItems(QList<QTreeWidgetItem*>& expandedItems)
   collapseAll();
 
   for(QTreeWidgetItem* item : expandedItems)
-    expandItem(item);
+      if(item)
+          expandItem(item);
 }
 
 void
