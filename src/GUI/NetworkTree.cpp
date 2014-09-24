@@ -1069,43 +1069,14 @@ NetworkTree::expandItems(QList<QTreeWidgetItem*>& expandedItems)
   collapseAll();
 
   for(QTreeWidgetItem* item : expandedItems)
+  {
       if(item)
+      {
+          if(item->parent() && !item->parent()->isExpanded())
+               expandItem(item->parent());
           expandItem(item);
-}
-
-void
-NetworkTree::expandNodes(QList<QTreeWidgetItem *> items)
-{
-  QList<QTreeWidgetItem *>::iterator it;
-  QTreeWidgetItem *curIt, *father;
-  for (it = items.begin(); it < items.end(); ++it) {
-      curIt = *it;
-      while (curIt->parent() != nullptr) {
-          father = curIt->parent();
-          if (father->type() != NodeNoNamespaceType) {
-              father->setExpanded(true);
-            }
-          curIt = father;
-        }
-    }
-}
-
-void
-NetworkTree::editValue()
-{
-  QTreeWidgetItem *item = currentItem();
-  if (currentColumn() == START_COLUMN || currentColumn() == END_COLUMN) {
-      item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsEditable);
-      editItem(item, currentColumn());
-      if (currentColumn() == START_COLUMN) {
-          VALUE_MODIFIED = true;
-        }
-      if (currentColumn() == END_COLUMN) {
-          VALUE_MODIFIED = true;
-        }
-      item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsUserCheckable);
-      item->setSelected(true);
-    }
+      }
+  }
 }
 
 void
@@ -1450,6 +1421,7 @@ NetworkTree::resetAssignedNodes()
 void
 NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
 {
+  bool isLearning{isInLearningMode()};
   // Make a copy of the addresses which were expanded
   std::vector<std::string> previouslyExpandedAddresses;
   for(auto& addr : _expandedItems)
@@ -1457,8 +1429,11 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
 
   // Make a copy of all the addresses
   std::vector<std::string> previousAddressMap;
-  for(auto& addr : _addressMap)
-    previousAddressMap.push_back(addr);
+  if(isLearning)
+  {
+      for(auto& addr : _addressMap)
+          previousAddressMap.push_back(addr);
+  }
 
   if(item != nullptr)
   {
@@ -1487,13 +1462,16 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
   }
 
   // The new ones
-  for(auto& addr : _addressMap)
+  if(isLearning)
   {
-    if(std::find(previousAddressMap.begin(),
-                 previousAddressMap.end(),
-                 addr) == previousAddressMap.end())
-      _expandedItems.append(_addressMap.key(addr));
+      for(auto& addr : _addressMap)
+      {
+          if(std::find(previousAddressMap.begin(),
+                       previousAddressMap.end(),
+                       addr) == previousAddressMap.end())
+              _expandedItems.append(_addressMap.key(addr));
 
+      }
   }
 
   expandItems(_expandedItems);
@@ -1759,7 +1737,9 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
         }
 
         if(event->button()==Qt::LeftButton){
-            if(currentItem()->type() == addDeviceNode){                
+            if(currentItem()->type() == addDeviceNode){
+
+                 disableLearningForEveryDevice();
                  _deviceEdit->edit();
                  setCurrentItem(nullptr);
             }            
@@ -1908,6 +1888,8 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
         if (item->type() == addOSCNode) {
             addOSCMessage(item->parent());
         }
+
+        // Check if there are still nodes in learning mode
     }
 }
 
@@ -2334,9 +2316,7 @@ NetworkTree::updateDeviceName(QString oldName, QString newName)
     }
 }
 
-void
-NetworkTree::
-addNewDevice(QString deviceName)
+void NetworkTree::addNewDevice(QString deviceName)
 {
     QTreeWidgetItem *newItem = addDeviceItem(deviceName);
     newItem->setCheckState(NAME_COLUMN,Qt::Unchecked);
@@ -2575,4 +2555,22 @@ NetworkTree::unselectAll()
         item->setSelected(false);
 
     emit(treeSelectionChanged(selectedItems()));
+}
+
+bool NetworkTree::isInLearningMode()
+{
+    for(int i = 0; i < topLevelItemCount(); ++i)
+    {
+        if(topLevelItem(i)->checkState(NAME_COLUMN) == Qt::Checked)
+            return true;
+    }
+
+    return false;
+}
+
+void NetworkTree::disableLearningForEveryDevice()
+{
+    for(int i = 0; i < topLevelItemCount(); ++i)
+        if(topLevelItem(i)->type() != addDeviceNode)
+            topLevelItem(i)->setCheckState(NAME_COLUMN, Qt::Unchecked);
 }

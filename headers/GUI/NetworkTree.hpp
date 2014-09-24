@@ -544,9 +544,12 @@ class NetworkTree : public QTreeWidget
     bool _recMode;
     bool _noItemClicked;
 
+    bool isInLearningMode();
+
     DeviceEdit *_deviceEdit;  
 
-  public slots:
+    void disableLearningForEveryDevice();
+public slots:
     /*!
       * \brief Rebuild the networkTree under the item (or currentItem by default), after asking the engine to refresh its namespace.
       * \param The application we want to refresh.
