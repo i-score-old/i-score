@@ -364,11 +364,9 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
       case Qt::AltModifier: //delete breakpoint
       {
         map<float, pair<float, float> >::iterator it;
-        bool found;
         QPointF relativePoint = relativeCoordinates(event->pos());
         for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
             if (fabs(it->first - relativePoint.x()) < 0.01) {
-                found = true;
                 _abstract->_breakpoints.erase(it);
                 _movingBreakpointX = -1.;
                 _movingBreakpointY = -1.;
@@ -456,11 +454,10 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
         case Qt::AltModifier: //delete breakpoints
         {
             map<float, pair<float, float> >::iterator it;
-            bool found;
+
             QPointF relativePoint = relativeCoordinates(event->pos());
             for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
                 if (fabs(it->first - relativePoint.x()) < 0.02) {
-                    found = true;
                     _abstract->_breakpoints.erase(it);
                     _movingBreakpointX = -1.;
                     _movingBreakpointY = -1.;

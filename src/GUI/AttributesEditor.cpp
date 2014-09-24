@@ -347,52 +347,22 @@ AttributesEditor::setAttributes(AbstractBox *abBox)
               _networkTree->setAssignedItems(abBox->networkTreeItems());             
             }
 
-          _networkTree->displayBoxContent(abBox);
-
-          //PRINT MESSAGES
-//            QList<QTreeWidgetItem *> items = _networkTree->assignedItems().keys();
-//            QList<QTreeWidgetItem *>::iterator i;
-//            QTreeWidgetItem *curIt;
-//            std::cout<<"\nsetattribute::AFFICHAGE START box \n";
-//            vector<string> startMessages = _scene->getBox(_boxEdited)->startMessages()->computeMessages();
-//            vector<string> startMessages = _networkTree->startMessages()->computeMessages();
-//            for(unsigned int i=0; i<startMessages.size(); i++){
-//                std::cout<<startMessages[i]<<std::endl;
-//            }
-//            std::cout<<"setattribute::AFFICHAGE END\n";
-//            vector<string> endMessages = _scene->getBox(_boxEdited)->endMessages()->computeMessages();
-////            vector<string> endMessages = _networkTree->endMessages()->computeMessages();
-//            for(int i=0; i<endMessages.size(); i++){
-//                std::cout<<endMessages[i]<<std::endl;
-//            }
-          //END PRINT          
+          _networkTree->displayBoxContent(abBox);        
         }
     }
 
-
 //Special update for the main scenario
-  if(_boxEdited == ROOT_BOX_ID){
+  if(_boxEdited == ROOT_BOX_ID)
+  {
       _scene->view()->setScenarioSelected(true);
       _boxName->setText(QString::fromStdString(abBox->name()));
   }
-  else{
+  else
+  {
       _scene->view()->setScenarioSelected(false);
       _networkTree->updateCurves(_boxEdited);
       updateWidgets(boxModified);
-
   }
-}
-
-void
-AttributesEditor::keyPressEvent(QKeyEvent *event)
-{
-  QDockWidget::keyPressEvent(event);
-}
-
-void
-AttributesEditor::keyReleaseEvent(QKeyEvent *event)
-{
-  QDockWidget::keyReleaseEvent(event);
 }
 
 void
@@ -422,33 +392,6 @@ AttributesEditor::updateWidgets(bool boxModified)
   }
 
   update();
-}
-
-void
-AttributesEditor::startChanged()
-{
-//  std::cout<<"--- startChanged ---"<<std::endl;
-  BasicBox * box = _scene->getBox(_boxEdited);
-  if (box != nullptr) {
-      box->moveBy(_boxStartValue->value() * S_TO_MS / MaquetteScene::MS_PER_PIXEL - box->getTopLeft().x(), 0);
-      _scene->boxMoved(_boxEdited);
-    }
-}
-
-void
-AttributesEditor::lengthChanged()
-{
-//  std::cout<<"--- length changed ---"<<std::endl;
-  BasicBox * box = _scene->getBox(_boxEdited);
-  if (box != nullptr) {
-      box->resizeWidthEdition(_boxLengthValue->value() * S_TO_MS / MaquetteScene::MS_PER_PIXEL);
-      QPainterPath nullptrPath;
-      nullptrPath.addRect(QRectF(QPointF(0., 0.), QSizeF(0., 0.)));
-      _scene->setSelectionArea(nullptrPath);
-      box->setSelected(true);
-      _scene->setResizeBox(_boxEdited);
-      _scene->boxResized();
-    }
 }
 
 void
@@ -589,44 +532,6 @@ AttributesEditor::endMessageChanged(QTreeWidgetItem *item)
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
       item->setText(NetworkTree::END_COLUMN, "");
     }  
-}
-
-void
-AttributesEditor::startMessageRemoved(const string &address)
-{
-    if (_scene->paused()) {
-        _scene->stopAndGoToCurrentTime();
-    }
-
-  if (_boxEdited != NO_ID) {
-      if(_boxEdited == ROOT_BOX_ID)
-          _scene->view()->resetCachedContent();
-      else{
-          QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
-          Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
-          Maquette::getInstance()->setStartMessagesToSend(_boxEdited, _networkTree->startMessages());
-          Maquette::getInstance()->removeCurve(_boxEdited, address);
-      }
-    }
-  else {
-      _scene->displayMessage("No box selected", INDICATION_LEVEL);
-    }
-}
-
-void
-AttributesEditor::endMessageRemoved(const string &address)
-{
-    if (_scene->paused()) {
-        _scene->stopAndGoToCurrentTime();
-    }
-
-    if (_boxEdited != NO_ID) {
-        Maquette::getInstance()->setEndMessagesToSend(_boxEdited, _networkTree->endMessages());
-        Maquette::getInstance()->removeCurve(_boxEdited, address);
-    }
-    else {
-        _scene->displayMessage("No box selected", INDICATION_LEVEL);
-    }
 }
 
 void

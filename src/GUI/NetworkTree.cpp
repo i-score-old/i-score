@@ -691,8 +691,6 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                                    attributesValues;
          string                    nodeType,
                                    address = (getAbsoluteAddress(curItem)).toStdString();
-         bool                      requestSuccess;
-         int                       requestResult;
          vector<string>::iterator  it;
 
          //TOTO : check if necessary (unused for the moment) NH.
@@ -710,8 +708,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
          curItem->setForeground(VALUE_COLUMN, brush);
 
          //Gets object's type
-         requestResult = Maquette::getInstance()->getObjectType(address,nodeType);
-         requestSuccess = requestResult > 0;
+         Maquette::getInstance()->getObjectType(address,nodeType);
 
          //Gets priority
          unsigned int priority = 0;
@@ -871,8 +868,7 @@ NetworkTree::clearColumn(unsigned int column, bool fullCleaning)
               curIt->setCheckState(column, Qt::Unchecked);
 
           if(!fullCleaning){
-              if(curIt->whatsThis(NAME_COLUMN)=="Message")
-                  ;//we don't clear type message
+              if(curIt->whatsThis(NAME_COLUMN)=="Message") { }
           }
           else
               curIt->setText(column, emptyString);

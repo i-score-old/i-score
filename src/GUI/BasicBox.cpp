@@ -263,12 +263,6 @@ BasicBox::createMenus()
 }
 
 void
-BasicBox::updateWidgets()
-{
-  centerWidget();
-}
-
-void
 BasicBox::updateDisplay(QString displayMode)
 {
   Q_UNUSED(displayMode)
@@ -495,12 +489,6 @@ BasicBox::getCenter() const
 }
 
 QPointF
-BasicBox::getRelativeCenter() const
-{
-  return QPointF(relativeBeginPos() + _abstract->width() / 2., _abstract->topLeft().y() + _abstract->height() / 2.);
-}
-
-QPointF
 BasicBox::getSize() const
 {
   return QPointF(_abstract->width(), _abstract->height());
@@ -522,18 +510,6 @@ BasicBox::getRightGripPoint()
       std::cerr << "BasicBox::getRightGripPoint() : " << e.what();
       return QPointF();
     }
-}
-
-QPointF
-BasicBox::getMiddleRight() const
-{
-  return QPointF(_abstract->topLeft().x() + _abstract->width(), _abstract->topLeft().y() + _abstract->height() / 2.);
-}
-
-QPointF
-BasicBox::getMiddleLeft() const
-{
-  return QPointF(_abstract->topLeft().x(), _abstract->topLeft().y() + _abstract->height() / 2.);
 }
 
 QPointF
@@ -861,18 +837,6 @@ BasicBox::detachFromCondition()
 }
 
 QList<Relation *>
-BasicBox::getStartBoxRelations()
-{
-  return getRelations(BOX_START);
-}
-
-QList<Relation *>
-BasicBox::getEndBoxRelations()
-{
-  return getRelations(BOX_END);
-}
-
-QList<Relation *>
 BasicBox::getRelations(BoxExtremity extremity)
 {
   QList<Relation *>relations;
@@ -910,18 +874,6 @@ BasicBox::addComment(const AbstractComment &abstract)
   _comment->updatePos();
 }
 
-bool
-BasicBox::hasComment() const
-{
-  return(_comment != nullptr);
-}
-
-Comment*
-BasicBox::comment() const
-{
-  return _comment;
-}
-
 void
 BasicBox::removeComment()
 {
@@ -946,19 +898,6 @@ BasicBox::setCrossedExtremity(BoxExtremity extremity)
   _scene->setPlaying(_abstract->ID(), _playing);
   update();
 }
-
-void
-BasicBox::setCrossedTriggerPoint(bool waiting, BoxExtremity extremity)
-{
-  QMap<BoxExtremity, TriggerPoint*>::iterator it;
-
-//	if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
-  if (_triggerPoints->contains(extremity)) {
-      _triggerPoints->value(extremity)->setWaiting(waiting);
-    }
-  update();
-}
-
 
 bool
 BasicBox::hasTriggerPoint(BoxExtremity extremity)
@@ -1058,29 +997,6 @@ BasicBox::removeTriggerPoint(BoxExtremity extremity)
     }
 }
 
-void
-BasicBox::setTriggerPointMessage(BoxExtremity extremity, const string &message)
-{
-  QMap<BoxExtremity, TriggerPoint*>::iterator it;
-
-//	if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
-  if (_triggerPoints->contains(extremity)) {
-      _triggerPoints->value(extremity)->setMessage(message);
-    }
-}
-
-string
-BasicBox::triggerPointMessage(BoxExtremity extremity)
-{
-  if (_triggerPoints->contains(extremity)) {
-      return _triggerPoints->value(extremity)->message();
-    }
-
-  else {
-      return "";
-    }
-}
-
 TriggerPoint *
 BasicBox::getTriggerPoint(BoxExtremity extremity)
 {
@@ -1129,12 +1045,6 @@ void
 BasicBox::removeFromExpandedItemsList(QTreeWidgetItem *item)
 {
   _abstract->removeFromNetworkTreeExpandedItems(item);
-}
-
-void
-BasicBox::clearExpandedItemsList()
-{
-  _abstract->clearNetworkTreeExpandedItems();
 }
 
 void
@@ -1247,14 +1157,6 @@ BasicBox::unlock()
 
 //    setFlag(QGraphicsItem::ItemIsSelectable);
   setFlag(QGraphicsItem::ItemIsFocusable);
-}
-
-bool
-BasicBox::resizing() const
-{
-  return (cursor().shape() == Qt::SizeFDiagCursor)
-         || (cursor().shape() == Qt::SizeHorCursor)
-         || (cursor().shape() == Qt::SizeVerCursor);
 }
 
 bool
@@ -2050,24 +1952,6 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         painter->drawLine(QPointF(progressPosX, RESIZE_TOLERANCE), QPointF(progressPosX, _abstract->height()));
     }
     setOpacity(_mute ? 0.4 : 1);
-}
-
-void
-BasicBox::curveShowChanged(const QString &address, bool state)
-{
-  _boxContentWidget->curveShowChanged(address, state);
-}
-
-void
-BasicBox::displayCurveEditWindow()
-{
-  QWidget *editWindow = new QWidget;
-  editWindow->setWindowModality(Qt::ApplicationModal);
-  QGridLayout *layout = new QGridLayout;
-
-  editWindow->setLayout(layout);
-  editWindow->setGeometry(QRect(_scene->sceneRect().toRect()));
-  editWindow->show();
 }
 
 void

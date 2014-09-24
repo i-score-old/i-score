@@ -81,7 +81,6 @@ class NetworkMessages;
 class AttributesEditor : public QDockWidget
 {
   Q_OBJECT
-
   public:
     AttributesEditor(QWidget* parent);
 
@@ -174,8 +173,6 @@ class AttributesEditor : public QDockWidget
      * \brief Associates slots with QWidgets' signals.
      **/
     void connectSlots();
-    void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
 
   private slots:
     /*!
@@ -184,8 +181,6 @@ class AttributesEditor : public QDockWidget
     void changeColor();
     void startMessageChanged(QTreeWidgetItem *item);
     void endMessageChanged(QTreeWidgetItem *item);
-    void startMessageRemoved(const std::string &address);
-    void endMessageRemoved(const std::string &address);
     void curveActivationChanged(QTreeWidgetItem *item, bool activated);
     void curveRedundancyChanged(QTreeWidgetItem *item, bool activated);
     void curveSampleRateChanged(QTreeWidgetItem *item, int value);
@@ -201,15 +196,6 @@ class AttributesEditor : public QDockWidget
      * \brief Updates box end message
      */
     void endMessagesChanged(bool forceUpdate = false);
-    /*!
-     * \brief Called when the start of the box is changed.
-     */
-    void startChanged();
-
-    /*!
-     * \brief Called when the length of the box is changed.
-     */
-    void lengthChanged();
 
     /*!
      * \brief Called when the name of the box is changed.

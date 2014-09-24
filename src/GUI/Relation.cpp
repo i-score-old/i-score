@@ -501,10 +501,6 @@ Relation::shape() const
   double toleranceY = sizeY > 0 ? ARROW_SIZE : -ARROW_SIZE;
 
   // Handling zones
-  double startBound = startX;
-  if (_abstract->minBound() != NO_BOUND) {
-      startBound = startX + _abstract->minBound() * _scene->zoom();
-    }
   double endBound = endX;
   if (_abstract->maxBound() != NO_BOUND) {
       endBound = startX + _abstract->maxBound() * _scene->zoom();

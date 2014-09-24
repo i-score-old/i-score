@@ -228,14 +228,6 @@ class BasicBox : public QGraphicsObject
     void detachFromCondition();
 
     /*!
-     * \brief Returns Relations associated to the start box extremity.
-     */
-    QList<Relation *> getStartBoxRelations();
-    /*!
-     * \brief Returns Relations associated to the end box extremity.
-     */
-    QList<Relation *> getEndBoxRelations();
-    /*!
      * \brief Gets relations from an extremity
      *
      * \param extremity : the extremity involved in the relation
@@ -260,13 +252,6 @@ class BasicBox : public QGraphicsObject
     void removeComment();
 
     /*!
-     * \brief Gets the comment from the box if one.
-     *
-     * \return the possible comment
-     */
-    Comment* comment() const;
-
-    /*!
      * \brief Plays the box.
      */
     virtual void play() = 0;
@@ -284,13 +269,6 @@ class BasicBox : public QGraphicsObject
      * \param extremity : the extremity crossed
      */
     void setCrossedExtremity(BoxExtremity extremity);
-
-    /*!
-     * \brief Informs the box that a specific extremity is triggered while playing.
-     *
-     * \param extremity : the extremity crossed
-     */
-    void setCrossedTriggerPoint(bool waiting, BoxExtremity extremity);
 
     /*!
      * \brief Determines if the box has a trigger point at a specific extremity.
@@ -332,21 +310,6 @@ class BasicBox : public QGraphicsObject
     void removeTriggerPoint(BoxExtremity extremity);
 
     /*!
-     * \brief Sets the message waited by a control point.
-     *
-     * \param extremity : the box extremity to set message from
-     * \param message : new message to wait for the trigger point
-     */
-    void setTriggerPointMessage(BoxExtremity extremity, const std::string &message);
-
-    /*!
-     * \brief Gets the message waited by a control point.
-     *
-     * \param extremity : the box extremity to get message from
-     */
-    std::string triggerPointMessage(BoxExtremity extremity);
-
-    /*!
      * \brief Gets trigger point on the extremity.
      *
      * \param extremity : the box extremity to get trigger point from.
@@ -358,11 +321,9 @@ class BasicBox : public QGraphicsObject
     void removeCurve(const std::string &address);
     void addCurve(const std::string &address);
     void addCurveAddress(const std::string &address);
-    void curveShowChanged(const QString &address, bool state);
     QRectF boxRect();
     QRectF boxBody();
     void curveActivationChanged(string address, bool activated);
-    void setMessage(QTreeWidgetItem *item, QString address);
     void createActions();
     void createMenus();
 
@@ -386,27 +347,6 @@ class BasicBox : public QGraphicsObject
      * \return the center
      */
     virtual QPointF getCenter() const;
-
-    /*!
-     * \brief Gets the relative center of the box.
-     *
-     * \return the relative center
-     */
-    virtual QPointF getRelativeCenter() const;
-
-    /*!
-     * \brief Gets the shape's right side center.
-     *
-     * \return the shape's right side center
-     */
-    virtual QPointF getMiddleRight() const;
-
-    /*!
-     * \brief Gets the shape's left side center.
-     *
-     * \return the shape's left side center
-     */
-    virtual QPointF getMiddleLeft() const;
 
     /*!
      * \brief Gets the shape top left point.
@@ -558,41 +498,6 @@ class BasicBox : public QGraphicsObject
     virtual void resizeAllEdition(float height, float length);
 
     /*!
-     * \brief Determines if the box is currently beeing resized.
-     *
-     * \return true if the box is currently beeing resized
-     */
-    bool resizing() const;
-
-    /*!
-     * \brief Determines if the box is commented.
-     *
-     * \return if the box is commented
-     */
-    bool hasComment() const;
-
-    /*!
-     * \brief Gets message to send when the start of the box is reached.
-     *
-     * \return the message to send at box's start
-     */
-    std::vector<std::string> firstMessagesToSend() const;
-
-    /*!
-     * \brief Gets message to send when the end of the box is reached.
-     *
-     * \return the message to send at box's end
-     */
-    std::vector<std::string> lastMessagesToSend() const;
-
-    /*!
-     * \brief Sets messages to send when the start of the box is reached.
-     *
-     * \param messages : the messages to send at box's start
-     */
-    void setFirstMessagesToSend(const std::vector<std::string> &messages);
-
-    /*!
      * \brief Sets networkMessages to send when the start of the box is reached.
      *
      * \param messages : the messages to send at box's start
@@ -633,18 +538,6 @@ class BasicBox : public QGraphicsObject
     void removeFromExpandedItemsList(QTreeWidgetItem* item);
 
     /*!
-     * \brief Clear the expandedItems list.
-     */
-    void clearExpandedItemsList();
-
-    /*!
-     * \brief Sets messages to send when the end of the box is reached.
-     *
-     * \param messages : the messages to send at box's end
-     */
-    void setLastMessagesToSend(const std::vector<std::string> &messages);
-
-    /*!
      * \brief Sets networkMessages to send when the end of the box is reached.
      *
      * \param messages : the messages to send at box's end
@@ -660,7 +553,6 @@ class BasicBox : public QGraphicsObject
 
     NetworkMessages *endMessages();
     void setEndMessage(QTreeWidgetItem *item, QString address);
-    void updateWidgets();
     void updateCurveRangeBoundMin(string address, float value);
     void updateCurveRangeBoundMax(string address, float value);
 
@@ -711,26 +603,19 @@ class BasicBox : public QGraphicsObject
     void drawSelectShape(QPainter *painter);
 
     void updateBoxSize();
-    QRectF leftEar(){ return _leftEar; }
-    QRectF rightEar(){ return _rightEar; }
-    BoxWidget * boxContentWidget(){ return _boxContentWidget; }
-    QWidget * boxWidget(){ return _boxWidget; }
     MaquetteScene * maquetteScene(){ return _scene; }
-    void setStackedLayout(QStackedLayout *slayout){ boxContentWidget()->setStackedLayout(slayout); }
     bool hasCurve(string address){ return _curvesAddresses.contains(address); }
     void addMessageToRecord(std::string address);
     void removeMessageToRecord(std::string address);
 
     QPointF getLeftGripPoint();
     QPointF getRightGripPoint();
-    void displayCurveEditWindow();
     bool hasStartMsgs(){ return _abstract->hasFirstMsgs(); }
     bool hasEndMsgs(){ return _abstract->hasLastMsgs(); }
     void drawMsgsIndicators(QPainter *painter);
     void updateFlexibility();
     void addToComboBox(QString address);
     QString currentText();
-    qreal currentZvalue(){ return _currentZvalue; }
     void lower(bool state);
     void changeColor(QColor color);
     QColor currentColor(){ return _color; }

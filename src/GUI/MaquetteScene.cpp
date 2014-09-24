@@ -1179,7 +1179,7 @@ MaquetteScene::findMother(const QPointF &topLeft, const QPointF &size)
 #endif
   map<unsigned int, ParentBox*>::iterator it;
   unsigned int motherID = ROOT_BOX_ID;
-  float motherZValue = std::numeric_limits<float>::min();
+
   QRectF childRect = QRectF(topLeft, QSize(size.x(), size.y())); /// \todo old TODO updated (by jC)
   for (it = parentBoxes.begin(); it != parentBoxes.end(); ++it) {
       QRectF mRect = QRectF(it->second->getTopLeft(), QSize(it->second->getSize().x(), it->second->getSize().y()));
@@ -1192,7 +1192,6 @@ MaquetteScene::findMother(const QPointF &topLeft, const QPointF &size)
           std::cerr << "MaquetteScene::findMother : newMother : " << it->first << std::endl;
 #endif
           motherID = it->first;
-          motherZValue = it->second->zValue();
         }
     }
   return motherID;
