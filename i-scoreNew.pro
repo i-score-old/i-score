@@ -87,7 +87,8 @@ headers/GUI/ConditionalRelation.hpp \
 headers/GUI/TriggerPointEdit.hpp \
 headers/IScoreApplication.hpp \
     headers/GUI/CurvesComboBox.hpp \
-    headers/DelayedDelete.h
+    headers/DelayedDelete.h \
+    headers/GlobalEventFilter.h
 
 SOURCES += src/main.cpp \
 src/data/AbstractBox.cpp \

@@ -55,6 +55,7 @@
 #include "MaquetteScene.hpp"
 #include "HeaderPanelWidget.hpp"
 
+class IScoreApplication;
 class MaquetteView;
 class AttributesEditor;
 class BasicBox;
@@ -78,6 +79,7 @@ class QDoubleSpinBox;
 class MainWindow : public QMainWindow
 {
   Q_OBJECT
+    friend class IScoreApplication;
 
   public:
     MainWindow();

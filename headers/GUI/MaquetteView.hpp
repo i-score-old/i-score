@@ -84,7 +84,9 @@ class MaquetteView : public QGraphicsView
     void emitPlayModeChanged();
     const QColor BACKGROUND_COLOR{60, 60, 60};
 
-  signals:
+    // To allow a key event when pressing space on another window
+    void sub_keyPressEvent(QKeyEvent *event);
+signals:
     void zoomChanged(float newValue);
     void playModeChanged();
     void sizeChanged();

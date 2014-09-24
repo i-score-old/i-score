@@ -65,6 +65,7 @@
 #include <vector>
 #include <string>
 
+
 class MaquetteView;
 class BasicBox;
 class AttributesEditor;
@@ -106,7 +107,7 @@ typedef enum { NO_RESIZE, HORIZONTAL_RESIZE, VERTICAL_RESIZE,
 class MaquetteScene : public QGraphicsScene
 
 {
-  Q_OBJECT
+    Q_OBJECT
 
   public:
     MaquetteScene(const QRectF & rect, AttributesEditor *palette);
