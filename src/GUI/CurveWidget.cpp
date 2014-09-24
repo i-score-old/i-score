@@ -257,11 +257,11 @@ CurveWidget::relativeCoordinates(const QPointF &point)
   float translatedY = pointY - _xAxisPos;
   float symetricalY = -translatedY;
   float finalY = symetricalY / (float)(_scaleY);
-
+/*
   qDebug() << "pointY : " << pointY
            << "height : " << height();
           // << "\nfinalY " << finalY ;
-
+*/
   return QPointF(finalX, finalY);
 }
 
