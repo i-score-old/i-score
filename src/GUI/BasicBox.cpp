@@ -312,6 +312,11 @@ BasicBox::createWidget()
   _comboBoxProxy->setWidget(_comboBox);
   _comboBoxProxy->setZValue(1);
   _boxContentWidget->setComboBox(_comboBox);
+
+  connect(_comboBox, &CurvesComboBox::clicked,
+		  this, &BasicBox::onComboBoxClicked);
+  connect(_comboBox, &CurvesComboBox::hid,
+		  this, &BasicBox::onComboBoxHidden);
 }
 
 BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
@@ -1967,7 +1972,18 @@ BasicBox::displayBoxDuration(){
 
     //Displays in the maquetteScene's bottom
     QString durationMsg = QString("box duration : %1").arg(duration);
-    maquetteScene()->displayMessage(durationMsg.toStdString(),INDICATION_LEVEL);
+	maquetteScene()->displayMessage(durationMsg.toStdString(),INDICATION_LEVEL);
+}
+
+void BasicBox::onComboBoxClicked()
+{
+	oldZValue = this->zValue();
+	this->setZValue(99);
+}
+
+void BasicBox::onComboBoxHidden()
+{
+	this->setZValue(oldZValue);
 }
 
 void BasicBox::cleanupRelations()

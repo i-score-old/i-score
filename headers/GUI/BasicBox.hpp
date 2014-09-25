@@ -725,7 +725,7 @@ class BasicBox : public QGraphicsObject
     std::map < BoxExtremity, std::map < unsigned int, Relation* > > _relations; //!< The relations.
     QList<ConditionalRelation *> _conditionalRelation;                          //!< The conditional relations attached.
     std::map<std::string, AbstractCurve*> _abstractCurves;                      //!< The Curves.
-    BoxWidget *_boxContentWidget{};
+	BoxWidget *_boxContentWidget{};
 
     QRectF _boxRect;
     QRectF _leftEar;
@@ -761,6 +761,12 @@ class BasicBox : public QGraphicsObject
     QPushButton *_endMenuButton{};
     QPushButton *_playButton{};
     QPushButton *_stopButton{};
+
+
+	qreal oldZValue{1};
+	public slots:
+		void onComboBoxClicked();
+		void onComboBoxHidden();
 
 private:
     // Check if the relations are still up to date with what is in the maquette, to prevent crashes

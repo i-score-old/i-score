@@ -35,6 +35,7 @@ void CurvesComboBox::showPopup()
 {
   shown = true;
   QComboBox::showPopup();
+  emit clicked();
 }
 
 
@@ -42,9 +43,10 @@ void CurvesComboBox::hidePopup()
 {
   shown = false;
   QComboBox::hidePopup();
+  emit hid();
 }
 
 bool CurvesComboBox::isShown() const
 {
-  return shown;
+	return shown;
 }
