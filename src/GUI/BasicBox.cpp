@@ -1860,7 +1860,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 {
     Q_UNUSED(widget);
     painter->setClipRect(option->exposedRect);//To increase performance
-    bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
+	bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
 
     //Set disabled the curve proxy when box not selected.
     _boxContentWidget->setCurveLowerStyle(_comboBox->currentText().toStdString(),!isSelected());
@@ -1934,14 +1934,27 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     //draw name
     if(width() > 100)
     {
-        painter->save();
-        painter->setPen(QPen(Qt::black));
+		painter->save();
+		painter->translate(0, 4);
+		painter->setPen(QPen(Qt::gray));
 
-        painter->translate(0,4);
-        painter->setPen(QPen(Qt::gray));
-        painter->drawText(QRectF(BOX_MARGIN*2, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
+		if(_hover || isSelected())
+			painter->drawText(QRectF(BOX_MARGIN * 2, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
+		else
+			painter->drawText(QRectF(0, 0, textRect.width(), textRect.height()), Qt::AlignHCenter, name());
         painter->restore();
     }
+	else
+	{
+		painter->save();
+
+		painter->translate(-5, -15);
+		painter->rotate(90);
+		painter->translate(-15, 10);
+		painter->setPen(QPen(Qt::gray));
+		painter->drawText(QPointF(BOX_MARGIN, 0),  name());
+		painter->restore();
+	}
     //draw progress bar during execution
     if (_playing) {
         QPen pen = painter->pen();
@@ -2050,32 +2063,14 @@ BasicBox::updateRecordingCurves(){
 void
 BasicBox::setButtonsVisible(bool value)
 {
-    if(width() > 230)
-        _comboBoxProxy->setVisible(value || _comboBox->isShown());
-    else
-        _comboBoxProxy->setVisible(false);
+	_comboBoxProxy->setVisible((value || _comboBox->isShown()) &&
+							   (width() > 180));
 
-    if(width() > 90)
-    {
-        _startMenuButton->setVisible(value);
-        _endMenuButton->setVisible(value);
-    }
-    else
-    {
-        _startMenuButton->setVisible(false);
-        _endMenuButton->setVisible(false);
-    }
+	_startMenuButton->setVisible(value);
+	_endMenuButton->setVisible(value && (width() > 90));
 
-    if(width() > 50)
-    {
-        _playButton->setVisible(!_playing && value);
-        _stopButton->setVisible(_playing && value);
-    }
-    else
-    {
-        _playButton->setVisible(false);
-        _stopButton->setVisible(false);
-    }
+	_playButton->setVisible((!_playing && value) && (width() > 50));
+	_stopButton->setVisible((_playing && value) && (width() > 50));
 }
 
 void
