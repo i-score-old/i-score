@@ -1059,6 +1059,19 @@ NetworkTree::brothersPartiallyChecked(QTreeWidgetItem *item, int column)
     }
 }
 
+
+bool itemExistsInTree(QTreeWidgetItem* parent, QTreeWidgetItem* toFind)
+{
+	bool found = false;
+	for( int i = 0; i < parent->childCount(); ++i )
+	{
+		if(parent->child(i) == toFind) return true;
+		else found |= itemExistsInTree(parent->child(i), toFind);
+	}
+
+	return found;
+}
+
 void
 NetworkTree::expandItems(QList<QTreeWidgetItem*>& expandedItems)
 {
@@ -1066,14 +1079,15 @@ NetworkTree::expandItems(QList<QTreeWidgetItem*>& expandedItems)
 
   for(QTreeWidgetItem* item : expandedItems)
   {
-      if(item)
-      {
+	  if(item && itemExistsInTree(this->invisibleRootItem(), item))
+	  {
           if(item->parent() && !item->parent()->isExpanded())
                expandItem(item->parent());
           expandItem(item);
       }
   }
 }
+
 
 void
 NetworkTree::clearOSCMessages()
@@ -1454,7 +1468,14 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
   // The ones that were expanded
   for(auto& addr : previouslyExpandedAddresses)
   {
-    _expandedItems.append(_addressMap.key(addr));
+	  if(std::find(_addressMap.begin(),
+				   _addressMap.end(),
+				   addr) != _addressMap.end())
+	  {
+		 const auto& tree_items = _addressMap.keys(addr);
+		 for(auto& item : tree_items)
+			_expandedItems.append(item);
+	  }
   }
 
   // The new ones
@@ -1465,8 +1486,11 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
           if(std::find(previousAddressMap.begin(),
                        previousAddressMap.end(),
                        addr) == previousAddressMap.end())
-              _expandedItems.append(_addressMap.key(addr));
-
+		  {
+			 const auto& tree_items = _addressMap.keys(addr);
+			 for(auto& item : tree_items)
+				_expandedItems.append(item);
+		  }
       }
   }
 
