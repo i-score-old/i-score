@@ -21,7 +21,10 @@ protected:
         if(event->type() == QEvent::KeyPress)
         {
             QKeyEvent* ev = static_cast<QKeyEvent*>(event);
-            if(ev->key() == Qt::Key_Space)
+			if(ev->key() == Qt::Key_Space ||
+			   ev->key() == Qt::Key_Comma ||
+			   ev->key() == Qt::Key_Enter ||
+			   ev->key() == Qt::Key_Period)
             {
                 _view->sub_keyPressEvent(ev);
                 return true;
