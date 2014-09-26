@@ -97,6 +97,11 @@ AttributesEditor::init()
   pal.setColor( QPalette::Background, QColor(60,60,60) );
   setPalette( pal );
   setAutoFillBackground( true );
+
+  connect(&_colorDialog, SIGNAL(currentColorChanged(QColor)),
+		  this, SLOT(currentColorSelectionChanged(QColor)));
+  connect(&_colorDialog, SIGNAL(rejected()),
+		  this, SLOT(revertColor()));
 }
 
 AttributesEditor::~AttributesEditor()
@@ -402,26 +407,44 @@ AttributesEditor::nameChanged()
   if (box != nullptr) {
       box->setName(_boxName->text());
       _scene->update(box->getTopLeft().x(), box->getTopLeft().y(), box->width(), box->height() + 10);
-    }
+  }
+}
+
+void AttributesEditor::currentColorSelectionChanged(const QColor& color)
+{
+	if (_boxEdited != NO_ID)
+	{
+		BasicBox * box = _scene->getBox(_boxEdited);
+
+		if (color.isValid())
+		{
+			_colorButtonPixmap->fill(color);
+			_generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
+			box->changeColor(color);
+		}
+	}
+}
+
+void AttributesEditor::revertColor()
+{
+	BasicBox * box = _scene->getBox(_boxEdited);
+	box->changeColor(_currentBoxOriginalColor);
+	_colorButtonPixmap->fill(_currentBoxOriginalColor);
+	_generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
 }
 
 void
 AttributesEditor::changeColor()
 {
-  if (_boxEdited != NO_ID) {
-      BasicBox * box = _scene->getBox(_boxEdited);
-
-      QColor color = QColorDialog::getColor(box->currentColor(), this);
-
-      if (color.isValid()) {
-          _colorButtonPixmap->fill(color);
-          _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
-          box->changeColor(color);
-        }
-    }
-  else {
-      _scene->displayMessage("No box selected", INDICATION_LEVEL);
-    }
+	if (_boxEdited != NO_ID)
+	{
+		_currentBoxOriginalColor = _scene->getBox(_boxEdited)->color();
+		_colorDialog.exec();
+	}
+	else
+	{
+		_scene->displayMessage("No box selected", INDICATION_LEVEL);
+	}
 }
 
 void

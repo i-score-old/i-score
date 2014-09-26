@@ -49,6 +49,7 @@
 
 #include <QDockWidget>
 #include <QString>
+#include <QColorDialog>
 
 class QButtonGroup;
 class QRadioButton;
@@ -201,6 +202,8 @@ class AttributesEditor : public QDockWidget
      * \brief Called when the name of the box is changed.
      */
     void nameChanged();
+	void currentColorSelectionChanged(const QColor& );
+	void revertColor();
 
   private:
     QWidget * _centralWidget;   //!< Central widget.
@@ -224,5 +227,8 @@ class AttributesEditor : public QDockWidget
 
     unsigned int _boxEdited;    //!< ID of box being edited
     MaquetteScene * _scene; //!< The maquetteScene related with.
+
+	QColorDialog _colorDialog{this};
+	QColor _currentBoxOriginalColor;
 };
 #endif
