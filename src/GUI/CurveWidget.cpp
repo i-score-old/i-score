@@ -81,12 +81,8 @@ CurveWidget::~CurveWidget() {}
 
 void
 CurveWidget::init()
-{    
-//    setAttribute(Qt::WA_PaintOnScreen,true);
-//    setWindowFlags(Qt::Window);
+{
   _abstract = new AbstractCurve(NO_ID, "", 0, 10, false, true, true, 1, vector<float>(), map<float, pair<float, float> >());
-
-//    setBackgroundRole(QPalette::Base);
 
   setCursor(Qt::CrossCursor);
   setMouseTracking(true);
@@ -257,11 +253,7 @@ CurveWidget::relativeCoordinates(const QPointF &point)
   float translatedY = pointY - _xAxisPos;
   float symetricalY = -translatedY;
   float finalY = symetricalY / (float)(_scaleY);
-/*
-  qDebug() << "pointY : " << pointY
-           << "height : " << height();
-          // << "\nfinalY " << finalY ;
-*/
+
   return QPointF(finalX, finalY);
 }
 
