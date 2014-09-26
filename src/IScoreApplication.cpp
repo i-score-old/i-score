@@ -6,7 +6,7 @@ void IScoreApplication::startWindow()
   win = new MainWindow();
   evf = new GlobalEventFilter(win->_view, win->_editor);
 
-  this->installEventFilter(evf);
+//  this->installEventFilter(evf);
 
   win->show();
   if(!loadString.isEmpty())

@@ -1309,21 +1309,37 @@ BasicBox::boxBody()
   return QRectF(_boxRect.topLeft() + QPointF(0, RESIZE_TOLERANCE), _boxRect.bottomRight());
 }
 
-void
-BasicBox::keyPressEvent(QKeyEvent *event)
+void BasicBox::keyPressEvent(QKeyEvent *event)
 {
-  QGraphicsObject::keyPressEvent(event);
-  if(event->key() == Qt::Key_R)
-  {
+    QGraphicsObject::keyPressEvent(event);
+
     CurveWidget *curve = dynamic_cast<CurveWidget *>(_boxContentWidget->stackedLayout()->currentWidget());
-    if(curve) curve->adaptScale();
-  }
+    if(curve)
+    {
+        if(event->key() == Qt::Key_R)
+        {
+            curve->adaptScale();
+        }
+        if(event->key() == Qt::Key_Control)
+        {
+            curve->keyPressEvent(event);
+        }
+    }
 }
 
 void
 BasicBox::keyReleaseEvent(QKeyEvent *event)
 {
   QGraphicsObject::keyReleaseEvent(event);
+
+  CurveWidget *curve = dynamic_cast<CurveWidget *>(_boxContentWidget->stackedLayout()->currentWidget());
+  if(curve)
+  {
+      if(event->key() == Qt::Key_Control)
+      {
+          curve->keyReleaseEvent(event);
+      }
+  }
 }
 
 void

@@ -151,6 +151,23 @@ void Engine::registerIscoreToProtocols()
     
     // launch OSC protocol communication
     aProtocol.send("Run");
+    
+    
+    TTLogMessage("\n*** Enable MIDI communication ***\n");
+    ////////////////////////////////////////////////////////////////////////
+    
+    // create a OSC protocol unit
+    err = m_applicationManager.send("ProtocolInstantiate", "MIDI", out);
+    
+    if (err) {
+        TTLogError("Error : can't create MIDI protocol unit \n");
+        return;
+    }
+    else
+        aProtocol = out[0];
+    
+    // launch MIDI protocol communication
+    aProtocol.send("Run");
 }
 
 void Engine::initScore(const char* pathToTheJamomaFolder)
