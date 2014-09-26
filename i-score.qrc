@@ -44,5 +44,6 @@
         <file>resources/translations/i-score_fr.qm</file>
         <file>resources/translations/i-score_en.qm</file>
         <file>resources/images/downArrow.png</file>
+        <file>resources/images/pen.png</file>
     </qresource>
 </RCC>

@@ -49,7 +49,11 @@
 
 #include <QWidget>
 #include <QPointF>
+#include <QPixmap>
+#include <QCursor>
+#include <QKeyEvent>
 
+#include <QGuiApplication>
 #include <map>
 #include <vector>
 #include <string>
@@ -65,10 +69,13 @@ class AbstractCurve;
  * \brief Widget handling curve.
  */
 
+class BasicBox;
+
 class CurveWidget : public QWidget
 {
   Q_OBJECT
 
+  friend class BasicBox;
   public:
     ~CurveWidget();
 
@@ -163,7 +170,31 @@ class CurveWidget : public QWidget
      * \brief This event handler can be reimplemented in a subclass to receive widget resize events which are passed in the event parameter.
      * \param event : the resizing event
      */
-    virtual void resizeEvent(QResizeEvent * event);  
+    virtual void resizeEvent(QResizeEvent * event);
+
+    virtual void keyPressEvent(QKeyEvent *ev)
+    {
+        QWidget::keyPressEvent(ev);
+        if(ev->key() == Qt::Key_Control)
+        {
+            qApp->setOverrideCursor(_penCursor);
+        }
+    }
+
+    virtual void keyReleaseEvent(QKeyEvent* ev)
+    {
+        QWidget::keyReleaseEvent(ev);
+        if(ev->key() == Qt::Key_Control)
+        {
+            qApp->restoreOverrideCursor();
+        }
+    }
+
+    virtual void leaveEvent(QEvent * ev)
+    {
+        QWidget::leaveEvent(ev);
+        qApp->restoreOverrideCursor();
+    }
 
   private:
     /*!
@@ -213,5 +244,7 @@ class CurveWidget : public QWidget
     float _lastPowSave;
 
     std::map<float, std::pair<float, float> > _savedMap;
+
+    const QCursor _penCursor{QPixmap(":/resources/images/pen.png")};
 };
 #endif /* CURVE_WIDGET_HPP */
