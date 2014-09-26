@@ -12,9 +12,9 @@
 #include <QPushButton>
 #include <QHostAddress>
 #include <QFileDialog>
+#include <NetworkUpdater.h>
 
 class MaquetteScene;
-
 /*!
  * \class DeviceEdit
  *
@@ -25,6 +25,7 @@ class DeviceEdit : public QDialog
 {
   Q_OBJECT
 
+		friend class NetworkUpdater;
   public:
     DeviceEdit(QWidget *parent);
     ~DeviceEdit();
@@ -88,5 +89,7 @@ class DeviceEdit : public QDialog
 
     QPushButton *_okButton;      //!< Button used to confirme.
     QPushButton *_cancelButton;  //!< Button used to cancel.
+
+	NetworkUpdater updater{this};
 };
 #endif // DEVICEEDIT_HPP

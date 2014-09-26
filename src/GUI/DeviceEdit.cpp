@@ -48,6 +48,8 @@ DeviceEdit::DeviceEdit(QWidget *parent)
 void
 DeviceEdit::init()
 {
+  connect(this, SIGNAL(accepted()),
+		  &updater, SLOT(update()));
   _changed = false;
   _nameChanged = false;  
   _protocolChanged = false;
@@ -114,8 +116,10 @@ DeviceEdit::init()
   connect(_openNamespaceFileButton, SIGNAL(clicked()), this, SLOT(openFileDialog()));
   connect(_namespaceFilePath, SIGNAL(textChanged(QString)), this, SLOT(setNamespacePathChanged()));
 
-  connect(_okButton, SIGNAL(clicked()), this, SLOT(updateNetworkConfiguration()));
+  connect(_okButton, SIGNAL(clicked()), this, SLOT(accept()));
   connect(_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+
+  connect(this, SIGNAL(accepted()), &updater, SLOT(update()));
 }
 
 DeviceEdit::~DeviceEdit()
@@ -260,72 +264,7 @@ DeviceEdit::setChanged()
 void
 DeviceEdit::updateNetworkConfiguration()
 {
-    //setModal(false);
-    if(_newDevice){
-        string          name = _nameEdit->text().toStdString(),
-                        ip   = _localHostBox->text().toStdString(),
-                        protocol = _protocolsComboBox->currentText().toStdString();
-        unsigned int    destinationPort = _portOutputBox->value(),
-                        receptionPort = _portInputBox->value();
 
-        _currentDevice = _nameEdit->text();
-        Maquette:: getInstance()->addNetworkDevice(name, protocol, ip, destinationPort, receptionPort);
-
-        emit(newDeviceAdded(_nameEdit->text())); //sent to networkTree
-
-        _newDevice = false;
-    }
-
-    else if (_changed) {
-        if (_nameChanged) {
-            Maquette::getInstance()->setDeviceName(_currentDevice.toStdString(), _nameEdit->text().toStdString());
-            emit(deviceNameChanged(_currentDevice, _nameEdit->text()));
-            _currentDevice = _nameEdit->text();
-        }
-        if (_localHostChanged) {
-            Maquette::getInstance()->setDeviceLocalHost(_currentDevice.toStdString(), _localHostBox->text().toStdString());
-        }
-        if (_networkPortChanged) {
-            Maquette::getInstance()->setDevicePort(_currentDevice.toStdString(), _portOutputBox->value(), _portInputBox->value());
-        }
-        if (_protocolChanged) {
-            Maquette::getInstance()->setDeviceProtocol(_currentDevice.toStdString(), _protocolsComboBox->currentText().toStdString());
-//            emit(deviceProtocolChanged(_protocolsComboBox->currentText()));
-        }
-        emit(deviceChanged(_currentDevice));
-    }
-
-
-    if(_namespacePathChanged){
-
-        //check if currentDevice ok
-        if(Maquette::getInstance()->isNetworkDeviceRequestable(_currentDevice.toStdString()) == 0){
-
-            //load
-            if(!Maquette::getInstance()->loadNetworkNamespace(_currentDevice.toStdString(),_namespaceFilePath->text().toStdString())){
-                emit(namespaceLoaded(_currentDevice));
-                _namespaceFilePath->clear();
-            }
-            else{
-                QMessageBox::warning(this, "", tr("Cannot load namespace file"));
-                reject();
-            }
-        }
-
-        else{
-            QMessageBox::warning(this, "", tr("Cannot load namespace file - please verify your device's parameters"));
-            reject();
-        }
-    }
-    accept();
-    close();
-
-    _changed = false;
-    _nameChanged = false;
-    _protocolChanged = false;
-    _localHostChanged = false;
-    _networkPortChanged = false;
-    _namespacePathChanged = false;
 }
 
 void
