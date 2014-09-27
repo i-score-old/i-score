@@ -434,8 +434,9 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 
             _abstract->_breakpoints = _savedMap;
 
-            _abstract->_breakpoints[static_cast<qreal>(relativePoint.x())] = std::make_pair<float, float>(static_cast<qreal>(_movingBreakpointY),
-                                                                                                          static_cast<qreal>(_lastPowSave));
+            _abstract->_breakpoints[static_cast<qreal>(relativePoint.x())] = 
+					std::make_pair<float, float>(static_cast<qreal>(_movingBreakpointY),
+												 static_cast<qreal>(_lastPowSave));
             curveChanged();
             update();
 
@@ -496,7 +497,8 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event)
               }
               else
               {
-                  Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (high range clipMode)").toStdString(), INDICATION_LEVEL);
+                  Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (high range clipMode)").toStdString(), 
+																   INDICATION_LEVEL);
               }
 
           }
@@ -513,7 +515,8 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event)
                   }
                   else
                   {
-                      Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (low range clipMode)").toStdString(), INDICATION_LEVEL);
+                      Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (low range clipMode)").toStdString(), 
+																	   INDICATION_LEVEL);
                   }
               }
           }
@@ -522,7 +525,9 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event)
           if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
               _abstract->_breakpoints.erase(it);
           }
-          _abstract->_breakpoints[static_cast<qreal>(relativePoint.x())] = std::make_pair<float, float>(static_cast<qreal>(_movingBreakpointY), static_cast<qreal>(_lastPowSave));
+          _abstract->_breakpoints[static_cast<qreal>(relativePoint.x())] = 
+				  std::make_pair<float, float>(static_cast<qreal>(_movingBreakpointY),
+											   static_cast<qreal>(_lastPowSave));
           curveChanged();
           update();
 
@@ -555,7 +560,13 @@ CurveWidget::curveChanged()
         sectionType.push_back(CURVE_POW);
     }
     
-    if (Maquette::getInstance()->setCurveSections(_abstract->_boxID, _abstract->_address, 0, xPercents, yValues, sectionType, coeff)) {
+    if (Maquette::getInstance()->setCurveSections(_abstract->_boxID, 
+												  _abstract->_address, 
+												  0, 
+												  xPercents, 
+												  yValues, 
+												  sectionType, 
+												  coeff)) {
         unsigned int sampleRate;
         bool redundancy, interpolate;
         vector<string> argTypes;
@@ -565,8 +576,32 @@ CurveWidget::curveChanged()
         sectionType.clear();
         coeff.clear();
 
-        if (Maquette::getInstance()->getCurveAttributes(_abstract->_boxID, _abstract->_address, 0, sampleRate, redundancy, interpolate, values, argTypes, xPercents, yValues, sectionType, coeff)) {
-            setAttributes(_abstract->_boxID, _abstract->_address, 0, values, sampleRate, redundancy, interpolate, _abstract->_show, argTypes, xPercents, yValues, sectionType, coeff);
+        if (Maquette::getInstance()->getCurveAttributes(_abstract->_boxID, 
+														_abstract->_address, 
+														0, 
+														sampleRate, 
+														redundancy, 
+														interpolate, 
+														values, 
+														argTypes, 
+														xPercents, 
+														yValues, 
+														sectionType, 
+														coeff)) {
+            setAttributes(_abstract->_boxID, 
+						  _abstract->_address, 
+						  0, 
+						  values, 
+						  sampleRate, 
+						  redundancy, 
+						  interpolate, 
+						  _abstract->_show, 
+						  argTypes, 
+						  xPercents, 
+						  yValues, 
+						  sectionType, 
+						  coeff);
+			
             update();
             return true;
         }
