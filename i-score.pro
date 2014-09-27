@@ -58,7 +58,9 @@ macx-clang {
 # Input
 HEADERS += /usr/local/jamoma/includes/TTScore.h \
 /usr/local/jamoma/includes/TTModular.h \
-/usr/local/jamoma/includes/TTDSP.h \
+/usr/local/jamoma/includes/TTDSP.h
+
+HEADERS += \
 headers/data/Abstract.hpp \
 headers/data/AbstractBox.hpp \
 headers/data/AbstractComment.hpp \
@@ -73,7 +75,6 @@ headers/GUI/AttributesEditor.hpp \
 headers/GUI/BasicBox.hpp \
 headers/GUI/Comment.hpp \
 headers/GUI/CurveWidget.hpp \
-headers/GUI/CurvesComboBox.hpp \
 headers/GUI/Help.hpp \
 headers/GUI/LogarithmicSlider.hpp \
 headers/GUI/MainWindow.hpp \
@@ -91,7 +92,10 @@ headers/GUI/HeaderPanelWidget.hpp \
 headers/GUI/ConditionalRelation.hpp \
 headers/GUI/TriggerPointEdit.hpp \
 headers/IScoreApplication.hpp \
-headers/DelayedDelete.h
+headers/GUI/CurvesComboBox.hpp \
+headers/DelayedDelete.h \
+headers/GlobalEventFilter.h \
+headers/GUI/NetworkUpdater.h
 
 SOURCES += src/main.cpp \
 src/data/AbstractBox.cpp \
@@ -107,7 +111,6 @@ src/GUI/AttributesEditor.cpp \
 src/GUI/BasicBox.cpp \
 src/GUI/Comment.cpp \
 src/GUI/CurveWidget.cpp \
-src/GUI/CurvesComboBox.cpp \
 src/GUI/Help.cpp \
 src/GUI/LogarithmicSlider.cpp \
 src/GUI/MainWindow.cpp \
@@ -122,6 +125,8 @@ src/GUI/BoxWidget.cpp \
 src/GUI/TimeBarWidget.cpp \
 src/GUI/DeviceEdit.cpp \
 src/GUI/HeaderPanelWidget.cpp \
-src/GUI/ConditionalRelation.cpp \ 
+src/GUI/ConditionalRelation.cpp \
 src/GUI/TriggerPointEdit.cpp \
-src/IScoreApplication.cpp
+src/IScoreApplication.cpp \
+src/GUI/CurvesComboBox.cpp \
+src/GUI/NetworkUpdater.cpp
