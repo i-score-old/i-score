@@ -5,14 +5,14 @@ NetworkUpdater::NetworkUpdater(DeviceEdit *parent) :
 	QObject(nullptr),
 	ed(parent)
 {
-	thrd.start();
-	this->moveToThread(&thrd);
+	//thrd.start();
+	//this->moveToThread(&thrd);
 }
 
 NetworkUpdater::~NetworkUpdater()
 {
-	thrd.quit();
-	thrd.wait();
+	//thrd.quit();
+	//thrd.wait();
 }
 
 void NetworkUpdater::update()

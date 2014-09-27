@@ -62,6 +62,9 @@ using std::make_pair;
 #include "CurveWidget.hpp"
 #include "AbstractCurve.hpp"
 #include "Maquette.hpp"
+#include "MaquetteScene.hpp"
+#include "AttributesEditor.hpp"
+#include "NetworkTree.hpp"
 
 #define BORDER_WIDTH 2.
 
@@ -201,7 +204,16 @@ CurveWidget::setAttributes(unsigned int boxID,
   for (it = values.begin(); it != values.end(); ++it) {
       _abstract->_curve.push_back(*it);
     }
+  
+  // Update the values in the NetworkTree
+  auto itemPtr = Maquette::getInstance()->scene()->editor()->networkTree()->getItemFromAddress(address);
 
+  if(itemPtr)
+  {
+	  itemPtr->setText(NetworkTree::START_COLUMN, QString::number(*values.begin()));
+	  itemPtr->setText(NetworkTree::END_COLUMN, QString::number(*(--values.end())));
+  }
+  
   for (unsigned int i = 0; i < xPercents.size(); ++i) {
       _abstract->_breakpoints[xPercents[i] / 100.] = pair<float, float>(yValues[i], coeff[i]);
     }

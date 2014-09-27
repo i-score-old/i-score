@@ -438,6 +438,10 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
   rootNode->insertChild(rootNode->childCount() - 1, newItem);
   QString address = getAbsoluteAddress(newItem);
   _OSCMessages.insert(newItem, address);
+  
+  refreshItemNamespace(newItem);
+  if(newItem->parent())
+	  expandItem(newItem->parent());
 
   //Edits automatically the new item's name.
 //  Maquette::getInstance()->appendToNetWorkNamespace(address.toStdString()); crash
@@ -1481,6 +1485,10 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
       if(updateBoxes)
         Maquette::getInstance()->updateBoxesAttributes();
     }
+	else if(item->type() == OSCNode)
+	{
+		treeRecursiveExploration(item, true);
+	}
   }
 
   // Restore the addresses
