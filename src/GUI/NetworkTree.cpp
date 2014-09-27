@@ -369,58 +369,6 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
 }
 
 void
-NetworkTree::createItemsFromMessages(QList<QString> messageslist)
-{
-  QString curMsg;
-  for (QList<QString>::iterator it = messageslist.begin(); it != messageslist.end(); it++) {
-      curMsg = *it;
-      createItemFromMessage(curMsg);
-    }
-}
-
-void
-NetworkTree::createItemFromMessage(QString message)
-{
-  QStringList splitMessage = message.split("/");
-  QStringList name;
-  QList<QTreeWidgetItem *>  itemsFound;
-  QStringList::iterator it = splitMessage.begin();
-  QString device = *it;
-
-  int nodeType = DeviceNode;
-  itemsFound = findItems(device, Qt::MatchRecursive);
-  if (!itemsFound.isEmpty()) {
-      if (itemsFound.size() > 1) {
-          std::cerr << "NetworkTree::createItemFromMessage : device name conflict" << std::endl;
-          return;
-        }
-    }
-  else {
-      std::cerr << "NetworkTree::createItemFromMessage : Unknown device" << std::endl;
-      return;
-    }
-
-  QTreeWidgetItem *father = itemsFound.first();
-
-  //***************** change that, plutôt donner en paramètre un cas OSC ?
-  map<string, MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
-  map<string, MyDevice>::iterator it2 = devices.find(device.toStdString());
-
-  if (it2 != devices.end() && it2->second.plugin == "OSC") {
-      nodeType = OSCNode;
-      addOSCMessage(father, *(++it));
-    }
-  else {
-      //****************************************************************
-      for (++it; it != splitMessage.end(); it++) {
-          name << *it;
-          QTreeWidgetItem *newItem = new QTreeWidgetItem(father, name, nodeType);
-          father = newItem;
-        }
-    }
-}
-
-void
 NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
 {
   rootNode->setCheckState(START_ASSIGNATION_COLUMN, Qt::Unchecked);
@@ -436,7 +384,6 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
   _OSCMessages.insert(newItem, address);
   
   
-  
   refreshItemNamespace(newItem);
   if(newItem->parent())
 	  expandItem(newItem->parent());
@@ -444,34 +391,12 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
   //Edits automatically the new item's name.
 //  Maquette::getInstance()->appendToNetWorkNamespace(address.toStdString()); crash
   NAME_MODIFIED = true;
-  editItem(newItem, NAME_COLUMN);
   newItem->setForeground(NAME_COLUMN, Qt::darkGray);
   newItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
   newItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
   newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
-}
-
-void
-NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode, QString message)
-{
-  rootNode->setCheckState(START_ASSIGNATION_COLUMN, Qt::Unchecked);
-  rootNode->setCheckState(END_ASSIGNATION_COLUMN, Qt::Unchecked);
-
-  QStringList OSCname = QStringList(message);
-
-  QTreeWidgetItem *newItem = new QTreeWidgetItem(OSCname, OSCNode);
-  _OSCMessages.insert(newItem, getAbsoluteAddress(newItem));
-  rootNode->insertChild(rootNode->childCount() - 1, newItem);
   
-  refreshItemNamespace(newItem);
-  if(newItem->parent())
-	  expandItem(newItem->parent());
-  
-  newItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
-  newItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
-  newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
-  
-  newItem->setForeground(NAME_COLUMN, Qt::darkGray);
+  editItem(newItem, NAME_COLUMN);
 }
 
 void
@@ -2168,14 +2093,6 @@ NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue)
 /***********************************************************************
 *                              Curves
 ***********************************************************************/
-
-void
-NetworkTree::assignOCSMsg(QTreeWidgetItem *item)
-{
-  QFont font = item->font(NAME_COLUMN);
-  font.setBold(true);
-  item->setFont(NAME_COLUMN, font);
-}
 
 unsigned int
 NetworkTree::getSampleRate(QTreeWidgetItem *item)
