@@ -236,7 +236,7 @@ BasicBox::createMenus()
     _stopButton->setStyleSheet(_pushButtonStyle);
 
 	// Mute
-	_muteButton = new QPushButton(_muteOffIcon, "");
+	_muteButton = new QPushButton(_muteOffIcon, "&");
 	_muteButton->setStyleSheet(_pushButtonStyle);
 	_muteButton->setCheckable(true);
 	
@@ -2016,9 +2016,8 @@ void BasicBox::onComboBoxHidden()
 	this->setZValue(oldZValue);
 }
 
-void BasicBox::toggleMuteButton(bool value)
+void BasicBox::toggleMuteButton(bool )
 {
-	_mute != value;
 	_scene->muteBoxes();
 }
 
