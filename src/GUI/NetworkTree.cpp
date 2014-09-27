@@ -391,7 +391,7 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
   //Edits automatically the new item's name.
 //  Maquette::getInstance()->appendToNetWorkNamespace(address.toStdString()); crash
   NAME_MODIFIED = true;
-  newItem->setForeground(NAME_COLUMN, Qt::darkGray);
+  newItem->setForeground(NAME_COLUMN, Qt::lightGray);
   newItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
   newItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
   newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
@@ -661,7 +661,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
          curFont.setItalic(false);
          curItem->setFont(NAME_COLUMN,curFont);
 
-         QBrush brush(Qt::lightGray);
+         QBrush brush(Qt::white);
          curItem->setForeground(NAME_COLUMN, brush);
          curItem->setForeground(VALUE_COLUMN, brush);
 
@@ -695,7 +695,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                  curFont.setItalic(true);
                  curItem->setFont(NAME_COLUMN,curFont);
 
-                 QBrush brush(Qt::darkGray);
+                 QBrush brush(Qt::lightGray);
                  curItem->setForeground(NAME_COLUMN, brush);
                  curItem->setForeground(VALUE_COLUMN, brush);
 
@@ -746,7 +746,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                      curFont.setItalic(true);
                      curItem->setFont(NAME_COLUMN,curFont);
 
-                     QBrush brush(Qt::darkGray);
+                     QBrush brush(Qt::lightGray);
                      curItem->setForeground(NAME_COLUMN, brush);
                      curItem->setForeground(VALUE_COLUMN, brush);
 
