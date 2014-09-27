@@ -1417,6 +1417,12 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
       treeRecursiveExploration(item,true);
       if(updateBoxes)
         Maquette::getInstance()->updateBoxesAttributes();
+	  
+	  std::string protocol;
+	  Maquette::getInstance()->getDeviceProtocol(item->text(0).toStdString(),protocol);
+	  
+      if(protocol=="OSC")
+          createOSCBranch(item);
     }
 	else if(item->type() == OSCNode)
 	{
@@ -1455,6 +1461,7 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
 		  }
       }
   }
+  
 
   expandItems(_expandedItems);
 }
