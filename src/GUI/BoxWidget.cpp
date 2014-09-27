@@ -559,11 +559,16 @@ void BoxWidget::play()
 void
 BoxWidget::stop()
 {
-    QList<unsigned int> boxesId;
-    boxesId << _boxID;
+//    QList<unsigned int> boxesId;
+//    boxesId << _boxID;
 
-    _box->maquetteScene()->stopOrPause(boxesId);
+	_box->maquetteScene()->stopOrPause({_boxID});
     _box->updatePlayingModeButtons();
+}
+
+void BoxWidget::mute()
+{
+	
 }
 
 void

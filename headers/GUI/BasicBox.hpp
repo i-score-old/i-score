@@ -761,12 +761,18 @@ class BasicBox : public QGraphicsObject
     QPushButton *_endMenuButton{};
     QPushButton *_playButton{};
     QPushButton *_stopButton{};
+	QPushButton *_muteButton{};
+	const QIcon _muteOffIcon{":/resources/images/Mute.png"};
+	const QIcon _muteOnIcon{":/resources/images/MuteOn.png"};
 
 
 	qreal oldZValue{1};
+	
+	QString _pushButtonStyle;
 	public slots:
 		void onComboBoxClicked();
 		void onComboBoxHidden();
+		void toggleMuteButton(bool value);
 
 private:
     // Check if the relations are still up to date with what is in the maquette, to prevent crashes

@@ -1013,7 +1013,7 @@ MaquetteScene::muteBoxes()
     {
         if (curItem->type() == PARENT_BOX_TYPE)
         {
-            if(auto curBox = dynamic_cast<ParentBox*>(curItem))
+            if(ParentBox* curBox = dynamic_cast<ParentBox*>(curItem))
             {
                 curBox->setMuteState(!curBox->getMuteState());
             }

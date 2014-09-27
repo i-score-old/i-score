@@ -106,6 +106,14 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 {    
 
   _scene = parent;
+  
+  QFile pb_ss_file(":/resources/stylesheets/BasicBox/push_button.qss");
+  if(!pb_ss_file.open(QIODevice::ReadOnly | QIODevice::Text))
+  {
+	  qDebug("Cannot read the pushbutton stylesheet");
+	  return;
+  }
+  _pushButtonStyle = pb_ss_file.readAll();
 
   /// \todo : !! Problème d'arrondi, on cast en int des floats !! A étudier parce que crash (avec 0 notamment) si on remet en float. NH
   int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
@@ -153,10 +161,16 @@ BasicBox::centerWidget()
         _endMenuButton->move((width()) / 2 + 2 * LINE_WIDTH - BOX_MARGIN, -(height()) / 2 + LINE_WIDTH);
 
     if(_playButton != nullptr)
-        _playButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN-4, -(height()) / 2);
+        _playButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN + 16, 
+						  -(height()) / 2);
 
     if(_stopButton != nullptr)
-        _stopButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN-4, -(height()) / 2);
+        _stopButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN + 16, 
+						  -(height()) / 2);
+	
+	if(_muteButton)
+		_muteButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN-4, 
+						  -(height()) / 2);
 }
 
 void
@@ -187,20 +201,14 @@ BasicBox::createMenus()
   _endMenu->setWindowModality(Qt::ApplicationModal);
   _endMenu->addAction(_jumpToEndCue);
   _endMenu->addAction(_updateEndCue);
-
+  
   //--- start button ---
   QIcon startMenuIcon(":/resources/images/boxStartMenu.svg");
   _startMenuButton = new QPushButton();
   _startMenuButton->setIcon(startMenuIcon);
   _startMenuButton->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  _startMenuButton->setStyleSheet(
-    "QPushButton {"
-    "border: none;"
-    "border-radius: none;"
-    "background-color: transparent;"
-    "};"
-    );
+  _startMenuButton->setStyleSheet(_pushButtonStyle);
   if(_boxContentWidget != nullptr)
       _boxContentWidget->setStartMenu(_startMenu);
 
@@ -209,13 +217,7 @@ BasicBox::createMenus()
   _endMenuButton = new QPushButton();
   _endMenuButton->setIcon(endMenuIcon);
   _endMenuButton->setShortcutEnabled(1, false);
-  _endMenuButton->setStyleSheet(
-    "QPushButton {"
-    "border: none;"
-    "border-radius: none;"
-    "background-color: transparent;"
-    "}"
-    );
+  _endMenuButton->setStyleSheet(_pushButtonStyle);
   if(_boxContentWidget != nullptr)
       _boxContentWidget->setEndMenu(_endMenu);
 
@@ -224,27 +226,20 @@ BasicBox::createMenus()
   _playButton= new QPushButton();
   _playButton->setIcon(playIcon);
   _playButton->setShortcutEnabled(1, false);
-  _playButton->setStyleSheet(
-    "QPushButton {"
-    "border: none;"
-    "border-radius: none;"
-    "background-color: transparent;"
-    "}"
-    );
-
+  _playButton->setStyleSheet(_pushButtonStyle);
+  
 //  Stop
     QIcon stopIcon(":/resources/images/stopSimple.svg");
     _stopButton= new QPushButton();
     _stopButton->setIcon(stopIcon);
     _stopButton->setShortcutEnabled(1, false);
-    _stopButton->setStyleSheet(
-      "QPushButton {"
-      "border: none;"
-      "border-radius: none;"
-      "background-color: transparent;"
-      "}"
-      );
+    _stopButton->setStyleSheet(_pushButtonStyle);
 
+	// Mute
+	_muteButton = new QPushButton(_muteOffIcon, "");
+	_muteButton->setStyleSheet(_pushButtonStyle);
+	_muteButton->setCheckable(true);
+	
   QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
   startMenuProxy->setWidget(_startMenuButton);
   QGraphicsProxyWidget *endMenuProxy = new QGraphicsProxyWidget(this);
@@ -253,6 +248,8 @@ BasicBox::createMenus()
   playProxy->setWidget(_playButton);
   QGraphicsProxyWidget *stopProxy = new QGraphicsProxyWidget(this);
   stopProxy->setWidget(_stopButton);
+  QGraphicsProxyWidget *muteProxy = new QGraphicsProxyWidget(this);
+  muteProxy->setWidget(_muteButton);
 
   connect(_startMenuButton, SIGNAL(clicked()), _boxContentWidget, SLOT(execStartAction()));
   connect(_endMenuButton, SIGNAL(clicked()), _boxContentWidget, SLOT(execEndAction()));
@@ -260,6 +257,8 @@ BasicBox::createMenus()
   connect(_endMenuButton, SIGNAL(customContextMenuRequested(QPoint)), _boxContentWidget, SLOT(displayEndMenu(QPoint)));
   connect(_playButton, SIGNAL(clicked()), _boxContentWidget, SLOT(play()));
   connect(_stopButton, SIGNAL(clicked()), _boxContentWidget, SLOT(stop()));
+  connect(_muteButton, &QPushButton::toggled, 
+		  this,		   &BasicBox::toggleMuteButton);
 }
 
 void
@@ -347,6 +346,7 @@ BasicBox::~BasicBox()
   _startMenuButton->deleteLater();
   _endMenuButton->deleteLater();
   _playButton->deleteLater();
+  _muteButton->deleteLater();
   _stopButton->deleteLater();
 
   _jumpToStartCue->deleteLater();
@@ -1888,6 +1888,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         _startMenuButton->setVisible(false);
         _endMenuButton->setVisible(false);
         _stopButton->setVisible(true);
+		_muteButton->setVisible(true);
     }
     else{
         setButtonsVisible(_hover || isSelected());
@@ -1948,10 +1949,10 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     painter->fillRect(0, 0, textRect.width(), textRect.height(), isSelected() ? _color : _colorUnselected);
 
     //draw name
-    if(width() > 100)
+    if(width() > 120)
     {
 		painter->save();
-		painter->translate(0, 4);
+		painter->translate(20, 4);
 		painter->setPen(QPen(Qt::gray));
 
 		if(_hover || isSelected())
@@ -2015,6 +2016,12 @@ void BasicBox::onComboBoxHidden()
 	this->setZValue(oldZValue);
 }
 
+void BasicBox::toggleMuteButton(bool value)
+{
+	_mute != value;
+	_scene->muteBoxes();
+}
+
 void BasicBox::cleanupRelations()
 {
   for(auto& extremity : _relations)
@@ -2050,6 +2057,9 @@ BasicBox::setMuteState(bool activated){
     Maquette::getInstance()->setBoxMuteState(ID(),_mute);
     Maquette::getInstance()->setStartEventMuteState(ID(),_mute);
     Maquette::getInstance()->setEndEventMuteState(ID(),_mute);
+	
+	_muteButton->setIcon(_mute? _muteOnIcon : _muteOffIcon);
+	
     update();
 }
 
@@ -2085,8 +2095,9 @@ BasicBox::setButtonsVisible(bool value)
 	_startMenuButton->setVisible(value);
 	_endMenuButton->setVisible(value && (width() > 90));
 
-	_playButton->setVisible((!_playing && value) && (width() > 50));
-	_stopButton->setVisible((_playing && value) && (width() > 50));
+	_playButton->setVisible((!_playing && value) && (width() > 70));
+	_stopButton->setVisible((_playing && value) && (width() > 70));
+	_muteButton->setVisible(value && (width() > 50));
 }
 
 void

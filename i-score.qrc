@@ -45,5 +45,8 @@
         <file>resources/translations/i-score_en.qm</file>
         <file>resources/images/downArrow.png</file>
         <file>resources/images/pen.png</file>
+        <file>resources/images/Mute.png</file>
+        <file>resources/images/MuteOn.png</file>
+        <file>resources/stylesheets/BasicBox/push_button.qss</file>
     </qresource>
 </RCC>
