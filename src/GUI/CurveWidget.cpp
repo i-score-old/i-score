@@ -316,10 +316,8 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
                   _movingBreakpointX = it->first;
                   _movingBreakpointY = it->second.first;
                   _lastPowSave = it->second.second;
-                  auto it = _abstract->_breakpoints.find(_movingBreakpointX);
-                  if (it != _abstract->_breakpoints.end() && // Exists
-					  it != _abstract->_breakpoints.begin() && // Not an event breakpoint 
-					  it != _abstract->_breakpoints.end()--)
+                  map<float, pair<float, float> >::iterator it;
+                  if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end())
                   {
                       _abstract->_breakpoints.erase(it);
                   }
