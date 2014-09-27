@@ -280,7 +280,7 @@ NetworkTree::load()
 
       Maquette::getInstance()->getDeviceProtocol(deviceName.toStdString(),protocol);
       if(protocol=="OSC")
-          createOCSBranch(curItem);
+          createOSCBranch(curItem);
     }
 
   itemsList<<_addADeviceItem;
@@ -431,13 +431,11 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
   QStringList OSCname = QStringList(name);
 
   QTreeWidgetItem *newItem = new QTreeWidgetItem(OSCname, OSCNode);
-  newItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
-  newItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
-  newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
-
   rootNode->insertChild(rootNode->childCount() - 1, newItem);
   QString address = getAbsoluteAddress(newItem);
   _OSCMessages.insert(newItem, address);
+  
+  
   
   refreshItemNamespace(newItem);
   if(newItem->parent())
@@ -447,6 +445,10 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
 //  Maquette::getInstance()->appendToNetWorkNamespace(address.toStdString()); crash
   NAME_MODIFIED = true;
   editItem(newItem, NAME_COLUMN);
+  newItem->setForeground(NAME_COLUMN, Qt::darkGray);
+  newItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
+  newItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
+  newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
 }
 
 void
@@ -458,12 +460,18 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode, QString message)
   QStringList OSCname = QStringList(message);
 
   QTreeWidgetItem *newItem = new QTreeWidgetItem(OSCname, OSCNode);
+  _OSCMessages.insert(newItem, getAbsoluteAddress(newItem));
+  rootNode->insertChild(rootNode->childCount() - 1, newItem);
+  
+  refreshItemNamespace(newItem);
+  if(newItem->parent())
+	  expandItem(newItem->parent());
+  
   newItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
   newItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
   newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
-
-  rootNode->insertChild(rootNode->childCount() - 1, newItem);
-  _OSCMessages.insert(newItem, getAbsoluteAddress(newItem));
+  
+  newItem->setForeground(NAME_COLUMN, Qt::darkGray);
 }
 
 void
@@ -532,7 +540,7 @@ NetworkTree::loadNetworkTree(AbstractBox *abBox)
 
 
 void
-NetworkTree::createOCSBranch(QTreeWidgetItem *curItem)
+NetworkTree::createOSCBranch(QTreeWidgetItem *curItem)
 {    
   QTreeWidgetItem *addANodeItem = new QTreeWidgetItem(QStringList(OSC_ADD_NODE_TEXT), addOSCNode);
   addANodeItem->setFlags(Qt::ItemIsEnabled);
@@ -2373,7 +2381,7 @@ void NetworkTree::addNewDevice(QString deviceName)
     string protocol;
     Maquette::getInstance()->getDeviceProtocol(deviceName.toStdString(),protocol);    
     if(protocol=="OSC")
-        createOCSBranch(newItem);
+        createOSCBranch(newItem);
 }
 
 void
@@ -2383,7 +2391,7 @@ NetworkTree::updateDeviceProtocol(QString newName)
   QTreeWidgetItem *item = currentItem();
   if (newName == "OSC") {
       item->takeChildren();
-      createOCSBranch(item);
+      createOSCBranch(item);
     }
   else if (newName == "Minuit") {
       item->takeChildren();

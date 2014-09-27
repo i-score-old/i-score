@@ -439,7 +439,7 @@ class NetworkTree : public QTreeWidget
 
   private:
     void treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict);
-    void createOCSBranch(QTreeWidgetItem *curItem);
+    void createOSCBranch(QTreeWidgetItem *curItem);
     QTreeWidgetItem *addADeviceNode();
 
     /*!
