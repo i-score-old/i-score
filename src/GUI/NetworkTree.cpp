@@ -130,11 +130,22 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   connect(this, SIGNAL(endValueChanged(QTreeWidgetItem*, QString)), this, SLOT(changeEndValue(QTreeWidgetItem*, QString)));
   connect(this,SIGNAL(itemExpanded(QTreeWidgetItem*)),this, SLOT(addToExpandedItems(QTreeWidgetItem*)));
   connect(this,SIGNAL(itemCollapsed(QTreeWidgetItem*)),this, SLOT(removeFromExpandedItems(QTreeWidgetItem*)));
-  connect(_deviceEdit, SIGNAL(deviceChanged(QString)), this, SLOT(refreshCurrentItemNamespace()));
-  connect(_deviceEdit, SIGNAL(deviceNameChanged(QString,QString)), this, SLOT(updateDeviceName(QString, QString)));
-  connect(_deviceEdit, SIGNAL(deviceProtocolChanged(QString)), this, SLOT(updateDeviceProtocol(QString)));
-  connect(_deviceEdit, SIGNAL(newDeviceAdded(QString)), this, SLOT(addNewDevice(QString)));
-  connect(_deviceEdit, SIGNAL(namespaceLoaded(QString)), this, SLOT(updateDeviceNamespace(QString)));
+  
+  connect(_deviceEdit, SIGNAL(deviceChanged(QString)), 
+		  this,		   SLOT(refreshCurrentItemNamespace()), Qt::DirectConnection);
+  connect(_deviceEdit, SIGNAL(deviceNameChanged(QString,QString)), 
+		  this,		   SLOT(updateDeviceName(QString, QString)), Qt::DirectConnection);
+  connect(_deviceEdit, SIGNAL(deviceProtocolChanged(QString)), 
+		  this,		   SLOT(updateDeviceProtocol(QString)), Qt::DirectConnection);
+  connect(_deviceEdit, SIGNAL(newDeviceAdded(QString)), 
+		  this,		   SLOT(addNewDevice(QString)), Qt::DirectConnection);
+  connect(_deviceEdit, SIGNAL(namespaceLoaded(QString)), 
+		  this,		   SLOT(updateDeviceNamespace(QString)), Qt::DirectConnection);
+  
+  connect(_deviceEdit, &DeviceEdit::disableTree,
+		  this,		   &NetworkTree::disable, Qt::DirectConnection);
+  connect(_deviceEdit, &DeviceEdit::enableTree,
+		  this,		   &NetworkTree::enable, Qt::DirectConnection);
 
   _addADeviceItem = addADeviceNode();
   addTopLevelItem(_addADeviceItem);
@@ -235,6 +246,16 @@ NetworkTree::clear()
   _OSCMessageCount = 0;
 
   QTreeWidget::clear();
+}
+
+void NetworkTree::enable()
+{
+	setEnabled(true);
+}
+
+void NetworkTree::disable()
+{
+	setEnabled(false);
 }
 
 void

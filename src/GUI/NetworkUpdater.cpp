@@ -17,6 +17,7 @@ NetworkUpdater::~NetworkUpdater()
 
 void NetworkUpdater::update()
 {
+	emit disableTree();
 	//setModal(false);
 	if(ed->_newDevice){
 		string          name = ed->_nameEdit->text().toStdString(),
@@ -27,7 +28,7 @@ void NetworkUpdater::update()
 
 		ed->_currentDevice = ed->_nameEdit->text();
 		Maquette:: getInstance()->addNetworkDevice(name, protocol, ip, destinationPort, receptionPort);
-		emit ed->newDeviceAdded(ed->_nameEdit->text()); //sent to networkTree
+		emit newDeviceAdded(ed->_nameEdit->text()); //sent to networkTree
 
 		ed->_newDevice = false;
 	}
@@ -35,7 +36,7 @@ void NetworkUpdater::update()
 	else if (ed->_changed) {
 		if (ed->_nameChanged) {
 			Maquette::getInstance()->setDeviceName(ed->_currentDevice.toStdString(), ed->_nameEdit->text().toStdString());
-			emit(ed->deviceNameChanged(ed->_currentDevice, ed->_nameEdit->text()));
+			emit(deviceNameChanged(ed->_currentDevice, ed->_nameEdit->text()));
 			ed->_currentDevice = ed->_nameEdit->text();
 		}
 		if (ed->_localHostChanged) {
@@ -48,7 +49,7 @@ void NetworkUpdater::update()
 			Maquette::getInstance()->setDeviceProtocol(ed->_currentDevice.toStdString(), ed->_protocolsComboBox->currentText().toStdString());
 //            emit(deviceProtocolChanged(_protocolsComboBox->currentText()));
 		}
-		emit ed->deviceChanged(ed->_currentDevice);
+		emit deviceChanged(ed->_currentDevice);
 	}
 
 
@@ -59,7 +60,7 @@ void NetworkUpdater::update()
 
 			//load
 			if(!Maquette::getInstance()->loadNetworkNamespace(ed->_currentDevice.toStdString(),ed->_namespaceFilePath->text().toStdString())){
-				emit ed->namespaceLoaded(ed->_currentDevice);
+				emit namespaceLoaded(ed->_currentDevice);
 				ed->_namespaceFilePath->clear();
 			}
 			else{
@@ -78,4 +79,6 @@ void NetworkUpdater::update()
 	ed->_localHostChanged = false;
 	ed->_networkPortChanged = false;
 	ed->_namespacePathChanged = false;
+	
+	emit enableTree();
 }

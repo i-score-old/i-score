@@ -572,5 +572,8 @@ public slots:
     void removeFromExpandedItems(QTreeWidgetItem *item);
 
     virtual void clear();
+	
+	void enable();
+	void disable();
 };
 #endif /* NETWORKTREE_HPP_ */

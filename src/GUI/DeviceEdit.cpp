@@ -120,6 +120,23 @@ DeviceEdit::init()
   connect(_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   connect(this, SIGNAL(accepted()), &updater, SLOT(update()));
+  
+  
+  connect(&updater, &NetworkUpdater::deviceChanged,
+		  this,		&DeviceEdit::deviceChanged, Qt::DirectConnection);
+  connect(&updater, &NetworkUpdater::newDeviceAdded,
+		  this,		&DeviceEdit::newDeviceAdded, Qt::DirectConnection);
+  connect(&updater, &NetworkUpdater::namespaceLoaded,
+		  this,		&DeviceEdit::namespaceLoaded, Qt::DirectConnection);
+  connect(&updater, &NetworkUpdater::deviceNameChanged,
+		  this,		&DeviceEdit::deviceNameChanged, Qt::DirectConnection);
+  connect(&updater, &NetworkUpdater::deviceProtocolChanged,
+		  this,		&DeviceEdit::deviceProtocolChanged, Qt::DirectConnection);
+  
+  connect(&updater,  &NetworkUpdater::enableTree,
+		  this,		&DeviceEdit::enableTree, Qt::DirectConnection);
+  connect(&updater,  &NetworkUpdater::disableTree,
+		  this,		&DeviceEdit::disableTree, Qt::DirectConnection);
 }
 
 DeviceEdit::~DeviceEdit()
