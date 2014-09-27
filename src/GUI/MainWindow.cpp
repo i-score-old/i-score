@@ -660,10 +660,10 @@ MainWindow::createMenus()
   _viewMenu->addAction(_zoomInAct);
   _viewMenu->addAction(_editorAct);
 
-//  _helpMenu = _menuBar->addMenu(tr("&Help"));
-//  _helpMenu->addAction(_aboutAct);
-//  _helpMenu->addSeparator();
-//  _helpMenu->addAction(_helpAct);
+  _helpMenu = _menuBar->addMenu(tr("&Help"));
+  _helpMenu->addAction(_aboutAct);
+  _helpMenu->addSeparator();
+  _helpMenu->addAction(_helpAct);
 }
 
 void
