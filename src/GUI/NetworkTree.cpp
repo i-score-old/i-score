@@ -70,8 +70,8 @@ int NetworkTree::MIN_COLUMN = 10;
 int NetworkTree::MAX_COLUMN = 11;
 unsigned int NetworkTree::PRIORITY_COLUMN = 12;
 
-const QColor NetworkTree::TEXT_COLOR = QColor(100, 100, 100);
-const QColor NetworkTree::TEXT_DISABLED_COLOR = QColor(50, 50, 50);
+const QColor NetworkTree::TEXT_COLOR = QColor(200, 200, 200);
+const QColor NetworkTree::TEXT_DISABLED_COLOR = QColor(100, 100, 100);
 
 QString NetworkTree::OSC_ADD_NODE_TEXT = QString("Add a node");
 QString NetworkTree::ADD_A_DEVICE_TEXT = QString("Add a device");
@@ -758,7 +758,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                  curFont.setItalic(true);
                  curItem->setFont(NAME_COLUMN,curFont);
 
-                 QBrush brush(Qt::black);
+                 QBrush brush(Qt::darkGray);
                  curItem->setForeground(NAME_COLUMN, brush);
                  curItem->setForeground(VALUE_COLUMN, brush);
 
@@ -809,7 +809,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                      curFont.setItalic(true);
                      curItem->setFont(NAME_COLUMN,curFont);
 
-                     QBrush brush(Qt::black);
+                     QBrush brush(Qt::darkGray);
                      curItem->setForeground(NAME_COLUMN, brush);
                      curItem->setForeground(VALUE_COLUMN, brush);
 
