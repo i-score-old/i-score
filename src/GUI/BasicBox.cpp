@@ -1966,7 +1966,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 
 		painter->translate(-5, -15);
 		painter->rotate(90);
-		painter->translate(-15, 10);
+		painter->translate(20, -10);
 		painter->setPen(QPen(Qt::gray));
 		painter->drawText(QPointF(BOX_MARGIN, 0),  name());
 		painter->restore();
