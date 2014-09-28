@@ -463,15 +463,33 @@ NetworkTree::loadNetworkTree(AbstractBox *abBox)
   setEndMessages(endMsg);
 }
 
+bool checkPredicateInTree(QTreeWidgetItem* parent, std::function<bool(QTreeWidgetItem*)> fun)
+{
+	bool found = false;
+	for( int i = 0; i < parent->childCount(); ++i )
+	{
+		if(fun(parent->child(i))) return true;
+		else found |= checkPredicateInTree(parent->child(i), fun);
+	}
+
+	return found;
+}
 
 void
 NetworkTree::createOSCBranch(QTreeWidgetItem *curItem)
-{    
-  QTreeWidgetItem *addANodeItem = new QTreeWidgetItem(QStringList(OSC_ADD_NODE_TEXT), addOSCNode);
-  addANodeItem->setFlags(Qt::ItemIsEnabled);
-  addANodeItem->setIcon(0, QIcon(":/resources/images/addANode.png"));
-  curItem->addChild(addANodeItem);
-//  curItem->setFlags(Qt::ItemIsEnabled);
+{
+	// Check if current branch does not have a "Add a node"
+	bool already_exists = checkPredicateInTree(curItem, 
+											   [] (QTreeWidgetItem* item) 
+							{ return item->type() == addOSCNode;});
+	if(already_exists) return;
+	
+	// If so, add it
+	QTreeWidgetItem *addANodeItem = new QTreeWidgetItem(QStringList(OSC_ADD_NODE_TEXT), addOSCNode);
+	addANodeItem->setFlags(Qt::ItemIsEnabled);
+	addANodeItem->setIcon(0, QIcon(":/resources/images/addANode.png"));
+	curItem->addChild(addANodeItem);
+	//  curItem->setFlags(Qt::ItemIsEnabled);
 }
 
 QTreeWidgetItem *
@@ -1017,19 +1035,6 @@ NetworkTree::brothersPartiallyChecked(QTreeWidgetItem *item, int column)
     }
 }
 
-
-bool itemExistsInTree(QTreeWidgetItem* parent, QTreeWidgetItem* toFind)
-{
-	bool found = false;
-	for( int i = 0; i < parent->childCount(); ++i )
-	{
-		if(parent->child(i) == toFind) return true;
-		else found |= itemExistsInTree(parent->child(i), toFind);
-	}
-
-	return found;
-}
-
 void
 NetworkTree::expandItems(QList<QTreeWidgetItem*>& expandedItems)
 {
@@ -1037,7 +1042,10 @@ NetworkTree::expandItems(QList<QTreeWidgetItem*>& expandedItems)
 
   for(QTreeWidgetItem* item : expandedItems)
   {
-	  if(item && itemExistsInTree(this->invisibleRootItem(), item))
+	  if(item && checkPredicateInTree(this->invisibleRootItem(), [&item] (QTreeWidgetItem* node)
+					{
+						return node == item;
+					}))
 	  {
           if(item->parent() && !item->parent()->isExpanded())
                expandItem(item->parent());
