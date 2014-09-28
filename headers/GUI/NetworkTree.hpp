@@ -360,9 +360,7 @@ class NetworkTree : public QTreeWidget
      */
     void resetAssignedNodes();
     void addOSCMessage(QTreeWidgetItem *rootNode);
-    void addOSCMessage(QTreeWidgetItem *rootNode, QString message);
     void setOSCMessageName(QTreeWidgetItem *item, QString name);
-    void assignOCSMsg(QTreeWidgetItem *item);
     inline QMap<QTreeWidgetItem *, QString> OSCMessages(){ return _OSCMessages; }
     QList<QString> getOSCMessages();
 
@@ -380,8 +378,6 @@ class NetworkTree : public QTreeWidget
     void setRedundancy(QTreeWidgetItem *item, bool activated);
 
     void updateLine(QTreeWidgetItem *item, bool interpolationState, int sampleRate, bool redundancy);
-    void createItemsFromMessages(QList<QString> messageslist);
-    void createItemFromMessage(QString messages);
 
     virtual void keyPressEvent(QKeyEvent *event);
     virtual void keyReleaseEvent(QKeyEvent *event);
@@ -439,7 +435,7 @@ class NetworkTree : public QTreeWidget
 
   private:
     void treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict);
-    void createOCSBranch(QTreeWidgetItem *curItem);
+    void createOSCBranch(QTreeWidgetItem *curItem);
     QTreeWidgetItem *addADeviceNode();
 
     /*!
@@ -572,5 +568,8 @@ public slots:
     void removeFromExpandedItems(QTreeWidgetItem *item);
 
     virtual void clear();
+	
+	void enable();
+	void disable();
 };
 #endif /* NETWORKTREE_HPP_ */

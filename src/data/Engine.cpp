@@ -2326,6 +2326,10 @@ void Engine::getProtocolNames(std::vector<std::string>& allProtocolNames)
         
         name = protocolNames[i];
         
+        // Théo : this is a temporary solution to load MIDI but to not allow to select it
+        if (name == TTSymbol("MIDI"))
+            continue;
+        
         allProtocolNames.push_back(name.c_str());
     }
 }
