@@ -77,6 +77,45 @@ QString NetworkTree::OSC_ADD_NODE_TEXT = QString("Add a node");
 QString NetworkTree::ADD_A_DEVICE_TEXT = QString("Add a device");
 
 unsigned int NetworkTree::TEXT_POINT_SIZE = 10;
+
+/////
+// Some helper functions
+
+
+bool checkPredicateInTree(QTreeWidgetItem* parent, std::function<bool(QTreeWidgetItem*)> fun)
+{
+	bool found = false;
+	for( int i = 0; i < parent->childCount(); ++i )
+	{
+		if(fun(parent->child(i))) return true;
+		else found |= checkPredicateInTree(parent->child(i), fun);
+	}
+
+	return found;
+}
+
+void applyInTree(QTreeWidgetItem* parent, std::function<void(QTreeWidgetItem*)> fun)
+{
+	for( int i = 0; i < parent->childCount(); ++i )
+	{
+		fun(parent->child(i));
+		applyInTree(parent->child(i), fun);
+	}
+}
+
+
+bool isOSC(QTreeWidgetItem* item)
+{
+	std::string protocol;
+    Maquette::getInstance()->getDeviceProtocol(item->text(0).toStdString(),protocol);
+    
+    return protocol == "OSC";
+}
+
+/////
+
+
+
 #include <QHeaderView>
 NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
 {
@@ -386,8 +425,17 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
   
   refreshItemNamespace(newItem);
   if(newItem->parent())
+  {
 	  expandItem(newItem->parent());
-
+  
+	  applyInTree(newItem->parent(), [] (QTreeWidgetItem* item) 
+	  { 
+		  item->setForeground(NAME_COLUMN, Qt::darkGray);
+		  item->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
+		  item->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
+		  item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
+	  });
+  }
   //Edits automatically the new item's name.
 //  Maquette::getInstance()->appendToNetWorkNamespace(address.toStdString()); crash
   NAME_MODIFIED = true;
@@ -463,17 +511,6 @@ NetworkTree::loadNetworkTree(AbstractBox *abBox)
   setEndMessages(endMsg);
 }
 
-bool checkPredicateInTree(QTreeWidgetItem* parent, std::function<bool(QTreeWidgetItem*)> fun)
-{
-	bool found = false;
-	for( int i = 0; i < parent->childCount(); ++i )
-	{
-		if(fun(parent->child(i))) return true;
-		else found |= checkPredicateInTree(parent->child(i), fun);
-	}
-
-	return found;
-}
 
 void
 NetworkTree::createOSCBranch(QTreeWidgetItem *curItem)
@@ -489,6 +526,14 @@ NetworkTree::createOSCBranch(QTreeWidgetItem *curItem)
 	addANodeItem->setFlags(Qt::ItemIsEnabled);
 	addANodeItem->setIcon(0, QIcon(":/resources/images/addANode.png"));
 	curItem->addChild(addANodeItem);
+	
+	applyInTree(curItem, [] (QTreeWidgetItem* item) 
+    { 
+	    item->setForeground(NAME_COLUMN, Qt::darkGray);
+	    item->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
+	    item->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
+	    item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
+    });
 	//  curItem->setFlags(Qt::ItemIsEnabled);
 }
 
@@ -809,7 +854,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                  if(Maquette::getInstance()->getObjectType(childAbsoluteAddress,nodeType)){
 
                      if(nodeType == "Data"){
-                         childItem = new QTreeWidgetItem(name, LeaveType);
+                         childItem = new QTreeWidgetItem(name, OSCNode);
                      }
                      else{
                          childItem = new QTreeWidgetItem(name, NodeNoNamespaceType);
@@ -1426,10 +1471,7 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
       if(updateBoxes)
         Maquette::getInstance()->updateBoxesAttributes();
 	  
-	  std::string protocol;
-	  Maquette::getInstance()->getDeviceProtocol(item->text(0).toStdString(),protocol);
-	  
-      if(protocol=="OSC")
+	  if(isOSC(item))
           createOSCBranch(item);
     }
 	else if(item->type() == OSCNode)
@@ -1754,8 +1796,10 @@ NetworkTree::mouseDoubleClickEvent(QMouseEvent *event)
     if(currentItem()!=nullptr){
         
         /// \todo : replace by if(item->whatsThis(NAME_COLUMN)=="Message").
-        if (currentItem()->type() == OSCNode || currentItem()->text(TYPE_COLUMN) == "->") {
+        if (currentItem()->type() == OSCNode || currentItem()->text(TYPE_COLUMN) == "->") 
+		{
             editItem(currentItem(), currentColumn());
+			
             if (currentColumn() == NAME_COLUMN) {
                 NAME_MODIFIED = true;
             }
