@@ -430,7 +430,7 @@ NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
   
 	  applyInTree(newItem->parent(), [] (QTreeWidgetItem* item) 
 	  { 
-		  item->setForeground(NAME_COLUMN, Qt::darkGray);
+          item->setForeground(NAME_COLUMN, Qt::darkGray);
 		  item->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
 		  item->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
 		  item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
@@ -529,7 +529,7 @@ NetworkTree::createOSCBranch(QTreeWidgetItem *curItem)
 	
 	applyInTree(curItem, [] (QTreeWidgetItem* item) 
     { 
-	    item->setForeground(NAME_COLUMN, Qt::darkGray);
+        item->setForeground(NAME_COLUMN, Qt::white);
 	    item->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
 	    item->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
 	    item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
