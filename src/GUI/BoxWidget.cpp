@@ -105,10 +105,8 @@ BoxWidget::~BoxWidget()
 
 void
 BoxWidget::mousePressEvent(QMouseEvent *event)
-{        
-    qDebug() << Q_FUNC_INFO;
+{
     Q_UNUSED(event);
-
 
     if (_box->maquetteScene()->paused())
         _box->maquetteScene()->stopAndGoToCurrentTime();
@@ -121,6 +119,7 @@ BoxWidget::mousePressEvent(QMouseEvent *event)
     }    
     else
     {
+        Maquette::getInstance()->scene()->unselectAll();
         _box->select();
     }
 }
@@ -523,7 +522,7 @@ BoxWidget::updateStartCue()
   if (_startMenu != nullptr) {
       _startMenu->close();
     }
-  qDebug() << Q_FUNC_INFO;
+
   _box->setSelected(true);
   _box->update();
   _box->maquetteScene()->editor()->snapshotStartAssignment();
@@ -535,7 +534,7 @@ BoxWidget::updateEndCue()
   if (_endMenu != nullptr) {
       _endMenu->close();
     }
-  qDebug() << Q_FUNC_INFO;
+
   _box->setSelected(true);
   _box->update();
   _box->maquetteScene()->editor()->snapshotEndAssignment();

@@ -1374,7 +1374,6 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
   if (event->button() == Qt::LeftButton)
   {
-      qDebug() << Q_FUNC_INFO;
       setSelected(true);
       emit _scene->selectionChanged();
 
@@ -1524,7 +1523,6 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
       QPainterPath nullPath;
       nullPath.addRect(QRectF(QPointF(0., 0.), QSizeF(0., 0.)));
       _scene->setSelectionArea(nullPath);
-      qDebug() << Q_FUNC_INFO;
       setSelected(true);
       emit _scene->selectionChanged();
       _scene->boxResized();
@@ -2063,7 +2061,6 @@ void BasicBox::cleanupRelations()
 
 void
 BasicBox::select(){
-    qDebug() << Q_FUNC_INFO;
     setSelected(true);
     emit _scene->selectionChanged();
     _scene->setAttributes(_abstract);

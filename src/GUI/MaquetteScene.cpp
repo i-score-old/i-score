@@ -484,9 +484,7 @@ bool MaquetteScene::subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent)
 void
 MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-  qDebug() << "Number of selected items before: " << selectedItems().size();
   QGraphicsScene::mousePressEvent(mouseEvent);
-  qDebug() << "Number of selected items after: "  << selectedItems().size();
   _clicked = true;
  
   if (paused())
@@ -688,14 +686,12 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
                     if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE)) {
                         setRelationSecondBox(secondBox->ID(), BOX_START);
                         addPendingRelation();
-                        qDebug() << Q_FUNC_INFO << "1";
                         firstBox->setSelected(true);
                         emit selectionChanged();
                     }
                     else if (mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
                         setRelationSecondBox(secondBox->ID(), BOX_END);
                         addPendingRelation();
-                        qDebug() << Q_FUNC_INFO << "2";
                         firstBox->setSelected(true);
                         emit selectionChanged();
                     }
@@ -1232,7 +1228,6 @@ MaquetteScene::addBox(BoxCreationMode mode)
         }
     }
   if (boxID != NO_ID) {
-      qDebug() << Q_FUNC_INFO;
       getBox(boxID)->select();
     }
 }

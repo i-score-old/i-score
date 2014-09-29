@@ -259,7 +259,6 @@ ParentBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
   if (event->button() == Qt::LeftButton) {
       if (_scene->currentMode() != CREATION_MODE) {
-          qDebug(Q_FUNC_INFO);
           setSelected(true);
           emit _scene->selectionChanged();
           if (cursor().shape() == Qt::ClosedHandCursor) {
@@ -346,7 +345,6 @@ ParentBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
       QPainterPath nullptrPath;
       nullptrPath.addRect(QRectF(QPointF(0., 0.), QSizeF(0., 0.)));
       _scene->setSelectionArea(nullptrPath);
-      qDebug(Q_FUNC_INFO);
       setSelected(true);
       emit _scene->selectionChanged();
       _scene->boxResized();

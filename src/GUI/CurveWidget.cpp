@@ -279,9 +279,8 @@ CurveWidget::absoluteCoordinates(const QPointF &point)
 void
 CurveWidget::mousePressEvent(QMouseEvent *event)
 {
-    qDebug() << "Curve : Number of selected items before" << Maquette::getInstance()->scene()->selectedItems().size();
   QWidget::mousePressEvent(event);
-  qDebug() << "Curve :  Number of selected items after" << Maquette::getInstance()->scene()->selectedItems().size();
+
   _clicked = true;
   _shiftModifierWasEnabled = (event->modifiers() == Qt::ShiftModifier);
 
