@@ -2930,6 +2930,23 @@ bool Engine::getDeviceLearn(std::string deviceName)
     return TTBoolean(v[0]);
 }
 
+bool Engine::protocolScan(const std::string & protocol, std::vector<std::string>& scanResult)
+{
+    TTObject    aProtocol = (TTObjectBasePtr)accessProtocol(TTSymbol(protocol));
+    TTValue     args, out;
+    
+    TTErr err = aProtocol.send("Scan", args, out);
+    
+    for (TTUInt8 i = 0; i < out.size(); i++) {
+        
+        TTSymbol scanInfo = out[i];
+
+        scanResult.push_back(scanInfo.c_str());
+    }
+    
+    return err == kTTErrNone;
+}
+
 int Engine::requestNetworkNamespace(const std::string & address, std::string & nodeType, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)
 {
     TTAddress           anAddress = toTTAddress(address);
