@@ -2930,10 +2930,15 @@ bool Engine::getDeviceLearn(std::string deviceName)
     return TTBoolean(v[0]);
 }
 
-bool Engine::protocolScan(const std::string & protocol, std::vector<std::string>& scanResult)
+bool Engine::protocolScan(const std::string & protocol, std::vector<std::string>& scanOptions, std::vector<std::string>& scanResult)
 {
     TTObject    aProtocol = (TTObjectBasePtr)accessProtocol(TTSymbol(protocol));
     TTValue     args, out;
+    vector<string>::iterator it;
+
+    // prepare scan options value
+    for (it = scanOptions.begin(); it != scanOptions.end(); ++it)
+            args.append(TTSymbol(*it));
     
     TTErr err = aProtocol.send("Scan", args, out);
     
