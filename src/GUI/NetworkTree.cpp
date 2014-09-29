@@ -1083,6 +1083,7 @@ NetworkTree::brothersPartiallyChecked(QTreeWidgetItem *item, int column)
 void
 NetworkTree::expandItems(QList<QTreeWidgetItem*>& expandedItems)
 {
+  scrollToTop();
   collapseAll();
 
   for(QTreeWidgetItem* item : expandedItems)
