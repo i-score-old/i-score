@@ -204,16 +204,7 @@ CurveWidget::setAttributes(unsigned int boxID,
   for (it = values.begin(); it != values.end(); ++it) {
       _abstract->_curve.push_back(*it);
     }
-  
-  // Update the values in the NetworkTree
-  auto itemPtr = Maquette::getInstance()->scene()->editor()->networkTree()->getItemFromAddress(address);
-
-  if(itemPtr)
-  {
-	  itemPtr->setText(NetworkTree::START_COLUMN, QString::number(*values.begin()));
-	  itemPtr->setText(NetworkTree::END_COLUMN, QString::number(*(--values.end())));
-  }
-  
+    
   for (unsigned int i = 0; i < xPercents.size(); ++i) {
       _abstract->_breakpoints[xPercents[i] / 100.] = pair<float, float>(yValues[i], coeff[i]);
     }
@@ -287,8 +278,10 @@ CurveWidget::absoluteCoordinates(const QPointF &point)
 
 void
 CurveWidget::mousePressEvent(QMouseEvent *event)
-{    
+{
+    qDebug() << "Curve : Number of selected items before" << Maquette::getInstance()->scene()->selectedItems().size();
   QWidget::mousePressEvent(event);
+  qDebug() << "Curve :  Number of selected items after" << Maquette::getInstance()->scene()->selectedItems().size();
   _clicked = true;
   _shiftModifierWasEnabled = (event->modifiers() == Qt::ShiftModifier);
 
@@ -648,9 +641,11 @@ CurveWidget::paintEvent(QPaintEvent * /* event */)
   painter->setRenderHint(QPainter::Antialiasing, true);
   static const QColor BASE_COLOR(Qt::black);
   static const QColor AXE_COLOR(Qt::black);
-  static const QColor EXTREMITY_COLOR(Qt::red);
-  static const QColor CURVE_COLOR(Qt::darkRed);
-  static const QColor BREAKPOINT_COLOR(Qt::blue);
+
+  QColor EXTREMITY_COLOR(isEnabled()? Qt::red : Qt::gray);
+  QColor CURVE_COLOR(isEnabled()? Qt::darkRed : Qt::gray);
+  QColor BREAKPOINT_COLOR(isEnabled()? Qt::blue : Qt::gray);
+
   static const QColor MOVING_BREAKPOINT_COLOR(Qt::darkBlue);
   static const QColor UNACTIVE_COLOR(Qt::darkGray);
 

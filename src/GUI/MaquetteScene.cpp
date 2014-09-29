@@ -137,6 +137,9 @@ MaquetteScene::init()
 
   connect(_timeBar, SIGNAL(timeOffsetEntered(unsigned int)), this, SLOT(changeTimeOffset(unsigned int)));
   connect(this, SIGNAL(stopPlaying()), this, SLOT(stopOrPause()));
+
+  connect(this, &MaquetteScene::selectionChanged,
+          this, &MaquetteScene::onSelectionChanged);
 }
 
 void
@@ -434,6 +437,11 @@ MaquetteScene::noBoxSelected()
   return selectedItems().isEmpty();
 }
 
+bool MaquetteScene::multipleBoxesSelected()
+{
+    return selectedItems().size() > 1;
+}
+
 QGraphicsItem *
 MaquetteScene::getSelectedItem()
 {
@@ -476,7 +484,9 @@ bool MaquetteScene::subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent)
 void
 MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
+  qDebug() << "Number of selected items before: " << selectedItems().size();
   QGraphicsScene::mousePressEvent(mouseEvent);
+  qDebug() << "Number of selected items after: "  << selectedItems().size();
   _clicked = true;
  
   if (paused())
@@ -551,7 +561,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
       case BOX_EDIT_MODE:
         break;
-    } 
+    }
 }
 
 void MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
@@ -678,12 +688,16 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
                     if (mouseEvent->scenePos().x() < (secondBox->mapToScene(secondBox->boundingRect().topLeft()).x() + BasicBox::RESIZE_TOLERANCE)) {
                         setRelationSecondBox(secondBox->ID(), BOX_START);
                         addPendingRelation();
+                        qDebug() << Q_FUNC_INFO << "1";
                         firstBox->setSelected(true);
+                        emit selectionChanged();
                     }
                     else if (mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
                         setRelationSecondBox(secondBox->ID(), BOX_END);
                         addPendingRelation();
+                        qDebug() << Q_FUNC_INFO << "2";
                         firstBox->setSelected(true);
+                        emit selectionChanged();
                     }
                     else {
                         if (selectedItems().empty()) {
@@ -708,7 +722,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
         break;
 
       case SELECTION_MODE:
-        if (selectedItems().isEmpty()) {
+        if (noBoxSelected() || multipleBoxesSelected()) {
             _editor->noBoxEdited(); /// \todo noBoxEdited() est un public slot. mieux vaux faire appel au mécanisme d'auto-connexion des signaux dans Qt (QMetaObject) que de le garder en attribut de classe pour éviter le couplage. (par jaime Chao)
           }
 
@@ -733,7 +747,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
               }
 
             else {
-                if (selectedItems().empty()) {
+                if (noBoxSelected() || multipleBoxesSelected()) {
                     _editor->noBoxEdited(); /// \todo noBoxEdited() est un public slot. mieux vaux faire appel au mécanisme d'auto-connexion des signaux dans Qt (QMetaObject) que de le garder en attribut de classe (couplage). (par jaime Chao)
                   }
               }
@@ -1218,6 +1232,7 @@ MaquetteScene::addBox(BoxCreationMode mode)
         }
     }
   if (boxID != NO_ID) {
+      qDebug() << Q_FUNC_INFO;
       getBox(boxID)->select();
     }
 }
@@ -1783,6 +1798,28 @@ MaquetteScene::speedChanged(double value)
 {
   setAccelerationFactor(value);
   emit(accelerationValueChanged(value));
+}
+
+void MaquetteScene::onSelectionChanged()
+{
+    if(multipleBoxesSelected())
+    {
+        for(auto item : selectedItems())
+        {
+            ParentBox* box = dynamic_cast<ParentBox*>(item);
+            if(box)
+                box->disableCurveEdition();
+        }
+    }
+    else
+    {
+        for(auto item : selectedItems())
+        {
+            ParentBox* box = dynamic_cast<ParentBox*>(item);
+            if(box)
+                box->enableCurveEdition();
+        }
+    }
 }
 
 void

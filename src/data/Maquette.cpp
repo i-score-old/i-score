@@ -1232,6 +1232,25 @@ bool
 Maquette::setCurveSections(unsigned int boxID, const string &address, unsigned int argPosition,
                            const vector<float> &xPercents, const vector<float> &yValues, const vector<short> &sectionType, const vector<float> &coeff)
 {
+    auto tree = Maquette::getInstance()->scene()->editor()->networkTree();
+    auto itemPtr = tree->getItemFromAddress(address);
+
+    if(itemPtr)
+    {
+        auto sv = QString::number(*yValues.begin());
+        if(sv != itemPtr->text(NetworkTree::START_COLUMN))
+        {
+            tree->startValueChanged(itemPtr, sv);
+        }
+
+        auto ev = QString::number(*(--yValues.end()));
+        if(ev != itemPtr->text(NetworkTree::END_COLUMN))
+        {
+            tree->endValueChanged(itemPtr, ev);
+        }
+
+
+    }
   return _engines->setCurveSections(boxID, address, argPosition, xPercents, yValues, sectionType, coeff);
 }
 
