@@ -1374,6 +1374,7 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
   if (event->button() == Qt::LeftButton)
   {
+      _scene->unselectAll();
       setSelected(true);
       emit _scene->selectionChanged();
 
@@ -2041,6 +2042,7 @@ void BasicBox::onComboBoxHidden()
 
 void BasicBox::toggleMuteButton(bool )
 {
+    setSelected(true);
 	_scene->muteBoxes();
 }
 
