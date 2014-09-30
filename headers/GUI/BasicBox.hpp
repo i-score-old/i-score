@@ -638,6 +638,9 @@ class BasicBox : public QGraphicsObject
     QMap<QString, QPair<QString, unsigned int> > getFinalState();
     QMap<QString, QPair<QString, unsigned int> > getStartState();
 
+    void disableCurveEdition();
+    void enableCurveEdition();
+
   protected:
     /*!
      * \brief Create the QInputDialog, for asking new name.
