@@ -396,7 +396,7 @@ void
 MainWindow::about()
 {
   QMessageBox::about(this, tr("About i-score"),
-                     tr("A wonderful music software"));
+                     tr("An interactive sequencer for intermedia creation"));
 }
 
 void
