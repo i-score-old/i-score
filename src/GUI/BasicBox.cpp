@@ -770,7 +770,9 @@ BasicBox::updateRelations(BoxExtremity extremity)
       for (it2 = cur.begin(); it2 != cur.end(); ++it2) {
           curRel = it2->second;
           curRel->lower(_low);
-          curRel->updateFlexibility();
+          if (extremity == BOX_START) {
+            curRel->updateFlexibility();
+          }
         }
     }
 }
