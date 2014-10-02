@@ -1269,7 +1269,7 @@ public:
      * \param scanResult : a vector containing all available devices
      * \return true if the scan succeed
      */
-    bool protocolScan(const std::string & protocol, std::vector<std::string>& scanOptions, std::vector<std::string>& scanResult);
+    bool protocolScan(const std::string & protocol, std::vector<std::string>&& scanOptions, std::vector<std::string>& scanResult);
 
 	//Store and load ////////////////////////////////////////////////////////////////////////////////////
     
