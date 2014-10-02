@@ -281,7 +281,6 @@ NetworkTree::clear()
   _OSCEndMessages->clear();
   _recMessages.clear();
 
-  _OSCMessages.clear();
   _OSCMessageCount = 0;
 
   QTreeWidget::clear();
@@ -407,75 +406,63 @@ NetworkTree:: getItemsFromMsg(vector<string> itemsName)
   return itemsMatchedList;
 }
 
-void
-NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
+void NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
 {
-  rootNode->setCheckState(START_ASSIGNATION_COLUMN, Qt::Unchecked);
-  rootNode->setCheckState(END_ASSIGNATION_COLUMN, Qt::Unchecked);
+    // Propriétés préalables
+    rootNode->setCheckState(START_ASSIGNATION_COLUMN, Qt::Unchecked);
+    rootNode->setCheckState(END_ASSIGNATION_COLUMN, Qt::Unchecked);
 
-  QString number = QString("%1").arg(_OSCMessageCount++);
-  QString name = QString("OSCMessage" + number);
-  QStringList OSCname = QStringList(name);
+    // Ajout d'un faux device pour permettre d'entrer le nom quelque part
+    QTreeWidgetItem *newItem = new QTreeWidgetItem({"OSCMessage"}, OSCNode);
+    rootNode->insertChild(rootNode->childCount() - 1, newItem);
+    newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    editItem(newItem);
 
-  QTreeWidgetItem *newItem = new QTreeWidgetItem(OSCname, OSCNode);
-  rootNode->insertChild(rootNode->childCount() - 1, newItem);
-  QString address = getAbsoluteAddress(newItem);
-  _OSCMessages.insert(newItem, address);
-  
-  
-  refreshItemNamespace(newItem);
-  if(newItem->parent())
-  {
-	  expandItem(newItem->parent());
-  
-	  applyInTree(newItem->parent(), [] (QTreeWidgetItem* item) 
-	  { 
-		  item->setForeground(NAME_COLUMN, Qt::darkGray);
-		  item->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
-		  item->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
-		  item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
-	  });
-  }
-  //Edits automatically the new item's name.
-//  Maquette::getInstance()->appendToNetWorkNamespace(address.toStdString()); crash
-  NAME_MODIFIED = true;
-  newItem->setForeground(NAME_COLUMN, Qt::lightGray);
-  newItem->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
-  newItem->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
-  newItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
-  
-  editItem(newItem, NAME_COLUMN);
+    auto conn = std::make_shared<QMetaObject::Connection>();
+
+    // L'ajout du vrai device se fait une fois qu'on a le nom.
+    // On est obligé de se connecter au slot de l'item qui change pour le faire.
+    // Ça ne marchera pas si on a le learn quelque part et qu'il reçoit des messages de son coté, évidemment...
+    *conn = QObject::connect(this,
+                   &NetworkTree::itemChanged,
+                   [this, rootNode, conn] (QTreeWidgetItem* itm, int col)
+    {
+        QObject::disconnect(*conn);
+        rootNode->removeChild(itm);
+
+        auto devicename = getAbsoluteAddress(rootNode);
+        auto fullname = devicename + "/" + itm->text(col);
+
+        // Ajout du device par simulation de learn
+        Maquette::getInstance()->setDeviceLearn(devicename.toLatin1().constData(), true);
+        Maquette::getInstance()->appendToNetWorkNamespace(fullname.toStdString());
+        Maquette::getInstance()->setDeviceLearn(devicename.toLatin1().constData(), false);
+
+        // Configuration graphique à l'ajout.
+        expandItem(rootNode);
+
+        applyInTree(rootNode, [] (QTreeWidgetItem* item)
+        {
+            item->setForeground(NAME_COLUMN, Qt::darkGray);
+            item->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
+            item->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
+            item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
+        });
+    });
+
+    return;
 }
 
-void
-NetworkTree::setOSCMessageName(QTreeWidgetItem *item, QString name)
+void NetworkTree::removeOSCMessage(QTreeWidgetItem* item)
 {
-  QMap<QTreeWidgetItem *, QString> ::iterator it = _OSCMessages.find(item);
-  string oldAddress = getAbsoluteAddress(item).toStdString();
-  item->setText(NAME_COLUMN, name);
-  QString newAddress = getAbsoluteAddress(item);
-
-  if (it != _OSCMessages.end()) {
-      _OSCMessages.erase(it);
-      Maquette::getInstance()->removeFromNetWorkNamespace(oldAddress);
-      _OSCMessages.insert(item, newAddress);
-      Maquette::getInstance()->appendToNetWorkNamespace(newAddress.toStdString());
-
-      /// \todo reload tree - Redemander à score le nouvel arbre (après ajout de cet item). Ainsi il ira se placer en fonction des / dans son nom comme fils ou parent des autres noeuds dans l'arbre.
-    }
-}
-
-QList<QString>
-NetworkTree::getOSCMessages()
-{
-  return _OSCMessages.values();
+    Maquette::getInstance()->removeFromNetWorkNamespace(getAbsoluteAddress(item).toStdString());
 }
 
 void
 NetworkTree::loadNetworkTree(AbstractBox *abBox)
 {
-    QList< QPair<QTreeWidgetItem *, Message> > startItemsAndMsgs = getItemsFromMsg(Maquette::getInstance()->firstMessagesToSend(abBox->ID()));
-    QList< QPair<QTreeWidgetItem *, Message> > endItemsAndMsgs = getItemsFromMsg(Maquette::getInstance()->lastMessagesToSend(abBox->ID()));
+  QList< QPair<QTreeWidgetItem *, Message> > startItemsAndMsgs = getItemsFromMsg(Maquette::getInstance()->firstMessagesToSend(abBox->ID()));
+  QList< QPair<QTreeWidgetItem *, Message> > endItemsAndMsgs = getItemsFromMsg(Maquette::getInstance()->lastMessagesToSend(abBox->ID()));
 
   QList< QPair<QTreeWidgetItem *, Message> >::iterator it0;
   QPair<QTreeWidgetItem *, Message> curPair;
@@ -529,7 +516,7 @@ NetworkTree::createOSCBranch(QTreeWidgetItem *curItem)
 	
 	applyInTree(curItem, [] (QTreeWidgetItem* item) 
     { 
-	    item->setForeground(NAME_COLUMN, Qt::darkGray);
+        item->setForeground(NAME_COLUMN, Qt::white);
 	    item->setCheckState(INTERPOLATION_COLUMN, Qt::Unchecked);
 	    item->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
 	    item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
@@ -1083,6 +1070,7 @@ NetworkTree::brothersPartiallyChecked(QTreeWidgetItem *item, int column)
 void
 NetworkTree::expandItems(QList<QTreeWidgetItem*>& expandedItems)
 {
+  scrollToTop();
   collapseAll();
 
   for(QTreeWidgetItem* item : expandedItems)
@@ -1755,23 +1743,47 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
 
     if(currentItem()!=nullptr){
         if(event->button()==Qt::RightButton){
-            if(currentItem()->type() == DeviceNode){
+            switch(currentItem()->type())
+            {
+                case DeviceNode:
+                {
+                    QMenu *contextMenu = new QMenu(this);
+                    QAction *refreshAct = new QAction(tr("Refresh"),this);
+                    QAction *deleteAct = new QAction(tr("Delete"),this);
 
-                QMenu *contextMenu = new QMenu(this);
-                QAction *refreshAct = new QAction(tr("Refresh"),this);
-                QAction *deleteAct = new QAction(tr("Delete"),this);
+                    contextMenu->addAction(refreshAct);
+                    contextMenu->addAction(deleteAct);
 
-                contextMenu->addAction(refreshAct);
-                contextMenu->addAction(deleteAct);
+                    connect(refreshAct, SIGNAL(triggered()), this, SLOT(refreshCurrentItemNamespace()));
+                    connect(deleteAct, SIGNAL(triggered()), this, SLOT(deleteCurrentItemNamespace()));
 
-                connect(refreshAct, SIGNAL(triggered()), this, SLOT(refreshCurrentItemNamespace()));
-                connect(deleteAct, SIGNAL(triggered()), this, SLOT(deleteCurrentItemNamespace()));
+                    contextMenu->exec(event->globalPos());
 
-                contextMenu->exec(event->globalPos());
+                    refreshAct->deleteLater();
+                    deleteAct->deleteLater();
+                    contextMenu->deleteLater();
+                    break;
+                }
 
-                refreshAct->deleteLater();
-                deleteAct->deleteLater();
-                contextMenu->deleteLater();
+                case NodeNoNamespaceType:
+                case OSCNode:
+                {
+                    QMenu *contextMenu = new QMenu(this);
+                    QAction *deleteAct = new QAction(tr("Delete"),this);
+
+                    contextMenu->addAction(deleteAct);
+
+                    connect(deleteAct, &QAction::triggered,
+                            this, std::bind(&NetworkTree::removeOSCMessage, this, currentItem()));
+
+                    contextMenu->exec(event->globalPos());
+
+                    deleteAct->deleteLater();
+                    contextMenu->deleteLater();
+                    break;
+                }
+                default:
+                    break;
             }
         }
 
@@ -2132,13 +2144,13 @@ NetworkTree::changeNameValue(QTreeWidgetItem *item, QString newValue)
           _OSCEndMessages->removeMessage(item);
           _OSCStartMessages->removeMessage(item);
           item->parent()->removeChild(item);
-          _OSCMessages.remove(item);
+
           removeAssignItem(item);
           Maquette::getInstance()->removeFromNetWorkNamespace(getAbsoluteAddress(item).toStdString());
         }
       else {
-          setOSCMessageName(item, newValue);
-          emit(messageChanged(item, newValue));
+          /*setOSCMessageName(item, newValue);
+          emit(messageChanged(item, newValue));*/
         }
       QMap<QTreeWidgetItem *, Data>::iterator it = _assignedItems.find(item);
       if (it != _assignedItems.end()) {
@@ -2306,17 +2318,6 @@ NetworkTree::updateLine(QTreeWidgetItem *item, bool interpolationState, int samp
     }
   else {
       item->setCheckState(REDUNDANCY_COLUMN, Qt::Unchecked);
-    }
-}
-
-void
-NetworkTree::updateOSCAddresses()
-{
-  QMap<QTreeWidgetItem *, QString>::iterator it;
-  QTreeWidgetItem *curItem;
-  for (it = _OSCMessages.begin(); it != _OSCMessages.end(); it++) {
-      curItem = it.key();
-      _OSCMessages.insert(curItem, getAbsoluteAddress(curItem));
     }
 }
 
