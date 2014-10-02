@@ -733,7 +733,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                  return;
              }
              if(Maquette::getInstance()->requestObjectAttribruteValue(address,"tags",attributesValues) > 0){
-                 if(attributesValues[0] == "setup"){
+                 if(!attributesValues.empty() && attributesValues[0] == "setup"){
                      delete curItem;
                      return;
                  }
@@ -772,7 +772,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                  curItem->setCheckState(END_ASSIGNATION_COLUMN, Qt::Unchecked);
 
                  //Case type return
-                 if(attributesValues[0] == "return"){
+                 if(!attributesValues.empty() && attributesValues[0] == "return"){
 
                      curItem->setFlags(Qt::ItemIsDropEnabled);
                      QFont curFont = curItem->font(NAME_COLUMN);
@@ -789,7 +789,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                  }
 
                  //Case type message
-                 if(attributesValues[0] == "message"){
+                 if(!attributesValues.empty() && attributesValues[0] == "message"){
                      curItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
 
                      QFont curFont = curItem->font(NAME_COLUMN);
@@ -808,7 +808,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                  }
 
                  //Case type parameter
-                 if(attributesValues[0] == "parameter"){
+                 if(!attributesValues.empty() && attributesValues[0] == "parameter"){
 
                      curItem->setText(TYPE_COLUMN,QString("<->"));
                      curItem->setToolTip(TYPE_COLUMN, tr("Type parameter"));
