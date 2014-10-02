@@ -337,7 +337,7 @@ MaquetteView::zoomIn()
 
           Maquette::getInstance()->updateBoxesFromEngines();
 
-          QPointF newCenter(getCenterCoordinates().x(), getCenterCoordinates().y()); //facteur 2 louche
+          QPointF newCenter(2. * getCenterCoordinates().x(), getCenterCoordinates().y()); //facteur 2 louche
           centerOn(newCenter);
           Maquette::getInstance()->setViewPosition(newCenter);
           _scene->zoomChanged(_zoom);
@@ -349,7 +349,7 @@ MaquetteView::zoomIn()
 QPointF
 MaquetteView::getCenterCoordinates()
 {
-  QPointF centerCoordinates = mapToScene(viewport()->rect().center() -= QPoint(viewport()->rect().center().y() / 2, viewport()->rect().center().y() / 2));
+  QPointF centerCoordinates = mapToScene(viewport()->rect().center());// -= QPoint(viewport()->rect().center().x() / 2, viewport()->rect().center().y() / 2));
   return centerCoordinates;
 }
 
@@ -404,7 +404,7 @@ MaquetteView::zoomOut()
   _scene->update();
   Maquette::getInstance()->updateBoxesFromEngines();
 
-  QPointF newCenter(getCenterCoordinates().x(), getCenterCoordinates().y());
+  QPointF newCenter(0.5 * getCenterCoordinates().x(), getCenterCoordinates().y());
   centerOn(newCenter);
   Maquette::getInstance()->setViewPosition(newCenter);
   _scene->updateProgressBar();
