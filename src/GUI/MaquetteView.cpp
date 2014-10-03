@@ -337,8 +337,10 @@ MaquetteView::zoomIn()
 
           Maquette::getInstance()->updateBoxesFromEngines();
 
-          QPointF newCenter(2. * getCenterCoordinates().x(), getCenterCoordinates().y()); //facteur 2 louche
+          QPointF newCenter(2. * (mapFromGlobal(QCursor::pos()).x() + mapToScene(viewport()->rect().bottomLeft()).x()), getCenterCoordinates().y() );
+                // new center : cursor position in Window + scroll offset. (+ zoom factor 2.)
           centerOn(newCenter);
+
           Maquette::getInstance()->setViewPosition(newCenter);
           _scene->zoomChanged(_zoom);
           setSceneRect((QRectF(0,0,_scene->getMaxSceneWidth(),_scene->height())));
@@ -349,7 +351,7 @@ MaquetteView::zoomIn()
 QPointF
 MaquetteView::getCenterCoordinates()
 {
-  QPointF centerCoordinates = mapToScene(viewport()->rect().center());// -= QPoint(viewport()->rect().center().x() / 2, viewport()->rect().center().y() / 2));
+  QPointF centerCoordinates = mapToScene(viewport()->rect().center());// -= QPoint(viewport()->rect().center().x() / 2, viewport()->rect().center().y() / 2);
   return centerCoordinates;
 }
 
