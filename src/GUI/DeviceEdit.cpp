@@ -345,29 +345,31 @@ void DeviceEdit::setCorrespondingProtocolLayout()
     if(_protocolsComboBox->currentText() == "OSC")
     {
       defaultName = "newOSCdevice";
-      defaultLocalHost = "127.0.0.1";
       defaultPort = 9997;
       defaultInputPort = 9996;
 
-      _nameEdit->setText(defaultName);
-      _localHostBox->setText(defaultLocalHost);
-      _portOutputBox->setValue(defaultPort);
-      _portInputBox->setValue(defaultInputPort);
       setOSCLayout();
 
     }
     else if (_protocolsComboBox->currentText() == "Minuit")
     {
       defaultName = "newMinuitDevice";
+      defaultPort = 9998;
+      defaultInputPort = 0;
       setMinuitLayout();
 
     }
     else if (_protocolsComboBox->currentText() == "MIDI")
     {
       defaultName = "newMidiDevice";
-      _nameEdit->setText(defaultName);
       setMidiLayout();
     }
+
+    _localHostBox->setText(defaultLocalHost);
+    _portOutputBox->setValue(defaultPort);
+    _portInputBox->setValue(defaultInputPort);
+    _nameEdit->setText(defaultName);
+
 }
 
 void
