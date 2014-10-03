@@ -475,6 +475,7 @@ Relation::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
   if (_middleHandleSelected) {
       double startX = mapFromScene(_start).x();
       double endX = mapFromScene(_end).x();
+
       _scene->changeRelationBounds(_abstract->ID(), NO_LENGTH, (endX - startX) / _scene->zoom(), (endX - startX) / _scene->zoom());
       _middleHandleSelected = false;
     }
@@ -534,7 +535,6 @@ Relation::updateFlexibility()
   if (_scene->getBox(_abstract->secondBox()) != nullptr) {
       if (_abstract->secondExtremity() == BOX_START && _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_START)) {
           _flexibleRelation = true;
-          std::cout << "relation flex" << std::endl ;
         }
 
       else if (_abstract->secondExtremity() == BOX_END && _scene->getBox(_abstract->secondBox())->hasTriggerPoint(BOX_END)) {
@@ -561,7 +561,6 @@ Relation::updateFlexibility()
       changeBounds(0, NO_BOUND);
       _scene->changeRelationBounds(_abstract->ID(), NO_LENGTH, _abstract->minBound(), _abstract->maxBound());
     }
-  std::cout << "flexibilité : " << _flexibleRelation << std::endl ;
 }
 
 void
