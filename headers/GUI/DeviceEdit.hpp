@@ -73,9 +73,9 @@ class DeviceEdit : public QDialog
     bool _newDevice;
     bool _namespacePathChanged;
 
-    QString defaultName = "OSCDevice";
+    QString defaultName = "newDevice";
     QString defaultLocalHost = "127.0.0.1";
-    unsigned int defaultPort = 9996;
+    unsigned int defaultPort = 9998;
     unsigned int defaultInputPort = 9997;
     int defaultProtocolIndex = 0;
 
