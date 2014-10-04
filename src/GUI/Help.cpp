@@ -71,15 +71,15 @@ Help::Help(QWidget *parent)
 
   _fileLabel = new QLabel(fileString);
 
-  QString toolbarString;
-  QFile toolbar(":/resources/documentation/toolbar.htm");
-  if (toolbar.open(QIODevice::ReadOnly)) {
-      toolbarString = QString(toolbar.readAll());
+  QString quickstartString;
+  QFile quickstart(":/resources/documentation/quickstart.htm");
+  if (quickstart.open(QIODevice::ReadOnly)) {
+      quickstartString = QString(quickstart.readAll());
     }
   else {
-      toolbarString = tr("No Help Found");
+      quickstartString = tr("No Help Found");
     }
-  _toolBarLabel = new QLabel(toolbarString);
+  _quickStartLabel = new QLabel(quickstartString);
 
   QString contextString;
   QFile context(":/resources/documentation/contextual.htm");
@@ -126,9 +126,9 @@ Help::Help(QWidget *parent)
 
   //_tabs->addTab(fileScrollArea,tr("File"));
 
-  QScrollArea *toolBarScrollArea = new QScrollArea;
-  toolBarScrollArea->setWidget(_toolBarLabel);
-  _tabs->addTab(toolBarScrollArea, tr("Toolbar"));
+  QScrollArea *quickStartScrollArea = new QScrollArea;
+  quickStartScrollArea->setWidget(_quickStartLabel);
+  _tabs->addTab(quickStartScrollArea, tr("Quick start"));
 
   QScrollArea *contextScrollArea = new QScrollArea;
   contextScrollArea->setWidget(_contextLabel);

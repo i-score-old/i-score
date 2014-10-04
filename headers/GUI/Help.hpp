@@ -73,7 +73,7 @@ class Help : public QDialog
     QVBoxLayout *_layout;         //!< Global layout.
     QTabWidget *_tabs;            //!< Handling various tabs.
     QLabel *_fileLabel;           //!< File menu help tab.
-    QLabel *_toolBarLabel;        //!< Toolbar help tab.
+    QLabel *_quickStartLabel;        //!< Toolbar help tab.
     QLabel *_contextLabel;        //!< Contextual menu help tab.
     QLabel *_editorGeneralLabel;  //!< Attributes editor help tab.
     QLabel *_editorSnapshotLabel; //!< Attributes editor help tab.
