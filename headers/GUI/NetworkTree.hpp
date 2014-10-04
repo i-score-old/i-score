@@ -360,10 +360,6 @@ class NetworkTree : public QTreeWidget
      */
     void resetAssignedNodes();
     void addOSCMessage(QTreeWidgetItem *rootNode);
-    void addOSCMessage(QTreeWidgetItem *rootNode, QString message);
-    void setOSCMessageName(QTreeWidgetItem *item, QString name);
-    void assignOCSMsg(QTreeWidgetItem *item);
-    inline QMap<QTreeWidgetItem *, QString> OSCMessages(){ return _OSCMessages; }
     QList<QString> getOSCMessages();
 
     /***********************************************************************
@@ -380,8 +376,6 @@ class NetworkTree : public QTreeWidget
     void setRedundancy(QTreeWidgetItem *item, bool activated);
 
     void updateLine(QTreeWidgetItem *item, bool interpolationState, int sampleRate, bool redundancy);
-    void createItemsFromMessages(QList<QString> messageslist);
-    void createItemFromMessage(QString messages);
 
     virtual void keyPressEvent(QKeyEvent *event);
     virtual void keyReleaseEvent(QKeyEvent *event);
@@ -439,7 +433,7 @@ class NetworkTree : public QTreeWidget
 
   private:
     void treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict);
-    void createOCSBranch(QTreeWidgetItem *curItem);
+    void createOSCBranch(QTreeWidgetItem *curItem);
     QTreeWidgetItem *addADeviceNode();
 
     /*!
@@ -535,7 +529,7 @@ class NetworkTree : public QTreeWidget
     NetworkMessages *_OSCStartMessages;
     NetworkMessages *_OSCEndMessages;
     QList<QTreeWidgetItem *> _recMessages;
-    QMap<QTreeWidgetItem *, QString> _OSCMessages;
+
     QTreeWidgetItem *_addADeviceItem;
     QList<QTreeWidgetItem*> _expandedItems;
 
@@ -549,6 +543,7 @@ class NetworkTree : public QTreeWidget
     DeviceEdit *_deviceEdit;  
 
     void disableLearningForEveryDevice();
+    void removeOSCMessage(QTreeWidgetItem* item);
 public slots:
     /*!
       * \brief Rebuild the networkTree under the item (or currentItem by default), after asking the engine to refresh its namespace.

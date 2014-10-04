@@ -1260,6 +1260,16 @@ public:
      * \return the learn status of the device.
      */
     bool getDeviceLearn(std::string deviceName);
+    
+    /*!
+     * Scan the Network using a protocol to get all available devices
+     *
+     * \param protocol : the protocol to scan
+     * \param scanResult : a vector containing options for scanning (ex : for MIDI protocol pass "inputs" or "outputs", for OSC protocol ?)
+     * \param scanResult : a vector containing all available devices
+     * \return true if the scan succeed
+     */
+    bool protocolScan(const std::string & protocol, std::vector<std::string>&& scanOptions, std::vector<std::string>& scanResult);
 
 	//Store and load ////////////////////////////////////////////////////////////////////////////////////
     

@@ -563,7 +563,8 @@ class MaquetteScene : public QGraphicsScene
      */
     void conditionBoxes(QList<BasicBox *> boxesToCondition);
 
-  protected:
+    bool multipleBoxesSelected();
+protected:
 
     /*!
      * \brief Redefinition of QGraphicsScene::drawForeground().
@@ -619,6 +620,8 @@ class MaquetteScene : public QGraphicsScene
     void changeTimeOffset(unsigned int timeOffset);
     void zoomChanged(float value);
     void speedChanged(double value);
+
+    void onSelectionChanged();
 
     /*!
      * \brief Cuts selected boxes.

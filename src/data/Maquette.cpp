@@ -1232,6 +1232,25 @@ bool
 Maquette::setCurveSections(unsigned int boxID, const string &address, unsigned int argPosition,
                            const vector<float> &xPercents, const vector<float> &yValues, const vector<short> &sectionType, const vector<float> &coeff)
 {
+    auto tree = Maquette::getInstance()->scene()->editor()->networkTree();
+    auto itemPtr = tree->getItemFromAddress(address);
+
+    if(itemPtr)
+    {
+        auto sv = QString::number(*yValues.begin());
+        if(sv != itemPtr->text(NetworkTree::START_COLUMN))
+        {
+            tree->startValueChanged(itemPtr, sv);
+        }
+
+        auto ev = QString::number(*(--yValues.end()));
+        if(ev != itemPtr->text(NetworkTree::END_COLUMN))
+        {
+            tree->endValueChanged(itemPtr, ev);
+        }
+
+
+    }
   return _engines->setCurveSections(boxID, address, argPosition, xPercents, yValues, sectionType, coeff);
 }
 
@@ -2138,7 +2157,8 @@ transportCallback(TTSymbol& transport, const TTValue& value)
 void
 deviceCallback(TTSymbol& deviceName)
 {
-    Maquette::getInstance()->scene()->editor()->networkTree()->refreshItemNamespace(Maquette::getInstance()->scene()->editor()->networkTree()->getItemFromAddress(deviceName.c_str()), false);
+	auto tree = Maquette::getInstance()->scene()->editor()->networkTree();
+    tree->refreshItemNamespace(tree->getItemFromAddress(deviceName.c_str()), false);
     std::cerr << "Maquette::deviceCallback : " << deviceName.c_str() << std::endl;
 }
 
@@ -2167,21 +2187,24 @@ Maquette::getRangeBounds(const std::string& address, std::vector<float>& rangeBo
     if(Maquette::getInstance()->requestObjectAttribruteValue(address,"rangeBounds",values)>0){
 
         //parse string to vector<float>
-        QString qvalues = QString::fromStdString(values[0]);
-        QStringList valuesParsed = qvalues.split(" ");
+        if(!values.empty())
+        {
+            QString qvalues = QString::fromStdString(values[0]);
+            QStringList valuesParsed = qvalues.split(" ");
 
-        if(valuesParsed.size()==2){
-            //minBound
-            std::istringstream issMin(valuesParsed.at(0).toStdString());
-            issMin >> min;
-            rangeBounds.push_back(min);
+            if(valuesParsed.size()==2){
+                //minBound
+                std::istringstream issMin(valuesParsed.at(0).toStdString());
+                issMin >> min;
+                rangeBounds.push_back(min);
 
-            //maxBound
-            std::istringstream issMax(valuesParsed.at(1).toStdString());
-            issMax >> max;
-            rangeBounds.push_back(max);
+                //maxBound
+                std::istringstream issMax(valuesParsed.at(1).toStdString());
+                issMax >> max;
+                rangeBounds.push_back(max);
 
-            return 1;
+                return 1;
+            }
         }
     }
     return 0;
@@ -2354,3 +2377,19 @@ void Maquette::boxIsRunningSlot(unsigned int boxID, bool running)
   if(boxID==ROOT_BOX_ID)
       Maquette::getInstance()->udpatePlayModeView(running);
 }
+
+
+std::vector<std::string> Maquette::getMIDIInputDevices()
+{
+    std::vector<std::string> vec;
+    _engines->protocolScan("MIDI", {"inputs"}, vec);
+    return vec;
+}
+
+std::vector<std::string> Maquette::getMIDIOutputDevices()
+{
+    std::vector<std::string> vec;
+    _engines->protocolScan("MIDI", {"outputs"}, vec);
+    return vec;
+}
+

@@ -475,6 +475,7 @@ Relation::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
   if (_middleHandleSelected) {
       double startX = mapFromScene(_start).x();
       double endX = mapFromScene(_end).x();
+
       _scene->changeRelationBounds(_abstract->ID(), NO_LENGTH, (endX - startX) / _scene->zoom(), (endX - startX) / _scene->zoom());
       _middleHandleSelected = false;
     }

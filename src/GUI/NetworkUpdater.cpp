@@ -5,14 +5,14 @@ NetworkUpdater::NetworkUpdater(DeviceEdit *parent) :
 	QObject(nullptr),
 	ed(parent)
 {
-	thrd.start();
-	this->moveToThread(&thrd);
+	//thrd.start();
+	//this->moveToThread(&thrd);
 }
 
 NetworkUpdater::~NetworkUpdater()
 {
-	thrd.quit();
-	thrd.wait();
+	//thrd.quit();
+	//thrd.wait();
 }
 
 void NetworkUpdater::update()
@@ -20,24 +20,26 @@ void NetworkUpdater::update()
 	emit disableTree();
 	//setModal(false);
 	if(ed->_newDevice){
-		string          name = ed->_nameEdit->text().toStdString(),
-						ip   = ed->_localHostBox->text().toStdString(),
-						protocol = ed->_protocolsComboBox->currentText().toStdString();
+        string          protocol = ed->_protocolsComboBox->currentText().toStdString(),
+                        name = ed->currentDevice(),
+                        ip   = ed->_localHostBox->text().toStdString();
+
 		unsigned int    destinationPort = ed->_portOutputBox->value(),
 						receptionPort = ed->_portInputBox->value();
 
-		ed->_currentDevice = ed->_nameEdit->text();
 		Maquette:: getInstance()->addNetworkDevice(name, protocol, ip, destinationPort, receptionPort);
-		emit newDeviceAdded(ed->_nameEdit->text()); //sent to networkTree
+        emit newDeviceAdded(QString::fromStdString(ed->currentDevice())); //sent to networkTree
+
+        ed->_currentDevice = QString::fromStdString(ed->currentDevice());
 
 		ed->_newDevice = false;
 	}
 
 	else if (ed->_changed) {
 		if (ed->_nameChanged) {
-			Maquette::getInstance()->setDeviceName(ed->_currentDevice.toStdString(), ed->_nameEdit->text().toStdString());
-			emit(deviceNameChanged(ed->_currentDevice, ed->_nameEdit->text()));
-			ed->_currentDevice = ed->_nameEdit->text();
+            Maquette::getInstance()->setDeviceName(ed->_currentDevice.toStdString(), ed->currentDevice());
+            emit(deviceNameChanged(ed->_currentDevice, QString::fromStdString(ed->currentDevice())));
+            ed->_currentDevice = QString::fromStdString(ed->currentDevice());
 		}
 		if (ed->_localHostChanged) {
 			Maquette::getInstance()->setDeviceLocalHost(ed->_currentDevice.toStdString(), ed->_localHostBox->text().toStdString());

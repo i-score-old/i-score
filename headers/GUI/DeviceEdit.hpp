@@ -12,6 +12,7 @@
 #include <QPushButton>
 #include <QHostAddress>
 #include <QFileDialog>
+#include <QRadioButton>
 #include <NetworkUpdater.h>
 
 class MaquetteScene;
@@ -29,6 +30,14 @@ class DeviceEdit : public QDialog
   public:
     DeviceEdit(QWidget *parent);
     ~DeviceEdit();
+
+    std::string currentDevice()
+    {
+        return _protocolsComboBox->currentText().toStdString() != "MIDI" ?
+                    _nameEdit->text().toStdString()
+               :
+                    _midiDevicesBox.currentText().toStdString();
+    }
 
   public slots:
     void edit(QString name);
@@ -67,11 +76,12 @@ class DeviceEdit : public QDialog
     QString defaultName = "newDevice";
     QString defaultLocalHost = "127.0.0.1";
     unsigned int defaultPort = 9998;
-    unsigned int defaultInputPort = 0;
+    unsigned int defaultInputPort = 9997;
     int defaultProtocolIndex = 0;
 
     QString _currentDevice;
 
+    ///// GUI /////
     QGridLayout *_layout;
     QLabel *_deviceNameLabel;
     QLineEdit *_nameEdit;
@@ -93,6 +103,16 @@ class DeviceEdit : public QDialog
     QPushButton *_okButton;      //!< Button used to confirme.
     QPushButton *_cancelButton;  //!< Button used to cancel.
 
-	NetworkUpdater updater{this};
+    QLabel _midiDeviceLabel{tr("MIDI devices"), this};
+    QComboBox _midiDevicesBox{this};
+
+    QRadioButton _midiIn{"Input", this};
+    QRadioButton _midiOut{"Output", this};
+
+    NetworkUpdater updater{this};
+    void setOSCLayout();
+    void setMinuitLayout();
+    void setMidiLayout();
+    void setCorrespondingProtocolLayout();
 };
 #endif // DEVICEEDIT_HPP

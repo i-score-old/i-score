@@ -79,6 +79,7 @@
 #include <cmath>
 #include <QPixmapCache>
 #include <QDebug>
+#include "BoxWidget.hpp"
 
 using std::string;
 using std::vector;
@@ -278,7 +279,7 @@ BasicBox::createWidget()
   palette.setBrush(QPalette::Background, brush);
 
   //---------------------- Curve widget ----------------------//
-  _boxWidget = new QWidget();
+  _boxWidget = new QWidget;
   _boxContentWidget = new BoxWidget(_boxWidget, this);
   QGridLayout *layout = new QGridLayout;
   layout->addWidget(_boxContentWidget);
@@ -649,6 +650,24 @@ BasicBox::getStartState()
   return finalMessages;
 }
 
+void BasicBox::enableCurveEdition()
+{
+    CurveWidget* curve = dynamic_cast<CurveWidget*>(_boxContentWidget->stackedLayout()->currentWidget());
+    if(curve)
+    {
+        curve->setEnabled(true);
+    }
+}
+
+void BasicBox::disableCurveEdition()
+{
+    CurveWidget* curve = dynamic_cast<CurveWidget*>(_boxContentWidget->stackedLayout()->currentWidget());
+    if(curve)
+    {
+        curve->setEnabled(false);
+    }
+}
+
 std::vector<std::string>
 BasicBox::getStartMessages(){
     return _abstract->startMessages()->computeMessages();
@@ -751,7 +770,9 @@ BasicBox::updateRelations(BoxExtremity extremity)
       for (it2 = cur.begin(); it2 != cur.end(); ++it2) {
           curRel = it2->second;
           curRel->lower(_low);
-          curRel->updateFlexibility();
+          if (extremity == BOX_START) {
+            curRel->updateFlexibility();
+          }
         }
     }
 }
@@ -1345,7 +1366,6 @@ BasicBox::keyReleaseEvent(QKeyEvent *event)
 void
 BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-  QGraphicsObject::mousePressEvent(event);
 
   if (_startMenu != nullptr) {
       _startMenu->close();
@@ -1354,8 +1374,11 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
       _endMenu->close();
     }
 
-  if (event->button() == Qt::LeftButton) {
+  if (event->button() == Qt::LeftButton)
+  {
+      _scene->unselectAll();
       setSelected(true);
+      emit _scene->selectionChanged();
 
       if (cursor().shape() == Qt::OpenHandCursor) {
           setCursor(Qt::ClosedHandCursor);
@@ -1395,6 +1418,8 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
         }
 //      update();
     }    
+
+  QGraphicsObject::mousePressEvent(event);
 }
 
 void
@@ -1502,6 +1527,7 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
       nullPath.addRect(QRectF(QPointF(0., 0.), QSizeF(0., 0.)));
       _scene->setSelectionArea(nullPath);
       setSelected(true);
+      emit _scene->selectionChanged();
       _scene->boxResized();
   }
 }
@@ -2018,6 +2044,7 @@ void BasicBox::onComboBoxHidden()
 
 void BasicBox::toggleMuteButton(bool )
 {
+    setSelected(true);
 	_scene->muteBoxes();
 }
 
@@ -2039,6 +2066,7 @@ void BasicBox::cleanupRelations()
 void
 BasicBox::select(){
     setSelected(true);
+    emit _scene->selectionChanged();
     _scene->setAttributes(_abstract);
     update();
 }
