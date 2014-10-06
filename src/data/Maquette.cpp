@@ -2158,7 +2158,7 @@ void
 deviceCallback(TTSymbol& deviceName)
 {
 	auto tree = Maquette::getInstance()->scene()->editor()->networkTree();
-    tree->refreshItemNamespace(tree->getItemFromAddress(deviceName.c_str()), false);
+    emit tree->deviceUpdated(tree->getItemFromAddress(deviceName.c_str()), false);
     std::cerr << "Maquette::deviceCallback : " << deviceName.c_str() << std::endl;
 }
 

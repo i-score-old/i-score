@@ -319,6 +319,9 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   connect(_deviceEdit, &DeviceEdit::enableTree,
 		  this,		   &NetworkTree::enable, Qt::DirectConnection);
 
+  connect(this,        &NetworkTree::deviceUpdated,
+          this,        &NetworkTree::refreshItemNamespace);
+
   _addADeviceItem = addADeviceNode();
   addTopLevelItem(_addADeviceItem);
 }
@@ -1171,7 +1174,6 @@ NetworkTree::expandItems(QList<QTreeWidgetItem*>& expandedItems)
           if(item->parent() && !item->parent()->isExpanded())
                expandItem(item->parent());
           expandItem(item);
-          qDebug() << "Expanding" << getAbsoluteAddress(item);
       }
   }
 }
@@ -1533,7 +1535,6 @@ QList<QTreeWidgetItem*> NetworkTree::getExpandedItems()
 void
 NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
 {
-    qDebug(Q_FUNC_INFO);
     bool isLearning{isInLearningMode()};
     // Make a copy of the addresses which were expanded
     std::vector<std::string> previouslyExpandedAddresses;
@@ -1544,9 +1545,7 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
             previouslyExpandedAddresses.push_back(getAbsoluteAddress(it).toStdString());
         }
     });
-/*    for(auto& addr : _expandedItems)
-        previouslyExpandedAddresses.push_back(_addressMap[addr]);
-*/
+
     // Make a copy of all the addresses
     std::vector<std::string> previousAddressMap;
     if(isLearning)
@@ -1559,7 +1558,7 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
 
     if(item != nullptr)
     {
-        if(item->type()==DeviceNode)
+        if(item->type() == DeviceNode)
         {
             collapseItem(item);
             string application = getAbsoluteAddress(item).toStdString();
@@ -1568,17 +1567,13 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
             /// \todo récupérer la valeur de retour.
             /// Peut être false en cas de OSC (traitement différent dans ce cas là).
             Maquette::getInstance()->rebuildNetworkNamespace(application);
-            treeRecursiveExploration(item,true);
+            treeRecursiveExploration(item, true);
             if(updateBoxes)
                 Maquette::getInstance()->updateBoxesAttributes();
 
             if(isOSC(item))
                 createOSCBranch(item);
-        }/*
-        else if(item->type() == OSCNode)
-        {
-           treeRecursiveExploration(item, true);
-        }*/
+        }
     }
 
     // Restore the addresses

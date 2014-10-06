@@ -431,6 +431,8 @@ class NetworkTree : public QTreeWidget
     void requestSnapshotEnd(QList<QTreeWidgetItem *> itemsLists);
     void treeSelectionChanged(QList<QTreeWidgetItem *> selectedItems);
 
+    void deviceUpdated(QTreeWidgetItem* item, bool updateBoxes);
+
   private:
     void treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict);
     void createOSCBranch(QTreeWidgetItem *curItem);
