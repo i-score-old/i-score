@@ -564,6 +564,7 @@ class MaquetteScene : public QGraphicsScene
     void conditionBoxes(QList<BasicBox *> boxesToCondition);
 
     bool multipleBoxesSelected();
+
 protected:
 
     /*!

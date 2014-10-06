@@ -442,6 +442,7 @@ bool MaquetteScene::multipleBoxesSelected()
     return selectedItems().size() > 1;
 }
 
+
 QGraphicsItem *
 MaquetteScene::getSelectedItem()
 {

@@ -337,8 +337,11 @@ MaquetteView::zoomIn()
 
           Maquette::getInstance()->updateBoxesFromEngines();
 
-          QPointF newCenter(2. * (mapFromGlobal(QCursor::pos()).x() + mapToScene(viewport()->rect().bottomLeft()).x()), getCenterCoordinates().y() );
+          //QPointF newCenter(2. * (mapFromGlobal(QCursor::pos()).x() + mapToScene(viewport()->rect().bottomLeft()).x()), getCenterCoordinates().y() );
                 // new center : cursor position in Window + scroll offset. (+ zoom factor 2.)
+          QPointF newCenter((getCenterCoordinates().x() + _scene->getCurrentTime()/(2* MaquetteScene::MS_PER_PIXEL)) , getCenterCoordinates().y() );
+
+          std::cout << "centre =" << getCenterCoordinates().x() << " timeBar = " << _scene->getCurrentTime()/ (2* MaquetteScene::MS_PER_PIXEL)  << std::endl;
           centerOn(newCenter);
 
           Maquette::getInstance()->setViewPosition(newCenter);
@@ -406,7 +409,7 @@ MaquetteView::zoomOut()
   _scene->update();
   Maquette::getInstance()->updateBoxesFromEngines();
 
-  QPointF newCenter(0.5 * getCenterCoordinates().x(), getCenterCoordinates().y());
+  QPointF newCenter(getCenterCoordinates().x() -  _scene->getCurrentTime()/(MaquetteScene::MS_PER_PIXEL) , getCenterCoordinates().y());
   centerOn(newCenter);
   Maquette::getInstance()->setViewPosition(newCenter);
   _scene->updateProgressBar();
