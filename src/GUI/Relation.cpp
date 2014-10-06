@@ -108,6 +108,7 @@ Relation::init()
   setZValue(1);
   _leftHandleSelected = false;
   _rightHandleSelected = false;
+  _middleHandleSelected = false;
   _color = QColor(Qt::blue);
   _lastMaxBound = -1;
   _elasticMode = false;
@@ -475,12 +476,12 @@ Relation::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
   if (_middleHandleSelected) {
       double startX = mapFromScene(_start).x();
       double endX = mapFromScene(_end).x();
-
       _scene->changeRelationBounds(_abstract->ID(), NO_LENGTH, (endX - startX) / _scene->zoom(), (endX - startX) / _scene->zoom());
       _middleHandleSelected = false;
     }
   _leftHandleSelected = false;
   _rightHandleSelected = false;
+
 }
 
 QRectF
