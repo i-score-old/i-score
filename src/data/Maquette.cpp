@@ -2187,21 +2187,24 @@ Maquette::getRangeBounds(const std::string& address, std::vector<float>& rangeBo
     if(Maquette::getInstance()->requestObjectAttribruteValue(address,"rangeBounds",values)>0){
 
         //parse string to vector<float>
-        QString qvalues = QString::fromStdString(values[0]);
-        QStringList valuesParsed = qvalues.split(" ");
+        if(!values.empty())
+        {
+            QString qvalues = QString::fromStdString(values[0]);
+            QStringList valuesParsed = qvalues.split(" ");
 
-        if(valuesParsed.size()==2){
-            //minBound
-            std::istringstream issMin(valuesParsed.at(0).toStdString());
-            issMin >> min;
-            rangeBounds.push_back(min);
+            if(valuesParsed.size()==2){
+                //minBound
+                std::istringstream issMin(valuesParsed.at(0).toStdString());
+                issMin >> min;
+                rangeBounds.push_back(min);
 
-            //maxBound
-            std::istringstream issMax(valuesParsed.at(1).toStdString());
-            issMax >> max;
-            rangeBounds.push_back(max);
+                //maxBound
+                std::istringstream issMax(valuesParsed.at(1).toStdString());
+                issMax >> max;
+                rangeBounds.push_back(max);
 
-            return 1;
+                return 1;
+            }
         }
     }
     return 0;
@@ -2374,3 +2377,19 @@ void Maquette::boxIsRunningSlot(unsigned int boxID, bool running)
   if(boxID==ROOT_BOX_ID)
       Maquette::getInstance()->udpatePlayModeView(running);
 }
+
+
+std::vector<std::string> Maquette::getMIDIInputDevices()
+{
+    std::vector<std::string> vec;
+    _engines->protocolScan("MIDI", {"inputs"}, vec);
+    return vec;
+}
+
+std::vector<std::string> Maquette::getMIDIOutputDevices()
+{
+    std::vector<std::string> vec;
+    _engines->protocolScan("MIDI", {"outputs"}, vec);
+    return vec;
+}
+

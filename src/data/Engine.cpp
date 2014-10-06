@@ -2231,7 +2231,7 @@ void Engine::trigger(vector<ConditionedProcessId> triggerIds)
         lastTimeCondition.send("Trigger", events, out);
 }
 
-void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort)
+void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort, const bool isInputPort, const std::string & stringPort)
 {
     TTValue     args, out;
     TTSymbol    applicationName(deviceName);
@@ -2255,10 +2255,23 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
             // register the application to the protocol
             aProtocol.send("ApplicationRegister", applicationName, out);
             
+            // select appliction before to set its parameter
             aProtocol.send("ApplicationSelect", applicationName, out);
-            args = TTValue(TTUInt16(destinationPort), TTUInt16(receptionPort));
-            aProtocol.set("port", args);
-            aProtocol.set("ip", TTSymbol(DeviceIp));
+            
+            // prepare parameters depending of the protocol
+            if (pluginToUse == "Minuit" || pluginToUse == "OSC") {
+                
+                args = TTValue(TTUInt16(destinationPort), TTUInt16(receptionPort));
+                aProtocol.set("port", args);
+                aProtocol.set("ip", TTSymbol(DeviceIp));
+            }
+            else if (pluginToUse == "MIDI") {
+                
+                if (isInputPort)
+                    aProtocol.set("input", TTSymbol(stringPort));
+                else
+                    aProtocol.set("output", TTSymbol(stringPort));
+            }
             
             // run the protocol
             aProtocol.send("Run");
@@ -2325,11 +2338,6 @@ void Engine::getProtocolNames(std::vector<std::string>& allProtocolNames)
     for (TTUInt8 i = 0; i < protocolNames.size(); i++) {
         
         name = protocolNames[i];
-        
-        // Théo : this is a temporary solution to load MIDI but to not allow to select it
-        if (name == TTSymbol("MIDI"))
-            continue;
-        
         allProtocolNames.push_back(name.c_str());
     }
 }
@@ -2930,15 +2938,14 @@ bool Engine::getDeviceLearn(std::string deviceName)
     return TTBoolean(v[0]);
 }
 
-bool Engine::protocolScan(const std::string & protocol, std::vector<std::string>& scanOptions, std::vector<std::string>& scanResult)
+bool Engine::protocolScan(const std::string & protocol, std::vector<std::string>&& scanOptions, std::vector<std::string>& scanResult)
 {
     TTObject    aProtocol = (TTObjectBasePtr)accessProtocol(TTSymbol(protocol));
     TTValue     args, out;
-    vector<string>::iterator it;
 
     // prepare scan options value
-    for (it = scanOptions.begin(); it != scanOptions.end(); ++it)
-            args.append(TTSymbol(*it));
+    for (const auto& opt : scanOptions)
+            args.append(TTSymbol(opt));
     
     TTErr err = aProtocol.send("Scan", args, out);
     

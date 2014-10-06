@@ -73,7 +73,7 @@ enum { RELATION_TYPE = QGraphicsObject::UserType + 4 };
 class Relation : public QGraphicsObject
 {
   public:
-    Relation(unsigned int firstBoxID, BoxExtremity firstBoxExt, unsigned int secondBoxID,
+    Relation(unsigned int BoxID, BoxExtremity firstBoxExt, unsigned int secondBoxID,
              BoxExtremity secondBoxExt, MaquetteScene *parent);
 
     Relation(const AbstractRelation &abstract, MaquetteScene *parent);

@@ -795,8 +795,10 @@ class Maquette : public QObject
     int appendToNetWorkNamespace(const std::string & address, const std::string & service = "parameter", const std::string & type = "generic", const std::string & priority = "0", const std::string & description = "", const std::string & range = "0. 1.", const std::string & clipmode = "none", const std::string & tags = "");
     int removeFromNetWorkNamespace(const std::string & address);
 	
-	
-  signals:
+
+    std::vector<std::string> getMIDIInputDevices();
+    std::vector<std::string> getMIDIOutputDevices();
+signals:
      void boxIsRunningSignal(unsigned int boxId, bool running);
   
   public slots:

@@ -65,7 +65,7 @@ DeviceEdit::init()
   _protocolsLabel = new QLabel(tr("protocols"));
   _portOutputLabel = new QLabel(tr("Port (destination)"));
   _portInputLabel = new QLabel(tr("          (reception)"));
-  _localHostLabel = new QLabel(tr("localHost"));
+  _localHostLabel = new QLabel(tr("Host"));
 
   _portOutputBox = new QSpinBox;
   _portOutputBox->setRange(0, 65535);
@@ -75,9 +75,10 @@ DeviceEdit::init()
   _localHostBox = new QLineEdit;
   _nameEdit = new QLineEdit;
   _protocolsComboBox = new QComboBox;
+  _protocolsComboBox->addItems({"Minuit", "OSC", "MIDI"});
 
   _namespaceFilePath = new QLineEdit;
-
+/*
   // Protocols
   std::vector<std::string> protocols = Maquette::getInstance()->getProtocolsName();
   for (unsigned int i = 0; i < protocols.size(); i++) {
@@ -85,15 +86,24 @@ DeviceEdit::init()
           _protocolsComboBox->addItem(QString::fromStdString(protocols[i]));
         }
   }
-
+*/
   _layout->addWidget(_deviceNameLabel, 0, 0, 1, 1);
   _layout->addWidget(_nameEdit, 0, 1, 1, 1);
+
+  _layout->addWidget(&_midiDeviceLabel, 3, 0, 1, 1);
+  _layout->addWidget(&_midiDevicesBox, 3, 1, 1, 1);
+
+  _layout->addWidget(&_midiIn, 2, 1, 1, 1);
+  _layout->addWidget(&_midiOut, 2, 2, 1, 1);
+
   _layout->addWidget(_protocolsLabel, 1, 0, 1, 1);
   _layout->addWidget(_protocolsComboBox, 1, 1, 1, 1);
+
   _layout->addWidget(_portOutputLabel, 2, 0, 1, 1);
   _layout->addWidget(_portOutputBox, 2, 1, 1, 1);
   _layout->addWidget(_portInputLabel, 2, 3, 1, 1);
   _layout->addWidget(_portInputBox, 2, 4, 1, 1);
+
   _layout->addWidget(_localHostLabel, 4, 0, 1, 1);
   _layout->addWidget(_localHostBox, 4, 1, 1, 1);
 
@@ -108,6 +118,7 @@ DeviceEdit::init()
   _layout->addWidget(_cancelButton, 6, 4, 1, 1);
 
   connect(_nameEdit, SIGNAL(textChanged(QString)), this, SLOT(setDeviceNameChanged()));
+  connect(&_midiDevicesBox, SIGNAL(currentTextChanged(QString)), this, SLOT(setDeviceNameChanged()));
   connect(_protocolsComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setProtocolChanged()));
   connect(_portOutputBox, SIGNAL(valueChanged(int)), this, SLOT(setNetworkPortChanged()));
   connect(_portInputBox, SIGNAL(valueChanged(int)), this, SLOT(setNetworkPortChanged()));
@@ -115,6 +126,23 @@ DeviceEdit::init()
 
   connect(_openNamespaceFileButton, SIGNAL(clicked()), this, SLOT(openFileDialog()));
   connect(_namespaceFilePath, SIGNAL(textChanged(QString)), this, SLOT(setNamespacePathChanged()));
+
+  connect(&_midiIn, &QRadioButton::pressed,
+          [&] ()
+  {
+      _midiDevicesBox.clear();
+      for(const auto& str : Maquette::getInstance()->getMIDIInputDevices())
+          _midiDevicesBox.addItem(QString::fromStdString(str));
+  });
+
+  connect(&_midiOut, &QRadioButton::pressed,
+          [&] ()
+  {
+      _midiDevicesBox.clear();
+      for(const auto& str : Maquette::getInstance()->getMIDIOutputDevices())
+          _midiDevicesBox.addItem(QString::fromStdString(str));
+  });
+
 
   connect(_okButton, SIGNAL(clicked()), this, SLOT(accept()));
   connect(_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
@@ -137,6 +165,8 @@ DeviceEdit::init()
 		  this,		&DeviceEdit::enableTree, Qt::DirectConnection);
   connect(&updater,  &NetworkUpdater::disableTree,
 		  this,		&DeviceEdit::disableTree, Qt::DirectConnection);
+
+  setCorrespondingProtocolLayout();
 }
 
 DeviceEdit::~DeviceEdit()
@@ -219,6 +249,7 @@ DeviceEdit::edit(QString name)
 
   _nameEdit->setFocus();
 
+  setCorrespondingProtocolLayout();
   exec();
 }
 
@@ -234,7 +265,112 @@ DeviceEdit::edit()
     _newDevice = true;
 
     _nameEdit->setFocus();
+    setCorrespondingProtocolLayout();
     exec();
+}
+
+void DeviceEdit::setMidiLayout()
+{
+    _midiIn.setHidden(false);
+    _midiOut.setHidden(false);
+
+    _deviceNameLabel->setHidden(true);
+    _nameEdit->setHidden(true);
+
+    _midiDeviceLabel.setHidden(false);
+    _midiDevicesBox.setHidden(false);
+
+    _localHostBox->setHidden(true);
+    _localHostLabel->setHidden(true);
+
+    _portOutputLabel->setHidden(true);
+    _portOutputBox->setHidden(true);
+
+    _portInputLabel->setHidden(true);
+    _portInputBox->setHidden(true);
+
+    _namespaceFilePath->setHidden(true);
+    _openNamespaceFileButton->setHidden(true);
+}
+
+void DeviceEdit::setMinuitLayout()
+{
+    _midiIn.setHidden(true);
+    _midiOut.setHidden(true);
+
+    _deviceNameLabel->setHidden(false);
+    _nameEdit->setHidden(false);
+
+    _midiDeviceLabel.setHidden(true);
+    _midiDevicesBox.setHidden(true);
+
+    _localHostBox->setHidden(false);
+    _localHostLabel->setHidden(false);
+
+    _portOutputLabel->setHidden(false);
+    _portOutputBox->setHidden(false);
+
+    _portInputLabel->setHidden(true);
+    _portInputBox->setHidden(true);
+
+    _namespaceFilePath->setHidden(true);
+    _openNamespaceFileButton->setHidden(true);
+}
+
+void DeviceEdit::setOSCLayout()
+{
+    _midiIn.setHidden(true);
+    _midiOut.setHidden(true);
+
+    _deviceNameLabel->setHidden(false);
+    _nameEdit->setHidden(false);
+
+    _midiDeviceLabel.setHidden(true);
+    _midiDevicesBox.setHidden(true);
+
+    _localHostBox->setHidden(false);
+    _localHostLabel->setHidden(false);
+
+    _portOutputLabel->setHidden(false);
+    _portOutputBox->setHidden(false);
+
+    _portInputLabel->setHidden(false);
+    _portInputBox->setHidden(false);
+
+    _namespaceFilePath->setHidden(false);
+    _openNamespaceFileButton->setHidden(false);
+}
+
+void DeviceEdit::setCorrespondingProtocolLayout()
+{
+    if(_protocolsComboBox->currentText() == "OSC")
+    {
+      defaultName = "OSCdevice";
+      defaultPort = 9997;
+      defaultInputPort = 9996;
+
+      setOSCLayout();
+
+    }
+    else if (_protocolsComboBox->currentText() == "Minuit")
+    {
+      defaultName = "MinuitDevice";
+      defaultPort = 9998;
+      defaultInputPort = 13579;
+      setMinuitLayout();
+
+    }
+    else if (_protocolsComboBox->currentText() == "MIDI")
+    {
+      defaultName = "MIDIDevice";
+      setMidiLayout();
+    }
+
+    _localHostBox->setText(defaultLocalHost);
+    _portOutputBox->setValue(defaultPort);
+    _portInputBox->setValue(defaultInputPort);
+    _nameEdit->setText(defaultName);
+
 }
 
 void
@@ -242,18 +378,7 @@ DeviceEdit::setProtocolChanged()
 {
   _protocolChanged = true;
 
-  if(_protocolsComboBox->currentText() == "OSC"){
-      _portInputLabel->setHidden(false);
-      _portInputBox->setHidden(false);
-      _namespaceFilePath->setHidden(false);
-      _openNamespaceFileButton->setHidden(false);      
-  }
-  else if (_protocolsComboBox->currentText() == "Minuit"){
-      _portInputLabel->setHidden(true);
-      _portInputBox->setHidden(true);
-      _namespaceFilePath->setHidden(true);
-      _openNamespaceFileButton->setHidden(true);
-  }
+  setCorrespondingProtocolLayout();
 
   setChanged();
 }

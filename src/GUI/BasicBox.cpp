@@ -770,7 +770,9 @@ BasicBox::updateRelations(BoxExtremity extremity)
       for (it2 = cur.begin(); it2 != cur.end(); ++it2) {
           curRel = it2->second;
           curRel->lower(_low);
-          curRel->updateFlexibility();
+          if (extremity == BOX_START) {
+            curRel->updateFlexibility();
+          }
         }
     }
 }
@@ -2122,7 +2124,7 @@ BasicBox::setButtonsVisible(bool value)
 
 	_playButton->setVisible((!_playing && value) && (width() > 70));
 	_stopButton->setVisible((_playing && value) && (width() > 70));
-	_muteButton->setVisible(value && (width() > 50));
+    _muteButton->setVisible(value && (width() > 50));
 }
 
 void

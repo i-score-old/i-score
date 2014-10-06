@@ -1010,10 +1010,12 @@ public:
 	 * \param deviceName : the name to give to this device.
 	 * \param pluginToUse : plugin to use with this device (the plugin name could be retrieved with
 	 * the networkGetAllLoadedPlugins function).
-	 * \param deviceIp : the ip of the network device.
-	 * \param devicePort : the port of the network device.
+	 * \param deviceIp : the ip of the network device (for Minuit and OSC plugin)
+	 * \param devicePort : the port of the network device (for Minuit and OSC plugin)
+     * \param isInputPort : true for input, false for output (for MIDI plugin)
+     * \param stringPort : the port name (for MIDI plugin)
 	 */
-    void addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & deviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort = 0);
+    void addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & deviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort = 0, const bool isInputPort = false, const std::string & stringPort = "");
     
 	/*!
 	 * Removes a network device.
@@ -1269,7 +1271,7 @@ public:
      * \param scanResult : a vector containing all available devices
      * \return true if the scan succeed
      */
-    bool protocolScan(const std::string & protocol, std::vector<std::string>& scanOptions, std::vector<std::string>& scanResult);
+    bool protocolScan(const std::string & protocol, std::vector<std::string>&& scanOptions, std::vector<std::string>& scanResult);
 
 	//Store and load ////////////////////////////////////////////////////////////////////////////////////
     

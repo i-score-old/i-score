@@ -108,6 +108,7 @@ Relation::init()
   setZValue(1);
   _leftHandleSelected = false;
   _rightHandleSelected = false;
+  _middleHandleSelected = false;
   _color = QColor(Qt::blue);
   _lastMaxBound = -1;
   _elasticMode = false;
@@ -480,6 +481,7 @@ Relation::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
     }
   _leftHandleSelected = false;
   _rightHandleSelected = false;
+
 }
 
 QRectF
