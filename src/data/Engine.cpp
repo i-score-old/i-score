@@ -2032,8 +2032,12 @@ bool Engine::play(TimeProcessId processId)
     TTLogMessage("***************************************\n");
     TTLogMessage("Engine::play\n");
     
-    // make the start event to happen
-    TTErr err = getTimeProcess(processId).send("Start");
+    TTValue none;
+    
+    // simulate start event happening and push it state
+    TTErr err = getTimeProcess(processId).send("Start", TTBoolean(YES), none);
+    //if (processId != ROOT_BOX_ID)
+    //    getSubScenario(processId).send("Start");
     
     return err == kTTErrNone;
 }
@@ -3511,7 +3515,6 @@ void TimeProcessEndCallback(const TTValue& baton, const TTValue& /*value*/)
     // update all process running state too
     if (engine->m_TimeProcessSchedulerRunningAttributeCallback != nullptr)
         engine->m_TimeProcessSchedulerRunningAttributeCallback(boxId, NO);
-    
 }
 
 void NamespaceCallback(const TTValue& baton, const TTValue& value)
