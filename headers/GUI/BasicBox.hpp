@@ -560,7 +560,7 @@ class BasicBox : public QGraphicsObject
     static const unsigned int LINE_WIDTH = 2;
 
     //! \brief Handles resizing tolerance.
-    static const unsigned int RESIZE_TOLERANCE = 40;
+    static const unsigned int RESIZE_TOLERANCE = 25;
 
     static unsigned int BOX_MARGIN;
     static const float TRIGGER_ZONE_WIDTH;
