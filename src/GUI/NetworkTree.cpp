@@ -88,6 +88,14 @@ unsigned int NetworkTree::TEXT_POINT_SIZE = 10;
 
 struct ItemProperties { virtual void setup(QTreeWidgetItem*) = 0; };
 
+struct DeviceProperties : public ItemProperties
+{
+        virtual void setup(QTreeWidgetItem* curItem) override
+        {
+            curItem->setForeground(0, Qt::white);
+        }
+};
+
 struct NodeProperties : public ItemProperties
 {
         virtual void setup(QTreeWidgetItem* curItem) override
@@ -189,9 +197,8 @@ class NetworkTreeItem : public QTreeWidgetItem
             curFont.setItalic(false);
             setFont(NetworkTree::NAME_COLUMN,curFont);
 
-            QBrush brush(Qt::white);
-            setForeground(NetworkTree::NAME_COLUMN, brush);
-            setForeground(NetworkTree::VALUE_COLUMN, brush);
+            for(int i = 0; i <= 12; i++)
+                setForeground(i, Qt::white);
 
             setCheckState(NetworkTree::START_ASSIGNATION_COLUMN, Qt::Unchecked);
             setCheckState(NetworkTree::END_ASSIGNATION_COLUMN, Qt::Unchecked);
@@ -664,8 +671,10 @@ NetworkTree::addADeviceNode()
 QTreeWidgetItem *
 NetworkTree::addDeviceItem(QString name)
 {
-    QTreeWidgetItem *newItem = new QTreeWidgetItem(DeviceNode);
+    auto newItem = new NetworkTreeItem(DeviceNode);
     newItem->setText(NAME_COLUMN,name);
+    newItem->setupProperties(DeviceProperties());
+
     insertTopLevelItem(topLevelItemCount()-1, newItem);
 
     return newItem;
