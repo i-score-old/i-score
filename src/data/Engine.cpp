@@ -2010,8 +2010,6 @@ void Engine::setTimeOffset(TimeValue timeOffset, bool mute)
 
     // set the time process at time offset (an optionaly mute the output)
     m_mainScenario.send("Goto", args, out);
-    
-    TTLogMessage("Engine::setTimeOffset = %ld\n", timeOffset);       
 }
 
 TimeValue Engine::getTimeOffset()
@@ -2026,8 +2024,6 @@ TimeValue Engine::getTimeOffset()
     
     scheduler.get("offset", out);
     
-    TTLogMessage("Engine::getTimeOffset = %ld\n", TimeValue(TTFloat64(out[0])));
-    
     return TimeValue(TTFloat64(out[0]));
 }
 
@@ -2038,8 +2034,6 @@ bool Engine::play(TimeProcessId processId)
     
     // make the start event to happen
     TTErr err = getTimeProcess(processId).send("Start");
-    if (processId != ROOT_BOX_ID)
-        getSubScenario(processId).send("Start");
     
     return err == kTTErrNone;
 }
