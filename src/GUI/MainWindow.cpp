@@ -314,6 +314,7 @@ MainWindow::open()
   dialog.setFileMode(QFileDialog::ExistingFile);
   if(dialog.exec() && !dialog.selectedFiles().isEmpty() && !dialog.selectedFiles()[0].isEmpty())
   {
+      dialog.close();
       emit sigLoad(dialog.selectedFiles()[0]);
   }
 }
