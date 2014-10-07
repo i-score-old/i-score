@@ -1,7 +1,7 @@
 i-score is an interactive intermedia sequencer - read more on http://i-score.org/
 
 In order to build i-score, follow the instructions on https://github.com/OSSIA/OSSIA (or in INSTALL.md).
-Current builds tested on Mac OS X 10.9, Debian GNU/Linux and Windows 7.
+Current builds tested on Mac OS X 10.8, Debian Jessie, Ubuntu and Windows 8.
 
 An installer is available on http://i-score.org/
 
