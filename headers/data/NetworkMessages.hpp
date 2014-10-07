@@ -31,6 +31,11 @@ struct Message {
   QString value;
 };
 
+inline bool operator==(const Message m, const Message m2)
+{
+    return m.device == m2.device && m.message == m2.message && m.value == m2.value;
+}
+
 struct Data {
   unsigned int sampleRate;
   QString value;
