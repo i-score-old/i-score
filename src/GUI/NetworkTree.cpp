@@ -1025,7 +1025,6 @@ void
 NetworkTree::displayBoxContent(AbstractBox *abBox)
 {
   qDebug(Q_FUNC_INFO);
-  abBox->updateTreeItemPointers();
   auto map = abBox->startMessages()->getMessages();
   for(auto mess : map )
   {
