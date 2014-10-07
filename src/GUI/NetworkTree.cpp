@@ -573,6 +573,7 @@ void NetworkTree::addOSCMessage(QTreeWidgetItem *rootNode)
         Maquette::getInstance()->appendToNetWorkNamespace(fullname.toStdString());
         Maquette::getInstance()->setDeviceLearn(devicename.toLatin1().constData(), false);
 
+        // Expansion des items nouvellement ajoutés
         std::vector<QString> addrsAfter;
         applyInTree(rootNode, [&] (QTreeWidgetItem* item)
         {
@@ -604,7 +605,7 @@ void NetworkTree::removeOSCMessage(QTreeWidgetItem* item)
 
 void
 NetworkTree::loadNetworkTree(AbstractBox *abBox)
-{
+{ qDebug(Q_FUNC_INFO);
   QList< QPair<QTreeWidgetItem *, Message> > startItemsAndMsgs = getItemsFromMsg(Maquette::getInstance()->firstMessagesToSend(abBox->ID()));
   QList< QPair<QTreeWidgetItem *, Message> > endItemsAndMsgs = getItemsFromMsg(Maquette::getInstance()->lastMessagesToSend(abBox->ID()));
 
@@ -865,6 +866,7 @@ NetworkTree::treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict)
                      childItem->setupProperties(NodeProperties());
                  }
 
+                 qDebug() << "New node created: " << childAbsoluteAddress.c_str();
                  treeRecursiveExploration(childItem, conflict);
                  setNewItemProperties(childItem);
              }
@@ -1022,6 +1024,15 @@ NetworkTree::clearDevicesEndMsgs(QList<QString> devices)
 void
 NetworkTree::displayBoxContent(AbstractBox *abBox)
 {
+  qDebug(Q_FUNC_INFO);
+  abBox->updateTreeItemPointers();
+  auto map = abBox->startMessages()->getMessages();
+  for(auto mess : map )
+  {
+      for(auto key : map.keys(mess))
+        qDebug() << "Key: " << (void*)key << "Message: " << mess.device + mess.message + " " + mess.value;
+  }
+
   setStartMessages(abBox->startMessages());
   setEndMessages(abBox->endMessages());
   updateStartMsgsDisplay();
@@ -1543,7 +1554,7 @@ QList<QTreeWidgetItem*> NetworkTree::getExpandedItems()
 
 void
 NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
-{
+{qDebug(Q_FUNC_INFO);
     bool isLearning{isInLearningMode()};
     // Make a copy of the addresses which were expanded
     std::vector<std::string> previouslyExpandedAddresses;
@@ -1621,7 +1632,8 @@ NetworkTree::refreshItemNamespace(QTreeWidgetItem *item, bool updateBoxes)
 }
 
 void
-NetworkTree::refreshCurrentItemNamespace(){
+NetworkTree::refreshCurrentItemNamespace()
+{qDebug(Q_FUNC_INFO);
     if(currentItem() != nullptr)
         refreshItemNamespace(currentItem());
 }
@@ -2473,7 +2485,7 @@ NetworkTree::updateDeviceName(QString oldName, QString newName)
 }
 
 void NetworkTree::addNewDevice(QString deviceName)
-{
+{qDebug(Q_FUNC_INFO);
     QTreeWidgetItem *newItem = addDeviceItem(deviceName);
     newItem->setCheckState(NAME_COLUMN,Qt::Unchecked);
     refreshItemNamespace(newItem);
@@ -2499,7 +2511,8 @@ NetworkTree::updateDeviceProtocol(QString newName)
 }
 
 void
-NetworkTree::updateDeviceNamespace(QString deviceName){
+NetworkTree::updateDeviceNamespace(QString deviceName)
+{ qDebug(Q_FUNC_INFO);
     QTreeWidgetItem *deviceItem;
 
     if(currentItem()!=nullptr && currentItem()->text(NAME_COLUMN) == deviceName)
