@@ -341,7 +341,6 @@ MaquetteView::zoomIn()
                 // new center : cursor position in Window + scroll offset. (+ zoom factor 2.)
           QPointF newCenter((getCenterCoordinates().x() + _scene->getCurrentTime()/(2* MaquetteScene::MS_PER_PIXEL)) , getCenterCoordinates().y() );
 
-          std::cout << "centre =" << getCenterCoordinates().x() << " timeBar = " << _scene->getCurrentTime()/ (2* MaquetteScene::MS_PER_PIXEL)  << std::endl;
           centerOn(newCenter);
 
           Maquette::getInstance()->setViewPosition(newCenter);
