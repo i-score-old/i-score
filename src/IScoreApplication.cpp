@@ -11,7 +11,7 @@ void IScoreApplication::startWindow()
   win->show();
   if(!loadString.isEmpty())
   {
-    win->loadFile(loadString);
+    emit win->sigLoad(loadString);
   }
 
   connect(this, SIGNAL(fileOpened(QString)), win, SLOT(open(QString)));

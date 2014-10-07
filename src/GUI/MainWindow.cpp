@@ -310,15 +310,12 @@ MainWindow::open()
         }
     }
 
-  QString fileName = QFileDialog::
-          getOpenFileName(this, tr("Open File"), 0, tr("XML Files (*.score)"));
-
-
-
-  if (!fileName.isEmpty()) {                  
-      QCoreApplication::processEvents();//permet de fermer la fenêtre de dialogue avant de lancer le chargement.
-      emit sigLoad(fileName);
-    }
+  QFileDialog dialog{this, tr("Open File"), QString(), tr("XML Files (*.score)")};
+  dialog.setFileMode(QFileDialog::ExistingFile);
+  if(dialog.exec() && !dialog.selectedFiles().isEmpty() && !dialog.selectedFiles()[0].isEmpty())
+  {
+      emit sigLoad(dialog.selectedFiles()[0]);
+  }
 }
 
 void
@@ -707,7 +704,7 @@ MainWindow::writeSettings()
 void
 MainWindow::loadFile(const QString &fileName)
 {
-    QCoreApplication::processEvents();//permet de fermer la fenêtre de dialogue avant de lancer le chargement.
+  QCoreApplication::processEvents();//permet de fermer la fenêtre de dialogue avant de lancer le chargement.
   QApplication::setOverrideCursor(Qt::WaitCursor);
   _scene->clear();
   _editor->clear();
