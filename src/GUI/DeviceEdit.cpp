@@ -75,9 +75,10 @@ DeviceEdit::init()
   _localHostBox = new QLineEdit;
   _nameEdit = new QLineEdit;
   _protocolsComboBox = new QComboBox;
+  _protocolsComboBox->addItems({"Minuit", "OSC", "MIDI"});
 
   _namespaceFilePath = new QLineEdit;
-
+/*
   // Protocols
   std::vector<std::string> protocols = Maquette::getInstance()->getProtocolsName();
   for (unsigned int i = 0; i < protocols.size(); i++) {
@@ -85,7 +86,7 @@ DeviceEdit::init()
           _protocolsComboBox->addItem(QString::fromStdString(protocols[i]));
         }
   }
-
+*/
   _layout->addWidget(_deviceNameLabel, 0, 0, 1, 1);
   _layout->addWidget(_nameEdit, 0, 1, 1, 1);
 
