@@ -144,7 +144,11 @@ MainWindow::MainWindow()
   connect(_scene, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
   connect(_view, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
   connect(_scene, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
-  connect(_scene, &MaquetteScene::updateRecordingBoxes, this, &MainWindow::updateRecordingBoxes);
+  connect(_scene, &MaquetteScene::updateRecordingBoxes,
+          this,   &MainWindow::updateRecordingBoxes);
+
+  connect(this, &MainWindow::sigLoad,
+          this, &MainWindow::loadFile);
 }
 
 MainWindow::~MainWindow()
@@ -313,7 +317,7 @@ MainWindow::open()
 
   if (!fileName.isEmpty()) {                  
       QCoreApplication::processEvents();//permet de fermer la fenêtre de dialogue avant de lancer le chargement.
-      loadFile(fileName);      
+      emit sigLoad(fileName);
     }
 }
 
@@ -342,7 +346,7 @@ MainWindow::open(QString s)
         }
     }
 
-    loadFile(s);
+     emit sigLoad(s);
 
 }
 
