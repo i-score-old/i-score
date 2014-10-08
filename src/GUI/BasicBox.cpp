@@ -88,7 +88,7 @@ using std::map;
 /// \todo On pourrait les instancier directement dans le header avec leurs définitions. (par jaime Chao)
 const int BasicBox::COMBOBOX_HEIGHT = 25;
 const int BasicBox::COMBOBOX_WIDTH = 120;
-const int BasicBox::BUTTON_SIZE = 20;
+const int BasicBox::BUTTON_SIZE = 16;
 const float BasicBox::TRIGGER_ZONE_WIDTH = 18.;
 const float BasicBox::TRIGGER_ZONE_HEIGHT = 20.;
 const float BasicBox::TRIGGER_EXPANSION_FACTOR = 2.5;
@@ -152,26 +152,28 @@ BasicBox::centerWidget()
 
     if(_comboBox != nullptr){
         _comboBox->move(0, -(height() / 2 + LINE_WIDTH));
-        _comboBox->resize((width() - 4 * LINE_WIDTH - BOX_MARGIN) / 2 - 5, COMBOBOX_HEIGHT);
+        _comboBox->resize((width() - 4 * LINE_WIDTH - BOX_MARGIN) / 2 - 2, COMBOBOX_HEIGHT);
     }
 
     if(_startMenuButton != nullptr)
-        _startMenuButton->move(-(width()) / 2 + LINE_WIDTH, -(height()) / 2);
+        _startMenuButton->move(-(width()) / 2 + LINE_WIDTH,
+                          -(height()) / 2 + 2);
 
     if(_endMenuButton != nullptr)
-        _endMenuButton->move((width()) / 2 + 2 * LINE_WIDTH - BOX_MARGIN, -(height()) / 2);
+        _endMenuButton->move((width()) / 2 + 2 * LINE_WIDTH - BOX_MARGIN,
+                          -(height()) / 2 + 2);
 
     if(_playButton != nullptr)
-        _playButton->move(-(width()) / 2 + LINE_WIDTH + 2 * BOX_MARGIN,
-						  -(height()) / 2);
+        _playButton->move(-(width()) / 2 + LINE_WIDTH + 4 + 2 * ( BUTTON_SIZE + 2 ),
+                          -(height()) / 2 + 2);
 
     if(_stopButton != nullptr)
-        _stopButton->move(-(width()) / 2 + LINE_WIDTH + 2 * BOX_MARGIN,
-						  -(height()) / 2);
+        _stopButton->move(-(width()) / 2 + LINE_WIDTH + 4 + 2 * ( BUTTON_SIZE + 2 ),
+                          -(height()) / 2 + 2);
 	
 	if(_muteButton)
-        _muteButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN,
-						  -(height()) / 2);
+        _muteButton->move(-(width()) / 2 + LINE_WIDTH + 3 + BUTTON_SIZE + 2,
+                          -(height()) / 2 + 2);
 }
 
 void
@@ -1985,12 +1987,12 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     if(width() > 140)
     {
 		painter->save();
-        painter->translate(30, 4);
+        painter->translate(0, 2);
 		painter->setPen(QPen(Qt::gray));
 
 		if(_hover || isSelected())
-			painter->drawText(QRectF(BOX_MARGIN * 2, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
-		else
+            painter->drawText(QRectF(BOX_MARGIN * 2 + 17, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
+        else
 			painter->drawText(QRectF(0, 0, textRect.width(), textRect.height()), Qt::AlignHCenter, name());
         painter->restore();
     }
