@@ -156,23 +156,23 @@ BasicBox::centerWidget()
 
     if(_startMenuButton != nullptr)
         _startMenuButton->move(-(width()) / 2 + LINE_WIDTH,
-                          -(height()) / 2 + 2);
+                          -(height()) / 2 + 2.5);
 
     if(_endMenuButton != nullptr)
         _endMenuButton->move((width()) / 2 + 2 * LINE_WIDTH - BOX_MARGIN,
-                          -(height()) / 2 + 2);
+                          -(height()) / 2 + 2.5);
 
     if(_playButton != nullptr)
         _playButton->move(-(width()) / 2 + LINE_WIDTH + 4 + 2 * ( BUTTON_SIZE + 2 ),
-                          -(height()) / 2 + 2);
+                          -(height()) / 2 + 2.5);
 
     if(_stopButton != nullptr)
         _stopButton->move(-(width()) / 2 + LINE_WIDTH + 4 + 2 * ( BUTTON_SIZE + 2 ),
-                          -(height()) / 2 + 2);
+                          -(height()) / 2 + 2.5);
 	
 	if(_muteButton)
         _muteButton->move(-(width()) / 2 + LINE_WIDTH + 3 + BUTTON_SIZE + 2,
-                          -(height()) / 2 + 2);
+                          -(height()) / 2 + 2.5);
 }
 
 void
@@ -1986,7 +1986,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     if(width() > 140)
     {
 		painter->save();
-        painter->translate(0, 2);
+        painter->translate(0, 3);
 		painter->setPen(QPen(Qt::gray));
 
 		if(_hover || isSelected())
