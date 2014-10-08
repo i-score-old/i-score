@@ -150,8 +150,8 @@ BasicBox::centerWidget()
     }
 
     if(_comboBox != nullptr){
-        _comboBox->move(0, -(height() / 2 + LINE_WIDTH));
-        _comboBox->resize((width() - 4 * LINE_WIDTH - BOX_MARGIN) / 2 - 2, COMBOBOX_HEIGHT);
+        _comboBox->move( - 4, -(height() / 2 + LINE_WIDTH));
+        _comboBox->resize((width() - 4 * LINE_WIDTH - BOX_MARGIN ) / 2, COMBOBOX_HEIGHT);
     }
 
     if(_startMenuButton != nullptr)
@@ -2129,7 +2129,7 @@ void
 BasicBox::setButtonsVisible(bool value)
 {
 	_comboBoxProxy->setVisible((value || _comboBox->isShown()) &&
-                               (width() > 3 * BOX_MARGIN + 150));
+                               (width() > 3 * BOX_MARGIN + 125));
 
 	_startMenuButton->setVisible(value);
     _endMenuButton->setVisible(value && (width() > 4 * BOX_MARGIN));
