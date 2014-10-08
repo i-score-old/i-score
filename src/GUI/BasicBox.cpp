@@ -102,7 +102,6 @@ const QString BasicBox::SCENARIO_MODE_TEXT = tr("Scenario");
 const QString BasicBox::DEFAULT_MODE_TEXT = "Select content to edit";
 const QColor BasicBox::BOX_COLOR = QColor(60, 60, 60);
 const QColor BasicBox::TEXT_COLOR = QColor(0, 0, 0);
-
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
   : QGraphicsObject()
 {    
