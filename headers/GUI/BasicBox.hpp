@@ -571,6 +571,7 @@ class BasicBox : public QGraphicsObject
     static const float EAR_HEIGHT;
     static const int COMBOBOX_WIDTH;
     static const int COMBOBOX_HEIGHT;
+    static const int BUTTON_SIZE;
     static const float MSGS_INDICATOR_WIDTH;
     static const float GRIP_CIRCLE_SIZE;
     static const QString SCENARIO_MODE_TEXT;
@@ -765,8 +766,8 @@ class BasicBox : public QGraphicsObject
     QPushButton *_playButton{};
     QPushButton *_stopButton{};
 	QPushButton *_muteButton{};
-	const QIcon _muteOffIcon{":/resources/images/Mute.png"};
-	const QIcon _muteOnIcon{":/resources/images/MuteOn.png"};
+    const QIcon _muteOffIcon{":/resources/images/mute_off.png"};
+    const QIcon _muteOnIcon{":/resources/images/mute_on.png"};
 
 
 	qreal oldZValue{1};

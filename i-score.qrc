@@ -48,5 +48,11 @@
         <file>resources/images/Mute.png</file>
         <file>resources/images/MuteOn.png</file>
         <file>resources/stylesheets/BasicBox/push_button.qss</file>
+        <file>resources/images/play.png</file>
+        <file>resources/images/mute_on.png</file>
+        <file>resources/images/mute_off.png</file>
+        <file>resources/images/start.png</file>
+        <file>resources/images/stop.png</file>
+        <file>resources/images/end.png</file>
     </qresource>
 </RCC>

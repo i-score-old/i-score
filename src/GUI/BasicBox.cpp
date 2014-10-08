@@ -88,6 +88,7 @@ using std::map;
 /// \todo On pourrait les instancier directement dans le header avec leurs définitions. (par jaime Chao)
 const int BasicBox::COMBOBOX_HEIGHT = 25;
 const int BasicBox::COMBOBOX_WIDTH = 120;
+const int BasicBox::BUTTON_SIZE = 20;
 const float BasicBox::TRIGGER_ZONE_WIDTH = 18.;
 const float BasicBox::TRIGGER_ZONE_HEIGHT = 20.;
 const float BasicBox::TRIGGER_EXPANSION_FACTOR = 2.5;
@@ -129,7 +130,6 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
   _abstract->setTopLeft(QPointF(xmin, ymin));
   _abstract->setWidth(xmax - xmin);
   _abstract->setHeight(ymax - ymin);
-
   init();
 
   createWidget();
@@ -152,25 +152,25 @@ BasicBox::centerWidget()
 
     if(_comboBox != nullptr){
         _comboBox->move(0, -(height() / 2 + LINE_WIDTH));
-        _comboBox->resize((width() - 4 * LINE_WIDTH - BOX_MARGIN) / 2, COMBOBOX_HEIGHT);
+        _comboBox->resize((width() - 4 * LINE_WIDTH - BOX_MARGIN) / 2 - 5, COMBOBOX_HEIGHT);
     }
 
     if(_startMenuButton != nullptr)
         _startMenuButton->move(-(width()) / 2 + LINE_WIDTH, -(height()) / 2);
 
     if(_endMenuButton != nullptr)
-        _endMenuButton->move((width()) / 2 + 2 * LINE_WIDTH - BOX_MARGIN, -(height()) / 2 + LINE_WIDTH);
+        _endMenuButton->move((width()) / 2 + 2 * LINE_WIDTH - BOX_MARGIN, -(height()) / 2);
 
     if(_playButton != nullptr)
-        _playButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN + 16, 
+        _playButton->move(-(width()) / 2 + LINE_WIDTH + 2 * BOX_MARGIN,
 						  -(height()) / 2);
 
     if(_stopButton != nullptr)
-        _stopButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN + 16, 
+        _stopButton->move(-(width()) / 2 + LINE_WIDTH + 2 * BOX_MARGIN,
 						  -(height()) / 2);
 	
 	if(_muteButton)
-		_muteButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN-4, 
+        _muteButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN,
 						  -(height()) / 2);
 }
 
@@ -204,9 +204,10 @@ BasicBox::createMenus()
   _endMenu->addAction(_updateEndCue);
   
   //--- start button ---
-  QIcon startMenuIcon(":/resources/images/boxStartMenu.svg");
+  QIcon startMenuIcon(":/resources/images/start.png"); //boxStartMenu.svg
   _startMenuButton = new QPushButton();
   _startMenuButton->setIcon(startMenuIcon);
+  _startMenuButton->setIconSize(QSize(BUTTON_SIZE,BUTTON_SIZE));
   _startMenuButton->setContextMenuPolicy(Qt::CustomContextMenu);
 
   _startMenuButton->setStyleSheet(_pushButtonStyle);
@@ -214,31 +215,37 @@ BasicBox::createMenus()
       _boxContentWidget->setStartMenu(_startMenu);
 
   //--- end button ---
-  QIcon endMenuIcon(":/resources/images/boxEndMenu.svg");
+  QIcon endMenuIcon(":/resources/images/end.png"); //boxEndMenu.svg
   _endMenuButton = new QPushButton();
   _endMenuButton->setIcon(endMenuIcon);
+  _endMenuButton->setIconSize(QSize(BUTTON_SIZE,BUTTON_SIZE));
   _endMenuButton->setShortcutEnabled(1, false);
   _endMenuButton->setStyleSheet(_pushButtonStyle);
   if(_boxContentWidget != nullptr)
       _boxContentWidget->setEndMenu(_endMenu);
 
 //  Play
-  QIcon playIcon(":/resources/images/playSimple.svg");
+  QIcon playIcon(":/resources/images/play.png"); //playSimple.svg
   _playButton= new QPushButton();
   _playButton->setIcon(playIcon);
+  _playButton->setIconSize(QSize(BUTTON_SIZE,BUTTON_SIZE));
   _playButton->setShortcutEnabled(1, false);
   _playButton->setStyleSheet(_pushButtonStyle);
   
 //  Stop
-    QIcon stopIcon(":/resources/images/stopSimple.svg");
+    QIcon stopIcon(":/resources/images/stop.png"); //stopSimple.svg
     _stopButton= new QPushButton();
     _stopButton->setIcon(stopIcon);
+    _stopButton->setIconSize(QSize(BUTTON_SIZE,BUTTON_SIZE));
     _stopButton->setShortcutEnabled(1, false);
     _stopButton->setStyleSheet(_pushButtonStyle);
 
 	// Mute
-	_muteButton = new QPushButton(_muteOffIcon, "&");
-	_muteButton->setStyleSheet(_pushButtonStyle);
+//    _muteButton = new QPushButton(_muteOffIcon, "&");
+    _muteButton = new QPushButton();
+    _muteButton->setIcon(_muteOffIcon);
+    _muteButton->setIconSize(QSize(BUTTON_SIZE,BUTTON_SIZE));
+    _muteButton->setStyleSheet(_pushButtonStyle);
 	_muteButton->setCheckable(true);
 	
   QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
@@ -1902,7 +1909,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 {
     Q_UNUSED(widget);
     painter->setClipRect(option->exposedRect);//To increase performance
-	bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
+    bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
 
     //Set disabled the curve proxy when box not selected.
     _boxContentWidget->setCurveLowerStyle(_comboBox->currentText().toStdString(),!isSelected());
@@ -1917,8 +1924,8 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     }
     else{
         setButtonsVisible(_hover || isSelected());
-        _muteButton->setVisible(true);
     }
+
 
     //draw hover shape
     if (_hover && !isSelected() && !_playing)
@@ -1975,10 +1982,10 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     painter->fillRect(0, 0, textRect.width(), textRect.height(), isSelected() ? _color : _colorUnselected);
 
     //draw name
-    if(width() > 120)
+    if(width() > 140)
     {
 		painter->save();
-		painter->translate(20, 4);
+        painter->translate(30, 4);
 		painter->setPen(QPen(Qt::gray));
 
 		if(_hover || isSelected())
@@ -2087,7 +2094,10 @@ BasicBox::setMuteState(bool activated){
     Maquette::getInstance()->setEndEventMuteState(ID(),_mute);
 	
 	_muteButton->setIcon(_mute? _muteOnIcon : _muteOffIcon);
-	
+    _startMenuButton->setVisible(!_mute);
+    _playButton->setVisible(!_mute);
+    _endMenuButton->setVisible(!_mute);
+
     update();
 }
 
@@ -2118,14 +2128,20 @@ void
 BasicBox::setButtonsVisible(bool value)
 {
 	_comboBoxProxy->setVisible((value || _comboBox->isShown()) &&
-							   (width() > 180));
+                               (width() > 3 * BOX_MARGIN + 150));
 
 	_startMenuButton->setVisible(value);
-	_endMenuButton->setVisible(value && (width() > 90));
+    _endMenuButton->setVisible(value && (width() > 4 * BOX_MARGIN));
 
-	_playButton->setVisible((!_playing && value) && (width() > 70));
-	_stopButton->setVisible((_playing && value) && (width() > 70));
-    _muteButton->setVisible(value && (width() > 50));
+    _playButton->setVisible((!_playing && value) && (width() > 3 * BOX_MARGIN));
+    _stopButton->setVisible((_playing && value) && (width() > 3 * BOX_MARGIN));
+    _muteButton->setVisible(value && (width() > 2 * BOX_MARGIN));
+
+    if (_mute) {
+        _startMenuButton->setVisible(false);
+        _playButton->setVisible(false);
+        _endMenuButton->setVisible(false);
+    }
 }
 
 void
@@ -2133,5 +2149,6 @@ BasicBox::updatePlayingModeButtons()
 {
     _playButton->setVisible(!_playing);
     _stopButton->setVisible(_playing);
+    _muteButton->setVisible(_scene->playing());
     update();
 }
