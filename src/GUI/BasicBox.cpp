@@ -1907,17 +1907,17 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     //Set disabled the curve proxy when box not selected.
     _boxContentWidget->setCurveLowerStyle(_comboBox->currentText().toStdString(),!isSelected());
 
-
     //Showing stop button when playing
     if(_playing){
         _comboBoxProxy->setVisible(false);
         _startMenuButton->setVisible(false);
         _endMenuButton->setVisible(false);
         _stopButton->setVisible(true);
-		_muteButton->setVisible(true);
+        _muteButton->setVisible(false);
     }
     else{
         setButtonsVisible(_hover || isSelected());
+        _muteButton->setVisible(true);
     }
 
     //draw hover shape
@@ -2046,6 +2046,7 @@ void BasicBox::toggleMuteButton(bool )
 {
     setSelected(true);
 	_scene->muteBoxes();
+    setSelected(false);
 }
 
 void BasicBox::cleanupRelations()

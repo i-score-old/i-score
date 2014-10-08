@@ -335,39 +335,43 @@ AttributesEditor::connectSlots()
 void
 AttributesEditor::setAttributes(AbstractBox *abBox)
 {            
-  bool boxModified = (_boxEdited != abBox->ID());
+    bool boxModified = (_boxEdited != abBox->ID());
 
-  _boxEdited = abBox->ID();
+    _boxEdited = abBox->ID();
 
-  if (boxModified || (_boxEdited == NO_ID)) {
-      _networkTree->resetNetworkTree();
-      if (_boxEdited != NO_ID) {
-          if (abBox->networkTreeItems().isEmpty() && abBox->networkTreeExpandedItems().isEmpty()) {
-              //LOAD FILE
-              _networkTree->loadNetworkTree(abBox);
-              startMessagesChanged();
-              endMessagesChanged();
+    if (boxModified || (_boxEdited == NO_ID))
+    {
+        _networkTree->resetNetworkTree();
+        if (_boxEdited != NO_ID)
+        {
+           // if (abBox->networkTreeItems().isEmpty() && abBox->networkTreeExpandedItems().isEmpty())
+            {
+                //LOAD FILE
+                _networkTree->loadNetworkTree(abBox);
+                startMessagesChanged();
+                endMessagesChanged();
             }
-          else {
-              _networkTree->setAssignedItems(abBox->networkTreeItems());             
+           // else
+            {
+           //     _networkTree->setAssignedItems(abBox->networkTreeItems());
             }
 
-          _networkTree->displayBoxContent(abBox);        
+            _networkTree->displayBoxContent(abBox);
         }
     }
 
-//Special update for the main scenario
-  if(_boxEdited == ROOT_BOX_ID)
-  {
-      _scene->view()->setScenarioSelected(true);
-      _boxName->setText(QString::fromStdString(abBox->name()));
-  }
-  else
-  {
-      _scene->view()->setScenarioSelected(false);
-      _networkTree->updateCurves(_boxEdited);
-      updateWidgets(boxModified);
-  }
+    //Special update for the main scenario
+    if(_boxEdited == ROOT_BOX_ID)
+    {
+        _scene->view()->setScenarioSelected(true);
+        _boxName->setText(QString::fromStdString(abBox->name()));
+    }
+    else
+    {
+        _scene->view()->setScenarioSelected(false);
+        _networkTree->updateCurves(_boxEdited);
+        updateWidgets(boxModified);
+    }
 }
 
 void

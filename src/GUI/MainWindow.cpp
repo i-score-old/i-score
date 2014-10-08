@@ -144,7 +144,11 @@ MainWindow::MainWindow()
   connect(_scene, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
   connect(_view, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
   connect(_scene, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
-  connect(_scene, &MaquetteScene::updateRecordingBoxes, this, &MainWindow::updateRecordingBoxes);
+  connect(_scene, &MaquetteScene::updateRecordingBoxes,
+          this,   &MainWindow::updateRecordingBoxes);
+
+  connect(this, &MainWindow::sigLoad,
+          this, &MainWindow::loadFile);
 }
 
 MainWindow::~MainWindow()
@@ -306,15 +310,13 @@ MainWindow::open()
         }
     }
 
-  QString fileName = QFileDialog::
-          getOpenFileName(this, tr("Open File"), 0, tr("XML Files (*.score)"));
-
-
-
-  if (!fileName.isEmpty()) {                  
-      QCoreApplication::processEvents();//permet de fermer la fenêtre de dialogue avant de lancer le chargement.
-      loadFile(fileName);      
-    }
+  QFileDialog dialog{this, tr("Open File"), QString(), tr("XML Files (*.score)")};
+  dialog.setFileMode(QFileDialog::ExistingFile);
+  if(dialog.exec() && !dialog.selectedFiles().isEmpty() && !dialog.selectedFiles()[0].isEmpty())
+  {
+      dialog.close();
+      emit sigLoad(dialog.selectedFiles()[0]);
+  }
 }
 
 void
@@ -342,7 +344,7 @@ MainWindow::open(QString s)
         }
     }
 
-    loadFile(s);
+     emit sigLoad(s);
 
 }
 
@@ -703,7 +705,7 @@ MainWindow::writeSettings()
 void
 MainWindow::loadFile(const QString &fileName)
 {
-    QCoreApplication::processEvents();//permet de fermer la fenêtre de dialogue avant de lancer le chargement.
+  QCoreApplication::processEvents();//permet de fermer la fenêtre de dialogue avant de lancer le chargement.
   QApplication::setOverrideCursor(Qt::WaitCursor);
   _scene->clear();
   _editor->clear();
@@ -801,7 +803,7 @@ MainWindow::updatePlayMode(){
 
 void
 MainWindow::updateRecordingBoxes(bool onPlay)
-{
+{ qDebug(Q_FUNC_INFO);
     //Update recorded curves
     QList<BasicBox*> boxes = Maquette::getInstance()->getRecordingBoxes();
     QList<BasicBox*>::iterator it;

@@ -130,6 +130,9 @@ class MainWindow : public QMainWindow
      */
     void open(QString);
 
+    signals:
+    void sigLoad(const QString&);
+
   protected:
     /*!
      * \brief Redefinition of QMainWindow::closeEvent(QCloseEvent *event).

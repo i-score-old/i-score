@@ -107,5 +107,5 @@ AbstractBox::addMessageToRecord(std::string address){
 
 void
 AbstractBox::removeMessageToRecord(std::string address){
-    _messagesToRecord.removeAll(address);    
+    _messagesToRecord.removeAll(address);
 }
