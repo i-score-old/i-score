@@ -151,18 +151,14 @@ AttributesEditor::nameWidgets()
   assignStart = tr("Start");
   assignEnd = tr("End");
 
-  QFont font;
-  font.setPointSize(10);
-  _snapshotAssignStart->setFont(font);
-  _snapshotAssignEnd->setFont(font);
-//  font.setPointSize(1);
-//  _updateLabel->setFont(font);
-  _updateLabel->setStyleSheet("QLabel { color : gray;"
-                              "font-size: 10pt;} "
-                              );
+   QIcon startIcon(":/resources/images/start_update.png");
+   _snapshotAssignStart->setIcon(startIcon);
+   _snapshotAssignStart->setIconSize(QSize(15,15));
 
-  _snapshotAssignStart->setText(assignStart);
-  _snapshotAssignEnd->setText(assignEnd);
+   QIcon endIcon(":/resources/images/end_update.png");
+   _snapshotAssignEnd->setIcon(endIcon);
+   _snapshotAssignEnd->setIconSize(QSize(15,15));
+
   _updateLabel->setText("update");
 }
 
