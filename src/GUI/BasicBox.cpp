@@ -1349,7 +1349,7 @@ void BasicBox::keyPressEvent(QKeyEvent *event)
         {
             curve->adaptScale();
         }
-        if(event->key() == Qt::Key_Control)
+        if(event->key() == Qt::Key_Control && _hover)
         {
             curve->keyPressEvent(event);
         }
