@@ -796,6 +796,7 @@ MainWindow::strippedName(const QString &fullFileName)
 
 void
 MainWindow::updatePlayMode(){
+    _scene->updateBoxesButtons();
     _scene->unselectAll();
     _editor->noBoxEdited();
     _editor->setDisabled(_scene->playing());

@@ -674,6 +674,7 @@ protected:
     bool noBoxSelected();
     inline void resetSelection(){ clearSelection(); }
     void updateBoxesWidgets();
+    void updateBoxesButtons();
     void unselectAll();
 
   private:

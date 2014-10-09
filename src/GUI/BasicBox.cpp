@@ -2128,7 +2128,7 @@ BasicBox::updateRecordingCurves(){
 void
 BasicBox::setButtonsVisible(bool value)
 {
-	_comboBoxProxy->setVisible((value || _comboBox->isShown()) &&
+    _comboBoxProxy->setVisible(!_scene->playing() && (value || _comboBox->isShown()) &&
                                (width() > 3 * BOX_MARGIN + 125));
 
 	_startMenuButton->setVisible(value);
@@ -2138,10 +2138,11 @@ BasicBox::setButtonsVisible(bool value)
     _stopButton->setVisible((_playing && value) && (width() > 3 * BOX_MARGIN));
     _muteButton->setVisible(value && (width() > 2 * BOX_MARGIN));
 
-    if (_mute) {
+    if (_mute || _scene->playing()) {
         _startMenuButton->setVisible(false);
         _playButton->setVisible(false);
         _endMenuButton->setVisible(false);
+        _muteButton->setVisible(true);
     }
 }
 
@@ -2150,6 +2151,5 @@ BasicBox::updatePlayingModeButtons()
 {
     _playButton->setVisible(!_playing);
     _stopButton->setVisible(_playing);
-    _muteButton->setVisible(_scene->playing());
     update();
 }
