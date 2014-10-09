@@ -111,7 +111,7 @@ HeaderPanelWidget::createActions()
   _stopAction = new QAction(stopIcon, tr("Stop"), this);
   _stopAction->setStatusTip(tr("Stop scenario"));
 
-  QIcon rewindIcon(":/resources/images/start.png");
+  QIcon rewindIcon(":/resources/images/rewind.png");
   _rewindAction = new QAction(rewindIcon, tr("Rewind"), this);
   _rewindAction->setStatusTip(tr("Rewind scenario"));
 
