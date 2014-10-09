@@ -55,5 +55,7 @@
         <file>resources/images/stop.png</file>
         <file>resources/images/end.png</file>
         <file>resources/images/rewind.png</file>
+        <file>resources/images/end_update.png</file>
+        <file>resources/images/start_update.png</file>
     </qresource>
 </RCC>
