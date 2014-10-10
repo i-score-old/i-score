@@ -163,11 +163,11 @@ BasicBox::centerWidget()
                           -(height()) / 2 + 2.5);
 
     if(_playButton != nullptr)
-        _playButton->move(-(width()) / 2 + LINE_WIDTH + 4 + 2 * ( BUTTON_SIZE + 2 ),
+        _playButton->move(-(width()) / 2 + LINE_WIDTH + 6 + 2 * ( BUTTON_SIZE + 2 ),
                           -(height()) / 2 + 2.5);
 
     if(_stopButton != nullptr)
-        _stopButton->move(-(width()) / 2 + LINE_WIDTH + 4 + 2 * ( BUTTON_SIZE + 2 ),
+        _stopButton->move(-(width()) / 2 + LINE_WIDTH + 3 + ( BUTTON_SIZE + 2 ),
                           -(height()) / 2 + 2.5);
 	
 	if(_muteButton)
