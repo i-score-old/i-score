@@ -86,6 +86,11 @@ using std::vector;
 using std::map;
 
 /// \todo On pourrait les instancier directement dans le header avec leurs définitions. (par jaime Chao)
+
+const unsigned int BasicBox::LINE_WIDTH = 2;
+const unsigned int BasicBox::RESIZE_TOLERANCE = 25;
+const float BasicBox::RESIZE_ZONE_WIDTH = 5 * LINE_WIDTH;
+
 const int BasicBox::COMBOBOX_HEIGHT = 25;
 const int BasicBox::COMBOBOX_WIDTH = 120;
 const int BasicBox::BUTTON_SIZE = 16;
@@ -94,14 +99,15 @@ const float BasicBox::TRIGGER_ZONE_HEIGHT = 20.;
 const float BasicBox::TRIGGER_EXPANSION_FACTOR = 2.5;
 const float BasicBox::RAIL_HEIGHT = 20.;
 const float BasicBox::MSGS_INDICATOR_WIDTH = 50;
-const float BasicBox::EAR_WIDTH = 9;
-const float BasicBox::EAR_HEIGHT = 30;
+const float BasicBox::EAR_WIDTH = 11;
+const float BasicBox::EAR_HEIGHT = 35;
 const float BasicBox::GRIP_CIRCLE_SIZE = 5;
 unsigned int BasicBox::BOX_MARGIN = 25;
 const QString BasicBox::SCENARIO_MODE_TEXT = tr("Scenario");
 const QString BasicBox::DEFAULT_MODE_TEXT = "Select content to edit";
 const QColor BasicBox::BOX_COLOR = QColor(60, 60, 60);
 const QColor BasicBox::TEXT_COLOR = QColor(0, 0, 0);
+
 BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *parent)
   : QGraphicsObject()
 {    
@@ -1565,8 +1571,6 @@ BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
   QGraphicsObject::hoverEnterEvent(event);
   _hover = true;
 
-  const float RESIZE_ZONE_WIDTH = 3 * LINE_WIDTH;
-
   QRectF textRect(_boxRect.topLeft(), _boxRect.topRight() + QPointF(0, RESIZE_TOLERANCE));
 
   QRectF triggerGripLeft = _startTriggerGrip;
@@ -1637,7 +1641,6 @@ BasicBox::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 
   QGraphicsObject::hoverEnterEvent(event);
   _hover = true;
-  const float RESIZE_ZONE_WIDTH = 3 * LINE_WIDTH;
 
   QRectF textRect(_boxRect.topLeft(), _boxRect.topRight() + QPointF(0, 3 * RESIZE_TOLERANCE / 4));
 
