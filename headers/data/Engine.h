@@ -1349,11 +1349,4 @@ void TimeProcessEndCallback(const TTValue& baton, const TTValue& value);
  @return                an error code */
 void NamespaceCallback(const TTValue& baton, const TTValue& value);
 
-// TODO : this should move into a TTModularAPI file
-/** compare priority attribute of object's node
- @param	v1				a value containing a pointer to a #TTNode >
- @param	v2				a value containing a pointer to a #TTNode >
- @return				is the priority of v1 is smaller than v2 (except if equal 0) ? */
-TTBoolean TTModularCompareNodePriorityThenNameThenInstance(TTValue& v1, TTValue& v2);
-
 #endif // __SCORE_ENGINE_H__

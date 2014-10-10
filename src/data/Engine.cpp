@@ -2292,9 +2292,8 @@ void Engine::removeNetworkDevice(const std::string & deviceName)
     // if the application exists
     if (anApplication.valid()) {
         
-        // get the protocol names used by the application
-        v = accessApplicationProtocolNames(applicationName);
-        protocolName = v[0]; // we register application to 1 protocol only
+        // get the protocol name used by the application (we register distante application to 1 protocol only)
+        protocolName = accessApplicationProtocolNames(applicationName)[0];
         aProtocol = accessProtocol(protocolName);
         
         // stop the protocol for this application
@@ -2368,9 +2367,8 @@ bool Engine::isNetworkDeviceRequestable(const std::string deviceName)
     // if the application exists
     if (anApplication.valid()) {
         
-        // get the protocol names used by the application
-        v = accessApplicationProtocolNames(applicationName);
-        protocolName = v[0]; // we register application to 1 protocol only
+        // get the protocol name used by the application (we register distante application to 1 protocol only)
+        protocolName = accessApplicationProtocolNames(applicationName)[0];
         aProtocol = accessProtocol(protocolName);
         
         aProtocol.get("discover", out);
@@ -2583,7 +2581,7 @@ Engine::requestObjectChildren(const std::string & address, vector<string>& child
     if (!aDirectory->getTTNode(anAddress, &aNode)) {
 
         aNode->getChildren(S_WILDCARD, S_WILDCARD, nodeList);
-        nodeList.sort(&TTModularCompareNodePriorityThenNameThenInstance);
+        nodeList.sort(&compareNodePriorityThenNameThenInstance);
 
         for (nodeList.begin(); nodeList.end(); nodeList.next()) {
 
@@ -2613,9 +2611,8 @@ Engine::rebuildNetworkNamespace(const string &deviceName, const string &/*addres
     // if the application exists
     if (anApplication.valid()) {
         
-        // get the protocol names used by the application
-        v = accessApplicationProtocolNames(applicationName);
-        protocolName = v[0]; // we register application to 1 protocol only
+        // get the protocol name used by the application (we register distante application to 1 protocol only)
+        protocolName = accessApplicationProtocolNames(applicationName)[0];
         
         // Minuit case : use discovery mechanism
         if (protocolName == TTSymbol("Minuit")) {
@@ -2761,7 +2758,6 @@ Engine::getDeviceStringParameter(const string device, const string protocol, con
 bool
 Engine::getDeviceProtocol(std::string deviceName, std::string &protocol)
 {
-    TTValue     v;
     TTSymbol    applicationName(deviceName);
     TTObject    anApplication = accessApplication(applicationName);
     TTSymbol    protocolName;
@@ -2769,9 +2765,8 @@ Engine::getDeviceProtocol(std::string deviceName, std::string &protocol)
     // if the application exists
     if (anApplication.valid()) {
         
-        // get the protocol names used by the application
-        v = accessApplicationProtocolNames(applicationName);
-        protocolName = v[0]; // we register application to 1 protocol only
+        // get the protocol name used by the application (we register distante application to 1 protocol only)
+        protocolName = accessApplicationProtocolNames(applicationName)[0];
         protocol = protocolName.c_str();
         return 0;
     }
@@ -2804,9 +2799,8 @@ Engine::setDevicePort(string deviceName, int destinationPort, int receptionPort)
     // if the application exists
     if (anApplication.valid()) {
         
-        // get the protocol names used by the application
-        v = accessApplicationProtocolNames(applicationName);
-        protocolName = v[0]; // we register application to 1 protocol only
+        // get the protocol name used by the application (we register distante application to 1 protocol only)
+        protocolName = accessApplicationProtocolNames(applicationName)[0];
         aProtocol = accessProtocol(protocolName);
         
         err = aProtocol.send("ApplicationSelect", applicationName, out);
@@ -2841,9 +2835,8 @@ Engine::setDeviceLocalHost(string deviceName, string localHost)
     // if the application exists
     if (anApplication.valid()) {
         
-        // get the protocol names used by the application
-        v = accessApplicationProtocolNames(applicationName);
-        protocolName = v[0]; // we register application to 1 protocol only
+        // get the protocol name used by the application (we register distante application to 1 protocol only)
+        protocolName = accessApplicationProtocolNames(applicationName)[0];
         aProtocol = accessProtocol(protocolName);
         
         err = aProtocol.send("ApplicationSelect", applicationName, out);
@@ -2895,7 +2888,16 @@ bool Engine::setDeviceLearn(std::string deviceName, bool newLearn)
     TTSymbol    applicationName(deviceName);
     TTObject    anApplication = accessApplication(applicationName);
     
-    TTErr err = anApplication.set("learn", newLearn);
+    // get the protocol name used by the application (we register distante application to 1 protocol only)
+    TTSymbol    protocolName = accessApplicationProtocolNames(applicationName)[0];
+    TTErr       err;
+    TTValue     out;
+    
+    // depending of the protocol this application used
+    if (protocolName == "Minuit")
+        err = anApplication.send("DirectoryObserve", newLearn, out);
+    else
+        err = anApplication.set("learn", newLearn);
     
     // enable namespace observation
     if (newLearn && !m_namespaceObserver.valid()) {
@@ -3047,7 +3049,7 @@ int Engine::requestNetworkNamespace(const std::string & address, std::string & n
         aNode->getChildren(S_WILDCARD, S_WILDCARD, nodeList);
         
         // sort children
-        nodeList.sort(&TTModularCompareNodePriorityThenNameThenInstance);
+        nodeList.sort(&compareNodePriorityThenNameThenInstance);
 
         // sort children in leaves and nodes
         for (nodeList.begin(); nodeList.end(); nodeList.next()) {
@@ -3558,66 +3560,3 @@ std::string Engine::toNetworkTreeAddress(TTAddress aTTAddress)
     
     return s;
 }
-
-#if 0
-#pragma mark -
-#pragma mark Miscellaneous Methods
-#endif
-
-TTBoolean TTModularCompareNodePriorityThenNameThenInstance(TTValue& v1, TTValue& v2)
-{
-	TTNodePtr	n1, n2;
-	TTObject    o1, o2;
-	TTValue		v;
-    TTValue     name1;
-    TTValue     name2;
-    TTValue     instance1;
-    TTValue     instance2;
-	TTInt32		p1 = 0;
-	TTInt32		p2 = 0;
-	
-	// get priority of v1
-	n1 = TTNodePtr((TTPtr)v1[0]);
-	if (n1) {
-        
-        name1 = n1->getName();
-        instance1 = n1->getInstance();
-		o1 = n1->getObject();
-		
-		if (o1.valid())
-			if (!o1.get(kTTSym_priority, v))
-				p1 = v[0];
-	}
-	
-	// get priority of v2
-	n2 = TTNodePtr((TTPtr)v2[0]);
-	if (n2) {
-        
-        name2 = n2->getName();
-        instance2 = n2->getInstance();
-		o2 = n2->getObject();
-		
-		if (o2.valid())
-			if (!o2.get(kTTSym_priority, v))
-				p2 = v[0];
-	}
-	
-	if (p1 == p2) {
-        
-        if (name1 == name2) {
-            
-            if (instance1 == instance2)
-                return v1 < v2;
-            else
-                return instance1 < instance2;
-        }
-        else
-            return name1 < name2;
-    }
-	
-	if (p1 == 0) return NO;
-	if (p2 == 0) return YES;
-	
-	return p1 < p2;
-}
-
