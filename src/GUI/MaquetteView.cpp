@@ -125,6 +125,17 @@ MaquetteView::wheelEvent(QWheelEvent *event)
         }
         verticalScrollBar()->setValue(newValue);
     }
+
+    if ( event->modifiers()==Qt::ControlModifier) {
+        if (event->orientation() == Qt::Vertical) {
+            if (event->delta() > 100) {
+               zoomIn();
+            }
+            else if (event->delta() < -100) {
+               zoomOut();
+            }
+        }
+    }
 }
 
 void
@@ -348,6 +359,7 @@ MaquetteView::zoomIn()
           setSceneRect((QRectF(0,0,_scene->getMaxSceneWidth(),_scene->height())));
         }
     }
+  _scene->updateWidgets();
 }
 
 QPointF

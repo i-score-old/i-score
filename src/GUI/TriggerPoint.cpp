@@ -347,10 +347,22 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
       if ((box = _scene->getBox(_abstract->boxID())) != nullptr) {
           QPen pen = painter->pen();
           QBrush brush = painter->brush();
-          pen.setColor(box->color().darker());
-          pen.setWidth(isSelected() ? 1.5 * BasicBox::LINE_WIDTH : BasicBox::LINE_WIDTH / 2);
-          painter->setPen(pen);
 
+          // selection
+          if (isSelected()) {
+              QPen penBlue(QColor(60,60,255)); // same blue as box selected
+
+              penBlue.setWidth(BasicBox::LINE_WIDTH);
+              painter->setPen(penBlue);
+
+              QPainterPath path;
+              path = shape();
+              painter->drawPath(path);
+          }
+
+          pen.setColor(box->color().darker());
+          pen.setWidth(BasicBox::LINE_WIDTH / 2);
+          painter->setPen(pen);
           if (_scene->playing()) {
               if (!isWaiting()) {
                   drawFlag(painter, QColor("red"));
@@ -363,13 +375,11 @@ TriggerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
                           drawFlag(painter, QColor("green"));
                           this->setFocus();
                       }
-                  else {
-//                      brush.setColor(QColor("orange"));
-//                      painter->setBrush(brush);
-                      drawFlag(painter, QColor("orange"));
-                    }
+                      else {
+                          drawFlag(painter, QColor("orange"));
+                      }
 				  }
-                }
+              }
 
               if (_abstract->waiting()) {
                   BasicBox *box = _scene->getBox(_abstract->boxID());
