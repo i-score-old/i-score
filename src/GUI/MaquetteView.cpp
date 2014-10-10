@@ -348,6 +348,7 @@ MaquetteView::zoomIn()
           setSceneRect((QRectF(0,0,_scene->getMaxSceneWidth(),_scene->height())));
         }
     }
+  _scene->updateWidgets();
 }
 
 QPointF

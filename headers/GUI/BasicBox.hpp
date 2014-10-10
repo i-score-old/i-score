@@ -557,11 +557,12 @@ class BasicBox : public QGraphicsObject
     void updateCurveRangeBoundMax(string address, float value);
 
     //! \brief Handles line width.
-    static const unsigned int LINE_WIDTH = 2;
+    static const unsigned int LINE_WIDTH;
 
     //! \brief Handles resizing tolerance.
-    static const unsigned int RESIZE_TOLERANCE = 25;
+    static const unsigned int RESIZE_TOLERANCE;
 
+    static const float RESIZE_ZONE_WIDTH;
     static unsigned int BOX_MARGIN;
     static const float TRIGGER_ZONE_WIDTH;
     static const float TRIGGER_ZONE_HEIGHT;
