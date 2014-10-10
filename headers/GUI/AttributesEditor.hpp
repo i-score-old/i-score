@@ -113,7 +113,7 @@ class AttributesEditor : public QDockWidget
      **/
     unsigned int currentBox();
 
-//    static const int BUTTON_SIZE;
+    static const int BUTTON_SIZE;
 
     inline void setBoxEdited(unsigned int boxId){ _boxEdited = boxId; }
 

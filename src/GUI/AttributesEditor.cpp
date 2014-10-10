@@ -55,7 +55,7 @@ static const int LEFT_MARGIN = 1;
 static const int RIGHT_MARGIN = 1;
 static const int COLOR_ICON_SIZE = 21;
 
-// const int BasicBox::BUTTON_SIZE = 22;
+const int AttributesEditor::BUTTON_SIZE = 22;
 
 AttributesEditor::AttributesEditor(QWidget* parent) : QDockWidget(tr("Inspector"), parent, 0)
 {
@@ -164,13 +164,11 @@ AttributesEditor::nameWidgets()
 
    QIcon startIcon(":/resources/images/start_update.png");
    _snapshotAssignStart->setIcon(startIcon);
-   _snapshotAssignStart->setIconSize(QSize(22,22));
-//should be BUTTON_SIZE here, but couldn't find how to do that (PB)
+   _snapshotAssignStart->setIconSize(QSize(BUTTON_SIZE,BUTTON_SIZE));
 
    QIcon endIcon(":/resources/images/end_update.png");
    _snapshotAssignEnd->setIcon(endIcon);
-   _snapshotAssignEnd->setIconSize(QSize(22,22));
-//should be BUTTON_SIZE here, but couldn't find how to do that (PB)
+   _snapshotAssignEnd->setIconSize(QSize(BUTTON_SIZE,BUTTON_SIZE));
   _updateLabel->setText("update");
 }
 
