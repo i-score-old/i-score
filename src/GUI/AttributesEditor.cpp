@@ -55,11 +55,22 @@ static const int LEFT_MARGIN = 1;
 static const int RIGHT_MARGIN = 1;
 static const int COLOR_ICON_SIZE = 21;
 
+// const int BasicBox::BUTTON_SIZE = 22;
+
 AttributesEditor::AttributesEditor(QWidget* parent) : QDockWidget(tr("Inspector"), parent, 0)
 {
   _boxEdited = NO_ID;
   setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetVerticalTitleBar | QDockWidget::DockWidgetClosable	);
+  QFile pb_ss_file(":/resources/stylesheets/BasicBox/push_button.qss");
+  if(!pb_ss_file.open(QIODevice::ReadOnly | QIODevice::Text))
+  {
+      qDebug("Cannot read the pushbutton stylesheet");
+      return;
+  }
+  _pushButtonStyle = pb_ss_file.readAll();
+
+
 }
 
 void
@@ -153,12 +164,13 @@ AttributesEditor::nameWidgets()
 
    QIcon startIcon(":/resources/images/start_update.png");
    _snapshotAssignStart->setIcon(startIcon);
-   _snapshotAssignStart->setIconSize(QSize(15,15));
+   _snapshotAssignStart->setIconSize(QSize(22,22));
+//should be BUTTON_SIZE here, but couldn't find how to do that (PB)
 
    QIcon endIcon(":/resources/images/end_update.png");
    _snapshotAssignEnd->setIcon(endIcon);
-   _snapshotAssignEnd->setIconSize(QSize(15,15));
-
+   _snapshotAssignEnd->setIconSize(QSize(22,22));
+//should be BUTTON_SIZE here, but couldn't find how to do that (PB)
   _updateLabel->setText("update");
 }
 
@@ -202,58 +214,14 @@ AttributesEditor::createWidgets()
   //Start&End buttons
   _snapshotAssignStart = new QPushButton;
   _snapshotAssignStart->setToolTip("Update start state");
-  _snapshotAssignStart->setStyleSheet(
-              " QPushButton {"
-              "border: 2px solid #6f6f80;"
-              "border-radius: 6px;"
-              "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-              "stop: 0 #808080, stop: 1 #909090);"
-              "padding-bottom: 1px;"
-              "padding-top: 1px;"
-
-              "min-width: 22px;"
-              "}"
-
-              "QPushButton:pressed {"
-              "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-              "stop: 0 #606060, stop: 1 #808080);"
-              "}"
-
-              "QPushButton:flat {"
-              "border: none; /* no border for a flat push button */"
-              "}"
-
-              "QPushButton:default {"
-              "border-color: navy; /* make the default button prominent */"
-              "}"
-              );
+  _snapshotAssignStart->setIconSize(QSize(20,20));
+  _snapshotAssignStart->setStyleSheet(_pushButtonStyle);
 
   _snapshotAssignEnd = new QPushButton;
   _snapshotAssignEnd->setToolTip("Update end state");
-  _snapshotAssignEnd->setStyleSheet(
-              " QPushButton {"
-              "border: 2px solid #6f6f80;"
-              "border-radius: 6px;"
-              "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-              "stop: 0 #808080, stop: 1 #909090);"
-              "padding-bottom: 1px;"
-              "padding-top: 1px;"
+  _snapshotAssignEnd->setIconSize(QSize(20 ,20));
+  _snapshotAssignEnd->setStyleSheet(_pushButtonStyle);
 
-              "min-width: 22px;"
-              "}"
-              "QPushButton:pressed {"
-              "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-              "stop: 0 #606060, stop: 1 #808080);"
-              "}"
-
-              "QPushButton:flat {"
-              "border: none; /* no border for a flat push button */"
-              "}"
-
-              "QPushButton:default {"
-              "border-color: navy; /* make the default button prominent */"
-              "}"
-              );
   //NetworkTree
   _networkTree = new NetworkTree(this);
   //_networkTree->load();

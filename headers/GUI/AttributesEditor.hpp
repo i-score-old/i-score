@@ -113,6 +113,8 @@ class AttributesEditor : public QDockWidget
      **/
     unsigned int currentBox();
 
+//    static const int BUTTON_SIZE;
+
     inline void setBoxEdited(unsigned int boxId){ _boxEdited = boxId; }
 
   public slots:
@@ -175,6 +177,8 @@ class AttributesEditor : public QDockWidget
      **/
     void connectSlots();
 
+    QString _pushButtonStyle;
+
   private slots:
     /*!
      * \brief Selecs a new color for PreviewArea and palette.
@@ -204,6 +208,7 @@ class AttributesEditor : public QDockWidget
     void nameChanged();
 	void currentColorSelectionChanged(const QColor& );
 	void revertColor();
+
 
   private:
     QWidget * _centralWidget;   //!< Central widget.
