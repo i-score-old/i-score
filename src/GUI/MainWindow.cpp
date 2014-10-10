@@ -249,8 +249,9 @@ MainWindow::closeEvent(QCloseEvent *event)
     }
   else {
       event->accept();
-    }
+  }
 }
+
 
 void
 MainWindow::newFile()

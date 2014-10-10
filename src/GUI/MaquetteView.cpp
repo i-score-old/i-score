@@ -125,6 +125,17 @@ MaquetteView::wheelEvent(QWheelEvent *event)
         }
         verticalScrollBar()->setValue(newValue);
     }
+
+    if ( event->modifiers()==Qt::ControlModifier) {
+        if (event->orientation() == Qt::Vertical) {
+            if (event->delta() > 0) {
+               zoomIn();
+            }
+            else {
+               zoomOut();
+            }
+        }
+    }
 }
 
 void
