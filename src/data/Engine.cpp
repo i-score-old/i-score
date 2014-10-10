@@ -2617,6 +2617,10 @@ Engine::rebuildNetworkNamespace(const string &deviceName, const string &/*addres
         // Minuit case : use discovery mechanism
         if (protocolName == TTSymbol("Minuit")) {
             
+            // only if there is no namespace observation !
+            if (m_namespaceObserver.valid())
+                return 1;
+            
             anApplication.send("DirectoryBuild");
             return 0;
         }
