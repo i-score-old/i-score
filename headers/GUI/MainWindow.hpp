@@ -55,17 +55,12 @@
 #include "MaquetteScene.hpp"
 #include "HeaderPanelWidget.hpp"
 
+class IScoreApplication;
 class MaquetteView;
 class AttributesEditor;
 class BasicBox;
 class QActionGroup;
-class QVBoxLayout;
-class QLabel;
-class QTabWidget;
-class QLCDNumber;
-class LogarithmicSlider;
 class Help;
-class QDoubleSpinBox;
 
 /*!
  * \class MainWindow
@@ -78,6 +73,7 @@ class QDoubleSpinBox;
 class MainWindow : public QMainWindow
 {
   Q_OBJECT
+    friend class IScoreApplication;
 
   public:
     MainWindow();
@@ -133,6 +129,9 @@ class MainWindow : public QMainWindow
      * \brief Opens an existing file.
      */
     void open(QString);
+
+    signals:
+    void sigLoad(const QString&);
 
   protected:
     /*!

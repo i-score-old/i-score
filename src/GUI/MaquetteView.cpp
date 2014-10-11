@@ -231,57 +231,62 @@ MaquetteView::triggerShortcut(int shorcut)
     }
 }
 
+void MaquetteView::sub_keyPressEvent(QKeyEvent* event)
+{
+    if (event->matches(QKeySequence::Copy)) {
+   //     _scene->copyBoxes();
+   //     _scene->displayMessage(tr("Selection copied").toStdString(), INDICATION_LEVEL);
+      }
+    else if (event->matches(QKeySequence::Cut)) {
+   //     _scene->cutBoxes();
+   //     _scene->displayMessage(tr("Selection cut").toStdString(), INDICATION_LEVEL);
+      }
+    else if (event->matches(QKeySequence::Paste)) {
+   //     _scene->pasteBoxes();
+   //     _scene->displayMessage(tr("Copied selection pasted").toStdString(), INDICATION_LEVEL);
+      }
+    else if (event->matches(QKeySequence::SelectAll)) {
+        _scene->selectAll();
+        _scene->displayMessage(tr("All selected").toStdString(), INDICATION_LEVEL);
+      }
+    else if (event->matches(QKeySequence::Delete) || event->key() == Qt::Key_Backspace) {
+        _scene->removeSelectedItems();
+        _scene->displayMessage(tr("Selection removed").toStdString(), INDICATION_LEVEL);
+      }
+    else if ((event->key() == Qt::Key_Space || event->key() == Qt::Key_Comma || event->key() == Qt::Key_Period) && !_scene->playing()) {
+        _scene->playOrResume();
+      }
+    else if ((event->key() == Qt::Key_Comma || event->key() == Qt::Key_Period) && _scene->playing()) {
+        _scene->stopOrPause();
+      }
+    else if (event->key() == Qt::Key_Space && _scene->playing()) {
+        _scene->stopOrPause();
+      }
+    else if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+        _scene->stopAndGoToStart();
+      }
+    else if (event->key() == Qt::Key_0) {
+        if (!_scene->playing()) {
+            _scene->stopOrPause();
+          }
+        else {
+            triggerShortcut(Qt::Key_0);
+          }
+      }
+    else if (event->key() == Qt::Key_1 || event->key() == Qt::Key_2 || event->key() == Qt::Key_3) {
+        triggerShortcut(event->key());
+      }
+    else if(event->key() == Qt::Key_M ){
+        _scene->muteBoxes();
+    }
+}
+
 void
 MaquetteView::keyPressEvent(QKeyEvent *event)
-{    
+{
   QGraphicsView::keyPressEvent(event);
+  sub_keyPressEvent(event);
 
-  if (event->matches(QKeySequence::Copy)) {
- //     _scene->copyBoxes();
- //     _scene->displayMessage(tr("Selection copied").toStdString(), INDICATION_LEVEL);
-    }
-  else if (event->matches(QKeySequence::Cut)) {
- //     _scene->cutBoxes();
- //     _scene->displayMessage(tr("Selection cut").toStdString(), INDICATION_LEVEL);
-    }
-  else if (event->matches(QKeySequence::Paste)) {
- //     _scene->pasteBoxes();
- //     _scene->displayMessage(tr("Copied selection pasted").toStdString(), INDICATION_LEVEL);
-    }
-  else if (event->matches(QKeySequence::SelectAll)) {
-      _scene->selectAll();
-      _scene->displayMessage(tr("All selected").toStdString(), INDICATION_LEVEL);
-    }
-  else if (event->matches(QKeySequence::Delete) || event->key() == Qt::Key_Backspace) {
-      _scene->removeSelectedItems();
-      _scene->displayMessage(tr("Selection removed").toStdString(), INDICATION_LEVEL);
-    }
-  else if ((event->key() == Qt::Key_Space || event->key() == Qt::Key_Comma || event->key() == Qt::Key_Period) && !_scene->playing()) {
-      _scene->playOrResume();
-    }
-  else if ((event->key() == Qt::Key_Comma || event->key() == Qt::Key_Period) && _scene->playing()) {
-      _scene->stopOrPause();
-    }
-  else if (event->key() == Qt::Key_Space && _scene->playing()) {
-      _scene->stopOrPause();
-    }
-  else if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
-      _scene->stopAndGoToStart();
-    }
-  else if (event->key() == Qt::Key_0) {
-      if (!_scene->playing()) {
-          _scene->stopOrPause();
-        }
-      else {
-          triggerShortcut(Qt::Key_0);
-        }
-    }
-  else if (event->key() == Qt::Key_1 || event->key() == Qt::Key_2 || event->key() == Qt::Key_3) {
-      triggerShortcut(event->key());
-    }
-  else if(event->key() == Qt::Key_M ){
-      _scene->muteBoxes();
-  }
 }
 
 void
@@ -332,19 +337,24 @@ MaquetteView::zoomIn()
 
           Maquette::getInstance()->updateBoxesFromEngines();
 
-          QPointF newCenter(2 * getCenterCoordinates().x(), 2 * getCenterCoordinates().y());
+          //QPointF newCenter(2. * (mapFromGlobal(QCursor::pos()).x() + mapToScene(viewport()->rect().bottomLeft()).x()), getCenterCoordinates().y() );
+                // new center : cursor position in Window + scroll offset. (+ zoom factor 2.)
+          QPointF newCenter((getCenterCoordinates().x() + _scene->getCurrentTime()/(2* MaquetteScene::MS_PER_PIXEL)) , getCenterCoordinates().y() );
+
           centerOn(newCenter);
+
           Maquette::getInstance()->setViewPosition(newCenter);
           _scene->zoomChanged(_zoom);
           setSceneRect((QRectF(0,0,_scene->getMaxSceneWidth(),_scene->height())));
         }
     }
+  _scene->updateWidgets();
 }
 
 QPointF
 MaquetteView::getCenterCoordinates()
 {
-  QPointF centerCoordinates = mapToScene(viewport()->rect().center() -= QPoint(viewport()->rect().center().y() / 2, viewport()->rect().center().y() / 2));
+  QPointF centerCoordinates = mapToScene(viewport()->rect().center());// -= QPoint(viewport()->rect().center().x() / 2, viewport()->rect().center().y() / 2);
   return centerCoordinates;
 }
 
@@ -399,7 +409,7 @@ MaquetteView::zoomOut()
   _scene->update();
   Maquette::getInstance()->updateBoxesFromEngines();
 
-  QPointF newCenter(getCenterCoordinates().x() / 2, getCenterCoordinates().y() / 2);
+  QPointF newCenter(getCenterCoordinates().x() -  _scene->getCurrentTime()/(MaquetteScene::MS_PER_PIXEL) , getCenterCoordinates().y());
   centerOn(newCenter);
   Maquette::getInstance()->setViewPosition(newCenter);
   _scene->updateProgressBar();

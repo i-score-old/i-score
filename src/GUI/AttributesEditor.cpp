@@ -55,11 +55,22 @@ static const int LEFT_MARGIN = 1;
 static const int RIGHT_MARGIN = 1;
 static const int COLOR_ICON_SIZE = 21;
 
+const int AttributesEditor::BUTTON_SIZE = 22;
+
 AttributesEditor::AttributesEditor(QWidget* parent) : QDockWidget(tr("Inspector"), parent, 0)
 {
   _boxEdited = NO_ID;
   setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetVerticalTitleBar | QDockWidget::DockWidgetClosable	);
+  QFile pb_ss_file(":/resources/stylesheets/BasicBox/push_button.qss");
+  if(!pb_ss_file.open(QIODevice::ReadOnly | QIODevice::Text))
+  {
+      qDebug("Cannot read the pushbutton stylesheet");
+      return;
+  }
+  _pushButtonStyle = pb_ss_file.readAll();
+
+
 }
 
 void
@@ -97,6 +108,11 @@ AttributesEditor::init()
   pal.setColor( QPalette::Background, QColor(60,60,60) );
   setPalette( pal );
   setAutoFillBackground( true );
+
+  connect(&_colorDialog, SIGNAL(currentColorChanged(QColor)),
+		  this, SLOT(currentColorSelectionChanged(QColor)));
+  connect(&_colorDialog, SIGNAL(rejected()),
+		  this, SLOT(revertColor()));
 }
 
 AttributesEditor::~AttributesEditor()
@@ -146,18 +162,13 @@ AttributesEditor::nameWidgets()
   assignStart = tr("Start");
   assignEnd = tr("End");
 
-  QFont font;
-  font.setPointSize(10);
-  _snapshotAssignStart->setFont(font);
-  _snapshotAssignEnd->setFont(font);
-//  font.setPointSize(1);
-//  _updateLabel->setFont(font);
-  _updateLabel->setStyleSheet("QLabel { color : gray;"
-                              "font-size: 10pt;} "
-                              );
+   QIcon startIcon(":/resources/images/start_update.png");
+   _snapshotAssignStart->setIcon(startIcon);
+   _snapshotAssignStart->setIconSize(QSize(BUTTON_SIZE,BUTTON_SIZE));
 
-  _snapshotAssignStart->setText(assignStart);
-  _snapshotAssignEnd->setText(assignEnd);
+   QIcon endIcon(":/resources/images/end_update.png");
+   _snapshotAssignEnd->setIcon(endIcon);
+   _snapshotAssignEnd->setIconSize(QSize(BUTTON_SIZE,BUTTON_SIZE));
   _updateLabel->setText("update");
 }
 
@@ -201,58 +212,14 @@ AttributesEditor::createWidgets()
   //Start&End buttons
   _snapshotAssignStart = new QPushButton;
   _snapshotAssignStart->setToolTip("Update start state");
-  _snapshotAssignStart->setStyleSheet(
-              " QPushButton {"
-              "border: 2px solid #6f6f80;"
-              "border-radius: 6px;"
-              "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-              "stop: 0 #808080, stop: 1 #909090);"
-              "padding-bottom: 1px;"
-              "padding-top: 1px;"
-
-              "min-width: 22px;"
-              "}"
-
-              "QPushButton:pressed {"
-              "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-              "stop: 0 #606060, stop: 1 #808080);"
-              "}"
-
-              "QPushButton:flat {"
-              "border: none; /* no border for a flat push button */"
-              "}"
-
-              "QPushButton:default {"
-              "border-color: navy; /* make the default button prominent */"
-              "}"
-              );
+  _snapshotAssignStart->setIconSize(QSize(20,20));
+  _snapshotAssignStart->setStyleSheet(_pushButtonStyle);
 
   _snapshotAssignEnd = new QPushButton;
   _snapshotAssignEnd->setToolTip("Update end state");
-  _snapshotAssignEnd->setStyleSheet(
-              " QPushButton {"
-              "border: 2px solid #6f6f80;"
-              "border-radius: 6px;"
-              "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-              "stop: 0 #808080, stop: 1 #909090);"
-              "padding-bottom: 1px;"
-              "padding-top: 1px;"
+  _snapshotAssignEnd->setIconSize(QSize(20 ,20));
+  _snapshotAssignEnd->setStyleSheet(_pushButtonStyle);
 
-              "min-width: 22px;"
-              "}"
-              "QPushButton:pressed {"
-              "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-              "stop: 0 #606060, stop: 1 #808080);"
-              "}"
-
-              "QPushButton:flat {"
-              "border: none; /* no border for a flat push button */"
-              "}"
-
-              "QPushButton:default {"
-              "border-color: navy; /* make the default button prominent */"
-              "}"
-              );
   //NetworkTree
   _networkTree = new NetworkTree(this);
   //_networkTree->load();
@@ -330,69 +297,43 @@ AttributesEditor::connectSlots()
 void
 AttributesEditor::setAttributes(AbstractBox *abBox)
 {            
-  bool boxModified = (_boxEdited != abBox->ID());
+    bool boxModified = (_boxEdited != abBox->ID());
 
-  _boxEdited = abBox->ID();
+    _boxEdited = abBox->ID();
 
-  if (boxModified || (_boxEdited == NO_ID)) {
-      _networkTree->resetNetworkTree();
-      if (_boxEdited != NO_ID) {
-          if (abBox->networkTreeItems().isEmpty() && abBox->networkTreeExpandedItems().isEmpty()) {
-              //LOAD FILE
-              _networkTree->loadNetworkTree(abBox);
-              startMessagesChanged();
-              endMessagesChanged();
+    if (boxModified || (_boxEdited == NO_ID))
+    {
+        _networkTree->resetNetworkTree();
+        if (_boxEdited != NO_ID)
+        {
+           // if (abBox->networkTreeItems().isEmpty() && abBox->networkTreeExpandedItems().isEmpty())
+            {
+                //LOAD FILE
+                _networkTree->loadNetworkTree(abBox);
+                startMessagesChanged();
+                endMessagesChanged();
             }
-          else {
-              _networkTree->setAssignedItems(abBox->networkTreeItems());             
+           // else
+            {
+           //     _networkTree->setAssignedItems(abBox->networkTreeItems());
             }
 
-          _networkTree->displayBoxContent(abBox);
-
-          //PRINT MESSAGES
-//            QList<QTreeWidgetItem *> items = _networkTree->assignedItems().keys();
-//            QList<QTreeWidgetItem *>::iterator i;
-//            QTreeWidgetItem *curIt;
-//            std::cout<<"\nsetattribute::AFFICHAGE START box \n";
-//            vector<string> startMessages = _scene->getBox(_boxEdited)->startMessages()->computeMessages();
-//            vector<string> startMessages = _networkTree->startMessages()->computeMessages();
-//            for(unsigned int i=0; i<startMessages.size(); i++){
-//                std::cout<<startMessages[i]<<std::endl;
-//            }
-//            std::cout<<"setattribute::AFFICHAGE END\n";
-//            vector<string> endMessages = _scene->getBox(_boxEdited)->endMessages()->computeMessages();
-////            vector<string> endMessages = _networkTree->endMessages()->computeMessages();
-//            for(int i=0; i<endMessages.size(); i++){
-//                std::cout<<endMessages[i]<<std::endl;
-//            }
-          //END PRINT          
+            _networkTree->displayBoxContent(abBox);
         }
     }
 
-
-//Special update for the main scenario
-  if(_boxEdited == ROOT_BOX_ID){
-      _scene->view()->setScenarioSelected(true);
-      _boxName->setText(QString::fromStdString(abBox->name()));
-  }
-  else{
-      _scene->view()->setScenarioSelected(false);
-      _networkTree->updateCurves(_boxEdited);
-      updateWidgets(boxModified);
-
-  }
-}
-
-void
-AttributesEditor::keyPressEvent(QKeyEvent *event)
-{
-  QDockWidget::keyPressEvent(event);
-}
-
-void
-AttributesEditor::keyReleaseEvent(QKeyEvent *event)
-{
-  QDockWidget::keyReleaseEvent(event);
+    //Special update for the main scenario
+    if(_boxEdited == ROOT_BOX_ID)
+    {
+        _scene->view()->setScenarioSelected(true);
+        _boxName->setText(QString::fromStdString(abBox->name()));
+    }
+    else
+    {
+        _scene->view()->setScenarioSelected(false);
+        _networkTree->updateCurves(_boxEdited);
+        updateWidgets(boxModified);
+    }
 }
 
 void
@@ -425,33 +366,6 @@ AttributesEditor::updateWidgets(bool boxModified)
 }
 
 void
-AttributesEditor::startChanged()
-{
-//  std::cout<<"--- startChanged ---"<<std::endl;
-  BasicBox * box = _scene->getBox(_boxEdited);
-  if (box != nullptr) {
-      box->moveBy(_boxStartValue->value() * S_TO_MS / MaquetteScene::MS_PER_PIXEL - box->getTopLeft().x(), 0);
-      _scene->boxMoved(_boxEdited);
-    }
-}
-
-void
-AttributesEditor::lengthChanged()
-{
-//  std::cout<<"--- length changed ---"<<std::endl;
-  BasicBox * box = _scene->getBox(_boxEdited);
-  if (box != nullptr) {
-      box->resizeWidthEdition(_boxLengthValue->value() * S_TO_MS / MaquetteScene::MS_PER_PIXEL);
-      QPainterPath nullptrPath;
-      nullptrPath.addRect(QRectF(QPointF(0., 0.), QSizeF(0., 0.)));
-      _scene->setSelectionArea(nullptrPath);
-      box->setSelected(true);
-      _scene->setResizeBox(_boxEdited);
-      _scene->boxResized();
-    }
-}
-
-void
 AttributesEditor::nameChanged()
 {
   BasicBox * box = _scene->getBox(_boxEdited);
@@ -459,26 +373,44 @@ AttributesEditor::nameChanged()
   if (box != nullptr) {
       box->setName(_boxName->text());
       _scene->update(box->getTopLeft().x(), box->getTopLeft().y(), box->width(), box->height() + 10);
-    }
+  }
+}
+
+void AttributesEditor::currentColorSelectionChanged(const QColor& color)
+{
+	if (_boxEdited != NO_ID)
+	{
+		BasicBox * box = _scene->getBox(_boxEdited);
+
+		if (color.isValid())
+		{
+			_colorButtonPixmap->fill(color);
+			_generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
+			box->changeColor(color);
+		}
+	}
+}
+
+void AttributesEditor::revertColor()
+{
+	BasicBox * box = _scene->getBox(_boxEdited);
+	box->changeColor(_currentBoxOriginalColor);
+	_colorButtonPixmap->fill(_currentBoxOriginalColor);
+	_generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
 }
 
 void
 AttributesEditor::changeColor()
 {
-  if (_boxEdited != NO_ID) {
-      BasicBox * box = _scene->getBox(_boxEdited);
-
-      QColor color = QColorDialog::getColor(box->currentColor(), this);
-
-      if (color.isValid()) {
-          _colorButtonPixmap->fill(color);
-          _generalColorButton->setIcon(QIcon(*_colorButtonPixmap));
-          box->changeColor(color);
-        }
-    }
-  else {
-      _scene->displayMessage("No box selected", INDICATION_LEVEL);
-    }
+	if (_boxEdited != NO_ID)
+	{
+		_currentBoxOriginalColor = _scene->getBox(_boxEdited)->color();
+		_colorDialog.exec();
+	}
+	else
+	{
+		_scene->displayMessage("No box selected", INDICATION_LEVEL);
+	}
 }
 
 void
@@ -589,44 +521,6 @@ AttributesEditor::endMessageChanged(QTreeWidgetItem *item)
       _scene->displayMessage("No box selected", INDICATION_LEVEL);
       item->setText(NetworkTree::END_COLUMN, "");
     }  
-}
-
-void
-AttributesEditor::startMessageRemoved(const string &address)
-{
-    if (_scene->paused()) {
-        _scene->stopAndGoToCurrentTime();
-    }
-
-  if (_boxEdited != NO_ID) {
-      if(_boxEdited == ROOT_BOX_ID)
-          _scene->view()->resetCachedContent();
-      else{
-          QMap<QTreeWidgetItem*, Data> items = _networkTree->assignedItems();
-          Maquette::getInstance()->setSelectedItemsToSend(_boxEdited, items);
-          Maquette::getInstance()->setStartMessagesToSend(_boxEdited, _networkTree->startMessages());
-          Maquette::getInstance()->removeCurve(_boxEdited, address);
-      }
-    }
-  else {
-      _scene->displayMessage("No box selected", INDICATION_LEVEL);
-    }
-}
-
-void
-AttributesEditor::endMessageRemoved(const string &address)
-{
-    if (_scene->paused()) {
-        _scene->stopAndGoToCurrentTime();
-    }
-
-    if (_boxEdited != NO_ID) {
-        Maquette::getInstance()->setEndMessagesToSend(_boxEdited, _networkTree->endMessages());
-        Maquette::getInstance()->removeCurve(_boxEdited, address);
-    }
-    else {
-        _scene->displayMessage("No box selected", INDICATION_LEVEL);
-    }
 }
 
 void

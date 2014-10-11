@@ -144,7 +144,11 @@ MainWindow::MainWindow()
   connect(_scene, SIGNAL(playModeChanged()), _headerPanelWidget, SLOT(updatePlayMode()));
   connect(_view, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
   connect(_scene, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
-  connect(_scene, &MaquetteScene::updateRecordingBoxes, this, &MainWindow::updateRecordingBoxes);
+  connect(_scene, &MaquetteScene::updateRecordingBoxes,
+          this,   &MainWindow::updateRecordingBoxes);
+
+  connect(this, &MainWindow::sigLoad,
+          this, &MainWindow::loadFile);
 }
 
 MainWindow::~MainWindow()
@@ -306,15 +310,13 @@ MainWindow::open()
         }
     }
 
-  QString fileName = QFileDialog::
-          getOpenFileName(this, tr("Open File"), 0, tr("XML Files (*.score)"));
-
-
-
-  if (!fileName.isEmpty()) {                  
-      QCoreApplication::processEvents();//permet de fermer la fenêtre de dialogue avant de lancer le chargement.
-      loadFile(fileName);      
-    }
+  QFileDialog dialog{this, tr("Open File"), QString(), tr("XML Files (*.score)")};
+  dialog.setFileMode(QFileDialog::ExistingFile);
+  if(dialog.exec() && !dialog.selectedFiles().isEmpty() && !dialog.selectedFiles()[0].isEmpty())
+  {
+      dialog.close();
+      emit sigLoad(dialog.selectedFiles()[0]);
+  }
 }
 
 void
@@ -342,7 +344,7 @@ MainWindow::open(QString s)
         }
     }
 
-    loadFile(s);
+     emit sigLoad(s);
 
 }
 
@@ -547,14 +549,14 @@ MainWindow::createActions()
   _quitAct->setStatusTip(tr("Quit the application"));
   connect(_quitAct, SIGNAL(triggered()), this, SLOT(close()));
 
-  _aboutAct = new QAction(QIcon(":/resources/images/about.svg"), tr("&About"), this);
+  _aboutAct = new QAction(tr("&About"), this);
   _aboutAct->setShortcut(QKeySequence::WhatsThis);
   _aboutAct->setStatusTip(tr("Show the application's About box"));
   connect(_aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
   _helpDialog = new Help(this);
 
-  _helpAct = new QAction(QIcon(":/resources/images/help.svg"), tr("&Help"), this);
+  _helpAct = new QAction(tr("&Help"), this);
   _helpAct->setShortcut(QKeySequence::HelpContents);
   _helpAct->setStatusTip(tr("Show the application's Help"));
   connect(_helpAct, SIGNAL(triggered()), this, SLOT(help()));
@@ -569,7 +571,7 @@ MainWindow::createActions()
   _zoomOutAct->setStatusTip(tr("Zoom out"));
   connect(_zoomOutAct, SIGNAL(triggered()), _view, SLOT(zoomOut()));
 
-  _editorAct = new QAction(QIcon(":/resources/images/edit.svg"), tr("Devices Explorer"), this);
+  _editorAct = new QAction(tr("Devices Explorer"), this);
   _editorAct->setShortcut(QString("Ctrl+E"));
   _editorAct->setStatusTip(tr("Devices Explorer"));
   _editorAct->setCheckable(true);
@@ -597,21 +599,21 @@ MainWindow::createActions()
   _selectAllAct->setStatusTip(tr("Select every item"));
   connect(_selectAllAct, SIGNAL(triggered()), this, SLOT(selectAll()));
 
-  _selectModeAct = new QAction(QIcon(":/resources/images/select.svg"), tr("Select"), this);
+  _selectModeAct = new QAction(tr("Select"), this);
   _selectModeAct->setStatusTip(tr("Switch mode to selection"));
   _selectModeAct->setShortcut(QString("Ctrl+Shift+E"));
   _selectModeAct->setCheckable(true);
   _selectModeAct->setChecked(false);
   connect(_selectModeAct, SIGNAL(triggered()), this, SLOT(selectMode()));
 
-  _PBModeAct = new QAction(QIcon(":/resources/images/parentBox.svg"), tr("Box"), this);
+  _PBModeAct = new QAction(tr("Box"), this);
   _PBModeAct->setStatusTip(tr("Switch mode to Parent Box creation"));
   _PBModeAct->setShortcut(QString("Ctrl+Shift+P"));
   _PBModeAct->setCheckable(true);
   _PBModeAct->setChecked(true);
   connect(_PBModeAct, SIGNAL(triggered()), this, SLOT(selectMode()));
 
-  _commentModeAct = new QAction(QIcon(":/resources/images/comment.svg"), tr("Comment"), this);
+  _commentModeAct = new QAction(tr("Comment"), this);
   _commentModeAct->setStatusTip(tr("Adds a Comment"));
   _commentModeAct->setShortcut(QString("Ctrl+Shift+T"));
   _commentModeAct->setCheckable(true);
@@ -632,6 +634,7 @@ MainWindow::createMenus()
 {
 #ifdef __APPLE__
   _menuBar = new QMenuBar();
+  auto appleMenu = _menuBar->addMenu("i-Score");
 #else
   _menuBar = this->menuBar();
 #endif
@@ -702,7 +705,7 @@ MainWindow::writeSettings()
 void
 MainWindow::loadFile(const QString &fileName)
 {
-    QCoreApplication::processEvents();//permet de fermer la fenêtre de dialogue avant de lancer le chargement.
+  QCoreApplication::processEvents();//permet de fermer la fenêtre de dialogue avant de lancer le chargement.
   QApplication::setOverrideCursor(Qt::WaitCursor);
   _scene->clear();
   _editor->clear();
@@ -793,6 +796,7 @@ MainWindow::strippedName(const QString &fullFileName)
 
 void
 MainWindow::updatePlayMode(){
+    _scene->updateBoxesButtons();
     _scene->unselectAll();
     _editor->noBoxEdited();
     _editor->setDisabled(_scene->playing());
@@ -800,7 +804,7 @@ MainWindow::updatePlayMode(){
 
 void
 MainWindow::updateRecordingBoxes(bool onPlay)
-{
+{ qDebug(Q_FUNC_INFO);
     //Update recorded curves
     QList<BasicBox*> boxes = Maquette::getInstance()->getRecordingBoxes();
     QList<BasicBox*>::iterator it;

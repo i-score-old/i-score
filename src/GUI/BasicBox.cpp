@@ -79,21 +79,28 @@
 #include <cmath>
 #include <QPixmapCache>
 #include <QDebug>
+#include "BoxWidget.hpp"
 
 using std::string;
 using std::vector;
 using std::map;
 
 /// \todo On pourrait les instancier directement dans le header avec leurs définitions. (par jaime Chao)
+
+const unsigned int BasicBox::LINE_WIDTH = 2;
+const unsigned int BasicBox::RESIZE_TOLERANCE = 25;
+const float BasicBox::RESIZE_ZONE_WIDTH = 5 * LINE_WIDTH;
+
 const int BasicBox::COMBOBOX_HEIGHT = 25;
 const int BasicBox::COMBOBOX_WIDTH = 120;
+const int BasicBox::BUTTON_SIZE = 16;
 const float BasicBox::TRIGGER_ZONE_WIDTH = 18.;
 const float BasicBox::TRIGGER_ZONE_HEIGHT = 20.;
 const float BasicBox::TRIGGER_EXPANSION_FACTOR = 2.5;
 const float BasicBox::RAIL_HEIGHT = 20.;
 const float BasicBox::MSGS_INDICATOR_WIDTH = 50;
-const float BasicBox::EAR_WIDTH = 9;
-const float BasicBox::EAR_HEIGHT = 30;
+const float BasicBox::EAR_WIDTH = 11;
+const float BasicBox::EAR_HEIGHT = 35;
 const float BasicBox::GRIP_CIRCLE_SIZE = 5;
 unsigned int BasicBox::BOX_MARGIN = 25;
 const QString BasicBox::SCENARIO_MODE_TEXT = tr("Scenario");
@@ -106,6 +113,14 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 {    
 
   _scene = parent;
+  
+  QFile pb_ss_file(":/resources/stylesheets/BasicBox/push_button.qss");
+  if(!pb_ss_file.open(QIODevice::ReadOnly | QIODevice::Text))
+  {
+	  qDebug("Cannot read the pushbutton stylesheet");
+	  return;
+  }
+  _pushButtonStyle = pb_ss_file.readAll();
 
   /// \todo : !! Problème d'arrondi, on cast en int des floats !! A étudier parce que crash (avec 0 notamment) si on remet en float. NH
   int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
@@ -120,7 +135,6 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
   _abstract->setTopLeft(QPointF(xmin, ymin));
   _abstract->setWidth(xmax - xmin);
   _abstract->setHeight(ymax - ymin);
-
   init();
 
   createWidget();
@@ -142,21 +156,29 @@ BasicBox::centerWidget()
     }
 
     if(_comboBox != nullptr){
-        _comboBox->move(0, -(height() / 2 + LINE_WIDTH));
-        _comboBox->resize((width() - 4 * LINE_WIDTH - BOX_MARGIN) / 2, COMBOBOX_HEIGHT);
+        _comboBox->move( - 4, -(height() / 2 + LINE_WIDTH));
+        _comboBox->resize((width() - 4 * LINE_WIDTH - BOX_MARGIN ) / 2, COMBOBOX_HEIGHT);
     }
 
     if(_startMenuButton != nullptr)
-        _startMenuButton->move(-(width()) / 2 + LINE_WIDTH, -(height()) / 2);
+        _startMenuButton->move(-(width()) / 2 + LINE_WIDTH,
+                          -(height()) / 2 + 2.5);
 
     if(_endMenuButton != nullptr)
-        _endMenuButton->move((width()) / 2 + 2 * LINE_WIDTH - BOX_MARGIN, -(height()) / 2 + LINE_WIDTH);
+        _endMenuButton->move((width()) / 2 + 2 * LINE_WIDTH - BOX_MARGIN,
+                          -(height()) / 2 + 2.5);
 
     if(_playButton != nullptr)
-        _playButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN-4, -(height()) / 2);
+        _playButton->move(-(width()) / 2 + LINE_WIDTH + 6 + 2 * ( BUTTON_SIZE + 2 ),
+                          -(height()) / 2 + 2.5);
 
     if(_stopButton != nullptr)
-        _stopButton->move(-(width()) / 2 + LINE_WIDTH + BOX_MARGIN-4, -(height()) / 2);
+        _stopButton->move(-(width()) / 2 + LINE_WIDTH + 3 + ( BUTTON_SIZE + 2 ),
+                          -(height()) / 2 + 2.5);
+	
+	if(_muteButton)
+        _muteButton->move(-(width()) / 2 + LINE_WIDTH + 3 + BUTTON_SIZE + 2,
+                          -(height()) / 2 + 2.5);
 }
 
 void
@@ -187,64 +209,52 @@ BasicBox::createMenus()
   _endMenu->setWindowModality(Qt::ApplicationModal);
   _endMenu->addAction(_jumpToEndCue);
   _endMenu->addAction(_updateEndCue);
-
+  
   //--- start button ---
-  QIcon startMenuIcon(":/resources/images/boxStartMenu.svg");
+  QIcon startMenuIcon(":/resources/images/start.png"); //boxStartMenu.svg
   _startMenuButton = new QPushButton();
   _startMenuButton->setIcon(startMenuIcon);
+  _startMenuButton->setIconSize(QSize(BUTTON_SIZE,BUTTON_SIZE));
   _startMenuButton->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  _startMenuButton->setStyleSheet(
-    "QPushButton {"
-    "border: none;"
-    "border-radius: none;"
-    "background-color: transparent;"
-    "};"
-    );
+  _startMenuButton->setStyleSheet(_pushButtonStyle);
   if(_boxContentWidget != nullptr)
       _boxContentWidget->setStartMenu(_startMenu);
 
   //--- end button ---
-  QIcon endMenuIcon(":/resources/images/boxEndMenu.svg");
+  QIcon endMenuIcon(":/resources/images/end.png"); //boxEndMenu.svg
   _endMenuButton = new QPushButton();
   _endMenuButton->setIcon(endMenuIcon);
+  _endMenuButton->setIconSize(QSize(BUTTON_SIZE,BUTTON_SIZE));
   _endMenuButton->setShortcutEnabled(1, false);
-  _endMenuButton->setStyleSheet(
-    "QPushButton {"
-    "border: none;"
-    "border-radius: none;"
-    "background-color: transparent;"
-    "}"
-    );
+  _endMenuButton->setStyleSheet(_pushButtonStyle);
   if(_boxContentWidget != nullptr)
       _boxContentWidget->setEndMenu(_endMenu);
 
 //  Play
-  QIcon playIcon(":/resources/images/playSimple.svg");
+  QIcon playIcon(":/resources/images/play.png"); //playSimple.svg
   _playButton= new QPushButton();
   _playButton->setIcon(playIcon);
+  _playButton->setIconSize(QSize(BUTTON_SIZE,BUTTON_SIZE));
   _playButton->setShortcutEnabled(1, false);
-  _playButton->setStyleSheet(
-    "QPushButton {"
-    "border: none;"
-    "border-radius: none;"
-    "background-color: transparent;"
-    "}"
-    );
-
+  _playButton->setStyleSheet(_pushButtonStyle);
+  
 //  Stop
-    QIcon stopIcon(":/resources/images/stopSimple.svg");
+    QIcon stopIcon(":/resources/images/stop.png"); //stopSimple.svg
     _stopButton= new QPushButton();
     _stopButton->setIcon(stopIcon);
+    _stopButton->setIconSize(QSize(BUTTON_SIZE,BUTTON_SIZE));
     _stopButton->setShortcutEnabled(1, false);
-    _stopButton->setStyleSheet(
-      "QPushButton {"
-      "border: none;"
-      "border-radius: none;"
-      "background-color: transparent;"
-      "}"
-      );
+    _stopButton->setStyleSheet(_pushButtonStyle);
 
+	// Mute
+//    _muteButton = new QPushButton(_muteOffIcon, "&");
+    _muteButton = new QPushButton();
+    _muteButton->setIcon(_muteOffIcon);
+    _muteButton->setIconSize(QSize(BUTTON_SIZE,BUTTON_SIZE));
+    _muteButton->setStyleSheet(_pushButtonStyle);
+	_muteButton->setCheckable(true);
+	
   QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
   startMenuProxy->setWidget(_startMenuButton);
   QGraphicsProxyWidget *endMenuProxy = new QGraphicsProxyWidget(this);
@@ -253,6 +263,8 @@ BasicBox::createMenus()
   playProxy->setWidget(_playButton);
   QGraphicsProxyWidget *stopProxy = new QGraphicsProxyWidget(this);
   stopProxy->setWidget(_stopButton);
+  QGraphicsProxyWidget *muteProxy = new QGraphicsProxyWidget(this);
+  muteProxy->setWidget(_muteButton);
 
   connect(_startMenuButton, SIGNAL(clicked()), _boxContentWidget, SLOT(execStartAction()));
   connect(_endMenuButton, SIGNAL(clicked()), _boxContentWidget, SLOT(execEndAction()));
@@ -260,12 +272,8 @@ BasicBox::createMenus()
   connect(_endMenuButton, SIGNAL(customContextMenuRequested(QPoint)), _boxContentWidget, SLOT(displayEndMenu(QPoint)));
   connect(_playButton, SIGNAL(clicked()), _boxContentWidget, SLOT(play()));
   connect(_stopButton, SIGNAL(clicked()), _boxContentWidget, SLOT(stop()));
-}
-
-void
-BasicBox::updateWidgets()
-{
-  centerWidget();
+  connect(_muteButton, &QPushButton::toggled, 
+		  this,		   &BasicBox::toggleMuteButton);
 }
 
 void
@@ -285,7 +293,7 @@ BasicBox::createWidget()
   palette.setBrush(QPalette::Background, brush);
 
   //---------------------- Curve widget ----------------------//
-  _boxWidget = new QWidget();
+  _boxWidget = new QWidget;
   _boxContentWidget = new BoxWidget(_boxWidget, this);
   QGridLayout *layout = new QGridLayout;
   layout->addWidget(_boxContentWidget);
@@ -318,6 +326,11 @@ BasicBox::createWidget()
   _comboBoxProxy->setWidget(_comboBox);
   _comboBoxProxy->setZValue(1);
   _boxContentWidget->setComboBox(_comboBox);
+
+  connect(_comboBox, &CurvesComboBox::clicked,
+		  this, &BasicBox::onComboBoxClicked);
+  connect(_comboBox, &CurvesComboBox::hid,
+		  this, &BasicBox::onComboBoxHidden);
 }
 
 BasicBox::BasicBox(AbstractBox *abstract, MaquetteScene *parent)
@@ -348,6 +361,7 @@ BasicBox::~BasicBox()
   _startMenuButton->deleteLater();
   _endMenuButton->deleteLater();
   _playButton->deleteLater();
+  _muteButton->deleteLater();
   _stopButton->deleteLater();
 
   _jumpToStartCue->deleteLater();
@@ -495,12 +509,6 @@ BasicBox::getCenter() const
 }
 
 QPointF
-BasicBox::getRelativeCenter() const
-{
-  return QPointF(relativeBeginPos() + _abstract->width() / 2., _abstract->topLeft().y() + _abstract->height() / 2.);
-}
-
-QPointF
 BasicBox::getSize() const
 {
   return QPointF(_abstract->width(), _abstract->height());
@@ -522,18 +530,6 @@ BasicBox::getRightGripPoint()
       std::cerr << "BasicBox::getRightGripPoint() : " << e.what();
       return QPointF();
     }
-}
-
-QPointF
-BasicBox::getMiddleRight() const
-{
-  return QPointF(_abstract->topLeft().x() + _abstract->width(), _abstract->topLeft().y() + _abstract->height() / 2.);
-}
-
-QPointF
-BasicBox::getMiddleLeft() const
-{
-  return QPointF(_abstract->topLeft().x(), _abstract->topLeft().y() + _abstract->height() / 2.);
 }
 
 QPointF
@@ -668,6 +664,24 @@ BasicBox::getStartState()
   return finalMessages;
 }
 
+void BasicBox::enableCurveEdition()
+{
+    CurveWidget* curve = dynamic_cast<CurveWidget*>(_boxContentWidget->stackedLayout()->currentWidget());
+    if(curve)
+    {
+        curve->setEnabled(true);
+    }
+}
+
+void BasicBox::disableCurveEdition()
+{
+    CurveWidget* curve = dynamic_cast<CurveWidget*>(_boxContentWidget->stackedLayout()->currentWidget());
+    if(curve)
+    {
+        curve->setEnabled(false);
+    }
+}
+
 std::vector<std::string>
 BasicBox::getStartMessages(){
     return _abstract->startMessages()->computeMessages();
@@ -770,7 +784,9 @@ BasicBox::updateRelations(BoxExtremity extremity)
       for (it2 = cur.begin(); it2 != cur.end(); ++it2) {
           curRel = it2->second;
           curRel->lower(_low);
-          curRel->updateFlexibility();
+          if (extremity == BOX_START) {
+            curRel->updateFlexibility();
+          }
         }
     }
 }
@@ -861,18 +877,6 @@ BasicBox::detachFromCondition()
 }
 
 QList<Relation *>
-BasicBox::getStartBoxRelations()
-{
-  return getRelations(BOX_START);
-}
-
-QList<Relation *>
-BasicBox::getEndBoxRelations()
-{
-  return getRelations(BOX_END);
-}
-
-QList<Relation *>
 BasicBox::getRelations(BoxExtremity extremity)
 {
   QList<Relation *>relations;
@@ -910,18 +914,6 @@ BasicBox::addComment(const AbstractComment &abstract)
   _comment->updatePos();
 }
 
-bool
-BasicBox::hasComment() const
-{
-  return(_comment != nullptr);
-}
-
-Comment*
-BasicBox::comment() const
-{
-  return _comment;
-}
-
 void
 BasicBox::removeComment()
 {
@@ -946,19 +938,6 @@ BasicBox::setCrossedExtremity(BoxExtremity extremity)
   _scene->setPlaying(_abstract->ID(), _playing);
   update();
 }
-
-void
-BasicBox::setCrossedTriggerPoint(bool waiting, BoxExtremity extremity)
-{
-  QMap<BoxExtremity, TriggerPoint*>::iterator it;
-
-//	if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
-  if (_triggerPoints->contains(extremity)) {
-      _triggerPoints->value(extremity)->setWaiting(waiting);
-    }
-  update();
-}
-
 
 bool
 BasicBox::hasTriggerPoint(BoxExtremity extremity)
@@ -1058,29 +1037,6 @@ BasicBox::removeTriggerPoint(BoxExtremity extremity)
     }
 }
 
-void
-BasicBox::setTriggerPointMessage(BoxExtremity extremity, const string &message)
-{
-  QMap<BoxExtremity, TriggerPoint*>::iterator it;
-
-//	if ((it = _triggerPoints.find(extremity)) != _triggerPoints.end()) {
-  if (_triggerPoints->contains(extremity)) {
-      _triggerPoints->value(extremity)->setMessage(message);
-    }
-}
-
-string
-BasicBox::triggerPointMessage(BoxExtremity extremity)
-{
-  if (_triggerPoints->contains(extremity)) {
-      return _triggerPoints->value(extremity)->message();
-    }
-
-  else {
-      return "";
-    }
-}
-
 TriggerPoint *
 BasicBox::getTriggerPoint(BoxExtremity extremity)
 {
@@ -1129,12 +1085,6 @@ void
 BasicBox::removeFromExpandedItemsList(QTreeWidgetItem *item)
 {
   _abstract->removeFromNetworkTreeExpandedItems(item);
-}
-
-void
-BasicBox::clearExpandedItemsList()
-{
-  _abstract->clearNetworkTreeExpandedItems();
 }
 
 void
@@ -1247,14 +1197,6 @@ BasicBox::unlock()
 
 //    setFlag(QGraphicsItem::ItemIsSelectable);
   setFlag(QGraphicsItem::ItemIsFocusable);
-}
-
-bool
-BasicBox::resizing() const
-{
-  return (cursor().shape() == Qt::SizeFDiagCursor)
-         || (cursor().shape() == Qt::SizeHorCursor)
-         || (cursor().shape() == Qt::SizeVerCursor);
 }
 
 bool
@@ -1402,27 +1344,42 @@ BasicBox::boxBody()
   return QRectF(_boxRect.topLeft() + QPointF(0, RESIZE_TOLERANCE), _boxRect.bottomRight());
 }
 
-void
-BasicBox::keyPressEvent(QKeyEvent *event)
+void BasicBox::keyPressEvent(QKeyEvent *event)
 {
-  QGraphicsObject::keyPressEvent(event);
-  if(event->key() == Qt::Key_R)
-  {
+    QGraphicsObject::keyPressEvent(event);
+
     CurveWidget *curve = dynamic_cast<CurveWidget *>(_boxContentWidget->stackedLayout()->currentWidget());
-    if(curve) curve->adaptScale();
-  }
+    if(curve)
+    {
+        if(event->key() == Qt::Key_R)
+        {
+            curve->adaptScale();
+        }
+        if(event->key() == Qt::Key_Control && _hover)
+        {
+            curve->keyPressEvent(event);
+        }
+    }
 }
 
 void
 BasicBox::keyReleaseEvent(QKeyEvent *event)
 {
   QGraphicsObject::keyReleaseEvent(event);
+
+  CurveWidget *curve = dynamic_cast<CurveWidget *>(_boxContentWidget->stackedLayout()->currentWidget());
+  if(curve)
+  {
+      if(event->key() == Qt::Key_Control)
+      {
+          curve->keyReleaseEvent(event);
+      }
+  }
 }
 
 void
 BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-  QGraphicsObject::mousePressEvent(event);
 
   if (_startMenu != nullptr) {
       _startMenu->close();
@@ -1431,8 +1388,11 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
       _endMenu->close();
     }
 
-  if (event->button() == Qt::LeftButton) {
+  if (event->button() == Qt::LeftButton)
+  {
+      _scene->unselectAll();
       setSelected(true);
+      emit _scene->selectionChanged();
 
       if (cursor().shape() == Qt::OpenHandCursor) {
           setCursor(Qt::ClosedHandCursor);
@@ -1472,6 +1432,8 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
         }
 //      update();
     }    
+
+  QGraphicsObject::mousePressEvent(event);
 }
 
 void
@@ -1579,6 +1541,7 @@ BasicBox::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
       nullPath.addRect(QRectF(QPointF(0., 0.), QSizeF(0., 0.)));
       _scene->setSelectionArea(nullPath);
       setSelected(true);
+      emit _scene->selectionChanged();
       _scene->boxResized();
   }
 }
@@ -1607,8 +1570,6 @@ BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 {
   QGraphicsObject::hoverEnterEvent(event);
   _hover = true;
-
-  const float RESIZE_ZONE_WIDTH = 3 * LINE_WIDTH;
 
   QRectF textRect(_boxRect.topLeft(), _boxRect.topRight() + QPointF(0, RESIZE_TOLERANCE));
 
@@ -1680,7 +1641,6 @@ BasicBox::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 
   QGraphicsObject::hoverEnterEvent(event);
   _hover = true;
-  const float RESIZE_ZONE_WIDTH = 3 * LINE_WIDTH;
 
   QRectF textRect(_boxRect.topLeft(), _boxRect.topRight() + QPointF(0, 3 * RESIZE_TOLERANCE / 4));
 
@@ -1950,7 +1910,7 @@ BasicBox::drawSelectShape(QPainter *painter){
 
 void
 BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{    
+{
     Q_UNUSED(widget);
     painter->setClipRect(option->exposedRect);//To increase performance
     bool smallSize = _abstract->width() <= 3 * RESIZE_TOLERANCE;
@@ -1958,17 +1918,18 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     //Set disabled the curve proxy when box not selected.
     _boxContentWidget->setCurveLowerStyle(_comboBox->currentText().toStdString(),!isSelected());
 
-
     //Showing stop button when playing
     if(_playing){
         _comboBoxProxy->setVisible(false);
         _startMenuButton->setVisible(false);
         _endMenuButton->setVisible(false);
-        _stopButton->setVisible(_playing);
+        _stopButton->setVisible(true);
+        _muteButton->setVisible(false);
     }
     else{
         setButtonsVisible(_hover || isSelected());
     }
+
 
     //draw hover shape
     if (_hover && !isSelected() && !_playing)
@@ -2021,24 +1982,33 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     painter->setFont(font);
     painter->translate(textRect.topLeft());
 
-    //rotate if small
-//    if (_abstract->width() <= 3 * RESIZE_TOLERANCE) {
-//        painter->translate(QPointF(RESIZE_TOLERANCE - LINE_WIDTH, 0));
-//        painter->rotate(90);
-//        textRect.setWidth(_abstract->height());
-//    }
-
     //fill header
     painter->fillRect(0, 0, textRect.width(), textRect.height(), isSelected() ? _color : _colorUnselected);
-    painter->save();
-    painter->setPen(QPen(Qt::black));
 
     //draw name
-    painter->translate(0,4);
-    painter->setPen(QPen(Qt::gray));
-    painter->drawText(QRectF(BOX_MARGIN*2, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
-    painter->restore();
+    if(width() > 140)
+    {
+		painter->save();
+        painter->translate(0, 3);
+		painter->setPen(QPen(Qt::gray));
 
+		if(_hover || isSelected())
+            painter->drawText(QRectF(BOX_MARGIN * 2 + 17, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
+        else
+			painter->drawText(QRectF(0, 0, textRect.width(), textRect.height()), Qt::AlignHCenter, name());
+        painter->restore();
+    }
+	else
+	{
+		painter->save();
+
+		painter->translate(-5, -15);
+		painter->rotate(90);
+		painter->translate(20, -10);
+		painter->setPen(QPen(Qt::gray));
+		painter->drawText(QPointF(BOX_MARGIN, 0),  name());
+		painter->restore();
+	}
     //draw progress bar during execution
     if (_playing) {
         QPen pen = painter->pen();
@@ -2057,24 +2027,6 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 }
 
 void
-BasicBox::curveShowChanged(const QString &address, bool state)
-{
-  _boxContentWidget->curveShowChanged(address, state);
-}
-
-void
-BasicBox::displayCurveEditWindow()
-{
-  QWidget *editWindow = new QWidget;
-  editWindow->setWindowModality(Qt::ApplicationModal);
-  QGridLayout *layout = new QGridLayout;
-
-  editWindow->setLayout(layout);
-  editWindow->setGeometry(QRect(_scene->sceneRect().toRect()));
-  editWindow->show();
-}
-
-void
 BasicBox::displayBoxDuration(){
     float duration = this->duration()/1000.;
 
@@ -2087,7 +2039,25 @@ BasicBox::displayBoxDuration(){
 
     //Displays in the maquetteScene's bottom
     QString durationMsg = QString("box duration : %1").arg(duration);
-    maquetteScene()->displayMessage(durationMsg.toStdString(),INDICATION_LEVEL);
+	maquetteScene()->displayMessage(durationMsg.toStdString(),INDICATION_LEVEL);
+}
+
+void BasicBox::onComboBoxClicked()
+{
+	oldZValue = this->zValue();
+	this->setZValue(99);
+}
+
+void BasicBox::onComboBoxHidden()
+{
+	this->setZValue(oldZValue);
+}
+
+void BasicBox::toggleMuteButton(bool )
+{
+    setSelected(true);
+	_scene->muteBoxes();
+    setSelected(false);
 }
 
 void BasicBox::cleanupRelations()
@@ -2108,6 +2078,7 @@ void BasicBox::cleanupRelations()
 void
 BasicBox::select(){
     setSelected(true);
+    emit _scene->selectionChanged();
     _scene->setAttributes(_abstract);
     update();
 }
@@ -2125,6 +2096,12 @@ BasicBox::setMuteState(bool activated){
     Maquette::getInstance()->setBoxMuteState(ID(),_mute);
     Maquette::getInstance()->setStartEventMuteState(ID(),_mute);
     Maquette::getInstance()->setEndEventMuteState(ID(),_mute);
+	
+	_muteButton->setIcon(_mute? _muteOnIcon : _muteOffIcon);
+    _startMenuButton->setVisible(!_mute);
+    _playButton->setVisible(!_mute);
+    _endMenuButton->setVisible(!_mute);
+
     update();
 }
 
@@ -2154,12 +2131,22 @@ BasicBox::updateRecordingCurves(){
 void
 BasicBox::setButtonsVisible(bool value)
 {
-    _comboBoxProxy->setVisible(value || _comboBox->isShown());
+    _comboBoxProxy->setVisible(!_scene->playing() && (value || _comboBox->isShown()) &&
+                               (width() > 3 * BOX_MARGIN + 125));
 
-    _startMenuButton->setVisible(value);
-    _endMenuButton->setVisible(value);
-    _playButton->setVisible(!_playing && value);
-    _stopButton->setVisible(_playing && value);
+	_startMenuButton->setVisible(value);
+    _endMenuButton->setVisible(value && (width() > 4 * BOX_MARGIN));
+
+    _playButton->setVisible((!_playing && value) && (width() > 3 * BOX_MARGIN));
+    _stopButton->setVisible((_playing && value) && (width() > 3 * BOX_MARGIN));
+    _muteButton->setVisible(value && (width() > 2 * BOX_MARGIN));
+
+    if (_mute || _scene->playing()) {
+        _startMenuButton->setVisible(false);
+        _playButton->setVisible(false);
+        _endMenuButton->setVisible(false);
+        _muteButton->setVisible(true);
+    }
 }
 
 void

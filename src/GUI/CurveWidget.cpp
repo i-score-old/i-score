@@ -62,6 +62,9 @@ using std::make_pair;
 #include "CurveWidget.hpp"
 #include "AbstractCurve.hpp"
 #include "Maquette.hpp"
+#include "MaquetteScene.hpp"
+#include "AttributesEditor.hpp"
+#include "NetworkTree.hpp"
 
 #define BORDER_WIDTH 2.
 
@@ -81,12 +84,8 @@ CurveWidget::~CurveWidget() {}
 
 void
 CurveWidget::init()
-{    
-//    setAttribute(Qt::WA_PaintOnScreen,true);
-//    setWindowFlags(Qt::Window);
+{
   _abstract = new AbstractCurve(NO_ID, "", 0, 10, false, true, true, 1, vector<float>(), map<float, pair<float, float> >());
-
-//    setBackgroundRole(QPalette::Base);
 
   setCursor(Qt::CrossCursor);
   setMouseTracking(true);
@@ -205,7 +204,7 @@ CurveWidget::setAttributes(unsigned int boxID,
   for (it = values.begin(); it != values.end(); ++it) {
       _abstract->_curve.push_back(*it);
     }
-
+    
   for (unsigned int i = 0; i < xPercents.size(); ++i) {
       _abstract->_breakpoints[xPercents[i] / 100.] = pair<float, float>(yValues[i], coeff[i]);
     }
@@ -257,11 +256,7 @@ CurveWidget::relativeCoordinates(const QPointF &point)
   float translatedY = pointY - _xAxisPos;
   float symetricalY = -translatedY;
   float finalY = symetricalY / (float)(_scaleY);
-/*
-  qDebug() << "pointY : " << pointY
-           << "height : " << height();
-          // << "\nfinalY " << finalY ;
-*/
+
   return QPointF(finalX, finalY);
 }
 
@@ -283,8 +278,9 @@ CurveWidget::absoluteCoordinates(const QPointF &point)
 
 void
 CurveWidget::mousePressEvent(QMouseEvent *event)
-{    
+{
   QWidget::mousePressEvent(event);
+
   _clicked = true;
   _shiftModifierWasEnabled = (event->modifiers() == Qt::ShiftModifier);
 
@@ -364,11 +360,9 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
       case Qt::AltModifier: //delete breakpoint
       {
         map<float, pair<float, float> >::iterator it;
-        bool found;
         QPointF relativePoint = relativeCoordinates(event->pos());
         for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
             if (fabs(it->first - relativePoint.x()) < 0.01) {
-                found = true;
                 _abstract->_breakpoints.erase(it);
                 _movingBreakpointX = -1.;
                 _movingBreakpointY = -1.;
@@ -444,8 +438,9 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 
             _abstract->_breakpoints = _savedMap;
 
-            _abstract->_breakpoints[static_cast<qreal>(relativePoint.x())] = std::make_pair<float, float>(static_cast<qreal>(_movingBreakpointY),
-                                                                                                          static_cast<qreal>(_lastPowSave));
+            _abstract->_breakpoints[static_cast<qreal>(relativePoint.x())] = 
+					std::make_pair<float, float>(static_cast<qreal>(_movingBreakpointY),
+												 static_cast<qreal>(_lastPowSave));
             curveChanged();
             update();
 
@@ -456,11 +451,10 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
         case Qt::AltModifier: //delete breakpoints
         {
             map<float, pair<float, float> >::iterator it;
-            bool found;
+
             QPointF relativePoint = relativeCoordinates(event->pos());
             for (it = _abstract->_breakpoints.begin(); it != _abstract->_breakpoints.end(); ++it) {
                 if (fabs(it->first - relativePoint.x()) < 0.02) {
-                    found = true;
                     _abstract->_breakpoints.erase(it);
                     _movingBreakpointX = -1.;
                     _movingBreakpointY = -1.;
@@ -507,7 +501,8 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event)
               }
               else
               {
-                  Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (high range clipMode)").toStdString(), INDICATION_LEVEL);
+                  Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (high range clipMode)").toStdString(), 
+																   INDICATION_LEVEL);
               }
 
           }
@@ -524,7 +519,8 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event)
                   }
                   else
                   {
-                      Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (low range clipMode)").toStdString(), INDICATION_LEVEL);
+                      Maquette::getInstance()->scene()->displayMessage(tr("Value clipped (low range clipMode)").toStdString(), 
+																	   INDICATION_LEVEL);
                   }
               }
           }
@@ -533,7 +529,9 @@ CurveWidget::mouseReleaseEvent(QMouseEvent *event)
           if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
               _abstract->_breakpoints.erase(it);
           }
-          _abstract->_breakpoints[static_cast<qreal>(relativePoint.x())] = std::make_pair<float, float>(static_cast<qreal>(_movingBreakpointY), static_cast<qreal>(_lastPowSave));
+          _abstract->_breakpoints[static_cast<qreal>(relativePoint.x())] = 
+				  std::make_pair<float, float>(static_cast<qreal>(_movingBreakpointY),
+											   static_cast<qreal>(_lastPowSave));
           curveChanged();
           update();
 
@@ -566,7 +564,13 @@ CurveWidget::curveChanged()
         sectionType.push_back(CURVE_POW);
     }
     
-    if (Maquette::getInstance()->setCurveSections(_abstract->_boxID, _abstract->_address, 0, xPercents, yValues, sectionType, coeff)) {
+    if (Maquette::getInstance()->setCurveSections(_abstract->_boxID, 
+												  _abstract->_address, 
+												  0, 
+												  xPercents, 
+												  yValues, 
+												  sectionType, 
+												  coeff)) {
         unsigned int sampleRate;
         bool redundancy, interpolate;
         vector<string> argTypes;
@@ -576,8 +580,32 @@ CurveWidget::curveChanged()
         sectionType.clear();
         coeff.clear();
 
-        if (Maquette::getInstance()->getCurveAttributes(_abstract->_boxID, _abstract->_address, 0, sampleRate, redundancy, interpolate, values, argTypes, xPercents, yValues, sectionType, coeff)) {
-            setAttributes(_abstract->_boxID, _abstract->_address, 0, values, sampleRate, redundancy, interpolate, _abstract->_show, argTypes, xPercents, yValues, sectionType, coeff);
+        if (Maquette::getInstance()->getCurveAttributes(_abstract->_boxID, 
+														_abstract->_address, 
+														0, 
+														sampleRate, 
+														redundancy, 
+														interpolate, 
+														values, 
+														argTypes, 
+														xPercents, 
+														yValues, 
+														sectionType, 
+														coeff)) {
+            setAttributes(_abstract->_boxID, 
+						  _abstract->_address, 
+						  0, 
+						  values, 
+						  sampleRate, 
+						  redundancy, 
+						  interpolate, 
+						  _abstract->_show, 
+						  argTypes, 
+						  xPercents, 
+						  yValues, 
+						  sectionType, 
+						  coeff);
+			
             update();
             return true;
         }
@@ -612,9 +640,11 @@ CurveWidget::paintEvent(QPaintEvent * /* event */)
   painter->setRenderHint(QPainter::Antialiasing, true);
   static const QColor BASE_COLOR(Qt::black);
   static const QColor AXE_COLOR(Qt::black);
-  static const QColor EXTREMITY_COLOR(Qt::red);
-  static const QColor CURVE_COLOR(Qt::darkRed);
-  static const QColor BREAKPOINT_COLOR(Qt::blue);
+
+  QColor EXTREMITY_COLOR(isEnabled()? Qt::red : Qt::gray);
+  QColor CURVE_COLOR(isEnabled()? Qt::darkRed : Qt::gray);
+  QColor BREAKPOINT_COLOR(isEnabled()? Qt::blue : Qt::gray);
+
   static const QColor MOVING_BREAKPOINT_COLOR(Qt::darkBlue);
   static const QColor UNACTIVE_COLOR(Qt::darkGray);
 

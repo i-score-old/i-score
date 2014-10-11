@@ -64,7 +64,7 @@ enum { DeviceNode = QTreeWidgetItem::UserType + 1, NodeNoNamespaceType = QTreeWi
        OSCNamespace = QTreeWidgetItem::UserType + 5, OSCNode = QTreeWidgetItem::UserType + 6, addOSCNode = QTreeWidgetItem::UserType + 7,
        MessageType = QTreeWidgetItem::UserType + 8, addDeviceNode = QTreeWidgetItem::UserType + 9};
 
-
+class NetworkTreeItem;
 class NetworkTree : public QTreeWidget
 {
   Q_OBJECT
@@ -360,10 +360,6 @@ class NetworkTree : public QTreeWidget
      */
     void resetAssignedNodes();
     void addOSCMessage(QTreeWidgetItem *rootNode);
-    void addOSCMessage(QTreeWidgetItem *rootNode, QString message);
-    void setOSCMessageName(QTreeWidgetItem *item, QString name);
-    void assignOCSMsg(QTreeWidgetItem *item);
-    inline QMap<QTreeWidgetItem *, QString> OSCMessages(){ return _OSCMessages; }
     QList<QString> getOSCMessages();
 
     /***********************************************************************
@@ -380,8 +376,6 @@ class NetworkTree : public QTreeWidget
     void setRedundancy(QTreeWidgetItem *item, bool activated);
 
     void updateLine(QTreeWidgetItem *item, bool interpolationState, int sampleRate, bool redundancy);
-    void createItemsFromMessages(QList<QString> messageslist);
-    void createItemFromMessage(QString messages);
 
     virtual void keyPressEvent(QKeyEvent *event);
     virtual void keyReleaseEvent(QKeyEvent *event);
@@ -437,9 +431,11 @@ class NetworkTree : public QTreeWidget
     void requestSnapshotEnd(QList<QTreeWidgetItem *> itemsLists);
     void treeSelectionChanged(QList<QTreeWidgetItem *> selectedItems);
 
+    void deviceUpdated(QTreeWidgetItem* item, bool updateBoxes);
+
   private:
     void treeRecursiveExploration(QTreeWidgetItem *curItem, bool conflict);
-    void createOCSBranch(QTreeWidgetItem *curItem);
+    void createOSCBranch(QTreeWidgetItem *curItem);
     QTreeWidgetItem *addADeviceNode();
 
     /*!
@@ -535,9 +531,8 @@ class NetworkTree : public QTreeWidget
     NetworkMessages *_OSCStartMessages;
     NetworkMessages *_OSCEndMessages;
     QList<QTreeWidgetItem *> _recMessages;
-    QMap<QTreeWidgetItem *, QString> _OSCMessages;
+
     QTreeWidgetItem *_addADeviceItem;
-    QList<QTreeWidgetItem*> _expandedItems;
 
     int _OSCMessageCount;
     bool _treeFilterActive;
@@ -549,6 +544,8 @@ class NetworkTree : public QTreeWidget
     DeviceEdit *_deviceEdit;  
 
     void disableLearningForEveryDevice();
+    void removeOSCMessage(QTreeWidgetItem* item);
+    void setNewItemProperties(NetworkTreeItem* curItem);
 public slots:
     /*!
       * \brief Rebuild the networkTree under the item (or currentItem by default), after asking the engine to refresh its namespace.
@@ -568,9 +565,10 @@ public slots:
     void updateDeviceNamespace(QString deviceName);
     void setRecMode(std::string address);
     void setRecMode(QList<std::string> items);
-    void addToExpandedItems(QTreeWidgetItem *item);
-    void removeFromExpandedItems(QTreeWidgetItem *item);
 
     virtual void clear();
+	
+	void enable();
+	void disable();
 };
 #endif /* NETWORKTREE_HPP_ */

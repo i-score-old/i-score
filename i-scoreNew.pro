@@ -86,8 +86,10 @@ headers/GUI/HeaderPanelWidget.hpp \
 headers/GUI/ConditionalRelation.hpp \
 headers/GUI/TriggerPointEdit.hpp \
 headers/IScoreApplication.hpp \
-    headers/GUI/CurvesComboBox.hpp \
-    headers/DelayedDelete.h
+headers/GUI/CurvesComboBox.hpp \
+headers/DelayedDelete.h \
+headers/GlobalEventFilter.h \
+headers/GUI/NetworkUpdater.h
 
 SOURCES += src/main.cpp \
 src/data/AbstractBox.cpp \
@@ -119,5 +121,6 @@ src/GUI/DeviceEdit.cpp \
 src/GUI/HeaderPanelWidget.cpp \
 src/GUI/ConditionalRelation.cpp \
 src/GUI/TriggerPointEdit.cpp \
-    src/IScoreApplication.cpp \
-    src/GUI/CurvesComboBox.cpp
+src/IScoreApplication.cpp \
+src/GUI/CurvesComboBox.cpp \
+src/GUI/NetworkUpdater.cpp

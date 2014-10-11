@@ -49,6 +49,7 @@
 
 #include <QDockWidget>
 #include <QString>
+#include <QColorDialog>
 
 class QButtonGroup;
 class QRadioButton;
@@ -81,7 +82,6 @@ class NetworkMessages;
 class AttributesEditor : public QDockWidget
 {
   Q_OBJECT
-
   public:
     AttributesEditor(QWidget* parent);
 
@@ -112,6 +112,8 @@ class AttributesEditor : public QDockWidget
      * \return the box edited in the editor
      **/
     unsigned int currentBox();
+
+    static const int BUTTON_SIZE;
 
     inline void setBoxEdited(unsigned int boxId){ _boxEdited = boxId; }
 
@@ -174,8 +176,8 @@ class AttributesEditor : public QDockWidget
      * \brief Associates slots with QWidgets' signals.
      **/
     void connectSlots();
-    void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
+
+    QString _pushButtonStyle;
 
   private slots:
     /*!
@@ -184,8 +186,6 @@ class AttributesEditor : public QDockWidget
     void changeColor();
     void startMessageChanged(QTreeWidgetItem *item);
     void endMessageChanged(QTreeWidgetItem *item);
-    void startMessageRemoved(const std::string &address);
-    void endMessageRemoved(const std::string &address);
     void curveActivationChanged(QTreeWidgetItem *item, bool activated);
     void curveRedundancyChanged(QTreeWidgetItem *item, bool activated);
     void curveSampleRateChanged(QTreeWidgetItem *item, int value);
@@ -201,20 +201,14 @@ class AttributesEditor : public QDockWidget
      * \brief Updates box end message
      */
     void endMessagesChanged(bool forceUpdate = false);
-    /*!
-     * \brief Called when the start of the box is changed.
-     */
-    void startChanged();
-
-    /*!
-     * \brief Called when the length of the box is changed.
-     */
-    void lengthChanged();
 
     /*!
      * \brief Called when the name of the box is changed.
      */
     void nameChanged();
+	void currentColorSelectionChanged(const QColor& );
+	void revertColor();
+
 
   private:
     QWidget * _centralWidget;   //!< Central widget.
@@ -238,5 +232,8 @@ class AttributesEditor : public QDockWidget
 
     unsigned int _boxEdited;    //!< ID of box being edited
     MaquetteScene * _scene; //!< The maquetteScene related with.
+
+	QColorDialog _colorDialog{this};
+	QColor _currentBoxOriginalColor;
 };
 #endif

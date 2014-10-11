@@ -1,18 +1,21 @@
 #include "IScoreApplication.hpp"
-
+#include "AttributesEditor.hpp"
 
 void IScoreApplication::startWindow()
 {
   win = new MainWindow();
+  evf = new GlobalEventFilter(win->_view, win->_editor);
+
+//  this->installEventFilter(evf);
+
   win->show();
   if(!loadString.isEmpty())
   {
-    win->loadFile(loadString);
+    emit win->sigLoad(loadString);
   }
 
   connect(this, SIGNAL(fileOpened(QString)), win, SLOT(open(QString)));
 }
-
 
 bool IScoreApplication::notify(QObject *receiver_, QEvent *event_)
 {
@@ -33,22 +36,21 @@ bool IScoreApplication::notify(QObject *receiver_, QEvent *event_)
   return false;
 }
 
-#ifdef __APPLE__
 bool IScoreApplication::event(QEvent *ev)
 {
   bool eaten;
   switch (ev->type())
   {
 
+#ifdef __APPLE__
   case QEvent::FileOpen:
     loadString = static_cast<QFileOpenEvent *>(ev)->file();
     emit fileOpened(loadString);
     eaten = true;
     break;
-
+#endif
   default:
     return QApplication::event(ev);
   }
   return eaten;
 }
-#endif

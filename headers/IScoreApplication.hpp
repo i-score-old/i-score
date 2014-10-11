@@ -1,6 +1,7 @@
 #pragma once
 #include <QApplication>
 #include "MainWindow.hpp"
+#include "GlobalEventFilter.h"
 
 // A wrapper class on QAppliation to catch exceptions and display them
 class IScoreApplication : public QApplication
@@ -10,21 +11,20 @@ class IScoreApplication : public QApplication
     IScoreApplication(int argc, char** argv): QApplication(argc, argv) {}
     virtual ~IScoreApplication()
     {
+      delete evf;
       delete win;
     }
 
     void startWindow();
 
     bool notify(QObject *receiver_, QEvent *event_);
-
-    #ifdef __APPLE__
     bool event(QEvent *ev);
-    #endif
 
   signals:
     void fileOpened(QString);
 
   private:
+    GlobalEventFilter* evf;
     MainWindow* win;
     QString loadString;
 };

@@ -65,6 +65,7 @@
 #include <vector>
 #include <string>
 
+
 class MaquetteView;
 class BasicBox;
 class AttributesEditor;
@@ -106,7 +107,7 @@ typedef enum { NO_RESIZE, HORIZONTAL_RESIZE, VERTICAL_RESIZE,
 class MaquetteScene : public QGraphicsScene
 
 {
-  Q_OBJECT
+    Q_OBJECT
 
   public:
     MaquetteScene(const QRectF & rect, AttributesEditor *palette);
@@ -551,7 +552,7 @@ class MaquetteScene : public QGraphicsScene
     inline float
     zoom(){ return _view->zoom(); }
     void updateProgressBar();
-    void setAccelerationFactor(double value);
+    void setAccelerationFactor(double value, unsigned int boxID = ROOT_BOX_ID);
 
     float getMaxSceneWidth();
     void setMaxSceneWidth(float maxSceneWidth);
@@ -562,7 +563,9 @@ class MaquetteScene : public QGraphicsScene
      */
     void conditionBoxes(QList<BasicBox *> boxesToCondition);
 
-  protected:
+    bool multipleBoxesSelected();
+
+protected:
 
     /*!
      * \brief Redefinition of QGraphicsScene::drawForeground().
@@ -619,6 +622,8 @@ class MaquetteScene : public QGraphicsScene
     void zoomChanged(float value);
     void speedChanged(double value);
 
+    void onSelectionChanged();
+
     /*!
      * \brief Cuts selected boxes.
      */
@@ -669,6 +674,7 @@ class MaquetteScene : public QGraphicsScene
     bool noBoxSelected();
     inline void resetSelection(){ clearSelection(); }
     void updateBoxesWidgets();
+    void updateBoxesButtons();
     void unselectAll();
 
   private:

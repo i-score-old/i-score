@@ -137,6 +137,9 @@ MaquetteScene::init()
 
   connect(_timeBar, SIGNAL(timeOffsetEntered(unsigned int)), this, SLOT(changeTimeOffset(unsigned int)));
   connect(this, SIGNAL(stopPlaying()), this, SLOT(stopOrPause()));
+
+  connect(this, &MaquetteScene::selectionChanged,
+          this, &MaquetteScene::onSelectionChanged);
 }
 
 void
@@ -434,6 +437,12 @@ MaquetteScene::noBoxSelected()
   return selectedItems().isEmpty();
 }
 
+bool MaquetteScene::multipleBoxesSelected()
+{
+    return selectedItems().size() > 1;
+}
+
+
 QGraphicsItem *
 MaquetteScene::getSelectedItem()
 {
@@ -492,7 +501,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
   if (mouseEvent->modifiers() == Qt::ShiftModifier) {
       setCurrentMode(SELECTION_MODE);
     }
-  else if ((noBoxSelected() || subScenarioMode(mouseEvent)) && mouseEvent->modifiers()==Qt::ControlModifier) {
+  else if (!playing() && (noBoxSelected() || subScenarioMode(mouseEvent)) && mouseEvent->modifiers()==Qt::ControlModifier) {
       setCurrentMode(CREATION_MODE);
     }  
   else {
@@ -551,7 +560,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
       case BOX_EDIT_MODE:
         break;
-    } 
+    }
 }
 
 void MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
@@ -679,11 +688,13 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
                         setRelationSecondBox(secondBox->ID(), BOX_START);
                         addPendingRelation();
                         firstBox->setSelected(true);
+                        emit selectionChanged();
                     }
                     else if (mouseEvent->scenePos().x() > (secondBox->mapToScene(secondBox->boundingRect().bottomRight()).x() - BasicBox::RESIZE_TOLERANCE)) {
                         setRelationSecondBox(secondBox->ID(), BOX_END);
                         addPendingRelation();
                         firstBox->setSelected(true);
+                        emit selectionChanged();
                     }
                     else {
                         if (selectedItems().empty()) {
@@ -708,7 +719,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
         break;
 
       case SELECTION_MODE:
-        if (selectedItems().isEmpty()) {
+        if (noBoxSelected() || multipleBoxesSelected()) {
             _editor->noBoxEdited(); /// \todo noBoxEdited() est un public slot. mieux vaux faire appel au mécanisme d'auto-connexion des signaux dans Qt (QMetaObject) que de le garder en attribut de classe pour éviter le couplage. (par jaime Chao)
           }
 
@@ -733,7 +744,7 @@ MaquetteScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent)
               }
 
             else {
-                if (selectedItems().empty()) {
+                if (noBoxSelected() || multipleBoxesSelected()) {
                     _editor->noBoxEdited(); /// \todo noBoxEdited() est un public slot. mieux vaux faire appel au mécanisme d'auto-connexion des signaux dans Qt (QMetaObject) que de le garder en attribut de classe (couplage). (par jaime Chao)
                   }
               }
@@ -1013,7 +1024,7 @@ MaquetteScene::muteBoxes()
     {
         if (curItem->type() == PARENT_BOX_TYPE)
         {
-            if(auto curBox = dynamic_cast<ParentBox*>(curItem))
+            if(ParentBox* curBox = dynamic_cast<ParentBox*>(curItem))
             {
                 curBox->setMuteState(!curBox->getMuteState());
             }
@@ -1179,7 +1190,7 @@ MaquetteScene::findMother(const QPointF &topLeft, const QPointF &size)
 #endif
   map<unsigned int, ParentBox*>::iterator it;
   unsigned int motherID = ROOT_BOX_ID;
-  float motherZValue = std::numeric_limits<float>::min();
+
   QRectF childRect = QRectF(topLeft, QSize(size.x(), size.y())); /// \todo old TODO updated (by jC)
   for (it = parentBoxes.begin(); it != parentBoxes.end(); ++it) {
       QRectF mRect = QRectF(it->second->getTopLeft(), QSize(it->second->getSize().x(), it->second->getSize().y()));
@@ -1192,7 +1203,6 @@ MaquetteScene::findMother(const QPointF &topLeft, const QPointF &size)
           std::cerr << "MaquetteScene::findMother : newMother : " << it->first << std::endl;
 #endif
           motherID = it->first;
-          motherZValue = it->second->zValue();
         }
     }
   return motherID;
@@ -1772,10 +1782,11 @@ MaquetteScene::stopAndGoToCurrentTime()
 }
 
 void
-MaquetteScene::setAccelerationFactor(double value)
+MaquetteScene::setAccelerationFactor(double value, unsigned int boxID)
 {
-  _maquette->setAccelerationFactor(value);
-  _accelerationFactor = value;
+  _maquette->setAccelerationFactor(value, boxID);
+  if(boxID == ROOT_BOX_ID)
+      _accelerationFactor = value;
 }
 
 void
@@ -1783,6 +1794,28 @@ MaquetteScene::speedChanged(double value)
 {
   setAccelerationFactor(value);
   emit(accelerationValueChanged(value));
+}
+
+void MaquetteScene::onSelectionChanged()
+{
+    if(multipleBoxesSelected())
+    {
+        for(auto item : selectedItems())
+        {
+            ParentBox* box = dynamic_cast<ParentBox*>(item);
+            if(box)
+                box->disableCurveEdition();
+        }
+    }
+    else
+    {
+        for(auto item : selectedItems())
+        {
+            ParentBox* box = dynamic_cast<ParentBox*>(item);
+            if(box)
+                box->enableCurveEdition();
+        }
+    }
 }
 
 void
@@ -1965,12 +1998,26 @@ MaquetteScene::updateBoxesWidgets()
 
   for (it = boxes.begin(); it != boxes.end(); it++) {
       unsigned int boxID = it->first;
-      static_cast<AbstractBox*>(getBox(boxID)->abstract())->clearMessages();      
+      static_cast<AbstractBox*>(getBox(boxID)->abstract())->clearMessages();
       if (boxID != NO_ID) {
           setAttributes(static_cast<AbstractBox*>(getBox(boxID)->abstract()));
         }
     }
-    _editor->setBoxEdited(currentBoxSave); //Because setAttributes changes currentBoxEdited value. And the edited box became an unselected one.
+  _editor->setBoxEdited(currentBoxSave); //Because setAttributes changes currentBoxEdited value. And the edited box became an unselected one.
+}
+
+void MaquetteScene::updateBoxesButtons()
+{
+    std::map<unsigned int, BasicBox*>::iterator it;
+    std::map<unsigned int, BasicBox*> boxes = _maquette->getBoxes();
+    it = boxes.begin();
+    ++it;
+    while (it != boxes.end()) {
+        BasicBox* box = it->second;
+        //box->updatePlayingModeButtons();
+        box->setButtonsVisible(playing());
+        it++;
+    }
 }
 
 void

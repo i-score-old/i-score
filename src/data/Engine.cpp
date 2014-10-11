@@ -151,6 +151,23 @@ void Engine::registerIscoreToProtocols()
     
     // launch OSC protocol communication
     aProtocol.send("Run");
+    
+    
+    TTLogMessage("\n*** Enable MIDI communication ***\n");
+    ////////////////////////////////////////////////////////////////////////
+    
+    // create a OSC protocol unit
+    err = m_applicationManager.send("ProtocolInstantiate", "MIDI", out);
+    
+    if (err) {
+        TTLogError("Error : can't create MIDI protocol unit \n");
+        return;
+    }
+    else
+        aProtocol = out[0];
+    
+    // launch MIDI protocol communication
+    aProtocol.send("Run");
 }
 
 void Engine::initScore(const char* pathToTheJamomaFolder)
@@ -2214,7 +2231,7 @@ void Engine::trigger(vector<ConditionedProcessId> triggerIds)
         lastTimeCondition.send("Trigger", events, out);
 }
 
-void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort)
+void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort, const bool isInputPort, const std::string & stringPort)
 {
     TTValue     args, out;
     TTSymbol    applicationName(deviceName);
@@ -2238,10 +2255,23 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
             // register the application to the protocol
             aProtocol.send("ApplicationRegister", applicationName, out);
             
+            // select appliction before to set its parameter
             aProtocol.send("ApplicationSelect", applicationName, out);
-            args = TTValue(TTUInt16(destinationPort), TTUInt16(receptionPort));
-            aProtocol.set("port", args);
-            aProtocol.set("ip", TTSymbol(DeviceIp));
+            
+            // prepare parameters depending of the protocol
+            if (pluginToUse == "Minuit" || pluginToUse == "OSC") {
+                
+                args = TTValue(TTUInt16(destinationPort), TTUInt16(receptionPort));
+                aProtocol.set("port", args);
+                aProtocol.set("ip", TTSymbol(DeviceIp));
+            }
+            else if (pluginToUse == "MIDI") {
+                
+                if (isInputPort)
+                    aProtocol.set("input", TTSymbol(stringPort));
+                else
+                    aProtocol.set("output", TTSymbol(stringPort));
+            }
             
             // run the protocol
             aProtocol.send("Run");
@@ -2308,7 +2338,6 @@ void Engine::getProtocolNames(std::vector<std::string>& allProtocolNames)
     for (TTUInt8 i = 0; i < protocolNames.size(); i++) {
         
         name = protocolNames[i];
-        
         allProtocolNames.push_back(name.c_str());
     }
 }
@@ -2907,6 +2936,27 @@ bool Engine::getDeviceLearn(std::string deviceName)
     anApplication.get("learn", v);
     
     return TTBoolean(v[0]);
+}
+
+bool Engine::protocolScan(const std::string & protocol, std::vector<std::string>&& scanOptions, std::vector<std::string>& scanResult)
+{
+    TTObject    aProtocol = (TTObjectBasePtr)accessProtocol(TTSymbol(protocol));
+    TTValue     args, out;
+
+    // prepare scan options value
+    for (const auto& opt : scanOptions)
+            args.append(TTSymbol(opt));
+    
+    TTErr err = aProtocol.send("Scan", args, out);
+    
+    for (TTUInt8 i = 0; i < out.size(); i++) {
+        
+        TTSymbol scanInfo = out[i];
+
+        scanResult.push_back(scanInfo.c_str());
+    }
+    
+    return err == kTTErrNone;
 }
 
 int Engine::requestNetworkNamespace(const std::string & address, std::string & nodeType, vector<string>& nodes, vector<string>& leaves, vector<string>& attributs, vector<string>& attributsValue)

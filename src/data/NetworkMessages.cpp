@@ -100,12 +100,10 @@ NetworkMessages::clearDevicesMsgs(QList<QString> devices)
 
           //we don't remove messages and preset manager
           if(Maquette::getInstance()->requestObjectAttribruteValue(address,"service",attributesValues) > 0){
-              if(attributesValues[0]=="message")
-                  ;
+              if(attributesValues[0]=="message") { }
           }
           else if(Maquette::getInstance()->getObjectType(address,nodeType)>0){
-              if(nodeType=="PresetManager")
-                  ;
+              if(nodeType=="PresetManager") { }
           }
           else
               _messages.remove(curItem);
