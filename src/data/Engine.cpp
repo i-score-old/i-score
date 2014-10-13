@@ -1532,13 +1532,25 @@ bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned
         // edit parameters as : x1 y1 b1 x2 y2 b2
         parameters.resize(nbPoints * 3);
         
+        // DEBUG
+        TTLogMessage("coeff[ ");
+        
         for (i = 0; i < parameters.size(); i = i+3) {
             
             parameters[i] = TTFloat64(percent[i/3] / 100.);
             parameters[i+1] = TTFloat64(y[i/3]);
-            parameters[i+2] = TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]);
             
+            // from the second point
+            TTFloat64 c = coeff[i/3];
+            
+            // DEBUG
+            TTLogMessage("%f ", c);
+            
+            parameters[i+2] = c * c * c * c;
         }
+        
+        // DEBUG
+        TTLogMessage("]\n");
         
         // set first indexed curve only
         curve = objects[0];
