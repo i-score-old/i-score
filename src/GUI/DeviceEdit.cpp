@@ -75,7 +75,9 @@ DeviceEdit::init()
   _localHostBox = new QLineEdit;
   _nameEdit = new QLineEdit;
   _protocolsComboBox = new QComboBox;
-  _protocolsComboBox->addItems({"Minuit", "OSC", "MIDI"});
+  auto protocols = Maquette::getInstance()->getWorkingProtocols();
+  for(auto& protocol : protocols) 
+	  _protocolsComboBox->addItem(QString::fromStdString(protocol));
 
   _namespaceFilePath = new QLineEdit;
 /*
