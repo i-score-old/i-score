@@ -2166,7 +2166,7 @@ void
 deviceConnectionErrorCallback(TTSymbol& deviceName, TTSymbol& errorInfo)
 {
     // TODO : pop-up info to notify the user
-    std::cerr << "Maquette::deviceConnectionErrorCallback : " << deviceName.c_str() << " " << errorInfo.c_str() << std::endl;
+	emit Maquette::getInstance()->deviceConnectionFailed(QString(deviceName.c_str()), QString(errorInfo.c_str()));
 }
 
 void

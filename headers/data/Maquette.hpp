@@ -802,6 +802,7 @@ class Maquette : public QObject
 	{ return _engines->workingProtocols(); }
 signals:
      void boxIsRunningSignal(unsigned int boxId, bool running);
+	 void deviceConnectionFailed(QString, QString);
   
   public slots:
     /*

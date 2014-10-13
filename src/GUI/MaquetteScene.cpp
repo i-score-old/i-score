@@ -123,6 +123,12 @@ MaquetteScene::init()
 
   /// \todo MainWindow appelle init() de MaquetteScene, qui instancie lui même Maquette puis l'init. (par jaime Chao)
   _maquette = Maquette::getInstance();
+  connect(_maquette, &Maquette::deviceConnectionFailed,
+		  this, [] (QString device, QString error) 
+		  { QMessageBox::warning(nullptr, 
+			  device, 
+			  "Could not open port " + error + ". Maybe another instance of i-score is already running?"); 
+		  });
   _maquette->setScene(this);
   _maquette->init();      
 
