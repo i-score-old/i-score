@@ -28,6 +28,7 @@ include_directories("/usr/include/libxml2")
 
 add_definitions(-D__Types__)
 add_definitions(-DTT_NO_DSP)
+add_definitions(-DQ_COMPILER_INITIALIZER_LISTS)
 
 
 #RESOURCES += i-score.qrc

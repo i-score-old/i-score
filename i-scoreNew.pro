@@ -6,7 +6,7 @@ QT += core network xml svg printsupport
 
 INCLUDEPATH += headers headers/GUI headers/data
 RESOURCES += i-score.qrc
-DEFINES += __Types__ TT_NO_DSP
+DEFINES += __Types__ TT_NO_DSP Q_COMPILER_INITIALIZER_LISTS
 
 ICON = resources/images/i-score.icns
 resources/translations = i-score_en.ts i-score_fr.ts
