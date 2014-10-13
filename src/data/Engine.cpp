@@ -34,12 +34,14 @@ Engine::Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, boo
                void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
                void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
                void (*networkDeviceNamespaceCallback)(TTSymbol&),
+               void (*networkDeviceConnectionError)(TTSymbol&, TTSymbol&),
                std::string pathToTheJamomaFolder)
 {
     m_TimeEventStatusAttributeCallback = timeEventStatusAttributeCallback;
     m_TimeProcessSchedulerRunningAttributeCallback = timeProcessSchedulerRunningAttributeCallback;
     m_TransportDataValueCallback = transportDataValueCallback;
     m_NetworkDeviceNamespaceCallback = networkDeviceNamespaceCallback;
+    m_NetworkDeviceConnectionError = networkDeviceConnectionError;
     
     m_nextTimeProcessId = 1;
     m_nextIntervalId = 1;
@@ -100,7 +102,7 @@ void Engine::registerIscoreToProtocols()
 {
     TTObject    aProtocol;
     TTErr       err;
-    TTValue     out;
+    TTValue     none, out;
     
     
     TTLogMessage("\n*** Enable Minuit communication ***\n");
@@ -125,7 +127,13 @@ void Engine::registerIscoreToProtocols()
     aProtocol.set("ip", "127.0.0.1");
 
     // launch Minuit protocol communication
-    aProtocol.send("Run");
+    err = aProtocol.send("Run", none, out);
+    
+    if (err) {
+        out.toString();
+        TTSymbol errorInfo = TTSymbol(TTString(out[0]));
+        m_NetworkDeviceConnectionError(iscore, errorInfo);
+    }
     
     
     TTLogMessage("\n*** Enable OSC communication ***\n");
@@ -150,7 +158,13 @@ void Engine::registerIscoreToProtocols()
     aProtocol.set("ip", "127.0.0.1");
     
     // launch OSC protocol communication
-    aProtocol.send("Run");
+    err = aProtocol.send("Run", none, out);
+    
+    if (err) {
+        out.toString();
+        TTSymbol errorInfo = TTSymbol(TTString(out[0]));
+        m_NetworkDeviceConnectionError(iscore, errorInfo);
+    }
     
     
     TTLogMessage("\n*** Enable MIDI communication ***\n");
@@ -167,7 +181,13 @@ void Engine::registerIscoreToProtocols()
         aProtocol = out[0];
     
     // launch MIDI protocol communication
-    aProtocol.send("Run");
+    err = aProtocol.send("Run", none, out);
+    
+    if (err) {
+        out.toString();
+        TTSymbol errorInfo = TTSymbol(TTString(out[0]));
+        m_NetworkDeviceConnectionError(iscore, errorInfo);
+    }
 }
 
 void Engine::initScore(const char* pathToTheJamomaFolder)
@@ -2239,10 +2259,11 @@ void Engine::trigger(vector<ConditionedProcessId> triggerIds)
 
 void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort, const bool isInputPort, const std::string & stringPort)
 {
-    TTValue     args, out;
+    TTValue     args, none, out;
     TTSymbol    applicationName(deviceName);
     TTObject    anApplication;
     TTObject    aProtocol;
+    TTErr       err;
     
     // if the application doesn't already exist
     if (!accessApplication(applicationName)) {
@@ -2280,7 +2301,13 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
             }
             
             // run the protocol
-            aProtocol.send("Run");
+            err = aProtocol.send("Run", none, out);
+            
+            if (err) {
+                out.toString();
+                TTSymbol errorInfo = TTSymbol(TTString(out[0]));
+                m_NetworkDeviceConnectionError(iscore, errorInfo);
+            }
         }
         
         // set the priority, service, tags and rangeBounds attributes as a cached attributes
@@ -2809,7 +2836,7 @@ Engine::setDevicePort(string deviceName, int destinationPort, int receptionPort)
     TTObject    anApplication = accessApplication(applicationName);
     TTSymbol    protocolName;
     TTObject    aProtocol;
-    TTValue     v, out;
+    TTValue     v, none, out;
     TTErr       err;
     
     // if the application exists
@@ -2826,9 +2853,15 @@ Engine::setDevicePort(string deviceName, int destinationPort, int receptionPort)
             aProtocol.send("Stop");
             
             v = TTValue(destinationPort, receptionPort);
-            err = aProtocol.set("port", v);
+            aProtocol.set("port", v);
             
-            aProtocol.send("Run");
+            err = aProtocol.send("Run", none, out);
+            
+            if (err) {
+                out.toString();
+                TTSymbol errorInfo = TTSymbol(TTString(out[0]));
+                m_NetworkDeviceConnectionError(applicationName, errorInfo);
+            }
             
             if (!err)
                 return 0;
@@ -2845,7 +2878,7 @@ Engine::setDeviceLocalHost(string deviceName, string localHost)
     TTObject    anApplication = accessApplication(applicationName);
     TTSymbol    protocolName;
     TTObject    aProtocol;
-    TTValue     v, out;
+    TTValue     v, none, out;
     TTErr       err;
     
     // if the application exists
@@ -2862,9 +2895,15 @@ Engine::setDeviceLocalHost(string deviceName, string localHost)
             aProtocol.send("Stop");
             
             v = TTSymbol(localHost);
-            err = aProtocol.set("ip", v);
+            aProtocol.set("ip", v);
             
-            aProtocol.send("Run");
+            err = aProtocol.send("Run", none, out);
+            
+            if (err) {
+                out.toString();
+                TTSymbol errorInfo = TTSymbol(TTString(out[0]));
+                m_NetworkDeviceConnectionError(applicationName, errorInfo);
+            }
             
             if (!err)
                 return 0;

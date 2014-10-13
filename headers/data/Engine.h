@@ -178,6 +178,7 @@ private:
     void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);    // allow to notify the Maquette if a box is running or not
     void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);                // allow to notify the Maquette if the transport features have been used remotly (via OSC messages for example)
     void (*m_NetworkDeviceNamespaceCallback)(TTSymbol&);                            // allow to notify the Maquette if a device's namespace have changed (see in setDeviceLearn)
+    void (*m_NetworkDeviceConnectionError)(TTSymbol&, TTSymbol&);                   // allow to notify the Maquette if a device connection failed
 
 public:
 
@@ -194,6 +195,7 @@ public:
            void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
            void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
            void (*networkDeviceNamespaceCallback)(TTSymbol&),
+           void (*m_NetworkDeviceConnectionError)(TTSymbol&, TTSymbol&),
            std::string pathToTheJamomaFolder);
     
     void initModular(const char* pathToTheJamomaFolder = NULL);

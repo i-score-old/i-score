@@ -1076,4 +1076,12 @@ void executionFinishedCallback();
  * \param deviceName : the name of the device to refresh
  */
 void deviceCallback(TTSymbol& deviceName);
+
+/*!
+ * \brief Callback called when device connection failed
+ *
+ * \param deviceName : the name of the device which failed
+ * \param errorInfo : inforamtion about why it failed
+ */
+void deviceConnectionErrorCallback(TTSymbol& deviceName, TTSymbol& errorInfo);
 #endif
