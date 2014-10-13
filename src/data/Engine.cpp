@@ -109,85 +109,114 @@ void Engine::registerIscoreToProtocols()
     ////////////////////////////////////////////////////////////////////////
     
     // create a Minuit protocol unit
-    err = m_applicationManager.send("ProtocolInstantiate", "Minuit", out);
-    
-    if (err) {
-        TTLogError("Error : can't create Minuit protocol unit \n");
-        return;
-    }
-    else
-        aProtocol = out[0];
-    
-    // register i-score to the Minuit protocol
-    aProtocol.send("ApplicationRegister", iscore, out);
-    
-    // select i-score to set its Minuit protocol parameters
-    aProtocol.send("ApplicationSelect", iscore, out);
-    aProtocol.set("port", MINUIT_INPUT_PORT);
-    aProtocol.set("ip", "127.0.0.1");
+	try
+	{
+	    err = m_applicationManager.send("ProtocolInstantiate", "Minuit", out);
+	    
+	    if (err) {
+	        TTLogError("Error : can't create Minuit protocol unit \n");
+	        return;
+	    }
+	    else
+	        aProtocol = out[0];
+	    
+	    // register i-score to the Minuit protocol
+	    aProtocol.send("ApplicationRegister", iscore, out);
+	    
+	    // select i-score to set its Minuit protocol parameters
+	    aProtocol.send("ApplicationSelect", iscore, out);
+	    aProtocol.set("port", MINUIT_INPUT_PORT);
+	    aProtocol.set("ip", "127.0.0.1");
 
-    // launch Minuit protocol communication
-    err = aProtocol.send("Run", none, out);
+	    // launch Minuit protocol communication
+	    // launch Minuit protocol communication
+    	err = aProtocol.send("Run", none, out);
     
-    if (err) {
-        out.toString();
-        TTSymbol errorInfo = TTSymbol(TTString(out[0]));
-        m_NetworkDeviceConnectionError(iscore, errorInfo);
-    }
-    
+    	if (err) {
+        	out.toString();
+        	TTSymbol errorInfo = TTSymbol(TTString(out[0]));
+        	m_NetworkDeviceConnectionError(iscore, errorInfo);
+    	}
+
+		m_workingProtocols.push_back("Minuit");
+	}
+	catch(TTException& e)
+	{
+		TTLogError("Error : could not instantiate Minuit protocol: ");
+		TTLogError(e.getReason());
+	}
     
     TTLogMessage("\n*** Enable OSC communication ***\n");
     ////////////////////////////////////////////////////////////////////////
     
     // create a OSC protocol unit
-    err = m_applicationManager.send("ProtocolInstantiate", "OSC", out);
+	try
+	{
+	    err = m_applicationManager.send("ProtocolInstantiate", "OSC", out);
+	    
+	    if (err) {
+	        TTLogError("Error : can't create OSC protocol unit \n");
+	        return;
+	    }
+
+	    aProtocol = out[0];
+	    
+	    // register i-score to the OSC protocol
+	    aProtocol.send("ApplicationRegister", iscore, out);
+	    
+	    // select i-score to set its OSC protocol parameters
+	    aProtocol.send("ApplicationSelect", iscore, out);
+	    aProtocol.set("port", OSC_INPUT_PORT);
+	    aProtocol.set("ip", "127.0.0.1");
+	    
+	    // launch Minuit protocol communication
+    	err = aProtocol.send("Run", none, out);
     
-    if (err) {
-        TTLogError("Error : can't create OSC protocol unit \n");
-        return;
-    }
-    else
-        aProtocol = out[0];
-    
-    // register i-score to the OSC protocol
-    aProtocol.send("ApplicationRegister", iscore, out);
-    
-    // select i-score to set its OSC protocol parameters
-    aProtocol.send("ApplicationSelect", iscore, out);
-    aProtocol.set("port", OSC_INPUT_PORT);
-    aProtocol.set("ip", "127.0.0.1");
-    
-    // launch OSC protocol communication
-    err = aProtocol.send("Run", none, out);
-    
-    if (err) {
-        out.toString();
-        TTSymbol errorInfo = TTSymbol(TTString(out[0]));
-        m_NetworkDeviceConnectionError(iscore, errorInfo);
-    }
-    
+    	if (err) {
+        	out.toString();
+        	TTSymbol errorInfo = TTSymbol(TTString(out[0]));
+        	m_NetworkDeviceConnectionError(iscore, errorInfo);
+    	}
+		
+		m_workingProtocols.push_back("OSC");
+	}
+	catch(TTException& e)
+	{
+		TTLogError("Error : could not instantiate OSC protocol: ");
+		TTLogError(e.getReason());
+	}
     
     TTLogMessage("\n*** Enable MIDI communication ***\n");
     ////////////////////////////////////////////////////////////////////////
     
     // create a OSC protocol unit
-    err = m_applicationManager.send("ProtocolInstantiate", "MIDI", out);
+	try 
+	{
+	    err = m_applicationManager.send("ProtocolInstantiate", "MIDI", out);
     
-    if (err) {
-        TTLogError("Error : can't create MIDI protocol unit \n");
-        return;
-    }
-    else
-        aProtocol = out[0];
+	    if (err) {
+	        TTLogError("Error : can't create MIDI protocol unit \n");
+	        return;
+	    }
+	    
+	    aProtocol = out[0];
     
-    // launch MIDI protocol communication
-    err = aProtocol.send("Run", none, out);
+	    // launch Minuit protocol communication
+    	err = aProtocol.send("Run", none, out);
     
-    if (err) {
-        out.toString();
-        TTSymbol errorInfo = TTSymbol(TTString(out[0]));
-        m_NetworkDeviceConnectionError(iscore, errorInfo);
-    }
+    	if (err) {
+        	out.toString();
+        	TTSymbol errorInfo = TTSymbol(TTString(out[0]));
+        	m_NetworkDeviceConnectionError(iscore, errorInfo);
+    	}
+		
+		m_workingProtocols.push_back("MIDI");
+	}
+	catch(TTException& e)
+	{
+		TTLogError("Error : could not instantiate MIDI protocol: ");
+		TTLogError(e.getReason());
+	}
 }
 
 void Engine::initScore(const char* pathToTheJamomaFolder)

@@ -143,7 +143,7 @@ class Engine
 {
     
 private:
-    
+    std::vector<std::string> m_workingProtocols;							/// The protocols that were successfully enabled.
     TTSymbol            iscore;                                         /// application name
     
     TTSymbol            m_lastProjectFilePath;                          /// the last project file path
@@ -206,7 +206,8 @@ public:
     void dumpAddressBelow(TTNodePtr aNode);
     
     ~Engine();
-    
+	const std::vector<std::string>& workingProtocols() 
+	{ return m_workingProtocols; }
     // Id management //////////////////////////////////////////////////////////////////
     
     TimeProcessId       cacheTimeProcess(TTObject& timeProcess, TTAddress& anAddress, TTObject& subScenario);

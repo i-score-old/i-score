@@ -798,6 +798,8 @@ class Maquette : public QObject
 
     std::vector<std::string> getMIDIInputDevices();
     std::vector<std::string> getMIDIOutputDevices();
+	const std::vector<std::string>& getWorkingProtocols()
+	{ return _engines->workingProtocols(); }
 signals:
      void boxIsRunningSignal(unsigned int boxId, bool running);
   
