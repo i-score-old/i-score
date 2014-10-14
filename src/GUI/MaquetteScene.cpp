@@ -127,7 +127,7 @@ MaquetteScene::init()
 		  this, [] (QString device, QString error) 
 		  { QMessageBox::warning(nullptr, 
 			  device, 
-			  "Could not open port " + error + ". Maybe another instance of i-score is already running?"); 
+			  "Could not open port " + error + ". Maybe another application use it ?"); 
 		  });
   _maquette->setScene(this);
   _maquette->init();      
