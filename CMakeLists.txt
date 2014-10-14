@@ -2,40 +2,47 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(i-score)
 
-# Find includes in corresponding build directories
+##################################
+######### Settings ###############
+##################################
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-# Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
-
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-unused-parameter -Wno-deprecated-register -Wno-unknown-pragmas -Wno-conversion -Wl,-rpath,/usr/local/lib/jamoma/lib  -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions")
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE Debug)
+endif()
 
-
-find_package(Qt5Core)
-find_package(Qt5Widgets)
-find_package(Qt5Network)
-find_package(Qt5Xml)
-find_package(Qt5Svg)
-find_package(Qt5PrintSupport)
+find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets Network Xml Svg PrintSupport)
 
 include_directories("${PROJECT_SOURCE_DIR}/headers")
 include_directories("${PROJECT_SOURCE_DIR}/headers/GUI")
 include_directories("${PROJECT_SOURCE_DIR}/headers/data")
-include_directories("/usr/local/lib/jamoma/include")
-include_directories("/usr/local/jamoma/include")
-include_directories("/usr/include/libxml2")
 
 add_definitions(-D__Types__)
 add_definitions(-DTT_NO_DSP)
-add_definitions(-DQ_COMPILER_INITIALIZER_LISTS)
+
+#TODO find_package
+if(UNIX)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-unused-parameter -Wno-deprecated-register -Wno-unknown-pragmas -Wno-conversion -Wl,-rpath,/usr/local/lib/jamoma/lib  -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions")
+
+	include_directories("/usr/local/lib/jamoma/include")
+	include_directories("/usr/local/jamoma/include")
+	include_directories("/usr/include/libxml2")
+elseif(WIN32)
+	add_definitions(-DQ_COMPILER_INITIALIZER_LISTS)
+	add_definitions(-DNOMINMAX)
+	include_directories("C:\\Program Files (x86)\\GnuWin32\\include")
+	include_directories("C:\\Program Files (x86)\\libxml2-2.7.8.win32\\include")
+	include_directories("C:\\Program Files (x86)\\JamomaCore 0.6-dev\\include")
+endif()
 
 
-#RESOURCES += i-score.qrc
 
-#ICON = resources/images/i-score.icns
-#resources/translations = i-score_en.ts i-score_fr.ts
 
+##################################
+######### Source files ###########
+##################################
 set(PROJECT_HDRS
 ${CMAKE_CURRENT_SOURCE_DIR}/headers/data/Abstract.hpp
 ${CMAKE_CURRENT_SOURCE_DIR}/headers/data/AbstractBox.hpp
@@ -108,49 +115,183 @@ ${CMAKE_CURRENT_SOURCE_DIR}/src/IScoreApplication.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/src/GUI/CurvesComboBox.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/src/GUI/NetworkUpdater.cpp)
 
+IF(APPLE)
+	set(MACOSX_BUNDLE_INFO_PLIST "Info.plist")
+	set(MACOSX_BUNDLE_ICON_FILE "resources/images/i-score.icns") 
+	set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/images/i-score.icns" 
+								PROPERTIES 
+								MACOSX_PACKAGE_LOCATION Resources)
+							  
+ENDIF(APPLE)
 
 qt5_add_resources(i-score_RESOURCES_RCC "i-score.qrc")
 
-add_executable(i-score ${PROJECT_SRCS} ${PROJECT_HDRS} ${i-score_RESOURCES_RCC})
+#resources/translations = i-score_en.ts i-score_fr.ts
 
-qt5_use_modules(i-score Svg Xml Network Widgets PrintSupport)
+##################################
+############ Target ##############
+##################################
+add_executable(i-score MACOSX_BUNDLE WIN32
+			   ${PROJECT_SRCS} 
+			   ${PROJECT_HDRS} 
+			   ${i-score_RESOURCES_RCC}
+			   "${CMAKE_CURRENT_SOURCE_DIR}/resources/images/i-score.icns")
 
 
-target_link_libraries(i-score Qt5::Widgets Qt5::Core Qt5::Network Qt5::Xml Qt5::Svg Qt5::PrintSupport)
 
-# To do in a cleanlier fashion... What about creating a package file for Jamoma?
-set(JAMOMA_LIB_FOLDER "/usr/local/lib/jamoma/lib")
+##################################
+############ Libraries ###########
+##################################
+#qt5_use_modules(i-score Core Svg Xml Network Widgets PrintSupport)
+
+# Todo in a cleanlier fashion... What about creating a package file for Jamoma?
+if(UNIX)
+	set(JAMOMA_LIB_FOLDER "/usr/local/lib/jamoma/lib")
+elseif(WIN32)
+	set(JAMOMA_LIB_FOLDER_WIN32 "c:\\Program Files (x86)\\JamomaCore 0.6-dev\\lib")
+	FILE(TO_CMAKE_PATH ${JAMOMA_LIB_FOLDER_WIN32} JAMOMA_LIB_FOLDER)
+endif()
+
 FIND_LIBRARY(JAMOMA_FOUNDATION_LIBRARY JamomaFoundation ${JAMOMA_LIB_FOLDER})
 FIND_LIBRARY(JAMOMA_SCORE_LIBRARY JamomaScore ${JAMOMA_LIB_FOLDER})
 FIND_LIBRARY(JAMOMA_MODULAR_LIBRARY JamomaModular ${JAMOMA_LIB_FOLDER})
 
-target_link_libraries(i-score ${JAMOMA_FOUNDATION_LIBRARY} ${JAMOMA_SCORE_LIBRARY} ${JAMOMA_MODULAR_LIBRARY})
+target_link_libraries(i-score ${JAMOMA_FOUNDATION_LIBRARY} 
+							  ${JAMOMA_SCORE_LIBRARY} 
+							  ${JAMOMA_MODULAR_LIBRARY}
+							  Qt5::Core 
+							  Qt5::Gui
+							  Qt5::Svg 
+							  Qt5::Xml 
+							  Qt5::Network 
+							  Qt5::Widgets 
+							  Qt5::PrintSupport)
 
-#############################
-######## Installing #########
-#############################
-INSTALL(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/i-score" DESTINATION "bin")
+
 
 #############################
 ######## Packaging ##########
 #############################
-SET(CPACK_PACKAGE_NAME "i-score")
-SET(CPACK_PACKAGE_VENDOR "i-score")
-SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "i-score")
+## Bundlin' like mad
+set(plugin_dest_dir bin)
+set(qtconf_dest_dir bin)
+set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/i-score")
 
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "An intermedia sequencer for the precise and flexible scripting of interactive scenarios.")
-SET(CPACK_PACKAGE_VERSION "0.2.2")
-SET(CPACK_PACKAGE_VERSION_MAJOR "0")
-SET(CPACK_PACKAGE_VERSION_MINOR "2")
+if(APPLE)
+  set(plugin_dest_dir i-score.app/Contents/MacOS)
+  set(qtconf_dest_dir i-score.app/Contents/Resources)
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/i-score.app")
+elseif(WIN32)
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/i-score.exe")
+endif()
 
-SET(CPACK_GENERATOR "DEB")
-SET(CPACK_SET_DESTDIR true)
-SET(CPACK_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+INSTALL(TARGETS i-score 
+    BUNDLE DESTINATION . COMPONENT Runtime
+    RUNTIME DESTINATION bin COMPONENT Runtime)
 
-SET(CPACK_SOURCE_GENERATOR TGZ)
-SET(CPACK_SOURCE_PACKAGE_FILE_NAME "i-score-0.2")
-SET(CPACK_DEBIAN_PACKAGE_DEPENDS "jamomacore, libxml2")
-SET(CPACK_DEBIAN_PACKAGE_SECTION "sound")
+# Beware : Fifth circle of the DLL Hell
+if(WIN32)
+	# Qt stuff
+	if(CMAKE_BUILD_TYPE MATCHES Debug)
+		get_target_property(QtWinPlugin Qt5::QWindowsIntegrationPlugin LOCATION_Debug)
+		file(TO_CMAKE_PATH "C:\\Qt\\Qt5.3.1\\5.3\\msvc2013\\bin\\libEGLd.dll" LIBEGL_DLL)
+	elseif(CMAKE_BUILD_TYPE MATCHES Release)
+		get_target_property(QtWinPlugin Qt5::QWindowsIntegrationPlugin LOCATION)
+		file(TO_CMAKE_PATH "C:\\Qt\\Qt5.3.1\\5.3\\msvc2013\\bin\\libEGL.dll" LIBEGL_DLL)
+	endif()
+	
+	install(FILES "${QtWinPlugin}" DESTINATION "${plugin_dest_dir}/platforms" COMPONENT Runtime)
+	install(FILES ${LIBEGL_DLL} DESTINATION bin COMPONENT Runtime)
 
+	# Libraries
+	file(TO_CMAKE_PATH "C:\\Qt\\Qt5.3.1\\5.3\\msvc2013\\bin" QT_FOLDER)
+	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\libxml2-2.7.8.win32\\bin" LIBXML_FOLDER)
+	# Fuck this
+	file(TO_CMAKE_PATH "C:\\Users\\Doom\\Documents\\GitHub\\Jamoma\\Core\\Foundation\\library\\libiconv\\bin" LIBICONV_FOLDER)
+	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\zlib" ZLIB_FOLDER)
+	
+	# Jamoma extensions
+	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\JamomaCore 0.6-dev\\extensions" JAMOMA_EXTENSIONS_FOLDER)
+	set(JAMOMA_EXTENSIONS 
+		"${JAMOMA_EXTENSIONS_FOLDER}/Scenario.ttdll"  
+		"${JAMOMA_EXTENSIONS_FOLDER}/Automation.ttdll"  
+		"${JAMOMA_EXTENSIONS_FOLDER}/Interval.ttdll"  
+		"${JAMOMA_EXTENSIONS_FOLDER}/OSC.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/Minuit.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/MIDI.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/AnalysisLib.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/DataspaceLib.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/FunctionLib.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/System.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/NetworkLib.ttdll")
+		
+	install(FILES ${JAMOMA_EXTENSIONS}
+			DESTINATION bin
+			COMPONENT Runtime)
+	
+	# Jamoma extensions also require their own DLLs.
+	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\Portmidi\\lib\\portmidi.dll" PORTMIDI_DLL)
+	install(FILES ${PORTMIDI_DLL} DESTINATION bin COMPONENT Runtime)
+	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\pthread-win32\\dll\\x86\\pthreadVC2.dll" PTHREAD_DLL)
+	install(FILES ${PTHREAD_DLL} DESTINATION bin COMPONENT Runtime)
+	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\Gecode\\bin" GECODE_DLL_FOLDER)
+	set(GECODE_DLLS 
+		"${GECODE_DLL_FOLDER}/GecodeDriver-4-3-0-d-x86.dll"   
+		"${GECODE_DLL_FOLDER}/GecodeFlatZinc-4-3-0-d-x86.dll"   
+		"${GECODE_DLL_FOLDER}/GecodeInt-4-3-0-d-x86.dll"   
+		"${GECODE_DLL_FOLDER}/GecodeFloat-4-3-0-d-x86.dll"   
+		"${GECODE_DLL_FOLDER}/GecodeGist-4-3-0-d-x86.dll"  
+		"${GECODE_DLL_FOLDER}/GecodeKernel-4-3-0-d-x86.dll"  
+		"${GECODE_DLL_FOLDER}/GecodeMinimodel-4-3-0-d-x86.dll"  
+		"${GECODE_DLL_FOLDER}/GecodeSet-4-3-0-d-x86.dll"  
+		"${GECODE_DLL_FOLDER}/GecodeSupport-4-3-0-d-x86.dll"  
+		"${GECODE_DLL_FOLDER}/GecodeSearch-4-3-0-d-x86.dll")
+	install(FILES ${GECODE_DLLS} DESTINATION bin COMPONENT Runtime)
+	
+	
+	set(DIRS "${QT_FOLDER}" "${JAMOMA_LIB_FOLDER}" "${JAMOMA_EXTENSIONS_FOLDER}" "${LIBXML_FOLDER}" "${LIBICONV_FOLDER}" "${ZLIB_FOLDER}" )
+	#~ set(DIRS ${QtCore_location} ${QtSvg_location} ${QtXml_location} ${QtNetwork_location} ${QtWidgets_location} ${QtPrintSupport_location})
+	install(CODE "
+				    file(GLOB_RECURSE QTPLUGINS
+				      \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/platforms/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+				      set(PLUGINS ${QTPLUGINS} ${JAMOMA_EXTENSIONS})
+					include(BundleUtilities) 
+					fixup_bundle(\"${APPS}\"   \"${PLUGINS}\"   \"${DIRS}\")
+				 "
+			COMPONENT Runtime)
+endif()
+#INSTALL(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/i-score" DESTINATION "bin")
+
+## CPack-specific stuff
+set(CPACK_PACKAGE_NAME "i-score")
+set(CPACK_PACKAGE_VENDOR "i-score")
+
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "An intermedia sequencer for the precise and flexible scripting of interactive scenarios.")
+set(CPACK_PACKAGE_VERSION "0.2.2")
+set(CPACK_PACKAGE_VERSION_MAJOR "0")
+set(CPACK_PACKAGE_VERSION_MINOR "2")
+
+set(CPACK_SOURCE_GENERATOR TGZ)
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "i-score-0.2")
+
+if(UNIX)
+	if(APPLE)
+		# TODO
+	else()
+		# Debian... Others will come.
+		set(CPACK_GENERATOR "DEB")
+		set(CPACK_SET_DESTDIR true)
+		set(CPACK_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+		
+		set(CPACK_SOURCE_GENERATOR TGZ)
+		set(CPACK_SOURCE_PACKAGE_FILE_NAME "i-score-0.2")
+		
+		set(CPACK_DEBIAN_PACKAGE_MAINTAINER "i-score")
+		set(CPACK_DEBIAN_PACKAGE_DEPENDS "jamomacore, libxml2")
+		set(CPACK_DEBIAN_PACKAGE_SECTION "sound")
+	endif()
+elseif(WIN32)
+	set(CPACK_GENERATOR "NSIS")
+endif()
 INCLUDE(CPack)
 
