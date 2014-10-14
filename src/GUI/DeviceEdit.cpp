@@ -393,7 +393,7 @@ void DeviceEdit::setCorrespondingProtocolLayout()
         defaultName = newDefaultName;
     }
 */
-    //checkName(defaultName);
+    checkName(defaultName);
     _localHostBox->setText(defaultLocalHost);
     _portOutputBox->setValue(defaultPort);
     _portInputBox->setValue(defaultInputPort);
