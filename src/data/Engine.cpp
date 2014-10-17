@@ -534,6 +534,9 @@ void Engine::cacheTimeCondition(ConditionedProcessId triggerId, TTObject& timeCo
     e->index = triggerId;
     
     m_timeConditionMap[triggerId] = e;
+    
+    // We cache an observer on time condition ready attribute
+    cacheReadyCallback(triggerId);
 }
 
 TTObject& Engine::getTimeCondition(ConditionedProcessId triggerId)
@@ -544,6 +547,9 @@ TTObject& Engine::getTimeCondition(ConditionedProcessId triggerId)
 void Engine::uncacheTimeCondition(ConditionedProcessId triggerId)
 {
     EngineCacheElementPtr   e = m_timeConditionMap[triggerId];
+    
+    // Uncache observer on time condition ready attribute
+    uncacheReadyCallback(triggerId);
     
     delete e;
     m_timeConditionMap.erase(triggerId);
@@ -680,6 +686,82 @@ void Engine::uncacheStatusCallback(ConditionedProcessId triggerId, TimeEventInde
     
     delete e;
     m_statusCallbackMap.erase(triggerId);
+}
+
+void Engine::cacheReadyCallback(ConditionedProcessId triggerId)
+{
+    EngineCacheElementPtr   e;
+    TTObject    timeCondition = getTimeCondition(triggerId);
+    TTValue     v, baton;
+    
+    // Create a new engine cache element
+    e = new EngineCacheElement();
+    e->index = triggerId;
+    
+    // create a TTCallback to observe time condition ready attribute (using TimeConditionReadyAttributeCallback)
+    e->object = TTObject("callback");
+    
+    baton = TTValue(TTPtr(this));
+    e->object.set("baton", baton);
+    e->object.set("function", TTPtr(&TimeConditionReadyAttributeCallback));
+    e->object.set("notification", TTSymbol("ConditionReadyChanged"));
+    
+    // observe the "ConditionReadyChanged" notification
+    timeCondition.registerObserverForNotifications(e->object);
+    
+    m_readyCallbackMap[triggerId] = e;
+}
+
+void Engine::uncacheReadyCallback(ConditionedProcessId triggerId)
+{
+    EngineCacheElementPtr   e = m_readyCallbackMap[triggerId];
+    TTObject    timeCondition = getTimeCondition(triggerId);
+    
+    // don't observe the "ConditionReadyChanged" notification anymore
+    timeCondition.unregisterObserverForNotifications(e->object);
+    
+    delete e;
+    m_readyCallbackMap.erase(triggerId);
+}
+
+void Engine::appendToCacheReadyCallback(ConditionedProcessId triggerId, ConditionedProcessId triggerIdToAppend)
+{
+    EngineCacheElementPtr   e = m_readyCallbackMap[triggerId];
+    TTObject    timeCondition = getTimeCondition(triggerId);
+    TTValue     baton, newBaton;
+    TTBoolean   found = false;
+    
+    e->object.get("baton", baton);
+    
+    newBaton.append(baton[0]);
+    for (TTUInt32 i = 1; i < baton.size(); i++)
+    {
+        if (ConditionedProcessId(baton[i]) == triggerIdToAppend)
+            found = true;
+        
+        newBaton.append(baton[i]);
+    }
+    
+    if (!found)
+        newBaton.append(triggerIdToAppend);
+    
+    e->object.set("baton", newBaton);
+}
+
+void Engine::removeFromCacheReadyCallback(ConditionedProcessId triggerId, ConditionedProcessId triggerIdToRemove)
+{
+    EngineCacheElementPtr   e = m_readyCallbackMap[triggerId];
+    TTObject    timeCondition = getTimeCondition(triggerId);
+    TTValue     baton, newBaton;
+    
+    e->object.get("baton", baton);
+    
+    newBaton.append(baton[0]);
+    for (TTUInt32 i = 1; i < baton.size(); i++)
+         if (ConditionedProcessId(baton[i]) != triggerIdToRemove)
+             newBaton.append(baton[i]);
+    
+    e->object.set("baton", newBaton);
 }
 
 // Edition ////////////////////////////////////////////////////////////////////////
@@ -1741,10 +1823,11 @@ TimeConditionId Engine::createCondition(std::vector<ConditionedProcessId> trigge
     std::vector<ConditionedProcessId>::iterator it = triggerIds.begin();
     TimeConditionId conditionId = m_nextConditionedProcessId++;
     cacheTimeCondition(conditionId, getTimeCondition(*it));
-
+    appendToCacheReadyCallback(conditionId, *it);
+    
     for(++it ; it != triggerIds.end() ; ++it)
         attachToCondition(conditionId, *it);
-
+    
     return conditionId;
 }
 
@@ -1778,6 +1861,8 @@ void Engine::attachToCondition(TimeConditionId conditionId, ConditionedProcessId
         // modify the cache
         m_timeConditionMap[triggerId]->object = getTimeCondition(conditionId);
         m_conditionsMap[conditionId].push_back(triggerId);
+        
+        appendToCacheReadyCallback(conditionId, triggerId);
     }
 }
 
@@ -1822,6 +1907,8 @@ void Engine::detachFromCondition(TimeConditionId conditionId, ConditionedProcess
         // modify cache
         m_timeConditionMap[triggerId]->object = getTimeCondition(triggerId);
         m_conditionsMap[conditionId].remove(triggerId);
+        
+        removeFromCacheReadyCallback(conditionId, triggerId);
     }
 }
 
@@ -3372,11 +3459,11 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
             // if the Start event of the Automation process is conditioned
             timeProcess.get("startEvent", v);
             timeEvent = v[0];
-            
+
             timeEvent.get("condition", v);
             timeCondition = v[0];
             
-            if (timeCondition != nullptr) {
+            if (timeCondition.valid()) {
             
                 // We cache the time process and the event index instead of the event itself
                 triggerId = cacheConditionedProcess(timeProcessId, BEGIN_CONTROL_POINT_INDEX);
@@ -3392,7 +3479,7 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
                     m_conditionsMap[it->second].push_back(triggerId);
                 }
             }
-            
+
             // if the End event of the Automation process is conditioned
             timeProcess.get("endEvent", v);
             timeEvent = v[0];
@@ -3400,7 +3487,7 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
             timeEvent.get("condition", v);
             timeCondition = v[0];
             
-            if (timeCondition != nullptr) {
+            if (timeCondition.valid()) {
                 
                 // We cache the time process and the event index instead of the event itself
                 triggerId = cacheConditionedProcess(timeProcessId, END_CONTROL_POINT_INDEX);
@@ -3517,9 +3604,10 @@ void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value
 {
     EnginePtr               engine;
     ConditionedProcessId    triggerId;
-    TTObject                event;
+    TTObject                event, condition;
     TTValue                 v;
     TTSymbol                status;
+    TTBoolean               ready;
 	
 	// unpack baton (engine, triggerId)
 	engine = EnginePtr((TTPtr)baton[0]);
@@ -3532,13 +3620,25 @@ void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value
     event.get("status", v);
     status = v[0];
     
+    // get event condition
+    event.get("condition", v);
+    condition = v[0];
+    
+    if (condition.valid()) {
+    
+        // get condition ready state
+        condition.get("ready", ready);
+    }
+    else
+        ready = true;
+    
     if (engine->m_TimeEventStatusAttributeCallback != nullptr) {
         
         if (status == kTTSym_eventWaiting) {
             engine->m_TimeEventStatusAttributeCallback(triggerId, false);
         }
         else if (status == kTTSym_eventPending) {
-            engine->m_TimeEventStatusAttributeCallback(triggerId, true);
+            engine->m_TimeEventStatusAttributeCallback(triggerId, ready);
         }
         else if (status == kTTSym_eventHappened) {
             engine->m_TimeEventStatusAttributeCallback(triggerId, false);
@@ -3561,6 +3661,27 @@ void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value
             else if (status == kTTSym_eventDisposed) {
                 TTLogMessage("TriggerPoint %ld is disposed\n", triggerId);
             }
+        }
+    }
+}
+
+void TimeConditionReadyAttributeCallback(const TTValue& baton, const TTValue& value)
+{
+    EnginePtr               engine;
+    ConditionedProcessId    triggerId;
+    TTObject                condition;
+    TTBoolean               ready = value[0];
+	
+	// unpack baton (engine, triggerId)
+	engine = EnginePtr((TTPtr)baton[0]);
+    
+    // only update for condition with more than one case
+    if (baton.size() > 2)
+    {
+        for (TTUInt32 i = 1; i < baton.size(); i++)
+        {
+            triggerId = ConditionedProcessId(baton[i]);
+            engine->m_TimeEventStatusAttributeCallback(triggerId, ready);
         }
     }
 }
