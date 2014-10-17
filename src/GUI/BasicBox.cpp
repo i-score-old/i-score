@@ -387,6 +387,7 @@ BasicBox::updateFlexibility()
   _flexible = hasTriggerPoint(BOX_END);
 }
 
+#include <ParentBox.hpp>
 /// \todo Une méthode init() ne devrait pas être utilisée. surtout en public !!! Elle peut laisser l'invariant de classe instable à tout moment.
 void
 BasicBox::init()
@@ -416,8 +417,15 @@ BasicBox::init()
   setFlag(ItemSendsGeometryChanges, true);
   setVisible(true);
   setAcceptHoverEvents(true);
-  _currentZvalue = 0;
-  setZValue(_currentZvalue);
+  
+  auto map =  Maquette::getInstance()->parentBoxes();
+  auto parent_box_it = map.find(mother());
+  if(parent_box_it != map.end())
+  {
+	  _currentZvalue = parent_box_it->second->zValue() + 1;
+	  setZValue(_currentZvalue);
+  }
+
   updateFlexibility();
 
   _abstract->setColor(QColor(BOX_COLOR));
