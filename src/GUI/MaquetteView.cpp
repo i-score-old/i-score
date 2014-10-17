@@ -126,12 +126,12 @@ MaquetteView::wheelEvent(QWheelEvent *event)
         verticalScrollBar()->setValue(newValue);
     }
 
-    if ( event->modifiers()==Qt::AltModifier) {
+    if ( event->modifiers()==Qt::ControlModifier) {
         if (event->orientation() == Qt::Vertical) {
-            if (event->delta() > 100) {
+            if (event->delta() > 20) {
                zoomIn();
             }
-            else if (event->delta() < -100) {
+            else if (event->delta() < -20) {
                zoomOut();
             }
         }
