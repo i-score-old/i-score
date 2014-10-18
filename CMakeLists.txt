@@ -210,6 +210,16 @@ if(WIN32)
 	file(TO_CMAKE_PATH "C:\\Users\\Doom\\Documents\\GitHub\\Jamoma\\Core\\Foundation\\library\\libiconv\\bin" LIBICONV_FOLDER)
 	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\zlib" ZLIB_FOLDER)
 	
+	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\Microsoft Visual Studio 12.0\\VC\\redist\\x86\\Microsoft.VC120.CRT" MSVC_REDIST_RELEASE)
+	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\Microsoft Visual Studio 12.0\\VC\\redist\\Debug_NonRedist\\x86\\Microsoft.VC120.DebugCRT" MSVC_REDIST_DEBUG)
+	
+	install(FILES "${MSVC_REDIST_RELEASE}/msvcr120.dll" 
+				  "${MSVC_REDIST_RELEASE}/msvcp120.dll" 
+				  "${MSVC_REDIST_DEBUG}/msvcr120d.dll" 
+				  "${MSVC_REDIST_DEBUG}/msvcp120d.dll"
+			DESTINATION bin
+			COMPONENT Runtime)
+	
 	# Jamoma extensions
 	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\JamomaCore 0.6-dev\\extensions" JAMOMA_EXTENSIONS_FOLDER)
 	set(JAMOMA_EXTENSIONS 
