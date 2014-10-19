@@ -25,7 +25,7 @@ add_definitions(-DTT_NO_DSP)
 #TODO find_package
 if(UNIX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-unused-parameter -Wno-deprecated-register -Wno-unknown-pragmas -Wno-conversion -Wl,-rpath,/usr/local/lib/jamoma/lib  -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions")
-
+	SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 	include_directories("/usr/local/lib/jamoma/include")
 	include_directories("/usr/local/jamoma/include")
 	include_directories("/usr/include/libxml2")
