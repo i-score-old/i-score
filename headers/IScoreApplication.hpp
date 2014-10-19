@@ -8,7 +8,7 @@ class IScoreApplication : public QApplication
 {
   Q_OBJECT
   public :
-    IScoreApplication(int argc, char** argv): QApplication(argc, argv) {}
+    IScoreApplication(int& argc, char** argv): QApplication(argc, argv) {}
     virtual ~IScoreApplication()
     {
       delete evf;
