@@ -269,6 +269,12 @@ if(WIN32)
 					fixup_bundle(\"${APPS}\"   \"${PLUGINS}\"   \"${DIRS}\")
 				 "
 			COMPONENT Runtime)
+			
+	# VC++ redistributable
+	install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/redist/vcredist_2010_x86.exe"
+			DESTINATION redist)
+	
+
 endif()
 #INSTALL(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/i-score" DESTINATION "bin")
 
@@ -302,6 +308,10 @@ if(UNIX)
 	endif()
 elseif(WIN32)
 	set(CPACK_GENERATOR "NSIS")
+	set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+			ExecWait '\\\"$INSTDIR\\\\redist\\\\vcredist_2010_x86.exe\\\" /q /norestart'
+			"
+		)
 endif()
 INCLUDE(CPack)
 
