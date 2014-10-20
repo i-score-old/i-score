@@ -245,17 +245,24 @@ if(WIN32)
 	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\pthread-win32\\dll\\x86\\pthreadVC2.dll" PTHREAD_DLL)
 	install(FILES ${PTHREAD_DLL} DESTINATION bin COMPONENT Runtime)
 	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\Gecode\\bin" GECODE_DLL_FOLDER)
+	
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		set(GECODE_WIN32_BUILD_TYPE "d")
+	else()
+		set(GECODE_WIN32_BUILD_TYPE "r")
+	endif()
+	
 	set(GECODE_DLLS 
-		"${GECODE_DLL_FOLDER}/GecodeDriver-4-3-0-d-x86.dll"   
-		"${GECODE_DLL_FOLDER}/GecodeFlatZinc-4-3-0-d-x86.dll"   
-		"${GECODE_DLL_FOLDER}/GecodeInt-4-3-0-d-x86.dll"   
-		"${GECODE_DLL_FOLDER}/GecodeFloat-4-3-0-d-x86.dll"   
-		"${GECODE_DLL_FOLDER}/GecodeGist-4-3-0-d-x86.dll"  
-		"${GECODE_DLL_FOLDER}/GecodeKernel-4-3-0-d-x86.dll"  
-		"${GECODE_DLL_FOLDER}/GecodeMinimodel-4-3-0-d-x86.dll"  
-		"${GECODE_DLL_FOLDER}/GecodeSet-4-3-0-d-x86.dll"  
-		"${GECODE_DLL_FOLDER}/GecodeSupport-4-3-0-d-x86.dll"  
-		"${GECODE_DLL_FOLDER}/GecodeSearch-4-3-0-d-x86.dll")
+		"${GECODE_DLL_FOLDER}/GecodeDriver-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"   
+		"${GECODE_DLL_FOLDER}/GecodeFlatZinc-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"   
+		"${GECODE_DLL_FOLDER}/GecodeInt-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"   
+		"${GECODE_DLL_FOLDER}/GecodeFloat-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"   
+		"${GECODE_DLL_FOLDER}/GecodeGist-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"  
+		"${GECODE_DLL_FOLDER}/GecodeKernel-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"  
+		"${GECODE_DLL_FOLDER}/GecodeMinimodel-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"  
+		"${GECODE_DLL_FOLDER}/GecodeSet-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"  
+		"${GECODE_DLL_FOLDER}/GecodeSupport-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"  
+		"${GECODE_DLL_FOLDER}/GecodeSearch-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll")
 	install(FILES ${GECODE_DLLS} DESTINATION bin COMPONENT Runtime)
 	
 	
