@@ -310,7 +310,7 @@ if(UNIX)
 		set(CPACK_SOURCE_PACKAGE_FILE_NAME "i-score-0.2")
 		
 		set(CPACK_DEBIAN_PACKAGE_MAINTAINER "i-score")
-		set(CPACK_DEBIAN_PACKAGE_DEPENDS "jamomacore, libxml2")
+		set(CPACK_DEBIAN_PACKAGE_DEPENDS "jamomacore, libxml2, libqt5core5a, libqt5gui5, libqt5svg5, libqt5xml5, libqt5network5, libqt5printsupport5")
 		set(CPACK_DEBIAN_PACKAGE_SECTION "sound")
 	endif()
 elseif(WIN32)
