@@ -25,7 +25,7 @@ add_definitions(-DTT_NO_DSP)
 #TODO find_package
 if(UNIX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-unused-parameter -Wno-deprecated-register -Wno-unknown-pragmas -Wno-conversion -Wl,-rpath,/usr/local/lib/jamoma/lib  -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions")
-
+	SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 	include_directories("/usr/local/lib/jamoma/include")
 	include_directories("/usr/local/jamoma/include")
 	include_directories("/usr/include/libxml2")
@@ -210,6 +210,16 @@ if(WIN32)
 	file(TO_CMAKE_PATH "C:\\Users\\Doom\\Documents\\GitHub\\Jamoma\\Core\\Foundation\\library\\libiconv\\bin" LIBICONV_FOLDER)
 	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\zlib" ZLIB_FOLDER)
 	
+	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\Microsoft Visual Studio 12.0\\VC\\redist\\x86\\Microsoft.VC120.CRT" MSVC_REDIST_RELEASE)
+	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\Microsoft Visual Studio 12.0\\VC\\redist\\Debug_NonRedist\\x86\\Microsoft.VC120.DebugCRT" MSVC_REDIST_DEBUG)
+	
+	install(FILES "${MSVC_REDIST_RELEASE}/msvcr120.dll" 
+				  "${MSVC_REDIST_RELEASE}/msvcp120.dll" 
+				  "${MSVC_REDIST_DEBUG}/msvcr120d.dll" 
+				  "${MSVC_REDIST_DEBUG}/msvcp120d.dll"
+			DESTINATION bin
+			COMPONENT Runtime)
+	
 	# Jamoma extensions
 	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\JamomaCore 0.6-dev\\extensions" JAMOMA_EXTENSIONS_FOLDER)
 	set(JAMOMA_EXTENSIONS 
@@ -235,17 +245,24 @@ if(WIN32)
 	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\pthread-win32\\dll\\x86\\pthreadVC2.dll" PTHREAD_DLL)
 	install(FILES ${PTHREAD_DLL} DESTINATION bin COMPONENT Runtime)
 	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\Gecode\\bin" GECODE_DLL_FOLDER)
+	
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		set(GECODE_WIN32_BUILD_TYPE "d")
+	else()
+		set(GECODE_WIN32_BUILD_TYPE "r")
+	endif()
+	
 	set(GECODE_DLLS 
-		"${GECODE_DLL_FOLDER}/GecodeDriver-4-3-0-d-x86.dll"   
-		"${GECODE_DLL_FOLDER}/GecodeFlatZinc-4-3-0-d-x86.dll"   
-		"${GECODE_DLL_FOLDER}/GecodeInt-4-3-0-d-x86.dll"   
-		"${GECODE_DLL_FOLDER}/GecodeFloat-4-3-0-d-x86.dll"   
-		"${GECODE_DLL_FOLDER}/GecodeGist-4-3-0-d-x86.dll"  
-		"${GECODE_DLL_FOLDER}/GecodeKernel-4-3-0-d-x86.dll"  
-		"${GECODE_DLL_FOLDER}/GecodeMinimodel-4-3-0-d-x86.dll"  
-		"${GECODE_DLL_FOLDER}/GecodeSet-4-3-0-d-x86.dll"  
-		"${GECODE_DLL_FOLDER}/GecodeSupport-4-3-0-d-x86.dll"  
-		"${GECODE_DLL_FOLDER}/GecodeSearch-4-3-0-d-x86.dll")
+		"${GECODE_DLL_FOLDER}/GecodeDriver-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"   
+		"${GECODE_DLL_FOLDER}/GecodeFlatZinc-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"   
+		"${GECODE_DLL_FOLDER}/GecodeInt-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"   
+		"${GECODE_DLL_FOLDER}/GecodeFloat-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"   
+		"${GECODE_DLL_FOLDER}/GecodeGist-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"  
+		"${GECODE_DLL_FOLDER}/GecodeKernel-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"  
+		"${GECODE_DLL_FOLDER}/GecodeMinimodel-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"  
+		"${GECODE_DLL_FOLDER}/GecodeSet-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"  
+		"${GECODE_DLL_FOLDER}/GecodeSupport-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll"  
+		"${GECODE_DLL_FOLDER}/GecodeSearch-4-3-0-${GECODE_WIN32_BUILD_TYPE}-x86.dll")
 	install(FILES ${GECODE_DLLS} DESTINATION bin COMPONENT Runtime)
 	
 	
@@ -259,6 +276,12 @@ if(WIN32)
 					fixup_bundle(\"${APPS}\"   \"${PLUGINS}\"   \"${DIRS}\")
 				 "
 			COMPONENT Runtime)
+			
+	# VC++ redistributable
+	install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/redist/vcredist_2010_x86.exe"
+			DESTINATION redist)
+	
+
 endif()
 #INSTALL(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/i-score" DESTINATION "bin")
 
@@ -287,11 +310,15 @@ if(UNIX)
 		set(CPACK_SOURCE_PACKAGE_FILE_NAME "i-score-0.2")
 		
 		set(CPACK_DEBIAN_PACKAGE_MAINTAINER "i-score")
-		set(CPACK_DEBIAN_PACKAGE_DEPENDS "jamomacore, libxml2")
+		set(CPACK_DEBIAN_PACKAGE_DEPENDS "jamomacore, libxml2, libqt5core5a, libqt5gui5, libqt5svg5, libqt5xml5, libqt5network5, libqt5printsupport5")
 		set(CPACK_DEBIAN_PACKAGE_SECTION "sound")
 	endif()
 elseif(WIN32)
 	set(CPACK_GENERATOR "NSIS")
+	set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+			ExecWait '\\\"$INSTDIR\\\\redist\\\\vcredist_2010_x86.exe\\\" /q /norestart'
+			"
+		)
 endif()
 INCLUDE(CPack)
 

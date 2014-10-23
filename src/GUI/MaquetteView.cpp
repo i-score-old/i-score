@@ -128,10 +128,10 @@ MaquetteView::wheelEvent(QWheelEvent *event)
 
     if ( event->modifiers()==Qt::ControlModifier) {
         if (event->orientation() == Qt::Vertical) {
-            if (event->delta() > 100) {
+            if (event->delta() > 20) {
                zoomIn();
             }
-            else if (event->delta() < -100) {
+            else if (event->delta() < -20) {
                zoomOut();
             }
         }
