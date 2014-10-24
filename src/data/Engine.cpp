@@ -3448,7 +3448,7 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
             timeConditionId = m_nextConditionedProcessId++;
 
             // cache it
-            TTAddress address = scenarioAddress.getParent().appendAddress(TTAddress("TP.1"));
+            TTAddress address = scenarioAddress.getParent().appendAddress(TTAddress("/TP.1"));
             cacheTimeCondition(timeConditionId, timeCondition, address);
 
             // fill the temporary map
@@ -3486,7 +3486,7 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
                 triggerId = cacheConditionedProcess(timeProcessId, BEGIN_CONTROL_POINT_INDEX);
             
                 // We cache the TTTimeCondition
-                address = scenarioAddress.getParent().appendAddress(TTAddress("TP.1"));
+                address = scenarioAddress.getParent().appendAddress(TTAddress("/TP.1"));
                 cacheTimeCondition(triggerId, timeCondition, address);
 
                 // if it is a condition for i-score
@@ -3511,7 +3511,7 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
                 triggerId = cacheConditionedProcess(timeProcessId, END_CONTROL_POINT_INDEX);
             
                 // We cache the TTTimeCondition
-                address = scenarioAddress.getParent().appendAddress(TTAddress("TP.1"));
+                address = scenarioAddress.getParent().appendAddress(TTAddress("/TP.1"));
                 cacheTimeCondition(triggerId, timeCondition, address);
             }
         }
