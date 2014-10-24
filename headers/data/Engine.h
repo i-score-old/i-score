@@ -231,7 +231,7 @@ public:
     void                uncacheConditionedProcess(ConditionedProcessId triggerId);
     void                clearConditionedProcess();
     
-    void                cacheTimeCondition(ConditionedProcessId triggerId, TTObject& timeCondition);
+    void                cacheTimeCondition(ConditionedProcessId triggerId, TTObject& timeCondition, TTAddress& anAddress = kTTAdrsEmpty);
     TTObject&           getTimeCondition(ConditionedProcessId triggerId);
     void                uncacheTimeCondition(ConditionedProcessId triggerId);
     void                clearTimeCondition();

@@ -524,14 +524,20 @@ void Engine::clearConditionedProcess()
     m_nextConditionedProcessId = 1;
 }
 
-void Engine::cacheTimeCondition(ConditionedProcessId triggerId, TTObject& timeCondition)
+void Engine::cacheTimeCondition(ConditionedProcessId triggerId, TTObject& timeCondition, TTAddress& anAddress)
 {
     EngineCacheElementPtr   e;
-    TTValue                 args, v;
+    TTValue                 args, out;
     
     e = new EngineCacheElement();
     e->object = timeCondition;
     e->index = triggerId;
+    e->address = anAddress;
+    
+    if (e->address != kTTAdrsEmpty) {
+        args = TTValue(e->address, e->object);
+        m_iscore.send("ObjectRegister", args, out);
+    }
     
     m_timeConditionMap[triggerId] = e;
     
@@ -547,6 +553,9 @@ TTObject& Engine::getTimeCondition(ConditionedProcessId triggerId)
 void Engine::uncacheTimeCondition(ConditionedProcessId triggerId)
 {
     EngineCacheElementPtr   e = m_timeConditionMap[triggerId];
+    
+    TTValue out;
+    m_iscore.send("ObjectUnregister", e->address, out);
     
     // Uncache observer on time condition ready attribute
     uncacheReadyCallback(triggerId);
@@ -1761,9 +1770,11 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
     TTObject    timeEvent;
     TTObject    timeCondition;
     TTObject    parentScenario;
-    ConditionedProcessId triggerId;
+    ConditionedProcessId    triggerId;
+    TimeProcessId           motherId = getParentId(containingBoxId);
     TTValue     args, out;
     TTString    instance;
+    TTAddress   address;
     
     // get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
@@ -1787,8 +1798,13 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
     // we cache the time process and the event index instead of the event itself
     triggerId = cacheConditionedProcess(containingBoxId, controlPointIndex);
     
+    if (motherId == ROOT_BOX_ID)
+        address = kTTAdrsRoot.appendAddress(TTAddress("TP.1"));
+    else
+        address = getAddress(motherId).appendAddress(TTAddress("TP.1"));
+    
     // we cache the TTTimeCondition
-    cacheTimeCondition(triggerId, timeCondition);
+    cacheTimeCondition(triggerId, timeCondition, address);
 
     // note : see in setTriggerPointMessage to see how the expression associated to an event is edited
     
@@ -3432,7 +3448,8 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
             timeConditionId = m_nextConditionedProcessId++;
 
             // cache it
-            cacheTimeCondition(timeConditionId, timeCondition);
+            TTAddress address = scenarioAddress.getParent().appendAddress(TTAddress("TP.1"));
+            cacheTimeCondition(timeConditionId, timeCondition, address);
 
             // fill the temporary map
             TTCondToID[timeCondition.instance()] = timeConditionId;
@@ -3469,7 +3486,8 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
                 triggerId = cacheConditionedProcess(timeProcessId, BEGIN_CONTROL_POINT_INDEX);
             
                 // We cache the TTTimeCondition
-                cacheTimeCondition(triggerId, timeCondition);
+                address = scenarioAddress.getParent().appendAddress(TTAddress("TP.1"));
+                cacheTimeCondition(triggerId, timeCondition, address);
 
                 // if it is a condition for i-score
                 std::map<TTObjectBasePtr, TimeConditionId>::iterator it = TTCondToID.find(timeCondition.instance());
@@ -3493,7 +3511,8 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
                 triggerId = cacheConditionedProcess(timeProcessId, END_CONTROL_POINT_INDEX);
             
                 // We cache the TTTimeCondition
-                cacheTimeCondition(triggerId, timeCondition);
+                address = scenarioAddress.getParent().appendAddress(TTAddress("TP.1"));
+                cacheTimeCondition(triggerId, timeCondition, address);
             }
         }
         
