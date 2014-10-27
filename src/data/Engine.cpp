@@ -1770,8 +1770,7 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
     TTObject    timeEvent;
     TTObject    timeCondition;
     TTObject    parentScenario;
-    ConditionedProcessId    triggerId;
-    TimeProcessId           motherId = getParentId(containingBoxId);
+    ConditionedProcessId triggerId;
     TTValue     args, out;
     TTString    instance;
     TTAddress   address;
@@ -1798,12 +1797,12 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
     // we cache the time process and the event index instead of the event itself
     triggerId = cacheConditionedProcess(containingBoxId, controlPointIndex);
     
-    if (motherId == ROOT_BOX_ID)
-        address = kTTAdrsRoot.appendAddress(TTAddress("TP.1"));
+     // cache the condition and register it into the namespace
+    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+        address = getAddress(containingBoxId).appendAddress(TTAddress("/start"));
     else
-        address = getAddress(motherId).appendAddress(TTAddress("TP.1"));
+        address = getAddress(containingBoxId).appendAddress(TTAddress("/end"));
     
-    // we cache the TTTimeCondition
     cacheTimeCondition(triggerId, timeCondition, address);
 
     // note : see in setTriggerPointMessage to see how the expression associated to an event is edited
@@ -3447,9 +3446,8 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
             // get a unique ID for the condition
             timeConditionId = m_nextConditionedProcessId++;
 
-            // cache it
-            TTAddress address = scenarioAddress.getParent().appendAddress(TTAddress("/TP.1"));
-            cacheTimeCondition(timeConditionId, timeCondition, address);
+            // cache it but don't register it
+            cacheTimeCondition(timeConditionId, timeCondition);
 
             // fill the temporary map
             TTCondToID[timeCondition.instance()] = timeConditionId;
@@ -3482,16 +3480,19 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
             
             if (timeCondition.valid()) {
             
-                // We cache the time process and the event index instead of the event itself
+                // cache the time process and the event index instead of the event itself
                 triggerId = cacheConditionedProcess(timeProcessId, BEGIN_CONTROL_POINT_INDEX);
-            
-                // We cache the TTTimeCondition
-                address = scenarioAddress.getParent().appendAddress(TTAddress("/TP.1"));
+                
+                // cache the condition and register it into the namespace
+                address = getAddress(timeProcessId).appendAddress(TTAddress("/start"));
                 cacheTimeCondition(triggerId, timeCondition, address);
 
                 // if it is a condition for i-score
                 std::map<TTObjectBasePtr, TimeConditionId>::iterator it = TTCondToID.find(timeCondition.instance());
                 if (it != TTCondToID.end()) {
+                    
+                    // cache the condition without registering it into the namespace
+                    cacheTimeCondition(triggerId, timeCondition);
 
                     // add it in the conditions map
                     m_conditionsMap[it->second].push_back(triggerId);
@@ -3507,11 +3508,13 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
             
             if (timeCondition.valid()) {
                 
-                // We cache the time process and the event index instead of the event itself
+                // cache the time process and the event index instead of the event itself
                 triggerId = cacheConditionedProcess(timeProcessId, END_CONTROL_POINT_INDEX);
             
-                // We cache the TTTimeCondition
-                address = scenarioAddress.getParent().appendAddress(TTAddress("/TP.1"));
+                // note : for the moment we consider it is not possible to create conditions at the end of boxes
+                
+                // cache the condition and register it into the namespace
+                address = getAddress(timeProcessId).appendAddress(TTAddress("/end"));
                 cacheTimeCondition(triggerId, timeCondition, address);
             }
         }
