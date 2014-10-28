@@ -827,6 +827,7 @@ BasicBox::updateStuff()
   QList<ConditionalRelation *>::iterator it3;
   for(it3 = _conditionalRelation.begin() ; it3 != _conditionalRelation.end() ; it3++)
       (*it3)->updateCoordinates(ID());
+      //(*it3)->updateCoordinates();
 
   setFlag(QGraphicsItem::ItemIsMovable, true);
 }

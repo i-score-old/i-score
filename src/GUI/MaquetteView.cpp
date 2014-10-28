@@ -345,7 +345,7 @@ MaquetteView::zoomIn()
 
           resetCachedContent();
           _scene->update();
-
+          Maquette::getInstance()->setZooming(true);
           Maquette::getInstance()->updateBoxesFromEngines();
 
           //QPointF newCenter(2. * (mapFromGlobal(QCursor::pos()).x() + mapToScene(viewport()->rect().bottomLeft()).x()), getCenterCoordinates().y() );
@@ -360,6 +360,7 @@ MaquetteView::zoomIn()
         }
     }
   _scene->updateWidgets();
+  Maquette::getInstance()->setZooming(false);
 }
 
 QPointF
@@ -418,14 +419,16 @@ MaquetteView::zoomOut()
   _zoom /= 2.;
   resetCachedContent();
   _scene->update();
+  Maquette::getInstance()->setZooming(true);
   Maquette::getInstance()->updateBoxesFromEngines();
 
-  QPointF newCenter(getCenterCoordinates().x() -  _scene->getCurrentTime()/(MaquetteScene::MS_PER_PIXEL) , getCenterCoordinates().y());
+  QPointF newCenter(getCenterCoordinates().x() -  _scene->getCurrentTime()/(MaquetteScene::MS_PER_PIXEL) , getCenterCoordinates().y()/2);
   centerOn(newCenter);
   Maquette::getInstance()->setViewPosition(newCenter);
   _scene->updateProgressBar();
   _scene->zoomChanged(_zoom);
   setSceneRect((QRectF(0,0,_scene->getMaxSceneWidth(),_scene->height())));
+  Maquette::getInstance()->setZooming(false);
 }
 
 void

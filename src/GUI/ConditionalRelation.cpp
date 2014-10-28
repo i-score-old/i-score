@@ -118,8 +118,9 @@ void
 ConditionalRelation::updateCoordinates(unsigned int boxId)
 {
     /// \todo Maquette::getInstance()->getConditionDate(ID()); then update start/end;    
-
-    updateBoxesCoordinates(boxId);
+    if (!Maquette::getInstance()->isZooming() ) {
+        updateBoxesCoordinates(boxId);
+    }
     updateCoordinates();
 }
 

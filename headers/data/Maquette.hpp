@@ -948,6 +948,9 @@ signals:
      */
     void setCurveRecording(unsigned int boxID, std::string address, bool activated);
 
+    void setZooming(bool zoom) {_zooming = zoom;}
+
+    bool isZooming() {return _zooming;}
   private:
     /*!
      * \brief Generates the triggerQueueList.
@@ -1037,6 +1040,7 @@ signals:
 
     bool _recording;    //!< Handling recording state.
     bool _paused;       //!< Handling paused state.
+    bool _zooming = false;
 
     QDomDocument *_doc; //!< Handling document used for saving/loading.
 
