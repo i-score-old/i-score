@@ -3467,7 +3467,7 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
             
             timeProcess.get(kTTSym_name, name);
             
-            // Cache it and get an unique id for this process
+            // cache it and get an unique id for this process
             TTAddress address = scenarioAddress.appendAddress(TTAddress(name));
             timeProcessId = cacheTimeProcess(timeProcess, address, empty);
             
@@ -3482,10 +3482,6 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
             
                 // cache the time process and the event index instead of the event itself
                 triggerId = cacheConditionedProcess(timeProcessId, BEGIN_CONTROL_POINT_INDEX);
-                
-                // cache the condition and register it into the namespace
-                address = getAddress(timeProcessId).appendAddress(TTAddress("/start"));
-                cacheTimeCondition(triggerId, timeCondition, address);
 
                 // if it is a condition for i-score
                 std::map<TTObjectBasePtr, TimeConditionId>::iterator it = TTCondToID.find(timeCondition.instance());
@@ -3496,6 +3492,14 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
 
                     // add it in the conditions map
                     m_conditionsMap[it->second].push_back(triggerId);
+                    
+                    appendToCacheReadyCallback(it->second, triggerId);
+                }
+                else {
+                    
+                    // cache the condition and register it into the namespace
+                    address = getAddress(timeProcessId).appendAddress(TTAddress("/start"));
+                    cacheTimeCondition(triggerId, timeCondition, address);
                 }
             }
 
@@ -3650,6 +3654,14 @@ void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value
     
         // get condition ready state
         condition.get("ready", ready);
+        
+        iscoreEngineDebug {
+            
+            if (ready)
+                TTLogMessage("TriggerPoint %ld is part of a ready condition\n", triggerId);
+            else
+                TTLogMessage("TriggerPoint %ld is part of a none ready condition\n", triggerId);
+        }
     }
     else
         ready = true;
@@ -3704,6 +3716,14 @@ void TimeConditionReadyAttributeCallback(const TTValue& baton, const TTValue& va
         {
             triggerId = ConditionedProcessId(baton[i]);
             engine->m_TimeEventStatusAttributeCallback(triggerId, ready);
+            
+            iscoreEngineDebug {
+                
+                if (ready)
+                    TTLogMessage("TriggerPoint %ld is part of a ready condition\n", triggerId);
+                else
+                    TTLogMessage("TriggerPoint %ld is part of a none ready condition\n", triggerId);
+            }
         }
     }
 }
