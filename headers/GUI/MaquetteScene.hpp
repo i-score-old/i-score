@@ -564,6 +564,7 @@ class MaquetteScene : public QGraphicsScene
     void conditionBoxes(QList<BasicBox *> boxesToCondition);
 
     bool multipleBoxesSelected();
+
 protected:
 
     /*!
@@ -673,6 +674,7 @@ protected:
     bool noBoxSelected();
     inline void resetSelection(){ clearSelection(); }
     void updateBoxesWidgets();
+    void updateBoxesButtons();
     void unselectAll();
 
   private:

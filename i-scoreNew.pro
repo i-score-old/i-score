@@ -6,18 +6,18 @@ QT += core network xml svg printsupport
 
 INCLUDEPATH += headers headers/GUI headers/data
 RESOURCES += i-score.qrc
-DEFINES += __Types__ TT_NO_DSP
+DEFINES += __Types__ TT_NO_DSP Q_COMPILER_INITIALIZER_LISTS
 
 ICON = resources/images/i-score.icns
 resources/translations = i-score_en.ts i-score_fr.ts
 
 unix {
-    INCLUDEPATH += /usr/local/jamoma/include /usr/include/libxml2
+    INCLUDEPATH += /usr/local/lib/jamoma/include /usr/local/jamoma/include /usr/include/libxml2
     QMAKE_CXXFLAGS += -std=c++11  -Wno-unused-parameter -Wno-deprecated-register
     QMAKE_CXXFLAGS_RELEASE += -O3 -fPIC
-    QMAKE_LFLAGS += -L/usr/local/lib/jamoma/lib -L/usr/local/lib/ -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
+    QMAKE_LFLAGS += -Wl,-rpath,/usr/local/lib/jamoma/lib  -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions
 
-    LIBS += -L/usr/local/jamoma/lib -lJamomaFoundation -lJamomaDSP -lJamomaScore -lJamomaModular
+    LIBS += -L/usr/local/lib/jamoma/lib -L/usr/local/lib/ -L/usr/local/jamoma/lib -lJamomaFoundation -lJamomaDSP -lJamomaScore -lJamomaModular
     LIBS += -lxml2 -lgecodeint -lgecodesearch -lgecodedriver -lgecodeflatzinc -lgecodekernel -lgecodeminimodel -lgecodeset -lgecodesupport
 
     contains(QMAKE_HOST.arch, 86){

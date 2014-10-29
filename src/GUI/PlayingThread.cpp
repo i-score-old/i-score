@@ -70,7 +70,7 @@ void PlayingThread::start()
 
 void PlayingThread::stop()
 {
-  _timer.stop();
+  //_timer.stop();
 }
 
 void PlayingThread::update()

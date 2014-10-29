@@ -449,7 +449,7 @@ Relation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
   double startX = mapFromScene(_start).x();
 
   if (_leftHandleSelected) {
-      changeBounds(_abstract->maxBound() == NO_BOUND ? std::max(eventPosX - startX, 0.) : std::min((float)std::max((eventPosX - startX)/_scene->zoom(), 0.), _abstract->maxBound()),
+      changeBounds(_abstract->maxBound() == NO_BOUND ? std::max((eventPosX - startX)/_scene->zoom(), 0.) : std::min((float)std::max((eventPosX - startX)/_scene->zoom(), 0.), _abstract->maxBound()),
                    _abstract->maxBound());
       _scene->changeRelationBounds(_abstract->ID(), NO_LENGTH, _abstract->minBound(), _abstract->maxBound());
       update();
@@ -457,7 +457,7 @@ Relation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
   else if (_rightHandleSelected) {
       _scene->changeRelationBounds(_abstract->ID(), NO_LENGTH, _abstract->minBound(), std::max((float)std::max((eventPosX - startX)/_scene->zoom(), 0.), _abstract->minBound()));
       update();
-    }
+      }
   else if (_middleHandleSelected) {
       BasicBox *rightBox = _scene->getBox(_abstract->secondBox());
       _scene->changeRelationBounds(_abstract->ID(), NO_LENGTH, NO_BOUND, NO_BOUND);
@@ -466,7 +466,7 @@ Relation::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
       rightBox->setTopLeft(rightBox->getTopLeft() + QPointF(factorX, 0.));
       rightBox->updateStuff();
       _scene->boxMoved(rightBox->ID());
-    }
+  }
 }
 
 void

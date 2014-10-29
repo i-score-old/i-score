@@ -96,7 +96,7 @@ Maquette::init()
     // note : this is a temporary solution to test new Score framework easily
     delete _engines;
         
-    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, &deviceCallback, jamomaFolder);
+    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, &deviceCallback, &deviceConnectionErrorCallback, jamomaFolder);
 
     //Creating rootBox as the mainScenario
     auto scenarioAb = new AbstractParentBox();
@@ -2158,8 +2158,15 @@ void
 deviceCallback(TTSymbol& deviceName)
 {
 	auto tree = Maquette::getInstance()->scene()->editor()->networkTree();
-    tree->refreshItemNamespace(tree->getItemFromAddress(deviceName.c_str()), false);
+    emit tree->deviceUpdated(tree->getItemFromAddress(deviceName.c_str()), false);
     std::cerr << "Maquette::deviceCallback : " << deviceName.c_str() << std::endl;
+}
+
+void
+deviceConnectionErrorCallback(TTSymbol& deviceName, TTSymbol& errorInfo)
+{
+    // TODO : pop-up info to notify the user
+	emit Maquette::getInstance()->deviceConnectionFailed(QString(deviceName.c_str()), QString(errorInfo.c_str()));
 }
 
 void

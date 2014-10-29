@@ -34,12 +34,14 @@ Engine::Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, boo
                void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
                void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
                void (*networkDeviceNamespaceCallback)(TTSymbol&),
+               void (*networkDeviceConnectionError)(TTSymbol&, TTSymbol&),
                std::string pathToTheJamomaFolder)
 {
     m_TimeEventStatusAttributeCallback = timeEventStatusAttributeCallback;
     m_TimeProcessSchedulerRunningAttributeCallback = timeProcessSchedulerRunningAttributeCallback;
     m_TransportDataValueCallback = transportDataValueCallback;
     m_NetworkDeviceNamespaceCallback = networkDeviceNamespaceCallback;
+    m_NetworkDeviceConnectionError = networkDeviceConnectionError;
     
     m_nextTimeProcessId = 1;
     m_nextIntervalId = 1;
@@ -100,74 +102,121 @@ void Engine::registerIscoreToProtocols()
 {
     TTObject    aProtocol;
     TTErr       err;
-    TTValue     out;
+    TTValue     none, out;
     
     
     TTLogMessage("\n*** Enable Minuit communication ***\n");
     ////////////////////////////////////////////////////////////////////////
     
     // create a Minuit protocol unit
-    err = m_applicationManager.send("ProtocolInstantiate", "Minuit", out);
-    
-    if (err) {
-        TTLogError("Error : can't create Minuit protocol unit \n");
-        return;
-    }
-    else
-        aProtocol = out[0];
-    
-    // register i-score to the Minuit protocol
-    aProtocol.send("ApplicationRegister", iscore, out);
-    
-    // select i-score to set its Minuit protocol parameters
-    aProtocol.send("ApplicationSelect", iscore, out);
-    aProtocol.set("port", MINUIT_INPUT_PORT);
-    aProtocol.set("ip", "127.0.0.1");
+	try
+	{
+	    err = m_applicationManager.send("ProtocolInstantiate", "Minuit", out);
+	    
+	    if (err) {
+	        TTLogError("Error : can't create Minuit protocol unit \n");
+	        return;
+	    }
+	    else
+	        aProtocol = out[0];
+	    
+	    // register i-score to the Minuit protocol
+	    aProtocol.send("ApplicationRegister", iscore, out);
+	    
+	    // select i-score to set its Minuit protocol parameters
+	    aProtocol.send("ApplicationSelect", iscore, out);
+	    aProtocol.set("port", MINUIT_INPUT_PORT);
+	    aProtocol.set("ip", "127.0.0.1");
 
-    // launch Minuit protocol communication
-    aProtocol.send("Run");
+	    // launch Minuit protocol communication
+	    // launch Minuit protocol communication
+    	err = aProtocol.send("Run", none, out);
     
+    	if (err) {
+        	out.toString();
+        	TTSymbol errorInfo = TTSymbol(TTString(out[0]));
+        	m_NetworkDeviceConnectionError(iscore, errorInfo);
+    	}
+
+		m_workingProtocols.push_back("Minuit");
+	}
+	catch(TTException& e)
+	{
+		TTLogError("Error : could not instantiate Minuit protocol: ");
+		TTLogError(e.getReason());
+	}
     
     TTLogMessage("\n*** Enable OSC communication ***\n");
     ////////////////////////////////////////////////////////////////////////
     
     // create a OSC protocol unit
-    err = m_applicationManager.send("ProtocolInstantiate", "OSC", out);
+	try
+	{
+	    err = m_applicationManager.send("ProtocolInstantiate", "OSC", out);
+	    
+	    if (err) {
+	        TTLogError("Error : can't create OSC protocol unit \n");
+	        return;
+	    }
+
+	    aProtocol = out[0];
+	    
+	    // register i-score to the OSC protocol
+	    aProtocol.send("ApplicationRegister", iscore, out);
+	    
+	    // select i-score to set its OSC protocol parameters
+	    aProtocol.send("ApplicationSelect", iscore, out);
+	    aProtocol.set("port", OSC_INPUT_PORT);
+	    aProtocol.set("ip", "127.0.0.1");
+	    
+	    // launch Minuit protocol communication
+    	err = aProtocol.send("Run", none, out);
     
-    if (err) {
-        TTLogError("Error : can't create OSC protocol unit \n");
-        return;
-    }
-    else
-        aProtocol = out[0];
-    
-    // register i-score to the OSC protocol
-    aProtocol.send("ApplicationRegister", iscore, out);
-    
-    // select i-score to set its OSC protocol parameters
-    aProtocol.send("ApplicationSelect", iscore, out);
-    aProtocol.set("port", OSC_INPUT_PORT);
-    aProtocol.set("ip", "127.0.0.1");
-    
-    // launch OSC protocol communication
-    aProtocol.send("Run");
-    
+    	if (err) {
+        	out.toString();
+        	TTSymbol errorInfo = TTSymbol(TTString(out[0]));
+        	m_NetworkDeviceConnectionError(iscore, errorInfo);
+    	}
+		
+		m_workingProtocols.push_back("OSC");
+	}
+	catch(TTException& e)
+	{
+		TTLogError("Error : could not instantiate OSC protocol: ");
+		TTLogError(e.getReason());
+	}
     
     TTLogMessage("\n*** Enable MIDI communication ***\n");
     ////////////////////////////////////////////////////////////////////////
     
     // create a OSC protocol unit
-    err = m_applicationManager.send("ProtocolInstantiate", "MIDI", out);
+	try 
+	{
+	    err = m_applicationManager.send("ProtocolInstantiate", "MIDI", out);
     
-    if (err) {
-        TTLogError("Error : can't create MIDI protocol unit \n");
-        return;
-    }
-    else
-        aProtocol = out[0];
+	    if (err) {
+	        TTLogError("Error : can't create MIDI protocol unit \n");
+	        return;
+	    }
+	    
+	    aProtocol = out[0];
     
-    // launch MIDI protocol communication
-    aProtocol.send("Run");
+	    // launch Minuit protocol communication
+    	err = aProtocol.send("Run", none, out);
+    
+    	if (err) {
+        	out.toString();
+        	TTSymbol errorInfo = TTSymbol(TTString(out[0]));
+        	m_NetworkDeviceConnectionError(iscore, errorInfo);
+    	}
+		
+		m_workingProtocols.push_back("MIDI");
+	}
+	catch(TTException& e)
+	{
+		TTLogError("Error : could not instantiate MIDI protocol: ");
+		TTLogError(e.getReason());
+	}
 }
 
 void Engine::initScore(const char* pathToTheJamomaFolder)
@@ -475,16 +524,25 @@ void Engine::clearConditionedProcess()
     m_nextConditionedProcessId = 1;
 }
 
-void Engine::cacheTimeCondition(ConditionedProcessId triggerId, TTObject& timeCondition)
+void Engine::cacheTimeCondition(ConditionedProcessId triggerId, TTObject& timeCondition, TTAddress& anAddress)
 {
     EngineCacheElementPtr   e;
-    TTValue                 args, v;
+    TTValue                 args, out;
     
     e = new EngineCacheElement();
     e->object = timeCondition;
     e->index = triggerId;
+    e->address = anAddress;
+    
+    if (e->address != kTTAdrsEmpty) {
+        args = TTValue(e->address, e->object);
+        m_iscore.send("ObjectRegister", args, out);
+    }
     
     m_timeConditionMap[triggerId] = e;
+    
+    // We cache an observer on time condition ready attribute
+    cacheReadyCallback(triggerId);
 }
 
 TTObject& Engine::getTimeCondition(ConditionedProcessId triggerId)
@@ -495,6 +553,12 @@ TTObject& Engine::getTimeCondition(ConditionedProcessId triggerId)
 void Engine::uncacheTimeCondition(ConditionedProcessId triggerId)
 {
     EngineCacheElementPtr   e = m_timeConditionMap[triggerId];
+    
+    TTValue out;
+    m_iscore.send("ObjectUnregister", e->address, out);
+    
+    // Uncache observer on time condition ready attribute
+    uncacheReadyCallback(triggerId);
     
     delete e;
     m_timeConditionMap.erase(triggerId);
@@ -631,6 +695,82 @@ void Engine::uncacheStatusCallback(ConditionedProcessId triggerId, TimeEventInde
     
     delete e;
     m_statusCallbackMap.erase(triggerId);
+}
+
+void Engine::cacheReadyCallback(ConditionedProcessId triggerId)
+{
+    EngineCacheElementPtr   e;
+    TTObject    timeCondition = getTimeCondition(triggerId);
+    TTValue     v, baton;
+    
+    // Create a new engine cache element
+    e = new EngineCacheElement();
+    e->index = triggerId;
+    
+    // create a TTCallback to observe time condition ready attribute (using TimeConditionReadyAttributeCallback)
+    e->object = TTObject("callback");
+    
+    baton = TTValue(TTPtr(this));
+    e->object.set("baton", baton);
+    e->object.set("function", TTPtr(&TimeConditionReadyAttributeCallback));
+    e->object.set("notification", TTSymbol("ConditionReadyChanged"));
+    
+    // observe the "ConditionReadyChanged" notification
+    timeCondition.registerObserverForNotifications(e->object);
+    
+    m_readyCallbackMap[triggerId] = e;
+}
+
+void Engine::uncacheReadyCallback(ConditionedProcessId triggerId)
+{
+    EngineCacheElementPtr   e = m_readyCallbackMap[triggerId];
+    TTObject    timeCondition = getTimeCondition(triggerId);
+    
+    // don't observe the "ConditionReadyChanged" notification anymore
+    timeCondition.unregisterObserverForNotifications(e->object);
+    
+    delete e;
+    m_readyCallbackMap.erase(triggerId);
+}
+
+void Engine::appendToCacheReadyCallback(ConditionedProcessId triggerId, ConditionedProcessId triggerIdToAppend)
+{
+    EngineCacheElementPtr   e = m_readyCallbackMap[triggerId];
+    TTObject    timeCondition = getTimeCondition(triggerId);
+    TTValue     baton, newBaton;
+    TTBoolean   found = false;
+    
+    e->object.get("baton", baton);
+    
+    newBaton.append(baton[0]);
+    for (TTUInt32 i = 1; i < baton.size(); i++)
+    {
+        if (ConditionedProcessId(baton[i]) == triggerIdToAppend)
+            found = true;
+        
+        newBaton.append(baton[i]);
+    }
+    
+    if (!found)
+        newBaton.append(triggerIdToAppend);
+    
+    e->object.set("baton", newBaton);
+}
+
+void Engine::removeFromCacheReadyCallback(ConditionedProcessId triggerId, ConditionedProcessId triggerIdToRemove)
+{
+    EngineCacheElementPtr   e = m_readyCallbackMap[triggerId];
+    TTObject    timeCondition = getTimeCondition(triggerId);
+    TTValue     baton, newBaton;
+    
+    e->object.get("baton", baton);
+    
+    newBaton.append(baton[0]);
+    for (TTUInt32 i = 1; i < baton.size(); i++)
+         if (ConditionedProcessId(baton[i]) != triggerIdToRemove)
+             newBaton.append(baton[i]);
+    
+    e->object.set("baton", newBaton);
 }
 
 // Edition ////////////////////////////////////////////////////////////////////////
@@ -1532,13 +1672,25 @@ bool Engine::setCurveSections(TimeProcessId boxId, std::string address, unsigned
         // edit parameters as : x1 y1 b1 x2 y2 b2
         parameters.resize(nbPoints * 3);
         
+        // DEBUG
+        // TTLogMessage("coeff[ ");
+        
         for (i = 0; i < parameters.size(); i = i+3) {
             
             parameters[i] = TTFloat64(percent[i/3] / 100.);
             parameters[i+1] = TTFloat64(y[i/3]);
-            parameters[i+2] = TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]) * TTFloat64(coeff[i/3]);
             
+            // from the second point
+            TTFloat64 c = coeff[i/3];
+            
+            // DEBUG
+            // TTLogMessage("%f ", c);
+            
+            parameters[i+2] = c * c * c * c;
         }
+        
+        // DEBUG
+        // TTLogMessage("]\n");
         
         // set first indexed curve only
         curve = objects[0];
@@ -1621,6 +1773,7 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
     ConditionedProcessId triggerId;
     TTValue     args, out;
     TTString    instance;
+    TTAddress   address;
     
     // get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
@@ -1644,8 +1797,13 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
     // we cache the time process and the event index instead of the event itself
     triggerId = cacheConditionedProcess(containingBoxId, controlPointIndex);
     
-    // we cache the TTTimeCondition
-    cacheTimeCondition(triggerId, timeCondition);
+     // cache the condition and register it into the namespace
+    if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
+        address = getAddress(containingBoxId).appendAddress(TTAddress("/start"));
+    else
+        address = getAddress(containingBoxId).appendAddress(TTAddress("/end"));
+    
+    cacheTimeCondition(triggerId, timeCondition, address);
 
     // note : see in setTriggerPointMessage to see how the expression associated to an event is edited
     
@@ -1680,10 +1838,11 @@ TimeConditionId Engine::createCondition(std::vector<ConditionedProcessId> trigge
     std::vector<ConditionedProcessId>::iterator it = triggerIds.begin();
     TimeConditionId conditionId = m_nextConditionedProcessId++;
     cacheTimeCondition(conditionId, getTimeCondition(*it));
-
+    appendToCacheReadyCallback(conditionId, *it);
+    
     for(++it ; it != triggerIds.end() ; ++it)
         attachToCondition(conditionId, *it);
-
+    
     return conditionId;
 }
 
@@ -1712,11 +1871,12 @@ void Engine::attachToCondition(TimeConditionId conditionId, ConditionedProcessId
 
         // add the event to the chosen time condition with the saved expression
         getTimeCondition(conditionId).send("EventAdd", timeEvent, out);
-//        setTriggerPointMessage(triggerId, expr);
 
         // modify the cache
         m_timeConditionMap[triggerId]->object = getTimeCondition(conditionId);
         m_conditionsMap[conditionId].push_back(triggerId);
+        
+        appendToCacheReadyCallback(conditionId, triggerId);
     }
 }
 
@@ -1760,7 +1920,11 @@ void Engine::detachFromCondition(TimeConditionId conditionId, ConditionedProcess
 
         // modify cache
         m_timeConditionMap[triggerId]->object = getTimeCondition(triggerId);
-        m_conditionsMap[conditionId].remove(triggerId);
+        
+        // théo : it is bad to modify the triggerIds cache here as detachFromCondition is used into a for loop in deleteCondition
+        //m_conditionsMap[conditionId].remove(triggerId);
+        
+        removeFromCacheReadyCallback(conditionId, triggerId);
     }
 }
 
@@ -1771,7 +1935,7 @@ void Engine::deleteCondition(TimeConditionId conditionId)
     TTObject    parentScenario;
     TTValue     out;
 
-    for(it = triggerIds.begin() ; it != triggerIds.end() ; ++it)
+    for (it = triggerIds.begin() ; it != triggerIds.end() ; ++it)
         detachFromCondition(conditionId, *it);
     
     // get parent scenario
@@ -2231,10 +2395,11 @@ void Engine::trigger(vector<ConditionedProcessId> triggerIds)
 
 void Engine::addNetworkDevice(const std::string & deviceName, const std::string & pluginToUse, const std::string & DeviceIp, const unsigned int & destinationPort, const unsigned int & receptionPort, const bool isInputPort, const std::string & stringPort)
 {
-    TTValue     args, out;
+    TTValue     args, none, out;
     TTSymbol    applicationName(deviceName);
     TTObject    anApplication;
     TTObject    aProtocol;
+    TTErr       err;
     
     // if the application doesn't already exist
     if (!accessApplication(applicationName)) {
@@ -2272,7 +2437,13 @@ void Engine::addNetworkDevice(const std::string & deviceName, const std::string 
             }
             
             // run the protocol
-            aProtocol.send("Run");
+            err = aProtocol.send("Run", none, out);
+            
+            if (err) {
+                out.toString();
+                TTSymbol errorInfo = TTSymbol(TTString(out[0]));
+                m_NetworkDeviceConnectionError(iscore, errorInfo);
+            }
         }
         
         // set the priority, service, tags and rangeBounds attributes as a cached attributes
@@ -2296,9 +2467,8 @@ void Engine::removeNetworkDevice(const std::string & deviceName)
     // if the application exists
     if (anApplication.valid()) {
         
-        // get the protocol names used by the application
-        v = accessApplicationProtocolNames(applicationName);
-        protocolName = v[0]; // we register application to 1 protocol only
+        // get the protocol name used by the application (we register distante application to 1 protocol only)
+        protocolName = accessApplicationProtocolNames(applicationName)[0];
         aProtocol = accessProtocol(protocolName);
         
         // stop the protocol for this application
@@ -2372,9 +2542,8 @@ bool Engine::isNetworkDeviceRequestable(const std::string deviceName)
     // if the application exists
     if (anApplication.valid()) {
         
-        // get the protocol names used by the application
-        v = accessApplicationProtocolNames(applicationName);
-        protocolName = v[0]; // we register application to 1 protocol only
+        // get the protocol name used by the application (we register distante application to 1 protocol only)
+        protocolName = accessApplicationProtocolNames(applicationName)[0];
         aProtocol = accessProtocol(protocolName);
         
         aProtocol.get("discover", out);
@@ -2587,7 +2756,7 @@ Engine::requestObjectChildren(const std::string & address, vector<string>& child
     if (!aDirectory->getTTNode(anAddress, &aNode)) {
 
         aNode->getChildren(S_WILDCARD, S_WILDCARD, nodeList);
-        nodeList.sort(&TTModularCompareNodePriorityThenNameThenInstance);
+        nodeList.sort(&compareNodePriorityThenNameThenInstance);
 
         for (nodeList.begin(); nodeList.end(); nodeList.next()) {
 
@@ -2617,12 +2786,15 @@ Engine::rebuildNetworkNamespace(const string &deviceName, const string &/*addres
     // if the application exists
     if (anApplication.valid()) {
         
-        // get the protocol names used by the application
-        v = accessApplicationProtocolNames(applicationName);
-        protocolName = v[0]; // we register application to 1 protocol only
+        // get the protocol name used by the application (we register distante application to 1 protocol only)
+        protocolName = accessApplicationProtocolNames(applicationName)[0];
         
         // Minuit case : use discovery mechanism
         if (protocolName == TTSymbol("Minuit")) {
+            
+            // only if there is no namespace observation !
+            if (m_namespaceObserver.valid())
+                return 1;
             
             anApplication.send("DirectoryBuild");
             return 0;
@@ -2765,7 +2937,6 @@ Engine::getDeviceStringParameter(const string device, const string protocol, con
 bool
 Engine::getDeviceProtocol(std::string deviceName, std::string &protocol)
 {
-    TTValue     v;
     TTSymbol    applicationName(deviceName);
     TTObject    anApplication = accessApplication(applicationName);
     TTSymbol    protocolName;
@@ -2773,9 +2944,8 @@ Engine::getDeviceProtocol(std::string deviceName, std::string &protocol)
     // if the application exists
     if (anApplication.valid()) {
         
-        // get the protocol names used by the application
-        v = accessApplicationProtocolNames(applicationName);
-        protocolName = v[0]; // we register application to 1 protocol only
+        // get the protocol name used by the application (we register distante application to 1 protocol only)
+        protocolName = accessApplicationProtocolNames(applicationName)[0];
         protocol = protocolName.c_str();
         return 0;
     }
@@ -2802,15 +2972,14 @@ Engine::setDevicePort(string deviceName, int destinationPort, int receptionPort)
     TTObject    anApplication = accessApplication(applicationName);
     TTSymbol    protocolName;
     TTObject    aProtocol;
-    TTValue     v, out;
+    TTValue     v, none, out;
     TTErr       err;
     
     // if the application exists
     if (anApplication.valid()) {
         
-        // get the protocol names used by the application
-        v = accessApplicationProtocolNames(applicationName);
-        protocolName = v[0]; // we register application to 1 protocol only
+        // get the protocol name used by the application (we register distante application to 1 protocol only)
+        protocolName = accessApplicationProtocolNames(applicationName)[0];
         aProtocol = accessProtocol(protocolName);
         
         err = aProtocol.send("ApplicationSelect", applicationName, out);
@@ -2820,9 +2989,15 @@ Engine::setDevicePort(string deviceName, int destinationPort, int receptionPort)
             aProtocol.send("Stop");
             
             v = TTValue(destinationPort, receptionPort);
-            err = aProtocol.set("port", v);
+            aProtocol.set("port", v);
             
-            aProtocol.send("Run");
+            err = aProtocol.send("Run", none, out);
+            
+            if (err) {
+                out.toString();
+                TTSymbol errorInfo = TTSymbol(TTString(out[0]));
+                m_NetworkDeviceConnectionError(applicationName, errorInfo);
+            }
             
             if (!err)
                 return 0;
@@ -2839,15 +3014,14 @@ Engine::setDeviceLocalHost(string deviceName, string localHost)
     TTObject    anApplication = accessApplication(applicationName);
     TTSymbol    protocolName;
     TTObject    aProtocol;
-    TTValue     v, out;
+    TTValue     v, none, out;
     TTErr       err;
     
     // if the application exists
     if (anApplication.valid()) {
         
-        // get the protocol names used by the application
-        v = accessApplicationProtocolNames(applicationName);
-        protocolName = v[0]; // we register application to 1 protocol only
+        // get the protocol name used by the application (we register distante application to 1 protocol only)
+        protocolName = accessApplicationProtocolNames(applicationName)[0];
         aProtocol = accessProtocol(protocolName);
         
         err = aProtocol.send("ApplicationSelect", applicationName, out);
@@ -2857,9 +3031,15 @@ Engine::setDeviceLocalHost(string deviceName, string localHost)
             aProtocol.send("Stop");
             
             v = TTSymbol(localHost);
-            err = aProtocol.set("ip", v);
+            aProtocol.set("ip", v);
             
-            aProtocol.send("Run");
+            err = aProtocol.send("Run", none, out);
+            
+            if (err) {
+                out.toString();
+                TTSymbol errorInfo = TTSymbol(TTString(out[0]));
+                m_NetworkDeviceConnectionError(applicationName, errorInfo);
+            }
             
             if (!err)
                 return 0;
@@ -2899,7 +3079,16 @@ bool Engine::setDeviceLearn(std::string deviceName, bool newLearn)
     TTSymbol    applicationName(deviceName);
     TTObject    anApplication = accessApplication(applicationName);
     
-    TTErr err = anApplication.set("learn", newLearn);
+    // get the protocol name used by the application (we register distante application to 1 protocol only)
+    TTSymbol    protocolName = accessApplicationProtocolNames(applicationName)[0];
+    TTErr       err;
+    TTValue     out;
+    
+    // depending of the protocol this application used
+    if (protocolName == "Minuit")
+        err = anApplication.send("DirectoryObserve", newLearn, out);
+    else
+        err = anApplication.set("learn", newLearn);
     
     // enable namespace observation
     if (newLearn && !m_namespaceObserver.valid()) {
@@ -3051,7 +3240,7 @@ int Engine::requestNetworkNamespace(const std::string & address, std::string & n
         aNode->getChildren(S_WILDCARD, S_WILDCARD, nodeList);
         
         // sort children
-        nodeList.sort(&TTModularCompareNodePriorityThenNameThenInstance);
+        nodeList.sort(&compareNodePriorityThenNameThenInstance);
 
         // sort children in leaves and nodes
         for (nodeList.begin(); nodeList.end(); nodeList.next()) {
@@ -3262,7 +3451,7 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
             // get a unique ID for the condition
             timeConditionId = m_nextConditionedProcessId++;
 
-            // cache it
+            // cache it but don't register it
             cacheTimeCondition(timeConditionId, timeCondition);
 
             // fill the temporary map
@@ -3283,34 +3472,42 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
             
             timeProcess.get(kTTSym_name, name);
             
-            // Cache it and get an unique id for this process
+            // cache it and get an unique id for this process
             TTAddress address = scenarioAddress.appendAddress(TTAddress(name));
             timeProcessId = cacheTimeProcess(timeProcess, address, empty);
             
             // if the Start event of the Automation process is conditioned
             timeProcess.get("startEvent", v);
             timeEvent = v[0];
-            
+
             timeEvent.get("condition", v);
             timeCondition = v[0];
             
-            if (timeCondition != nullptr) {
+            if (timeCondition.valid()) {
             
-                // We cache the time process and the event index instead of the event itself
+                // cache the time process and the event index instead of the event itself
                 triggerId = cacheConditionedProcess(timeProcessId, BEGIN_CONTROL_POINT_INDEX);
-            
-                // We cache the TTTimeCondition
-                cacheTimeCondition(triggerId, timeCondition);
 
                 // if it is a condition for i-score
                 std::map<TTObjectBasePtr, TimeConditionId>::iterator it = TTCondToID.find(timeCondition.instance());
                 if (it != TTCondToID.end()) {
+                    
+                    // cache the condition without registering it into the namespace
+                    cacheTimeCondition(triggerId, timeCondition);
 
                     // add it in the conditions map
                     m_conditionsMap[it->second].push_back(triggerId);
+                    
+                    appendToCacheReadyCallback(it->second, triggerId);
+                }
+                else {
+                    
+                    // cache the condition and register it into the namespace
+                    address = getAddress(timeProcessId).appendAddress(TTAddress("/start"));
+                    cacheTimeCondition(triggerId, timeCondition, address);
                 }
             }
-            
+
             // if the End event of the Automation process is conditioned
             timeProcess.get("endEvent", v);
             timeEvent = v[0];
@@ -3318,13 +3515,16 @@ void Engine::buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress)
             timeEvent.get("condition", v);
             timeCondition = v[0];
             
-            if (timeCondition != nullptr) {
+            if (timeCondition.valid()) {
                 
-                // We cache the time process and the event index instead of the event itself
+                // cache the time process and the event index instead of the event itself
                 triggerId = cacheConditionedProcess(timeProcessId, END_CONTROL_POINT_INDEX);
             
-                // We cache the TTTimeCondition
-                cacheTimeCondition(triggerId, timeCondition);
+                // note : for the moment we consider it is not possible to create conditions at the end of boxes
+                
+                // cache the condition and register it into the namespace
+                address = getAddress(timeProcessId).appendAddress(TTAddress("/end"));
+                cacheTimeCondition(triggerId, timeCondition, address);
             }
         }
         
@@ -3435,9 +3635,10 @@ void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value
 {
     EnginePtr               engine;
     ConditionedProcessId    triggerId;
-    TTObject                event;
+    TTObject                event, condition;
     TTValue                 v;
     TTSymbol                status;
+    TTBoolean               ready;
 	
 	// unpack baton (engine, triggerId)
 	engine = EnginePtr((TTPtr)baton[0]);
@@ -3450,13 +3651,33 @@ void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value
     event.get("status", v);
     status = v[0];
     
+    // get event condition
+    event.get("condition", v);
+    condition = v[0];
+    
+    if (condition.valid()) {
+    
+        // get condition ready state
+        condition.get("ready", ready);
+        
+        iscoreEngineDebug {
+            
+            if (ready)
+                TTLogMessage("TriggerPoint %ld is part of a ready condition\n", triggerId);
+            else
+                TTLogMessage("TriggerPoint %ld is part of a none ready condition\n", triggerId);
+        }
+    }
+    else
+        ready = true;
+    
     if (engine->m_TimeEventStatusAttributeCallback != nullptr) {
         
         if (status == kTTSym_eventWaiting) {
             engine->m_TimeEventStatusAttributeCallback(triggerId, false);
         }
         else if (status == kTTSym_eventPending) {
-            engine->m_TimeEventStatusAttributeCallback(triggerId, true);
+            engine->m_TimeEventStatusAttributeCallback(triggerId, ready);
         }
         else if (status == kTTSym_eventHappened) {
             engine->m_TimeEventStatusAttributeCallback(triggerId, false);
@@ -3478,6 +3699,35 @@ void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value
             }
             else if (status == kTTSym_eventDisposed) {
                 TTLogMessage("TriggerPoint %ld is disposed\n", triggerId);
+            }
+        }
+    }
+}
+
+void TimeConditionReadyAttributeCallback(const TTValue& baton, const TTValue& value)
+{
+    EnginePtr               engine;
+    ConditionedProcessId    triggerId;
+    TTObject                condition;
+    TTBoolean               ready = value[0];
+	
+	// unpack baton (engine, triggerId)
+	engine = EnginePtr((TTPtr)baton[0]);
+    
+    // only update for condition with more than one case
+    if (baton.size() > 2)
+    {
+        for (TTUInt32 i = 1; i < baton.size(); i++)
+        {
+            triggerId = ConditionedProcessId(baton[i]);
+            engine->m_TimeEventStatusAttributeCallback(triggerId, ready);
+            
+            iscoreEngineDebug {
+                
+                if (ready)
+                    TTLogMessage("TriggerPoint %ld is part of a ready condition\n", triggerId);
+                else
+                    TTLogMessage("TriggerPoint %ld is part of a none ready condition\n", triggerId);
             }
         }
     }
@@ -3561,66 +3811,3 @@ std::string Engine::toNetworkTreeAddress(TTAddress aTTAddress)
     
     return s;
 }
-
-#if 0
-#pragma mark -
-#pragma mark Miscellaneous Methods
-#endif
-
-TTBoolean TTModularCompareNodePriorityThenNameThenInstance(TTValue& v1, TTValue& v2)
-{
-	TTNodePtr	n1, n2;
-	TTObject    o1, o2;
-	TTValue		v;
-    TTValue     name1;
-    TTValue     name2;
-    TTValue     instance1;
-    TTValue     instance2;
-	TTInt32		p1 = 0;
-	TTInt32		p2 = 0;
-	
-	// get priority of v1
-	n1 = TTNodePtr((TTPtr)v1[0]);
-	if (n1) {
-        
-        name1 = n1->getName();
-        instance1 = n1->getInstance();
-		o1 = n1->getObject();
-		
-		if (o1.valid())
-			if (!o1.get(kTTSym_priority, v))
-				p1 = v[0];
-	}
-	
-	// get priority of v2
-	n2 = TTNodePtr((TTPtr)v2[0]);
-	if (n2) {
-        
-        name2 = n2->getName();
-        instance2 = n2->getInstance();
-		o2 = n2->getObject();
-		
-		if (o2.valid())
-			if (!o2.get(kTTSym_priority, v))
-				p2 = v[0];
-	}
-	
-	if (p1 == p2) {
-        
-        if (name1 == name2) {
-            
-            if (instance1 == instance2)
-                return v1 < v2;
-            else
-                return instance1 < instance2;
-        }
-        else
-            return name1 < name2;
-    }
-	
-	if (p1 == 0) return NO;
-	if (p2 == 0) return YES;
-	
-	return p1 < p2;
-}
-

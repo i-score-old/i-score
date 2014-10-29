@@ -123,6 +123,12 @@ MaquetteScene::init()
 
   /// \todo MainWindow appelle init() de MaquetteScene, qui instancie lui même Maquette puis l'init. (par jaime Chao)
   _maquette = Maquette::getInstance();
+  connect(_maquette, &Maquette::deviceConnectionFailed,
+		  this, [] (QString device, QString error) 
+		  { QMessageBox::warning(nullptr, 
+			  device, 
+              "Could not open port " + error + ". <br> <br> Maybe another instance of i-score is open <br> or another application is using it ?");
+		  });
   _maquette->setScene(this);
   _maquette->init();      
 
@@ -442,6 +448,7 @@ bool MaquetteScene::multipleBoxesSelected()
     return selectedItems().size() > 1;
 }
 
+
 QGraphicsItem *
 MaquetteScene::getSelectedItem()
 {
@@ -500,7 +507,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
   if (mouseEvent->modifiers() == Qt::ShiftModifier) {
       setCurrentMode(SELECTION_MODE);
     }
-  else if ((noBoxSelected() || subScenarioMode(mouseEvent)) && mouseEvent->modifiers()==Qt::ControlModifier) {
+  else if (!playing() && (noBoxSelected() || subScenarioMode(mouseEvent)) && mouseEvent->modifiers()==Qt::ControlModifier) {
       setCurrentMode(CREATION_MODE);
     }  
   else {
@@ -1997,12 +2004,26 @@ MaquetteScene::updateBoxesWidgets()
 
   for (it = boxes.begin(); it != boxes.end(); it++) {
       unsigned int boxID = it->first;
-      static_cast<AbstractBox*>(getBox(boxID)->abstract())->clearMessages();      
+      static_cast<AbstractBox*>(getBox(boxID)->abstract())->clearMessages();
       if (boxID != NO_ID) {
           setAttributes(static_cast<AbstractBox*>(getBox(boxID)->abstract()));
         }
     }
-    _editor->setBoxEdited(currentBoxSave); //Because setAttributes changes currentBoxEdited value. And the edited box became an unselected one.
+  _editor->setBoxEdited(currentBoxSave); //Because setAttributes changes currentBoxEdited value. And the edited box became an unselected one.
+}
+
+void MaquetteScene::updateBoxesButtons()
+{
+    std::map<unsigned int, BasicBox*>::iterator it;
+    std::map<unsigned int, BasicBox*> boxes = _maquette->getBoxes();
+    it = boxes.begin();
+    ++it;
+    while (it != boxes.end()) {
+        BasicBox* box = it->second;
+        //box->updatePlayingModeButtons();
+        box->setButtonsVisible(playing());
+        it++;
+    }
 }
 
 void
