@@ -96,6 +96,8 @@ class NetworkTree : public QTreeWidget
     QString getDeviceName(QTreeWidgetItem *item) const;
     QString getAbsoluteAddressWithValue(QTreeWidgetItem *item, int column) const;
 
+
+    QList<std::string> getAddressList();
     /*!
      * \brief Gets the absolute address of an item in the snapshot tree.
      *

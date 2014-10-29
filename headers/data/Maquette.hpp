@@ -951,6 +951,9 @@ signals:
     void setZooming(bool zoom) {_zooming = zoom;}
 
     bool isZooming() {return _zooming;}
+
+    QList<string> addressList();
+
   private:
     /*!
      * \brief Generates the triggerQueueList.
