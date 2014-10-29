@@ -22,6 +22,7 @@ public slots :
     void expressionChanged();
     void autoTriggerChanged();
     void edit();
+    void addressFilter(QString deviceSelected);
 
 private :
     AbstractTriggerPoint    *_abstract;
@@ -36,7 +37,7 @@ private :
     QLabel                  *_deviceLabel;
     QLabel                  *_conditionLabel;
 
-    QLineEdit               *_addressEdit;
+    QComboBox               *_addressEdit;
     QComboBox               *_deviceEdit;
     QLineEdit               *_conditionEdit;
     QCheckBox               *_autoTriggerCheckBox;
@@ -46,6 +47,8 @@ private :
     QString address = "";
     QString expression = "";
     QString condition = "";
+
+    QList<string>           addresses;
 
 };
 
