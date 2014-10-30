@@ -2186,6 +2186,16 @@ NetworkTree::getAbsoluteAddressWithValue(QTreeWidgetItem *item, int column) cons
   return address;
 }
 
+QList<string> NetworkTree::getAddressList()
+{
+    QList<string> addressList;
+    QMap<QTreeWidgetItem *, string>::iterator it;
+    for (it = _addressMap.begin(); it != _addressMap.end(); it++) {
+        addressList << it.value();
+    }
+    return addressList;
+}
+
 void
 NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue)
 {
