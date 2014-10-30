@@ -8,7 +8,6 @@
 #include <QLabel>
 #include <QCheckBox>
 #include "AbstractTriggerPoint.hpp"
-#include <vector>
 
 class TriggerPointEdit : public QDialog
 {
@@ -23,8 +22,6 @@ public slots :
     void expressionChanged();
     void autoTriggerChanged();
     void edit();
-    void addressFilter(QString deviceSelected, QString currentEntry = "");
-    void manualAddressChange(QString newEntry);
 
 private :
     AbstractTriggerPoint    *_abstract;
@@ -34,32 +31,11 @@ private :
 
     QPushButton             *_okButton;
     QPushButton             *_cancelButton;
-
-    QLabel                  *_addressLabel;
-    QLabel                  *_deviceLabel;
-    QLabel                  *_operatorLabel;
-    QLabel                  *_conditionLabel;
-
-    QComboBox               *_addressEdit;
-    QComboBox               *_deviceEdit;
-    QComboBox               *_operatorEdit;
-    QLineEdit               *_conditionEdit;
+    QLabel                  *_expressionLabel;
+    QLineEdit               *_expressionEdit;
     QCheckBox               *_autoTriggerCheckBox;
 
-    QLineEdit               *_userAddressEdit;
-
     QGridLayout             *_layout;
-
-    QString address = "";
-    QString expression = "";
-    QString device;
-
-    QList<string>           addresses;
-    std::vector<string>    _operators;
-
-    void init();
-    void parseMessage(string message, QString &extractedAddress, QString &extractedExpression);
-
 };
 
 #endif // TRIGGERPOINTEDIT_HPP
