@@ -2199,9 +2199,12 @@ bool Engine::play(TimeProcessId processId)
     // start the time process
     TTErr err = getTimeProcess(processId).send("Start");
     
-    // start its sub scenario
-    if (processId != ROOT_BOX_ID)
-        getSubScenario(processId).send("Start");
+    // start its sub scenario but don't push the start event state one more time
+    if (processId != ROOT_BOX_ID) {
+        
+        TTValue out;
+        getSubScenario(processId).send("Start", TTBoolean(NO), out);
+    }
     
     return err == kTTErrNone;
 }
