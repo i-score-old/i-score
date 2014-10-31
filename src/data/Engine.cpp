@@ -2196,8 +2196,12 @@ bool Engine::play(TimeProcessId processId)
     TTLogMessage("***************************************\n");
     TTLogMessage("Engine::play\n");
     
-    // make the start event to happen
+    // start the time process
     TTErr err = getTimeProcess(processId).send("Start");
+    
+    // start its sub scenario
+    if (processId != ROOT_BOX_ID)
+        getSubScenario(processId).send("Start");
     
     return err == kTTErrNone;
 }
