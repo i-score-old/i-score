@@ -28,18 +28,19 @@ void NetworkUpdater::update()
 						receptionPort = ed->_portInputBox->value();
 
 		Maquette:: getInstance()->addNetworkDevice(name, protocol, ip, destinationPort, receptionPort);
-        emit newDeviceAdded(QString::fromStdString(ed->currentDevice())); //sent to networkTree
+        emit newDeviceAdded(QString::fromStdString(name)); //sent to networkTree
 
-        ed->_currentDevice = QString::fromStdString(ed->currentDevice());
+        ed->_currentDevice = QString::fromStdString(name);
 
 		ed->_newDevice = false;
 	}
 
 	else if (ed->_changed) {
 		if (ed->_nameChanged) {
-            Maquette::getInstance()->setDeviceName(ed->_currentDevice.toStdString(), ed->currentDevice());
+            string name = ed->currentDevice();
+            Maquette::getInstance()->setDeviceName(ed->_currentDevice.toStdString(), name);
             emit(deviceNameChanged(ed->_currentDevice, QString::fromStdString(ed->currentDevice())));
-            ed->_currentDevice = QString::fromStdString(ed->currentDevice());
+            ed->_currentDevice = QString::fromStdString(name);
 		}
 		if (ed->_localHostChanged) {
 			Maquette::getInstance()->setDeviceLocalHost(ed->_currentDevice.toStdString(), ed->_localHostBox->text().toStdString());

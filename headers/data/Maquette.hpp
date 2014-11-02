@@ -798,8 +798,11 @@ class Maquette : public QObject
 
     std::vector<std::string> getMIDIInputDevices();
     std::vector<std::string> getMIDIOutputDevices();
+	const std::vector<std::string>& getWorkingProtocols()
+	{ return _engines->workingProtocols(); }
 signals:
      void boxIsRunningSignal(unsigned int boxId, bool running);
+	 void deviceConnectionFailed(QString, QString);
   
   public slots:
     /*
@@ -945,6 +948,12 @@ signals:
      */
     void setCurveRecording(unsigned int boxID, std::string address, bool activated);
 
+    void setZooming(bool zoom) {_zooming = zoom;}
+
+    bool isZooming() {return _zooming;}
+
+    QList<string> addressList();
+
   private:
     /*!
      * \brief Generates the triggerQueueList.
@@ -1034,6 +1043,7 @@ signals:
 
     bool _recording;    //!< Handling recording state.
     bool _paused;       //!< Handling paused state.
+    bool _zooming = false;
 
     QDomDocument *_doc; //!< Handling document used for saving/loading.
 
@@ -1076,4 +1086,12 @@ void executionFinishedCallback();
  * \param deviceName : the name of the device to refresh
  */
 void deviceCallback(TTSymbol& deviceName);
+
+/*!
+ * \brief Callback called when device connection failed
+ *
+ * \param deviceName : the name of the device which failed
+ * \param errorInfo : inforamtion about why it failed
+ */
+void deviceConnectionErrorCallback(TTSymbol& deviceName, TTSymbol& errorInfo);
 #endif

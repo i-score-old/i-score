@@ -75,7 +75,9 @@ DeviceEdit::init()
   _localHostBox = new QLineEdit;
   _nameEdit = new QLineEdit;
   _protocolsComboBox = new QComboBox;
-  _protocolsComboBox->addItems({"Minuit", "OSC", "MIDI"});
+  auto protocols = Maquette::getInstance()->getWorkingProtocols();
+  for(auto& protocol : protocols) 
+	  _protocolsComboBox->addItem(QString::fromStdString(protocol));
 
   _namespaceFilePath = new QLineEdit;
 /*
@@ -366,6 +368,32 @@ void DeviceEdit::setCorrespondingProtocolLayout()
       setMidiLayout();
     }
 
+    /*
+    // adding a number if many default name are used (ex OSCdevice.1 for the 2nd OSCdevice)
+    std::map<std::string, MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
+    std::map<std::string, MyDevice>::iterator it;
+    int i = 0;
+    std::string lastDefaultName;
+    for (it = devices.begin(); it != devices.end(); it++) {
+        if (it->first.find(defaultName.toStdString()) == 0 ) {
+            i++;
+            lastDefaultName = it->first;
+            std::cout << lastDefaultName << std::endl;
+        }
+    }
+
+    if (i != 0) {
+        lastDefaultName.erase(0, defaultName.size()+1);
+        if(!lastDefaultName.empty()) {
+            i = std::stoi(lastDefaultName) + 1;
+        }
+        std::cout << i << std::endl;
+        QString newDefaultName = defaultName + ".";
+        newDefaultName += QString(std::to_string(i).c_str());
+        defaultName = newDefaultName;
+    }
+*/
+    checkName(defaultName);
     _localHostBox->setText(defaultLocalHost);
     _portOutputBox->setValue(defaultPort);
     _portInputBox->setValue(defaultInputPort);
@@ -421,6 +449,31 @@ DeviceEdit::openFileDialog()
 void
 DeviceEdit::setNamespacePathChanged(){
     _namespacePathChanged = true;
+}
+
+void DeviceEdit::checkName(QString &name)
+{
+    std::map<std::string, MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
+    std::map<std::string, MyDevice>::iterator it;
+    int i = 0;
+    std::string lastName;
+    for (it = devices.begin(); it != devices.end(); it++) {
+        if (it->first.find(name.toStdString()) == 0 ) {
+            i++;
+            lastName = it->first;
+        }
+    }
+    QString newName = name;
+    if (i != 0) {
+        lastName.erase(0, name.size()+1);
+        if(!lastName.empty()) {
+            i = std::stoi(lastName) + 1;
+            std::cout << lastName << std::endl;
+        }
+        newName += ".";
+        newName += QString(std::to_string(i).c_str());
+    }
+    name = newName;
 }
 
 void

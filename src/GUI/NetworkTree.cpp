@@ -2186,6 +2186,20 @@ NetworkTree::getAbsoluteAddressWithValue(QTreeWidgetItem *item, int column) cons
   return address;
 }
 
+QList<string> NetworkTree::getAddressList()
+{
+    string nodeType;
+    QList<string> addressList;
+    QMap<QTreeWidgetItem *, string>::iterator it;
+    for (it = _addressMap.begin(); it != _addressMap.end(); it++) {
+        if( it.key()->toolTip(NetworkTree::TYPE_COLUMN) == "Type parameter" || it.key()->toolTip(NetworkTree::TYPE_COLUMN) == "Type message" ) {
+            addressList << it.value();
+  //          qDebug() << nodeType.c_str();
+        }
+    }
+    return addressList;
+}
+
 void
 NetworkTree::changeStartValue(QTreeWidgetItem *item, QString newValue)
 {

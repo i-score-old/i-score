@@ -399,26 +399,39 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
             if (_movingBreakpointX != -1) {
                 map<float, pair<float, float> >::iterator it;
 
-                if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end()) {
-                    float mousePosY = relativePoint.y();
-                    float pow = 1.;
-                    float min = 100;
-                    float div;
-                    float rigidity = 2;
-                    float ratio = std::max<double>(0.1, fabs(std::log(it->second.first)));
+				if ((it = _abstract->_breakpoints.find(_movingBreakpointX)) != _abstract->_breakpoints.end())
+				{
+					auto it2 = it;
+					float previousYval = (--it2)->second.first;
+					bool under = it->second.first <= previousYval;
+					float mousePosY = relativePoint.y();
+					float pow = 1.;
+					float min = 100;
+					float div;
+					float rigidity = 2;
+					float ratio = std::max<double>(0.1, fabs(std::log(it->second.first)));
+					float ratioModifier{under?0.5f:1.0f};;
 
-                    if (mousePosY > it->second.first) { // mouse under : pow between 0 and 1
-                        div = std::min((double)min, (double)std::max(fabs(_maxY), fabs(_minY)));
-                        pow = std::max(1 - std::min((mousePosY - it->second.first)/(rigidity*ratio), min) / (double)div, 0.01);
-                    }
-                    else if (it->second.first > mousePosY) { // mouse above : pow between 1 and 6
-                        div = std::min<double>((double)min, std::max(fabs(_maxY), fabs(_minY))) / 10;
-                        pow = 1 + std::min((it->second.first - mousePosY)/(rigidity*ratio), min) / div;
-                    }
-                    it->second = std::make_pair(it->second.first, pow);
-                    _movingBreakpointY = -1;
-                    curveChanged();
-                }
+					if (mousePosY > it->second.first)
+					{ // mouse under : pow between 0 and 1
+						div = std::min((double)min, (double)std::max(fabs(_maxY), fabs(_minY)));
+						pow = std::max(1 - std::min((mousePosY - it->second.first)/(rigidity*ratio*ratioModifier), min) / (double)div, 0.01);
+					}
+					else if (it->second.first > mousePosY)
+					{ // mouse above : pow between 1 and 6
+						div = std::min<double>((double)min, std::max(fabs(_maxY), fabs(_minY))) / 10;
+						pow = 1 + std::min((it->second.first - mousePosY)/(rigidity*ratio), min) / div;
+					}
+
+					if (under)
+					{
+						pow = 1.0 / pow;
+					}
+
+					it->second = std::make_pair(it->second.first, pow);
+					_movingBreakpointY = -1;
+					curveChanged();
+				}
             }
             break;
         }

@@ -33,8 +33,10 @@ class DeviceEdit : public QDialog
 
     std::string currentDevice()
     {
+        QString deviceName = _nameEdit->text();
+        checkName(deviceName);
         return _protocolsComboBox->currentText().toStdString() != "MIDI" ?
-                    _nameEdit->text().toStdString()
+                    deviceName.toStdString()
                :
                     _midiDevicesBox.currentText().toStdString();
     }
@@ -51,6 +53,8 @@ class DeviceEdit : public QDialog
     void openFileDialog();
     void setNamespacePathChanged();
 
+    // adding a number if the name is already used (ex OSCdevice.1 for the 2nd OSCdevice)
+    void checkName(QString &name);
 
   signals:
 	void deviceChanged(QString);

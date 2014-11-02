@@ -96,7 +96,7 @@ Maquette::init()
     // note : this is a temporary solution to test new Score framework easily
     delete _engines;
         
-    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, &deviceCallback, jamomaFolder);
+    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, &deviceCallback, &deviceConnectionErrorCallback, jamomaFolder);
 
     //Creating rootBox as the mainScenario
     auto scenarioAb = new AbstractParentBox();
@@ -109,7 +109,12 @@ Maquette::init()
 
 Maquette::Maquette() : _engines(nullptr)
 {
-	connect(this, SIGNAL(boxIsRunningSignal(uint,bool)), this, SLOT(boxIsRunningSlot(uint,bool)), Qt::QueuedConnection);
+    connect(this, SIGNAL(boxIsRunningSignal(uint,bool)), this, SLOT(boxIsRunningSlot(uint,bool)), Qt::QueuedConnection);
+}
+
+QList<std::string> Maquette::addressList()
+{
+    return _scene->editor()->networkTree()->getAddressList();
 }
 
 Maquette::~Maquette()
@@ -2160,6 +2165,13 @@ deviceCallback(TTSymbol& deviceName)
 	auto tree = Maquette::getInstance()->scene()->editor()->networkTree();
     emit tree->deviceUpdated(tree->getItemFromAddress(deviceName.c_str()), false);
     std::cerr << "Maquette::deviceCallback : " << deviceName.c_str() << std::endl;
+}
+
+void
+deviceConnectionErrorCallback(TTSymbol& deviceName, TTSymbol& errorInfo)
+{
+    // TODO : pop-up info to notify the user
+	emit Maquette::getInstance()->deviceConnectionFailed(QString(deviceName.c_str()), QString(errorInfo.c_str()));
 }
 
 void
