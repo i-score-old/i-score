@@ -2197,7 +2197,7 @@ bool Engine::play(TimeProcessId processId)
     TTLogMessage("Engine::play\n");
     
     // start the time process
-    TTErr err = getTimeProcess(processId).send("Start");
+    TTErr err = getTimeProcess(processId).send("Play");
   
     return err == kTTErrNone;
 }
