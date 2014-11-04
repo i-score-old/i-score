@@ -116,6 +116,8 @@ void TriggerPointEdit::init()
     // displays address from selected device
     addressFilter(_device, _address);
 
+    _deviceEdit->setCurrentText(_device);
+    qDebug() << _device;
 }
 
 void
@@ -158,15 +160,18 @@ void TriggerPointEdit::addressFilter(QString deviceSelected, QString currentEntr
     _addressEdit->clear();
     _addressEdit->addItem(currentEntry);
     _userAddressEdit->setText(currentEntry);
-
+    string newAddress;
     int i = 0;
     for (i = 0; i < _addresses.size(); i++ ) {
-        string newAddress = _addresses.at(i);
+        newAddress = _addresses.at(i);
         if (newAddress.find(deviceSelected.toStdString()) == 0) {
             newAddress.erase(0,newAddress.find("/"));
 
-            if (!newAddress.empty() && newAddress.find(currentEntry.toStdString()) == 0) {
-                _addressEdit->addItem(newAddress.c_str());
+            if (!newAddress.empty() && newAddress.find(currentEntry.toStdString()) != string::npos ) {
+                if (newAddress.find(currentEntry.toStdString()) == 0)
+                    _addressEdit->insertItem(1, newAddress.c_str());
+                else
+                    _addressEdit->insertItem(i, newAddress.c_str());
             }
         }
     }
@@ -181,13 +186,14 @@ void TriggerPointEdit::parseMessage(std::string message)
 {
     QString msg(message.c_str());
 
+    msg.remove(0, msg.indexOf("/"));
+
     std::vector<std::string>::iterator it;
     for(it=_operators.begin(); it != _operators.end(); it++) {
         std::string op = *it;
         if (message.find(op) != std::string::npos) {
             _address = msg.section(op.c_str(),0,0);
             _address = _address.section(" ",0,0);
-            //_address.truncate(_address.size()-1);
             _condition = QString::fromStdString(message).section(op.c_str(),-1);
             _operator = op.c_str() ;
         }
@@ -231,6 +237,7 @@ TriggerPointEdit::updateStuff()
             if (!_operator.isEmpty()) {
                 _expression += " ";
                 _expression += _operator;
+                _expression += " ";
             }
             if (!_condition.isEmpty()) {
                 _expression += _condition;
