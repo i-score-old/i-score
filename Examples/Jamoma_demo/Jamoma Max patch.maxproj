@@ -1,5 +1,5 @@
 {
-	"name" : "Demo cues",
+	"name" : "Jamoma Max patch",
 	"version" : 1,
 	"creationdate" : -801741194,
 	"modificationdate" : -801741119,
