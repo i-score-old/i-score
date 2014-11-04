@@ -312,6 +312,17 @@ if(UNIX)
 		set(CPACK_DEBIAN_PACKAGE_MAINTAINER "i-score")
 		set(CPACK_DEBIAN_PACKAGE_DEPENDS "jamomacore, libxml2, libqt5core5a, libqt5gui5, libqt5svg5, libqt5xml5, libqt5network5, libqt5printsupport5")
 		set(CPACK_DEBIAN_PACKAGE_SECTION "sound")
+		
+		install(FILES resources/linux/i-score.desktop
+				DESTINATION /usr/share/applications)
+		install(FILES resources/linux/i-score.png
+				DESTINATION /usr/share/pixmaps)
+		install(DIRECTORY installer_data/examples
+				DESTINATION /usr/share/doc/i-score)
+		install(DIRECTORY installer_data/documentation
+				DESTINATION /usr/share/doc/i-score)
+		install(DIRECTORY installer_data/Licenses
+				DESTINATION /usr/share/doc/i-score)
 	endif()
 elseif(WIN32)
 	set(CPACK_GENERATOR "NSIS")
