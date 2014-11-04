@@ -20,7 +20,6 @@ public :
 
 public slots :
     void updateStuff();
-    void expressionChanged();
     void autoTriggerChanged();
     void edit();
     void addressFilter(QString deviceSelected, QString currentEntry = "");
@@ -29,8 +28,7 @@ public slots :
 private :
     AbstractTriggerPoint    *_abstract;
 
-    bool                    _expressionChanged,
-                            _autoTriggerChanged;
+    bool                    _autoTriggerChanged;
 
     QPushButton             *_okButton;
     QPushButton             *_cancelButton;
@@ -50,15 +48,18 @@ private :
 
     QGridLayout             *_layout;
 
-    QString address = "";
-    QString expression = "";
-    QString device;
+    QString _address = "";
+    QString _condition = "";
+    QString _operator = "";
+    QString _device;
 
-    QList<string>           addresses;
+    QString _expression = "";
+
+    QList<string>           _addresses;
     std::vector<string>    _operators;
 
     void init();
-    void parseMessage(string message, QString &extractedAddress, QString &extractedExpression);
+    void parseMessage(string message);
 
 };
 
