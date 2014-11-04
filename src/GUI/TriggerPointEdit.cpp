@@ -23,7 +23,6 @@ TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *pare
     // display availables addresses
     _addressEdit = new QComboBox;
     _addressEdit->setEditable(true);
-    _addressEdit->setFocus();
 
     _userAddressEdit = new QLineEdit;
     _addressEdit->setLineEdit(_userAddressEdit); // lineEdit in comboBox
@@ -162,16 +161,20 @@ void TriggerPointEdit::addressFilter(QString deviceSelected, QString currentEntr
     _userAddressEdit->setText(currentEntry);
     string newAddress;
     int i = 0;
+    int k = 0;
     for (i = 0; i < _addresses.size(); i++ ) {
         newAddress = _addresses.at(i);
         if (newAddress.find(deviceSelected.toStdString()) == 0) {
             newAddress.erase(0,newAddress.find("/"));
 
             if (!newAddress.empty() && newAddress.find(currentEntry.toStdString()) != string::npos ) {
-                if (newAddress.find(currentEntry.toStdString()) == 0)
-                    _addressEdit->insertItem(1, newAddress.c_str());
+                if (newAddress.find(currentEntry.toStdString()) == 0 || newAddress.find(currentEntry.toStdString()) == 1) { // if real address is typing
+                    // alphabetical order
+                    _addressEdit->insertItem(++k, newAddress.c_str());
+                }
                 else
-                    _addressEdit->insertItem(i, newAddress.c_str());
+                    // look for address that contain the entry, and display them at the end
+                    _addressEdit->insertItem(i+1, newAddress.c_str());
             }
         }
     }
