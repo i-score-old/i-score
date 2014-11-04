@@ -2196,10 +2196,10 @@ bool Engine::play(TimeProcessId processId)
     TTLogMessage("***************************************\n");
     TTLogMessage("Engine::play\n");
     
-    // start the time process
-    TTErr err = getTimeProcess(processId).send("Start");
+    // play a time process triggering its start event (this will also play other time processes attached to the start event)
+    TTBoolean success = !getTimeProcess(processId).send("Start");
   
-    return err == kTTErrNone;
+    return success;
 }
 
 bool Engine::isPlaying(TimeProcessId processId)
@@ -2219,30 +2219,10 @@ bool Engine::isPlaying(TimeProcessId processId)
 
 bool Engine::stop(TimeProcessId processId)
 {
-    TTValue objects;
-    
-    TTLogMessage("Engine::stop\n");
-    
-    // stop the main scenario execution
-    // but the end event don't happen
-    TTBoolean success = !getTimeProcess(processId).send("Stop");
-    if (processId != ROOT_BOX_ID)
-        getSubScenario(processId).send("Stop");
-/*
-    if (processId == ROOT_BOX_ID) {
-        
-        // get all TTTimeProcesses
-        getTimeProcess(processId).get("timeProcesses", objects);
-        
-        // stop all time process
-        for (TTUInt32 i = 0; i < objects.size(); i++) {
-            
-            TTObject timeProcess = objects[i];
-            
-            timeProcess.send("Stop");
-        }
-    }
-*/    
+    // stop a time process its end event (this will also stop other time processes attached to the end event)
+    TTBoolean success = !getTimeProcess(processId).send("End");
+  
+    TTLogMessage("Engine::stopped\n");
     TTLogMessage("***************************************\n");
     
     return success;
