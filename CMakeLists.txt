@@ -10,7 +10,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if(NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE Debug)
+	set(CMAKE_BUILD_TYPE Release)
 endif()
 
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets Network Xml Svg PrintSupport)
@@ -24,11 +24,18 @@ add_definitions(-DTT_NO_DSP)
 
 #TODO find_package
 if(UNIX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-unused-parameter -Wno-deprecated-register -Wno-unknown-pragmas -Wno-conversion -Wl,-rpath,/usr/local/lib/jamoma/lib  -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions")
-	SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-unused-parameter -Wno-deprecated-register -Wno-unknown-pragmas -Wno-conversion")
 	include_directories("/usr/local/lib/jamoma/include")
 	include_directories("/usr/local/jamoma/include")
 	include_directories("/usr/include/libxml2")
+	
+	if(APPLE)
+		set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR})
+	else()
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-rpath,/usr/local/lib/jamoma/lib  -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions")
+	endif()
+	
+	set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 elseif(WIN32)
 	add_definitions(-DQ_COMPILER_INITIALIZER_LISTS)
 	add_definitions(-DNOMINMAX)
@@ -130,16 +137,17 @@ qt5_add_resources(i-score_RESOURCES_RCC "i-score.qrc")
 ##################################
 ############ Target ##############
 ##################################
-add_executable(i-score MACOSX_BUNDLE WIN32
+
+add_executable(i-score WIN32 MACOSX_BUNDLE
 			${PROJECT_SRCS}
 			${PROJECT_HDRS}
 			${i-score_RESOURCES_RCC}
 			"${CMAKE_CURRENT_SOURCE_DIR}/resources/images/i-score.icns")
-
+			
 if(APPLE)
 	set_target_properties(i-score PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist")
 	set_target_properties(i-score PROPERTIES MACOSX_BUNDLE_ICON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources/images/i-score.icns")
-	set_target_properties(i-score PROPERTIES MACOSX_BUNDLE_STARTUP_COMMAND "i-score")
+	#set_target_properties(i-score PROPERTIES MACOSX_BUNDLE_STARTUP_COMMAND "i-score")
 endif()
 
 
@@ -150,7 +158,11 @@ endif()
 
 # Todo in a cleanlier fashion... What about creating a package file for Jamoma?
 if(UNIX)
-	set(JAMOMA_LIB_FOLDER "/usr/local/lib/jamoma/lib")
+	if(APPLE)
+		set(JAMOMA_LIB_FOLDER "/usr/local/jamoma/lib")
+	else()
+		set(JAMOMA_LIB_FOLDER "/usr/local/lib/jamoma/lib")
+	endif()
 elseif(WIN32)
 	set(JAMOMA_LIB_FOLDER_WIN32 "c:\\Program Files (x86)\\JamomaCore 0.6-dev\\lib")
 	FILE(TO_CMAKE_PATH ${JAMOMA_LIB_FOLDER_WIN32} JAMOMA_LIB_FOLDER)
@@ -190,8 +202,8 @@ elseif(WIN32)
 endif()
 
 INSTALL(TARGETS i-score
-    BUNDLE DESTINATION . COMPONENT Runtime
-    RUNTIME DESTINATION bin COMPONENT Runtime)
+	BUNDLE DESTINATION . COMPONENT Runtime
+	RUNTIME DESTINATION bin COMPONENT Runtime)
 
 # Beware : Fifth circle of the DLL Hell
 if(WIN32)
@@ -273,9 +285,9 @@ if(WIN32)
 	set(DIRS "${QT_FOLDER}" "${JAMOMA_LIB_FOLDER}" "${JAMOMA_EXTENSIONS_FOLDER}" "${LIBXML_FOLDER}" "${LIBICONV_FOLDER}" "${ZLIB_FOLDER}" )
 	#~ set(DIRS ${QtCore_location} ${QtSvg_location} ${QtXml_location} ${QtNetwork_location} ${QtWidgets_location} ${QtPrintSupport_location})
 	install(CODE "
-				    file(GLOB_RECURSE QTPLUGINS
-				      \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/platforms/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
-				      set(PLUGINS ${QTPLUGINS} ${JAMOMA_EXTENSIONS})
+					file(GLOB_RECURSE QTPLUGINS
+					  \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/platforms/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+					  set(PLUGINS ${QTPLUGINS} ${JAMOMA_EXTENSIONS})
 					include(BundleUtilities)
 					fixup_bundle(\"${APPS}\"   \"${PLUGINS}\"   \"${DIRS}\")
 				 "
@@ -284,8 +296,6 @@ if(WIN32)
 	# VC++ redistributable
 	install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/redist/vcredist_2010_x86.exe"
 			DESTINATION redist)
-
-
 endif()
 #INSTALL(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/i-score" DESTINATION "bin")
 
@@ -303,22 +313,9 @@ set(CPACK_SOURCE_PACKAGE_FILE_NAME "i-score-0.2")
 
 if(UNIX)
 	if(APPLE)
-
-  	#install(CODE "
-		#			set(PLUGINS ${JAMOMA_EXTENSIONS})
-		#			include(BundleUtilities)
-		#			fixup_bundle(\"${APPS}\"   \"${PLUGINS}\"   \"${DIRS}\")
-		#		"
-		#	    COMPONENT Runtime)
-
 		set(CPACK_GENERATOR "DragNDrop")
 		set(CPACK_PACKAGE_FILE_NAME "i-score")
 		set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/resources/images/i-score.icns")
-#		set(CPACK_BUNDLE_NAME "i-score")
-#		set(CPACK_BUNDLE_ICON "${CMAKE_SOURCE_DIR}/resources/images/i-score.icns")
-#		set(CPACK_BUNDLE_PLIST "${CMAKE_SOURCE_DIR}/Info.plist")
-#		set(CPACK_BUNDLE_STARTUP_COMMAND "i-score")
-
 
 		install(DIRECTORY installer_data/examples
 			DESTINATION Examples)
@@ -326,6 +323,8 @@ if(UNIX)
 			DESTINATION Documentation)
 		install(DIRECTORY installer_data/Licenses
 			DESTINATION Licenses)
+			
+		install(CODE "execute_process(COMMAND ${CMAKE_SOURCE_DIR}/deploy_osx.sh)")
 	else()
 		# Debian... Others will come.
 		set(CPACK_GENERATOR "DEB")
