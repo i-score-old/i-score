@@ -235,7 +235,6 @@ TriggerPointEdit::updateStuff()
             if (!_condition.isEmpty()) {
                 _expression += _condition;
             }
-
         }
         if (Maquette::getInstance()->setTriggerPointMessage(_abstract->ID(), _expression.toStdString()))
                 _abstract->setMessage(_expression.toStdString());
@@ -250,7 +249,6 @@ TriggerPointEdit::updateStuff()
         accept();
 
     }
-
     else {
         reject();
     }
