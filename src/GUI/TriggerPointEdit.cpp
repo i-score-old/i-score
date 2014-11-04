@@ -11,7 +11,6 @@ TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *pare
     setModal(true);
 
     _abstract = abstract;
-    _expressionChanged = false;
     _autoTriggerChanged = false;
     _layout = new QGridLayout(this);
     setLayout(_layout);
@@ -31,6 +30,7 @@ TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *pare
 
     _deviceEdit = new QComboBox;
     _operatorEdit = new QComboBox;
+    _operatorEdit->setAutoCompletion(true);
     _conditionEdit = new QLineEdit;
 
     _autoTriggerCheckBox = new QCheckBox("auto-trigger");
@@ -79,9 +79,49 @@ TriggerPointEdit::~TriggerPointEdit()
   _autoTriggerCheckBox->deleteLater();
 }
 
+void TriggerPointEdit::init()
+{
+
+    // QList to store the availables addresses
+    _addresses = Maquette::getInstance()->addressList();
+    std::sort(_addresses.begin(), _addresses.end());
+
+    // display availables devices
+    _deviceEdit->addItem("");
+    std::map<std::string, MyDevice>::iterator it;
+    std::map<std::string, MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
+    for (it = devices.begin(); it != devices.end(); it++) {
+        _deviceEdit->addItem(it->first.c_str());
+    }
+
+    // list of operators
+    _operators.push_back(">");
+    _operators.push_back("<");
+    _operators.push_back("=");
+    _operators.push_back(">=");
+    _operators.push_back("<=");
+
+    _operatorEdit->addItem("");
+
+    std::vector<std::string>::iterator op;
+    for(op=_operators.begin(); op != _operators.end(); op++) {
+        _operatorEdit->addItem((*op).c_str());
+    }
+
+    // load stored message and extract address, operator and condition value
+    parseMessage(_abstract->message());
+    _operatorEdit->setCurrentText(_operator);
+    _conditionEdit->setText(_condition);
+
+    // displays address from selected device
+    addressFilter(_device, _address);
+
+}
+
 void
 TriggerPointEdit::edit()
 {
+
     if(Maquette::getInstance()->getTriggerPoint(_abstract->ID())->isConditioned() && _abstract->boxExtremity() == BOX_START){
         _autoTriggerCheckBox->setEnabled(true);
         _autoTriggerCheckBox->setChecked(Maquette::getInstance()->getTriggerPointDefault(_abstract->ID()));
@@ -89,12 +129,25 @@ TriggerPointEdit::edit()
     else
         _autoTriggerCheckBox->setEnabled(false);
 
+    // reload enabled devices
     _deviceEdit->clear();
-    std::map<std::string, MyDevice>::iterator it;
-    std::map<std::string, MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
+    _deviceEdit->addItem(" ");
+    std::vector<std::string>::iterator it;
+    std::vector<std::string> devices;
+    Maquette::getInstance()->getNetworkDeviceNames(devices);
     for (it = devices.begin(); it != devices.end(); it++) {
-        _deviceEdit->addItem(it->first.c_str());
+        _deviceEdit->addItem((*it).c_str());
     }
+    _deviceEdit->setCurrentText(_device);
+
+    // reload tree
+    _addresses = Maquette::getInstance()->addressList();
+    std::sort(_addresses.begin(), _addresses.end());    
+    addressFilter(_device, _address);
+
+    _operatorEdit->setCurrentText(_operator);
+
+    _conditionEdit->setText(_condition);
 
     exec();
 }
@@ -102,15 +155,14 @@ TriggerPointEdit::edit()
 // display only address from current device
 void TriggerPointEdit::addressFilter(QString deviceSelected, QString currentEntry)
 {
-    device = deviceSelected;
     _addressEdit->clear();
     _addressEdit->addItem(currentEntry);
     _userAddressEdit->setText(currentEntry);
 
     int i = 0;
-    for (i = 0; i < addresses.size(); i++ ) {
-        string newAddress = addresses.at(i);
-        if (newAddress.find(device.toStdString()) == 0) {
+    for (i = 0; i < _addresses.size(); i++ ) {
+        string newAddress = _addresses.at(i);
+        if (newAddress.find(deviceSelected.toStdString()) == 0) {
             newAddress.erase(0,newAddress.find("/"));
 
             if (!newAddress.empty() && newAddress.find(currentEntry.toStdString()) == 0) {
@@ -122,69 +174,30 @@ void TriggerPointEdit::addressFilter(QString deviceSelected, QString currentEntr
 
 void TriggerPointEdit::manualAddressChange(QString newEntry)
 {
-    addressFilter(device, newEntry);
+    addressFilter(_deviceEdit->currentText(), newEntry);
 }
 
-void TriggerPointEdit::init()
+void TriggerPointEdit::parseMessage(std::string message)
 {
-    // QList to store the availables addresses
-    addresses = Maquette::getInstance()->addressList();
-    std::sort(addresses.begin(), addresses.end());
-
-    // display availables devices
-    std::map<std::string, MyDevice>::iterator it;
-    std::map<std::string, MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
-    for (it = devices.begin(); it != devices.end(); it++) {
-        _deviceEdit->addItem(it->first.c_str());
-    }
-
-    // list of operators
-    _operators.push_back(">");
-    _operators.push_back("<");
-    _operators.push_back("=");
-
-    _operatorEdit->addItem("");
-
-    std::vector<std::string>::iterator op;
-    for(op=_operators.begin(); op != _operators.end(); op++) {
-        _operatorEdit->addItem((*op).c_str());
-    }
-
-    // displays address from selected device
-    addressFilter(_deviceEdit->currentText());
-
-    // load stored message and extract address, operator and condition value
-    QString loadedAddress;
-    QString loadedExpression;
-    parseMessage(_abstract->message(), loadedAddress, loadedExpression);
-    _conditionEdit->setText(loadedExpression);
-    _addressEdit->setCurrentText(loadedAddress);
-
-
-}
-
-void TriggerPointEdit::parseMessage(std::string message, QString &extractedAddress, QString &extractedExpression)
-{
+    QString msg(message.c_str());
 
     std::vector<std::string>::iterator it;
     for(it=_operators.begin(); it != _operators.end(); it++) {
         std::string op = *it;
         if (message.find(op) != std::string::npos) {
-            extractedAddress = QString::fromStdString(message).section(op.c_str(),0,0);
-            extractedExpression = QString::fromStdString(message).section(op.c_str(),-1);
-            _operatorEdit->setCurrentText(op.c_str());
+            _address = msg.section(op.c_str(),0,0);
+            _address = _address.section(" ",0,0);
+            //_address.truncate(_address.size()-1);
+            _condition = QString::fromStdString(message).section(op.c_str(),-1);
+            _operator = op.c_str() ;
         }
     }
-    if (extractedAddress.isEmpty()) {
-        extractedAddress = message.c_str();
+    if (_address.isEmpty()) {
+        _address = message.c_str();
     }
+
 }
 
-void
-TriggerPointEdit::expressionChanged()
-{
-    _expressionChanged = true;
-}
 
 void
 TriggerPointEdit::autoTriggerChanged()
@@ -198,40 +211,48 @@ TriggerPointEdit::updateStuff()
     // final expression has form : device:/any/path[operator][value].
     // the block operator+value are optionnal
 
-    if (!_addressEdit->currentText().isEmpty() ) {
-        expression.clear();
+    _device = _deviceEdit->currentText();
+    _address = _addressEdit->currentText();
+    _operator = _operatorEdit->currentText();
+    _condition = _conditionEdit->text();
 
-        if (!_deviceEdit->currentText().isEmpty()) {
-            expression = _deviceEdit->currentText();
-            expression += ":";
+    // stop the strings at the first space
+    _address = _address.section(" ",0,0);
+    _condition = _condition.section(" ",0,0);
+
+    if (!_address.isEmpty() ) {
+        _expression.clear();
+
+        if( !_device.isEmpty()) {
+            _expression = _device;
+            _expression += ":";
+            _expression += _address;
+
+            if (!_operator.isEmpty()) {
+                _expression += " ";
+                _expression += _operator;
+            }
+            if (!_condition.isEmpty()) {
+                _expression += _condition;
+            }
+
         }
+        if (Maquette::getInstance()->setTriggerPointMessage(_abstract->ID(), _expression.toStdString()))
+                _abstract->setMessage(_expression.toStdString());
+                qDebug() << "abstract msg : " << _abstract->message().c_str();
 
-        address = _addressEdit->currentText();
-        expression += address;
-
-        if (!_operatorEdit->currentText().isEmpty()) {
-            expression += _operatorEdit->currentText();
-        }
-        if (!_conditionEdit->text().isEmpty()) {
-            expression += _conditionEdit->text();
-        }
-    //    if(_expressionChanged){
-        if (Maquette::getInstance()->setTriggerPointMessage(_abstract->ID(), expression.toStdString()))
-                _abstract->setMessage(expression.toStdString());
-
-    //    }
         if(_autoTriggerChanged){
             Maquette::getInstance()->setTriggerPointDefault(_abstract->ID(), _autoTriggerCheckBox->isChecked());
         }
 
         _autoTriggerChanged = false;
-        _expressionChanged = false;
 
         accept();
 
     }
+
+
     else {
         reject();
     }
 }
-
