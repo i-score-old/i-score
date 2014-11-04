@@ -251,7 +251,6 @@ TriggerPointEdit::updateStuff()
 
     }
 
-
     else {
         reject();
     }

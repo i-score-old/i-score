@@ -58,6 +58,7 @@ private :
     QList<string>           _addresses;
     std::vector<string>    _operators;
 
+
     void init();
     void parseMessage(string message);
 
