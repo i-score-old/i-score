@@ -2197,7 +2197,7 @@ bool Engine::play(TimeProcessId processId)
     TTLogMessage("Engine::play\n");
     
     // start the time process
-    TTErr err = getTimeProcess(processId).send("Play");
+    TTErr err = getTimeProcess(processId).send("Start");
   
     return err == kTTErrNone;
 }
@@ -2228,7 +2228,7 @@ bool Engine::stop(TimeProcessId processId)
     TTBoolean success = !getTimeProcess(processId).send("Stop");
     if (processId != ROOT_BOX_ID)
         getSubScenario(processId).send("Stop");
-    
+/*
     if (processId == ROOT_BOX_ID) {
         
         // get all TTTimeProcesses
@@ -2242,7 +2242,7 @@ bool Engine::stop(TimeProcessId processId)
             timeProcess.send("Stop");
         }
     }
-    
+*/    
     TTLogMessage("***************************************\n");
     
     return success;
