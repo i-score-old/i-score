@@ -799,6 +799,7 @@ void
 MainWindow::updatePlayMode(){
     _scene->updateBoxesButtons();
     _scene->unselectAll();
+    _scene->enableCurveEdition();
     _editor->noBoxEdited();
     _editor->setDisabled(_scene->playing());
 }
