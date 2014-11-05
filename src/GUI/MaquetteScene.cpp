@@ -2121,5 +2121,24 @@ MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
 void MaquetteScene::unselectAll()
 {
     for(auto& item : items())
-      item->setSelected(false);
+        item->setSelected(false);
+}
+
+// Disable the curve Edition on execution
+void MaquetteScene::enableCurveEdition()
+{
+    std::map<unsigned int, BasicBox*>::iterator it;
+    std::map<unsigned int, BasicBox*> boxes = _maquette->getBoxes();
+    it = boxes.begin();
+    ++it;
+    while (it != boxes.end()) {
+        BasicBox* box = it->second;
+        if (playing()) {
+            box->disableCurveEdition();
+        }
+        else {
+            box->enableCurveEdition();
+        }
+        it++;
+    }
 }
