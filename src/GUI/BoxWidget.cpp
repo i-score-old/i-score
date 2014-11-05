@@ -607,3 +607,8 @@ BoxWidget::updateCurveRangeBoundMax(string address, float value){
         curve->setMaxY(value);
     }
 }
+
+void BoxWidget::disabledCurveEdition()
+{
+    _comboBox->setCurrentIndex(0);
+}

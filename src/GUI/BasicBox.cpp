@@ -688,6 +688,7 @@ void BasicBox::disableCurveEdition()
     {
         curve->setEnabled(false);
     }
+    _boxContentWidget->disabledCurveEdition();
 }
 
 std::vector<std::string>

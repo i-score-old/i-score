@@ -676,6 +676,7 @@ protected:
     void updateBoxesWidgets();
     void updateBoxesButtons();
     void unselectAll();
+    void enableCurveEdition();
 
   private:
     /*!
