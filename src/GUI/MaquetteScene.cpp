@@ -2022,6 +2022,13 @@ void MaquetteScene::updateBoxesButtons()
         BasicBox* box = it->second;
         //box->updatePlayingModeButtons();
         box->setButtonsVisible(playing());
+
+        if (playing()) {
+            box->disableCurveEdition();
+        }
+        else {
+            box->enableCurveEdition();
+        }
         it++;
     }
 }
