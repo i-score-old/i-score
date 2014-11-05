@@ -34,11 +34,10 @@ if(UNIX)
 #		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.7 -stdlib=libc++")
 #		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++")
 	else()
-		
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-rpath,/usr/local/lib/jamoma/lib  -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions")
 	endif()
 	
-#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-rpath,/usr/local/lib/jamoma/lib  -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions")
-	set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+#	set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 	
 elseif(WIN32)
 	add_definitions(-DQ_COMPILER_INITIALIZER_LISTS)
@@ -230,7 +229,7 @@ if(WIN32)
 	file(TO_CMAKE_PATH "C:\\Qt\\Qt5.3.1\\5.3\\msvc2013\\bin" QT_FOLDER)
 	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\libxml2-2.7.8.win32\\bin" LIBXML_FOLDER)
 	# Fuck this
-	file(TO_CMAKE_PATH "C:\\Users\\Doom\\Documents\\GitHub\\Jamoma\\Core\\Foundation\\library\\libiconv\\bin" LIBICONV_FOLDER)
+	file(TO_CMAKE_PATH "W:\\GitHub\\Jamoma\\Core\\Foundation\\library\\libiconv\\bin" LIBICONV_FOLDER)
 	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\zlib" ZLIB_FOLDER)
 
 	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\Microsoft Visual Studio 12.0\\VC\\redist\\x86\\Microsoft.VC120.CRT" MSVC_REDIST_RELEASE)
@@ -362,5 +361,36 @@ elseif(WIN32)
 			ExecWait '\\\"$INSTDIR\\\\redist\\\\vcredist_2010_x86.exe\\\" /q /norestart'
 			"
 		)
+	set(CPACK_PACKAGE_EXECUTABLES "i-score;i-score")
+	
+	set(CPACK_NSIS_CONTACT "i-score-devs@lists.sourceforge.net")
+	set(CPACK_COMPONENTS_ALL i-score)
+	set ( CPACK_PACKAGE_VERSION "0.2.2" )
+	set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/installer_data/License.md")
+	set(CPACK_MONOLITHIC_INSTALL TRUE)
+	set(CPACK_NSIS_MUI_ICON  "${CMAKE_SOURCE_DIR}/resources/windows/i-score.ico")
+	set(CPACK_NSIS_MUI_UNIICON  "${CMAKE_SOURCE_DIR}/resources/windows/i-score.ico")
+	#set(CPACK_PACKAGE_ICON  "${CMAKE_SOURCE_DIR}/resources/windows/i-score.ico")
+	
+    set(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.i-score.org")
+    set(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.i-score.org")
+	
+	set(CPACK_NSIS_COMPRESSOR "/SOLID lzma")
+	set(CPACK_NSIS_MENU_LINKS 
+			"examples" "Examples"
+			"documentation" "Documentation"
+			"Licenses" "Licenses"
+			"http://www.i-score.org" "i-score website"
+			)
+			
+	set(CPACK_NSIS_MODIFY_PATH "ON")
+	set(CPACK_CREATE_DESKTOP_LINKS i-score)
+	
+	install(DIRECTORY installer_data/examples
+			DESTINATION .)
+	install(DIRECTORY installer_data/documentation
+			DESTINATION .)
+	install(DIRECTORY installer_data/Licenses
+			DESTINATION .)
 endif()
 INCLUDE(CPack)
