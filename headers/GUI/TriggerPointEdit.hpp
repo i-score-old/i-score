@@ -42,9 +42,9 @@ private :
     QComboBox               *_deviceEdit;
     QComboBox               *_operatorEdit;
     QLineEdit               *_conditionEdit;
-    QCheckBox               *_autoTriggerCheckBox;
-
     QLineEdit               *_userAddressEdit;
+
+    QCheckBox               *_autoTriggerCheckBox;
 
     QGridLayout             *_layout;
 
@@ -55,8 +55,8 @@ private :
 
     QString _expression = "";
 
-    QList<string>           _addresses;
-    std::vector<string>    _operators;
+    QList<string>           *_addresses;
+    std::vector<string>    *_operators;
 
     void init();
     void parseMessage(string message);

@@ -22,17 +22,18 @@ TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *pare
 
     // display availables addresses
     _addressEdit = new QComboBox;
-    _addressEdit->setEditable(true);
 
     _userAddressEdit = new QLineEdit;
     _addressEdit->setLineEdit(_userAddressEdit); // lineEdit in comboBox
 
     _deviceEdit = new QComboBox;
     _operatorEdit = new QComboBox;
-    _operatorEdit->setAutoCompletion(true);
     _conditionEdit = new QLineEdit;
 
     _autoTriggerCheckBox = new QCheckBox("auto-trigger");
+
+    _addresses = new QList<string>;
+    _operators = new std::vector<string>;
 
     init();
 
@@ -68,12 +69,17 @@ TriggerPointEdit::~TriggerPointEdit()
 {
   _okButton->deleteLater();
   _cancelButton->deleteLater();
-  _addressEdit->deleteLater();
+
   _addressLabel->deleteLater();
-  _deviceEdit->deleteLater();
   _deviceLabel->deleteLater();
-  _conditionEdit->deleteLater();
+  _operatorLabel->deleteLater();
   _conditionLabel->deleteLater();
+
+  _addressEdit->deleteLater();
+  _deviceEdit->deleteLater();
+  _operatorEdit->deleteLater();
+  _conditionEdit->deleteLater();
+
   _layout->deleteLater();
   _autoTriggerCheckBox->deleteLater();
 }
@@ -82,8 +88,9 @@ void TriggerPointEdit::init()
 {
 
     // QList to store the availables addresses
-    _addresses = Maquette::getInstance()->addressList();
-    std::sort(_addresses.begin(), _addresses.end());
+    delete _addresses;
+    _addresses = new  QList<string>(Maquette::getInstance()->addressList());
+    std::sort(_addresses->begin(), _addresses->end());
 
     // display availables devices
     _deviceEdit->addItem("");
@@ -94,16 +101,16 @@ void TriggerPointEdit::init()
     }
 
     // list of operators
-    _operators.push_back(">");
-    _operators.push_back("<");
-    _operators.push_back("=");
-    _operators.push_back(">=");
-    _operators.push_back("<=");
+    _operators->push_back(">");
+    _operators->push_back("<");
+    _operators->push_back("=");
+    _operators->push_back(">=");
+    _operators->push_back("<=");
 
     _operatorEdit->addItem("");
 
     std::vector<std::string>::iterator op;
-    for(op=_operators.begin(); op != _operators.end(); op++) {
+    for(op=_operators->begin(); op != _operators->end(); op++) {
         _operatorEdit->addItem((*op).c_str());
     }
 
@@ -116,7 +123,6 @@ void TriggerPointEdit::init()
     addressFilter(_device, _address);
 
     _deviceEdit->setCurrentText(_device);
-    qDebug() << _device;
 }
 
 void
@@ -142,8 +148,9 @@ TriggerPointEdit::edit()
     _deviceEdit->setCurrentText(_device);
 
     // reload tree
-    _addresses = Maquette::getInstance()->addressList();
-    std::sort(_addresses.begin(), _addresses.end());    
+    delete _addresses;
+    _addresses = new  QList<string>(Maquette::getInstance()->addressList());
+    std::sort(_addresses->begin(), _addresses->end());
     addressFilter(_device, _address);
 
     _operatorEdit->setCurrentText(_operator);
@@ -162,8 +169,8 @@ void TriggerPointEdit::addressFilter(QString deviceSelected, QString currentEntr
     string newAddress;
     int i = 0;
     int k = 0;
-    for (i = 0; i < _addresses.size(); i++ ) {
-        newAddress = _addresses.at(i);
+    for (i = 0; i < _addresses->size(); i++ ) {
+        newAddress = _addresses->at(i);
         if (newAddress.find(deviceSelected.toStdString()) == 0) {
             newAddress.erase(0,newAddress.find("/"));
 
@@ -188,11 +195,12 @@ void TriggerPointEdit::manualAddressChange(QString newEntry)
 void TriggerPointEdit::parseMessage(std::string message)
 {
     QString msg(message.c_str());
-
+    _device = msg;
+    _device.truncate(msg.indexOf(":"));
     msg.remove(0, msg.indexOf("/"));
 
     std::vector<std::string>::iterator it;
-    for(it=_operators.begin(); it != _operators.end(); it++) {
+    for(it=_operators->begin(); it != _operators->end(); it++) {
         std::string op = *it;
         if (message.find(op) != std::string::npos) {
             _address = msg.section(op.c_str(),0,0);
@@ -248,7 +256,6 @@ TriggerPointEdit::updateStuff()
         }
         if (Maquette::getInstance()->setTriggerPointMessage(_abstract->ID(), _expression.toStdString()))
                 _abstract->setMessage(_expression.toStdString());
-                qDebug() << "abstract msg : " << _abstract->message().c_str();
 
         if(_autoTriggerChanged){
             Maquette::getInstance()->setTriggerPointDefault(_abstract->ID(), _autoTriggerCheckBox->isChecked());
