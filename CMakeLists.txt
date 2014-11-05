@@ -31,11 +31,15 @@ if(UNIX)
 	
 	if(APPLE)
 		set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR})
+#		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.7 -stdlib=libc++")
+#		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++")
 	else()
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-rpath,/usr/local/lib/jamoma/lib  -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions")
+		
 	endif()
 	
+#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-rpath,/usr/local/lib/jamoma/lib  -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions")
 	set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+	
 elseif(WIN32)
 	add_definitions(-DQ_COMPILER_INITIALIZER_LISTS)
 	add_definitions(-DNOMINMAX)
@@ -183,6 +187,9 @@ target_link_libraries(i-score ${JAMOMA_FOUNDATION_LIBRARY}
 							  Qt5::Widgets
 							  Qt5::PrintSupport)
 
+if(APPLE)
+	target_link_libraries(i-score -L/usr/local/lib/ -lgecodekernel -lgecodesupport -lgecodeint -lgecodeset -lgecodedriver -lgecodeflatzinc -lgecodeminimodel -lgecodesearch -lgecodefloat)
+endif()
 
 
 #############################
