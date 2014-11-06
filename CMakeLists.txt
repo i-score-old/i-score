@@ -35,9 +35,9 @@ if(UNIX)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++")
 	else()
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-rpath,/usr/local/lib/jamoma/lib  -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions")
+		set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 	endif()
 	
-#	set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 	
 elseif(WIN32)
 	add_definitions(-DQ_COMPILER_INITIALIZER_LISTS)
