@@ -6,6 +6,7 @@ i-score.pro.user.3.0-pre1
 compiler_*
 *~
 \#*
+installer_data
 Info.plist
 qrc_i-score.cpp
 org.eclipse*
