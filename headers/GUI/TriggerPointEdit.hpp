@@ -31,22 +31,11 @@ private :
 
     QPushButton             *_okButton;
     QPushButton             *_cancelButton;
-
-    QLabel                  *_addressLabel;
-    QLabel                  *_deviceLabel;
-    QLabel                  *_conditionLabel;
-
-    QLineEdit               *_addressEdit;
-    QComboBox               *_deviceEdit;
-    QLineEdit               *_conditionEdit;
+    QLabel                  *_expressionLabel;
+    QLineEdit               *_expressionEdit;
     QCheckBox               *_autoTriggerCheckBox;
 
     QGridLayout             *_layout;
-
-    QString address = "";
-    QString expression = "";
-    QString condition = "";
-
 };
 
 #endif // TRIGGERPOINTEDIT_HPP

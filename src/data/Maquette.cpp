@@ -109,7 +109,12 @@ Maquette::init()
 
 Maquette::Maquette() : _engines(nullptr)
 {
-	connect(this, SIGNAL(boxIsRunningSignal(uint,bool)), this, SLOT(boxIsRunningSlot(uint,bool)), Qt::QueuedConnection);
+    connect(this, SIGNAL(boxIsRunningSignal(uint,bool)), this, SLOT(boxIsRunningSlot(uint,bool)), Qt::QueuedConnection);
+}
+
+QList<std::string> Maquette::addressList()
+{
+    return _scene->editor()->networkTree()->getAddressList();
 }
 
 Maquette::~Maquette()
