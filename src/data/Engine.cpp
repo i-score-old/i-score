@@ -802,6 +802,10 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const s
     getSubScenario(motherId).send("TimeProcessCreate", args, out);
     subScenario = out[0];
     
+    // set time process and sub scenario rigid
+    timeProcess.set("rigid", true);
+    subScenario.set("rigid", true);
+    
     // cache it and get an unique id for this process
     if (motherId == ROOT_BOX_ID)
         address = kTTAdrsRoot.appendAddress(TTAddress(name.data()));
@@ -864,6 +868,7 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
     TTObject    tp1, tp2;
     TTObject    startEvent, endEvent;
     TTObject    startScenario, endScenario;
+    TTObject    endCondition;
     IntervalId  relationId;
     TTValue     args, out;
     TTErr       err;
@@ -907,8 +912,9 @@ IntervalId Engine::addTemporalRelation(TimeProcessId boxId1,
         
         timeProcess = out[0];
         
-        // set the time process rigid
-        timeProcess.set("rigid", true);
+        // set the time process rigid if the the end event is not conditionned
+        endEvent.get("condition", endCondition);
+        timeProcess.set("rigid", !endCondition.valid());
 
         // cache it and get an unique id for this process
         relationId = cacheInterval(timeProcess);
@@ -1794,6 +1800,15 @@ ConditionedProcessId Engine::addTriggerPoint(TimeProcessId containingBoxId, Time
     // add the event to the condition with no associated expression
     timeCondition.send("EventAdd", timeEvent, out);
     
+    // get attached processes to set them as non rigid
+    timeEvent.get("attachedProcesses", out);
+    
+    for (TTElementIter it = out.begin(); it != out.end(); it++)
+    {
+        TTObject attachedProcess = TTElement(*it);
+        attachedProcess.set("rigid", false);
+    }
+    
     // we cache the time process and the event index instead of the event itself
     triggerId = cacheConditionedProcess(containingBoxId, controlPointIndex);
     
@@ -1816,7 +1831,7 @@ void Engine::removeTriggerPoint(ConditionedProcessId triggerId)
     if (m_conditionedProcessMap.find(triggerId) == m_conditionedProcessMap.end())
         return;
     
-    TTValue     out;
+    TTValue     out, events, processes;
     TTObject    parentScenario;
     
     // get the parent scenario
@@ -1824,7 +1839,20 @@ void Engine::removeTriggerPoint(ConditionedProcessId triggerId)
     parentScenario = out[0];
     
     // release the time condition
-    parentScenario.send("TimeConditionRelease", getTimeCondition(triggerId), out);
+    parentScenario.send("TimeConditionRelease", getTimeCondition(triggerId), events);
+    
+    // get attached processes of each events of the condition to set them as rigid
+    for (TTElementIter it = events.begin(); it != events.end(); it++)
+    {
+        TTObject timeEvent = TTElement(*it);
+        timeEvent.get("attachedProcesses", processes);
+        
+        for (TTElementIter it = processes.begin(); it != processes.end(); it++)
+        {
+            TTObject attachedProcess = TTElement(*it);
+            attachedProcess.set("rigid", true);
+        }
+    }
     
     // uncache
     uncacheConditionedProcess(triggerId);
@@ -1933,7 +1961,7 @@ void Engine::deleteCondition(TimeConditionId conditionId)
     std::list<ConditionedProcessId> & triggerIds = m_conditionsMap[conditionId];
     std::list<ConditionedProcessId>::iterator it;
     TTObject    parentScenario;
-    TTValue     out;
+    TTValue     out, events, processes;
 
     for (it = triggerIds.begin() ; it != triggerIds.end() ; ++it)
         detachFromCondition(conditionId, *it);
@@ -1944,6 +1972,19 @@ void Engine::deleteCondition(TimeConditionId conditionId)
 
     // release the condition
     parentScenario.send("TimeConditionRelease", getTimeCondition(conditionId), out);
+    
+    // get attached processes of each events of the condition to set them as rigid
+    for (TTElementIter it = events.begin(); it != events.end(); it++)
+    {
+        TTObject timeEvent = TTElement(*it);
+        timeEvent.get("attachedProcesses", processes);
+        
+        for (TTElementIter it = processes.begin(); it != processes.end(); it++)
+        {
+            TTObject attachedProcess = TTElement(*it);
+            attachedProcess.set("rigid", true);
+        }
+    }
 
     // uncache the condition
     uncacheTimeCondition(conditionId);
