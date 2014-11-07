@@ -12,7 +12,8 @@ before_install:
     - sudo dpkg -i gcc_4.9.1-1_amd64.deb
 
 script: 
+  - export CMAKE_PATH="$(pwd)/cmake-3.0.2-Linux-x86_64/bin"
   - source /opt/qt53/bin/qt53-env.sh
   - git clone https://github.com/OSSIA/OSSIA
   - cd OSSIA
-  - PATH=../cmake-3.0.2-Linux-x86_64/bin/:$PATH ./Build.sh jamoma iscore --clone
+  - PATH=$CMAKE_PATH:$PATH ./Build.sh jamoma iscore --clone
