@@ -883,6 +883,7 @@ BasicBox::detachFromCondition()
     for(; it!=_conditionalRelation.end() ; it++) {
         (*it)->detachBox(this);
     }
+
     removeConditionalRelations();
 }
 
