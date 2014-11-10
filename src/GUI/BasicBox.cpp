@@ -882,6 +882,9 @@ BasicBox::detachFromCondition()
 
     for(; it!=_conditionalRelation.end() ; it++) {
         (*it)->detachBox(this);
+        if ((*it)->nbOfAttachedBoxes() == 0) {
+            delete (*it);
+        }
     }
 
     removeConditionalRelations();
@@ -1043,8 +1046,7 @@ BasicBox::removeTriggerPoint(BoxExtremity extremity)
       updateRelations(extremity);
 
       Maquette::getInstance()->removeTriggerPoint(trgPoint->ID());
-      //_scene->update();
-      //update();
+      update();
     }
 }
 
