@@ -105,13 +105,10 @@ void
 ConditionalRelation::updateCoordinates()
 {
     /// \todo Maquette::getInstance()->getConditionDate(ID()); then update start/end;
-a;
+        QPair<BasicBox *, BasicBox *> lowestHighestBoxes = getLowestHighestBoxes();
 
-    QPair<BasicBox *, BasicBox *> lowestHighestBoxes = getLowestHighestBoxes();
-
-a;
-    _start = lowestHighestBoxes.first->getLeftGripPoint() - QPointF(GRIP_SHIFT,0);
-    _end = lowestHighestBoxes.second->getLeftGripPoint() - QPointF(GRIP_SHIFT,0);
+        _start = lowestHighestBoxes.first->getLeftGripPoint() - QPointF(GRIP_SHIFT,0);
+        _end = lowestHighestBoxes.second->getLeftGripPoint() - QPointF(GRIP_SHIFT,0);
 
     update();
 }
@@ -178,10 +175,7 @@ ConditionalRelation::attachBoxes(QList<BasicBox *> conditionedBox)
 void
 ConditionalRelation::detachBox(BasicBox * box)
 {
-k;
     Maquette::getInstance()->detachFromCondition(_id,box);
-    _boxesAttached.removeAll(box);
-
     updateCoordinates();
 }
 
