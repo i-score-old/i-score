@@ -16,7 +16,7 @@ TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *pare
     _addressLabel = new QLabel(tr("address : "));
     _deviceLabel = new QLabel("from device : ");
     _operatorLabel = new QLabel("operator :");
-    _conditionLabel = new QLabel("optionnal condition : ");
+    _conditionLabel = new QLabel("optional condition : ");
 
     // display availables addresses
     _addressEdit = new QComboBox;

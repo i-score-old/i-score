@@ -635,7 +635,7 @@ MainWindow::createMenus()
 {
 #ifdef __APPLE__
   _menuBar = new QMenuBar();
-  auto appleMenu = _menuBar->addMenu("i-Score");
+  auto appleMenu = _menuBar->addMenu("i-score");
 #else
   _menuBar = this->menuBar();
 #endif
