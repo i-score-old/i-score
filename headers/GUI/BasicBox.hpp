@@ -570,6 +570,8 @@ class BasicBox : public QGraphicsObject
     static const float RAIL_HEIGHT;
     static const float EAR_WIDTH;
     static const float EAR_HEIGHT;
+    static const float RELATION_GRIP_WIDTH;
+    static const float RELATION_GRIP_HEIGHT;
     static const int COMBOBOX_WIDTH;
     static const int COMBOBOX_HEIGHT;
     static const int BUTTON_SIZE;

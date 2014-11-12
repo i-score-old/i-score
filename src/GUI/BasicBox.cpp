@@ -101,6 +101,8 @@ const float BasicBox::RAIL_HEIGHT = 20.;
 const float BasicBox::MSGS_INDICATOR_WIDTH = 50;
 const float BasicBox::EAR_WIDTH = 11;
 const float BasicBox::EAR_HEIGHT = 35;
+const float BasicBox::RELATION_GRIP_WIDTH = 15;
+const float BasicBox::RELATION_GRIP_HEIGHT = 30;
 const float BasicBox::GRIP_CIRCLE_SIZE = 5;
 unsigned int BasicBox::BOX_MARGIN = 25;
 const QString BasicBox::SCENARIO_MODE_TEXT = tr("Scenario");
@@ -1842,8 +1844,8 @@ BasicBox::drawInteractionGrips(QPainter *painter)
   painter->drawChord(rect, startAngle, spanAngle);
   painter->rotate(90);
 
-  _leftGripEar = QRectF(-width()/2 -15, -15, 15, 30);
-  _rightGripEar = QRectF(width()/2     ,-15, 15, 30);
+  _leftGripEar = QRectF(-width()/2 - RELATION_GRIP_WIDTH, -RELATION_GRIP_HEIGHT/2, RELATION_GRIP_WIDTH, RELATION_GRIP_HEIGHT);
+  _rightGripEar = QRectF(width()/2 ,-RELATION_GRIP_HEIGHT/2, RELATION_GRIP_WIDTH, RELATION_GRIP_HEIGHT);
 
   painter->restore();
 
