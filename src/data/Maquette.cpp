@@ -109,7 +109,18 @@ Maquette::init()
 
 Maquette::Maquette() : _engines(nullptr)
 {
-    connect(this, SIGNAL(boxIsRunningSignal(uint,bool)), this, SLOT(boxIsRunningSlot(uint,bool)), Qt::QueuedConnection);
+	connect(this, SIGNAL(boxIsRunningSignal(uint,bool)),
+			this, SLOT(boxIsRunningSlot(uint,bool)), Qt::QueuedConnection);
+	connect(this, SIGNAL(triggerPointIsActiveSignal(uint,bool)),
+			this, SLOT(updateTriggerPointActiveStatus(uint,bool)), Qt::QueuedConnection);
+	connect(this, SIGNAL(playOrResumeSignal()),
+			_scene, SLOT(playOrResume()), Qt::QueuedConnection);
+	connect(this, SIGNAL(stopOrPauseSignal()),
+			_scene, SLOT(stopOrPause()), Qt::QueuedConnection);
+	connect(this, SIGNAL(changeTimeOffsetSignal(uint)),
+			_scene, SLOT(changeTimeOffset(uint)), Qt::QueuedConnection);
+	connect(this, SIGNAL(changeSpeedSignal(double)),
+			_scene, SLOT(speedChanged(double)), Qt::QueuedConnection);
 }
 
 QList<std::string> Maquette::addressList()
@@ -2107,7 +2118,7 @@ Maquette::udpatePlayModeView(bool running)
 void
 triggerPointIsActiveCallback(unsigned int trgID, bool active)
 {
-    Maquette::getInstance()->updateTriggerPointActiveStatus(trgID, active);
+	emit Maquette::getInstance()->triggerPointIsActiveSignal(trgID, active);
 }
 
 void
@@ -2121,41 +2132,37 @@ transportCallback(TTSymbol& transport, const TTValue& value)
 {
   MaquetteScene *scene = Maquette::getInstance()->scene();
 
-    if (scene != nullptr) {
-        
-        if (transport == TTSymbol("Play"))
-            scene->playOrResume();
-        
-        else if (transport == TTSymbol("Stop"))
-            scene->stopOrPause();
-        
-        else if (transport == TTSymbol("Pause"))
-            ;
-        
-        else if (transport == TTSymbol("Rewind"))
-            ;
-        
-        else if (transport == TTSymbol("StartPoint")) {
-            
-            if (value.size() == 1)
-                if (value[0].type() == kTypeUInt32)
-                    scene->changeTimeOffset(value[0]);
-            
-        }
-        else if (transport == TTSymbol("Speed")) {
-            
-            if (value.size() == 1)
-                if (value[0].type() == kTypeFloat32)
-                    scene->speedChanged(value[0]);
-            
-        }
-        
-        scene->view()->emitPlayModeChanged();
-    }
+	if (scene != nullptr) {
+
+		if (transport == TTSymbol("Play"))
+			scene->playOrResume();
+
+		else if (transport == TTSymbol("Stop"))
+			scene->stopOrPause();
+
+		else if (transport == TTSymbol("Pause"))
+			;
+
+		else if (transport == TTSymbol("Rewind"))
+			;
+
+		else if (transport == TTSymbol("StartPoint"))
+		{
+			if (value.size() == 1 && value[0].type() == kTypeUInt32)
+				emit Maquette::getInstance()->changeTimeOffsetSignal(value[0]);
+		}
+		else if (transport == TTSymbol("Speed"))
+		{
+			if (value.size() == 1 && value[0].type() == kTypeFloat32)
+				emit Maquette::getInstance()->changeSpeedSignal(value[0]);
+		}
+
+		scene->view()->emitPlayModeChanged();
+	}
 #ifdef DEBUG
-    else {
-        std::cerr << "Maquette::enginesNetworkCallback : attribute _scene == nullptr" << std::endl;
-    }
+	else {
+		std::cerr << "Maquette::enginesNetworkCallback : attribute _scene == nullptr" << std::endl;
+	}
 #endif
 }
 
