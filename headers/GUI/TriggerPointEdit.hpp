@@ -25,6 +25,7 @@ public slots :
 
     void addressFilter(QString deviceSelected, QString currentEntry);
     void manualAddressChange(QString newEntry);
+    void deviceSelectedChange(QString newDevice);
 private :
     AbstractTriggerPoint    *_abstract;
 

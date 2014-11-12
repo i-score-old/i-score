@@ -1,7 +1,7 @@
 #include "TriggerPointEdit.hpp"
 #include "TriggerPoint.hpp"
 #include "Maquette.hpp"
-
+#include <qdebug.h>
 
 TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *parent)
     : QDialog(parent)
@@ -20,6 +20,7 @@ TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *pare
 
     // display availables addresses
     _addressEdit = new QComboBox;
+    _addressEdit->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
     _userAddressEdit = new QLineEdit;
     _addressEdit->setLineEdit(_userAddressEdit); // lineEdit in comboBox
@@ -58,7 +59,7 @@ TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *pare
     connect(_conditionEdit,SIGNAL(textChanged(QString)),this,SLOT(expressionChanged()));
     connect(_okButton, SIGNAL(released()), this, SLOT(updateStuff()));
     connect(_cancelButton, SIGNAL(released()), this, SLOT(reject()));
-    connect(_deviceEdit, SIGNAL(currentIndexChanged(QString)), this, SLOT(addressFilter(QString)));
+    connect(_deviceEdit, SIGNAL(currentIndexChanged(QString)), this, SLOT(deviceSelectedChange(QString)));
     connect(_userAddressEdit, SIGNAL(textEdited(QString)), this, SLOT(manualAddressChange(QString)));
 }
 
@@ -187,6 +188,11 @@ void TriggerPointEdit::addressFilter(QString deviceSelected, QString currentEntr
 void TriggerPointEdit::manualAddressChange(QString newEntry)
 {
     addressFilter(_deviceEdit->currentText(), newEntry);
+}
+
+void TriggerPointEdit::deviceSelectedChange(QString newDevice)
+{
+    addressFilter(newDevice, "");
 }
 
 void TriggerPointEdit::parseMessage(std::string message)
