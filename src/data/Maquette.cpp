@@ -97,18 +97,7 @@ Maquette::init()
     delete _engines;
         
     _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, &deviceCallback, &deviceConnectionErrorCallback, jamomaFolder);
-
-    //Creating rootBox as the mainScenario
-    auto scenarioAb = new AbstractParentBox();
-    scenarioAb->setID(ROOT_BOX_ID);
-    /// \todo : set root box name. NH
-
-    ParentBox *scenarioBox = new ParentBox(scenarioAb, _scene);
-    _boxes[ROOT_BOX_ID] = scenarioBox;
-}
-
-Maquette::Maquette() : _engines(nullptr)
-{
+	
 	connect(this, SIGNAL(boxIsRunningSignal(uint,bool)),
 			this, SLOT(boxIsRunningSlot(uint,bool)), Qt::QueuedConnection);
 	connect(this, SIGNAL(triggerPointIsActiveSignal(uint,bool)),
@@ -121,6 +110,18 @@ Maquette::Maquette() : _engines(nullptr)
 			_scene, SLOT(changeTimeOffset(uint)), Qt::QueuedConnection);
 	connect(this, SIGNAL(changeSpeedSignal(double)),
 			_scene, SLOT(speedChanged(double)), Qt::QueuedConnection);
+	
+    //Creating rootBox as the mainScenario
+    auto scenarioAb = new AbstractParentBox();
+    scenarioAb->setID(ROOT_BOX_ID);
+    /// \todo : set root box name. NH
+
+    ParentBox *scenarioBox = new ParentBox(scenarioAb, _scene);
+    _boxes[ROOT_BOX_ID] = scenarioBox;
+}
+
+Maquette::Maquette() : _engines(nullptr)
+{
 }
 
 QList<std::string> Maquette::addressList()
