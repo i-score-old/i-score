@@ -735,6 +735,8 @@ class BasicBox : public QGraphicsObject
     QRectF _boxRect;
     QRectF _leftEar;
     QRectF _rightEar;
+    QRectF _leftGripEar;
+    QRectF _rightGripEar;
     QRectF _startTriggerGrip;
     QRectF _endTriggerGrip;
     QRectF _startMsgsIndicator;
