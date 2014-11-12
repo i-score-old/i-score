@@ -251,7 +251,6 @@ DeviceEdit::edit(QString name)
 
   _nameEdit->setFocus();
 
-  setCorrespondingProtocolLayout();
   exec();
 }
 
@@ -267,7 +266,6 @@ DeviceEdit::edit()
     _newDevice = true;
 
     _nameEdit->setFocus();
-    setCorrespondingProtocolLayout();
     exec();
 }
 
