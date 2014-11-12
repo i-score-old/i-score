@@ -30,9 +30,9 @@ cp -rf /usr/local/lib/libportmidi.dylib $ISCORE_BUNDLE/Contents/Frameworks/
 install_name_tool -change /usr/local/lib/libportmidi.dylib @executable_path/../Frameworks/libportmidi.dylib $ISCORE_BUNDLE/Contents/Frameworks/jamoma/extensions/MIDI.ttdylib
 
 # Gecode linking
+GECODE_DIR=$(dirname $(find /usr -name libgecodekernel.so))
 declare -a gecodelibs=("kernel" "support" "int" "set" "driver" "flatzinc" "minimodel" "search" "float")
 for GECODE_LIB in "${gecodelibs[@]}"
 do
-	#cp -rf /usr/local/lib/libgecode$GECODE_LIB.36.dylib $ISCORE_BUNDLE/Contents/Frameworks/
-	install_name_tool -change /usr/local/lib/libgecode$GECODE_LIB.36.dylib @executable_path/../Frameworks/libgecode$GECODE_LIB.36.dylib $ISCORE_BUNDLE/Contents/Frameworks/jamoma/extensions/Scenario.ttdylib
+	install_name_tool -change $GECODE_DIR/libgecode$GECODE_LIB.36.dylib @executable_path/../Frameworks/libgecode$GECODE_LIB.36.dylib $ISCORE_BUNDLE/Contents/Frameworks/jamoma/extensions/Scenario.ttdylib
 done
