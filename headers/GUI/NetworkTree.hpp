@@ -350,6 +350,8 @@ class NetworkTree : public QTreeWidget
     inline void
     removeAssignItem(QTreeWidgetItem* item){ _assignedItems.remove(item); }
 
+    void removeCurrentNode();
+
     inline bool
     treeFilterActive(){return _treeFilterActive;}
     /*!
