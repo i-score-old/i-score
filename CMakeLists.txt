@@ -24,17 +24,17 @@ add_definitions(-DTT_NO_DSP)
 
 #TODO find_package
 if(UNIX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-unused-parameter -Wno-deprecated-register -Wno-unknown-pragmas -Wno-conversion")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-unused-parameter -Wno-deprecated-register  -Wno-deprecated-declarations -Wno-unknown-pragmas -Wno-conversion")
 	include_directories("/usr/local/lib/jamoma/include")
 	include_directories("/usr/local/jamoma/include")
 	include_directories("/usr/include/libxml2")
+	include_directories("/usr/include/jamoma")
 	
 	if(APPLE)
 		set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR})
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.7 -stdlib=libc++")
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++")
 	else()
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-rpath,/usr/local/lib/jamoma/lib  -Wl,-rpath,/usr/local/jamoma/lib -Wl,-rpath,/usr/local/jamoma/extensions")
 	endif()
 	
 #	set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
