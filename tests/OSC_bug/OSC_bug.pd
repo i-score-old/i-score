@@ -1,0 +1,26 @@
+#N canvas 617 344 566 338 10;
+#X obj 304 237 udpsend;
+#X obj 11 74 loadbang;
+#X msg 11 94 connect 127.0.0.1 9996;
+#X obj 304 265 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+1;
+#X obj 210 135 list prepend send;
+#X obj 210 157 list trim;
+#X obj 210 114 packOSC;
+#X msg 210 60 /test/x \$1;
+#X floatatom 210 43 5 0 0 0 - - -, f 5;
+#X msg 339 109 send 20 10;
+#X text 12 56 1 connect;
+#X text 347 90 3 send some non-OSC bytes;
+#X text 209 26 2&4 send some OSC message;
+#X text 55 290 after sending non-OSC messages \, i-score doesn't understand
+anything else...;
+#X connect 0 0 3 0;
+#X connect 1 0 2 0;
+#X connect 2 0 0 0;
+#X connect 4 0 5 0;
+#X connect 5 0 0 0;
+#X connect 6 0 4 0;
+#X connect 7 0 6 0;
+#X connect 8 0 7 0;
+#X connect 9 0 0 0;
