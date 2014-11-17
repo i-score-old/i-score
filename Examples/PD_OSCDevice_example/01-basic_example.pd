@@ -1,9 +1,9 @@
-#N canvas 25 679 450 300 10;
+#N canvas 577 126 450 300 10;
 #X declare -stdpath osc -stdpath iemnet -lib iemnet -path abs;
 #X declare -path ../osc;
 #X declare -path ../osc;
 #X declare -path ../osc;
-#N canvas 544 500 418 579 OSC 0;
+#N canvas 542 145 418 579 OSC 0;
 #X obj 41 427 s from_i-score;
 #X obj 252 52 r to_i-score;
 #X obj 195 192 loadbang;
@@ -69,24 +69,24 @@ and;
 #X connect 27 0 12 0;
 #X connect 28 0 18 0;
 #X restore 38 58 pd OSC;
-#X floatatom 128 147 5 0 0 0 x - -, f 5;
+#X floatatom 128 147 5 0 0 0 x - -;
 #X text 34 8 You need mrpeach/osc and iemnet or mrpeach/net objects
 to use this patch.;
 #X obj 37 36 declare -stdpath osc -stdpath iemnet -lib iemnet -path
 abs;
-#X floatatom 128 167 5 0 0 0 y - -, f 5;
-#X obj 164 166 oscparam /position/y;
-#X obj 164 146 oscparam /position/x;
+#X floatatom 128 167 5 0 0 0 y - -;
 #X obj 164 196 oscparam /name;
-#X symbolatom 95 197 10 0 0 0 - - -, f 10;
+#X symbolatom 95 197 10 0 0 0 - - -;
 #X obj 164 216 symbol;
 #X text 62 91 Open the 01-simple_example.score with i-score.;
 #X text 62 111 Then press play in i-score \, you should see some changes
 here!;
-#X connect 1 0 6 0;
-#X connect 4 0 5 0;
-#X connect 5 0 4 0;
-#X connect 6 0 1 0;
-#X connect 7 0 9 0;
-#X connect 8 0 7 0;
-#X connect 9 0 8 0;
+#X obj 164 166 oscparam /position/y;
+#X obj 164 146 oscparam /position/x;
+#X connect 1 0 11 0;
+#X connect 4 0 10 0;
+#X connect 5 0 7 0;
+#X connect 6 0 5 0;
+#X connect 7 0 6 0;
+#X connect 10 0 4 0;
+#X connect 11 0 1 0;
