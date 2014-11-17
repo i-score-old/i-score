@@ -1405,7 +1405,10 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
   if (event->button() == Qt::LeftButton)
   {
-      _scene->unselectAll();
+	  if(!isSelected())
+	  {
+		  _scene->unselectAll();
+	  }
       setSelected(true);
       emit _scene->selectionChanged();
 
