@@ -28,6 +28,7 @@ if(UNIX)
 	include_directories("/usr/local/lib/jamoma/include")
 	include_directories("/usr/local/jamoma/include")
 	include_directories("/usr/include/libxml2")
+	include_directories("/usr/local/include/jamoma")
 	include_directories("/usr/include/jamoma")
 	
 	if(APPLE)

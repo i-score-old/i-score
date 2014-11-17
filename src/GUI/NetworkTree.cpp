@@ -1882,6 +1882,7 @@ NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool b_select)
 void
 NetworkTree::mousePressEvent(QMouseEvent *event)
 {
+	qDebug(Q_FUNC_INFO);
     _noItemClicked = true;
     QTreeWidget::mousePressEvent(event);
 
@@ -2073,6 +2074,7 @@ NetworkTree::keyPressEvent(QKeyEvent *event)
 void
 NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 {
+	qDebug(Q_FUNC_INFO);
     _noItemClicked = false;
     if (item != nullptr) {
         if(item->type()==DeviceNode && column == NAME_COLUMN){
@@ -2081,11 +2083,12 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 
         execClickAction(item, selectedItems(), column);
 
-        if (item->isSelected()) {
+        //if (item->isSelected()) 
+		{
             recursiveChildrenSelection(item, true);
             recursiveFatherSelection(item, true);
         }
-
+/*
         if (!item->isSelected() && item->type() != OSCNode) {
             unselectPartially(item);
             recursiveChildrenSelection(item, false);
@@ -2101,6 +2104,7 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
                 recursiveChildrenSelection(curIt, true);
             }
         }
+		*/
 
         emit(treeSelectionChanged(selectedItems()));
 
@@ -2630,7 +2634,8 @@ NetworkTree::getChildren(QTreeWidgetItem *item, QList<QTreeWidgetItem *> & items
 }
 void
 NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> selectedItems, int column)
-{                
+{
+	qDebug(Q_FUNC_INFO);   
     QTreeWidgetItem *item;
     QList<QTreeWidgetItem *>::iterator it;    
 
