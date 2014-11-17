@@ -1132,6 +1132,26 @@ NetworkTree::fatherColumnCheck(QTreeWidgetItem *item, int column)
             }
         }
       fatherColumnCheck(father, column);
+  }
+}
+
+void NetworkTree::removeCurrentNode()
+{
+    if(currentItem() != nullptr){
+        QString itemName = getAbsoluteAddress(currentItem());
+        int ret = QMessageBox::warning(this, QString("Delete %1").arg(itemName),
+                                        QString("Do you really want to delete %1 ?").arg(itemName),
+                                        QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel );
+        switch (ret) {
+            case QMessageBox::Yes:{
+                removeOSCMessage(currentItem());
+                currentItem()->parent()->removeChild(currentItem());
+                break;
+            }
+            case QMessageBox::Cancel:{
+                break;
+            }
+        }
     }
 }
 
@@ -1645,7 +1665,7 @@ NetworkTree::deleteCurrentItemNamespace()
 
         int ret = QMessageBox::warning(this, QString("Delete %1").arg(itemName),
                                         QString("Do you really want to delete %1 ?").arg(itemName),
-                                        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                                        QMessageBox::Yes | QMessageBox::Cancel,
                                         QMessageBox::Cancel);
         switch (ret) {
         case QMessageBox::Yes:{
@@ -1653,9 +1673,6 @@ NetworkTree::deleteCurrentItemNamespace()
             Maquette::getInstance()->removeNetworkDevice(itemName.toStdString());
             return;
         }
-
-        case QMessageBox::No:
-            break;
 
         case QMessageBox::Cancel:
             break;
@@ -1901,7 +1918,23 @@ NetworkTree::mousePressEvent(QMouseEvent *event)
                     contextMenu->addAction(deleteAct);
 
                     connect(deleteAct, &QAction::triggered,
-                            this, std::bind(&NetworkTree::removeOSCMessage, this, currentItem()));
+                            this, &NetworkTree::removeCurrentNode);
+
+                    contextMenu->exec(event->globalPos());
+
+                    deleteAct->deleteLater();
+                    contextMenu->deleteLater();
+                    break;
+                }
+                case LeaveType:
+                {
+                    QMenu *contextMenu = new QMenu(this);
+                    QAction *deleteAct = new QAction(tr("Delete"),this);
+
+                    contextMenu->addAction(deleteAct);
+
+                    connect(deleteAct, &QAction::triggered,
+                            this, &NetworkTree::removeCurrentNode);
 
                     contextMenu->exec(event->globalPos());
 
