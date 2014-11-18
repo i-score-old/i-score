@@ -816,6 +816,9 @@ TimeProcessId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const s
     
     iscoreEngineDebug TTLogMessage("TimeProcess %ld created at %ld ms for a duration of %ld ms\n", boxId, boxBeginPos, boxLength);
     
+    // DEBUG : create a loop
+    enableLoop(boxId);
+    
 	return boxId;
 }
 
@@ -2168,6 +2171,42 @@ void Engine::getConditionsId(vector<TimeConditionId>& conditionsID)
     for(it = m_conditionsMap.begin() ; it != m_conditionsMap.end() ; ++it) {
         conditionsID.push_back(it->first);
     }
+}
+
+bool Engine::enableLoop(TimeProcessId boxId)
+{
+    TTObject timeProcess = getTimeProcess(boxId);
+    TTObject subScenario = getSubScenario(boxId);
+    TTObject parentScenario = getTimeProcess(getParentId(boxId));
+    
+    // get start and end events
+    TTObject startEvent, endEvent;
+    timeProcess.get("startEvent", startEvent);
+    timeProcess.get("endEvent", endEvent);
+    
+    // create a new loop time process into the mother scenario
+    TTObject    timeLoop;
+    TTValue     out, args(TTSymbol("Loop"), startEvent, endEvent);
+    parentScenario.send("TimeProcessCreate", args, out);
+    timeLoop = out[0];
+    
+    // DEBUG :
+    timeLoop.set("name", TTSymbol("LoopTest"));
+    startEvent.set("name", TTSymbol("LoopIn"));
+    endEvent.set("name", TTSymbol("LoopOut"));
+    
+    // attach time process and sub scenario to the loop pattern
+    timeLoop.send("PatternAttach", timeProcess);
+    timeLoop.send("PatternAttach", subScenario);
+    
+    // TODO : cache the loop
+
+	return true;
+}
+
+bool Engine::disableLoop(TimeProcessId boxId)
+{
+    return true;
 }
 
 void Engine::setViewZoom(QPointF zoom)

@@ -873,6 +873,20 @@ public:
     void getConditionsId(std::vector<TimeConditionId>& conditionsID);
     
     /*!
+     * Enable loop on a box
+     *
+     * \param boxId : the box to loop
+     */
+    bool enableLoop(TimeProcessId boxId);
+    
+    /*!
+     * Disable loop on a box
+     *
+     * \param boxId : the box to not loop
+     */
+    bool disableLoop(TimeProcessId boxId);
+    
+    /*!
 	 * Set the zoom factor of the view of the main scenario
 	 * 
 	 * \param zoom : the zoom factor as QPointF variable
