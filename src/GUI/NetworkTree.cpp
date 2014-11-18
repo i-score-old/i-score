@@ -56,6 +56,7 @@
 #include <QApplication>
 #include <DelayedDelete.h>
 #include <utility>
+#include <QDebug>
 
 int NetworkTree::NAME_COLUMN = 0;
 int NetworkTree::VALUE_COLUMN = 1;
@@ -2224,9 +2225,19 @@ QList<string> NetworkTree::getAddressList()
     QList<string> addressList;
     QMap<QTreeWidgetItem *, string>::iterator it;
     for (it = _addressMap.begin(); it != _addressMap.end(); it++) {
-        if( it.key()->toolTip(NetworkTree::TYPE_COLUMN) == "Type parameter" || it.key()->toolTip(NetworkTree::TYPE_COLUMN) == "Type message" || it.key()->toolTip(NetworkTree::TYPE_COLUMN) == "Type return" ) {
-            addressList << it.value();
-  //          qDebug() << nodeType.c_str();
+        if(it.key() != nullptr) {
+            QTreeWidgetItem* item = it.key();
+            if(checkPredicateInTree(this->invisibleRootItem(), [&item] (QTreeWidgetItem* node)
+                    {
+                        return node == item;
+                    }))
+            {
+                if (it.key()->toolTip(NetworkTree::TYPE_COLUMN) != nullptr) {
+                    if( it.key()->toolTip(NetworkTree::TYPE_COLUMN) == "Type parameter" || it.key()->toolTip(NetworkTree::TYPE_COLUMN) == "Type message" || it.key()->toolTip(NetworkTree::TYPE_COLUMN) == "Type return" ) {
+                        addressList << it.value();
+                    }
+                }
+            }
         }
     }
     return addressList;
