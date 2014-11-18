@@ -2237,8 +2237,15 @@ bool Engine::play(TimeProcessId processId)
     TTLogMessage("***************************************\n");
     TTLogMessage("Engine::play\n");
     
-    // play a time process triggering its start event (this will also play other time processes attached to the start event)
-    TTBoolean success = !getTimeProcess(processId).send("Start");
+    // for local play : solo the process then goto one ms before its start date
+    if (processId != ROOT_BOX_ID)
+    {
+        TTValue v;
+        getTimeProcess(processId).get("startDate", v);
+        setTimeOffset(TTUInt32(v[0])-1, YES); // YES to mute the recall of the state
+    }
+    
+    TTBoolean success = !m_mainScenario.send("Start");
   
     return success;
 }
