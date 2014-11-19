@@ -2082,7 +2082,6 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
             Maquette::getInstance()->setDeviceLearn(item->text(NAME_COLUMN).toStdString(),item->checkState(NAME_COLUMN));
         }
 		
-		execClickAction(item, selectedItems(), column);
 		
 		bool select = item->isSelected();
 		if(item->text(TYPE_COLUMN) == "<->")
@@ -2096,6 +2095,8 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 			recursiveChildrenSelection(item, select);
 			recursiveFatherSelection(item, select);
 		}
+		
+		execClickAction(item, selectedItems(), column);
 		/*
 		if (selectionMode() == QAbstractItemView::ContiguousSelection) 
 		{
@@ -2665,7 +2666,7 @@ NetworkTree::getChildren(QTreeWidgetItem *item, QList<QTreeWidgetItem *> & items
 void
 NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> selectedItems, int column)
 {
-	qDebug(Q_FUNC_INFO);   
+	qDebug(Q_FUNC_INFO);
     QTreeWidgetItem *item;
     QList<QTreeWidgetItem *>::iterator it;    
 
@@ -2686,42 +2687,72 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
     }
     selectedItems<<allChildren;
 
-    if(column == START_ASSIGNATION_COLUMN){
-        if(hasStartMsg(curItem)){
-            //cmd+click update values
-            if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
-                emit(requestSnapshotStart(selectedItems));
-            }
-            else{
-                //remove all start messages
-                for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++){
-                    item = *it;
-                    item->setText(START_COLUMN, "");
-                    emit(startValueChanged(item, ""));
-                }
-            }
-        }
-        else
-            emit(requestSnapshotStart(selectedItems));
-    }
-    else if(column == END_ASSIGNATION_COLUMN){
-        if(hasEndMsg(curItem)){
-            //cmd+click update values
-            if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
-                emit(requestSnapshotEnd(selectedItems));
-            }
-            else{
-                //remove all start messages
-                for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++){
-                    item = *it;
-                    item->setText(END_COLUMN, "");
-                    emit(endValueChanged(item, ""));
-                }
-            }
-        }
-        else
-            emit(requestSnapshotEnd(selectedItems));
-    }
+	if(column == START_ASSIGNATION_COLUMN)
+	{
+		if(hasStartMsg(curItem))
+		{
+			//cmd+click update values
+			if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier)
+			{
+				emit(requestSnapshotStart(selectedItems));
+			}
+			else
+			{
+				//remove all start messages
+				for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++)
+				{
+					item = *it;
+					item->setText(START_COLUMN, "");
+					emit(startValueChanged(item, ""));
+				}
+			}
+		}
+		else if(curItem->checkState(START_ASSIGNATION_COLUMN) != Qt::Unchecked)
+		{
+			for(auto& item : selectedItems)
+			{
+				item->setText(START_COLUMN, "");
+				emit(startValueChanged(item, ""));
+			}
+		}
+		else
+		{
+			emit(requestSnapshotStart(selectedItems));
+		}
+	}
+	else if(column == END_ASSIGNATION_COLUMN)
+	{
+		if(hasEndMsg(curItem))
+		{
+			//cmd+click update values
+			if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier)
+			{
+				emit(requestSnapshotEnd(selectedItems));
+			}
+			else
+			{
+				//remove all start messages
+				for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++)
+				{
+					item = *it;
+					item->setText(END_COLUMN, "");
+					emit(endValueChanged(item, ""));
+				}
+			}
+		}
+		else if(curItem->checkState(START_ASSIGNATION_COLUMN) != Qt::Unchecked)
+		{
+			for(auto& item : selectedItems)
+			{
+				item->setText(START_COLUMN, "");
+				emit(startValueChanged(item, ""));
+			}
+		}
+		else
+		{
+			emit(requestSnapshotEnd(selectedItems));
+		}
+	}
 
     else if ((curItem->type() == LeaveType || curItem->type() == OSCNode) && column == INTERPOLATION_COLUMN) {
         if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
