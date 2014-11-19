@@ -1864,13 +1864,13 @@ NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool b_select)
       int childrenCount = curItem->childCount();
       for (i = 0; i < childrenCount; i++) {
           child = curItem->child(i);
-          if (child->type() == NodeNoNamespaceType) {
+          //if (child->type() == NodeNoNamespaceType) {
               child->setSelected(b_select);
               recursiveChildrenSelection(child, b_select);
-            }
-          if (child->type() == LeaveType) {
-              child->setSelected(b_select);
-            }
+          //  }
+          //if (child->type() == LeaveType) {
+          //    child->setSelected(b_select);
+          //  }
         }
     }
 }
@@ -2082,21 +2082,48 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
             Maquette::getInstance()->setDeviceLearn(item->text(NAME_COLUMN).toStdString(),item->checkState(NAME_COLUMN));
         }
 		
-		
-		bool select = item->isSelected();
-		if(item->text(TYPE_COLUMN) == "<->")
-		{
-			//item->setSelected(select);
-			recursiveChildrenSelection(item, select);
-			recursiveFatherSelection(item, select);
-		}
-		else if(item->childCount() > 0)
-		{
-			recursiveChildrenSelection(item, select);
-			recursiveFatherSelection(item, select);
-		}
-		
 		execClickAction(item, selectedItems(), column);
+		
+		//if(column == 0)
+		{
+			bool select = item->isSelected();
+			if(item->text(TYPE_COLUMN) == "<->")
+			{
+				recursiveChildrenSelection(item, select);
+				recursiveFatherSelection(item, select);
+			}
+			else if(item->childCount() > 0)
+			{
+				recursiveChildrenSelection(item, select);
+				recursiveFatherSelection(item, select);
+			}
+		}
+	//	else if(column > 0)
+		{
+		}
+		
+		if(item->childCount() > 0)
+		{
+			bool deselect_start = true;
+			bool deselect_end = true;
+			
+			qDebug() << item->text(0) << item->childCount();
+			for(int cnt = 0; cnt < item->childCount(); ++cnt)
+			{
+				auto child = item->child(cnt);
+				if(child->checkState(START_ASSIGNATION_COLUMN) != Qt::Unchecked)
+				{
+					deselect_start = false; 
+				}
+				if(child->checkState(END_ASSIGNATION_COLUMN) != Qt::Unchecked)
+				{
+					deselect_end = false; 
+				}
+			}
+			
+			if(deselect_start) item->setCheckState(START_ASSIGNATION_COLUMN, Qt::Unchecked);
+			if(deselect_end) item->setCheckState(END_ASSIGNATION_COLUMN, Qt::Unchecked);
+		}
 		/*
 		if (selectionMode() == QAbstractItemView::ContiguousSelection) 
 		{
@@ -2654,12 +2681,12 @@ NetworkTree::getChildren(QTreeWidgetItem *item, QList<QTreeWidgetItem *> & items
         int childrenCount = item->childCount();
         for (int i = 0; i < childrenCount; i++) {
             child = item->child(i);
-            if (child->type() == NodeNoNamespaceType) {
+            //if (child->type() == NodeNoNamespaceType) {
                 items<<child;
                 getChildren(child, items);
-            }
-            else
-                items<<child;
+            //}
+            //else
+            //    items<<child;
         }
     }
 }
@@ -2689,15 +2716,18 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
 
 	if(column == START_ASSIGNATION_COLUMN)
 	{
+		qDebug("++ 0 ++");
 		if(hasStartMsg(curItem))
 		{
 			//cmd+click update values
 			if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier)
 			{
+				qDebug("++ 0 ++ 0 ++");
 				emit(requestSnapshotStart(selectedItems));
 			}
 			else
 			{
+				qDebug("++ 0 ++ 1 ++");
 				//remove all start messages
 				for(it=selectedItems.begin() ; it!=selectedItems.end() ; it++)
 				{
@@ -2707,8 +2737,11 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
 				}
 			}
 		}
-		else if(curItem->checkState(START_ASSIGNATION_COLUMN) != Qt::Unchecked)
+		else if(curItem->checkState(START_ASSIGNATION_COLUMN) != Qt::Unchecked && curItem->childCount() > 0)
 		{
+			
+			qDebug("++ 1 ++");
+			qDebug() <<curItem->text(0) << curItem->checkState(START_ASSIGNATION_COLUMN) << Qt::Checked;
 			for(auto& item : selectedItems)
 			{
 				item->setText(START_COLUMN, "");
@@ -2717,6 +2750,8 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
 		}
 		else
 		{
+			qDebug("++ 2 ++");
+			for(auto& it : selectedItems) qDebug() << it->text(0);
 			emit(requestSnapshotStart(selectedItems));
 		}
 	}
@@ -2740,12 +2775,12 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
 				}
 			}
 		}
-		else if(curItem->checkState(START_ASSIGNATION_COLUMN) != Qt::Unchecked)
+		else if(curItem->checkState(END_ASSIGNATION_COLUMN) != Qt::Unchecked  && curItem->childCount() > 0)
 		{
 			for(auto& item : selectedItems)
 			{
-				item->setText(START_COLUMN, "");
-				emit(startValueChanged(item, ""));
+				item->setText(END_COLUMN, "");
+				emit(endValueChanged(item, ""));
 			}
 		}
 		else
