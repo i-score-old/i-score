@@ -180,12 +180,12 @@ public:
     // Id management //////////////////////////////////////////////////////////////////
     
     TimeBoxId           cacheTimeBox(TTObject& automation, TTAddress& anAddress, TTObject& subScenario);
+    TTObject&           getMainProcess(TimeBoxId boxId);
     TTObject&           getAutomation(TimeBoxId boxId);
-    TTObject&           getAutomationOrLoop(TimeBoxId boxId);
-    TTAddress&          getAddress(TimeBoxId boxId);
     TTObject&           getSubScenario(TimeBoxId boxId);
-    void                setLoop(TimeBoxId boxId, TTObject& loop);
     TTObject&           getLoop(TimeBoxId boxId);
+    void                setLoop(TimeBoxId boxId, TTObject& loop);
+    TTAddress&          getAddress(TimeBoxId boxId);
     void                uncacheTimeBox(TimeBoxId boxId);
     void                clearTimeBox();
     
@@ -708,16 +708,16 @@ public:
 	bool getCurveValues(TimeBoxId boxId, const std::string & address, unsigned int argNb, std::vector<float>& result);
     
 	/*!
-	 * Adds a new triggerPoint in CSP.
+	 * Adds a new triggerPoint to a box.
      *
-     * \param containingBoxId :
+     * \param boxId : the Id of the box.
 	 *
 	 * \return the created trigger ID
 	 */
-	ConditionedTimeBoxId addTriggerPoint(TimeBoxId containingBoxId, TimeEventIndex controlPointIndex);
+	ConditionedTimeBoxId addTriggerPoint(TimeBoxId boxId, TimeEventIndex controlPointIndex);
     
 	/*!
-	 * Removes the triggerPoint from the CSP.
+	 * Removes the triggerPoint from a box.
 	 *
 	 * Throws OutOfBoundException if the ID is not matching any triggerPoint.
 	 *
@@ -855,6 +855,14 @@ public:
      * \param boxId : the box to not loop
      */
     bool disableLoop(TimeBoxId boxId);
+    
+    /*!
+     * Is there a loop for a box ?
+     *
+     * \param boxId : the box to not loop
+     * \return true if there is a loop for the box
+     */
+    bool isLoop(TimeBoxId boxId);
     
     /*!
 	 * Set the zoom factor of the view of the main scenario

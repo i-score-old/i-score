@@ -320,12 +320,7 @@ TimeBoxId Engine::cacheTimeBox(TTObject& automation, TTAddress& anAddress, TTObj
     return id;
 }
 
-TTObject& Engine::getAutomation(TimeBoxId boxId)
-{
-    return m_timeBoxMap[boxId]->object;
-}
-
-TTObject& Engine::getAutomationOrLoop(TimeBoxId boxId)
+TTObject& Engine::getMainProcess(TimeBoxId boxId)
 {
     if (m_timeBoxMap[boxId]->loop.valid())
         return m_timeBoxMap[boxId]->loop;
@@ -333,9 +328,9 @@ TTObject& Engine::getAutomationOrLoop(TimeBoxId boxId)
     return m_timeBoxMap[boxId]->object;
 }
 
-TTAddress& Engine::getAddress(TimeBoxId boxId)
+TTObject& Engine::getAutomation(TimeBoxId boxId)
 {
-    return m_timeBoxMap[boxId]->address;
+    return m_timeBoxMap[boxId]->object;
 }
 
 TTObject& Engine::getSubScenario(TimeBoxId boxId)
@@ -351,6 +346,11 @@ void Engine::setLoop(TimeBoxId boxId, TTObject& loop)
 TTObject& Engine::getLoop(TimeBoxId boxId)
 {
     return m_timeBoxMap[boxId]->loop;
+}
+
+TTAddress& Engine::getAddress(TimeBoxId boxId)
+{
+    return m_timeBoxMap[boxId]->address;
 }
 
 TimeBoxId Engine::getParentId(TimeBoxId boxId)
@@ -480,7 +480,7 @@ void Engine::clearInterval()
 
 ConditionedTimeBoxId Engine::cacheConditionedTimeBox(TimeBoxId boxId, TimeEventIndex controlPointId)
 {
-    TTObject                timeProcess = getAutomationOrLoop(boxId);
+    TTObject                timeProcess = getMainProcess(boxId);
     ConditionedTimeBoxId    id;
     EngineCacheElementPtr   e;
     
@@ -840,7 +840,7 @@ void Engine::removeBox(TimeBoxId boxId)
     TTErr       err;
     
     // if there is a loop : disable it before
-    if (getLoop(boxId).valid())
+    if (isLoop(boxId))
         disableLoop(boxId);
     
     // retreive the automation and sub scenario using the boxId
@@ -880,7 +880,7 @@ IntervalId Engine::addTemporalRelation(TimeBoxId boxId1,
                                        vector<TimeBoxId>& movedBoxes)
 {
     TTObject    interval;
-    TTObject    tp1, tp2;
+    TTObject    timeProcess1, timeProcess2;
     TTObject    startEvent, endEvent;
     TTObject    startScenario, endScenario;
     TTObject    endCondition;
@@ -890,20 +890,20 @@ IntervalId Engine::addTemporalRelation(TimeBoxId boxId1,
     EngineCacheMapIterator  it;
     
     // get the events from the given box ids and pass them to the time process
-    tp1 = getAutomationOrLoop(boxId1);
-    tp2 = getAutomationOrLoop(boxId2);
+    timeProcess1 = getMainProcess(boxId1);
+    timeProcess2 = getMainProcess(boxId2);
     
     if (controlPoint1 == BEGIN_CONTROL_POINT_INDEX)
-        tp1.get("startEvent", out);
+        timeProcess1.get("startEvent", out);
     else
-        tp1.get("endEvent", out);
+        timeProcess1.get("endEvent", out);
     
     startEvent = out[0];
     
     if (controlPoint2 == BEGIN_CONTROL_POINT_INDEX)
-        tp2.get("startEvent", out);
+        timeProcess2.get("startEvent", out);
     else
-        tp2.get("endEvent", out);
+        timeProcess2.get("endEvent", out);
     
     endEvent = out[0];
     
@@ -1023,14 +1023,14 @@ bool Engine::isTemporalRelationExisting(TimeBoxId boxId1, TimeEventIndex control
     
     // Get the events from the given box ids and pass them to the time process
     if (controlPoint1 == BEGIN_CONTROL_POINT_INDEX)
-        getAutomationOrLoop(boxId1).get("startEvent", v1);
+        getMainProcess(boxId1).get("startEvent", v1);
     else
-        getAutomationOrLoop(boxId1).get("endEvent", v1);
+        getMainProcess(boxId1).get("endEvent", v1);
     
     if (controlPoint2 == BEGIN_CONTROL_POINT_INDEX)
-        getAutomationOrLoop(boxId2).get("startEvent", v2);
+        getMainProcess(boxId2).get("startEvent", v2);
     else
-        getAutomationOrLoop(boxId2).get("endEvent", v2);
+        getMainProcess(boxId2).get("endEvent", v2);
     
     // Look into the interval map to retreive an interval with the same events
     for (it = m_intervalMap.begin(); it != m_intervalMap.end(); ++it) {
@@ -1196,7 +1196,7 @@ bool Engine::performBoxEditing(TimeBoxId boxId, TimeValue start, TimeValue end, 
     EngineCacheMapIterator  it;
     
     args = TTValue(start, end);
-    err = getAutomationOrLoop(boxId).send("Move", args, out);
+    err = getMainProcess(boxId).send("Move", args, out);
 
     // return the entire time box map except the first box !!! (this is bad but it is like former engine)
     it = m_timeBoxMap.begin();
@@ -1275,7 +1275,7 @@ void Engine::setBoxMuteState(TimeBoxId boxId, bool muteState)
 {
     getAutomation(boxId).set("mute", muteState);
     getSubScenario(boxId).set("mute", muteState);
-    if (getLoop(boxId).valid())
+    if (isLoop(boxId))
         getLoop(boxId).set("mute", muteState);
 }
 
@@ -1317,7 +1317,7 @@ TimeValue Engine::getBoxBeginTime(TimeBoxId boxId)
     TTValue     v;
     TimeValue   startDate;
 
-	getAutomationOrLoop(boxId).get("startDate", v);
+	getMainProcess(boxId).get("startDate", v);
     startDate = v[0];
     
     return startDate;
@@ -1328,7 +1328,7 @@ TimeValue Engine::getBoxEndTime(TimeBoxId boxId)
     TTValue     v;
     TimeValue   endDate;
 
-	getAutomationOrLoop(boxId).get("endDate", v);
+	getMainProcess(boxId).get("endDate", v);
     endDate = v[0];
     
     return endDate;
@@ -1338,7 +1338,7 @@ TimeValue Engine::getBoxDuration(TimeBoxId boxId)
 {
     TTValue v;
     
-	getAutomationOrLoop(boxId).get("duration", v);
+	getMainProcess(boxId).get("duration", v);
     
     return v[0];
 }
@@ -1347,7 +1347,7 @@ int Engine::getBoxNbCtrlPoints(TimeBoxId boxId)
 {
     TTValue v;
     
-	getAutomationOrLoop(boxId).get("intermediateEvents", v);
+	getMainProcess(boxId).get("intermediateEvents", v);
     
     return v.size() + 2; // because there is always a start and an end event too
 }
@@ -1371,9 +1371,9 @@ void Engine::setCtrlPointMessagesToSend(TimeBoxId boxId, TimeEventIndex controlP
 
     // get the start or end event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        getAutomationOrLoop(boxId).get("startEvent", out);
+        getMainProcess(boxId).get("startEvent", out);
     else
-        getAutomationOrLoop(boxId).get("endEvent", out);
+        getMainProcess(boxId).get("endEvent", out);
     
     event = out[0];
     
@@ -1422,9 +1422,9 @@ void Engine::getCtrlPointMessagesToSend(TimeBoxId boxId, TimeEventIndex controlP
     
     // get the start or end event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        getAutomationOrLoop(boxId).get("startEvent", out);
+        getMainProcess(boxId).get("startEvent", out);
     else
-        getAutomationOrLoop(boxId).get("endEvent", out);
+        getMainProcess(boxId).get("endEvent", out);
     
     event = out[0];
     
@@ -1474,9 +1474,9 @@ void Engine::setCtrlPointMutingState(TimeBoxId boxId, TimeEventIndex controlPoin
     
     // get the start or end event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        getAutomationOrLoop(boxId).get("startEvent", out);
+        getMainProcess(boxId).get("startEvent", out);
     else
-        getAutomationOrLoop(boxId).get("endEvent", out);
+        getMainProcess(boxId).get("endEvent", out);
     
     event = out[0];
     
@@ -1490,9 +1490,9 @@ bool Engine::getCtrlPointMutingState(TimeBoxId boxId, TimeEventIndex controlPoin
     
     // get the start or end event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        getAutomationOrLoop(boxId).get("startEvent", out);
+        getMainProcess(boxId).get("startEvent", out);
     else
-        getAutomationOrLoop(boxId).get("endEvent", out);
+        getMainProcess(boxId).get("endEvent", out);
     
     event = out[0];
     
@@ -1789,7 +1789,7 @@ bool Engine::getCurveValues(TimeBoxId boxId, const std::string & address, unsign
 	return err == kTTErrNone;
 }
 
-ConditionedTimeBoxId Engine::addTriggerPoint(TimeBoxId containingBoxId, TimeEventIndex controlPointIndex)
+ConditionedTimeBoxId Engine::addTriggerPoint(TimeBoxId boxId, TimeEventIndex controlPointIndex)
 {
     TTObject    timeEvent;
     TTObject    timeCondition;
@@ -1799,16 +1799,20 @@ ConditionedTimeBoxId Engine::addTriggerPoint(TimeBoxId containingBoxId, TimeEven
     TTString    instance;
     TTAddress   address;
     
+    // DEBUG : create a loop if there is a trigger point at the end
+    if (controlPointIndex == END_CONTROL_POINT_INDEX)
+        enableLoop(boxId);
+    
     // get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        getAutomationOrLoop(containingBoxId).get("startEvent", out);
+        getMainProcess(boxId).get("startEvent", out);
     else
-        getAutomationOrLoop(containingBoxId).get("endEvent", out);
+        getMainProcess(boxId).get("endEvent", out);
     
     timeEvent = out[0];
     
     // get the parent scenario
-    getAutomationOrLoop(containingBoxId).get("container", out);
+    getMainProcess(boxId).get("container", out);
     parentScenario = out[0];
     
     // create a TTTimeCondition
@@ -1828,13 +1832,13 @@ ConditionedTimeBoxId Engine::addTriggerPoint(TimeBoxId containingBoxId, TimeEven
     }
     
     // we cache the time process and the event index instead of the event itself
-    triggerId = cacheConditionedTimeBox(containingBoxId, controlPointIndex);
+    triggerId = cacheConditionedTimeBox(boxId, controlPointIndex);
     
      // cache the condition and register it into the namespace
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
-        address = getAddress(containingBoxId).appendAddress(TTAddress("/start"));
+        address = getAddress(boxId).appendAddress(TTAddress("/start"));
     else
-        address = getAddress(containingBoxId).appendAddress(TTAddress("/end"));
+        address = getAddress(boxId).appendAddress(TTAddress("/end"));
     
     cacheTimeCondition(triggerId, timeCondition, address);
 
@@ -2193,7 +2197,7 @@ bool Engine::enableLoop(TimeBoxId boxId)
     TTObject    automation = getAutomation(boxId);
     TTObject    subScenario = getSubScenario(boxId);
     TTObject    parentScenario = getAutomation(getParentId(boxId));
-    TTValue     out, args;
+    TTValue     v, out, args;
 
     // remove the automation and sub scenario from the mother scenario
     parentScenario.send("TimeProcessRemove", automation, out);
@@ -2206,26 +2210,30 @@ bool Engine::enableLoop(TimeBoxId boxId)
     // create a new loop time process into the mother scenario
     args = TTValue(TTSymbol("Loop"), startEvent, endEvent);
     parentScenario.send("TimeProcessAdd", args, out);
-    TTObject timeLoop = out[0];
+    TTObject loop = out[0];
+    
+    // set loop rigidity like automation rigidity
+    automation.get("rigid", v);
+    loop.set("rigid", v);
     
     // DEBUG :
-    timeLoop.set("name", TTSymbol("LoopTest"));
+    loop.set("name", TTSymbol("LoopTest"));
     startEvent.set("name", TTSymbol("LoopIn"));
     endEvent.set("name", TTSymbol("LoopOut"));
     
     // attach automation and sub scenario to the loop pattern
-    timeLoop.send("PatternAttach", automation);
-    timeLoop.send("PatternAttach", subScenario);
+    loop.send("PatternAttach", automation);
+    loop.send("PatternAttach", subScenario);
     
     // cache the loop
-    setLoop(boxId, timeLoop);
+    setLoop(boxId, loop);
     
     // update m_conditionedTimeBoxMap object
     EngineCacheMapIterator it;
     for (it = m_conditionedTimeBoxMap.begin(); it != m_conditionedTimeBoxMap.end(); it++)
     {
         if (it->second->object == automation)
-            it->second->object = timeLoop;
+            it->second->object = loop;
     }
 
     return true;
@@ -2235,24 +2243,51 @@ bool Engine::disableLoop(TimeBoxId boxId)
 {
     TTObject    automation = getAutomation(boxId);
     TTObject    subScenario = getSubScenario(boxId);
-    TTObject    timeLoop = getLoop(boxId);
+    TTObject    loop = getLoop(boxId);
     TTObject    parentScenario = getAutomation(getParentId(boxId));
-    TTValue     out, args;
+    TTValue     v, out, args;
     
     // detach automation and sub scenario from the loop pattern
-    timeLoop.send("PatternDetach", automation);
-    timeLoop.send("PatternDetach", subScenario);
+    loop.send("PatternDetach", automation);
+    loop.send("PatternDetach", subScenario);
     
     // remove the loop from the mother scenario
-    parentScenario.send("TimeProcessRemove", timeLoop, out);
+    parentScenario.send("TimeProcessRemove", loop, out);
     
     // get start and end events
     TTObject startEvent = out[0];
     TTObject endEvent = out[1];
     
-    // add automation and sub scenario
+    // add automation and sub scenario to the parent scenario
+    args = TTValue(automation, startEvent, endEvent);
+    parentScenario.send("TimeProcessAdd", args, out);
+    
+    args = TTValue(subScenario, startEvent, endEvent);
+    parentScenario.send("TimeProcessAdd", args, out);
+    
+    // set automation and subScenario rigidity like loop rigidity
+    loop.get("rigid", v);
+    automation.set("rigid", v);
+    subScenario.set("rigid", v);
+    
+    // uncache the loop
+    TTObject empty;
+    setLoop(boxId, empty);
+    
+    // update m_conditionedTimeBoxMap object
+    EngineCacheMapIterator it;
+    for (it = m_conditionedTimeBoxMap.begin(); it != m_conditionedTimeBoxMap.end(); it++)
+    {
+        if (it->second->object == loop)
+            it->second->object = automation;
+    }
     
     return true;
+}
+
+bool Engine::isLoop(TimeBoxId boxId)
+{
+    return m_timeBoxMap[boxId]->loop.valid();
 }
 
 void Engine::setViewZoom(QPointF zoom)
@@ -2326,7 +2361,7 @@ bool Engine::play(TimeBoxId boxId)
     if (boxId != ROOT_BOX_ID)
     {
         TTValue v;
-        getAutomationOrLoop(boxId).get("startDate", v);
+        getMainProcess(boxId).get("startDate", v);
         setTimeOffset(TTUInt32(v[0])-1, YES); // YES to mute the recall of the state
     }
     
@@ -2342,7 +2377,7 @@ bool Engine::isPlaying(TimeBoxId boxId)
     
     // TODO : TTTimeProcess should extend Scheduler class
     // get the scheduler object
-    getAutomationOrLoop(boxId).get("scheduler", out);
+    getMainProcess(boxId).get("scheduler", out);
     scheduler = out[0];
     
     scheduler.get("running", out);
@@ -2353,7 +2388,7 @@ bool Engine::isPlaying(TimeBoxId boxId)
 bool Engine::stop(TimeBoxId boxId)
 {
     // stop a time process its end event (this will also stop other time processes attached to the end event)
-    TTBoolean success = !getAutomationOrLoop(boxId).send("End");
+    TTBoolean success = !getMainProcess(boxId).send("End");
   
     TTLogMessage("Engine::stopped\n");
     TTLogMessage("***************************************\n");
@@ -2365,14 +2400,14 @@ void Engine::pause(bool pauseValue, TimeBoxId boxId)
 {
     if (pauseValue) {
         TTLogMessage("---------------------------------------\n");
-        getAutomationOrLoop(boxId).send("Pause");
-        if (boxId != ROOT_BOX_ID && !getLoop(boxId).valid())
+        getMainProcess(boxId).send("Pause");
+        if (boxId != ROOT_BOX_ID && !isLoop(boxId))
             getSubScenario(boxId).send("Pause");
     }
     else {
         TTLogMessage("+++++++++++++++++++++++++++++++++++++++\n");
-        getAutomationOrLoop(boxId).send("Resume");
-        if (boxId != ROOT_BOX_ID&& !getLoop(boxId).valid())
+        getMainProcess(boxId).send("Resume");
+        if (boxId != ROOT_BOX_ID&& !isLoop(boxId))
             getSubScenario(boxId).send("Resume");
     }
 }
@@ -2384,7 +2419,7 @@ bool Engine::isPaused(TimeBoxId boxId)
     
     // TODO : TTTimeProcess should extend Scheduler class
     // get the scheduler object
-    getAutomationOrLoop(boxId).get("scheduler", out);
+    getMainProcess(boxId).get("scheduler", out);
     scheduler = out[0];
     
     scheduler.get("paused", out);
@@ -2419,8 +2454,8 @@ float Engine::getCurrentExecutionPosition(TimeBoxId boxId)
 void Engine::setExecutionSpeedFactor(float factor, TimeBoxId boxId)
 {
     // TODO : TTTimeProcess should extend Scheduler class
-    getAutomationOrLoop(boxId).set("speed", TTFloat64(factor));
-    if (boxId != ROOT_BOX_ID && !getLoop(boxId).valid())
+    getMainProcess(boxId).set("speed", TTFloat64(factor));
+    if (boxId != ROOT_BOX_ID && !isLoop(boxId))
         getSubScenario(boxId).set("speed", TTFloat64(factor));
 }
 
@@ -2429,7 +2464,7 @@ float Engine::getExecutionSpeedFactor(TimeBoxId boxId)
     TTValue out;
     
     // TODO : TTTimeProcess should extend Scheduler class
-    getAutomationOrLoop(boxId).get("speed", out);
+    getMainProcess(boxId).get("speed", out);
     
     return TTFloat64(out[0]);
 }
