@@ -503,11 +503,10 @@ class Maquette : public QObject
      * \param firstExtremum : the extremity of the first box used for relation
      * \param ID2 : the second box in the relation
      * \param secondExtremum : the extremity of the second box used for relation
-     * \param antPostType : the anterior/posterior relation type
      * \return a specific error message in ErrorMessage enum
      */
     int addRelation(unsigned int ID1, BoxExtremity firstExtremum, unsigned int ID2,
-                    BoxExtremity secondExtremum, int antPostType);
+                    BoxExtremity secondExtremum);
 
     /*!
      * \brief Adds a new AntPost relation described by a AbstractRelation.

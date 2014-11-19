@@ -1343,7 +1343,7 @@ Maquette::updateBoxesFromEngines()
 
 int
 Maquette::addRelation(unsigned int ID1, BoxExtremity firstExtremum, unsigned int ID2,
-                      BoxExtremity secondExtremum, int antPostType)
+                      BoxExtremity secondExtremum)
 {
   if (ID1 == NO_ID || ID2 == NO_ID) {
       return ARGS_ERROR;
@@ -1369,8 +1369,7 @@ Maquette::addRelation(unsigned int ID1, BoxExtremity firstExtremum, unsigned int
       return NO_MODIFICATION;
     }
 
-  relationID = _engines->addTemporalRelation(ID1, controlPointID1, ID2, controlPointID2,
-                                             TemporalRelationType(antPostType), movedBoxes);
+  relationID = _engines->addTemporalRelation(ID1, controlPointID1, ID2, controlPointID2, movedBoxes);
 
   if (!_engines->isTemporalRelationExisting(ID1, controlPointID1, ID2, controlPointID2)) {
       return RETURN_ERROR;
@@ -1398,7 +1397,7 @@ int
 Maquette::addRelation(const AbstractRelation &abstract)
 {
   if (abstract.ID() == NO_ID) {
-      return addRelation(abstract.firstBox(), abstract.firstExtremity(), abstract.secondBox(), abstract.secondExtremity(), ANTPOST_ANTERIORITY);
+      return addRelation(abstract.firstBox(), abstract.firstExtremity(), abstract.secondBox(), abstract.secondExtremity());
     }
   else {
       Relation* newRel = new Relation(abstract.firstBox(), abstract.firstExtremity(), abstract.secondBox(), abstract.secondExtremity(), _scene);
