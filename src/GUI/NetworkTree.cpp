@@ -1844,15 +1844,6 @@ NetworkTree::resetSelectedItems()
   _nodesWithSelectedChildren.clear();
 }
 
-QList<QTreeWidgetItem*>
-NetworkTree::getSelectedItems()
-{
-  QList<QTreeWidgetItem*> items = selectedItems(), allSelectedItems;
-  allSelectedItems << items;
-
-  return allSelectedItems;
-}
-
 void
 NetworkTree::recursiveChildrenSelection(QTreeWidgetItem *curItem, bool b_select)
 {
@@ -2074,17 +2065,31 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
 			Maquette::getInstance()->setDeviceLearn(item->text(NAME_COLUMN).toStdString(),item->checkState(NAME_COLUMN));
 		}
 		
-		auto before_selected = selectedItems();
+		// Trouver les parents sélectionnés de l'item actuel
+		QList<QTreeWidgetItem*> selected_parents;
+		QTreeWidgetItem* itm_parent = item->parent();
+		while(itm_parent)
+		{
+			if(itm_parent->isSelected()) selected_parents << itm_parent;
+			itm_parent = itm_parent->parent();
+		}
 		
 		bool item_selected = item->isSelected();
-		if(item->text(TYPE_COLUMN) == "<->" || item->childCount() > 0)
+		if(column == 0 && (item->text(TYPE_COLUMN) == "<->" || item->childCount() > 0))
 		{
 			recursiveChildrenSelection(item, item_selected);
 			recursiveFatherSelection(item, item_selected);
 		}
 		
-		execClickAction(item, selectedItems(), column);
+		for(auto& selected_parent : selected_parents)
+			selected_parent->setSelected(true);
 		
+		auto before_selected = selectedItems();
+		
+		if(column > 0)
+		{
+			execClickAction(item, selectedItems(), column);
+		}
 		/*
 		if (selectionMode() == QAbstractItemView::ContiguousSelection) 
 		{
@@ -2711,8 +2716,10 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
 		}
 	}
 
-    else if ((curItem->type() == LeaveType || curItem->type() == OSCNode) && column == INTERPOLATION_COLUMN) {
-        if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier){
+    else if ((curItem->type() == LeaveType || curItem->type() == OSCNode) && column == INTERPOLATION_COLUMN) 
+	{
+        if(static_cast<QApplication *>(QApplication::instance())->keyboardModifiers() == Qt::ControlModifier)
+		{
             for(int i = 0; i<selectedItems.size(); i++)
                 emit recModeChanged(selectedItems.at(i));
         }
@@ -2778,7 +2785,6 @@ NetworkTree::execClickAction(QTreeWidgetItem *curItem, QList<QTreeWidgetItem *> 
 		bool deselect_start = true;
 		bool deselect_end = true;
 		
-		qDebug() << curItem->text(0) << curItem->childCount();
 		for(int cnt = 0; cnt < curItem->childCount(); ++cnt)
 		{
 			auto child = curItem->child(cnt);
