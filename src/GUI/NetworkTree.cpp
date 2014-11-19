@@ -100,7 +100,7 @@ struct NodeProperties : public ItemProperties
 {
         virtual void setup(QTreeWidgetItem* curItem) override
         {
-            curItem->setFlags(Qt::ItemIsEnabled);
+            curItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         }
 };
 struct LeafProperties : public ItemProperties
@@ -2045,8 +2045,9 @@ NetworkTree::keyPressEvent(QKeyEvent *event)
         setSelectionMode(QAbstractItemView::ContiguousSelection);
     }
     else if(event->key() == Qt::Key_Control)
+	{
         setSelectionMode(QAbstractItemView::MultiSelection);
-
+	}
     else if (event->key() == Qt::Key_Backtab)
     {
         if (VALUE_MODIFIED)
@@ -2080,14 +2081,43 @@ NetworkTree::clickInNetworkTree(QTreeWidgetItem *item, int column)
         if(item->type()==DeviceNode && column == NAME_COLUMN){
             Maquette::getInstance()->setDeviceLearn(item->text(NAME_COLUMN).toStdString(),item->checkState(NAME_COLUMN));
         }
-
-        execClickAction(item, selectedItems(), column);
-
-        //if (item->isSelected()) 
+		
+		execClickAction(item, selectedItems(), column);
+		
+		bool select = item->isSelected();
+		if(item->text(TYPE_COLUMN) == "<->")
 		{
-            recursiveChildrenSelection(item, true);
-            recursiveFatherSelection(item, true);
+			//item->setSelected(select);
+			recursiveChildrenSelection(item, select);
+			recursiveFatherSelection(item, select);
+		}
+		else if(item->childCount() > 0)
+		{
+			recursiveChildrenSelection(item, select);
+			recursiveFatherSelection(item, select);
+		}
+		/*
+		if (selectionMode() == QAbstractItemView::ContiguousSelection) 
+		{
+            for(auto& item : selectedItems())
+			{
+				recursiveChildrenSelection(item, !item->isSelected());
+			}
+        }*/
+		
+/*
+        //if (selectionMode() != QAbstractItemView::SingleSelection) 
+		bool select = !item->isSelected() || _nodesWithSomeChildrenAssigned.contains(item) || _nodesWithAllChildrenAssigned.contains(item);
+		{
+            recursiveChildrenSelection(item, select);
+            recursiveFatherSelection(item, select);
         }
+		//else
+		{
+			//item->setSelected(false);
+			//recursiveChildrenSelection(item, false);
+            //recursiveFatherSelection(item, false);
+		}
 /*
         if (!item->isSelected() && item->type() != OSCNode) {
             unselectPartially(item);
