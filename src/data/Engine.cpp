@@ -1696,9 +1696,6 @@ bool Engine::setCurveSections(TimeBoxId boxId, std::string address, unsigned int
         // edit parameters as : x1 y1 b1 x2 y2 b2
         parameters.resize(nbPoints * 3);
         
-        // DEBUG
-        // TTLogMessage("coeff[ ");
-        
         for (i = 0; i < parameters.size(); i = i+3) {
             
             parameters[i] = TTFloat64(percent[i/3] / 100.);
@@ -1707,14 +1704,8 @@ bool Engine::setCurveSections(TimeBoxId boxId, std::string address, unsigned int
             // from the second point
             TTFloat64 c = coeff[i/3];
             
-            // DEBUG
-            // TTLogMessage("%f ", c);
-            
             parameters[i+2] = c * c * c * c;
         }
-        
-        // DEBUG
-        // TTLogMessage("]\n");
         
         // set first indexed curve only
         curve = objects[0];
@@ -1798,11 +1789,11 @@ ConditionedTimeBoxId Engine::addTriggerPoint(TimeBoxId boxId, TimeEventIndex con
     TTValue     args, out;
     TTString    instance;
     TTAddress   address;
-    
+/*
     // DEBUG : create a loop if there is a trigger point at the end
     if (controlPointIndex == END_CONTROL_POINT_INDEX)
         enableLoop(boxId);
-    
+*/
     // get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
         getMainProcess(boxId).get("startEvent", out);
@@ -2216,7 +2207,7 @@ bool Engine::enableLoop(TimeBoxId boxId)
     automation.get("rigid", v);
     loop.set("rigid", v);
     
-    // DEBUG :
+    // DEBUG : name the start and end event of the loop
     loop.set("name", TTSymbol("LoopTest"));
     startEvent.set("name", TTSymbol("LoopIn"));
     endEvent.set("name", TTSymbol("LoopOut"));
