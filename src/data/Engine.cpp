@@ -1871,7 +1871,6 @@ void Engine::attachToCondition(TimeConditionId conditionId, ConditionedProcessId
 
         // add the event to the chosen time condition with the saved expression
         getTimeCondition(conditionId).send("EventAdd", timeEvent, out);
-//        setTriggerPointMessage(triggerId, expr);
 
         // modify the cache
         m_timeConditionMap[triggerId]->object = getTimeCondition(conditionId);
@@ -1921,7 +1920,9 @@ void Engine::detachFromCondition(TimeConditionId conditionId, ConditionedProcess
 
         // modify cache
         m_timeConditionMap[triggerId]->object = getTimeCondition(triggerId);
-        m_conditionsMap[conditionId].remove(triggerId);
+        
+        // théo : it is bad to modify the triggerIds cache here as detachFromCondition is used into a for loop in deleteCondition
+        //m_conditionsMap[conditionId].remove(triggerId);
         
         removeFromCacheReadyCallback(conditionId, triggerId);
     }
@@ -1934,7 +1935,7 @@ void Engine::deleteCondition(TimeConditionId conditionId)
     TTObject    parentScenario;
     TTValue     out;
 
-    for(it = triggerIds.begin() ; it != triggerIds.end() ; ++it)
+    for (it = triggerIds.begin() ; it != triggerIds.end() ; ++it)
         detachFromCondition(conditionId, *it);
     
     // get parent scenario

@@ -71,6 +71,7 @@ public :
      * \return The list of attached boxes.
      */
     inline QList<BasicBox *> getBoxes(){return _boxesAttached;}
+    int nbOfAttachedBoxes();
 
     QInputDialog *disposeMessageInputDialog();
 

@@ -1809,7 +1809,7 @@ void MaquetteScene::onSelectionChanged()
         for(auto item : selectedItems())
         {
             ParentBox* box = dynamic_cast<ParentBox*>(item);
-            if(box)
+            if(box && playing())
                 box->disableCurveEdition();
         }
     }

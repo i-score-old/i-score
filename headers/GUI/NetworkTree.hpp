@@ -234,13 +234,6 @@ class NetworkTree : public QTreeWidget
     ***********************************************************************/
 
     /*!
-     * \brief Gets the list of items selected in the snapshot tree.
-     *
-     * return the item list
-     */
-    QList<QTreeWidgetItem*> getSelectedItems();
-
-    /*!
      * \brief Gets the list of items expanded in the snapshot tree.
      *
      * return the item list
@@ -349,6 +342,8 @@ class NetworkTree : public QTreeWidget
      */
     inline void
     removeAssignItem(QTreeWidgetItem* item){ _assignedItems.remove(item); }
+
+    void removeCurrentNode();
 
     inline bool
     treeFilterActive(){return _treeFilterActive;}

@@ -251,7 +251,6 @@ DeviceEdit::edit(QString name)
 
   _nameEdit->setFocus();
 
-  setCorrespondingProtocolLayout();
   exec();
 }
 
@@ -265,9 +264,8 @@ DeviceEdit::edit()
     _portInputBox->setValue(defaultInputPort);
     _protocolsComboBox->setCurrentIndex(defaultProtocolIndex);
     _newDevice = true;
-
-    _nameEdit->setFocus();
     setCorrespondingProtocolLayout();
+    _nameEdit->setFocus();
     exec();
 }
 
@@ -368,37 +366,12 @@ void DeviceEdit::setCorrespondingProtocolLayout()
       setMidiLayout();
     }
 
-    /*
-    // adding a number if many default name are used (ex OSCdevice.1 for the 2nd OSCdevice)
-    std::map<std::string, MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
-    std::map<std::string, MyDevice>::iterator it;
-    int i = 0;
-    std::string lastDefaultName;
-    for (it = devices.begin(); it != devices.end(); it++) {
-        if (it->first.find(defaultName.toStdString()) == 0 ) {
-            i++;
-            lastDefaultName = it->first;
-            std::cout << lastDefaultName << std::endl;
-        }
-    }
-
-    if (i != 0) {
-        lastDefaultName.erase(0, defaultName.size()+1);
-        if(!lastDefaultName.empty()) {
-            i = std::stoi(lastDefaultName) + 1;
-        }
-        std::cout << i << std::endl;
-        QString newDefaultName = defaultName + ".";
-        newDefaultName += QString(std::to_string(i).c_str());
-        defaultName = newDefaultName;
-    }
-*/
-    checkName(defaultName);
     _localHostBox->setText(defaultLocalHost);
     _portOutputBox->setValue(defaultPort);
     _portInputBox->setValue(defaultInputPort);
+    checkName(defaultName);
     _nameEdit->setText(defaultName);
-
+    _nameEdit->setFocus();
 }
 
 void
@@ -407,7 +380,7 @@ DeviceEdit::setProtocolChanged()
   _protocolChanged = true;
 
   setCorrespondingProtocolLayout();
-
+  _nameEdit->selectAll();
   setChanged();
 }
 
@@ -455,24 +428,30 @@ void DeviceEdit::checkName(QString &name)
 {
     std::map<std::string, MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
     std::map<std::string, MyDevice>::iterator it;
-    int i = 0;
     std::string lastName;
+
+    // check how many devices name begin with "name"
     for (it = devices.begin(); it != devices.end(); it++) {
         if (it->first.find(name.toStdString()) == 0 ) {
-            i++;
             lastName = it->first;
         }
     }
+
+    int j = 0;
     QString newName = name;
-    if (i != 0) {
+
+    // if there at least one occurrence of "name"
+    if (! lastName.empty()) {
+        j = 1;
         lastName.erase(0, name.size()+1);
+        // extract a potential extansion (deviceName.number)
         if(!lastName.empty()) {
-            i = std::stoi(lastName) + 1;
-            std::cout << lastName << std::endl;
+            j = std::stoi(lastName) + 1;
         }
         newName += ".";
-        newName += QString(std::to_string(i).c_str());
+        newName += QString(std::to_string(j).c_str());
     }
+
     name = newName;
 }
 
