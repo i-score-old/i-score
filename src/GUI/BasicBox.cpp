@@ -101,6 +101,8 @@ const float BasicBox::RAIL_HEIGHT = 20.;
 const float BasicBox::MSGS_INDICATOR_WIDTH = 50;
 const float BasicBox::EAR_WIDTH = 11;
 const float BasicBox::EAR_HEIGHT = 35;
+const float BasicBox::RELATION_GRIP_WIDTH = 20;
+const float BasicBox::RELATION_GRIP_HEIGHT = 40;
 const float BasicBox::GRIP_CIRCLE_SIZE = 5;
 unsigned int BasicBox::BOX_MARGIN = 25;
 const QString BasicBox::SCENARIO_MODE_TEXT = tr("Scenario");
@@ -882,7 +884,11 @@ BasicBox::detachFromCondition()
 
     for(; it!=_conditionalRelation.end() ; it++) {
         (*it)->detachBox(this);
+        if ((*it)->nbOfAttachedBoxes() == 0) {
+            delete (*it);
+        }
     }
+
     removeConditionalRelations();
 }
 
@@ -1042,8 +1048,7 @@ BasicBox::removeTriggerPoint(BoxExtremity extremity)
       updateRelations(extremity);
 
       Maquette::getInstance()->removeTriggerPoint(trgPoint->ID());
-      //_scene->update();
-      //update();
+      update();
     }
 }
 
@@ -1320,10 +1325,10 @@ BasicBox::shape() const
   QPainterPath path;
 
   path.addRect(_boxRect);
-  path.addRect(_leftEar);
-  path.addRect(_rightEar);
   path.addRect(_startTriggerGrip);
   path.addRect(_endTriggerGrip);
+  path.addRect(_leftGripEar);
+  path.addRect(_rightGripEar);
 
   return path;
 }
@@ -1400,7 +1405,10 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
   if (event->button() == Qt::LeftButton)
   {
-      _scene->unselectAll();
+	  if(!isSelected())
+	  {
+		  _scene->unselectAll();
+	  }
       setSelected(true);
       emit _scene->selectionChanged();
 
@@ -1586,8 +1594,8 @@ BasicBox::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
   QRectF triggerGripLeft = _startTriggerGrip;
   QRectF triggerGripRight = _endTriggerGrip;
 
-  QRectF relationGripLeft = _leftEar;
-  QRectF relationGripRight = _rightEar;
+  QRectF relationGripLeft = _leftGripEar;
+  QRectF relationGripRight = _rightGripEar;
 
   QRectF vertResize_bottom(_boxRect.bottomLeft() + QPointF(0, -RESIZE_ZONE_WIDTH), _boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, 0));
   QRectF diagResize_bottomRight(_boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, RESIZE_ZONE_WIDTH), _boxRect.bottomRight());
@@ -1657,8 +1665,8 @@ BasicBox::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
   QRectF triggerGripLeft = _startTriggerGrip;
   QRectF triggerGripRight = _endTriggerGrip;
 
-  QRectF relationGripLeft = _leftEar;
-  QRectF relationGripRight = _rightEar;
+  QRectF relationGripLeft = _leftGripEar;
+  QRectF relationGripRight = _rightGripEar;
 
   QRectF vertResize_bottom(_boxRect.bottomLeft() + QPointF(0, -RESIZE_ZONE_WIDTH), _boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, 0));
   QRectF diagResize_bottomRight(_boxRect.bottomRight() - QPointF(RESIZE_ZONE_WIDTH, RESIZE_ZONE_WIDTH), _boxRect.bottomRight());  
@@ -1839,8 +1847,12 @@ BasicBox::drawInteractionGrips(QPainter *painter)
   painter->drawChord(rect, startAngle, spanAngle);
   painter->rotate(90);
 
+  _leftGripEar = QRectF(-width()/2 - RELATION_GRIP_WIDTH, -RELATION_GRIP_HEIGHT/2, RELATION_GRIP_WIDTH, RELATION_GRIP_HEIGHT);
+  _rightGripEar = QRectF(width()/2 ,-RELATION_GRIP_HEIGHT/2, RELATION_GRIP_WIDTH, RELATION_GRIP_HEIGHT);
+
   painter->restore();
-}
+
+ }
 
 void
 BasicBox::drawMsgsIndicators(QPainter *painter)
