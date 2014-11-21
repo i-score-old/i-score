@@ -800,9 +800,16 @@ class Maquette : public QObject
     std::vector<std::string> getMIDIOutputDevices();
 	const std::vector<std::string>& getWorkingProtocols()
 	{ return _engines->workingProtocols(); }
-signals:
-     void boxIsRunningSignal(unsigned int boxId, bool running);
-	 void deviceConnectionFailed(QString, QString);
+	
+	signals:
+		 void boxIsRunningSignal(unsigned int boxId, bool running);
+		 void deviceConnectionFailed(QString, QString);
+	
+		 void triggerPointIsActiveSignal(unsigned int trgID, bool active);
+		 void playOrResumeSignal();
+		 void stopOrPauseSignal();
+		 void changeTimeOffsetSignal(unsigned int);
+		 void changeSpeedSignal(double);
   
   public slots:
     /*
