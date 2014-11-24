@@ -1789,11 +1789,11 @@ ConditionedTimeBoxId Engine::addTriggerPoint(TimeBoxId boxId, TimeEventIndex con
     TTValue     args, out;
     TTString    instance;
     TTAddress   address;
-/*
+
     // DEBUG : create a loop if there is a trigger point at the end
     if (controlPointIndex == END_CONTROL_POINT_INDEX)
         enableLoop(boxId);
-*/
+
     // get start or end time event
     if (controlPointIndex == BEGIN_CONTROL_POINT_INDEX)
         getMainProcess(boxId).get("startEvent", out);
