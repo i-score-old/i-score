@@ -1292,6 +1292,7 @@ public:
 	 */
 	int load(std::string filepath);
     void buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress);
+    void buildConditionedTimeBoxCache(TimeBoxId boxId, TTObject& startEvent, TTObject& endEvent, std::map<TTObjectBasePtr, TimeConditionId> TTCondToID);
     
 	/*!
 	 * Prints on standard output both engines. Useful only for debug purpose.
