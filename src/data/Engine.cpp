@@ -2463,7 +2463,7 @@ float Engine::getCurrentExecutionPosition(TimeBoxId boxId)
     getAutomation(boxId).get("position", out);
     position = TTFloat64(out[0]);
     
-    return position;
+    return position > 1. ? 1. : position;
 }
 
 void Engine::setExecutionSpeedFactor(float factor, TimeBoxId boxId)
