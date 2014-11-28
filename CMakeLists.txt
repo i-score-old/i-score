@@ -325,11 +325,11 @@ if(UNIX)
 		set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/resources/images/i-score.icns")
 
 		install(DIRECTORY installer_data/examples
-			DESTINATION Examples)
+			DESTINATION .)
 		install(DIRECTORY installer_data/documentation
-			DESTINATION Documentation)
+			DESTINATION .)
 		install(DIRECTORY installer_data/Licenses
-			DESTINATION Licenses)
+			DESTINATION .)
 			
 		install(CODE "execute_process(COMMAND ${CMAKE_SOURCE_DIR}/deploy_osx.sh)")
 	else()
