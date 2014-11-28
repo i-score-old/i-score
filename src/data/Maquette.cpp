@@ -126,7 +126,28 @@ Maquette::Maquette() : _engines(nullptr)
 
 QList<std::string> Maquette::addressList()
 {
-    return _scene->editor()->networkTree()->getAddressList();
+	return _scene->editor()->networkTree()->getAddressList();
+}
+#include <BasicBox.hpp>
+
+void Maquette::loop(int boxid)
+{
+	if(_engines->isLoop(boxid))
+	{
+		if(_boxes[boxid]->hasTriggerPoint(BOX_END))
+		{
+			_boxes[boxid]->removeTriggerPoint(BOX_END);
+		}
+		_engines->disableLoop(boxid);
+	}
+	else
+	{
+		_engines->enableLoop(boxid);
+		if(!_boxes[boxid]->hasTriggerPoint(BOX_END))
+		{
+			_boxes[boxid]->addTriggerPoint(BOX_END);
+		}
+	}
 }
 
 Maquette::~Maquette()

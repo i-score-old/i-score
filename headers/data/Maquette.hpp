@@ -960,6 +960,7 @@ class Maquette : public QObject
 
     QList<string> addressList();
 
+	void loop(int boxid);
   private:
     /*!
      * \brief Generates the triggerQueueList.
