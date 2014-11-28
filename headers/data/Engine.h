@@ -28,28 +28,28 @@
 #include <QColor>
 #include <QPointF>
 
-/** a temporary type dedicated to pass time value (date, duration, ...) */
+/** a type dedicated to pass time value (date, duration, ...) */
 typedef unsigned int TimeValue;
 
-/** a temporary type dedicated to pass bound value */
+/** a type dedicated to pass bound value */
 typedef int BoundValue;
 
-/** a temporary type dedicated to retreive a TimeProcess (this is related to Box notion) */
-typedef unsigned int TimeProcessId;
+/** a type dedicated to retreive a TimeBox */
+typedef unsigned int TimeBoxId;
 
-/** a temporary type dedicated to retreive a TimeEvent attached to a TimeProcess (this is related to ControlPoint notion) */
+/** a type dedicated to retreive a TimeEvent attached to a TimeBox */
 typedef unsigned int TimeEventIndex;
 
 #define BEGIN_CONTROL_POINT_INDEX 1     // TODO : replace by StartEventIndex
 #define END_CONTROL_POINT_INDEX 2       // TODO : replace by EndEventIndex
 
-/** a temporary type dedicated to retreive an Interval TimeProcess (this is related to Relation notion) */
+/** a type dedicated to retreive an Interval (this is related to Relation notion) */
 typedef unsigned int IntervalId;
 
-/** a temporary type dedicated to retreive a process with an Conditioned TimeEvent inside (this is related to TriggerPoint notion) */
-typedef unsigned int ConditionedProcessId;
+/** a type dedicated to retreive a TimeBox with an Conditioned TimeEvent inside (this is related to TriggerPoint notion) */
+typedef unsigned int ConditionedTimeBoxId;
 
-/** a temporary type dedicated to retreive a Condition */
+/** a type dedicated to retreive a Condition */
 typedef unsigned int TimeConditionId;
 
 /** a class used to cache TTObject and some observers */
@@ -60,6 +60,7 @@ public:
     unsigned int    index;
     TTAddress       address;
     TTObject        subScenario;
+    TTObject        loop;
     
     EngineCacheElement();
     ~EngineCacheElement();
@@ -67,17 +68,17 @@ public:
 };
 typedef EngineCacheElement* EngineCacheElementPtr;
 
-/** a temporary type that contains an id and a cached element */
+/** a type that contains an id and a cached element */
 typedef std::pair<unsigned int, EngineCacheElementPtr> EngineCacheKey;
 typedef	EngineCacheKey*	EngineCacheKeyPtr;
 
-/** a temporary type to define a map to store and retreive a cached element relative to an id */
+/** a type to define a map to store and retreive a cached element relative to an id */
 typedef std::map<unsigned int, EngineCacheElementPtr> EngineCacheMap;
 typedef	EngineCacheMap*	EngineCacheMapPtr;
 
 typedef std::map<unsigned int, EngineCacheElementPtr>::iterator EngineCacheMapIterator;
 
-/** a temporary type to define a map to store and retreive the triggerIds associated with a conditionId */
+/** a type to define a map to store and retreive the triggerIds associated with a conditionId */
 typedef std::map<unsigned int, std::list<unsigned int>> EngineConditionsMap;
 
 /** a map used to remember the namespace file path for each device */
@@ -91,39 +92,6 @@ typedef std::map<std::string, std::string> EngineFilesMap;
 #define NO_MAX_MODIFICATION 0
 
 #define CURVE_POW 1
-
-/// Allen relations types
-enum AllenType { ALLEN_BEFORE, ALLEN_AFTER, ALLEN_EQUALS, ALLEN_MEETS, ALLEN_OVERLAPS, ALLEN_DURING, ALLEN_STARTS, ALLEN_FINISHES, ALLEN_NONE };
-
-enum TemporalRelationType { ANTPOST_ANTERIORITY, ANTPOST_POSTERIORITY };
-
-enum TriggerType { TRIGGER_DEFAULT, TRIGGER_START_TEMPO_CHANGE, TRIGGER_END_TEMPO_CHANGE};
-
-
-const std::string ALLEN_BEFORE_STR = "before";
-const std::string ALLEN_AFTER_STR = "after";
-const std::string ALLEN_EQUALS_STR = "equals";
-const std::string ALLEN_MEETS_STR = "meets";
-const std::string ALLEN_OVERLAPS_STR = "overlaps";
-const std::string ALLEN_DURING_STR = "during";
-const std::string ALLEN_STARTS_STR = "starts";
-const std::string ALLEN_FINISHES_STR = "finishes";
-
-const std::string ANTPOST_ANTERIORITY_STR = "anteriority";
-const std::string ANTPOST_POSTERIORITY_STR = "posteriority";
-
-const TimeProcessId BOX_NOT_CREATED = NO_ID;
-const IntervalId RELATION_NOT_CREATED = NO_ID;
-const TimeProcessId NO_MOTHER = NO_ID;
-
-/// Different types of variables linked to the boxes
-enum VariableType { BEGIN_VAR_TYPE = 1, LENGTH_VAR_TYPE = 100, INTERVAL_VAR_TYPE = 50, VPOS_VAR_TYPE = 1, VSIZE_VAR_TYPE = 100 };
-
-/// The available binary relations types
-enum BinaryRelationType { EQ_RELATION = 0, NQ_RELATION = 1, LQ_RELATION = 2, LE_RELATION = 3, GQ_RELATION = 4, GR_RELATION = 5 };
-
-/// The three temporal relations in Boxes
-enum RelationType {ALLEN = 0, ANTPOST = 1, INTERVAL = 2, BOUNDING = 3};
 
 /// define part dedicated for debugging
 #define iscoreEngineDebug if (accessApplicationLocalDebug)
@@ -143,7 +111,7 @@ class Engine
 {
     
 private:
-    std::vector<std::string> m_workingProtocols;							/// The protocols that were successfully enabled.
+    std::vector<std::string> m_workingProtocols;						/// The protocols that were successfully enabled.
     TTSymbol            iscore;                                         /// application name
     
     TTSymbol            m_lastProjectFilePath;                          /// the last project file path
@@ -153,14 +121,14 @@ private:
     TTObject            m_mainStartEvent;                               /// The top scenario start event
     TTObject            m_mainEndEvent;                                 /// The top scenario end event
     
-    unsigned int        m_nextTimeProcessId;                            /// the next Id to give to any created time process
+    unsigned int        m_nextTimeBoxId;                                /// the next Id to give to any created time process
     unsigned int        m_nextIntervalId;                               /// the next Id to give to any created interval
-    unsigned int        m_nextConditionedProcessId;                     /// the next Id to give to any created time process
+    unsigned int        m_nextConditionedTimeBoxId;                     /// the next Id to give to any created time process
     
-    EngineCacheMap      m_timeProcessMap;                               /// All automation or scenario time process and some observers stored using an unique id
-    EngineCacheMap      m_intervalMap;                                  /// All interval time process and some observers stored using an unique id
+    EngineCacheMap      m_timeBoxMap;                                   /// All time boxes (e.g. automation + sub scenario + loop and some observers) stored using an unique id
+    EngineCacheMap      m_intervalMap;                                  /// All interval processes and some observers stored using an unique id
     EngineCacheMap      m_timeConditionMap;                             /// All condition stored using an unique id
-    EngineCacheMap      m_conditionedProcessMap;                        /// All conditioned time process with an conditioned event stored using an unique id
+    EngineCacheMap      m_conditionedTimeBoxMap;                        /// All conditioned time box with an conditioned event stored using an unique id
     
     EngineConditionsMap m_conditionsMap;                                /// All conditions Ids (in i-score point of view) mapped to corresponding triggers id
 
@@ -175,8 +143,8 @@ private:
     TTObject            m_sender;                                       /// #TTSender to send message to any application
     TTObject            m_namespaceObserver;                            /// #TTCallback to be notified when a node is created in learn mode
     
-	void (*m_TimeEventStatusAttributeCallback)(ConditionedProcessId, bool);         // allow to notify the Maquette if a triggerpoint is pending
-    void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool);    // allow to notify the Maquette if a box is running or not
+	void (*m_TimeEventStatusAttributeCallback)(ConditionedTimeBoxId, bool);         // allow to notify the Maquette if a triggerpoint is pending
+    void (*m_TimeProcessSchedulerRunningAttributeCallback)(TimeBoxId, bool);        // allow to notify the Maquette if a box is running or not
     void (*m_TransportDataValueCallback)(TTSymbol&, const TTValue&);                // allow to notify the Maquette if the transport features have been used remotly (via OSC messages for example)
     void (*m_NetworkDeviceNamespaceCallback)(TTSymbol&);                            // allow to notify the Maquette if a device's namespace have changed (see in setDeviceLearn)
     void (*m_NetworkDeviceConnectionError)(TTSymbol&, TTSymbol&);                   // allow to notify the Maquette if a device connection failed
@@ -192,8 +160,8 @@ public:
     // to emit OSC messages : used by i-score to send feedbacks or notifications
     const int OSC_OUTPUT_PORT = 13581;
 
-    Engine(void(*timeEventStatusAttributeCallback)(ConditionedProcessId, bool),
-           void(*timeProcessSchedulerRunningAttributeCallback)(TimeProcessId, bool),
+    Engine(void(*timeEventStatusAttributeCallback)(ConditionedTimeBoxId, bool),
+           void(*automationSchedulerRunningAttributeCallback)(TimeBoxId, bool),
            void(*transportDataValueCallback)(TTSymbol&, const TTValue&),
            void (*networkDeviceNamespaceCallback)(TTSymbol&),
            void (*m_NetworkDeviceConnectionError)(TTSymbol&, TTSymbol&),
@@ -211,47 +179,50 @@ public:
 	{ return m_workingProtocols; }
     // Id management //////////////////////////////////////////////////////////////////
     
-    TimeProcessId       cacheTimeProcess(TTObject& timeProcess, TTAddress& anAddress, TTObject& subScenario);
-    TTObject&           getTimeProcess(TimeProcessId boxId);
-    TTAddress&          getAddress(TimeProcessId boxId);
-    TTObject&           getSubScenario(TimeProcessId boxId);
-    void                uncacheTimeProcess(TimeProcessId boxId);
-    void                clearTimeProcess();
+    TimeBoxId           cacheTimeBox(TTObject& automation, TTAddress& anAddress, TTObject& subScenario);
+    TTObject&           getMainProcess(TimeBoxId boxId);
+    TTObject&           getAutomation(TimeBoxId boxId);
+    TTObject&           getSubScenario(TimeBoxId boxId);
+    TTObject&           getLoop(TimeBoxId boxId);
+    void                setLoop(TimeBoxId boxId, TTObject& loop);
+    TTAddress&          getAddress(TimeBoxId boxId);
+    void                uncacheTimeBox(TimeBoxId boxId);
+    void                clearTimeBox();
     
-    TimeProcessId       getParentId(TimeProcessId boxId);
-    void                getChildrenId(TimeProcessId boxId, std::vector<TimeProcessId>& childrenId);
+    TimeBoxId           getParentId(TimeBoxId boxId);
+    void                getChildrenId(TimeBoxId boxId, std::vector<TimeBoxId>& childrenId);
     
-    IntervalId          cacheInterval(TTObject& timeProcess);
+    IntervalId          cacheInterval(TTObject& interval);
     TTObject&           getInterval(IntervalId relationId);
     void                uncacheInterval(IntervalId relationId);
     void                clearInterval();
     
-    ConditionedProcessId cacheConditionedProcess(TimeProcessId timeProcessId, TimeEventIndex controlPointId);
-    TTObject&           getConditionedProcess(ConditionedProcessId triggerId, TimeEventIndex& controlPointId);
-    void                uncacheConditionedProcess(ConditionedProcessId triggerId);
-    void                clearConditionedProcess();
+    ConditionedTimeBoxId cacheConditionedTimeBox(TimeBoxId boxId, TimeEventIndex controlPointId);
+    TTObject&           getConditionedTimeProcess(ConditionedTimeBoxId triggerId, TimeEventIndex& controlPointId);
+    void                uncacheConditionedTimeBox(ConditionedTimeBoxId triggerId);
+    void                clearConditionedTimeBox();
     
-    void                cacheTimeCondition(ConditionedProcessId triggerId, TTObject& timeCondition, TTAddress& anAddress = kTTAdrsEmpty);
-    TTObject&           getTimeCondition(ConditionedProcessId triggerId);
-    void                uncacheTimeCondition(ConditionedProcessId triggerId);
+    void                cacheTimeCondition(ConditionedTimeBoxId triggerId, TTObject& timeCondition, TTAddress& anAddress = kTTAdrsEmpty);
+    TTObject&           getTimeCondition(ConditionedTimeBoxId triggerId);
+    void                uncacheTimeCondition(ConditionedTimeBoxId triggerId);
     void                clearTimeCondition();
     
-    void                cacheStartCallback(TimeProcessId boxId);
-    void                uncacheStartCallback(TimeProcessId boxId);
+    void                cacheStartCallback(TimeBoxId boxId);
+    void                uncacheStartCallback(TimeBoxId boxId);
     
-    void                cacheEndCallback(TimeProcessId boxId);
-    void                uncacheEndCallback(TimeProcessId boxId);
+    void                cacheEndCallback(TimeBoxId boxId);
+    void                uncacheEndCallback(TimeBoxId boxId);
     
-    void                cacheStatusCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId);
-    void                uncacheStatusCallback(ConditionedProcessId triggerId, TimeEventIndex controlPointId);
+    void                cacheStatusCallback(ConditionedTimeBoxId triggerId, TimeEventIndex controlPointId);
+    void                uncacheStatusCallback(ConditionedTimeBoxId triggerId, TimeEventIndex controlPointId);
     
-    void                cacheReadyCallback(ConditionedProcessId triggerId);
-    void                uncacheReadyCallback(ConditionedProcessId triggerId);
-    void                appendToCacheReadyCallback(ConditionedProcessId triggerId, ConditionedProcessId triggerIdToAppend);
-    void                removeFromCacheReadyCallback(ConditionedProcessId triggerId, ConditionedProcessId triggerIdToRemove);
+    void                cacheReadyCallback(ConditionedTimeBoxId triggerId);
+    void                uncacheReadyCallback(ConditionedTimeBoxId triggerId);
+    void                appendToCacheReadyCallback(ConditionedTimeBoxId triggerId, ConditionedTimeBoxId triggerIdToAppend);
+    void                removeFromCacheReadyCallback(ConditionedTimeBoxId triggerId, ConditionedTimeBoxId triggerIdToRemove);
     
-    void                cacheTriggerDataCallback(ConditionedProcessId triggerId, TimeProcessId boxId);
-    void                uncacheTriggerDataCallback(ConditionedProcessId triggerId);
+    void                cacheTriggerDataCallback(ConditionedTimeBoxId triggerId, TimeBoxId boxId);
+    void                uncacheTriggerDataCallback(ConditionedTimeBoxId triggerId);
         
 	// Edition ////////////////////////////////////////////////////////////////////////
     
@@ -265,7 +236,7 @@ public:
 	 *
 	 * \return the newly created box ID.
 	 */
-	TimeProcessId addBox(TimeValue boxBeginPos, TimeValue boxLength, const std::string & name, TimeProcessId motherId = ROOT_BOX_ID);
+	TimeBoxId addBox(TimeValue boxBeginPos, TimeValue boxLength, const std::string & name, TimeBoxId motherId = ROOT_BOX_ID);
     
 	/*!
 	 * Removes a box from the CSP : removes the relation implicating it and the
@@ -273,7 +244,7 @@ public:
 	 *
 	 * \param boxId : the ID of the box to remove.
 	 */
-	void removeBox(TimeProcessId boxId);
+	void removeBox(TimeBoxId boxId);
     
 	/*!
 	 * Adds a AntPostRelation between two controlPoints.
@@ -282,14 +253,13 @@ public:
 	 * \param controlPoint1 : the index of the point in the first box to put in relation
 	 * \param boxId2 : the ID of the second box
 	 * \param controlPoint2 : the index of the point in the second box to put in relation
-	 * \param type : the relation type
 	 * \param movedBoxes : empty vector, will be filled with the ID of the boxes moved by this new relation
 	 *
 	 * \return the newly created relation id (NO_ID if the creation is impossible).
 	 */
-	IntervalId addTemporalRelation(TimeProcessId boxId1, TimeEventIndex controlPoint1,
-                                     TimeProcessId boxId2, TimeEventIndex controlPoint2, TemporalRelationType type,
-                                     std::vector<TimeProcessId>& movedBoxes);
+	IntervalId addTemporalRelation(TimeBoxId boxId1, TimeEventIndex controlPoint1,
+                                     TimeBoxId boxId2, TimeEventIndex controlPoint2,
+                                     std::vector<TimeBoxId>& movedBoxes);
     
     /*!
 	 * Removes the temporal relation using given id.
@@ -306,7 +276,7 @@ public:
 	 * \param maxBound : the max bound for the box relation in ms. NO_BOUND if the max bound is not used (+infinity).
 	 * \param movedBoxes : empty vector, will be filled with the ID of the boxes moved by this new relation.
 	 */
-	void changeTemporalRelationBounds(IntervalId relationId, BoundValue minBound, BoundValue maxBound, std::vector<TimeProcessId>& movedBoxes);
+	void changeTemporalRelationBounds(IntervalId relationId, BoundValue minBound, BoundValue maxBound, std::vector<TimeBoxId>& movedBoxes);
     
 	/*!
 	 * Checks if a relation exists between the two given control points.
@@ -318,7 +288,7 @@ public:
 	 *
 	 * \return true if a relation exists between the two given control points.
 	 */
-	bool isTemporalRelationExisting(TimeProcessId boxId1, TimeEventIndex controlPoint1, TimeProcessId boxId2, TimeEventIndex controlPoint2);
+	bool isTemporalRelationExisting(TimeBoxId boxId1, TimeEventIndex controlPoint1, TimeBoxId boxId2, TimeEventIndex controlPoint2);
     
 	/*!
 	 * Gets the Id of the first box linked with the given relation id.
@@ -327,7 +297,7 @@ public:
 	 *
 	 * \return the id of the first box.
 	 */
-	TimeProcessId getRelationFirstBoxId(IntervalId relationId);
+	TimeBoxId getRelationFirstBoxId(IntervalId relationId);
     
 	/*!
 	 * Gets the index of the control point linked with the given relation id in the first box.
@@ -345,7 +315,7 @@ public:
 	 *
 	 * \return the id of the second box.
 	 */
-	TimeProcessId getRelationSecondBoxId(IntervalId relationId);
+	TimeBoxId getRelationSecondBoxId(IntervalId relationId);
     
 	/*!
 	 * Gets the index of the control point linked with the given relation id in the second box.
@@ -372,7 +342,7 @@ public:
 	 *
 	 * \return true if the move is allowed or false if the move is forbidden
 	 */
-	bool performBoxEditing(TimeProcessId boxId, TimeValue start, TimeValue end, std::vector<TimeProcessId>& movedBoxes);
+	bool performBoxEditing(TimeBoxId boxId, TimeValue start, TimeValue end, std::vector<TimeBoxId>& movedBoxes);
     
     /*!
 	 * Gets the name of the box matching the given ID
@@ -382,7 +352,7 @@ public:
 	 *
 	 * \return the name of the box matching the given ID
 	 */
-    std::string getBoxName(TimeProcessId boxId);
+    std::string getBoxName(TimeBoxId boxId);
     
     /*!
 	 * Gets the vertical position of the box matching the given ID
@@ -392,7 +362,7 @@ public:
 	 *
 	 * \return the vertical position of the box matching the given ID
 	 */
-    unsigned int getBoxVerticalPosition(TimeProcessId boxId);
+    unsigned int getBoxVerticalPosition(TimeBoxId boxId);
     
     /*!
 	 * Gets the vertical position of the box matching the given ID
@@ -402,7 +372,7 @@ public:
 	 *
 	 * \param newPosition : the new vertical position of the box matching the given ID
 	 */
-    void setBoxVerticalPosition(TimeProcessId boxId, unsigned int newPosition);
+    void setBoxVerticalPosition(TimeBoxId boxId, unsigned int newPosition);
     
     /*!
 	 * Gets the vertical size of the box matching the given ID
@@ -412,7 +382,7 @@ public:
 	 *
 	 * \return the vertical size of the box matching the given ID
 	 */
-    unsigned int getBoxVerticalSize(TimeProcessId boxId);
+    unsigned int getBoxVerticalSize(TimeBoxId boxId);
 
     /*!
 	 * Sets the vertical size of the box matching the given ID
@@ -422,7 +392,7 @@ public:
 	 *
 	 * \param newSize : the new vertical size of the box matching the given ID
 	 */
-    void setBoxVerticalSize(TimeProcessId boxId, unsigned int newSize);
+    void setBoxVerticalSize(TimeBoxId boxId, unsigned int newSize);
     
     /*!
 	 * Gets the color of the box matching the given ID
@@ -432,7 +402,7 @@ public:
 	 *
 	 * \return the color of the box matching the given ID
 	 */
-    QColor getBoxColor(TimeProcessId boxId);
+    QColor getBoxColor(TimeBoxId boxId);
     
     /*!
 	 * Sets the color of the box matching the given ID
@@ -442,7 +412,7 @@ public:
 	 *
 	 * \param newColor : the color of the box matching the given ID
 	 */
-    void setBoxColor(TimeProcessId boxId, QColor newColor);
+    void setBoxColor(TimeBoxId boxId, QColor newColor);
     
     /*!
      * Sets the mute state of the box (process) matching the given ID
@@ -452,7 +422,7 @@ public:
      *
      * \param muteState : the muteState of the box matching the given ID
      */
-    void setBoxMuteState(TimeProcessId boxId, bool muteState);
+    void setBoxMuteState(TimeBoxId boxId, bool muteState);
     
     /*!
      * Get the mute state of the box (process) matching the given ID
@@ -462,7 +432,7 @@ public:
      *
      * \return the muteState of the box matching the given ID
      */
-    bool getBoxMuteState(TimeProcessId boxId);
+    bool getBoxMuteState(TimeBoxId boxId);
 
     /*!
      * Sets the name of the box matching the given ID
@@ -472,7 +442,7 @@ public:
      *
      * \param newColor : the name of the box matching the given ID
      */
-    void setBoxName(TimeProcessId boxId, std::string name);
+    void setBoxName(TimeBoxId boxId, std::string name);
 
 	/*!
 	 * Gets the begin value of the box matching the given ID
@@ -483,7 +453,7 @@ public:
 	 *
 	 * \return the begin value of the box matching the given ID
 	 */
-	TimeValue getBoxBeginTime(TimeProcessId boxId);
+	TimeValue getBoxBeginTime(TimeBoxId boxId);
     
 	/*!
 	 * Gets the end value of the box matching the given ID
@@ -494,7 +464,7 @@ public:
 	 *
 	 * \return the end value of the box matching the given ID
 	 */
-	TimeValue getBoxEndTime(TimeProcessId boxId);
+	TimeValue getBoxEndTime(TimeBoxId boxId);
     
 	/*!
 	 * Gets the end duration of the box matching the given ID
@@ -505,7 +475,7 @@ public:
 	 *
 	 * \return the duration value of the box matching the given ID
 	 */
-	TimeValue getBoxDuration(TimeProcessId boxId);
+	TimeValue getBoxDuration(TimeBoxId boxId);
     
 	/*!
 	 * Gets the number of controlPoints in the box matching the given ID
@@ -516,7 +486,7 @@ public:
 	 *
 	 * \return the number of controlPoints in the box matching the given ID
 	 */
-	int getBoxNbCtrlPoints(TimeProcessId boxId);
+	int getBoxNbCtrlPoints(TimeBoxId boxId);
     
 	/*!
 	 * Gets the index of the first control point (the left one).
@@ -527,7 +497,7 @@ public:
 	 *
 	 * \return the index of the first control point (the left one)
 	 */
-	TimeEventIndex getBoxFirstCtrlPointIndex(TimeProcessId boxId);
+	TimeEventIndex getBoxFirstCtrlPointIndex(TimeBoxId boxId);
     
 	/*!
 	 * Gets the index of the first control point (the right one).
@@ -538,7 +508,7 @@ public:
 	 *
 	 * \return the index of the first control point (the right one)
 	 */
-	TimeEventIndex getBoxLastCtrlPointIndex(TimeProcessId boxId);
+	TimeEventIndex getBoxLastCtrlPointIndex(TimeBoxId boxId);
     
 	/*!
 	 * Sets the message to send (via Network) when the given controlPoint is reached.
@@ -550,7 +520,7 @@ public:
 	 * \param messageToSend : vector of message to send.
 	 * \param muteState : (optional) true if the messages must be stored but not sent.
 	 */
-	void setCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex controlPointIndex, std::vector<std::string> messageToSend, bool muteState = false);
+	void setCtrlPointMessagesToSend(TimeBoxId boxId, TimeEventIndex controlPointIndex, std::vector<std::string> messageToSend, bool muteState = false);
     
 	/*!
 	 * Gets the message to send (via Network) when the given controlPoint is reached, in a vector given as parameter.
@@ -561,7 +531,7 @@ public:
 	 * \param controlPointIndex : the index of the control point to set message.
 	 * \param messages : vector to fill with all messages that will be sent (the result)
 	 */
-	void getCtrlPointMessagesToSend(TimeProcessId boxId, TimeEventIndex controlPointIndex, std::vector<std::string>& messages);
+	void getCtrlPointMessagesToSend(TimeBoxId boxId, TimeEventIndex controlPointIndex, std::vector<std::string>& messages);
     
 	/*!
 	 * Sets the control point mute state. If muted, the messages related to this control point will not be send.
@@ -570,7 +540,7 @@ public:
 	 * \param controlPointIndex : the index of the control point.
 	 * \param mute : the mute state to set (true or false).
 	 */
-	void setCtrlPointMutingState(TimeProcessId boxId, TimeEventIndex controlPointIndex, bool mute);
+	void setCtrlPointMutingState(TimeBoxId boxId, TimeEventIndex controlPointIndex, bool mute);
     
     /*!
 	 * Gets the control point mute state.
@@ -579,7 +549,7 @@ public:
 	 * \param controlPointIndex : the index of the control point.
 	 * \return the mute state (true or false).
 	 */
-	bool getCtrlPointMutingState(TimeProcessId boxId, TimeEventIndex controlPointIndex);
+	bool getCtrlPointMutingState(TimeBoxId boxId, TimeEventIndex controlPointIndex);
     
 	//CURVES ////////////////////////////////////////////////////////////////////////////////////
     
@@ -601,7 +571,7 @@ public:
 	 * \param boxId : the Id of the box.
 	 * \param address : the curve address.
 	 */
-	void addCurve(TimeProcessId boxId, const std::string & address);
+	void addCurve(TimeBoxId boxId, const std::string & address);
     
 	/*!
 	 * Removes the address from the box, and so the matching curve.
@@ -609,14 +579,14 @@ public:
 	 * \param boxId : the Id of the box.
 	 * \param address : the curve address.
 	 */
-	void removeCurve(TimeProcessId boxId, const std::string & address);
+	void removeCurve(TimeBoxId boxId, const std::string & address);
     
 	/*!
 	 * Removes all curve address from the box.
 	 *
 	 * \param boxId : the Id of the box.
 	 */
-	void clearCurves(TimeProcessId boxId);
+	void clearCurves(TimeBoxId boxId);
     
 	/*!
 	 * Gets all the curves address stored in a box.
@@ -625,7 +595,7 @@ public:
 	 *
 	 * \return all curves addresses in a vector.
 	 */
-	std::vector<std::string> getCurvesAddress(TimeProcessId boxId);
+	std::vector<std::string> getCurvesAddress(TimeBoxId boxId);
     
 	/*!
 	 * Changes the sample rate of a curve.
@@ -634,7 +604,7 @@ public:
 	 * \param address : curve address.
 	 * \param nbSamplesBySec : new sample rate.
 	 */
-	void setCurveSampleRate(TimeProcessId boxId, const std::string & address, unsigned int nbSamplesBySec);
+	void setCurveSampleRate(TimeBoxId boxId, const std::string & address, unsigned int nbSamplesBySec);
     
 	/*!
 	 * Gets the sample rate of a curve.
@@ -644,7 +614,7 @@ public:
 	 *
 	 * \return the sample rate (0 if this address is not present as a curve).
 	 */
-	unsigned int getCurveSampleRate(TimeProcessId boxId, const std::string & address);
+	unsigned int getCurveSampleRate(TimeBoxId boxId, const std::string & address);
     
 	/*!
 	 * Changes the avoid redundancy information of a curve.
@@ -655,7 +625,7 @@ public:
 	 * \param address : curve address.
 	 * \param avoidRedundancy : new redundancy information.
 	 */
-	void setCurveRedundancy(TimeProcessId boxId, const std::string & address, bool redundancy);
+	void setCurveRedundancy(TimeBoxId boxId, const std::string & address, bool redundancy);
     
 	/*!
 	 * Gets the avoid redundancy information of a curve.
@@ -665,10 +635,10 @@ public:
 	 *
 	 * \return the avoid redundancy information.
 	 */
-	bool getCurveRedundancy(TimeProcessId boxId, const std::string & address);
+	bool getCurveRedundancy(TimeBoxId boxId, const std::string & address);
     
-	void setCurveMuteState(TimeProcessId boxId, const std::string & address, bool muteState);
-	bool getCurveMuteState(TimeProcessId boxId, const std::string & address);
+	void setCurveMuteState(TimeBoxId boxId, const std::string & address, bool muteState);
+	bool getCurveMuteState(TimeBoxId boxId, const std::string & address);
     
     /*!
 	 * Changes the recording information of a curve.
@@ -678,7 +648,7 @@ public:
 	 * \param address : curve address.
 	 * \param record : new record information.
 	 */
-    void setCurveRecording(TimeProcessId boxId, const std::string & address, bool record);
+    void setCurveRecording(TimeBoxId boxId, const std::string & address, bool record);
     
 	/*!
 	 * Sets sections informations for sending more complicated curves.
@@ -716,10 +686,10 @@ public:
 	 *
 	 * \return true if the new information about section is correct and correctly set.
 	 */
-	bool setCurveSections(TimeProcessId boxId, std::string address, unsigned int argNb,
+	bool setCurveSections(TimeBoxId boxId, std::string address, unsigned int argNb,
                           const std::vector<float>& xPercents, const std::vector<float>& yValues, const std::vector<short>& sectionType, const std::vector<float>& coeff);
     
-	bool getCurveSections(TimeProcessId boxId, std::string address, unsigned int argNb,
+	bool getCurveSections(TimeBoxId boxId, std::string address, unsigned int argNb,
                           std::vector<float> & percent,  std::vector<float> & y,  std::vector<short> & sectionType,  std::vector<float> & coeff);
     
 	/*!
@@ -735,32 +705,32 @@ public:
 	 *
 	 * \return false if the curve could not be compute, or if the argument is a string.
 	 */
-	bool getCurveValues(TimeProcessId boxId, const std::string & address, unsigned int argNb, std::vector<float>& result);
+	bool getCurveValues(TimeBoxId boxId, const std::string & address, unsigned int argNb, std::vector<float>& result);
     
 	/*!
-	 * Adds a new triggerPoint in CSP.
+	 * Adds a new triggerPoint to a box.
      *
-     * \param containingBoxId :
+     * \param boxId : the Id of the box.
 	 *
 	 * \return the created trigger ID
 	 */
-	ConditionedProcessId addTriggerPoint(TimeProcessId containingBoxId, TimeEventIndex controlPointIndex);
+	ConditionedTimeBoxId addTriggerPoint(TimeBoxId boxId, TimeEventIndex controlPointIndex);
     
 	/*!
-	 * Removes the triggerPoint from the CSP.
+	 * Removes the triggerPoint from a box.
 	 *
 	 * Throws OutOfBoundException if the ID is not matching any triggerPoint.
 	 *
 	 * \param triggerId : the ID of the trigger to be removed.
 	 */
-	void removeTriggerPoint(ConditionedProcessId triggerId);
+	void removeTriggerPoint(ConditionedTimeBoxId triggerId);
 
     /*!
      * Mix multiple triggerPoints into one TimeCondition.
      *
      * \return the created condition ID
      */
-    TimeConditionId createCondition(std::vector<ConditionedProcessId> triggerIds);
+    TimeConditionId createCondition(std::vector<ConditionedTimeBoxId> triggerIds);
 
     /*!
      * Add a trigger point to the condition.
@@ -768,7 +738,7 @@ public:
      * \param conditionId : the ID of the condition
      * \param triggerId : the ID of the trigger to add
      */
-    void attachToCondition(TimeConditionId conditionId, ConditionedProcessId triggerId);
+    void attachToCondition(TimeConditionId conditionId, ConditionedTimeBoxId triggerId);
 
     /*!
      * Remove a trigger point from the condition.
@@ -776,7 +746,7 @@ public:
      * \param conditionId : the ID of the condition
      * \param triggerId : the ID of the trigger to remove
      */
-    void detachFromCondition(TimeConditionId conditionId, ConditionedProcessId triggerId);
+    void detachFromCondition(TimeConditionId conditionId, ConditionedTimeBoxId triggerId);
 
     /*!
      * Delete the specified TimeCondition.
@@ -785,7 +755,7 @@ public:
      */
     void deleteCondition(TimeConditionId conditionId);
 
-    void getConditionTriggerIds(TimeConditionId conditionId, std::vector<TimeProcessId>& triggerIds);
+    void getConditionTriggerIds(TimeConditionId conditionId, std::vector<TimeBoxId>& triggerIds);
     
     // Sick of useless doc
     void setConditionMessage(TimeConditionId conditionId, std::string disposeMessage);
@@ -801,7 +771,7 @@ public:
 	 * \param triggerId : the ID of the trigger.
 	 * \param triggerMessage : the trigger message
 	 */
-	void setTriggerPointMessage(ConditionedProcessId triggerId, std::string triggerMessage);
+	void setTriggerPointMessage(ConditionedTimeBoxId triggerId, std::string triggerMessage);
     
 	/*!
 	 * Gets the triggerPoint (given by ID) message.
@@ -812,13 +782,13 @@ public:
 	 *
 	 * \return the trigger message
 	 */
-	std::string getTriggerPointMessage(ConditionedProcessId triggerId);
+	std::string getTriggerPointMessage(ConditionedTimeBoxId triggerId);
 
     // Sick of useless doc
-    void setTriggerPointDefault(ConditionedProcessId triggerId, bool dflt);
+    void setTriggerPointDefault(ConditionedTimeBoxId triggerId, bool dflt);
 
     // Sick of useless doc
-    bool getTriggerPointDefault(ConditionedProcessId triggerId);
+    bool getTriggerPointDefault(ConditionedTimeBoxId triggerId);
     
 	/*!
 	 * Gets the id of the box linked to the given trigger point.
@@ -828,7 +798,7 @@ public:
 	 * \return the id of the box linked to the trigger point,
 	 * NO_ID if the trigger point is not linked to a box.
 	 */
-	TimeProcessId getTriggerPointRelatedBoxId(ConditionedProcessId triggerId);
+	TimeBoxId getTriggerPointRelatedBoxId(ConditionedTimeBoxId triggerId);
     
 	/*!
 	 * Gets the index of the control point linked to the given trigger point.
@@ -838,7 +808,7 @@ public:
 	 * \return the index of the control point linked to the trigger point,
 	 * NO_ID if the trigger point is not linked to a control point.
 	 */
-	TimeProcessId getTriggerPointRelatedCtrlPointIndex(ConditionedProcessId triggerId);
+	TimeBoxId getTriggerPointRelatedCtrlPointIndex(ConditionedTimeBoxId triggerId);
     
 	/*!
 	 * Fills the given vector with all the boxes ID used in the editor.
@@ -846,7 +816,7 @@ public:
 	 *
 	 * \param boxesID : the vector to fill with all boxes ID used.
 	 */
-	void getBoxesId(std::vector<TimeProcessId>& boxesID);
+	void getBoxesId(std::vector<TimeBoxId>& boxesID);
     
 	/*!
 	 * Fills the given vector with all the relations ID used in the editor.
@@ -862,7 +832,7 @@ public:
 	 *
 	 * \param triggersID : the vector to fill with all triggers ID used.
 	 */
-	void getTriggersPointId(std::vector<ConditionedProcessId>& triggersID);
+	void getTriggersPointId(std::vector<ConditionedTimeBoxId>& triggersID);
 
     /*!
      * Fills the given vector with all the conditions ID used in the editor.
@@ -871,6 +841,28 @@ public:
      * \param conditionsID : the vector to fill with all conditions ID used.
      */
     void getConditionsId(std::vector<TimeConditionId>& conditionsID);
+    
+    /*!
+     * Enable loop on a box
+     *
+     * \param boxId : the box to loop
+     */
+    bool enableLoop(TimeBoxId boxId);
+    
+    /*!
+     * Disable loop on a box
+     *
+     * \param boxId : the box to not loop
+     */
+    bool disableLoop(TimeBoxId boxId);
+    
+    /*!
+     * Is there a loop for a box ?
+     *
+     * \param boxId : the box to not loop
+     * \return true if there is a loop for the box
+     */
+    bool isLoop(TimeBoxId boxId);
     
     /*!
 	 * Set the zoom factor of the view of the main scenario
@@ -922,75 +914,75 @@ public:
 	/*!
 	 * Plays a box.
 	 *
-     * \param processId: the id of the process (default : the main scenario).
+     * \param boxId: the id of the process (default : the main scenario).
 	 * \return true if the box starts fine.
 	 */
-	bool play(TimeProcessId processId = ROOT_BOX_ID);
+	bool play(TimeBoxId boxId = ROOT_BOX_ID);
     
     /*!
 	 * Tests if the main scenario is actually running.
 	 *
-     * \param processId: the id of the process (default : the main scenario).
+     * \param boxId: the id of the process (default : the main scenario).
 	 * \return true if the main scnerio is running. False if not.
 	 */
-	bool isPlaying(TimeProcessId processId = ROOT_BOX_ID);
+	bool isPlaying(TimeBoxId boxId = ROOT_BOX_ID);
 
 	/*!
 	 * Stops a box.
 	 *
-     * \param processId: the id of the process (default : the main scenario).
+     * \param boxId: the id of the process (default : the main scenario).
 	 * \return true if the box will actually stop.
 	 */
-	bool stop(TimeProcessId processId = ROOT_BOX_ID);
+	bool stop(TimeBoxId boxId = ROOT_BOX_ID);
     
     /*!
 	 * Pause a box.
      *
      * \param pause: new pause value
-     * \param processId: the id of the process (default : the main scenario).
+     * \param boxId: the id of the process (default : the main scenario).
 	 *
 	 */
-	void pause(bool pauseValue, TimeProcessId processId = ROOT_BOX_ID);
+	void pause(bool pauseValue, TimeBoxId boxId = ROOT_BOX_ID);
  
     /*!
 	 * Tests if a box is actually paused.
 	 *
-     * \param processId: the id of the process (default : the main scenario).
+     * \param boxId: the id of the process (default : the main scenario).
 	 * \return true if the main scnerio is paused. False if not.
 	 */
-	bool isPaused(TimeProcessId processId = ROOT_BOX_ID);
+	bool isPaused(TimeBoxId boxId = ROOT_BOX_ID);
     
 	/*!
 	 * Gets box current execution time (default : the main scenario).
 	 *
-     * \param processId: the id of the process.
+     * \param boxId: the id of the process.
 	 * \return the execution time in milliseconds.
 	 */
-	TimeValue getCurrentExecutionDate(TimeProcessId processId = ROOT_BOX_ID);
+	TimeValue getCurrentExecutionDate(TimeBoxId boxId = ROOT_BOX_ID);
     
     /*!
 	 * Gets box current execution position (default : the main scenario).
 	 *
-     * \param processId: the id of the process.
+     * \param boxId: the id of the process.
 	 * \return the execution position (normalized [0::1]).
 	 */
-	float getCurrentExecutionPosition(TimeProcessId processId = ROOT_BOX_ID);
+	float getCurrentExecutionPosition(TimeBoxId boxId = ROOT_BOX_ID);
     
 	/*!
 	 * Changes the execution speed of a box (default : the main scenario).
 	 *
 	 * \param factor: the new speed factor.
-     * \param processId: the id of the process.
+     * \param boxId: the id of the process.
 	 */
-	void setExecutionSpeedFactor(float factor, TimeProcessId processId = ROOT_BOX_ID);
+	void setExecutionSpeedFactor(float factor, TimeBoxId boxId = ROOT_BOX_ID);
     
     /*!
 	 * Gets the execution speed of a box (default : the main scenario).
 	 *
-     * \param processId: the id of the process.
+     * \param boxId: the id of the process.
 	 * \return the speed factor.
 	 */
-	float getExecutionSpeedFactor(TimeProcessId processId = ROOT_BOX_ID);
+	float getExecutionSpeedFactor(TimeBoxId boxId = ROOT_BOX_ID);
     
     
 	//Network //////////////////////////////////////////////////////////////////////////////////////////////
@@ -1002,7 +994,7 @@ public:
 	 *
 	 * \param triggerId : the id of the trigger point to trigger.
 	 */
-	void trigger(ConditionedProcessId triggerId);
+	void trigger(ConditionedTimeBoxId triggerId);
     
     /*!
 	 * Trigger several trigger point manually.
@@ -1011,7 +1003,7 @@ public:
 	 *
 	 * \param triggerIds : a vector of trigger point id to trigger.
 	 */
-	void trigger(std::vector<ConditionedProcessId> triggerIds);
+	void trigger(std::vector<ConditionedTimeBoxId> triggerIds);
     
 	/*!
 	 * Adds a network device.
@@ -1300,6 +1292,7 @@ public:
 	 */
 	int load(std::string filepath);
     void buildEngineCaches(TTObject& scenario, TTAddress& scenarioAddress);
+    void buildConditionedTimeBoxCache(TimeBoxId boxId, TTObject& startEvent, TTObject& endEvent, std::map<TTObjectBasePtr, TimeConditionId> TTCondToID);
     
 	/*!
 	 * Prints on standard output both engines. Useful only for debug purpose.
@@ -1309,8 +1302,8 @@ public:
     
     friend void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value);
     friend void TimeConditionReadyAttributeCallback(const TTValue& baton, const TTValue& value);
-    friend void TimeProcessStartCallback(const TTValue& baton, const TTValue& value);
-    friend void TimeProcessEndCallback(const TTValue& baton, const TTValue& value);
+    friend void AutomationStartCallback(const TTValue& baton, const TTValue& value);
+    friend void AutomationEndCallback(const TTValue& baton, const TTValue& value);
     friend void TriggerReceiverValueCallback(const TTValue& baton, const TTValue& value);
     friend void NamespaceCallback(const TTValue& baton, const TTValue& value);
     
@@ -1336,28 +1329,28 @@ private:
 typedef Engine* EnginePtr;
 
 /** time event status attribute callback
- @param	baton			an EnginePtr and a ConditionedProcessId
+ @param	baton			an EnginePtr and a ConditionedTimeBoxId
  @param	value			a time event
  @return                an error code */
 void TimeEventStatusAttributeCallback(const TTValue& baton, const TTValue& value);
 
 /** time condition ready attribute callback
- @param	baton			an EnginePtr and a ConditionedProcessId
+ @param	baton			an EnginePtr and a ConditionedTimeBoxId
  @param	value			a #TTBoolean new ready state
  @return                an error code */
 void TimeConditionReadyAttributeCallback(const TTValue& baton, const TTValue& value);
 
 /** Callback used each time a process starts
- @param	baton			an EnginePtr and a TimeProcessId
+ @param	baton			an EnginePtr and a TimeBoxId
  @param	value			nothing
  @return                an error code */
-void TimeProcessStartCallback(const TTValue& baton, const TTValue& value);
+void AutomationStartCallback(const TTValue& baton, const TTValue& value);
 
 /** Callback used each time a process ends
- @param	baton			an EnginePtr and a TimeProcessId
+ @param	baton			an EnginePtr and a TimeBoxId
  @param	value			nothing
  @return                an error code */
-void TimeProcessEndCallback(const TTValue& baton, const TTValue& value);
+void AutomationEndCallback(const TTValue& baton, const TTValue& value);
 
 /** Callback used for namespace observation
  @param	baton			an EnginePtr and an application name

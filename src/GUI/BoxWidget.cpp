@@ -576,6 +576,12 @@ void BoxWidget::mute()
 }
 
 void
+BoxWidget::loop()
+{
+	Maquette::getInstance()->loop(_boxID);
+}
+
+void
 BoxWidget::displayStartMenu(QPoint pos)
 {
   if (_startMenu != nullptr) {

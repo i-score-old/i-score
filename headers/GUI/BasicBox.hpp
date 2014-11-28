@@ -770,6 +770,7 @@ class BasicBox : public QGraphicsObject
     QPushButton *_endMenuButton{};
     QPushButton *_playButton{};
     QPushButton *_stopButton{};
+	QPushButton *_loopButton{};
 	QPushButton *_muteButton{};
     const QIcon _muteOffIcon{":/resources/images/mute_off.png"};
     const QIcon _muteOnIcon{":/resources/images/mute_on.png"};
