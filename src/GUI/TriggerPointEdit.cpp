@@ -7,7 +7,7 @@ TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *pare
     : QDialog(parent)
 {
     setModal(true);
-
+    setWindowFlags(Qt::WindowStaysOnTopHint);
     _abstract = abstract;
     _expressionChanged = false;
     _autoTriggerChanged = false;
