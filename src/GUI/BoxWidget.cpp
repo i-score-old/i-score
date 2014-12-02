@@ -181,35 +181,42 @@ BoxWidget::setCurveLowerStyle(std::string curveAddress, bool state){
 void
 BoxWidget::displayCurve(const QString &address)
 {    
-  std::string add = address.toStdString();
-  QMap<string, CurveWidget *>::iterator curveIt;
-  CurveWidget *curveWidget;
-
-  //Unactive curves
-  QList<CurveWidget *> values = _curveMap->values();
-  int count = values.size();
-
-  CurveWidget *cur;
-
-  for (int i = 0; i < count; i++) {
-      cur = values.at(i);
-      cur->setLowerStyle(true);      
-    }
-
-  if (address != BasicBox::SCENARIO_MODE_TEXT && address != BasicBox::DEFAULT_MODE_TEXT) {
-      setEnabled(true);
-      curveIt = _curveMap->find(add);
-      bool curveFound = (curveIt != _curveMap->end());
-
-      if (curveFound) {
-          curveWidget = curveIt.value();
-          curveWidget->setLowerStyle(false);          
-          _stackedLayout->setCurrentWidget(curveWidget);
-        }
-    }
-  else {
-      setEnabled(false);
-    }
+	std::string add = address.toStdString();
+	
+	QMap<string, CurveWidget *>::iterator curveIt;
+	CurveWidget *curveWidget;
+	
+	//Unactive curves
+	QList<CurveWidget *> values = _curveMap->values();
+	int count = values.size();
+	
+	CurveWidget *cur;
+	
+	for (int i = 0; i < count; i++) 
+	{
+		cur = values.at(i);
+		cur->setLowerStyle(true);      
+	}
+	
+	if (address != BasicBox::SCENARIO_MODE_TEXT && 
+		address != BasicBox::DEFAULT_MODE_TEXT) 
+	{
+		setEnabled(true);
+		curveIt = _curveMap->find(add);
+		bool curveFound = (curveIt != _curveMap->end());
+		
+		if (curveFound) 
+		{
+			qDebug() << "curveFound";
+			curveWidget = curveIt.value();
+			curveWidget->setLowerStyle(false);          
+			_stackedLayout->setCurrentWidget(curveWidget);
+		}
+	}
+	else 
+	{
+		setEnabled(false);
+	}
 }
 
 bool

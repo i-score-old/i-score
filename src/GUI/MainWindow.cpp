@@ -806,7 +806,7 @@ MainWindow::updatePlayMode(){
 
 void
 MainWindow::updateRecordingBoxes(bool onPlay)
-{ qDebug(Q_FUNC_INFO);
+{
     //Update recorded curves
     QList<BasicBox*> boxes = Maquette::getInstance()->getRecordingBoxes();
     QList<BasicBox*>::iterator it;
