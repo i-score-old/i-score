@@ -84,6 +84,8 @@ class AbstractCurve : public Abstract
 
     virtual int type() const; /// \todo les types sont utiles aux GraphicsItem. (par jaime Chao)
 
+	std::string address() const 
+	{ return _address; }
   private:
     unsigned int _boxID;      //!< Box ID.
     std::string _address;     //!< Address of the curve.

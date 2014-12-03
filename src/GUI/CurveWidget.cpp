@@ -130,15 +130,27 @@ CurveWidget::curveRepresentationOutdated()
 	float maxCurveElement = *(std::max_element(_abstract->_curve.begin(), _abstract->_curve.end()));
 	float minCurveElement = *(std::min_element(_abstract->_curve.begin(), _abstract->_curve.end()));
 	
+	
+	std::vector<float> range;
+	Maquette::getInstance()->getRangeBounds(_abstract->address(), range);
+	
+	float margin = std::abs(range[1]) * 0.1 + std::abs(range[2]) * 0.1; 
 	if(maxCurveElement > _maxY)
-		_maxY = maxCurveElement;
+	{
+		_maxY = _maxRangeBoundLocked? std::min(maxCurveElement, range[1] + margin) : maxCurveElement;
+	}
 	if(minCurveElement < _minY)
-		_minY = minCurveElement;
+	{
+		_minY = _minRangeBoundLocked? std::max(minCurveElement, range[0] - margin) : minCurveElement;
+	}
+	
 	//abscissa at the box middle only if the curve contains negative elements
-	if (_minY >= 0.) {
+	if (_minY >= 0.) 
+	{
 		_xAxisPos = height() - BORDER_WIDTH;
 	}
-	else {
+	else 
+	{
 		_xAxisPos = (height() - BORDER_WIDTH) / 2.;
 	}
 	
@@ -161,9 +173,12 @@ void CurveWidget::adaptScale()
 		_minY = -min_spacing;
 		_maxY = min_spacing;
 	}
-	_xAxisPos = (_minY >= 0.)? height() - BORDER_WIDTH : (height() - BORDER_WIDTH) / 2.;
+	_xAxisPos = (_minY >= 0.)? 
+					(height() - BORDER_WIDTH) : 
+					(height() - BORDER_WIDTH) / 2.;
 	
-	_interspace = (width() - BORDER_WIDTH) / (float)(std::max((unsigned int)2, (unsigned int)(_abstract->_curve.size())) - 1);
+	_interspace = (width() - BORDER_WIDTH) / (float)(std::max((unsigned int)2, 
+															  (unsigned int)(_abstract->_curve.size())) - 1);
 	
 	float halfSizeY = std::max(fabs(_maxY), fabs(_minY));
 	_scaleY = 2 * (_xAxisPos - BORDER_WIDTH) / (2 * halfSizeY);
@@ -331,6 +346,7 @@ CurveWidget::mousePressEvent(QMouseEvent *event)
 					break;
 				}
 			}
+			
 			if (!found)
 			{ //new breakpoint
 				_abstract->_breakpoints[relativePoint.x()] = std::make_pair<float, float>(relativePoint.y(), 1.);
@@ -381,12 +397,26 @@ CurveWidget::mouseMoveEvent(QMouseEvent *event)
 {    
 	QWidget::mouseMoveEvent(event);
 	
+	std::vector<float> range;
+	Maquette::getInstance()->getRangeBounds(_abstract->address(), range);
+	
 	// Draw cursor coordinates as a tooltip
 	QPointF relativePoint = relativeCoordinates(event->pos());
-	if(relativePoint.y() < std::numeric_limits<int>::min())
-		relativePoint.setY(std::numeric_limits<int>::min());
-	if(relativePoint.y() > std::numeric_limits<int>::max())
-		relativePoint.setY(std::numeric_limits<int>::max());
+
+	if(!_minRangeBoundLocked)
+	{
+		range[0] = std::numeric_limits<int>::min() + 1;
+	}
+	
+	if(!_maxRangeBoundLocked)
+	{
+		range[1] = std::numeric_limits<int>::max() - 1;
+	}
+	
+	if(relativePoint.y() < range[0])
+		relativePoint.setY(range[0]);
+	if(relativePoint.y() > range[1])
+		relativePoint.setY(range[1]);
 	
 	QString posStr = QString("%1 ; %2").arg(relativePoint.x(), 0, 'f', 3).arg(relativePoint.y(), 0, 'f', 3);
 	Maquette::getInstance()->scene()->displayMessage(posStr.toStdString(), INDICATION_LEVEL);
