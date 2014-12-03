@@ -11,7 +11,7 @@ mkdir -p $ISCORE_BUNDLE/Contents/Frameworks/jamoma/extensions
 ### Deployment ###
 # Jamoma libs
 declare -a jamomalibs=("Foundation" "Modular" "DSP" "Score")
-declare -a jamomaexts=("Scenario" "Automation" "Interval" "OSC" "Minuit" "MIDI" "AnalysisLib" "DataspaceLib" "FunctionLib" "System" "NetworkLib")
+declare -a jamomaexts=("Scenario" "Automation" "Interval" "Loop" "OSC" "Minuit" "MIDI" "AnalysisLib" "DataspaceLib" "FunctionLib" "System" "NetworkLib")
 for JAMOMA_LIB in "${jamomalibs[@]}"
 do
 	cp -rf /usr/local/jamoma/lib/libJamoma$JAMOMA_LIB.dylib $ISCORE_BUNDLE/Contents/Frameworks/jamoma/lib/
