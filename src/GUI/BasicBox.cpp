@@ -145,6 +145,8 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 
   setButtonsVisible(false); //only showed on hover
 
+  
+  setFlags(ItemIgnoresParentOpacity);
   update();
   connect(_comboBox, SIGNAL(currentIndexChanged(const QString &)), _boxContentWidget, SLOT(updateDisplay(const QString &)));
 }
@@ -328,7 +330,7 @@ BasicBox::createWidget()
 
   _curveProxy = new QGraphicsProxyWidget(this);
 
-  _curveProxy->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+  //_curveProxy->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
   _curveProxy->setAcceptedMouseButtons(Qt::LeftButton);
   _curveProxy->setFlag(QGraphicsItem::ItemIsMovable, false);
   _curveProxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
@@ -704,8 +706,9 @@ void BasicBox::disableCurveEdition()
     if(curve)
     {
         curve->setEnabled(false);
+		
+		_boxContentWidget->disabledCurveEdition();
     }
-    _boxContentWidget->disabledCurveEdition();
 }
 
 std::vector<std::string>
@@ -1410,7 +1413,6 @@ BasicBox::keyReleaseEvent(QKeyEvent *event)
 void
 BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-
   if (_startMenu != nullptr) {
       _startMenu->close();
     }
@@ -1472,20 +1474,41 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void
 BasicBox::lower(bool state)
 {
-  _low = state;
-
-  if (_low) {
-      setZValue(-1);
-      setEnabled(false);
-      setOpacity(0.5);
-    }
-  else {
-      setOpacity(1);
-      setZValue(0);
-      setEnabled(true);
-    }
-  updateRelations(BOX_START);
-  updateRelations(BOX_END);
+	_low = state;
+	
+	if (_low) {
+		qDebug() << "Lowering box number" << ID();
+		auto map =  Maquette::getInstance()->parentBoxes();
+		auto parent_box_it = map.find(mother());
+		if(parent_box_it != map.end())
+		{
+			_currentZvalue = parent_box_it->second->zValue() - 15;
+			setZValue(_currentZvalue);
+		}
+		else
+		{
+			setZValue(-3);
+		}
+		setEnabled(false);
+		setOpacity(0.5);
+	}
+	else {
+		setOpacity(1);
+		auto map =  Maquette::getInstance()->parentBoxes();
+		auto parent_box_it = map.find(mother());
+		if(parent_box_it != map.end())
+		{
+			_currentZvalue = parent_box_it->second->zValue() + 15;
+			setZValue(_currentZvalue);
+		}
+		else
+		{
+			setZValue(0);
+		}
+		setEnabled(true);
+	}
+	updateRelations(BOX_START);
+	updateRelations(BOX_END);
 }
 
 QInputDialog *

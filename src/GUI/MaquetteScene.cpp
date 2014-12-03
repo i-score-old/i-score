@@ -477,9 +477,10 @@ bool MaquetteScene::subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent)
         {
             if(auto box = dynamic_cast<ParentBox*>(getSelectedItem()))
             {
-                return box->currentText() == BasicBox::SCENARIO_MODE_TEXT &&
-                        box->boxBody().contains(mouseEvent->pos()) &&
-                        itemAt(mouseEvent->scenePos(), QTransform())->cursor().shape() == Qt::ArrowCursor;
+				auto r1 = box->currentText() == BasicBox::SCENARIO_MODE_TEXT;
+				auto r2 = box->boxBody().contains(mouseEvent->pos());
+				auto r3 = itemAt(mouseEvent->scenePos(), QTransform())->cursor().shape() == Qt::ArrowCursor;
+				return r1 && r2 && r3;
             }
         }
 
@@ -628,7 +629,8 @@ void MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
                 break;
 
             case CREATION_MODE:
-                if (noBoxSelected() || subScenarioMode(mouseEvent)) {
+                if (noBoxSelected() || subScenarioMode(mouseEvent))
+				{
                     if (resizeMode() == NO_RESIZE && _tempBox) {
                         int upLeftX, upLeftY, width, height;
 

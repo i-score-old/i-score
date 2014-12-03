@@ -42,12 +42,7 @@ DeviceEdit::DeviceEdit(QWidget *parent)
   : QDialog(parent)
 {
   setModal(true);
-  init();
-}
 
-void
-DeviceEdit::init()
-{
   connect(this, SIGNAL(accepted()),
 		  &updater, SLOT(update()));
   _changed = false;
@@ -345,7 +340,7 @@ void DeviceEdit::setCorrespondingProtocolLayout()
 {
     if(_protocolsComboBox->currentText() == "OSC")
     {
-      defaultName = "OSCdevice";
+     // defaultName = "OSCdevice";
       defaultPort = 9997;
       defaultInputPort = 9996;
 
@@ -354,7 +349,7 @@ void DeviceEdit::setCorrespondingProtocolLayout()
     }
     else if (_protocolsComboBox->currentText() == "Minuit")
     {
-      defaultName = "MinuitDevice";
+     // defaultName = "MinuitDevice";
       defaultPort = 9998;
       defaultInputPort = 13579;
       setMinuitLayout();
@@ -362,15 +357,15 @@ void DeviceEdit::setCorrespondingProtocolLayout()
     }
     else if (_protocolsComboBox->currentText() == "MIDI")
     {
-      defaultName = "MIDIDevice";
+   //   defaultName = "MIDIDevice";
       setMidiLayout();
     }
 
     _localHostBox->setText(defaultLocalHost);
     _portOutputBox->setValue(defaultPort);
     _portInputBox->setValue(defaultInputPort);
-    checkName(defaultName);
-    _nameEdit->setText(defaultName);
+   // checkName(defaultName);
+   // _nameEdit->setText(defaultName);
     _nameEdit->setFocus();
 }
 

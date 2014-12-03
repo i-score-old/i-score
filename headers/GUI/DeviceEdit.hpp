@@ -67,7 +67,6 @@ class DeviceEdit : public QDialog
 	void enableTree();
 
   private:
-    void init();
 
     bool _changed;
     bool _nameChanged;

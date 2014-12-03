@@ -54,7 +54,7 @@
 #include <QBuffer>
 #include <QPainter>
 
-
+#include <QDebug>
 #include <vector>
 #include <map>
 #include <sstream>
@@ -108,23 +108,35 @@ ParentBox::type() const
 
 void
 ParentBox::updateDisplay(QString displayMode)
-{    
-  BasicBox *curBox;
-  std::map<unsigned int, BasicBox*>::iterator it;
-  if (displayMode == SCENARIO_MODE_TEXT) {
-      for (it = _children.begin(); it != _children.end(); ++it) {
-          curBox = it->second;
-          curBox->lower(false);
-          curBox->setEnabled(true);
-        }
-    }
-  else {
-      for (it = _children.begin(); it != _children.end(); ++it) {
-          curBox = it->second;
-          curBox->lower(true);
-          curBox->setEnabled(false);
-        }
-    }
+{
+	BasicBox *curBox;
+	std::map<unsigned int, BasicBox*>::iterator it;
+	if (displayMode == SCENARIO_MODE_TEXT) 
+	{
+		for (it = _children.begin(); it != _children.end(); ++it) 
+		{
+			curBox = it->second;
+			curBox->lower(false);
+			curBox->setEnabled(true);
+		}
+		_curveProxy->setZValue(-50);
+		
+		this->setZValue(-50);
+	}
+	else
+	{
+		for (it = _children.begin(); it != _children.end(); ++it) 
+		{
+			curBox = it->second;
+			curBox->lower(true);
+			curBox->setOpacity(0.1);
+			curBox->setEnabled(false);
+		}
+		
+		_curveProxy->setZValue(50);
+		this->setZValue(50);
+	}
+	
 }
 
 bool
@@ -255,58 +267,76 @@ ParentBox::resizeAllEdition(float width, float height)
 void
 ParentBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-  BasicBox::mousePressEvent(event);
-
-  if (event->button() == Qt::LeftButton) {
-      if (_scene->currentMode() != CREATION_MODE) {
-          setSelected(true);
-          emit _scene->selectionChanged();
-          if (cursor().shape() == Qt::ClosedHandCursor) {
-              unlock();
-            }
-          else if (cursor().shape() == Qt::CrossCursor) {
-              lock();
-              if (event->pos().x() < boxRect().topLeft().x() + RESIZE_TOLERANCE) {
-                  _scene->setRelationFirstBox(_abstract->ID(), BOX_START);
-                }
-              else if (event->pos().x() > boxRect().topRight().x() - RESIZE_TOLERANCE) {
-                  _scene->setRelationFirstBox(_abstract->ID(), BOX_END);
-                }
-            }
-          else if (cursor().shape() == Qt::PointingHandCursor) {
-              lock();
-              if (event->pos().x() < boxRect().topLeft().x() + RESIZE_TOLERANCE) {
-                  addTriggerPoint(BOX_START);
-                }
-              else if (event->pos().x() > boxRect().topRight().x() - RESIZE_TOLERANCE) {
-                  addTriggerPoint(BOX_END);
-                }
-            }
-          else {
-              if (cursor().shape() == Qt::SizeHorCursor) {
-                  unlock();
-                  _scene->setResizeMode(HORIZONTAL_RESIZE);
-                }
-              else if (cursor().shape() == Qt::SizeVerCursor) {
-                  unlock();
-                  _scene->setResizeMode(VERTICAL_RESIZE);
-                }
-              else if (cursor().shape() == Qt::SizeFDiagCursor) {
-                  unlock();
-                  _scene->setResizeMode(DIAGONAL_RESIZE);
-                }
-              _scene->setResizeBox(_abstract->ID());
-            }
-          update();
-        }
-      else {
-          if (cursor().shape() == Qt::OpenHandCursor && event->modifiers() == Qt::ControlModifier) {
-              lock();
-            }
-        }
-    }
-  else {
-    }
+	BasicBox::mousePressEvent(event);
+	
+	if (event->button() == Qt::LeftButton) 
+	{
+		if (_scene->currentMode() != CREATION_MODE) 
+		{
+			setSelected(true);
+			emit _scene->selectionChanged();
+			
+			if (cursor().shape() == Qt::ClosedHandCursor) 
+			{
+				unlock();
+			}
+			else if (cursor().shape() == Qt::CrossCursor) 
+			{
+				lock();
+				if (event->pos().x() < boxRect().topLeft().x() + RESIZE_TOLERANCE) 
+				{
+					_scene->setRelationFirstBox(_abstract->ID(), BOX_START);
+				}
+				else if (event->pos().x() > boxRect().topRight().x() - RESIZE_TOLERANCE) 
+				{
+					_scene->setRelationFirstBox(_abstract->ID(), BOX_END);
+				}
+			}
+			else if (cursor().shape() == Qt::PointingHandCursor) 
+			{
+				lock();
+				if (event->pos().x() < boxRect().topLeft().x() + RESIZE_TOLERANCE) 
+				{
+					addTriggerPoint(BOX_START);
+				}
+				else if (event->pos().x() > boxRect().topRight().x() - RESIZE_TOLERANCE) 
+				{
+					addTriggerPoint(BOX_END);
+				}
+			}
+			else
+			{
+				if (cursor().shape() == Qt::SizeHorCursor)
+				{
+					unlock();
+					_scene->setResizeMode(HORIZONTAL_RESIZE);
+				}
+				else if (cursor().shape() == Qt::SizeVerCursor)
+				{
+					unlock();
+					_scene->setResizeMode(VERTICAL_RESIZE);
+				}
+				else if (cursor().shape() == Qt::SizeFDiagCursor)
+				{
+					unlock();
+					_scene->setResizeMode(DIAGONAL_RESIZE);
+				}
+				_scene->setResizeBox(_abstract->ID());
+			}
+			update();
+		}
+		else 
+		{
+			if (cursor().shape() == Qt::OpenHandCursor && event->modifiers() == Qt::ControlModifier) 
+			{
+				qDebug("Blip");
+				lock();
+			}
+		}
+	}
+	else
+	{
+	}
 }
 
 void
