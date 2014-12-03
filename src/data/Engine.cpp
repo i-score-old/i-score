@@ -2368,15 +2368,7 @@ bool Engine::play(TimeBoxId boxId)
     TTLogMessage("***************************************\n");
     TTLogMessage("Engine::play\n");
     
-    // for local play : solo the process then goto one ms before its start date
-    if (boxId != ROOT_BOX_ID)
-    {
-        TTValue v;
-        getMainProcess(boxId).get("startDate", v);
-        setTimeOffset(TTUInt32(v[0])-1, YES); // YES to mute the recall of the state
-    }
-    
-    TTBoolean success = !m_mainScenario.send("Start");
+    TTBoolean success = !getMainProcess(boxId).send("Start");
   
     return success;
 }
