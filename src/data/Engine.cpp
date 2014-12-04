@@ -2227,11 +2227,6 @@ bool Engine::enableLoop(TimeBoxId boxId)
     automation.get("rigid", v);
     loop.set("rigid", v);
     
-    // DEBUG : name the start and end event of the loop
-    loop.set("name", TTSymbol("LoopTest"));
-    startEvent.set("name", TTSymbol("LoopIn"));
-    endEvent.set("name", TTSymbol("LoopOut"));
-    
     // attach automation and sub scenario to the loop pattern
     loop.send("PatternAttach", automation);
     loop.send("PatternAttach", subScenario);
