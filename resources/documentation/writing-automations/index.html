@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Documentation - Writing automations</title>
+    <link rel="stylesheet" href="../stylesheet.css">
+
+    <!-- you don't need to keep this, but it's cool for stats! -->
+    <meta name="generator" content="nanoc 3.7.4">
+  </head>
+  <body>
+    <div id="main">
+      <p>In this tutorial, we will see how to create events and automations in i-score. Assuming you have already set up some devices in i-score Device explorer, you are now ready to start writing your own scenario.</p>
+<p>In the timeline panel, draw an empty box using cmd+drag (on Mac) or ctrl-drag (on Win and Linux).</p>
+<p><a href="./images/drawing-box.png"><img src="./images/drawing-box-detail.png" alt="drawing box-detail" width="300" height="186" class="aligncenter size-medium wp-image-533" /></a></p>
+<p>When done, you can freely move the box in i-score&#8217;s timeline and adjust its start time and duration. For example, we will want our box to start playing at 0 min 1 sec. and stop at 0 min. 5 sec. You can move the box by clicking its top bar and adjust its duration by dragging its lower right corner as shown below.</p>
+<p><a href="./images/ajusting-start-point.png"><img src="./images/asjusting-start-point-detail.png" alt="asjusting start point-detail" width="300" height="249" class="aligncenter size-medium wp-image-532" /></a></p>
+<p><a href="./images/adjusting-size-box.png"><img src="./images/adjusting-size-box-detail.png" alt="adjusting size box-detail" width="300" height="205" class="aligncenter size-medium wp-image-537" /></a></p>
+<h3>Manually adding content</h3>
+<p>We can manually set some values in our box. This is especially useful for application with no option to echo back their state.</p>
+<p>As an example, we will add some automation values for the pan value of the first audio of an application.</p>
+<p>Once having created a box as explained above, browse the Device explorer until you reach the desired address. ie :</p>
+<p><code>/mediaPlayer/audio/track.1/input/balance/position</code></p>
+<p>If you double-click in the start of end cell, you see that the cell brings a textfield. You can then enter some values to be used as the start event and end event of the automation box.</p>
+<p><a href="./images/manually-setting-values.png"><img src="./images/manually-setting-values-detail.png" alt="manually setting values-detail" width="300" height="123" class="aligncenter size-medium wp-image-563" /></a></p>
+<p>Content added to a start or end event is symbolized in the box by a grey shade at the box side.</p>
+<p><img src="./images/boxshade.png" title="Box shade" alt="Box shade" /></p>
+<p>When entering both values, you that i-score automatically created an interpolation in the automation box. Also notice that the check box in the interpolation column got checked. You can now add other parameters values for this automation box or create other boxes in your scenario.</p>
+<blockquote class="tip">Note that boxes can be played individually by clicking the play button in the box top-bar. This can be useful if you want to quickly check the automation you just wrote.</blockquote>
+<h3>Automatic content addition</h3>
+<p>When working with an application echoing back its value to i-score, storing some parameters value into an event can be done automatically.</p>
+<p>Here we will use i-score to control a Max patch built using the <a href="http://jamoma.org/download/0.6">Jamoma</a> framework through the Minuit protocol, as setup in the <a href="http://i-score.org/documentation/iscore-and-minuit">Minuit setup tutorial page</a>. You can find this patch from the Examples folder. In order to get this example work, be sure to setup your device as explained in the Minuit tutorial and set <code>mediaPlayer</code> as the name of your device.</p>
+<p>Here we will want to use this box to control a simple gain fade-in for the soundfile player in the first audio track of our Max patch.</p>
+<p>Select our box called <code>Box.2</code>. It should be highlighted by a blue shadow-like.</p>
+<p>Then from the Device explorer panel, deploy the various levels of our Patch parameters addresses until you reach the following:</p>
+<p><code>mediaPlayer/audio/track.1/input/audio/gain</code></p>
+<p><a href="./images/selecting-parameters.png"><img src="./images/selecting-parameters-detail.png" alt="selecting parameters-detail" width="275" height="300" class="aligncenter size-medium wp-image-535" /></a></p>
+<p>You can then click the checkbox beside our gain parameter to store its current value at the box&#8217;s start event. You can see that our parameter value was automatically grabbed from our Max patch and is displayed in the field next the checkbox. Again, the value is symbolized as a shade of grey at the box&#8217;s side.</p>
+<p><a href="./images/adding-start-point.png"><img src="./images/adding-start-point-detail.png" alt="adding start point" width="300" height="187" class="aligncenter size-medium wp-image-528" /></a></p>
+<blockquote class="tip">
+<p>If you want to remove some parameters from a box, select the parameter in the Device explorer and toggle off the checkbox or press the backspace key.</p>
+</blockquote>
+<p>From the Max patch <span class="caps">GUI</span>, set the Master gain slider of the input module to 100, then store that value at the end event of <code>Box.2</code>. From i-score&#8217;s Device explorer, click the end checkbox next to our gain parameter.</p>
+<p><a href="./images/adding-end-point.png"><img src="./images/adding-end-point-detail.png" alt="adding end point-detail" width="300" height="146" class="aligncenter size-medium wp-image-525" /></a></p>
+<p>If you play our scenario, you should see the <span class="caps">GUI</span> being updated as i-score goes through the automation in the box.</p>
+<p>You can now add more content to this box by selecting other parameters from the Device explorer and checking the start and end event boxes. Note that you can <a href="http://i-score.org/documentation/meeting-i-score-interface">select a group of parameters with a single click</a>.</p>
+<blockquote class="tip">
+<p>You may store an initial state for your scenario, for example, in order to set all of your parameters to a default state. To do so, click on your scenario name in the top bar, then check the start box as explained above.</p>
+</blockquote>
+<h3>Recording automations</h3>
+<p>i-score allows to record incoming parameter&#8217;s value into automation box. To do so, once selected the automation box to store value recording, navigate to the desired parameter address in the Device explorer and click on the interpolation check box while holding the cmd/ctl key down, respectively on Mac and Windows. You will see that the check box turned into a &#8220;recording&#8221; icon and the selected automation box is highlited in red. Now if you start playing your scenario, all incoming values while the box get played will be recorded as an automation.</p>
+<p>Note that you may arm recording for many parameters at once.</p>
+<p><a href="./images/recording.png"><img src="./images/recording-detail.png" width="300" height="123" class="aligncenter size-medium wp-image-563" /></a></p>
+<h3>Editing automations</h3>
+<p>When setting a parameter&#8217;s start and end value in a box, i-score will automatically create an interpolation bewteen the two defined values. Of course, you can edit this default interpolation and further refine your automation.</p>
+<p>From the box top-bar, select the parameter interpolation you want to edit from the drop-down menu. The interpolation function is now displayed at the box foreground.</p>
+<p><a href="./images/editing-interpolation.png"><img src="./images/editing-interpolation-detail.png" alt="editing interpolation-detail" width="300" height="150" class="aligncenter size-medium wp-image-557" /></a></p>
+<h4>Break Point Function editing</h4>
+<p>Points can be added to the default function by clicking in the box. Note that you can delete existing point by alt-clicking a point.</p>
+<p><a href="./images/drawing-bpf.png"><img src="./images/drawing-bpf-detail.png" alt="drawing bpf-detail" width="300" height="212" class="aligncenter size-medium wp-image-559" /></a></p>
+<p>You can also add to each segment of the break point function a curve factor. For this, shift+click on a point and drag your mouse upward ou downward.</p>
+<p><a href="./images/curve-factor.png"><img src="./images/curve-factor-detail.png" alt="curve factor-detail" width="300" height="212" class="aligncenter size-medium wp-image-561" /></a></p>
+<h4>Free curve drawing</h4>
+<p>You can also write a custom interpolation curve by drawing in the automation box. When having selected the parameter interpolation to edit as explained above, hold down the cmd/ctl key (respectively on Mac and Windows) and drag your mouse in the automation box. As you hover the box while holding the cmd/ctl key down, you will notice that the mouse cursor changes into a pen. You can now draw a curve as desired.</p>
+<p><img src="./images/freehand.png" title="Free curve drawing" alt="Free curve drawing" /></p>
+<p>You are now ready to write some nice automations to control your favorite applications !</p>
+    </div>
+    <div id="sidebar">
+		<a href="http://www.i-score.org"><img src="/logo.png" alt="i-score logo"/></a>      <h2>Introduction</h2>
+      <ul>
+        <li><a href="/introduction/">Introduction</a></li>
+        <li><a href="/meeting-i-score-interface/">Meeting i-score interface</a></li>
+      </ul>
+      <h2>Setting up</h2>
+      <ul>
+        <li><a href="/install-guide/">Install guide</a></li>
+        <li><a href="/i-score-and-osc/">i-score and OSC</a></li>
+        <li><a href="/i-score-and-minuit/">i-score and Minuit</a></li>
+      </ul>
+	  <h2>Using i-score</h2>
+	  <ul>
+		  <li><a href="/writing-automations/">Writing automation</a></li>
+		  <li><a href="/global-control-of-execution/">Globale control of execution</a></li>
+		  <li><a href="/event-interactive-triggering/"> Event interactive triggering</a></li>
+		  <li><a href="/setting-intervals-between-events/">Setting intervals between events</a></li>
+		  <li><a href="/working-with-sub-scenarios/">Working with sub-scenarios</a></li>
+		  <li><a href="/controlling-i-score-via-osc/">Controlling i-score via osc</a></li>
+	  </ul>
+	  <h2>Addendum</h2>
+	  <ul>
+		  <li><a href="/references/">References</a></li>
+		  <li><a href="/mouse-and-shortcuts/">Mouse and shortcuts</a></li>
+	  </ul>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Documentation - i-score and Minuit</title>
+    <link rel="stylesheet" href="../stylesheet.css">
+
+    <!-- you don't need to keep this, but it's cool for stats! -->
+    <meta name="generator" content="nanoc 3.7.4">
+  </head>
+  <body>
+    <div id="main">
+      <p>i-score allows to remotely control <a href="https://github.com/Minuit/minuit">Minuit</a> compatible devices (software or hardware).</p>
+<blockquote>Minuit is a query system built on top of <span class="caps">OSC</span>, in order to ease the communication between various applications. It allows applications to query the namespace of a distant application, its various parameters value or their attributes (ie. value range, data unit). See the <a href="https://github.com/Minuit/minuit">public Github repository</a> for more information.</blockquote>
+<h3>Setting up your Minuit compatible device</h3>
+<p>When opening a brand new i-score project, you first need to setup in i-score the Minuit application you want to control. Thanks to Minuit&#8217;s query/reply features, this includes setting up the name of your remote application and the port it listens to.</p>
+<p>Here, we will use a <a href="http://jamoma.org/download/0.6">Jamoma</a> -based Max patch (available in the examples folder) implementing the Minuit protocol.</p>
+<p><a href="./images/minuit-max-patch.png"><img src="./images/minuit-max-patch-detail.png" alt="minuit max patch" width="300" height="259" class="alignnone size-medium wp-image-484" /></a></p>
+<p>This is a simple multimedia player providing two audio tracks (input source, an equalizer and echo) going to a mixer and output and two video tracks (input source and brightness, contrast and saturation adjustment) rendered to a window. The patch also embeds a component defining its own Minuit name: &#8220;mediaPlayer&#8221; and a default port (9998).</p>
+<p>From the Device explorer panel, click the &#8220;Add a device&#8221; button to bring up the remote application setup window.</p>
+<p><a href="./images/adding-osc-device.png"><img class="alignnone size-medium wp-image-448" src="./images/adding-osc-device.png" alt="adding osc device" width="300" height="187" /></a></p>
+<p>Choose &#8220;Minuit&#8221; in the protocols menu. From the Device setup window, set your Minuit enabled patch name and click ok. Depending on the size of your application, the scanning of all adresses might take some time (up to 30 seconds, for a very large application).</p>
+<p><a href="./images/setup-patch.png"><img src="./images/setup-patch-detail.png" alt="setup patch" width="300" height="172" class="alignnone size-medium wp-image-486" /></a></p>
+<p>i-score Device explorer should now display all your Max patch namespace. Expand various addresses nodes to browse through your patch structure. Note that thanks to Minuit exchanges between i-score and Max, i-score automatically filled some additional informations regarding each parameter (ie. type, range&#8230;).</p>
+<p><a href="./images/minuit-namespace.png"><img src="./images/minuit-namespace-detail.png" alt="minuit namespace-detail" width="300" height="172" class="alignnone size-medium wp-image-487"/></a></p>
+<blockquote>
+<p>Note that when adding a Minuit device, i-score will query all parameters and their attributes. Depending on your patch size, this may take some time.</p>
+</blockquote>
+    </div>
+    <div id="sidebar">
+		<a href="http://www.i-score.org"><img src="/logo.png" alt="i-score logo"/></a>      <h2>Introduction</h2>
+      <ul>
+        <li><a href="/introduction/">Introduction</a></li>
+        <li><a href="/meeting-i-score-interface/">Meeting i-score interface</a></li>
+      </ul>
+      <h2>Setting up</h2>
+      <ul>
+        <li><a href="/install-guide/">Install guide</a></li>
+        <li><a href="/i-score-and-osc/">i-score and OSC</a></li>
+        <li><a href="/i-score-and-minuit/">i-score and Minuit</a></li>
+      </ul>
+	  <h2>Using i-score</h2>
+	  <ul>
+		  <li><a href="/writing-automations/">Writing automation</a></li>
+		  <li><a href="/global-control-of-execution/">Globale control of execution</a></li>
+		  <li><a href="/event-interactive-triggering/"> Event interactive triggering</a></li>
+		  <li><a href="/setting-intervals-between-events/">Setting intervals between events</a></li>
+		  <li><a href="/working-with-sub-scenarios/">Working with sub-scenarios</a></li>
+		  <li><a href="/controlling-i-score-via-osc/">Controlling i-score via osc</a></li>
+	  </ul>
+	  <h2>Addendum</h2>
+	  <ul>
+		  <li><a href="/references/">References</a></li>
+		  <li><a href="/mouse-and-shortcuts/">Mouse and shortcuts</a></li>
+	  </ul>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Documentation - i-score and OSC</title>
+    <link rel="stylesheet" href="../stylesheet.css">
+
+    <!-- you don't need to keep this, but it's cool for stats! -->
+    <meta name="generator" content="nanoc 3.7.4">
+  </head>
+  <body>
+    <div id="main">
+      <p>i-score allows to remotely control <span class="caps">OSC</span> (<a href="http://en.wikipedia.org/wiki/Open_Sound_Control">Open Sound Control</a>) compatible <a href="http://i-score.org/documentation/references#device">devices</a> (software or hardware).</p>
+<h3>Setting up your <span class="caps">OSC</span> compatible device</h3>
+<p>When opening a brand new i-score project, you first need to setup in i-score the <span class="caps">OSC</span> application you want to control. This includes setting up the in and out ports that i-score and your remote application will use for communication as well as declaring all the <span class="caps">OSC</span> addresses of your application&#8217;s parameters you want to control using i-score.</p>
+<p>From the Device explorer panel, click the &#8220;Add a device&#8221; button to bring up the remote application setup window.</p>
+<p><a href="./images/adding-osc-device.png"><img class="alignnone size-medium wp-image-448" src="./images/adding-osc-device.png" alt="adding osc device" /></a></p>
+<p>First, select &#8220;<span class="caps">OSC</span>&#8221; in the protocols menu.</p>
+<p><a href="./images/create-osc-device.png"><img class="alignnone size-medium wp-image-449" src="./images/create-osc-device-detail.png" alt="create osc device" /></a></p>
+<p>You can then set an optional name (here we&#8217;ll use &#8220;myOSCApp&#8221;) your <span class="caps">OSC</span> application will be displayed under in i-score Device explorer.</p>
+<p>Setup a destination port (that is, the port your remote application uses to receive incoming <span class="caps">OSC</span> messages) and, if your remote application can send out notifications at each parameter&#8217;s value change, setup a reception port (that is, the port used by your remote application to send out <span class="caps">OSC</span> notifications).</p>
+<p>Then set the IP address of the computer running your <span class="caps">OSC</span> application and click &#8220;ok&#8221; when you are done (by default, i-score uses your local IP address).</p>
+<p>You should now have an item called &#8220;myOSCApp&#8221; in i-score Device explorer.</p>
+<p><a href="./images/device-ok.png"><img class="alignnone size-medium wp-image-450" src="./images/device-ok-detail.png" alt="device ok" /></a></p>
+<h3>Adding <span class="caps">OSC</span> addresses</h3>
+<p>In order to control your <span class="caps">OSC</span> compatible application from i-score, you have to declare the <span class="caps">OSC</span> address of each application&#8217;s parameter you want to control. This can be done in three different ways.</p>
+<h4>Manual namespace editing</h4>
+<p>Expand your device top-level address using the arrow, then click the &#8220;Add a node&#8221; button.</p>
+<p><a href="./images/expanding-node.png"><img class="alignnone size-medium wp-image-451" src="./images/expanding-node-detail.png" alt="expanding node" /></a></p>
+<p>You can then write your application&#8217;s parameter address in the pop-up window.</p>
+<p><img src="./images/add-node-popup.png" title="Manually adding node" alt="Manually adding node" /></p>
+<h4>Namespace editing using learn mode</h4>
+<p>Typing all your application&#8217;s parameters addresses can be tedious, hence i-score provides a learn mode to automatically fill all of your device&#8217;s <span class="caps">OSC</span> addresses. Once you set up your device as explained above, toggle the check box next to your device name to activate learn mode. As an example, here, we will send two <span class="caps">OSC</span> messages from a <a href="http://cycling74.com/products/max">Max</a> patch:</p>
+<p><code>
+/layer/1/alpha value
+/layer/2/alpha value
+</code></p>
+<p><a href="./images/osc-learn.png"><img class="alignnone size-medium wp-image-460" src="./images/osc-learn-detail.png" alt="osc learn" /></a></p>
+<p>The Device explorer should now display your remote application <span class="caps">OSC</span> addresses.</p>
+<p><a href="./images/osc-learned.png"><img class="alignnone size-medium wp-image-461" src="./images/osc-learned.png" alt="osc learned" /></a></p>
+<p>For optimization concerns, it is better to turn off the learn mode (by unchecking the check box) when done.</p>
+<h4>Loading an <span class="caps">OSC</span> namespace configuration file</h4>
+<p>i-score also allows to load a previously saved namespace file, that is, a file listing as a tree-like structure all addresses of your application. This can show useful when working with applications with static structures. As pointed below, we provide a set of namespace files for some applications (such as Modul8, <span class="caps">OLA</span>, Dlight&#8230; etc).</p>
+<p>When creating a new device, click the &#8220;Load&#8221; button from the device configuration window and select the configuration file on your disk. Here, we&#8217;ll load the configuration file for the application <a href="http://www.modul8.ch">modul8</a>.</p>
+<p><a href="./images/loading-xml.png"><img class="alignnone" src="./images/loading-xml.png" alt="loading xml" /></a></p>
+<p>When done, all of the modul8 <span class="caps">OSC</span> parameter described in the configuration file should appear in i-score Device explorer as show below.</p>
+<p><a href="./images/modul8-conf.png"><img class="alignnone wp-image-463" src="./images/modul8-conf.png" alt="modul8-conf" /></a></p>
+<blockquote>Note that as of version 0.2, i-score does not allow to export your application namespace as an xml configuration file. Such file has to be done in your favorite text editor.<br />
+<br />
+Also note that there is an <a href="https://github.com/OSSIA/Namespaces">open repository hosted on Github</a> offering a growing list of configuration files for your use. Pull requests are also more than welcome if you want to contribute more configuration files.</blockquote>
+    </div>
+    <div id="sidebar">
+		<a href="http://www.i-score.org"><img src="/logo.png" alt="i-score logo"/></a>      <h2>Introduction</h2>
+      <ul>
+        <li><a href="/introduction/">Introduction</a></li>
+        <li><a href="/meeting-i-score-interface/">Meeting i-score interface</a></li>
+      </ul>
+      <h2>Setting up</h2>
+      <ul>
+        <li><a href="/install-guide/">Install guide</a></li>
+        <li><a href="/i-score-and-osc/">i-score and OSC</a></li>
+        <li><a href="/i-score-and-minuit/">i-score and Minuit</a></li>
+      </ul>
+	  <h2>Using i-score</h2>
+	  <ul>
+		  <li><a href="/writing-automations/">Writing automation</a></li>
+		  <li><a href="/global-control-of-execution/">Globale control of execution</a></li>
+		  <li><a href="/event-interactive-triggering/"> Event interactive triggering</a></li>
+		  <li><a href="/setting-intervals-between-events/">Setting intervals between events</a></li>
+		  <li><a href="/working-with-sub-scenarios/">Working with sub-scenarios</a></li>
+		  <li><a href="/controlling-i-score-via-osc/">Controlling i-score via osc</a></li>
+	  </ul>
+	  <h2>Addendum</h2>
+	  <ul>
+		  <li><a href="/references/">References</a></li>
+		  <li><a href="/mouse-and-shortcuts/">Mouse and shortcuts</a></li>
+	  </ul>
+    </div>
+  </body>
+</html>

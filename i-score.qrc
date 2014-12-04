@@ -2,14 +2,23 @@
     <qresource prefix="/">
         <file>resources/images/Acceleration.png</file>
         <file>resources/images/Goto.png</file>
-        <file>resources/documentation/contextual.htm</file>
-        <file>resources/documentation/help.htm</file>
-        <file>resources/documentation/file.htm</file>
-        <file>resources/documentation/menu.htm</file>
-        <file>resources/documentation/quickstart.htm</file>
-        <file>resources/documentation/editorGeneral.htm</file>
-        <file>resources/documentation/editorSnapshot.htm</file>
-        <file>resources/documentation/interaction.htm</file>
+		<file>resources/documentation/controlling-i-score-via-osc/index.html</file>
+		<file>resources/documentation/event-interactive-triggering/index.html</file>
+		<file>resources/documentation/global-control-of-execution/index.html</file>
+		<file>resources/documentation/i-score-and-minuit/index.html</file>
+		<file>resources/documentation/i-score-and-osc/index.html</file>
+		<file>resources/documentation/index.html</file>
+		<file>resources/documentation/install-guide/index.html</file>
+		<file>resources/documentation/interactive-triggering/index.html</file>
+		<file>resources/documentation/introduction/index.html</file>
+		<file>resources/documentation/meeting-i-score-interface/index.html</file>
+		<file>resources/documentation/mouse-and-shortcuts/index.html</file>
+		<file>resources/documentation/references/index.html</file>
+		<file>resources/documentation/setting-intervals-between-events/index.html</file>
+		<file>resources/documentation/test/index.html</file>
+		<file>resources/documentation/working-with-sub-scenarios/index.html</file>
+		<file>resources/documentation/writing-automations/index.html</file>
+		<file>resources/stylesheets/stylesheet.css</file>
         <file>resources/images/i-score.icns</file>
         <file>resources/images/addANode.png</file>
         <file>resources/images/error-icon.png</file>

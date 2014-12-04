@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Documentation - Meeting i-score interface</title>
+    <link rel="stylesheet" href="../stylesheet.css">
+
+    <!-- you don't need to keep this, but it's cool for stats! -->
+    <meta name="generator" content="nanoc 3.7.4">
+  </head>
+  <body>
+    <div id="main">
+      <p>This guide will walk you through the various component of i-score interface.</p>
+<p>i-score interface is organized around two main parts: the Device Explorer, used to navigate and manage your distant application&#8217;s parameters and the timeline where you create and organize your automations in time.</p>
+<h3>Timeline</h3>
+<p>When starting a brand new project, i-score offers a blank score named by default &#8220;New Scenario&#8221;. The name of the scenario is displayed in the timeline pane top bar. If you save your scenario on disk using <code>Save</code> from the <code>File</code> menu (cmd+s/ctl+s respectively on Mac and Windows), the name in the timeline pane top bar will be updated with the name of your scenario file.</p>
+<p><img src="./images/timeline.png" title="i-score timeline pane" alt="i-score timeline pane" /></p>
+<p>The main area is where you create and organize various objects such as automations boxes along the indicative time rule at the top.</p>
+<p>Objects are created by dragging your mouse in the scenario while holding cmd/ctl (respectively on Mac and Window). See <a href="writing-automations.html">Writing automation</a> section for detailed explanations.</p>
+<blockquote>
+<p>Please note that as of version 0.2.2, i-score does not support copy, paste, duplicate, undo facilities. These features and related shortcuts will be available in future versions</p>
+</blockquote>
+<p>This top bar also provides a transport section with the following controls:</p>
+<p><img src="./images/timeline-play.png" title="i-score transport" alt="i-score transport" /> play/stop the execution of your scenario</p>
+<p><img src="./images/timeline-rewind.png" title="i-score transport" alt="i-score transport" /> rewind to the start of your scenario</p>
+<p><img src="./images/timeline-speed.png" title="i-score transport" alt="i-score transport" /> adjust speed of your scenario in real time</p>
+<h3>Device explorer</h3>
+<p>The Device explorer allows to navigate through the various parameters of your distant application and select/unselect the parameter whose values to get stored in an object on the timeline.</p>
+<p><img src="./images/deviceexplorer.png" title="i-score Device explorer" alt="i-score Device explorer" /></p>
+<p>The Device explorer pane can be hidden/displayed by toggling the Device explorer entry in the View menu (cmd+e/ctl+e respectively on Mac and Windows). It can also be moved in a seperate window by clicking the top-left button in i-score&#8217;s main window. To attach it back to i-score main window, slide the Device explorer window to the left or right side of the timeline pane.</p>
+<p><img src="./images/deviceexplorer-move.png" title="Device explorer mover" alt="Device explorer mover" /></p>
+<h4>Basic components</h4>
+<p>The Device explorer displays a structured list of all parameters of a distant application loaded as an i-score device (See <a href="./i-score-and-osc.html">Using i-score with osc applications</a> and <a href="./i-score-and-minuit.html">Using i-score with Minuit applications</a> for detailed explanations).</p>
+<p>Each node in a parameter address is displayed as a name and a grey arrow. This arrow lets you expand/collapse the various levels or your application parameters. In the illustration below, we can see that the OSCdevice has the following parameters:</p>
+<blockquote>
+<p>/parent/topParameter.1<br />
+/parent/topParameter.2<br />
+/parent/child.1/myParameter<br />
+/parent/child.1/anotherParameter<br />
+/parent/child.2/myParameter<br />
+/parent/child.2/anotherParameter</p>
+</blockquote>
+<p><img src="./images/nodes.png" title="Structured list of parameters" alt="Structured list of parameters" /></p>
+<p>Each parameter can be of 3 different types:</p>
+<p>- bidirectionnal: a distant application&#8217;s parameter can be set and get from i-score<br />
+- receiver: a distant application&#8217;s parameter can be set from i-score<br />
+- sender: a distant application&#8217;s parameter can be get form i-score</p>
+<p>Note that in the Device explorer pane, receivers and senders are respectively displayed as light grey italic text and black italic text.</p>
+<p><!-- For example, in the illustration below, the preset address under the audio node of the mediaPlayer device is a method allowing to recall a preset setting, while audio/track.1/input/soundfile/report is a message sent from the distant application when the sounfile being played reaches its end. --><br />
+The Device explorer pane provides two columns named &#8220;Start&#8221; and &#8220;End&#8221;. For each parameter of the device, these columns display start and end values of an automation box. A double-click in the cell brings a textfield allowing to manually set start and/or end value.</p>
+<p><a href="./images/startend-col.png"><img src="./images/startend-col-detail.png" width="300" height="150" class="aligncenter size-medium wp-image-557" /></a></p>
+<p>Both Start and End columns are precedeed by a column named &#8220;v&#8221; containing checkboxes. These allow to set whether a parameter value will be respectively stored as a box&#8217;s start or end.</p>
+<p>Finally, the column named &#8220;~&#8221; is use to set whether i-score will draw an interpolation between start and end values of an automation box.</p>
+<h4>Advanced settings</h4>
+<p>Some additionnal settings can be accessed by widening the Device explorer pane (when the Device explorer pane is attached to i-score main window, grab its right border and slide it to the right).</p>
+<p><img src="./images/deviceexplorer-column.png" title="Device explorer advanced settings" alt="Device explorer advanced settings" /></p>
+<p>The first column named &#8220;=&#8221; sets whether repeted values will get filtered out (default) when playing an automation.</p>
+<p>Column named &#8220;%&#8221; allows to define the rate at which values will get sent by i-score. Time between two values is given as milliseconds.</p>
+<p>&#8220;Type&#8221; column displays a symbol depending on the type of the parameter: bidirectionnal (<code>&lt;-&gt;</code>), receiver (<code>-&gt;</code>) or sender (<code>&lt;-</code>).</p>
+<p>Finally, &#8220;min&#8221; and &#8220;max&#8221; column display some optional minimum and maximum values for the parameter, as optionally defined in the xml file describing the parameters structure of your device (ie. for <span class="caps">OSC</span> devices) or as queried by i-score (ie. for Minuit devices).</p>
+    </div>
+    <div id="sidebar">
+		<a href="http://www.i-score.org"><img src="/logo.png" alt="i-score logo"/></a>      <h2>Introduction</h2>
+      <ul>
+        <li><a href="/introduction/">Introduction</a></li>
+        <li><a href="/meeting-i-score-interface/">Meeting i-score interface</a></li>
+      </ul>
+      <h2>Setting up</h2>
+      <ul>
+        <li><a href="/install-guide/">Install guide</a></li>
+        <li><a href="/i-score-and-osc/">i-score and OSC</a></li>
+        <li><a href="/i-score-and-minuit/">i-score and Minuit</a></li>
+      </ul>
+	  <h2>Using i-score</h2>
+	  <ul>
+		  <li><a href="/writing-automations/">Writing automation</a></li>
+		  <li><a href="/global-control-of-execution/">Globale control of execution</a></li>
+		  <li><a href="/event-interactive-triggering/"> Event interactive triggering</a></li>
+		  <li><a href="/setting-intervals-between-events/">Setting intervals between events</a></li>
+		  <li><a href="/working-with-sub-scenarios/">Working with sub-scenarios</a></li>
+		  <li><a href="/controlling-i-score-via-osc/">Controlling i-score via osc</a></li>
+	  </ul>
+	  <h2>Addendum</h2>
+	  <ul>
+		  <li><a href="/references/">References</a></li>
+		  <li><a href="/mouse-and-shortcuts/">Mouse and shortcuts</a></li>
+	  </ul>
+    </div>
+  </body>
+</html>

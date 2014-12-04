@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Documentation - Working intervals between events</title>
+    <link rel="stylesheet" href="../stylesheet.css">
+
+    <!-- you don't need to keep this, but it's cool for stats! -->
+    <meta name="generator" content="nanoc 3.7.4">
+  </head>
+  <body>
+    <div id="main">
+      <p>i-score allows to add to your timeline a number of automation boxes where/whenever you want. While writing your scenario, you are free to move boxes along the timeline, adjust their start and end point and structure you score as you need. However, as you add more boxes to the timeline, your score can grow in complexity and editing can become quite of a tedious work. In the score shown below, we can easily see that if we want to make our <code>eq1-fadein</code> automation a bit longer, this will cross the <code>all</code> automation box, add some conflict between the automation stored in <code>eq1-fadein</code> and the one stored in <code>all</code> automation box, misalign boxes together, and so on.</p>
+<p><a href="./images/complexity.png"><img src="./images/complexity-detail.png" alt="complexity-detail" class="aligncenter wp-image-582" /></a></p>
+<p>To ease this work, i-score provides ways to set relationships between related events so that you are free to change some automations details while preserving the global structure of your score.</p>
+<h3>Setting fixed-duration intervals</h3>
+<p>First kind of interval between boxes that can be defined is a fixed-length interval. This ensures that a certain amount of time will be maintained between two events. For instance, you may want to ensure that some video files get properly loaded or that a curtain on stage is drawn before starting automations stored in <code>Box.3</code>. Hence, setting a 2 seconds fixed interval between two boxes will ensure that when moving a box, the time between two automations is preserved, thus the scenario is still functionnal.</p>
+<p>Assuming we want to set a interval between the end of <code>Box.2</code> and the beginning of <code>Box.3</code>, we can click the handle on Box.2&#8217;s right side and drag a link up to the handle in Box.3&#8217;s side as shown below.</p>
+<p><a href="./images/dragging-link.png"><img src="./images/dragging-link-detail.png" alt="dragging link-detail" class="aligncenter size-medium wp-image-584" /></a></p>
+<p>Now, if you move one of the boxes along the timeline, you will note that the other box (and any other boxes attached to the moved box) move accordingly as it maintains the duration set between the boxes.</p>
+<p>The duration can be adjusted by moving the vertical handle in the middle of the link. Dragging it to the left will shorten the duration, whereas dragging it to the right will make it greater.</p>
+<p><a href="./images/adjust-duration.png"><img src="./images/adjust-duration-detail.png" alt="adjust duration-detail" class="aligncenter size-medium wp-image-580" /></a></p>
+<p>Intervals can be established from a box end event to a box&#8217;s start event, but also from a box&#8217;s start event to another box&#8217;s start event as well as a box&#8217;s end event to another box&#8217;s end event, depending on how you need to align events and structure your scenario. For example, if we set some intervals in the complex score we saw earlier, we see that linking <code>Pan-mvt - copy</code>, <code>eq1-fadein</code> and <code>eq2.4</code> respective end events will ensure that boxes&#8217; ends will be kept aligned as we change the duration of <code>eq1-fadein</code> box, while linking <code>eq1-fadein</code> end point to <code>all</code> box&#8217;s start event will push the later so that boxes do not overlap.</p>
+<video width="720" height="405" src="./images/complexity_pushed.mp4"  preload="metadata" controls>You video cannot be displayed. Click <a href="./images/complexity_pushed.mp4">here</a>.</video>
+<blockquote class="tip">Note that i-score is smart enough to check whether an interval is valid or not. For instance, it will prevent you from doing illogical interval (ie. linking a box to itself, in case you would ask)</blockquote>
+<h3>Setting flexible intervals</h3>
+<p>You can also set intervals of variable/undefined time between boxes. When setting flexible intervals, you will be able to move automation boxes freely along the timeline as long as the order defined by the interval is preserved. That is, if <code>Box.2</code>&#8216;s end event reaches <code>Box.3</code>&#8217;s start event, rather than letting automation boxes overlap, i-score will push <code>Box.3</code> along the timeline. This makes i-score very useful to fine tune times of intervals between events while ensuring that the logical continuity of your scenario is at safe.</p>
+<p><a href="./images/flexible-relation.png"><img src="./images/flexible-relation-detail.png" alt="flexible relation-detail" class="alignnone size-medium wp-image-593" /></a></p>
+<p>Again, let&#8217;s make a simple scenario with two boxes (with default names <code>Box.2</code> and <code>Box.3</code>) and let&#8217;s draw a relation between <code>Box.2</code> end event and <code>Box.3</code> start event. We can make the interval flexible by double clicking it. You see that the vertical handle has changed to a duplet of dots. Now the interval between <code>Box.2</code> and <code>Box.3</code> has no pre-defined duration. You can move <code>Box.2</code> freely until its end event&#8217;s date equals <code>Box.3</code>&#8216;s start event&#8217;s date. i-score will then push <code>Box.3</code> along the timeline to keep the order preserved as shown in the video below.</p>
+<video width="720" height="405" src="./images/flexible-relation.mp4" preload="metadata" controls>Your video cannot be displayed inline. Click <a href="./images/flexible-relation.mp4">here</a></video>
+<p>Flexible intervals can also be established from a box end event to a box&#8217;s start event, from a box&#8217;s start event to another box&#8217;s start event, as well as from a box&#8217;s end event to another box&#8217;s end event, depending on how you need to align your automations and structure your scenario.</p>
+<h3>Intervals and interactive events</h3>
+<p>Intervals can be used with both automation box types. However, using intervals with interactive boxes has different consequences when executing your score. Indeed, for non-interactive boxes, while intervals are useful for editing your scenario, they have no consequence on when the bounded automation will be played: these will play depending on their position on the timeline. However, using intervals with interactive events will condition when the automation gets available for triggering.</p>
+<p>As an example, let&#8217;s set an interval between the start event of a box named <code>Box.2</code> and the start event of an interactive box named <code>Box.3</code>. If you start playing your scenario, you will notice that the trigger button turns red and the automation can not be triggered manually or using an <span class="caps">OSC</span> message until i-score playhead crosses start event of <code>Box.2</code>. Once i-score&#8217;s playhead crosses the beginning of <code>Box.2</code>, <code>Box.3</code>&#8217;s trigger button will turn green, meaning that the automation can be triggered. See both behaviour as illustrated below.</p>
+<p><a href="./images/cond-triggering.png"><img src="./images/cond-triggering-detail.png" alt="Non intervalled triggering" width="300" height="259" class="aligncenter size-medium wp-image-614" /></a></p>
+<p><a href="./images/cond-triggering2.png"><img src="./images/cond-triggering2-detail.png" alt="Non intervalled triggering" width="300" height="259" class="aligncenter size-medium wp-image-614" /></a></p>
+<p>You may however want to go a step further by preventing from triggering <code>Box.3</code>&#8216;s automation until a certain amount of time. For example, <code>Box.2</code> may load some media files but you would like to introduce a delay before being able to trigger <code>Box.3</code>&#8217;s automation so you are sure that the loading is properly done. Such a delay can be introduced by clicking the angle of the interval connection and dragging your mouse until you reach the desired length. You will see that the interval connection now displays a full line up to the minimum bound you just defined.</p>
+<p><a href="./images/min-bound.png"><img src="./images/min-bound-detail.png" alt="Min bounded interval" width="300" height="259" class="aligncenter size-medium wp-image-614" /></a></p>
+<p>On the opposite, you may want to force an automation to trigger after a certain amount of time. For example, if our <code>Box.2</code> is reading an audio or video file that is to be faded out by the automation contained in <code>Box.3</code>, you will want to make sure that such a fade out is being made before the end of the file so it ends gracefully.</p>
+<p>Interval maximum bound can be added by double-clicking on the dotted part of the connection. This bring a maximum bound handle at the start event of the interactive box as illustrated below.</p>
+<p><a href="./images/max-bound.png"><img src="./images/max-bound-detail.png" alt="Max bounded interval" width="300" height="259" class="aligncenter size-medium wp-image-614" /></a></p>
+<p>You can now click the handle and drag it to the right until your reach the desired amount of time.</p>
+<p><a href="./images/max-bound2.png"><img src="./images/max-bound2-detail.png" alt="Max bounded interval" width="300" height="259" class="aligncenter size-medium wp-image-614" /></a></p>
+<blockquote>
+<p>When editing your scenario, note that interval bounded with minimum and maximum values also affects moving interactive boxes along the timeline. Interactive boxes can be moved freely along the dotted part of the interval connection but will start pushing other linked boxes as you reach one of the bounds.</p>
+</blockquote>
+    </div>
+    <div id="sidebar">
+		<a href="http://www.i-score.org"><img src="/logo.png" alt="i-score logo"/></a>      <h2>Introduction</h2>
+      <ul>
+        <li><a href="/introduction/">Introduction</a></li>
+        <li><a href="/meeting-i-score-interface/">Meeting i-score interface</a></li>
+      </ul>
+      <h2>Setting up</h2>
+      <ul>
+        <li><a href="/install-guide/">Install guide</a></li>
+        <li><a href="/i-score-and-osc/">i-score and OSC</a></li>
+        <li><a href="/i-score-and-minuit/">i-score and Minuit</a></li>
+      </ul>
+	  <h2>Using i-score</h2>
+	  <ul>
+		  <li><a href="/writing-automations/">Writing automation</a></li>
+		  <li><a href="/global-control-of-execution/">Globale control of execution</a></li>
+		  <li><a href="/event-interactive-triggering/"> Event interactive triggering</a></li>
+		  <li><a href="/setting-intervals-between-events/">Setting intervals between events</a></li>
+		  <li><a href="/working-with-sub-scenarios/">Working with sub-scenarios</a></li>
+		  <li><a href="/controlling-i-score-via-osc/">Controlling i-score via osc</a></li>
+	  </ul>
+	  <h2>Addendum</h2>
+	  <ul>
+		  <li><a href="/references/">References</a></li>
+		  <li><a href="/mouse-and-shortcuts/">Mouse and shortcuts</a></li>
+	  </ul>
+    </div>
+  </body>
+</html>

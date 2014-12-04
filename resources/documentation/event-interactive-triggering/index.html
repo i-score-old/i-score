@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Documentation - Event interactive triggering</title>
+    <link rel="stylesheet" href="../stylesheet.css">
+
+    <!-- you don't need to keep this, but it's cool for stats! -->
+    <meta name="generator" content="nanoc 3.7.4">
+  </head>
+  <body>
+    <div id="main">
+      <p>Once you created a few automation boxes in i-score timeline, you can adjust their position and duration along the timeline. As with any standard <span class="caps">DAW</span>, automations are played as the playhead runs through them.</p>
+<p>However, when writing your interactive scenario, there are some cases where you want a specific automation to run at some point but cannot know when. For example, when writing the scenario of an interactive art installation, you know that an automation will start playing whenever a visitor enters the exhibition space or passes by a sensor, but you can not know when he will do so. To help with that, i-score let you set that an automation box will be triggered interactively. This brings the flexibility of cue-based systems. However, note that even if interactive automation boxes are dispatched along the timeline, they remain by default independant: their position on the timeline does not necesseraly imply a sequential order allowing parallel or non-linear triggering of events.</p>
+<p>We can add a &#8220;trigger&#8221; to a box by clicking one of the handle at the box&#8217;s top corners as illustrated below.</p>
+<p><a href="./images/adding-trigger-point.png"><img src="./images/adding-trigger-point-detail.png" alt="adding trigger point" width="300" height="259" class="aligncenter size-medium wp-image-614" /></a></p>
+<p>When done, the automation box displays a flag at its corner (start event, in our case). Now when playing our scenario, the automation will not start as the global playhead crosses its start event and will have to be triggered dynamically.</p>
+<p><a href="./images/interactive-automation-box.png"><img src="./images/interactive-automation-box-detail.png" alt="interactive automation box-detail" width="300" height="269" class="aligncenter size-medium wp-image-616" /></a></p>
+<p>As illustrated in the video below, when playing our scenario, the interactive automation box flag turns green when it is ready to be triggered until it is started by a mouse click or when receiving the <span class="caps">OSC</span> message displayed above the box (<code>/'box name'/start</code>. When playing, the interactive automation box&#8217;s flag turns red until it is done.</p>
+<video width="720" height="405" src="./images/interactive-triggering.mp4" preload="metadata" controls >Video cannot be displayed inline. Click <a href="./images/interactive-triggering.mp4">here</a></video>
+    </div>
+    <div id="sidebar">
+		<a href="http://www.i-score.org"><img src="/logo.png" alt="i-score logo"/></a>      <h2>Introduction</h2>
+      <ul>
+        <li><a href="/introduction/">Introduction</a></li>
+        <li><a href="/meeting-i-score-interface/">Meeting i-score interface</a></li>
+      </ul>
+      <h2>Setting up</h2>
+      <ul>
+        <li><a href="/install-guide/">Install guide</a></li>
+        <li><a href="/i-score-and-osc/">i-score and OSC</a></li>
+        <li><a href="/i-score-and-minuit/">i-score and Minuit</a></li>
+      </ul>
+	  <h2>Using i-score</h2>
+	  <ul>
+		  <li><a href="/writing-automations/">Writing automation</a></li>
+		  <li><a href="/global-control-of-execution/">Globale control of execution</a></li>
+		  <li><a href="/event-interactive-triggering/"> Event interactive triggering</a></li>
+		  <li><a href="/setting-intervals-between-events/">Setting intervals between events</a></li>
+		  <li><a href="/working-with-sub-scenarios/">Working with sub-scenarios</a></li>
+		  <li><a href="/controlling-i-score-via-osc/">Controlling i-score via osc</a></li>
+	  </ul>
+	  <h2>Addendum</h2>
+	  <ul>
+		  <li><a href="/references/">References</a></li>
+		  <li><a href="/mouse-and-shortcuts/">Mouse and shortcuts</a></li>
+	  </ul>
+    </div>
+  </body>
+</html>

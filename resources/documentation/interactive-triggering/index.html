@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Documentation - Interactive triggering</title>
+    <link rel="stylesheet" href="../stylesheet.css">
+
+    <!-- you don't need to keep this, but it's cool for stats! -->
+    <meta name="generator" content="nanoc 3.7.4">
+  </head>
+  <body>
+    <div id="main">
+      <p>When writing your interactive scenario, there are some cases where you want a specific automation to run at some point but cannot know when. For example, when writing the scenario of an interactive art installation, you know that an automation will start playing whenever a visitor enters the exhibition space or passes by a sensor, but you can not know when he will do so. To help with that, i-score let you set that an automation box will be triggered interactively. We can add a &#8220;trigger&#8221; to a box by clicking one of the handle at the box&#8217;s top corners as illustrated below.</p>
+<p><a href="./images/adding-trigger-point.png"><img src="./images/adding-trigger-point-detail.png" alt="adding trigger point-detail" width="300" height="259" class="aligncenter size-medium wp-image-614" /></a></p>
+<p>When done, the automation box displays a flag at its corner (start event, in our case). Now when playing our scenario, the automation will not start as the global playhead crosses its start event and will have to be triggered dynamically.</p>
+<p><a href="./images/interactive-automation-box.png"><img src="./images/interactive-automation-box-detail.png" alt="interactive automation box-detail" width="300" height="269" class="aligncenter size-medium wp-image-616" /></a></p>
+<p>As illustrated in the video below, when playing our scenario, the interactive automation box flag turns green when it is ready to be triggered until it is started by a mouse click or when receiving the <span class="caps">OSC</span> message displayed above the box (<code>/'box name'/start</code>. When playing, the interactive automation box&#8217;s flag turns red until it is done.</p>
+<p>[video width=&#8220;720&#8221; height=&#8220;405&#8221; mp4=&#8220;http://i-score.org/wp-content/uploads/2014/09/interactive-triggering.mp4&#8221;][/video]</p>
+<h4>Conditioning triggering</h4>
+<p>Interactive triggering of automations can be further refined by combining triggers and intervals. When boxes are made interactive, automations can be triggered as soon as the scenario start being played. However, using intervals between automation boxes allows to set when an automation will be ready for triggering or if it should trigger automatically after a certain amount of time for example. As an example, we will set an interval between the start event of a box named <code>Box.2</code> and the start event of an interactive box named <code>Box.3</code>. If you start playing your scenario, you will notice that the trigger button turns red and the automation can not be triggered manually or using an <span class="caps">OSC</span> message until i-score playhead crosses start event of <code>Box.2</code>. Once i-score&#8217;s playhead crosses the beginning of <code>Box.2</code>, <code>Box.3</code>&#8217;s trigger button will turn green, meaning that the automation can be triggered. See both behaviour as illustrated below.</p>
+<p><a href="./images/cond-triggering.png"><img src="./images/cond-triggering-detail.png" alt="Non intervalled triggering" width="300" height="259" class="aligncenter size-medium wp-image-614" /></a></p>
+<p><a href="./images/cond-triggering2.png"><img src="./images/cond-triggering2-detail.png" alt="Non intervalled triggering" width="300" height="259" class="aligncenter size-medium wp-image-614" /></a></p>
+<p>You may however want to go a step further by preventing from triggering <code>Box.3</code>&#8216;s automation until a certain amount of time. For example, <code>Box.2</code> may load some media files but you would like to introduce a delay before being able to trigger <code>Box.3</code>&#8217;s automation so you are sure that the loading is properly done. Such a delay can be introduced by clicking the angle of the interval connection and dragging your mouse until you reach the desired length. You will see that the interval connection now displays a full line up to the minimum bound you just defined.</p>
+<p><a href="./images/min-bound.png"><img src="./images/min-bound-detail.png" alt="Min bounded interval" width="300" height="259" class="aligncenter size-medium wp-image-614" /></a></p>
+<p>On the opposite, you may want to force an automation to trigger after a certain amount of time. For example, if our <code>Box.2</code> is reading an audio or video file that is to be faded out by the automation contained in <code>Box.3</code>, you will want to make sure that such a fade out is being made before the end of the file so it ends gracefully.</p>
+<p>Interval maximum bound can be added by double-clicking on the dotted part of the connection. This bring a maximum bound handle at the start event of the interactive box as illustrated below.</p>
+<p><a href="./images/max-bound.png"><img src="./images/max-bound-detail.png" alt="Max bounded interval" width="300" height="259" class="aligncenter size-medium wp-image-614" /></a></p>
+<p>You can now click the handle and drag it to the right until your reach the desired amount of time.</p>
+<p><a href="./images/max-bound2.png"><img src="./images/max-bound2-detail.png" alt="Max bounded interval" width="300" height="259" class="aligncenter size-medium wp-image-614" /></a></p>
+<blockquote>
+<p>When editing your scenario, note that interval bounded with minimum and maximum values also affects moving interactive boxes along the timeline. Interactive boxes can be moved freely along the dotted part of the interval connection but will start pushing other linked boxes as you reach one of the bounds.</p>
+</blockquote>
+    </div>
+    <div id="sidebar">
+		<a href="http://www.i-score.org"><img src="/logo.png" alt="i-score logo"/></a>      <h2>Introduction</h2>
+      <ul>
+        <li><a href="/introduction/">Introduction</a></li>
+        <li><a href="/meeting-i-score-interface/">Meeting i-score interface</a></li>
+      </ul>
+      <h2>Setting up</h2>
+      <ul>
+        <li><a href="/install-guide/">Install guide</a></li>
+        <li><a href="/i-score-and-osc/">i-score and OSC</a></li>
+        <li><a href="/i-score-and-minuit/">i-score and Minuit</a></li>
+      </ul>
+	  <h2>Using i-score</h2>
+	  <ul>
+		  <li><a href="/writing-automations/">Writing automation</a></li>
+		  <li><a href="/global-control-of-execution/">Globale control of execution</a></li>
+		  <li><a href="/event-interactive-triggering/"> Event interactive triggering</a></li>
+		  <li><a href="/setting-intervals-between-events/">Setting intervals between events</a></li>
+		  <li><a href="/working-with-sub-scenarios/">Working with sub-scenarios</a></li>
+		  <li><a href="/controlling-i-score-via-osc/">Controlling i-score via osc</a></li>
+	  </ul>
+	  <h2>Addendum</h2>
+	  <ul>
+		  <li><a href="/references/">References</a></li>
+		  <li><a href="/mouse-and-shortcuts/">Mouse and shortcuts</a></li>
+	  </ul>
+    </div>
+  </body>
+</html>
