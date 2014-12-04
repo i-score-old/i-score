@@ -1438,10 +1438,10 @@ void Engine::getCtrlPointMessagesToSend(TimeBoxId boxId, TimeEventIndex controlP
     event = out[0];
     
     // get all addresses of the state of the event and their value
-    TTValue addresses;
-    event.get("StateAddresses", addresses);
+    TTValue none, addresses;
+    addresses = event.send("StateAddresses", none);
     
-    for (TTElementIter it = addresses.begin(); it != end(); it++)
+    for (TTElementIter it = addresses.begin(); it != addresses.end(); it++)
     {
         TTAddress address = TTElement(*it);
         TTValue value = event.send("StateAddressGetValue", address);
