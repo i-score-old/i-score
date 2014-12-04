@@ -58,7 +58,7 @@ Help::Help(QWidget *parent)
   setWindowTitle("Help");
   _layout = new QVBoxLayout();
   _tabs = new QTabWidget(this);
-  _editorTabs = new QTabWidget(this);
+  // _editorTabs = new QTabWidget(this);
 
   QString fileString;
   QFile file(":/resources/documentation/file.htm");
@@ -72,7 +72,7 @@ Help::Help(QWidget *parent)
   _fileLabel = new QLabel(fileString);
 
   QString quickstartString;
-  QFile quickstart(":/resources/documentation/quickstart.htm");
+  QFile quickstart(":/resources/documentation/index.html");
   if (quickstart.open(QIODevice::ReadOnly)) {
       quickstartString = QString(quickstart.readAll());
     }
@@ -91,35 +91,35 @@ Help::Help(QWidget *parent)
     }
   _contextLabel = new QLabel(contextString);
 
-  QString interactionString;
-  QFile interaction(":/resources/documentation/interaction.htm");
-  if (interaction.open(QIODevice::ReadOnly)) {
-      interactionString = QString(interaction.readAll());
+  QString shortcutsString;
+  QFile shortcuts(":/resources/documentation/mouse-and-shortcuts/index.html");
+  if (shortcuts.open(QIODevice::ReadOnly)) {
+      shortcutsString = QString(shortcuts.readAll());
     }
   else {
-      interactionString = tr("No Help Found");
+      shortcutsString = tr("No Help Found");
     }
-  _interactionLabel = new QLabel(interactionString);
+  this->_shortcutsLabel = new QLabel(shortcutsString);
 
-  QString editorGeneralString;
-  QFile editorGeneral(":/resources/documentation/editorGeneral.htm");
-  if (editorGeneral.open(QIODevice::ReadOnly)) {
-      editorGeneralString = QString(editorGeneral.readAll());
-    }
-  else {
-      editorGeneralString = tr("No Help Found");
-    }
-  _editorGeneralLabel = new QLabel(editorGeneralString);
+  // QString editorGeneralString;
+  // QFile editorGeneral(":/resources/documentation/editorGeneral.htm");
+  // if (editorGeneral.open(QIODevice::ReadOnly)) {
+  //     editorGeneralString = QString(editorGeneral.readAll());
+  //   }
+  // else {
+  //     editorGeneralString = tr("No Help Found");
+  //   }
+  // _editorGeneralLabel = new QLabel(editorGeneralString);
 
-  QString editorSnapshotString;
-  QFile editorSnapshot(":/resources/documentation/editorSnapshot.htm");
-  if (editorSnapshot.open(QIODevice::ReadOnly)) {
-      editorSnapshotString = QString(editorSnapshot.readAll());
-    }
-  else {
-      editorSnapshotString = tr("No Help Found");
-    }
-  _editorSnapshotLabel = new QLabel(editorSnapshotString);
+  // QString editorSnapshotString;
+  // QFile editorSnapshot(":/resources/documentation/editorSnapshot.htm");
+  // if (editorSnapshot.open(QIODevice::ReadOnly)) {
+  //     editorSnapshotString = QString(editorSnapshot.readAll());
+  //   }
+  // else {
+  //     editorSnapshotString = tr("No Help Found");
+  //   }
+  // _editorSnapshotLabel = new QLabel(editorSnapshotString);
 
   QScrollArea *fileScrollArea = new QScrollArea;
   fileScrollArea->setWidget(_fileLabel);
@@ -128,25 +128,25 @@ Help::Help(QWidget *parent)
 
   QScrollArea *quickStartScrollArea = new QScrollArea;
   quickStartScrollArea->setWidget(_quickStartLabel);
-  _tabs->addTab(quickStartScrollArea, tr("Quick start"));
+  _tabs->addTab(quickStartScrollArea, tr("Getting started"));
 
   QScrollArea *contextScrollArea = new QScrollArea;
   contextScrollArea->setWidget(_contextLabel);
 
   //_tabs->addTab(contextScrollArea,"Contextual Menu");
-  QScrollArea *interactionScrollArea = new QScrollArea;
-  interactionScrollArea->setWidget(_interactionLabel);
-  _tabs->addTab(interactionScrollArea, tr("Interaction"));
+  QScrollArea *shortcutsScrollArea = new QScrollArea;
+  shortcutsScrollArea->setWidget(_shortcutsLabel);
+  _tabs->addTab(shortcutsScrollArea, tr("Shortcuts"));
 
-  QScrollArea *editorGeneralScrollArea = new QScrollArea;
-  editorGeneralScrollArea->setWidget(_editorGeneralLabel);
-  _editorTabs->addTab(editorGeneralScrollArea, tr("General"));
+  // QScrollArea *editorGeneralScrollArea = new QScrollArea;
+  // editorGeneralScrollArea->setWidget(_editorGeneralLabel);
+  // _editorTabs->addTab(editorGeneralScrollArea, tr("General"));
 
-  QScrollArea *editorSnapshotScrollArea = new QScrollArea;
-  editorSnapshotScrollArea->setWidget(_editorSnapshotLabel);
-  _editorTabs->addTab(editorSnapshotScrollArea, tr("Snapshot"));
-
-  _tabs->addTab(_editorTabs, tr("Devices Explorer"));
+  // QScrollArea *editorSnapshotScrollArea = new QScrollArea;
+  // editorSnapshotScrollArea->setWidget(_editorSnapshotLabel);
+  // _editorTabs->addTab(editorSnapshotScrollArea, tr("Snapshot"));
+  //
+  // _tabs->addTab(_editorTabs, tr("Devices Explorer"));
 
   _layout->addWidget(_tabs);
 

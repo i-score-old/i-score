@@ -78,6 +78,6 @@ class Help : public QDialog
     QLabel *_editorGeneralLabel;  //!< Attributes editor help tab.
     QLabel *_editorSnapshotLabel; //!< Attributes editor help tab.
     QTabWidget *_editorTabs;      //!< Editor subtabs.
-    QLabel *_interactionLabel;    //!< Widgets interaction help tab.
+    QLabel *_shortcutsLabel;    //!< Widgets shortcut help tab.
 };
 #endif
