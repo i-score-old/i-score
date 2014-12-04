@@ -96,8 +96,21 @@ Maquette::init()
     // note : this is a temporary solution to test new Score framework easily
     delete _engines;
         
-    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, &deviceCallback, jamomaFolder);
-
+    _engines = new Engine(&triggerPointIsActiveCallback, &boxIsRunningCallback, &transportCallback, &deviceCallback, &deviceConnectionErrorCallback, jamomaFolder);
+	
+	connect(this, SIGNAL(boxIsRunningSignal(uint,bool)),
+			this, SLOT(boxIsRunningSlot(uint,bool)), Qt::QueuedConnection);
+	connect(this, SIGNAL(triggerPointIsActiveSignal(uint,bool)),
+			this, SLOT(updateTriggerPointActiveStatus(uint,bool)), Qt::QueuedConnection);
+	connect(this, SIGNAL(playOrResumeSignal()),
+			_scene, SLOT(playOrResume()), Qt::QueuedConnection);
+	connect(this, SIGNAL(stopOrPauseSignal()),
+			_scene, SLOT(stopOrPause()), Qt::QueuedConnection);
+	connect(this, SIGNAL(changeTimeOffsetSignal(uint)),
+			_scene, SLOT(changeTimeOffset(uint)), Qt::QueuedConnection);
+	connect(this, SIGNAL(changeSpeedSignal(double)),
+			_scene, SLOT(speedChanged(double)), Qt::QueuedConnection);
+	
     //Creating rootBox as the mainScenario
     auto scenarioAb = new AbstractParentBox();
     scenarioAb->setID(ROOT_BOX_ID);
@@ -109,7 +122,32 @@ Maquette::init()
 
 Maquette::Maquette() : _engines(nullptr)
 {
-	connect(this, SIGNAL(boxIsRunningSignal(uint,bool)), this, SLOT(boxIsRunningSlot(uint,bool)), Qt::QueuedConnection);
+}
+
+QList<std::string> Maquette::addressList()
+{
+	return _scene->editor()->networkTree()->getAddressList();
+}
+#include <BasicBox.hpp>
+
+void Maquette::loop(int boxid)
+{
+	if(_engines->isLoop(boxid))
+	{
+		if(_boxes[boxid]->hasTriggerPoint(BOX_END))
+		{
+			_boxes[boxid]->removeTriggerPoint(BOX_END);
+		}
+		_engines->disableLoop(boxid);
+	}
+	else
+	{
+		_engines->enableLoop(boxid);
+		if(!_boxes[boxid]->hasTriggerPoint(BOX_END))
+		{
+			_boxes[boxid]->addTriggerPoint(BOX_END);
+		}
+	}
 }
 
 Maquette::~Maquette()
@@ -197,100 +235,7 @@ Maquette::sequentialID()
 {
   return _boxes.size();
 }
-/*
-void Maquette::addParentBoxToScene(unsigned int ID,
-                                   unsigned int mother,
-                                   ParentBox* newBox)
-{
-    if (mother != NO_ID && mother != ROOT_BOX_ID)
-    {
-        BoxesMap::iterator it;
-        if ((it = _boxes.find(mother)) != _boxes.end())
-        {
-            if (it->second->type() == PARENT_BOX_TYPE)
-            {
-                if(auto papa = dynamic_cast<ParentBox*>(it->second))
-                {
-                    newBox->setMother(mother);
-                    papa->addChild(ID);
-                }
-                else
-                {
-                    qDebug() << "ALERT : Trying to add a child to a non-parent." << Q_FUNC_INFO;
-                }
-            }
-            else
-            {
-                newBox->setMother(ROOT_BOX_ID);
-            }
-        }
-    }
-}
 
-unsigned int Maquette::addParentBox(unsigned int ID,
-                                    const QPointF & corner1,
-                                    const QPointF & corner2,
-                                    const string & name,
-                                    unsigned int mother)
-{
-    vector<string> firstMsgs;
-    vector<string> lastMsgs;
-
-    _engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-    _engines->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
-
-
-    if (ID != NO_ID)
-    {
-        ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
-        newBox->setName(QString::fromStdString(name));
-
-        _boxes[ID] = newBox;
-        _parentBoxes[ID] = newBox;
-        newBox->setID(ID);
-
-        addParentBoxToScene(ID, mother, newBox);
-    }
-
-    return ID;
-}
-
-unsigned int Maquette::addParentBox(unsigned int ID,
-                                    const unsigned int date,
-                                    const unsigned int topLeftY,
-                                    const unsigned int sizeY,
-                                    const unsigned int duration,
-                                    const string & name,
-                                    unsigned int mother,
-                                    QColor color)
-{
-    QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
-    QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);
-
-    vector<string> firstMsgs;
-    vector<string> lastMsgs;
-
-    _engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-    _engines->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
-
-
-    if (ID != NO_ID)
-    {
-        ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
-
-        newBox->setName(QString::fromStdString(name));
-        newBox->setColor(color);
-
-        _boxes[ID] = newBox;
-        _parentBoxes[ID] = newBox;
-        newBox->setID(ID);
-
-        addParentBoxToScene(ID, mother, newBox);
-    }
-
-    return ID;
-}
-*/
 /// \todo change arguments named corner. this is not comprehensible. (par jaime Chao)
 unsigned int
 Maquette::addParentBox(const QPointF & corner1,
@@ -1326,7 +1271,7 @@ Maquette::updateBoxesFromEngines()
 
 int
 Maquette::addRelation(unsigned int ID1, BoxExtremity firstExtremum, unsigned int ID2,
-                      BoxExtremity secondExtremum, int antPostType)
+                      BoxExtremity secondExtremum)
 {
   if (ID1 == NO_ID || ID2 == NO_ID) {
       return ARGS_ERROR;
@@ -1352,8 +1297,7 @@ Maquette::addRelation(unsigned int ID1, BoxExtremity firstExtremum, unsigned int
       return NO_MODIFICATION;
     }
 
-  relationID = _engines->addTemporalRelation(ID1, controlPointID1, ID2, controlPointID2,
-                                             TemporalRelationType(antPostType), movedBoxes);
+  relationID = _engines->addTemporalRelation(ID1, controlPointID1, ID2, controlPointID2, movedBoxes);
 
   if (!_engines->isTemporalRelationExisting(ID1, controlPointID1, ID2, controlPointID2)) {
       return RETURN_ERROR;
@@ -1381,7 +1325,7 @@ int
 Maquette::addRelation(const AbstractRelation &abstract)
 {
   if (abstract.ID() == NO_ID) {
-      return addRelation(abstract.firstBox(), abstract.firstExtremity(), abstract.secondBox(), abstract.secondExtremity(), ANTPOST_ANTERIORITY);
+      return addRelation(abstract.firstBox(), abstract.firstExtremity(), abstract.secondBox(), abstract.secondExtremity());
     }
   else {
       Relation* newRel = new Relation(abstract.firstBox(), abstract.firstExtremity(), abstract.secondBox(), abstract.secondExtremity(), _scene);
@@ -2102,7 +2046,7 @@ Maquette::udpatePlayModeView(bool running)
 void
 triggerPointIsActiveCallback(unsigned int trgID, bool active)
 {
-    Maquette::getInstance()->updateTriggerPointActiveStatus(trgID, active);
+	emit Maquette::getInstance()->triggerPointIsActiveSignal(trgID, active);
 }
 
 void
@@ -2116,41 +2060,37 @@ transportCallback(TTSymbol& transport, const TTValue& value)
 {
   MaquetteScene *scene = Maquette::getInstance()->scene();
 
-    if (scene != nullptr) {
-        
-        if (transport == TTSymbol("Play"))
-            scene->playOrResume();
-        
-        else if (transport == TTSymbol("Stop"))
-            scene->stopOrPause();
-        
-        else if (transport == TTSymbol("Pause"))
-            ;
-        
-        else if (transport == TTSymbol("Rewind"))
-            ;
-        
-        else if (transport == TTSymbol("StartPoint")) {
-            
-            if (value.size() == 1)
-                if (value[0].type() == kTypeUInt32)
-                    scene->changeTimeOffset(value[0]);
-            
-        }
-        else if (transport == TTSymbol("Speed")) {
-            
-            if (value.size() == 1)
-                if (value[0].type() == kTypeFloat32)
-                    scene->speedChanged(value[0]);
-            
-        }
-        
-        scene->view()->emitPlayModeChanged();
-    }
+	if (scene != nullptr) {
+
+		if (transport == TTSymbol("Play"))
+			scene->playOrResume();
+
+		else if (transport == TTSymbol("Stop"))
+			scene->stopOrPause();
+
+		else if (transport == TTSymbol("Pause"))
+			;
+
+		else if (transport == TTSymbol("Rewind"))
+			;
+
+		else if (transport == TTSymbol("StartPoint"))
+		{
+			if (value.size() == 1 && value[0].type() == kTypeUInt32)
+				emit Maquette::getInstance()->changeTimeOffsetSignal(value[0]);
+		}
+		else if (transport == TTSymbol("Speed"))
+		{
+			if (value.size() == 1 && value[0].type() == kTypeFloat32)
+				emit Maquette::getInstance()->changeSpeedSignal(value[0]);
+		}
+
+		scene->view()->emitPlayModeChanged();
+	}
 #ifdef DEBUG
-    else {
-        std::cerr << "Maquette::enginesNetworkCallback : attribute _scene == nullptr" << std::endl;
-    }
+	else {
+		std::cerr << "Maquette::enginesNetworkCallback : attribute _scene == nullptr" << std::endl;
+	}
 #endif
 }
 
@@ -2158,8 +2098,15 @@ void
 deviceCallback(TTSymbol& deviceName)
 {
 	auto tree = Maquette::getInstance()->scene()->editor()->networkTree();
-    tree->refreshItemNamespace(tree->getItemFromAddress(deviceName.c_str()), false);
+    emit tree->deviceUpdated(tree->getItemFromAddress(deviceName.c_str()), false);
     std::cerr << "Maquette::deviceCallback : " << deviceName.c_str() << std::endl;
+}
+
+void
+deviceConnectionErrorCallback(TTSymbol& deviceName, TTSymbol& errorInfo)
+{
+    // TODO : pop-up info to notify the user
+	emit Maquette::getInstance()->deviceConnectionFailed(QString(deviceName.c_str()), QString(errorInfo.c_str()));
 }
 
 void

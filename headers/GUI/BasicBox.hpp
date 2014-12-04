@@ -557,11 +557,12 @@ class BasicBox : public QGraphicsObject
     void updateCurveRangeBoundMax(string address, float value);
 
     //! \brief Handles line width.
-    static const unsigned int LINE_WIDTH = 2;
+    static const unsigned int LINE_WIDTH;
 
     //! \brief Handles resizing tolerance.
-    static const unsigned int RESIZE_TOLERANCE = 25;
+    static const unsigned int RESIZE_TOLERANCE;
 
+    static const float RESIZE_ZONE_WIDTH;
     static unsigned int BOX_MARGIN;
     static const float TRIGGER_ZONE_WIDTH;
     static const float TRIGGER_ZONE_HEIGHT;
@@ -569,8 +570,11 @@ class BasicBox : public QGraphicsObject
     static const float RAIL_HEIGHT;
     static const float EAR_WIDTH;
     static const float EAR_HEIGHT;
+    static const float RELATION_GRIP_WIDTH;
+    static const float RELATION_GRIP_HEIGHT;
     static const int COMBOBOX_WIDTH;
     static const int COMBOBOX_HEIGHT;
+    static const int BUTTON_SIZE;
     static const float MSGS_INDICATOR_WIDTH;
     static const float GRIP_CIRCLE_SIZE;
     static const QString SCENARIO_MODE_TEXT;
@@ -733,6 +737,8 @@ class BasicBox : public QGraphicsObject
     QRectF _boxRect;
     QRectF _leftEar;
     QRectF _rightEar;
+    QRectF _leftGripEar;
+    QRectF _rightGripEar;
     QRectF _startTriggerGrip;
     QRectF _endTriggerGrip;
     QRectF _startMsgsIndicator;
@@ -764,9 +770,10 @@ class BasicBox : public QGraphicsObject
     QPushButton *_endMenuButton{};
     QPushButton *_playButton{};
     QPushButton *_stopButton{};
+	QPushButton *_loopButton{};
 	QPushButton *_muteButton{};
-	const QIcon _muteOffIcon{":/resources/images/Mute.png"};
-	const QIcon _muteOnIcon{":/resources/images/MuteOn.png"};
+    const QIcon _muteOffIcon{":/resources/images/mute_off.png"};
+    const QIcon _muteOnIcon{":/resources/images/mute_on.png"};
 
 
 	qreal oldZValue{1};

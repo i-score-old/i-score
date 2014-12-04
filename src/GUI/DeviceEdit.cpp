@@ -42,12 +42,7 @@ DeviceEdit::DeviceEdit(QWidget *parent)
   : QDialog(parent)
 {
   setModal(true);
-  init();
-}
 
-void
-DeviceEdit::init()
-{
   connect(this, SIGNAL(accepted()),
 		  &updater, SLOT(update()));
   _changed = false;
@@ -75,9 +70,12 @@ DeviceEdit::init()
   _localHostBox = new QLineEdit;
   _nameEdit = new QLineEdit;
   _protocolsComboBox = new QComboBox;
+  auto protocols = Maquette::getInstance()->getWorkingProtocols();
+  for(auto& protocol : protocols) 
+	  _protocolsComboBox->addItem(QString::fromStdString(protocol));
 
   _namespaceFilePath = new QLineEdit;
-
+/*
   // Protocols
   std::vector<std::string> protocols = Maquette::getInstance()->getProtocolsName();
   for (unsigned int i = 0; i < protocols.size(); i++) {
@@ -85,7 +83,7 @@ DeviceEdit::init()
           _protocolsComboBox->addItem(QString::fromStdString(protocols[i]));
         }
   }
-
+*/
   _layout->addWidget(_deviceNameLabel, 0, 0, 1, 1);
   _layout->addWidget(_nameEdit, 0, 1, 1, 1);
 
@@ -248,7 +246,6 @@ DeviceEdit::edit(QString name)
 
   _nameEdit->setFocus();
 
-  setCorrespondingProtocolLayout();
   exec();
 }
 
@@ -262,9 +259,8 @@ DeviceEdit::edit()
     _portInputBox->setValue(defaultInputPort);
     _protocolsComboBox->setCurrentIndex(defaultProtocolIndex);
     _newDevice = true;
-
-    _nameEdit->setFocus();
     setCorrespondingProtocolLayout();
+    _nameEdit->setFocus();
     exec();
 }
 
@@ -344,7 +340,7 @@ void DeviceEdit::setCorrespondingProtocolLayout()
 {
     if(_protocolsComboBox->currentText() == "OSC")
     {
-      defaultName = "OSCdevice";
+     // defaultName = "OSCdevice";
       defaultPort = 9997;
       defaultInputPort = 9996;
 
@@ -353,7 +349,7 @@ void DeviceEdit::setCorrespondingProtocolLayout()
     }
     else if (_protocolsComboBox->currentText() == "Minuit")
     {
-      defaultName = "MinuitDevice";
+     // defaultName = "MinuitDevice";
       defaultPort = 9998;
       defaultInputPort = 13579;
       setMinuitLayout();
@@ -361,15 +357,16 @@ void DeviceEdit::setCorrespondingProtocolLayout()
     }
     else if (_protocolsComboBox->currentText() == "MIDI")
     {
-      defaultName = "MIDIDevice";
+   //   defaultName = "MIDIDevice";
       setMidiLayout();
     }
 
     _localHostBox->setText(defaultLocalHost);
     _portOutputBox->setValue(defaultPort);
     _portInputBox->setValue(defaultInputPort);
-    _nameEdit->setText(defaultName);
-
+   // checkName(defaultName);
+   // _nameEdit->setText(defaultName);
+    _nameEdit->setFocus();
 }
 
 void
@@ -378,7 +375,7 @@ DeviceEdit::setProtocolChanged()
   _protocolChanged = true;
 
   setCorrespondingProtocolLayout();
-
+  _nameEdit->selectAll();
   setChanged();
 }
 
@@ -420,6 +417,37 @@ DeviceEdit::openFileDialog()
 void
 DeviceEdit::setNamespacePathChanged(){
     _namespacePathChanged = true;
+}
+
+void DeviceEdit::checkName(QString &name)
+{
+    std::map<std::string, MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
+    std::map<std::string, MyDevice>::iterator it;
+    std::string lastName;
+
+    // check how many devices name begin with "name"
+    for (it = devices.begin(); it != devices.end(); it++) {
+        if (it->first.find(name.toStdString()) == 0 ) {
+            lastName = it->first;
+        }
+    }
+
+    int j = 0;
+    QString newName = name;
+
+    // if there at least one occurrence of "name"
+    if (! lastName.empty()) {
+        j = 1;
+        lastName.erase(0, name.size()+1);
+        // extract a potential extansion (deviceName.number)
+        if(!lastName.empty()) {
+            j = std::stoi(lastName) + 1;
+        }
+        newName += ".";
+        newName += QString(std::to_string(j).c_str());
+    }
+
+    name = newName;
 }
 
 void

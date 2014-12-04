@@ -125,6 +125,17 @@ MaquetteView::wheelEvent(QWheelEvent *event)
         }
         verticalScrollBar()->setValue(newValue);
     }
+
+    if ( event->modifiers()==Qt::ControlModifier) {
+        if (event->orientation() == Qt::Vertical) {
+            if (event->delta() > 20) {
+               zoomIn();
+            }
+            else if (event->delta() < -20) {
+               zoomOut();
+            }
+        }
+    }
 }
 
 void
@@ -334,11 +345,13 @@ MaquetteView::zoomIn()
 
           resetCachedContent();
           _scene->update();
-
+          Maquette::getInstance()->setZooming(true);
           Maquette::getInstance()->updateBoxesFromEngines();
 
-          QPointF newCenter(2. * (mapFromGlobal(QCursor::pos()).x() + mapToScene(viewport()->rect().bottomLeft()).x()), getCenterCoordinates().y() );
+          //QPointF newCenter(2. * (mapFromGlobal(QCursor::pos()).x() + mapToScene(viewport()->rect().bottomLeft()).x()), getCenterCoordinates().y() );
                 // new center : cursor position in Window + scroll offset. (+ zoom factor 2.)
+          QPointF newCenter((getCenterCoordinates().x() + _scene->getCurrentTime()/(2* MaquetteScene::MS_PER_PIXEL)) , getCenterCoordinates().y() );
+
           centerOn(newCenter);
 
           Maquette::getInstance()->setViewPosition(newCenter);
@@ -346,6 +359,8 @@ MaquetteView::zoomIn()
           setSceneRect((QRectF(0,0,_scene->getMaxSceneWidth(),_scene->height())));
         }
     }
+  _scene->updateWidgets();
+  Maquette::getInstance()->setZooming(false);
 }
 
 QPointF
@@ -404,14 +419,16 @@ MaquetteView::zoomOut()
   _zoom /= 2.;
   resetCachedContent();
   _scene->update();
+  Maquette::getInstance()->setZooming(true);
   Maquette::getInstance()->updateBoxesFromEngines();
 
-  QPointF newCenter(0.5 * getCenterCoordinates().x(), getCenterCoordinates().y());
+  QPointF newCenter(getCenterCoordinates().x() -  _scene->getCurrentTime()/(MaquetteScene::MS_PER_PIXEL) , getCenterCoordinates().y()/2);
   centerOn(newCenter);
   Maquette::getInstance()->setViewPosition(newCenter);
   _scene->updateProgressBar();
   _scene->zoomChanged(_zoom);
   setSceneRect((QRectF(0,0,_scene->getMaxSceneWidth(),_scene->height())));
+  Maquette::getInstance()->setZooming(false);
 }
 
 void

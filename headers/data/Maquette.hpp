@@ -503,11 +503,10 @@ class Maquette : public QObject
      * \param firstExtremum : the extremity of the first box used for relation
      * \param ID2 : the second box in the relation
      * \param secondExtremum : the extremity of the second box used for relation
-     * \param antPostType : the anterior/posterior relation type
      * \return a specific error message in ErrorMessage enum
      */
     int addRelation(unsigned int ID1, BoxExtremity firstExtremum, unsigned int ID2,
-                    BoxExtremity secondExtremum, int antPostType);
+                    BoxExtremity secondExtremum);
 
     /*!
      * \brief Adds a new AntPost relation described by a AbstractRelation.
@@ -798,8 +797,18 @@ class Maquette : public QObject
 
     std::vector<std::string> getMIDIInputDevices();
     std::vector<std::string> getMIDIOutputDevices();
-signals:
-     void boxIsRunningSignal(unsigned int boxId, bool running);
+	const std::vector<std::string>& getWorkingProtocols()
+	{ return _engines->workingProtocols(); }
+	
+	signals:
+		 void boxIsRunningSignal(unsigned int boxId, bool running);
+		 void deviceConnectionFailed(QString, QString);
+	
+		 void triggerPointIsActiveSignal(unsigned int trgID, bool active);
+		 void playOrResumeSignal();
+		 void stopOrPauseSignal();
+		 void changeTimeOffsetSignal(unsigned int);
+		 void changeSpeedSignal(double);
   
   public slots:
     /*
@@ -945,6 +954,13 @@ signals:
      */
     void setCurveRecording(unsigned int boxID, std::string address, bool activated);
 
+    void setZooming(bool zoom) {_zooming = zoom;}
+
+    bool isZooming() {return _zooming;}
+
+    QList<string> addressList();
+
+	void loop(int boxid);
   private:
     /*!
      * \brief Generates the triggerQueueList.
@@ -1034,6 +1050,7 @@ signals:
 
     bool _recording;    //!< Handling recording state.
     bool _paused;       //!< Handling paused state.
+    bool _zooming = false;
 
     QDomDocument *_doc; //!< Handling document used for saving/loading.
 
@@ -1076,4 +1093,12 @@ void executionFinishedCallback();
  * \param deviceName : the name of the device to refresh
  */
 void deviceCallback(TTSymbol& deviceName);
+
+/*!
+ * \brief Callback called when device connection failed
+ *
+ * \param deviceName : the name of the device which failed
+ * \param errorInfo : inforamtion about why it failed
+ */
+void deviceConnectionErrorCallback(TTSymbol& deviceName, TTSymbol& errorInfo);
 #endif

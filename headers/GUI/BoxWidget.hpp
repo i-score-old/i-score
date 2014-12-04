@@ -73,6 +73,7 @@ class BoxWidget : public QWidget
     CurveWidget * getCurveWidget(std::string address);
     void updateCurveRangeBoundMin(std::string address, float value);
     void updateCurveRangeBoundMax(std::string address, float value);
+    void disabledCurveEdition();
 
   public slots:
     void updateDisplay(const QString &address);
@@ -83,6 +84,7 @@ class BoxWidget : public QWidget
     void play();
     void stop();
 	void mute();
+	void loop();
 	
     void execStartAction();
     void execEndAction();

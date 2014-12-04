@@ -123,6 +123,12 @@ MaquetteScene::init()
 
   /// \todo MainWindow appelle init() de MaquetteScene, qui instancie lui même Maquette puis l'init. (par jaime Chao)
   _maquette = Maquette::getInstance();
+  connect(_maquette, &Maquette::deviceConnectionFailed,
+		  this, [] (QString device, QString error) 
+		  { QMessageBox::warning(nullptr, 
+			  device, 
+              "Could not open port " + error + ". <br> <br> Maybe another instance of i-score is open <br> or another application is using it ?");
+		  });
   _maquette->setScene(this);
   _maquette->init();      
 
@@ -442,6 +448,7 @@ bool MaquetteScene::multipleBoxesSelected()
     return selectedItems().size() > 1;
 }
 
+
 QGraphicsItem *
 MaquetteScene::getSelectedItem()
 {
@@ -470,9 +477,10 @@ bool MaquetteScene::subScenarioMode(QGraphicsSceneMouseEvent *mouseEvent)
         {
             if(auto box = dynamic_cast<ParentBox*>(getSelectedItem()))
             {
-                return box->currentText() == BasicBox::SCENARIO_MODE_TEXT &&
-                        box->boxBody().contains(mouseEvent->pos()) &&
-                        itemAt(mouseEvent->scenePos(), QTransform())->cursor().shape() == Qt::ArrowCursor;
+				auto r1 = box->currentText() == BasicBox::SCENARIO_MODE_TEXT;
+				auto r2 = box->boxBody().contains(mouseEvent->pos());
+				auto r3 = itemAt(mouseEvent->scenePos(), QTransform())->cursor().shape() == Qt::ArrowCursor;
+				return r1 && r2 && r3;
             }
         }
 
@@ -500,7 +508,7 @@ MaquetteScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
   if (mouseEvent->modifiers() == Qt::ShiftModifier) {
       setCurrentMode(SELECTION_MODE);
     }
-  else if ((noBoxSelected() || subScenarioMode(mouseEvent)) && mouseEvent->modifiers()==Qt::ControlModifier) {
+  else if (!playing() && (noBoxSelected() || subScenarioMode(mouseEvent)) && mouseEvent->modifiers()==Qt::ControlModifier) {
       setCurrentMode(CREATION_MODE);
     }  
   else {
@@ -621,7 +629,8 @@ void MaquetteScene::mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent)
                 break;
 
             case CREATION_MODE:
-                if (noBoxSelected() || subScenarioMode(mouseEvent)) {
+                if (noBoxSelected() || subScenarioMode(mouseEvent))
+				{
                     if (resizeMode() == NO_RESIZE && _tempBox) {
                         int upLeftX, upLeftY, width, height;
 
@@ -1802,7 +1811,7 @@ void MaquetteScene::onSelectionChanged()
         for(auto item : selectedItems())
         {
             ParentBox* box = dynamic_cast<ParentBox*>(item);
-            if(box)
+            if(box && playing())
                 box->disableCurveEdition();
         }
     }
@@ -1997,12 +2006,26 @@ MaquetteScene::updateBoxesWidgets()
 
   for (it = boxes.begin(); it != boxes.end(); it++) {
       unsigned int boxID = it->first;
-      static_cast<AbstractBox*>(getBox(boxID)->abstract())->clearMessages();      
+      static_cast<AbstractBox*>(getBox(boxID)->abstract())->clearMessages();
       if (boxID != NO_ID) {
           setAttributes(static_cast<AbstractBox*>(getBox(boxID)->abstract()));
         }
     }
-    _editor->setBoxEdited(currentBoxSave); //Because setAttributes changes currentBoxEdited value. And the edited box became an unselected one.
+  _editor->setBoxEdited(currentBoxSave); //Because setAttributes changes currentBoxEdited value. And the edited box became an unselected one.
+}
+
+void MaquetteScene::updateBoxesButtons()
+{
+    std::map<unsigned int, BasicBox*>::iterator it;
+    std::map<unsigned int, BasicBox*> boxes = _maquette->getBoxes();
+    it = boxes.begin();
+    ++it;
+    while (it != boxes.end()) {
+        BasicBox* box = it->second;
+        //box->updatePlayingModeButtons();
+        box->setButtonsVisible(playing());
+        it++;
+    }
 }
 
 void
@@ -2100,5 +2123,24 @@ MaquetteScene::conditionBoxes(QList<BasicBox *> boxesToCondition)
 void MaquetteScene::unselectAll()
 {
     for(auto& item : items())
-      item->setSelected(false);
+        item->setSelected(false);
+}
+
+// Disable the curve Edition on execution
+void MaquetteScene::enableCurveEdition()
+{
+    std::map<unsigned int, BasicBox*>::iterator it;
+    std::map<unsigned int, BasicBox*> boxes = _maquette->getBoxes();
+    it = boxes.begin();
+    ++it;
+    while (it != boxes.end()) {
+        BasicBox* box = it->second;
+        if (playing()) {
+            box->disableCurveEdition();
+        }
+        else {
+            box->enableCurveEdition();
+        }
+        it++;
+    }
 }

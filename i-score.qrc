@@ -1,27 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>resources/images/about.svg</file>
-        <file>resources/images/parentBox.svg</file>
-        <file>resources/images/comment.svg</file>
-        <file>resources/images/copy.svg</file>
-        <file>resources/images/cut.svg</file>
-        <file>resources/images/help.svg</file>
-        <file>resources/images/edit.svg</file>
-        <file>resources/images/network.svg</file>
-        <file>resources/images/paste.svg</file>
-        <file>resources/images/play.svg</file>
-        <file>resources/images/relation.svg</file>
-        <file>resources/images/select.svg</file>
-        <file>resources/images/soundBox.svg</file>
-        <file>resources/images/synth.svg</file>
-        <file>resources/images/stop.svg</file>
-        <file>resources/images/trigger.svg</file>
-        <file>resources/images/zoomin.svg</file>
-        <file>resources/images/zoomout.svg</file>
-        <file>resources/images/BoxInteraction.png</file>
-        <file>resources/images/Relation.png</file>
-        <file>resources/images/Messages.png</file>
-        <file>resources/images/SnapshotTab.png</file>
         <file>resources/images/Acceleration.png</file>
         <file>resources/images/Goto.png</file>
         <file>resources/documentation/contextual.htm</file>
@@ -32,21 +10,23 @@
         <file>resources/documentation/editorGeneral.htm</file>
         <file>resources/documentation/editorSnapshot.htm</file>
         <file>resources/documentation/interaction.htm</file>
-        <file>resources/images/playSimple.svg</file>
-        <file>resources/images/stopSimple.svg</file>
         <file>resources/images/i-score.icns</file>
         <file>resources/images/addANode.png</file>
         <file>resources/images/error-icon.png</file>
-        <file>resources/images/boxStartMenu.svg</file>
-        <file>resources/images/boxEndMenu.svg</file>
-        <file>resources/images/rewind.svg</file>
         <file>resources/images/record.svg</file>
         <file>resources/translations/i-score_fr.qm</file>
         <file>resources/translations/i-score_en.qm</file>
-        <file>resources/images/downArrow.png</file>
         <file>resources/images/pen.png</file>
-        <file>resources/images/Mute.png</file>
-        <file>resources/images/MuteOn.png</file>
         <file>resources/stylesheets/BasicBox/push_button.qss</file>
+        <file>resources/images/play.png</file>
+        <file>resources/images/mute_on.png</file>
+        <file>resources/images/mute_off.png</file>
+        <file>resources/images/start.png</file>
+        <file>resources/images/stop.png</file>
+        <file>resources/images/end.png</file>
+        <file>resources/images/rewind.png</file>
+        <file>resources/images/end_update.png</file>
+        <file>resources/images/start_update.png</file>
+        <file>resources/images/loop.png</file>
     </qresource>
 </RCC>

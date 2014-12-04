@@ -130,6 +130,9 @@ class MainWindow : public QMainWindow
      */
     void open(QString);
 
+    signals:
+    void sigLoad(const QString&);
+
   protected:
     /*!
      * \brief Redefinition of QMainWindow::closeEvent(QCloseEvent *event).
@@ -138,7 +141,6 @@ class MainWindow : public QMainWindow
      * \param event : the QT closing event
      */
     virtual void closeEvent(QCloseEvent *event); /// \todo virtual seulement si on a besoin d'hériter de MainWindow, ce qui n'est pas le cas. (par jaime Chao)    
-
   private slots:
     /*!
      * \brief Resets current composition and prepares to write into a new file.
