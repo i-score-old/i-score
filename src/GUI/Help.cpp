@@ -60,16 +60,16 @@ Help::Help(QWidget *parent)
   _tabs = new QTabWidget(this);
   // _editorTabs = new QTabWidget(this);
 
-  QString fileString;
-  QFile file(":/resources/documentation/file.htm");
-  if (file.open(QIODevice::ReadOnly)) {
-      fileString = QString(file.readAll());
-    }
-  else {
-      fileString = tr("No Help Found");
-    }
-
-  _fileLabel = new QLabel(fileString);
+  // QString fileString;
+  // QFile file(":/resources/documentation/file.htm");
+  // if (file.open(QIODevice::ReadOnly)) {
+  //     fileString = QString(file.readAll());
+  //   }
+  // else {
+  //     fileString = tr("No Help Found");
+  //   }
+  //
+  // _fileLabel = new QLabel(fileString);
 
   QString quickstartString;
   QFile quickstart(":/resources/documentation/index.html");
@@ -81,15 +81,15 @@ Help::Help(QWidget *parent)
     }
   _quickStartLabel = new QLabel(quickstartString);
 
-  QString contextString;
-  QFile context(":/resources/documentation/contextual.htm");
-  if (context.open(QIODevice::ReadOnly)) {
-      contextString = QString(context.readAll());
-    }
-  else {
-      contextString = tr("No Help Found");
-    }
-  _contextLabel = new QLabel(contextString);
+  // QString contextString;
+  // QFile context(":/resources/documentation/contextual.htm");
+  // if (context.open(QIODevice::ReadOnly)) {
+  //     contextString = QString(context.readAll());
+  //   }
+  // else {
+  //     contextString = tr("No Help Found");
+  //   }
+  // _contextLabel = new QLabel(contextString);
 
   QString shortcutsString;
   QFile shortcuts(":/resources/documentation/mouse-and-shortcuts/index.html");
@@ -130,8 +130,8 @@ Help::Help(QWidget *parent)
   quickStartScrollArea->setWidget(_quickStartLabel);
   _tabs->addTab(quickStartScrollArea, tr("Getting started"));
 
-  QScrollArea *contextScrollArea = new QScrollArea;
-  contextScrollArea->setWidget(_contextLabel);
+  // QScrollArea *contextScrollArea = new QScrollArea;
+  // contextScrollArea->setWidget(_contextLabel);
 
   //_tabs->addTab(contextScrollArea,"Contextual Menu");
   QScrollArea *shortcutsScrollArea = new QScrollArea;

@@ -74,10 +74,10 @@ class Help : public QDialog
     QTabWidget *_tabs;            //!< Handling various tabs.
     QLabel *_fileLabel;           //!< File menu help tab.
     QLabel *_quickStartLabel;        //!< Toolbar help tab.
-    QLabel *_contextLabel;        //!< Contextual menu help tab.
-    QLabel *_editorGeneralLabel;  //!< Attributes editor help tab.
-    QLabel *_editorSnapshotLabel; //!< Attributes editor help tab.
-    QTabWidget *_editorTabs;      //!< Editor subtabs.
+    // QLabel *_contextLabel;        //!< Contextual menu help tab.
+    // QLabel *_editorGeneralLabel;  //!< Attributes editor help tab.
+    // QLabel *_editorSnapshotLabel; //!< Attributes editor help tab.
+    // QTabWidget *_editorTabs;      //!< Editor subtabs.
     QLabel *_shortcutsLabel;    //!< Widgets shortcut help tab.
 };
 #endif
