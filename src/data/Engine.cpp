@@ -1397,16 +1397,12 @@ void Engine::setCtrlPointMessagesToSend(TimeBoxId boxId, TimeEventIndex controlP
     
     event = out[0];
     
-    // get the state of the event
-    event.get("state", out);
-    state = out[0];
-    
-    // clear the state
-    state.send("Clear");
+    // clear the state of the event
+    event.send("StateClear");
     
     // parse each incoming string into < directory:/address, value >
-    for (i = 0; i < messageToSend.size(); i++) {
-        
+    for (i = 0; i < messageToSend.size(); i++)
+    {
         TTValue v = TTString(messageToSend[i]);
         v.fromString();
         
@@ -1415,11 +1411,8 @@ void Engine::setCtrlPointMessagesToSend(TimeBoxId boxId, TimeEventIndex controlP
         v[0] = anAddress;
         
         // append a line to the state
-        state.send("Append", v, out);
+        event.send("StateAddressSetValue", v);
     }
-    
-    // flatten the state to increase the speed of the recall
-    state.send("Flatten");
     
     // don't update curve for the root box because it is a Scenario and not an Automation
     if (boxId != ROOT_BOX_ID) {
@@ -1433,10 +1426,6 @@ void Engine::getCtrlPointMessagesToSend(TimeBoxId boxId, TimeEventIndex controlP
 {
     TTValue     out;
     TTObject    event;
-    TTObject    state;
-    TTBoolean   flattened;
-    TTListPtr   lines = nullptr;
-    TTDictionaryBasePtr aLine;
     TTAddress   address;
     std::string s;
     
@@ -1448,42 +1437,23 @@ void Engine::getCtrlPointMessagesToSend(TimeBoxId boxId, TimeEventIndex controlP
     
     event = out[0];
     
-    // get the state of the event
-    event.get("state", out);
-    state = out[0];
+    // get all addresses of the state of the event and their value
+    TTValue none, addresses;
+    addresses = event.send("StateAddresses", none);
     
-    // check if the state is flattened
-    state.get("flattened", out);
-    flattened = out[0];
-    
-    if (!flattened)
-        state.send("Flatten");
-    
-    // get the state lines
-    state.get("flattenedLines", out);
-    lines = TTListPtr((TTPtr)out[0]);
-    
-    if (lines) {
-        // edit each line address into a "directory/address value" string
-        for (lines->begin(); lines->end(); lines->next()) {
-            
-            aLine = TTDictionaryBasePtr((TTPtr)lines->current()[0]);
-            
-            // get the target address
-            aLine->lookup(kTTSym_target, out);
-            address = out[0];
-            
-            // get value
-            aLine->getValue(out);
-            out.toString();
-            
-            // edit string
-            s = toNetworkTreeAddress(address);
-            s += " ";
-            s += TTString(out[0]).c_str();
-            
-            messages.push_back(s);
-        }
+    for (TTElementIter it = addresses.begin(); it != addresses.end(); it++)
+    {
+        TTAddress address = TTElement(*it);
+        TTValue value = event.send("StateAddressGetValue", address);
+        
+        value.toString();
+        
+        // edit string
+        s = toNetworkTreeAddress(address);
+        s += " ";
+        s += TTString(value[0]).c_str();
+        
+        messages.push_back(s);
     }
 }
 
