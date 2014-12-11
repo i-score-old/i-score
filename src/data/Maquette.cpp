@@ -122,6 +122,9 @@ Maquette::init()
 
 Maquette::Maquette() : _engines(nullptr)
 {
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(updateNamespaceTree()));
+    timer->start(200);
 }
 
 QList<std::string> Maquette::addressList()
@@ -1431,6 +1434,23 @@ Maquette::getTimeOffset()
 }
 
 void
+Maquette::updateNamespaceTree()
+{
+    if (!updatedDevicesList.empty())
+    {
+        updatedDevicesList.sort();
+        updatedDevicesList.unique();
+        std::cerr << "Maquette::updateNamespaceTree ! " << std::endl;
+        auto tree = Maquette::getInstance()->scene()->editor()->networkTree();
+        for( std::list<TTSymbol>::iterator it = updatedDevicesList.begin(); it != updatedDevicesList.end(); ++it)
+        {
+            emit tree->deviceUpdated(tree->getItemFromAddress(it->c_str()), false);
+        }
+        updatedDevicesList.clear();
+    }
+}
+
+void
 Maquette::generateTriggerQueue()
 {
     // Clear the current trigger queue list
@@ -2097,9 +2117,7 @@ transportCallback(TTSymbol& transport, const TTValue& value)
 void
 deviceCallback(TTSymbol& deviceName)
 {
-	auto tree = Maquette::getInstance()->scene()->editor()->networkTree();
-    emit tree->deviceUpdated(tree->getItemFromAddress(deviceName.c_str()), false);
-    std::cerr << "Maquette::deviceCallback : " << deviceName.c_str() << std::endl;
+    updatedDevicesList.push_back(deviceName);
 }
 
 void

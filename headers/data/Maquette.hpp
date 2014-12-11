@@ -49,6 +49,7 @@
 
 #include <QObject>
 #include <QPoint>
+#include <QTimer>
 
 #include <vector>
 #include <map>
@@ -77,6 +78,8 @@ static const std::string REWIND_ENGINES_MESSAGE = "/Transport/Rewind";
 static const std::string STARTPOINT_ENGINES_MESSAGE = "/Transport/StartPoint";
 static const std::string SPEED_ENGINES_MESSAGE = "/Transport/Speed";
 static const std::string NEXT_TRIGGER_MESSAGE = "/Transport/Next";
+
+static std::list<TTSymbol> updatedDevicesList;
 
 #define NETWORK_PORT_STR "7000"
 
@@ -154,7 +157,7 @@ class MyDevice {
  *
  */
 
-class Maquette : public QObject
+class Maquette : public QTimer
 {
   Q_OBJECT
 
@@ -815,6 +818,7 @@ class Maquette : public QObject
      * It is necessary to put this in a slot in order to prevent a crash due to inter-thread 
      * mechanism of qt. 
      */ 
+
     void boxIsRunningSlot(unsigned int boxId, bool running);
     /*!
      * \brief Sets the time offset value in ms where the engine will start from at the nex execution. The boolean "mute" mutes or not the dump of all messages (the scene state at timeOffset).
@@ -824,8 +828,14 @@ class Maquette : public QObject
     unsigned int getTimeOffset();
 
     /*!
+     * \brief Update the namespace if needed
+     */
+    static void updateNamespaceTree();
+
+    /*!
      * \brief Turn engine execution on depending on the context
      */
+
     void turnExecutionOn();
     void turnExecutionOn(unsigned int boxId);
     
