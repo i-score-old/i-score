@@ -269,10 +269,10 @@ Engine::~Engine()
 {
     // Clear all the EngineCacheMaps
     // note : this should be useless because all elements are removed by the maquette
-    clearTimeBox();
-    clearInterval();
-    clearConditionedTimeBox();
     clearTimeCondition();
+    clearConditionedTimeBox();
+    clearInterval();
+    clearTimeBox();
     
     TTValue out;
     
@@ -425,8 +425,26 @@ void Engine::clearTimeBox()
     
     for (it = m_timeBoxMap.begin(); it != m_timeBoxMap.end(); ++it)
     {
+        TTValue out;
+        m_iscore.send("ObjectUnregister", it->second->address);
+        
         // don't remove the root time process (the main scenario)
-        if (it->first != ROOT_BOX_ID) {
+        if (it->first != ROOT_BOX_ID)
+        {
+            // get the parent scenario
+            TTObject parentScenario;
+            it->second->object.get("container", parentScenario);
+            
+            // release the time process
+            TTValue events;
+            events = parentScenario.send("TimeProcessRemove", it->second->object);
+            
+            // release the sub scenario
+            events = parentScenario.send("TimeProcessRemove", it->second->subScenario);
+            
+            // release start and end event from the mother scenario
+            parentScenario.send("TimeEventRelease", events[0]);
+            parentScenario.send("TimeEventRelease", events[1]);
             
             uncacheStartCallback(it->first);
             uncacheEndCallback(it->first);
@@ -475,7 +493,17 @@ void Engine::clearInterval()
     EngineCacheMapIterator it;
     
     for (it = m_intervalMap.begin(); it != m_intervalMap.end(); ++it)
+    {
+        // get the parent scenario
+        TTObject parentScenario;
+        it->second->object.get("container", parentScenario);
+        
+        // release the time process
+        TTValue events;
+        parentScenario.send("TimeProcessRemove", it->second->object, events);
+        
         delete it->second;
+    }
     
     m_intervalMap.clear();
     
@@ -585,9 +613,25 @@ void Engine::clearTimeCondition()
     EngineCacheMapIterator it;
     
     for (it = m_timeConditionMap.begin(); it != m_timeConditionMap.end(); ++it)
+    {
+        TTValue out;
+        m_iscore.send("ObjectUnregister", it->second->address, out);
+        
+        uncacheReadyCallback(it->first);
+       
+        // get the parent scenario
+        TTObject parentScenario;
+        it->second->object.get("container", parentScenario);
+        
+        // release the time condition
+        TTValue events;
+        parentScenario.send("TimeConditionRelease", it->second->object, events);
+        
         delete it->second;
+    }
     
     m_timeConditionMap.clear();
+    m_readyCallbackMap.clear();
 }
 
 void Engine::cacheStartCallback(TimeBoxId boxId)
