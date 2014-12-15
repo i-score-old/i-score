@@ -109,7 +109,10 @@ struct LeafProperties : public ItemProperties
         virtual void setup(QTreeWidgetItem* curItem) override
         {
             curItem->setCheckState(NetworkTree::INTERPOLATION_COLUMN, Qt::Unchecked);
+            curItem->setToolTip(NetworkTree::INTERPOLATION_COLUMN, "check to create an automation - <br> cmd/ctrl click to record <br> a live input");
             curItem->setCheckState(NetworkTree::REDUNDANCY_COLUMN, Qt::Unchecked);
+            curItem->setToolTip(NetworkTree::REDUNDANCY_COLUMN, "check to repeat successive similar values");
+
 
             curItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
         }
@@ -180,7 +183,7 @@ struct PresetManagerProperties : public ItemProperties
             curItem->setForeground(NetworkTree::VALUE_COLUMN, brush);
 
             curItem->setText(NetworkTree::TYPE_COLUMN, QString("->"));
-            curItem->setToolTip(NetworkTree::TYPE_COLUMN, "Type PresetManager");
+            curItem->setToolTip(NetworkTree::TYPE_COLUMN, "preset");
             curItem->setWhatsThis(NetworkTree::NAME_COLUMN,"Message");
         }
 };
@@ -202,7 +205,10 @@ class NetworkTreeItem : public QTreeWidgetItem
                 setForeground(i, Qt::white);
 
             setCheckState(NetworkTree::START_ASSIGNATION_COLUMN, Qt::Unchecked);
+            setToolTip(NetworkTree::START_ASSIGNATION_COLUMN, "check to snapshot the value of this address <br> at the beginning of the selected box");
             setCheckState(NetworkTree::END_ASSIGNATION_COLUMN, Qt::Unchecked);
+            setToolTip(NetworkTree::END_ASSIGNATION_COLUMN, "check to snapshot the value of this address <br> at the end of the selected box");
+
         }
 
         void setupProperties() {}
@@ -285,8 +291,8 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   setColumnWidth(REDUNDANCY_COLUMN, 23);
   setColumnWidth(SR_COLUMN, 31);
   setColumnWidth(TYPE_COLUMN, 42);
-  setColumnWidth(MIN_COLUMN, 34);
-  setColumnWidth(MAX_COLUMN, 34);
+  setColumnWidth(MIN_COLUMN, 42);
+  setColumnWidth(MAX_COLUMN, 42);
   setColumnWidth(PRIORITY_COLUMN, 30);  
 
   setIndentation(13);
@@ -1167,6 +1173,7 @@ NetworkTree::updateEndMsgsDisplay()
       currentMsg = _endMessages->getMessages().value(curItem);
       curItem->setText(END_COLUMN, currentMsg.value);
       curItem->setCheckState(END_ASSIGNATION_COLUMN, Qt::Checked);
+      curItem->setToolTip(START_ASSIGNATION_COLUMN, "check to snapshot the value of this address at the end of the selected box");
       fatherColumnCheck(curItem, END_ASSIGNATION_COLUMN);
     }
 }
