@@ -2415,7 +2415,7 @@ NetworkTree::updateCurve(QTreeWidgetItem *item, unsigned int boxID, bool forceUp
         }
         else
         {
-          interpolate = item->checkState(INTERPOLATION_COLUMN);
+            interpolate = true;
         }
 
         Maquette::getInstance()->setCurveMuteState(boxID, address, !interpolate);
