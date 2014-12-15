@@ -120,7 +120,7 @@ struct ParameterProperties : public ItemProperties
         virtual void setup(QTreeWidgetItem* curItem) override
         {
             curItem->setText(NetworkTree::TYPE_COLUMN,QString("<->"));
-            curItem->setToolTip(NetworkTree::TYPE_COLUMN, "Type parameter");
+            curItem->setToolTip(NetworkTree::TYPE_COLUMN, "bi-directionnal");
 
             curItem->setForeground(NetworkTree::NAME_COLUMN, Qt::white);
         }
@@ -141,7 +141,7 @@ struct MessageProperties : public ItemProperties
             curItem->setForeground(NetworkTree::VALUE_COLUMN, brush);
 
             curItem->setText(NetworkTree::TYPE_COLUMN,QString("->"));
-            curItem->setToolTip(NetworkTree::TYPE_COLUMN, "Type message");
+            curItem->setToolTip(NetworkTree::TYPE_COLUMN, "receiver");
             curItem->setWhatsThis(NetworkTree::NAME_COLUMN,"Message");
         }
 };
@@ -160,7 +160,7 @@ struct ReturnProperties : public ItemProperties
             curItem->setForeground(NetworkTree::VALUE_COLUMN, brush);
 
             curItem->setText(NetworkTree::TYPE_COLUMN,QString("<-"));
-            curItem->setToolTip(NetworkTree::TYPE_COLUMN, "Type return");
+            curItem->setToolTip(NetworkTree::TYPE_COLUMN, "sender");
 
         }
 };
@@ -271,9 +271,9 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   this->setHeader(new CustomHeaderView(Qt::Horizontal));
   init();
 
-  setColumnCount(10);
+  setColumnCount(12);
   QStringList list;
-  list << "Address" << "Value" << "   v" <<"Start" << " ~ " << "   v" <<"End" << " = " << " % "<<" type "<<"min "<<"max ";
+  list << "Address" << "Value" << "   v" <<"Start" << " ~ " << "   v" <<"End" << " = " << " % "<<" access "<<"min "<<"max ";
   // removed <<"priority " and column
   setColumnWidth(NAME_COLUMN, 135);
   setColumnWidth(VALUE_COLUMN, 63);
@@ -284,9 +284,9 @@ NetworkTree::NetworkTree(QWidget *parent) : QTreeWidget(parent)
   setColumnWidth(INTERPOLATION_COLUMN, 23);
   setColumnWidth(REDUNDANCY_COLUMN, 23);
   setColumnWidth(SR_COLUMN, 31);
-  setColumnWidth(TYPE_COLUMN, 34);
-  setColumnWidth(MIN_COLUMN, 30);
-  setColumnWidth(MAX_COLUMN, 30);
+  setColumnWidth(TYPE_COLUMN, 42);
+  setColumnWidth(MIN_COLUMN, 34);
+  setColumnWidth(MAX_COLUMN, 34);
   setColumnWidth(PRIORITY_COLUMN, 30);  
 
   setIndentation(13);
@@ -2233,7 +2233,7 @@ QList<string> NetworkTree::getAddressList()
                     }))
             {
                 if (it.key()->toolTip(NetworkTree::TYPE_COLUMN) != nullptr) {
-                    if( it.key()->toolTip(NetworkTree::TYPE_COLUMN) == "Type parameter" || it.key()->toolTip(NetworkTree::TYPE_COLUMN) == "Type message" || it.key()->toolTip(NetworkTree::TYPE_COLUMN) == "Type return" ) {
+                    if( it.key()->toolTip(NetworkTree::TYPE_COLUMN) == "bi-directionnal" || it.key()->toolTip(NetworkTree::TYPE_COLUMN) == "receiver" || it.key()->toolTip(NetworkTree::TYPE_COLUMN) == "sender" ) {
                         addressList << it.value();
                     }
                 }
