@@ -101,7 +101,7 @@ void TriggerPointEdit::init()
     // list of operators
     _operators->push_back(">");
     _operators->push_back("<");
-    _operators->push_back("=");
+    _operators->push_back("==");
     _operators->push_back(">=");
     _operators->push_back("<=");
 
