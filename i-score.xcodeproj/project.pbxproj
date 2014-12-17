@@ -68,6 +68,8 @@
 		466B9EA419338DCC00EC8460 /* TimeBarWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TimeBarWidget.cpp; sourceTree = "<group>"; };
 		466B9EA719338DCC00EC8460 /* TriggerPoint.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TriggerPoint.cpp; sourceTree = "<group>"; };
 		466B9EA919338DCC00EC8460 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		46E974D01A41A09F00F7FDB1 /* TriggerPointEdit.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TriggerPointEdit.hpp; sourceTree = "<group>"; };
+		46E974D11A41A0AA00F7FDB1 /* TriggerPointEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TriggerPointEdit.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -129,6 +131,7 @@
 				466B9E7019338DC700EC8460 /* Relation.hpp */,
 				466B9E7319338DC700EC8460 /* TimeBarWidget.hpp */,
 				466B9E7719338DC700EC8460 /* TriggerPoint.hpp */,
+				46E974D01A41A09F00F7FDB1 /* TriggerPointEdit.hpp */,
 			);
 			path = GUI;
 			sourceTree = "<group>";
@@ -182,6 +185,7 @@
 				466B9EA119338DCC00EC8460 /* Relation.cpp */,
 				466B9EA419338DCC00EC8460 /* TimeBarWidget.cpp */,
 				466B9EA719338DCC00EC8460 /* TriggerPoint.cpp */,
+				46E974D11A41A0AA00F7FDB1 /* TriggerPointEdit.cpp */,
 			);
 			path = GUI;
 			sourceTree = "<group>";
