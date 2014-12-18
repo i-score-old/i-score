@@ -13,10 +13,10 @@ TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *pare
     _layout = new QGridLayout(this);
     setLayout(_layout);
 
-    _addressLabel = new QLabel(tr("address : "));
-    _deviceLabel = new QLabel("from device : ");
-    _operatorLabel = new QLabel("operator :");
-    _conditionLabel = new QLabel("optional condition : ");
+    _addressLabel = new QLabel(tr("address"));
+    _deviceLabel = new QLabel("device");
+    _operatorLabel = new QLabel("operator");
+    _conditionLabel = new QLabel("optional condition");
 
     // display availables addresses
     _addressEdit = new QComboBox;
@@ -24,9 +24,11 @@ TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *pare
 
     _userAddressEdit = new QLineEdit;
     _addressEdit->setLineEdit(_userAddressEdit); // lineEdit in comboBox
+    _addressEdit->setMinimumWidth(333);
 
     _deviceEdit = new QComboBox;
     _operatorEdit = new QComboBox;
+    _operatorEdit->setMaximumWidth(50);
     _conditionEdit = new QLineEdit;
 
     _autoTriggerCheckBox = new QCheckBox("auto-trigger");
@@ -36,17 +38,17 @@ TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *pare
 
     init();
 
-    _layout->addWidget(_deviceLabel, 0, 0, 1, 2);
-    _layout->addWidget(_deviceEdit, 1, 0, 1, 2);
+    _layout->addWidget(_deviceLabel, 0, 0, 1, 1);
+    _layout->addWidget(_deviceEdit, 1, 0, 1, 1);
 
-    _layout->addWidget(_addressLabel, 0, 2, 1, 3);
-    _layout->addWidget(_addressEdit, 1, 2, 1, 3);
+    _layout->addWidget(_addressLabel, 0, 1, 1, 4);
+    _layout->addWidget(_addressEdit, 1, 1, 1, 4);
 
-    _layout->addWidget(_operatorLabel, 0, 5, 1, 2);
-    _layout->addWidget(_operatorEdit, 1, 5, 1, 2);
+    _layout->addWidget(_operatorLabel, 0, 5, 1, 1);
+    _layout->addWidget(_operatorEdit, 1, 5, 1, 1);
 
-    _layout->addWidget(_conditionLabel, 0, 7, 1, 2);
-    _layout->addWidget(_conditionEdit, 1, 7, 1, 2);
+    _layout->addWidget(_conditionLabel, 0, 6, 1, 2);
+    _layout->addWidget(_conditionEdit, 1, 6, 1, 2);
 
     _layout->addWidget(_autoTriggerCheckBox, 2, 0, 1, 1);
 
@@ -101,7 +103,7 @@ void TriggerPointEdit::init()
     // list of operators
     _operators->push_back(">");
     _operators->push_back("<");
-    _operators->push_back("=");
+    _operators->push_back("==");
     _operators->push_back(">=");
     _operators->push_back("<=");
 
