@@ -115,9 +115,20 @@ HeaderPanelWidget::createActions()
   _rewindAction = new QAction(rewindIcon, tr("Rewind"), this);
   _rewindAction->setStatusTip(tr("Rewind scenario"));
 
+  QIcon loopOffIcon(":/resources/images/loop.png");
+  _setLoopAction = new QAction(loopOffIcon, tr("Loop"), this);
+  _setLoopAction->setStatusTip(tr("Loop scenario"));
+
+  QIcon loopOnIcon(":/resources/images/loopOn.png");
+  _unsetLoopAction = new QAction(loopOnIcon, tr("stop Loop"), this);
+  _unsetLoopAction->setStatusTip(tr("Don't Loop scenario"));
+
+
   connect(_playAction, SIGNAL(triggered()), this, SLOT(play()));
   connect(_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
   connect(_rewindAction, SIGNAL(triggered()), this, SLOT(rewind()));
+  connect(_setLoopAction, SIGNAL(triggered()), this, SLOT(loop()));
+  connect(_unsetLoopAction, SIGNAL(triggered()), this, SLOT(loop()) );
 }
 
 void
@@ -138,7 +149,10 @@ HeaderPanelWidget::createToolBar()
   _toolBar->addAction(_rewindAction);
   _toolBar->addAction(_playAction);
   _toolBar->addAction(_stopAction);
+  _toolBar->addAction(_setLoopAction);
+  _toolBar->addAction(_unsetLoopAction);
 
+  _unsetLoopAction->setVisible(false);
   _stopAction->setVisible(false);
   _toolBar->raise();
 }
@@ -198,6 +212,13 @@ HeaderPanelWidget::rewind(){
     _scene->stopAndGoToStart();
     
     updatePlayMode();
+}
+
+void HeaderPanelWidget::loop()
+{
+    Maquette::getInstance()->loop(ROOT_BOX_ID);
+    _setLoopAction->setVisible(!_setLoopAction->isVisible());
+    _unsetLoopAction->setVisible(!_unsetLoopAction->isVisible());
 }
 
 void

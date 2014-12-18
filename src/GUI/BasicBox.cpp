@@ -2217,7 +2217,7 @@ BasicBox::setButtonsVisible(bool value)
         _endMenuButton->setVisible(false);
         _muteButton->setVisible(true);
     }
-    if (_loop)
+    if (_loop || _scene->playing())
     {
         _loopButton->setVisible(true);
     }
