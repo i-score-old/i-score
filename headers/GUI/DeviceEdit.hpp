@@ -55,6 +55,7 @@ class DeviceEdit : public QDialog
 
     // adding a number if the name is already used (ex OSCdevice.1 for the 2nd OSCdevice)
     void checkName(QString &name);
+    void removeForbiddenChar(QString);
 
   signals:
 	void deviceChanged(QString);
