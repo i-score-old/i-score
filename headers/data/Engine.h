@@ -118,8 +118,6 @@ private:
     EngineFilesMap      m_namespaceFilesPath;                           /// the last namespace file used for each device
     
     TTObject            m_mainScenario;                                 /// The top scenario
-    TTObject            m_mainStartEvent;                               /// The top scenario start event
-    TTObject            m_mainEndEvent;                                 /// The top scenario end event
     
     unsigned int        m_nextTimeBoxId;                                /// the next Id to give to any created time process
     unsigned int        m_nextIntervalId;                               /// the next Id to give to any created interval

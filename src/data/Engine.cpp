@@ -2219,41 +2219,49 @@ void Engine::getConditionsId(vector<TimeConditionId>& conditionsID)
 
 bool Engine::enableLoop(TimeBoxId boxId)
 {
-    TTObject    automation = getAutomation(boxId);
-    TTObject    subScenario = getSubScenario(boxId);
-    TTObject    parentScenario = getAutomation(getParentId(boxId));
-    TTValue     v, out, args;
-
-    // remove the automation and sub scenario from the mother scenario
-    parentScenario.send("TimeProcessRemove", automation, out);
-    parentScenario.send("TimeProcessRemove", subScenario, out);
-    
-    // get start and end events
-    TTObject startEvent = out[0];
-    TTObject endEvent = out[1];
-    
-    // create a new loop time process into the mother scenario
-    args = TTValue(TTSymbol("Loop"), startEvent, endEvent);
-    parentScenario.send("TimeProcessAdd", args, out);
-    TTObject loop = out[0];
-    
-    // set loop rigidity like automation rigidity
-    automation.get("rigid", v);
-    loop.set("rigid", v);
-    
-    // attach automation and sub scenario to the loop pattern
-    loop.send("PatternAttach", automation);
-    loop.send("PatternAttach", subScenario);
-    
-    // cache the loop
-    setLoop(boxId, loop);
-    
-    // update m_conditionedTimeBoxMap object
-    EngineCacheMapIterator it;
-    for (it = m_conditionedTimeBoxMap.begin(); it != m_conditionedTimeBoxMap.end(); it++)
+    if (boxId != ROOT_BOX_ID)
     {
-        if (it->second->object == automation)
-            it->second->object = loop;
+        TTObject    automation = getAutomation(boxId);
+        TTObject    subScenario = getSubScenario(boxId);
+        TTObject    parentScenario = getAutomation(getParentId(boxId));
+        TTValue     v, out, args;
+        
+        // remove the automation and sub scenario from the mother scenario
+        parentScenario.send("TimeProcessRemove", automation, out);
+        parentScenario.send("TimeProcessRemove", subScenario, out);
+        
+        // get start and end events
+        TTObject startEvent = out[0];
+        TTObject endEvent = out[1];
+        
+        // create a new loop time process into the mother scenario
+        args = TTValue(TTSymbol("Loop"), startEvent, endEvent);
+        parentScenario.send("TimeProcessAdd", args, out);
+        TTObject loop = out[0];
+        
+        // set loop rigidity like automation rigidity
+        automation.get("rigid", v);
+        loop.set("rigid", v);
+        
+        // attach automation and sub scenario to the loop pattern
+        loop.send("PatternAttach", automation);
+        loop.send("PatternAttach", subScenario);
+        
+        // cache the loop
+        setLoop(boxId, loop);
+        
+        // update m_conditionedTimeBoxMap object
+        EngineCacheMapIterator it;
+        for (it = m_conditionedTimeBoxMap.begin(); it != m_conditionedTimeBoxMap.end(); it++)
+        {
+            if (it->second->object == automation)
+                it->second->object = loop;
+        }
+    }
+    // for main scenario use a temporary attribute used to easily loop the whole sceanrio without creating an upper loop process
+    else
+    {
+        m_mainScenario.set("loop", TTBoolean(YES));
     }
 
     return true;
@@ -2261,45 +2269,53 @@ bool Engine::enableLoop(TimeBoxId boxId)
 
 bool Engine::disableLoop(TimeBoxId boxId)
 {
-    TTObject    automation = getAutomation(boxId);
-    TTObject    subScenario = getSubScenario(boxId);
-    TTObject    loop = getLoop(boxId);
-    TTObject    parentScenario = getAutomation(getParentId(boxId));
-    TTValue     v, out, args;
-    
-    // detach automation and sub scenario from the loop pattern
-    loop.send("PatternDetach", automation);
-    loop.send("PatternDetach", subScenario);
-    
-    // remove the loop from the mother scenario
-    parentScenario.send("TimeProcessRemove", loop, out);
-    
-    // get start and end events
-    TTObject startEvent = out[0];
-    TTObject endEvent = out[1];
-    
-    // add automation and sub scenario to the parent scenario
-    args = TTValue(automation, startEvent, endEvent);
-    parentScenario.send("TimeProcessAdd", args, out);
-    
-    args = TTValue(subScenario, startEvent, endEvent);
-    parentScenario.send("TimeProcessAdd", args, out);
-    
-    // set automation and subScenario rigidity like loop rigidity
-    loop.get("rigid", v);
-    automation.set("rigid", v);
-    subScenario.set("rigid", v);
-    
-    // uncache the loop
-    TTObject empty;
-    setLoop(boxId, empty);
-    
-    // update m_conditionedTimeBoxMap object
-    EngineCacheMapIterator it;
-    for (it = m_conditionedTimeBoxMap.begin(); it != m_conditionedTimeBoxMap.end(); it++)
+    if (boxId != ROOT_BOX_ID)
     {
-        if (it->second->object == loop)
-            it->second->object = automation;
+        TTObject    automation = getAutomation(boxId);
+        TTObject    subScenario = getSubScenario(boxId);
+        TTObject    loop = getLoop(boxId);
+        TTObject    parentScenario = getAutomation(getParentId(boxId));
+        TTValue     v, out, args;
+        
+        // detach automation and sub scenario from the loop pattern
+        loop.send("PatternDetach", automation);
+        loop.send("PatternDetach", subScenario);
+        
+        // remove the loop from the mother scenario
+        parentScenario.send("TimeProcessRemove", loop, out);
+        
+        // get start and end events
+        TTObject startEvent = out[0];
+        TTObject endEvent = out[1];
+        
+        // add automation and sub scenario to the parent scenario
+        args = TTValue(automation, startEvent, endEvent);
+        parentScenario.send("TimeProcessAdd", args, out);
+        
+        args = TTValue(subScenario, startEvent, endEvent);
+        parentScenario.send("TimeProcessAdd", args, out);
+        
+        // set automation and subScenario rigidity like loop rigidity
+        loop.get("rigid", v);
+        automation.set("rigid", v);
+        subScenario.set("rigid", v);
+        
+        // uncache the loop
+        TTObject empty;
+        setLoop(boxId, empty);
+        
+        // update m_conditionedTimeBoxMap object
+        EngineCacheMapIterator it;
+        for (it = m_conditionedTimeBoxMap.begin(); it != m_conditionedTimeBoxMap.end(); it++)
+        {
+            if (it->second->object == loop)
+                it->second->object = automation;
+        }
+    }
+    // for main scenario use a temporary attribute used to easily loop the whole sceanrio without creating an upper loop process
+    else
+    {
+        m_mainScenario.set("loop", TTBoolean(NO));
     }
     
     return true;
@@ -2307,7 +2323,17 @@ bool Engine::disableLoop(TimeBoxId boxId)
 
 bool Engine::isLoop(TimeBoxId boxId)
 {
-    return m_timeBoxMap[boxId]->loop.valid();
+    if (boxId != ROOT_BOX_ID)
+    {
+        return m_timeBoxMap[boxId]->loop.valid();
+    }
+    // for main scenario use a temporary attribute used to easily loop the whole sceanrio without creating an upper loop process
+    else
+    {
+        TTBoolean isLoop;
+        m_mainScenario.get("loop", isLoop);
+        return isLoop;
+    }
 }
 
 void Engine::setViewZoom(QPointF zoom)
