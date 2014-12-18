@@ -13,52 +13,96 @@ TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *pare
     _layout = new QGridLayout(this);
     setLayout(_layout);
 
+    ///////////////////////////////////////
+    // Widgets creation
+
+    // Label widget
     _addressLabel = new QLabel(tr("address"));
     _deviceLabel = new QLabel("device");
     _operatorLabel = new QLabel("operator");
     _conditionLabel = new QLabel("optional condition");
 
-    // display availables addresses
+    // Edition widget
     _addressEdit = new QComboBox;
     _addressEdit->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
     _userAddressEdit = new QLineEdit;
     _addressEdit->setLineEdit(_userAddressEdit); // lineEdit in comboBox
-    _addressEdit->setMinimumWidth(333);
 
     _deviceEdit = new QComboBox;
     _operatorEdit = new QComboBox;
-    _operatorEdit->setMaximumWidth(50);
     _conditionEdit = new QLineEdit;
 
     _autoTriggerCheckBox = new QCheckBox("auto-trigger");
 
-    _addresses = new QList<string>;
-    _operators = new std::vector<string>;
+    _okButton = new QPushButton(tr("OK"), this);
+    _cancelButton = new QPushButton(tr("Cancel"), this);
 
-    init();
+    //////////////////////////////////////
+    // Values Containers
+
+    // QList to store the availables addresses
+    _addresses = new  QList<string>(Maquette::getInstance()->addressList());
+    std::sort(_addresses->begin(), _addresses->end());
+
+    _deviceEdit->addItem("");
+    std::map<std::string, MyDevice>::iterator it;
+    std::map<std::string, MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
+    for (it = devices.begin(); it != devices.end(); it++) {
+        _deviceEdit->addItem(it->first.c_str());
+    }
+
+    // list of operators
+    _operators = new std::vector<string>;
+    _operators->push_back(">");
+    _operators->push_back("<");
+    _operators->push_back("==");
+    _operators->push_back(">=");
+    _operators->push_back("<=");
+
+    _operatorEdit->addItem("");
+
+    std::vector<std::string>::iterator op;
+    for(op=_operators->begin(); op != _operators->end(); op++) {
+        _operatorEdit->addItem((*op).c_str());
+    }
+
+    // load stored message and extract address, operator and condition value
+    parseMessage(_abstract->message());
+    _operatorEdit->setCurrentText(_operator);
+    _conditionEdit->setText(_condition);
+
+    // displays address from selected device
+    addressFilter(_device, _address);
+
+    _deviceEdit->setCurrentText(_device);
+
+    /////////////////////////////////////////
+    // Widgets Position
 
     _layout->addWidget(_deviceLabel, 0, 0, 1, 1);
     _layout->addWidget(_deviceEdit, 1, 0, 1, 1);
 
     _layout->addWidget(_addressLabel, 0, 1, 1, 4);
     _layout->addWidget(_addressEdit, 1, 1, 1, 4);
+    _addressEdit->setMinimumWidth(333);
 
     _layout->addWidget(_operatorLabel, 0, 5, 1, 1);
     _layout->addWidget(_operatorEdit, 1, 5, 1, 1);
+    _operatorEdit->setMaximumWidth(50);
 
     _layout->addWidget(_conditionLabel, 0, 6, 1, 2);
     _layout->addWidget(_conditionEdit, 1, 6, 1, 2);
 
     _layout->addWidget(_autoTriggerCheckBox, 2, 0, 1, 1);
 
-    _okButton = new QPushButton(tr("OK"), this);
     _layout->addWidget(_okButton, 3, 0, 1, 1);
-    _cancelButton = new QPushButton(tr("Cancel"), this);
     _layout->addWidget(_cancelButton, 3, 1, 1, 1);
 
+    ////////////////////////////////////////////////
+    /// Connections
+
     connect(_autoTriggerCheckBox,SIGNAL(clicked()),this,SLOT(autoTriggerChanged()));
-    connect(_conditionEdit,SIGNAL(textChanged(QString)),this,SLOT(expressionChanged()));
     connect(_okButton, SIGNAL(released()), this, SLOT(updateStuff()));
     connect(_cancelButton, SIGNAL(released()), this, SLOT(reject()));
     connect(_deviceEdit, SIGNAL(currentIndexChanged(QString)), this, SLOT(deviceSelectedChange(QString)));
@@ -82,47 +126,6 @@ TriggerPointEdit::~TriggerPointEdit()
 
   _layout->deleteLater();
   _autoTriggerCheckBox->deleteLater();
-}
-
-void TriggerPointEdit::init()
-{
-
-    // QList to store the availables addresses
-    delete _addresses;
-    _addresses = new  QList<string>(Maquette::getInstance()->addressList());
-    std::sort(_addresses->begin(), _addresses->end());
-
-    // display availables devices
-    _deviceEdit->addItem("");
-    std::map<std::string, MyDevice>::iterator it;
-    std::map<std::string, MyDevice> devices = Maquette::getInstance()->getNetworkDevices();
-    for (it = devices.begin(); it != devices.end(); it++) {
-        _deviceEdit->addItem(it->first.c_str());
-    }
-
-    // list of operators
-    _operators->push_back(">");
-    _operators->push_back("<");
-    _operators->push_back("==");
-    _operators->push_back(">=");
-    _operators->push_back("<=");
-
-    _operatorEdit->addItem("");
-
-    std::vector<std::string>::iterator op;
-    for(op=_operators->begin(); op != _operators->end(); op++) {
-        _operatorEdit->addItem((*op).c_str());
-    }
-
-    // load stored message and extract address, operator and condition value
-    parseMessage(_abstract->message());
-    _operatorEdit->setCurrentText(_operator);
-    _conditionEdit->setText(_condition);
-
-    // displays address from selected device
-    addressFilter(_device, _address);
-
-    _deviceEdit->setCurrentText(_device);
 }
 
 void

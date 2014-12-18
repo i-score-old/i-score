@@ -577,11 +577,6 @@ BoxWidget::stop()
     _box->updatePlayingModeButtons();
 }
 
-void BoxWidget::mute()
-{
-	
-}
-
 void
 BoxWidget::loop()
 {

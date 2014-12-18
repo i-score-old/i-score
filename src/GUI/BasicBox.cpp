@@ -263,9 +263,8 @@ BasicBox::createMenus()
     _muteButton->setStyleSheet(_pushButtonStyle);
 	_muteButton->setCheckable(true);
 	
-	QIcon loopIcon(":/resources/images/loop.png"); //loopSimple.svg
     _loopButton= new QPushButton();
-    _loopButton->setIcon(loopIcon);
+    _loopButton->setIcon(_loopIcon);
     _loopButton->setIconSize(QSize(BUTTON_SIZE,BUTTON_SIZE));
     //_loopButton->setShortcutEnabled(1, false);
     _loopButton->setStyleSheet(_pushButtonStyle);
@@ -291,6 +290,8 @@ BasicBox::createMenus()
   connect(_playButton, SIGNAL(clicked()), _boxContentWidget, SLOT(play()));
   connect(_stopButton, SIGNAL(clicked()), _boxContentWidget, SLOT(stop()));
   connect(_loopButton, SIGNAL(clicked()), _boxContentWidget, SLOT(loop()));
+  connect(_loopButton, &QPushButton::clicked,
+          this,        &BasicBox::changeLoopButton);
   connect(_muteButton, &QPushButton::toggled, 
 		  this,		   &BasicBox::toggleMuteButton);
 }
@@ -415,6 +416,7 @@ BasicBox::init()
   _playing = false;
   _recording = true;
   _mute = false;
+  _loop = false;
   _low = false;
   _triggerPoints = new QMap<BoxExtremity, TriggerPoint*>();
   _comment = nullptr;
@@ -2121,6 +2123,13 @@ void BasicBox::toggleMuteButton(bool )
     setSelected(false);
 }
 
+void BasicBox::changeLoopButton()
+{
+    _loop = !_loop;
+    _loopButton->setIcon(_loop? _loopOnIcon : _loopIcon);
+    qDebug() << "zob";
+}
+
 void BasicBox::cleanupRelations()
 {
   for(auto& extremity : _relations)
@@ -2208,6 +2217,10 @@ BasicBox::setButtonsVisible(bool value)
         _playButton->setVisible(false);
         _endMenuButton->setVisible(false);
         _muteButton->setVisible(true);
+    }
+    if (_loop)
+    {
+        _loopButton->setVisible(true);
     }
 }
 

@@ -83,7 +83,6 @@ class BoxWidget : public QWidget
     void updateEndCue();
     void play();
     void stop();
-	void mute();
 	void loop();
 	
     void execStartAction();

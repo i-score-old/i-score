@@ -206,6 +206,7 @@ class AttributesEditor : public QDockWidget
      * \brief Called when the name of the box is changed.
      */
     void nameChanged();
+    void removeForbiddenChar(QString);
 	void currentColorSelectionChanged(const QColor& );
 	void revertColor();
 
