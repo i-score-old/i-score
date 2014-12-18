@@ -185,7 +185,7 @@ BasicBox::centerWidget()
                           -(height()) / 2 + 2.5);
 	
 	if(_loopButton)
-		_loopButton->move(-(width()) / 2 + LINE_WIDTH + 20 + 2 * (BUTTON_SIZE + 2),
+        _loopButton->move(-(width()) / 2 + LINE_WIDTH + 22 + 2 * (BUTTON_SIZE + 2),
 						  -(height()) / 2 + 2.5);
 }
 
@@ -2054,7 +2054,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 		painter->setPen(QPen(Qt::gray));
 
 		if(_hover || isSelected())
-            painter->drawText(QRectF(BOX_MARGIN * 2 + 25, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
+            painter->drawText(QRectF(BOX_MARGIN * 2 + 31, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
         else
 			painter->drawText(QRectF(0, 0, textRect.width(), textRect.height()), Qt::AlignHCenter, name());
         painter->restore();
