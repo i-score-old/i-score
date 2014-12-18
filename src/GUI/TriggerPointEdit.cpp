@@ -103,7 +103,6 @@ TriggerPointEdit::TriggerPointEdit(AbstractTriggerPoint *abstract, QWidget *pare
     /// Connections
 
     connect(_autoTriggerCheckBox,SIGNAL(clicked()),this,SLOT(autoTriggerChanged()));
-    connect(_conditionEdit,SIGNAL(textChanged(QString)),this,SLOT(expressionChanged()));
     connect(_okButton, SIGNAL(released()), this, SLOT(updateStuff()));
     connect(_cancelButton, SIGNAL(released()), this, SLOT(reject()));
     connect(_deviceEdit, SIGNAL(currentIndexChanged(QString)), this, SLOT(deviceSelectedChange(QString)));
