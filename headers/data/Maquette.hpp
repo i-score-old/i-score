@@ -700,11 +700,11 @@ class Maquette : public QTimer
     Relation* getRelation(unsigned int ID);
 
     /*!
-     * \brief Returns the next sequential name number.
+     * \brief Returns the next box number tu use for name
      *
-     * \return the next ID to be used for box creation
+     * \return the next number to be used for box creation
      */
-    unsigned int sequentialID();
+    unsigned int nextBoxNumber();
 
     /*!
      * \brief Saves the current composition into a file.

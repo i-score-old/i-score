@@ -234,9 +234,9 @@ Maquette::parentBoxes()
 }
 
 unsigned int
-Maquette::sequentialID()
+Maquette::nextBoxNumber()
 {
-  return _boxes.size();
+  return _engines->getNextTimeBoxId()-1; // -1 because the main scenario is at 1 so the first box is at 2
 }
 
 /// \todo change arguments named corner. this is not comprehensible. (par jaime Chao)

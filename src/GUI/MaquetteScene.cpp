@@ -1069,7 +1069,7 @@ MaquetteScene::getRelationsIDs(unsigned int entityID)
 std::string
 MaquetteScene::sequentialName(const string &name)
 {
-  const unsigned int curID = _maquette->sequentialID() + 1;
+  const unsigned int curID = _maquette->nextBoxNumber();
 
   std::stringstream tmp;
   tmp << curID;
@@ -1308,18 +1308,9 @@ MaquetteScene::addParentBox(const AbstractParentBox &box)
 unsigned int
 MaquetteScene::addParentBox()
 {
-  bool ok;
   QString name;
-  while (name.isEmpty()) {
-      name = QString::fromStdString(sequentialName(tr("Box").toStdString()));
-      ok = true;
-      if (!ok) {
-          return NO_ID;
-        }
-      if (name.isEmpty()) {
-          QMessageBox::warning(_view, tr("Warning"), tr("Please Enter a Name"));
-        }
-    }
+  while (name.isEmpty())
+    name = QString::fromStdString(sequentialName(tr("Box").toStdString()));
 
   return addParentBox(_pressPoint, _releasePoint, name.toStdString());
 }

@@ -835,6 +835,11 @@ void Engine::removeFromCacheReadyCallback(ConditionedTimeBoxId triggerId, Condit
 
 // Edition ////////////////////////////////////////////////////////////////////////
 
+TimeBoxId Engine::getNextTimeBoxId()
+{
+    return m_nextTimeBoxId;
+}
+
 TimeBoxId Engine::addBox(TimeValue boxBeginPos, TimeValue boxLength, const std::string & name, TimeBoxId motherId)
 {
     TTObject        startEvent, endEvent;

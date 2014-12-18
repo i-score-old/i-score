@@ -224,6 +224,13 @@ public:
         
 	// Edition ////////////////////////////////////////////////////////////////////////
     
+    /*!
+	 * Get the next time box ID to prepare a name.
+	 *
+	 * \return the next time box ID.
+	 */
+	TimeBoxId getNextTimeBoxId();
+    
 	/*!
 	 * Adds a new box in the CSP.
 	 *
