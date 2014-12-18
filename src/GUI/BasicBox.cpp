@@ -2127,7 +2127,6 @@ void BasicBox::changeLoopButton()
 {
     _loop = !_loop;
     _loopButton->setIcon(_loop? _loopOnIcon : _loopIcon);
-    qDebug() << "zob";
 }
 
 void BasicBox::cleanupRelations()
