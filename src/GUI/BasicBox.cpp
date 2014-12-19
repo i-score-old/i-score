@@ -1980,14 +1980,14 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     //Set disabled the curve proxy when box not selected.
     _boxContentWidget->setCurveLowerStyle(_comboBox->currentText().toStdString(),!isSelected());
 
-    //Showing stop button when playing
+    //Showing stop button when playing and loop button if looping
     if(_playing){
         _comboBoxProxy->setVisible(false);
         _startMenuButton->setVisible(false);
         _endMenuButton->setVisible(false);
         _stopButton->setVisible(true);
         _muteButton->setVisible(false);
-		_loopButton->setVisible(false);
+        _loopButton->setVisible(_loop);
     }
     else{
         setButtonsVisible(_hover || isSelected());
