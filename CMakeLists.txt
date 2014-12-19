@@ -25,11 +25,7 @@ add_definitions(-DTT_NO_DSP)
 #TODO find_package
 if(UNIX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-unused-parameter -Wno-deprecated-register  -Wno-deprecated-declarations -Wno-unknown-pragmas -Wno-conversion")
-	include_directories("/usr/local/lib/jamoma/include")
-	include_directories("/usr/local/jamoma/include")
 	include_directories("/usr/include/libxml2")
-	include_directories("/usr/local/include/jamoma")
-	include_directories("/usr/include/jamoma")
 	
 	if(APPLE)
 		set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR})
@@ -160,25 +156,16 @@ endif()
 ##################################
 #qt5_use_modules(i-score Core Svg Xml Network Widgets PrintSupport)
 
-# Todo in a cleanlier fashion... What about creating a package file for Jamoma?
 if(UNIX)
-	if(APPLE)
-		set(JAMOMA_LIB_FOLDER "/usr/local/jamoma/lib")
-	else()
-		set(JAMOMA_LIB_FOLDER "/usr/lib")
-	endif()
+	find_package(Jamoma 0.6 REQUIRED)
 elseif(WIN32)
 	set(JAMOMA_LIB_FOLDER_WIN32 "c:\\Program Files (x86)\\JamomaCore 0.6-dev\\lib")
 	FILE(TO_CMAKE_PATH ${JAMOMA_LIB_FOLDER_WIN32} JAMOMA_LIB_FOLDER)
 endif()
 
-FIND_LIBRARY(JAMOMA_FOUNDATION_LIBRARY JamomaFoundation ${JAMOMA_LIB_FOLDER})
-FIND_LIBRARY(JAMOMA_SCORE_LIBRARY JamomaScore ${JAMOMA_LIB_FOLDER})
-FIND_LIBRARY(JAMOMA_MODULAR_LIBRARY JamomaModular ${JAMOMA_LIB_FOLDER})
-
-target_link_libraries(i-score ${JAMOMA_FOUNDATION_LIBRARY}
-							  ${JAMOMA_SCORE_LIBRARY}
-							  ${JAMOMA_MODULAR_LIBRARY}
+target_link_libraries(i-score Jamoma::Foundation 
+							  Jamoma::Modular 
+							  Jamoma::Score 
 							  Qt5::Core
 							  Qt5::Gui
 							  Qt5::Svg
