@@ -5,6 +5,8 @@ project(i-score)
 ##################################
 ######### Settings ###############
 ##################################
+set(CMAKE_PREFIX_PATH /usr/share/cmake/Jamoma;/usr/local/jamoma/share/cmake/Jamoma;)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
