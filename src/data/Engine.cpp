@@ -2046,14 +2046,14 @@ void Engine::getConditionTriggerIds(TimeConditionId conditionId, std::vector<Tim
 
 void Engine::setConditionMessage(TimeConditionId conditionId, std::string disposeMessage)
 {
-    getTimeCondition(conditionId).set("disposeMessage", TTSymbol(disposeMessage));
+    getTimeCondition(conditionId).set("disposeExpression", TTSymbol(disposeMessage));
 }
 
 std::string Engine::getConditionMessage(TimeConditionId conditionId)
 {
     TTSymbol expr;
     
-    getTimeCondition(conditionId).get("disposeMessage", expr);
+    getTimeCondition(conditionId).get("disposeExpression", expr);
 
     return expr.c_str();
 }
