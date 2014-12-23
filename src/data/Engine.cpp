@@ -3601,6 +3601,29 @@ int Engine::load(std::string filepath)
             
             // Rebuild all the EngineCacheMaps from the main scenario content
             buildEngineCaches(m_mainScenario, kTTAdrsRoot);
+            
+            // BACKWARD COMPATIBILITY : add subScenario if there is not
+            for (EngineCacheMapIterator it = m_timeBoxMap.begin(); it != m_timeBoxMap.end(); ++it)
+            {
+                TTObject mainProcess = it->second->object;
+                if (it->second->subScenario == NULL)
+                {
+                    TTObject start, end;
+                
+                    mainProcess.get("startEvent", start);
+                    mainProcess.get("endEvent", end);
+                    
+                    // create a new sub scenario time process into the main scenario
+                    TTValue args = TTValue(TTSymbol("Scenario"), start, end);
+                    m_mainScenario.send("TimeProcessAdd", args, out);
+                    TTObject subScenario = out[0];
+                    
+                    // set sub scenario rigid
+                    subScenario.set("rigid", true);
+                
+                    it->second->subScenario = subScenario;
+                }
+            }
         }
     }
     
