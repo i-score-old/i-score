@@ -158,9 +158,8 @@ endif()
 ##################################
 #qt5_use_modules(i-score Core Svg Xml Network Widgets PrintSupport)
 
-if(UNIX)
-	find_package(Jamoma 0.6 REQUIRED)
-elseif(WIN32)
+find_package(Jamoma 0.6 REQUIRED)
+if(WIN32)
 	set(JAMOMA_LIB_FOLDER_WIN32 "c:\\Program Files (x86)\\JamomaCore 0.6-dev\\lib")
 	FILE(TO_CMAKE_PATH ${JAMOMA_LIB_FOLDER_WIN32} JAMOMA_LIB_FOLDER)
 endif()
