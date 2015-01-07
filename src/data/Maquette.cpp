@@ -137,7 +137,7 @@ void Maquette::loop(int boxid)
 {
 	if(_engines->isLoop(boxid))
 	{
-        if(_boxes[boxid]->hasTriggerPoint(BOX_END) && boxid != ROOT_BOX_ID)
+		if(_boxes[boxid]->hasTriggerPoint(BOX_END))
 		{
 			_boxes[boxid]->removeTriggerPoint(BOX_END);
 		}
@@ -146,7 +146,7 @@ void Maquette::loop(int boxid)
 	else
 	{
 		_engines->enableLoop(boxid);
-        if(!_boxes[boxid]->hasTriggerPoint(BOX_END) && boxid != ROOT_BOX_ID)
+		if(!_boxes[boxid]->hasTriggerPoint(BOX_END))
 		{
 			_boxes[boxid]->addTriggerPoint(BOX_END);
 		}
