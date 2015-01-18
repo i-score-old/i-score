@@ -1,7 +1,16 @@
-#!/bin/bash -x
+#!/bin/bash
 ISCORE_BUNDLE=_CPack_Packages/Darwin/DragNDrop/i-score/ALL_IN_ONE/i-score.app
 ISCORE_EXECUTABLE_NAME=i-score
-MACDEPLOYQT=$(find /usr/local/Cellar/qt5/ -name macdeployqt)
+
+if [[ -f $PWD/../../settings.sh ]]; then
+	source $PWD/../../settings.sh
+fi
+
+if [[ -z "$ISCORE_QT_PATH" ]]; then
+	MACDEPLOYQT=$(find /usr/local/Cellar/qt5/ -name macdeployqt)
+else
+	MACDEPLOYQT="$ISCORE_QT_PATH/bin/macdeployqt"
+fi
 $MACDEPLOYQT $ISCORE_BUNDLE
 
 mkdir -p $ISCORE_BUNDLE/Contents/Frameworks/jamoma/lib
