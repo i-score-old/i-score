@@ -1438,7 +1438,7 @@ Maquette::updateNamespaceTree()
 {
     if (!updatedDevicesList.empty())
     {
-        updatedDevicesList.sort();
+        updatedDevicesList.sort([] (const TTSymbol& s1, const TTSymbol& s2) { return s1 < s2; });
         updatedDevicesList.unique();
         std::cerr << "Maquette::updateNamespaceTree ! " << std::endl;
         auto tree = Maquette::getInstance()->scene()->editor()->networkTree();
