@@ -157,7 +157,6 @@ endif()
 ##################################
 ############ Libraries ###########
 ##################################
-#qt5_use_modules(i-score Core Svg Xml Network Widgets PrintSupport)
 
 find_package(Jamoma 0.6 REQUIRED)
 if(WIN32)
@@ -219,7 +218,7 @@ if(WIN32)
 	file(TO_CMAKE_PATH "C:\\Qt\\Qt5.3.1\\5.3\\msvc2013\\bin" QT_FOLDER)
 	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\libxml2-2.7.8.win32\\bin" LIBXML_FOLDER)
 	# Fuck this
-	file(TO_CMAKE_PATH "W:\\GitHub\\Jamoma\\Core\\Foundation\\library\\libiconv\\bin" LIBICONV_FOLDER)
+	file(TO_CMAKE_PATH "W:\\OSSIA_win\\Jamoma\\Core\\Foundation\\library\\libiconv\\bin" LIBICONV_FOLDER)
 	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\zlib" ZLIB_FOLDER)
 
 	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\Microsoft Visual Studio 12.0\\VC\\redist\\x86\\Microsoft.VC120.CRT" MSVC_REDIST_RELEASE)
@@ -233,18 +232,18 @@ if(WIN32)
 			COMPONENT Runtime)
 
 	# Jamoma extensions
-	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\JamomaCore 0.6-dev\\extensions" JAMOMA_EXTENSIONS_FOLDER)
+	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\JamomaCore 0.6-dev\\lib\\jamoma" JAMOMA_EXTENSIONS_FOLDER)
 	set(JAMOMA_EXTENSIONS
-		"${JAMOMA_EXTENSIONS_FOLDER}/Scenario.ttdll"
-		"${JAMOMA_EXTENSIONS_FOLDER}/Automation.ttdll"
-		"${JAMOMA_EXTENSIONS_FOLDER}/Interval.ttdll"
-		"${JAMOMA_EXTENSIONS_FOLDER}/OSC.ttdll"
-		"${JAMOMA_EXTENSIONS_FOLDER}/Minuit.ttdll"
-		"${JAMOMA_EXTENSIONS_FOLDER}/MIDI.ttdll"
-		"${JAMOMA_EXTENSIONS_FOLDER}/AnalysisLib.ttdll"
-		"${JAMOMA_EXTENSIONS_FOLDER}/DataspaceLib.ttdll"
-		"${JAMOMA_EXTENSIONS_FOLDER}/FunctionLib.ttdll"
-		"${JAMOMA_EXTENSIONS_FOLDER}/System.ttdll"
+		"${JAMOMA_EXTENSIONS_FOLDER}/Scenario.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/Automation.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/Interval.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/OSC.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/Minuit.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/MIDI.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/AnalysisLib.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/DataspaceLib.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/FunctionLib.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/System.ttdll" 
 		"${JAMOMA_EXTENSIONS_FOLDER}/NetworkLib.ttdll")
 
 	install(FILES ${JAMOMA_EXTENSIONS}
@@ -278,7 +277,7 @@ if(WIN32)
 	install(FILES ${GECODE_DLLS} DESTINATION bin COMPONENT Runtime)
 
 
-	set(DIRS "${QT_FOLDER}" "${JAMOMA_LIB_FOLDER}" "${JAMOMA_EXTENSIONS_FOLDER}" "${LIBXML_FOLDER}" "${LIBICONV_FOLDER}" "${ZLIB_FOLDER}" )
+	set(DIRS "${QT_FOLDER}" "${JAMOMA_LIB_FOLDER}/../bin" "${JAMOMA_LIB_FOLDER}" "${JAMOMA_EXTENSIONS_FOLDER}" "${LIBXML_FOLDER}" "${LIBICONV_FOLDER}" "${ZLIB_FOLDER}" )
 	#~ set(DIRS ${QtCore_location} ${QtSvg_location} ${QtXml_location} ${QtNetwork_location} ${QtWidgets_location} ${QtPrintSupport_location})
 	install(CODE "
 					file(GLOB_RECURSE QTPLUGINS
