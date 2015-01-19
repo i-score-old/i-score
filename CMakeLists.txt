@@ -299,7 +299,7 @@ set(CPACK_PACKAGE_NAME "i-score")
 set(CPACK_PACKAGE_VENDOR "i-score")
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "An intermedia sequencer for the precise and flexible scripting of interactive scenarios.")
-set(CPACK_PACKAGE_VERSION "0.2.2")
+set(CPACK_PACKAGE_VERSION "0.2.3")
 set(CPACK_PACKAGE_VERSION_MAJOR "0")
 set(CPACK_PACKAGE_VERSION_MINOR "2")
 
@@ -354,7 +354,7 @@ elseif(WIN32)
 	
 	set(CPACK_NSIS_CONTACT "i-score-devs@lists.sourceforge.net")
 	set(CPACK_COMPONENTS_ALL i-score)
-	set ( CPACK_PACKAGE_VERSION "0.2.2" )
+	set ( CPACK_PACKAGE_VERSION "0.2.3" )
 	set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/installer_data/License.md")
 	set(CPACK_MONOLITHIC_INSTALL TRUE)
 	set(CPACK_NSIS_MUI_ICON  "${CMAKE_SOURCE_DIR}/resources/windows/i-score.ico")
