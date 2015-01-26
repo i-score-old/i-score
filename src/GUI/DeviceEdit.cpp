@@ -345,7 +345,6 @@ void DeviceEdit::setCorrespondingProtocolLayout()
 {
     if(_protocolsComboBox->currentText() == "OSC")
     {
-      defaultName = "OSCdevice";
       defaultPort = 9997;
       defaultInputPort = 9996;
 
@@ -354,7 +353,6 @@ void DeviceEdit::setCorrespondingProtocolLayout()
     }
     else if (_protocolsComboBox->currentText() == "Minuit")
     {
-      defaultName = "MinuitDevice";
       defaultPort = 9998;
       defaultInputPort = 13579;
       setMinuitLayout();
@@ -362,15 +360,12 @@ void DeviceEdit::setCorrespondingProtocolLayout()
     }
     else if (_protocolsComboBox->currentText() == "MIDI")
     {
-      defaultName = "MIDIDevice";
       setMidiLayout();
     }
 
     _localHostBox->setText(defaultLocalHost);
     _portOutputBox->setValue(defaultPort);
     _portInputBox->setValue(defaultInputPort);
-    checkName(defaultName);
-    _nameEdit->setText(defaultName);
     _nameEdit->setFocus();
 }
 
