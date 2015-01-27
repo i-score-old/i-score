@@ -73,8 +73,6 @@ public :
     inline QList<BasicBox *> getBoxes(){return _boxesAttached;}
     int nbOfAttachedBoxes();
 
-    QInputDialog *disposeMessageInputDialog();
-
     inline unsigned int ID(){return _id;}
 
 protected:

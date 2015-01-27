@@ -1,4 +1,4 @@
-#N canvas 39 719 450 300 10;
+#N canvas 29 687 450 344 10;
 #X declare -path ../osc;
 #X declare -path ../osc;
 #X declare -path ../osc;
@@ -137,9 +137,11 @@
 #X declare -path ../osc;
 #X declare -path ../osc;
 #X declare -path ../osc;
-#X declare -stdpath osc -stdpath iemnet -lib iemnet -path abs;
 #X declare -path ../osc;
-#N canvas 544 500 418 579 OSC 0;
+#X declare -path osc -path iemnet -lib iemnet -path abs;
+#X declare -path ../osc;
+#X declare -path ../osc;
+#N canvas 608 294 418 579 OSC 1;
 #X obj 41 427 s from_i-score;
 #X obj 252 52 r to_i-score;
 #X obj 195 192 loadbang;
@@ -225,9 +227,16 @@ and;
 to use this patch.;
 #X text 62 99 each [dummy_text] and [dummy_video] contains several
 parameters that are exposed to i-score.;
-#X obj 38 36 declare -stdpath osc -stdpath iemnet -lib iemnet -path
-abs;
 #X obj 163 260 oscparam /test/position/x;
+#X obj 39 36 declare -path osc -path iemnet -lib iemnet -path abs;
+#X floatatom 127 281 5 0 0 0 x - -, f 5;
+#X obj 163 280 oscparam /test/position/y;
+#X floatatom 127 301 5 0 0 0 x - -, f 5;
+#X obj 163 300 oscparam /test/position/z;
 #X connect 1 0 0 0;
-#X connect 14 0 19 0;
-#X connect 19 0 14 0;
+#X connect 14 0 18 0;
+#X connect 18 0 14 0;
+#X connect 20 0 21 0;
+#X connect 21 0 20 0;
+#X connect 22 0 23 0;
+#X connect 23 0 22 0;

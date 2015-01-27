@@ -246,29 +246,23 @@ ConditionalRelation::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
     setCursor(Qt::ArrowCursor);
 }
 
-QInputDialog *
-ConditionalRelation::disposeMessageInputDialog()
-{
-  QInputDialog *msgDialog = new QInputDialog(_scene->views().first(), Qt::Popup);
-  msgDialog->setInputMode(QInputDialog::TextInput);
-  msgDialog->setLabelText(QObject::tr("Enter the dispose message :"));
-  msgDialog->setTextValue(QString::fromStdString(Maquette::getInstance()->getConditionMessage(_id)));
 
-  return msgDialog;
-}
 void
 ConditionalRelation::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
 {
     QGraphicsObject::mouseDoubleClickEvent(event);
       if (!_scene->playing())
       {
-          QInputDialog *disposeMsgEdit = disposeMessageInputDialog();
-          bool ok = disposeMsgEdit->exec();
-          disposeMsgEdit->move(event->pos().toPoint());
-          if (ok)
-              Maquette::getInstance()->setConditionMessage(_id,disposeMsgEdit->textValue().toStdString());
-
-          disposeMsgEdit->deleteLater();
+         bool ok;
+         QString text = QInputDialog::getText(_scene->views().first(), tr("Dispose"),
+                                              tr("Enter the dispose message :"), QLineEdit::Normal,
+                                              tr(Maquette::getInstance()->getConditionMessage(_id).c_str()),
+                                              &ok);
+         if (ok)
+         {
+             Maquette::getInstance()->setConditionMessage(_id,text.toStdString());
+ //            qDebug() << Maquette::getInstance()->getConditionMessage(_id).c_str();
+         }
       }
 }
 
