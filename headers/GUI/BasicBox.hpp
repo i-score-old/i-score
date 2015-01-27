@@ -727,6 +727,7 @@ class BasicBox : public QGraphicsObject
     bool _playing;                                                              //!< State of playing.
     bool _recording;                                                            //!< State of recording.
     bool _mute;                                                                 //!< State of mute.    
+    bool _loop;
     Comment *_comment{};                                                          //!< The box comment.
     QMap<BoxExtremity, TriggerPoint*> *_triggerPoints{};                          //!< The trigger points.
     std::map < BoxExtremity, std::map < unsigned int, Relation* > > _relations; //!< The relations.
@@ -770,10 +771,12 @@ class BasicBox : public QGraphicsObject
     QPushButton *_endMenuButton{};
     QPushButton *_playButton{};
     QPushButton *_stopButton{};
+	QPushButton *_loopButton{};
 	QPushButton *_muteButton{};
     const QIcon _muteOffIcon{":/resources/images/mute_off.png"};
     const QIcon _muteOnIcon{":/resources/images/mute_on.png"};
-
+    const QIcon _loopIcon{":/resources/images/loop.png"};
+    const QIcon _loopOnIcon{":/resources/images/loopOn.png"};
 
 	qreal oldZValue{1};
 	
@@ -782,6 +785,7 @@ class BasicBox : public QGraphicsObject
 		void onComboBoxClicked();
 		void onComboBoxHidden();
 		void toggleMuteButton(bool value);
+        void changeLoopButton();
 
 private:
     // Check if the relations are still up to date with what is in the maquette, to prevent crashes

@@ -42,12 +42,7 @@ DeviceEdit::DeviceEdit(QWidget *parent)
   : QDialog(parent)
 {
   setModal(true);
-  init();
-}
 
-void
-DeviceEdit::init()
-{
   connect(this, SIGNAL(accepted()),
 		  &updater, SLOT(update()));
   _changed = false;
@@ -120,6 +115,7 @@ DeviceEdit::init()
   _layout->addWidget(_cancelButton, 6, 4, 1, 1);
 
   connect(_nameEdit, SIGNAL(textChanged(QString)), this, SLOT(setDeviceNameChanged()));
+  connect(_nameEdit, SIGNAL(textEdited(QString)), this, SLOT(removeForbiddenChar(QString)));
   connect(&_midiDevicesBox, SIGNAL(currentTextChanged(QString)), this, SLOT(setDeviceNameChanged()));
   connect(_protocolsComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setProtocolChanged()));
   connect(_portOutputBox, SIGNAL(valueChanged(int)), this, SLOT(setNetworkPortChanged()));
@@ -448,6 +444,20 @@ void DeviceEdit::checkName(QString &name)
     }
 
     name = newName;
+}
+
+void DeviceEdit::removeForbiddenChar(QString newName)
+{
+    if ( newName.indexOf("/") != -1 )
+    {
+        newName.remove(newName.indexOf("/"),1);
+        _nameEdit->setText(newName);
+    }
+    if ( newName.indexOf(":") != -1 )
+    {
+        newName.remove(newName.indexOf(":"),1);
+        _nameEdit->setText(newName);
+    }
 }
 
 void

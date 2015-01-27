@@ -1,4 +1,4 @@
-#N canvas 577 126 450 300 10;
+#N canvas 575 142 450 300 10;
 #X declare -stdpath osc -stdpath iemnet -lib iemnet -path abs;
 #X declare -path ../osc;
 #X declare -path ../osc;
@@ -8,7 +8,7 @@
 #X obj 252 52 r to_i-score;
 #X obj 195 192 loadbang;
 #X obj 133 166 spigot;
-#X obj 152 291 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 152 291 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X msg 195 212 connect 127.0.0.1 9996;
 #X obj 252 156 spigot;
@@ -69,14 +69,14 @@ and;
 #X connect 27 0 12 0;
 #X connect 28 0 18 0;
 #X restore 38 58 pd OSC;
-#X floatatom 128 147 5 0 0 0 x - -;
+#X floatatom 128 147 5 0 0 0 x - -, f 5;
 #X text 34 8 You need mrpeach/osc and iemnet or mrpeach/net objects
 to use this patch.;
 #X obj 37 36 declare -stdpath osc -stdpath iemnet -lib iemnet -path
 abs;
-#X floatatom 128 167 5 0 0 0 y - -;
+#X floatatom 128 167 5 0 0 0 y - -, f 5;
 #X obj 164 196 oscparam /name;
-#X symbolatom 95 197 10 0 0 0 - - -;
+#X symbolatom 95 197 10 0 0 0 - - -, f 10;
 #X obj 164 216 symbol;
 #X text 62 91 Open the 01-simple_example.score with i-score.;
 #X text 62 111 Then press play in i-score \, you should see some changes

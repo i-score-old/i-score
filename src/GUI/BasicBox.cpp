@@ -145,6 +145,8 @@ BasicBox::BasicBox(const QPointF &press, const QPointF &release, MaquetteScene *
 
   setButtonsVisible(false); //only showed on hover
 
+  
+  setFlags(ItemIgnoresParentOpacity);
   update();
   connect(_comboBox, SIGNAL(currentIndexChanged(const QString &)), _boxContentWidget, SLOT(updateDisplay(const QString &)));
 }
@@ -181,6 +183,10 @@ BasicBox::centerWidget()
 	if(_muteButton)
         _muteButton->move(-(width()) / 2 + LINE_WIDTH + 3 + BUTTON_SIZE + 2,
                           -(height()) / 2 + 2.5);
+	
+	if(_loopButton)
+        _loopButton->move(-(width()) / 2 + LINE_WIDTH + 22 + 2 * (BUTTON_SIZE + 2),
+						  -(height()) / 2 + 2.5);
 }
 
 void
@@ -257,6 +263,13 @@ BasicBox::createMenus()
     _muteButton->setStyleSheet(_pushButtonStyle);
 	_muteButton->setCheckable(true);
 	
+    _loopButton= new QPushButton();
+    _loopButton->setIcon(_loopIcon);
+    _loopButton->setIconSize(QSize(BUTTON_SIZE,BUTTON_SIZE));
+    //_loopButton->setShortcutEnabled(1, false);
+    _loopButton->setStyleSheet(_pushButtonStyle);
+	_muteButton->setCheckable(true);
+	
   QGraphicsProxyWidget *startMenuProxy = new QGraphicsProxyWidget(this);
   startMenuProxy->setWidget(_startMenuButton);
   QGraphicsProxyWidget *endMenuProxy = new QGraphicsProxyWidget(this);
@@ -265,6 +278,8 @@ BasicBox::createMenus()
   playProxy->setWidget(_playButton);
   QGraphicsProxyWidget *stopProxy = new QGraphicsProxyWidget(this);
   stopProxy->setWidget(_stopButton);
+  QGraphicsProxyWidget *loopProxy = new QGraphicsProxyWidget(this);
+  loopProxy->setWidget(_loopButton);
   QGraphicsProxyWidget *muteProxy = new QGraphicsProxyWidget(this);
   muteProxy->setWidget(_muteButton);
 
@@ -274,6 +289,9 @@ BasicBox::createMenus()
   connect(_endMenuButton, SIGNAL(customContextMenuRequested(QPoint)), _boxContentWidget, SLOT(displayEndMenu(QPoint)));
   connect(_playButton, SIGNAL(clicked()), _boxContentWidget, SLOT(play()));
   connect(_stopButton, SIGNAL(clicked()), _boxContentWidget, SLOT(stop()));
+  connect(_loopButton, SIGNAL(clicked()), _boxContentWidget, SLOT(loop()));
+  connect(_loopButton, &QPushButton::clicked,
+          this,        &BasicBox::changeLoopButton);
   connect(_muteButton, &QPushButton::toggled, 
 		  this,		   &BasicBox::toggleMuteButton);
 }
@@ -313,7 +331,7 @@ BasicBox::createWidget()
 
   _curveProxy = new QGraphicsProxyWidget(this);
 
-  _curveProxy->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+  //_curveProxy->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
   _curveProxy->setAcceptedMouseButtons(Qt::LeftButton);
   _curveProxy->setFlag(QGraphicsItem::ItemIsMovable, false);
   _curveProxy->setFlag(QGraphicsItem::ItemIsFocusable, true);
@@ -398,6 +416,7 @@ BasicBox::init()
   _playing = false;
   _recording = true;
   _mute = false;
+  _loop = false;
   _low = false;
   _triggerPoints = new QMap<BoxExtremity, TriggerPoint*>();
   _comment = nullptr;
@@ -689,8 +708,9 @@ void BasicBox::disableCurveEdition()
     if(curve)
     {
         curve->setEnabled(false);
+		
+		_boxContentWidget->disabledCurveEdition();
     }
-    _boxContentWidget->disabledCurveEdition();
 }
 
 std::vector<std::string>
@@ -1395,7 +1415,6 @@ BasicBox::keyReleaseEvent(QKeyEvent *event)
 void
 BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-
   if (_startMenu != nullptr) {
       _startMenu->close();
     }
@@ -1457,20 +1476,41 @@ BasicBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void
 BasicBox::lower(bool state)
 {
-  _low = state;
-
-  if (_low) {
-      setZValue(-1);
-      setEnabled(false);
-      setOpacity(0.5);
-    }
-  else {
-      setOpacity(1);
-      setZValue(0);
-      setEnabled(true);
-    }
-  updateRelations(BOX_START);
-  updateRelations(BOX_END);
+	_low = state;
+	
+	if (_low) {
+		qDebug() << "Lowering box number" << ID();
+		auto map =  Maquette::getInstance()->parentBoxes();
+		auto parent_box_it = map.find(mother());
+		if(parent_box_it != map.end())
+		{
+			_currentZvalue = parent_box_it->second->zValue() - 15;
+			setZValue(_currentZvalue);
+		}
+		else
+		{
+			setZValue(-3);
+		}
+		setEnabled(false);
+		setOpacity(0.5);
+	}
+	else {
+		setOpacity(1);
+		auto map =  Maquette::getInstance()->parentBoxes();
+		auto parent_box_it = map.find(mother());
+		if(parent_box_it != map.end())
+		{
+			_currentZvalue = parent_box_it->second->zValue() + 15;
+			setZValue(_currentZvalue);
+		}
+		else
+		{
+			setZValue(0);
+		}
+		setEnabled(true);
+	}
+	updateRelations(BOX_START);
+	updateRelations(BOX_END);
 }
 
 QInputDialog *
@@ -1940,13 +1980,14 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     //Set disabled the curve proxy when box not selected.
     _boxContentWidget->setCurveLowerStyle(_comboBox->currentText().toStdString(),!isSelected());
 
-    //Showing stop button when playing
+    //Showing stop button when playing and loop button if looping
     if(_playing){
         _comboBoxProxy->setVisible(false);
         _startMenuButton->setVisible(false);
         _endMenuButton->setVisible(false);
         _stopButton->setVisible(true);
         _muteButton->setVisible(false);
+        _loopButton->setVisible(_loop);
     }
     else{
         setButtonsVisible(_hover || isSelected());
@@ -2015,7 +2056,7 @@ BasicBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 		painter->setPen(QPen(Qt::gray));
 
 		if(_hover || isSelected())
-            painter->drawText(QRectF(BOX_MARGIN * 2 + 17, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
+            painter->drawText(QRectF(BOX_MARGIN * 2 + 31, 0, textRect.width(), textRect.height()), Qt::AlignLeft, name());
         else
 			painter->drawText(QRectF(0, 0, textRect.width(), textRect.height()), Qt::AlignHCenter, name());
         painter->restore();
@@ -2080,6 +2121,12 @@ void BasicBox::toggleMuteButton(bool )
     setSelected(true);
 	_scene->muteBoxes();
     setSelected(false);
+}
+
+void BasicBox::changeLoopButton()
+{
+    _loop = !_loop;
+    _loopButton->setIcon(_loop? _loopOnIcon : _loopIcon);
 }
 
 void BasicBox::cleanupRelations()
@@ -2162,12 +2209,17 @@ BasicBox::setButtonsVisible(bool value)
     _playButton->setVisible((!_playing && value) && (width() > 3 * BOX_MARGIN));
     _stopButton->setVisible((_playing && value) && (width() > 3 * BOX_MARGIN));
     _muteButton->setVisible(value && (width() > 2 * BOX_MARGIN));
+	_loopButton->setVisible(value && (width() > 5 * BOX_MARGIN));
 
     if (_mute || _scene->playing()) {
         _startMenuButton->setVisible(false);
         _playButton->setVisible(false);
         _endMenuButton->setVisible(false);
         _muteButton->setVisible(true);
+    }
+    if (_loop)
+    {
+        _loopButton->setVisible(true);
     }
 }
 

@@ -122,11 +122,35 @@ Maquette::init()
 
 Maquette::Maquette() : _engines(nullptr)
 {
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(updateNamespaceTree()));
+    timer->start(200);
 }
 
 QList<std::string> Maquette::addressList()
 {
-    return _scene->editor()->networkTree()->getAddressList();
+	return _scene->editor()->networkTree()->getAddressList();
+}
+#include <BasicBox.hpp>
+
+void Maquette::loop(int boxid)
+{
+	if(_engines->isLoop(boxid))
+	{
+		if(_boxes[boxid]->hasTriggerPoint(BOX_END))
+		{
+			_boxes[boxid]->removeTriggerPoint(BOX_END);
+		}
+		_engines->disableLoop(boxid);
+	}
+	else
+	{
+		_engines->enableLoop(boxid);
+		if(!_boxes[boxid]->hasTriggerPoint(BOX_END))
+		{
+			_boxes[boxid]->addTriggerPoint(BOX_END);
+		}
+	}
 }
 
 Maquette::~Maquette()
@@ -210,104 +234,11 @@ Maquette::parentBoxes()
 }
 
 unsigned int
-Maquette::sequentialID()
+Maquette::nextBoxNumber()
 {
-  return _boxes.size();
-}
-/*
-void Maquette::addParentBoxToScene(unsigned int ID,
-                                   unsigned int mother,
-                                   ParentBox* newBox)
-{
-    if (mother != NO_ID && mother != ROOT_BOX_ID)
-    {
-        BoxesMap::iterator it;
-        if ((it = _boxes.find(mother)) != _boxes.end())
-        {
-            if (it->second->type() == PARENT_BOX_TYPE)
-            {
-                if(auto papa = dynamic_cast<ParentBox*>(it->second))
-                {
-                    newBox->setMother(mother);
-                    papa->addChild(ID);
-                }
-                else
-                {
-                    qDebug() << "ALERT : Trying to add a child to a non-parent." << Q_FUNC_INFO;
-                }
-            }
-            else
-            {
-                newBox->setMother(ROOT_BOX_ID);
-            }
-        }
-    }
+  return _engines->getNextTimeBoxId()-1; // -1 because the main scenario is at 1 so the first box is at 2
 }
 
-unsigned int Maquette::addParentBox(unsigned int ID,
-                                    const QPointF & corner1,
-                                    const QPointF & corner2,
-                                    const string & name,
-                                    unsigned int mother)
-{
-    vector<string> firstMsgs;
-    vector<string> lastMsgs;
-
-    _engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-    _engines->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
-
-
-    if (ID != NO_ID)
-    {
-        ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
-        newBox->setName(QString::fromStdString(name));
-
-        _boxes[ID] = newBox;
-        _parentBoxes[ID] = newBox;
-        newBox->setID(ID);
-
-        addParentBoxToScene(ID, mother, newBox);
-    }
-
-    return ID;
-}
-
-unsigned int Maquette::addParentBox(unsigned int ID,
-                                    const unsigned int date,
-                                    const unsigned int topLeftY,
-                                    const unsigned int sizeY,
-                                    const unsigned int duration,
-                                    const string & name,
-                                    unsigned int mother,
-                                    QColor color)
-{
-    QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
-    QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);
-
-    vector<string> firstMsgs;
-    vector<string> lastMsgs;
-
-    _engines->getCtrlPointMessagesToSend(ID, BEGIN_CONTROL_POINT_INDEX, firstMsgs);
-    _engines->getCtrlPointMessagesToSend(ID, END_CONTROL_POINT_INDEX, lastMsgs);
-
-
-    if (ID != NO_ID)
-    {
-        ParentBox *newBox = new ParentBox(corner1, corner2, _scene);
-
-        newBox->setName(QString::fromStdString(name));
-        newBox->setColor(color);
-
-        _boxes[ID] = newBox;
-        _parentBoxes[ID] = newBox;
-        newBox->setID(ID);
-
-        addParentBoxToScene(ID, mother, newBox);
-    }
-
-    return ID;
-}
-*/
 /// \todo change arguments named corner. this is not comprehensible. (par jaime Chao)
 unsigned int
 Maquette::addParentBox(const QPointF & corner1,
@@ -1343,7 +1274,7 @@ Maquette::updateBoxesFromEngines()
 
 int
 Maquette::addRelation(unsigned int ID1, BoxExtremity firstExtremum, unsigned int ID2,
-                      BoxExtremity secondExtremum, int antPostType)
+                      BoxExtremity secondExtremum)
 {
   if (ID1 == NO_ID || ID2 == NO_ID) {
       return ARGS_ERROR;
@@ -1369,8 +1300,7 @@ Maquette::addRelation(unsigned int ID1, BoxExtremity firstExtremum, unsigned int
       return NO_MODIFICATION;
     }
 
-  relationID = _engines->addTemporalRelation(ID1, controlPointID1, ID2, controlPointID2,
-                                             TemporalRelationType(antPostType), movedBoxes);
+  relationID = _engines->addTemporalRelation(ID1, controlPointID1, ID2, controlPointID2, movedBoxes);
 
   if (!_engines->isTemporalRelationExisting(ID1, controlPointID1, ID2, controlPointID2)) {
       return RETURN_ERROR;
@@ -1398,7 +1328,7 @@ int
 Maquette::addRelation(const AbstractRelation &abstract)
 {
   if (abstract.ID() == NO_ID) {
-      return addRelation(abstract.firstBox(), abstract.firstExtremity(), abstract.secondBox(), abstract.secondExtremity(), ANTPOST_ANTERIORITY);
+      return addRelation(abstract.firstBox(), abstract.firstExtremity(), abstract.secondBox(), abstract.secondExtremity());
     }
   else {
       Relation* newRel = new Relation(abstract.firstBox(), abstract.firstExtremity(), abstract.secondBox(), abstract.secondExtremity(), _scene);
@@ -1501,6 +1431,23 @@ unsigned int
 Maquette::getTimeOffset()
 {
     return _engines->getTimeOffset();
+}
+
+void
+Maquette::updateNamespaceTree()
+{
+    if (!updatedDevicesList.empty())
+    {
+        updatedDevicesList.sort([] (const TTSymbol& s1, const TTSymbol& s2) { return s1 < s2; });
+        updatedDevicesList.unique();
+        std::cerr << "Maquette::updateNamespaceTree ! " << std::endl;
+        auto tree = Maquette::getInstance()->scene()->editor()->networkTree();
+        for( std::list<TTSymbol>::iterator it = updatedDevicesList.begin(); it != updatedDevicesList.end(); ++it)
+        {
+            emit tree->deviceUpdated(tree->getItemFromAddress(it->c_str()), false);
+        }
+        updatedDevicesList.clear();
+    }
 }
 
 void
@@ -2170,9 +2117,7 @@ transportCallback(TTSymbol& transport, const TTValue& value)
 void
 deviceCallback(TTSymbol& deviceName)
 {
-	auto tree = Maquette::getInstance()->scene()->editor()->networkTree();
-    emit tree->deviceUpdated(tree->getItemFromAddress(deviceName.c_str()), false);
-    std::cerr << "Maquette::deviceCallback : " << deviceName.c_str() << std::endl;
+    updatedDevicesList.push_back(deviceName);
 }
 
 void

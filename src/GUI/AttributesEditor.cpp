@@ -266,6 +266,7 @@ AttributesEditor::connectSlots()
   // General
   connect(_generalColorButton, SIGNAL(clicked()), this, SLOT(changeColor()));
   connect(_boxName, SIGNAL(returnPressed()), this, SLOT(nameChanged()));
+  connect(_boxName, SIGNAL(textEdited(QString)), this, SLOT(removeForbiddenChar(QString)));
 
   connect(_networkTree, SIGNAL(startMessageValueChanged(QTreeWidgetItem *)), this, SLOT(startMessageChanged(QTreeWidgetItem *)));
   connect(_networkTree, SIGNAL(endMessageValueChanged(QTreeWidgetItem *)), this, SLOT(endMessageChanged(QTreeWidgetItem *)));
@@ -374,6 +375,20 @@ AttributesEditor::nameChanged()
       box->setName(_boxName->text());
       _scene->update(box->getTopLeft().x(), box->getTopLeft().y(), box->width(), box->height() + 10);
   }
+}
+
+void AttributesEditor::removeForbiddenChar(QString newName)
+{
+    if ( newName.indexOf("/") != -1 )
+    {
+        newName.remove(newName.indexOf("/"),1);
+        _boxName->setText(newName);
+    }
+    if ( newName.indexOf(":") != -1 )
+    {
+        newName.remove(newName.indexOf(":"),1);
+        _boxName->setText(newName);
+    }
 }
 
 void AttributesEditor::currentColorSelectionChanged(const QColor& color)
