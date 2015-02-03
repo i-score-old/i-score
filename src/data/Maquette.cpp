@@ -133,23 +133,32 @@ QList<std::string> Maquette::addressList()
 }
 #include <BasicBox.hpp>
 
-void Maquette::loop(int boxid)
+bool Maquette::getBoxLoopState(int boxid)
 {
-	if(_engines->isLoop(boxid))
-	{
-		if(_boxes[boxid]->hasTriggerPoint(BOX_END))
-		{
-			_boxes[boxid]->removeTriggerPoint(BOX_END);
-		}
-		_engines->disableLoop(boxid);
-	}
-	else
+	return _engines->isLoop(boxid);
+}
+
+void Maquette::setBoxLoopState(int boxid, bool loop)
+{
+    // filter repetitions
+    if (loop == getBoxLoopState(boxid))
+        return;
+    
+	if(loop)
 	{
 		_engines->enableLoop(boxid);
 		if(!_boxes[boxid]->hasTriggerPoint(BOX_END))
 		{
 			_boxes[boxid]->addTriggerPoint(BOX_END);
 		}
+	}
+	else
+	{
+        if(_boxes[boxid]->hasTriggerPoint(BOX_END))
+		{
+			_boxes[boxid]->removeTriggerPoint(BOX_END);
+		}
+		_engines->disableLoop(boxid);
 	}
 }
 
@@ -1771,7 +1780,7 @@ Maquette::load(const string &fileName)
         string                                      name;
         QColor                                      color;
         unsigned int                                date, duration, topLeftY, sizeY;        
-        bool                                        muteState;
+        bool                                        muteState, loopState;
         
         // get all boxes ID
         _engines->getBoxesId(boxesID);
@@ -1792,6 +1801,7 @@ Maquette::load(const string &fileName)
             color = _engines->getBoxColor(boxID);
             parentID = _engines->getParentId(boxID);
             muteState = _engines->getBoxMuteState(boxID);
+            loopState = _engines->isLoop(boxID);
             
             QPointF corner1(date / MaquetteScene::MS_PER_PIXEL, topLeftY);
             QPointF corner2((date + duration) / MaquetteScene::MS_PER_PIXEL, topLeftY + sizeY);           
@@ -1802,6 +1812,7 @@ Maquette::load(const string &fileName)
             newBox->setName(QString::fromStdString(name));
             newBox->setColor(color);
             newBox->setMuteState(muteState);
+            newBox->setLoopState(loopState);
 
             _boxes[boxID] = newBox;            
             _parentBoxes[boxID] = newBox;
