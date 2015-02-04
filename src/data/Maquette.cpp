@@ -147,14 +147,14 @@ void Maquette::setBoxLoopState(int boxid, bool loop)
 	if(loop)
 	{
 		_engines->enableLoop(boxid);
-		if(!_boxes[boxid]->hasTriggerPoint(BOX_END))
+		if(!_boxes[boxid]->hasTriggerPoint(BOX_END) && boxid != ROOT_BOX_ID)
 		{
 			_boxes[boxid]->addTriggerPoint(BOX_END);
 		}
 	}
 	else
 	{
-        if(_boxes[boxid]->hasTriggerPoint(BOX_END))
+        if(_boxes[boxid]->hasTriggerPoint(BOX_END) && boxid != ROOT_BOX_ID)
 		{
 			_boxes[boxid]->removeTriggerPoint(BOX_END);
 		}
