@@ -2263,10 +2263,30 @@ bool Engine::enableLoop(TimeBoxId boxId)
                 it->second->object = loop;
         }
     }
-    // for main scenario use a temporary attribute used to easily loop the whole sceanrio without creating an upper loop process
+    // for main scenario
     else
     {
-        m_mainScenario.set("loop", TTBoolean(YES));
+        // create a new loop time process and its events
+        TTObject mainLoopStart("TimeEvent");
+        TTObject mainLoopEnd("TimeEvent", 36000000);
+        TTValue args(mainLoopStart, mainLoopEnd);
+        TTObject mainLoop("Loop", args);
+        mainLoop.set("name", TTSymbol("mainLoop"));
+        mainLoop.set("rigid", true);
+        
+        // get main scenario start and end events to use them as pattern events
+        TTObject startEvent, endEvent;
+        m_mainScenario.get("startEvent", startEvent);
+        m_mainScenario.get("endEvent", endEvent);
+        
+        mainLoop.set("patternStartEvent", startEvent);
+        mainLoop.set("patternEndEvent", endEvent);
+        
+        // attach main scenario to the loop pattern
+        mainLoop.send("PatternAttach", m_mainScenario);
+        
+        // cache the loop
+        setLoop(boxId, mainLoop);
     }
 
     return true;
@@ -2317,10 +2337,17 @@ bool Engine::disableLoop(TimeBoxId boxId)
                 it->second->object = automation;
         }
     }
-    // for main scenario use a temporary attribute used to easily loop the whole sceanrio without creating an upper loop process
+    // for main scenario
     else
     {
-        m_mainScenario.set("loop", TTBoolean(NO));
+        TTObject mainLoop = getLoop(boxId);
+        
+        // detach main scenario from the loop pattern
+        mainLoop.send("PatternDetach", m_mainScenario);
+        
+        // uncache the loop
+        TTObject empty;
+        setLoop(boxId, empty);
     }
     
     return true;
@@ -2328,17 +2355,7 @@ bool Engine::disableLoop(TimeBoxId boxId)
 
 bool Engine::isLoop(TimeBoxId boxId)
 {
-    if (boxId != ROOT_BOX_ID)
-    {
-        return m_timeBoxMap[boxId]->loop.valid();
-    }
-    // for main scenario use a temporary attribute used to easily loop the whole sceanrio without creating an upper loop process
-    else
-    {
-        TTBoolean isLoop;
-        m_mainScenario.get("loop", isLoop);
-        return isLoop;
-    }
+    return m_timeBoxMap[boxId]->loop.valid();
 }
 
 void Engine::setViewZoom(QPointF zoom)
