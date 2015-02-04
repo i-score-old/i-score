@@ -970,7 +970,9 @@ class Maquette : public QTimer
 
     QList<string> addressList();
 
-	void loop(int boxid);
+    bool getBoxLoopState(int boxid);
+    void setBoxLoopState(int boxid, bool loop);
+    
   private:
     /*!
      * \brief Generates the triggerQueueList.

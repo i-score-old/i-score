@@ -68,6 +68,30 @@
 		466B9EA419338DCC00EC8460 /* TimeBarWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TimeBarWidget.cpp; sourceTree = "<group>"; };
 		466B9EA719338DCC00EC8460 /* TriggerPoint.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TriggerPoint.cpp; sourceTree = "<group>"; };
 		466B9EA919338DCC00EC8460 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		467F15821A80DB1D00DDC9D6 /* moc_AttributesEditor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_AttributesEditor.cpp; sourceTree = "<group>"; };
+		467F15831A80DB1D00DDC9D6 /* moc_BoxWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_BoxWidget.cpp; sourceTree = "<group>"; };
+		467F15841A80DB1D00DDC9D6 /* moc_ControlBoxContextMenu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_ControlBoxContextMenu.cpp; sourceTree = "<group>"; };
+		467F15851A80DB1E00DDC9D6 /* moc_CurvesComboBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_CurvesComboBox.cpp; sourceTree = "<group>"; };
+		467F15861A80DB1E00DDC9D6 /* moc_CurveWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_CurveWidget.cpp; sourceTree = "<group>"; };
+		467F15871A80DB1E00DDC9D6 /* moc_DeviceEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_DeviceEdit.cpp; sourceTree = "<group>"; };
+		467F15881A80DB1E00DDC9D6 /* moc_HeaderPanelWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_HeaderPanelWidget.cpp; sourceTree = "<group>"; };
+		467F15891A80DB1E00DDC9D6 /* moc_Help.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_Help.cpp; sourceTree = "<group>"; };
+		467F158A1A80DB1E00DDC9D6 /* moc_IScoreApplication.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_IScoreApplication.cpp; sourceTree = "<group>"; };
+		467F158B1A80DB1E00DDC9D6 /* moc_MainWindow.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_MainWindow.cpp; sourceTree = "<group>"; };
+		467F158C1A80DB1E00DDC9D6 /* moc_Maquette.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_Maquette.cpp; sourceTree = "<group>"; };
+		467F158D1A80DB1E00DDC9D6 /* moc_MaquetteScene.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_MaquetteScene.cpp; sourceTree = "<group>"; };
+		467F158E1A80DB1E00DDC9D6 /* moc_MaquetteView.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_MaquetteView.cpp; sourceTree = "<group>"; };
+		467F158F1A80DB1E00DDC9D6 /* moc_MaquetteWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_MaquetteWidget.cpp; sourceTree = "<group>"; };
+		467F15901A80DB1E00DDC9D6 /* moc_NetworkMessages.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_NetworkMessages.cpp; sourceTree = "<group>"; };
+		467F15911A80DB1E00DDC9D6 /* moc_NetworkTree.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_NetworkTree.cpp; sourceTree = "<group>"; };
+		467F15921A80DB1E00DDC9D6 /* moc_NetworkUpdater.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_NetworkUpdater.cpp; sourceTree = "<group>"; };
+		467F15931A80DB1E00DDC9D6 /* moc_PlayingThread.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_PlayingThread.cpp; sourceTree = "<group>"; };
+		467F15941A80DB1E00DDC9D6 /* moc_PreviewArea.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_PreviewArea.cpp; sourceTree = "<group>"; };
+		467F15951A80DB1E00DDC9D6 /* moc_RelationEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_RelationEdit.cpp; sourceTree = "<group>"; };
+		467F15961A80DB1E00DDC9D6 /* moc_SoundBoxContextMenu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_SoundBoxContextMenu.cpp; sourceTree = "<group>"; };
+		467F15971A80DB1E00DDC9D6 /* moc_TimeBarWidget.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_TimeBarWidget.cpp; sourceTree = "<group>"; };
+		467F15981A80DB1E00DDC9D6 /* moc_TriggerPointEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_TriggerPointEdit.cpp; sourceTree = "<group>"; };
+		467F15991A80DB1E00DDC9D6 /* moc_ViewRelations.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = moc_ViewRelations.cpp; sourceTree = "<group>"; };
 		46E974D01A41A09F00F7FDB1 /* TriggerPointEdit.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TriggerPointEdit.hpp; sourceTree = "<group>"; };
 		46E974D11A41A0AA00F7FDB1 /* TriggerPointEdit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TriggerPointEdit.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -79,6 +103,7 @@
 				466B9E3C19338DBC00EC8460 /* Makefile */,
 				466B9E3D19338DC700EC8460 /* headers */,
 				466B9E7919338DCC00EC8460 /* src */,
+				467F15811A80DB1D00DDC9D6 /* moc */,
 			);
 			sourceTree = "<group>";
 		};
@@ -188,6 +213,37 @@
 				46E974D11A41A0AA00F7FDB1 /* TriggerPointEdit.cpp */,
 			);
 			path = GUI;
+			sourceTree = "<group>";
+		};
+		467F15811A80DB1D00DDC9D6 /* moc */ = {
+			isa = PBXGroup;
+			children = (
+				467F15821A80DB1D00DDC9D6 /* moc_AttributesEditor.cpp */,
+				467F15831A80DB1D00DDC9D6 /* moc_BoxWidget.cpp */,
+				467F15841A80DB1D00DDC9D6 /* moc_ControlBoxContextMenu.cpp */,
+				467F15851A80DB1E00DDC9D6 /* moc_CurvesComboBox.cpp */,
+				467F15861A80DB1E00DDC9D6 /* moc_CurveWidget.cpp */,
+				467F15871A80DB1E00DDC9D6 /* moc_DeviceEdit.cpp */,
+				467F15881A80DB1E00DDC9D6 /* moc_HeaderPanelWidget.cpp */,
+				467F15891A80DB1E00DDC9D6 /* moc_Help.cpp */,
+				467F158A1A80DB1E00DDC9D6 /* moc_IScoreApplication.cpp */,
+				467F158B1A80DB1E00DDC9D6 /* moc_MainWindow.cpp */,
+				467F158C1A80DB1E00DDC9D6 /* moc_Maquette.cpp */,
+				467F158D1A80DB1E00DDC9D6 /* moc_MaquetteScene.cpp */,
+				467F158E1A80DB1E00DDC9D6 /* moc_MaquetteView.cpp */,
+				467F158F1A80DB1E00DDC9D6 /* moc_MaquetteWidget.cpp */,
+				467F15901A80DB1E00DDC9D6 /* moc_NetworkMessages.cpp */,
+				467F15911A80DB1E00DDC9D6 /* moc_NetworkTree.cpp */,
+				467F15921A80DB1E00DDC9D6 /* moc_NetworkUpdater.cpp */,
+				467F15931A80DB1E00DDC9D6 /* moc_PlayingThread.cpp */,
+				467F15941A80DB1E00DDC9D6 /* moc_PreviewArea.cpp */,
+				467F15951A80DB1E00DDC9D6 /* moc_RelationEdit.cpp */,
+				467F15961A80DB1E00DDC9D6 /* moc_SoundBoxContextMenu.cpp */,
+				467F15971A80DB1E00DDC9D6 /* moc_TimeBarWidget.cpp */,
+				467F15981A80DB1E00DDC9D6 /* moc_TriggerPointEdit.cpp */,
+				467F15991A80DB1E00DDC9D6 /* moc_ViewRelations.cpp */,
+			);
+			path = moc;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
