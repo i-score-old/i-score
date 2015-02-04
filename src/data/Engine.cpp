@@ -4019,7 +4019,7 @@ void TimeConditionReadyAttributeCallback(const TTValue& baton, const TTValue& va
 
 void AutomationStartCallback(const TTValue& baton, const TTValue& /*value*/)
 {
-    EnginePtr       engine;
+    EnginePtr   engine;
     TimeBoxId   boxId;
 	
 	// unpack baton (engine, boxId)
@@ -4027,7 +4027,7 @@ void AutomationStartCallback(const TTValue& baton, const TTValue& /*value*/)
     boxId = TTUInt32(baton[1]);
     
     iscoreEngineDebug 
-        TTLogMessage("Box %ld starts at %ld ms\n", boxId, engine->getCurrentExecutionDate());
+        TTLogMessage("Box %ld starts at %ld ms\n", boxId-1, engine->getCurrentExecutionDate());
         
     if (engine->m_TimeProcessSchedulerRunningAttributeCallback != nullptr)
         engine->m_TimeProcessSchedulerRunningAttributeCallback(boxId, YES);
@@ -4044,7 +4044,7 @@ void AutomationEndCallback(const TTValue& baton, const TTValue& /*value*/)
     boxId = TTUInt32(baton[1]);
     
     iscoreEngineDebug
-        TTLogMessage("Box %ld ends at %ld ms\n", boxId, engine->getCurrentExecutionDate());
+        TTLogMessage("Box %ld ends at %ld ms\n", boxId-1, engine->getCurrentExecutionDate());
     
     // update all process running state too
     if (engine->m_TimeProcessSchedulerRunningAttributeCallback != nullptr)
