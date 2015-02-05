@@ -58,6 +58,7 @@
 #include <QString>
 #include <QMenu>
 #include <QInputMethodEvent>
+#include <QDebug>
 using std::string;
 
 const float TriggerPoint::WIDTH = BasicBox::TRIGGER_ZONE_WIDTH;
@@ -103,7 +104,7 @@ TriggerPoint::init()
   setFlag(QGraphicsItem::ItemIsFocusable, true);
   setFlag(QGraphicsItem::ItemIsMovable, false);
   setVisible(true);
-  setZValue(1);
+  setZValue(1000);
 
   _edit = new TriggerPointEdit(_abstract);
 }
