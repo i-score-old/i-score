@@ -39,6 +39,7 @@ class HeaderPanelWidget : public QWidget {
     void play();
     void stop();
     void rewind();
+    void loop();
     void accelerationValueModified(int value);
     void accelerationValueEntered(double value);
 
@@ -56,6 +57,8 @@ class HeaderPanelWidget : public QWidget {
     QAction *_playAction;
     QAction *_stopAction;
     QAction *_rewindAction;
+    QAction *_setLoopAction;
+    QAction *_unsetLoopAction;
 
     LogarithmicSlider *_accelerationSlider;
     QDoubleSpinBox *_accelerationDisplay;
