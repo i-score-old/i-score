@@ -12,7 +12,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if(NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE Release)
+	set(CMAKE_BUILD_TYPE Debug)
 endif()
 
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets Network Xml Svg PrintSupport)
@@ -28,18 +28,17 @@ add_definitions(-DTT_NO_DSP)
 if(UNIX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-unused-parameter -Wno-deprecated-register  -Wno-deprecated-declarations -Wno-unknown-pragmas -Wno-conversion")
 	include_directories("/usr/include/libxml2")
-	
+
 	if(APPLE)
 		set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR})
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.7 -stdlib=libc++")
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++")
 	else()
 	endif()
-	
+
 #	set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-	
+
 elseif(WIN32)
-	add_definitions(-DQ_COMPILER_INITIALIZER_LISTS)
 	add_definitions(-DNOMINMAX)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 	include_directories("C:\\Program Files (x86)\\GnuWin32\\include")
@@ -146,7 +145,7 @@ add_executable(i-score WIN32 MACOSX_BUNDLE
 			${PROJECT_HDRS}
 			${i-score_RESOURCES_RCC}
 			"${CMAKE_CURRENT_SOURCE_DIR}/resources/images/i-score.icns")
-			
+
 if(APPLE)
 	set_target_properties(i-score PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist")
 	set_target_properties(i-score PROPERTIES MACOSX_BUNDLE_ICON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/resources/images/i-score.icns")
@@ -164,9 +163,9 @@ if(WIN32)
 	FILE(TO_CMAKE_PATH ${JAMOMA_LIB_FOLDER_WIN32} JAMOMA_LIB_FOLDER)
 endif()
 
-target_link_libraries(i-score Jamoma::Foundation 
-							  Jamoma::Modular 
-							  Jamoma::Score 
+target_link_libraries(i-score Jamoma::Foundation
+							  Jamoma::Modular
+							  Jamoma::Score
 							  Qt5::Core
 							  Qt5::Gui
 							  Qt5::Svg
@@ -205,17 +204,17 @@ if(WIN32)
 	# Qt stuff
 	if(CMAKE_BUILD_TYPE MATCHES Debug)
 		get_target_property(QtWinPlugin Qt5::QWindowsIntegrationPlugin LOCATION_Debug)
-		file(TO_CMAKE_PATH "C:\\Qt\\Qt5.3.1\\5.3\\msvc2013\\bin\\libEGLd.dll" LIBEGL_DLL)
+		file(TO_CMAKE_PATH "C:\\Qt\\5.3\\msvc2013\\bin\\libEGLd.dll" LIBEGL_DLL)
 	elseif(CMAKE_BUILD_TYPE MATCHES Release)
 		get_target_property(QtWinPlugin Qt5::QWindowsIntegrationPlugin LOCATION)
-		file(TO_CMAKE_PATH "C:\\Qt\\Qt5.3.1\\5.3\\msvc2013\\bin\\libEGL.dll" LIBEGL_DLL)
+		file(TO_CMAKE_PATH "C:\\Qt\\5.3\\msvc2013\\bin\\libEGL.dll" LIBEGL_DLL)
 	endif()
 
 	install(FILES "${QtWinPlugin}" DESTINATION "${plugin_dest_dir}/platforms" COMPONENT Runtime)
 	install(FILES ${LIBEGL_DLL} DESTINATION bin COMPONENT Runtime)
 
 	# Libraries
-	file(TO_CMAKE_PATH "C:\\Qt\\Qt5.3.1\\5.3\\msvc2013\\bin" QT_FOLDER)
+	file(TO_CMAKE_PATH "C:\\Qt\\5.3\\msvc2013\\bin" QT_FOLDER)
 	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\libxml2-2.7.8.win32\\bin" LIBXML_FOLDER)
 	# Fuck this
 	file(TO_CMAKE_PATH "W:\\OSSIA_win\\Jamoma\\Core\\Foundation\\library\\libiconv\\bin" LIBICONV_FOLDER)
@@ -234,16 +233,16 @@ if(WIN32)
 	# Jamoma extensions
 	file(TO_CMAKE_PATH "C:\\Program Files (x86)\\JamomaCore 0.6-dev\\lib\\jamoma" JAMOMA_EXTENSIONS_FOLDER)
 	set(JAMOMA_EXTENSIONS
-		"${JAMOMA_EXTENSIONS_FOLDER}/Scenario.ttdll" 
-		"${JAMOMA_EXTENSIONS_FOLDER}/Automation.ttdll" 
-		"${JAMOMA_EXTENSIONS_FOLDER}/Interval.ttdll" 
-		"${JAMOMA_EXTENSIONS_FOLDER}/OSC.ttdll" 
-		"${JAMOMA_EXTENSIONS_FOLDER}/Minuit.ttdll" 
-		"${JAMOMA_EXTENSIONS_FOLDER}/MIDI.ttdll" 
-		"${JAMOMA_EXTENSIONS_FOLDER}/AnalysisLib.ttdll" 
-		"${JAMOMA_EXTENSIONS_FOLDER}/DataspaceLib.ttdll" 
-		"${JAMOMA_EXTENSIONS_FOLDER}/FunctionLib.ttdll" 
-		"${JAMOMA_EXTENSIONS_FOLDER}/System.ttdll" 
+		"${JAMOMA_EXTENSIONS_FOLDER}/Scenario.ttdll"
+		"${JAMOMA_EXTENSIONS_FOLDER}/Automation.ttdll"
+		"${JAMOMA_EXTENSIONS_FOLDER}/Interval.ttdll"
+		"${JAMOMA_EXTENSIONS_FOLDER}/OSC.ttdll"
+		"${JAMOMA_EXTENSIONS_FOLDER}/Minuit.ttdll"
+		"${JAMOMA_EXTENSIONS_FOLDER}/MIDI.ttdll"
+		"${JAMOMA_EXTENSIONS_FOLDER}/AnalysisLib.ttdll"
+		"${JAMOMA_EXTENSIONS_FOLDER}/DataspaceLib.ttdll"
+		"${JAMOMA_EXTENSIONS_FOLDER}/FunctionLib.ttdll"
+		"${JAMOMA_EXTENSIONS_FOLDER}/System.ttdll"
 		"${JAMOMA_EXTENSIONS_FOLDER}/NetworkLib.ttdll")
 
 	install(FILES ${JAMOMA_EXTENSIONS}
@@ -318,7 +317,7 @@ if(UNIX)
 			DESTINATION .)
 		install(DIRECTORY installer_data/Licenses
 			DESTINATION .)
-			
+
 		install(CODE "execute_process(COMMAND ${CMAKE_SOURCE_DIR}/deploy_osx.sh)")
 	else()
 		# Debian... Others will come.
@@ -351,7 +350,7 @@ elseif(WIN32)
 			"
 		)
 	set(CPACK_PACKAGE_EXECUTABLES "i-score;i-score")
-	
+
 	set(CPACK_NSIS_CONTACT "i-score-devs@lists.sourceforge.net")
 	set(CPACK_COMPONENTS_ALL i-score)
 	set ( CPACK_PACKAGE_VERSION "0.2.3" )
@@ -360,21 +359,21 @@ elseif(WIN32)
 	set(CPACK_NSIS_MUI_ICON  "${CMAKE_SOURCE_DIR}/resources/windows/i-score.ico")
 	set(CPACK_NSIS_MUI_UNIICON  "${CMAKE_SOURCE_DIR}/resources/windows/i-score.ico")
 	#set(CPACK_PACKAGE_ICON  "${CMAKE_SOURCE_DIR}/resources/windows/i-score.ico")
-	
-    set(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.i-score.org")
-    set(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.i-score.org")
-	
+
+	set(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.i-score.org")
+	set(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.i-score.org")
+
 	set(CPACK_NSIS_COMPRESSOR "/SOLID lzma")
-	set(CPACK_NSIS_MENU_LINKS 
+	set(CPACK_NSIS_MENU_LINKS
 			"examples" "Examples"
 			"documentation" "Documentation"
 			"Licenses" "Licenses"
 			"http://www.i-score.org" "i-score website"
 			)
-			
+
 	set(CPACK_NSIS_MODIFY_PATH "ON")
 	set(CPACK_CREATE_DESKTOP_LINKS i-score)
-	
+
 	install(DIRECTORY installer_data/examples
 			DESTINATION .)
 	install(DIRECTORY installer_data/documentation
