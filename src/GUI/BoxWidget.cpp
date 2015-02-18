@@ -580,7 +580,7 @@ BoxWidget::stop()
 void
 BoxWidget::loop()
 {
-	Maquette::getInstance()->loop(_boxID);
+	Maquette::getInstance()->setBoxLoopState(_boxID, !Maquette::getInstance()->getBoxLoopState(_boxID));
 }
 
 void
