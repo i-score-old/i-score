@@ -626,6 +626,7 @@ class BasicBox : public QGraphicsObject
     void select();
     void setRecMode(bool activated);
     void setMuteState(bool activated);
+    void setLoopState(bool loop);
     bool recording(){return _recording;}
     bool getMuteState(){return _mute;}
     bool isConditioned(){return !_conditionalRelation.isEmpty();}

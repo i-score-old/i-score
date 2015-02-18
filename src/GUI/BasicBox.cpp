@@ -289,7 +289,7 @@ BasicBox::createMenus()
   connect(_endMenuButton, SIGNAL(customContextMenuRequested(QPoint)), _boxContentWidget, SLOT(displayEndMenu(QPoint)));
   connect(_playButton, SIGNAL(clicked()), _boxContentWidget, SLOT(play()));
   connect(_stopButton, SIGNAL(clicked()), _boxContentWidget, SLOT(stop()));
-  connect(_loopButton, SIGNAL(clicked()), _boxContentWidget, SLOT(loop()));
+  //connect(_loopButton, SIGNAL(clicked()), _boxContentWidget, SLOT(loop()));
   connect(_loopButton, &QPushButton::clicked,
           this,        &BasicBox::changeLoopButton);
   connect(_muteButton, &QPushButton::toggled, 
@@ -2125,8 +2125,18 @@ void BasicBox::toggleMuteButton(bool )
 
 void BasicBox::changeLoopButton()
 {
-    _loop = !_loop;
-    _loopButton->setIcon(_loop? _loopOnIcon : _loopIcon);
+    setLoopState(!_loop);
+}
+
+void BasicBox::setLoopState(bool loop)
+{
+    _loop = loop;
+    Maquette::getInstance()->setBoxLoopState(ID(), _loop);
+	
+	_loopButton->setIcon(_loop? _loopOnIcon : _loopIcon);
+    _loopButton->setVisible(!_loop);
+    
+    update();
 }
 
 void BasicBox::cleanupRelations()
@@ -2217,7 +2227,7 @@ BasicBox::setButtonsVisible(bool value)
         _endMenuButton->setVisible(false);
         _muteButton->setVisible(true);
     }
-    if (_loop)
+    if (_loop || _scene->playing())
     {
         _loopButton->setVisible(true);
     }
