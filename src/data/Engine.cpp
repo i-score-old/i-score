@@ -185,38 +185,6 @@ void Engine::registerIscoreToProtocols()
 		TTLogError("Error : could not instantiate OSC protocol: ");
 		TTLogError(e.getReason());
 	}
-    
-    TTLogMessage("\n*** Enable MIDI communication ***\n");
-    ////////////////////////////////////////////////////////////////////////
-    
-    // create a OSC protocol unit
-	try 
-	{
-	    err = m_applicationManager.send("ProtocolInstantiate", "MIDI", out);
-    
-	    if (err) {
-	        TTLogError("Error : can't create MIDI protocol unit \n");
-	        return;
-	    }
-	    
-	    aProtocol = out[0];
-    
-	    // launch Minuit protocol communication
-    	err = aProtocol.send("Run", none, out);
-    
-    	if (err) {
-        	out.toString();
-        	TTSymbol errorInfo = TTSymbol(TTString(out[0]));
-        	m_NetworkDeviceConnectionError(iscore, errorInfo);
-    	}
-		
-		m_workingProtocols.push_back("MIDI");
-	}
-	catch(TTException& e)
-	{
-		TTLogError("Error : could not instantiate MIDI protocol: ");
-		TTLogError(e.getReason());
-	}
 }
 
 void Engine::initScore(const char* pathToTheJamomaFolder)
